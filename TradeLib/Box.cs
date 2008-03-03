@@ -214,5 +214,32 @@ namespace TradeLib
         protected int Half { get { return -1 * Norm2Min(PosSize / 2); } }
         [BrowsableAttribute(false)]
         protected virtual int TakeProfitSize { get { return Half; } }
+
+
+        public static Box FromDLL(string boxname, string dllname,NewsService ns)
+        {
+            System.Reflection.Assembly a;
+            Type type;
+            object[] args;
+            Box mybox = new Box(ns);
+            try
+            {
+                a = System.Reflection.Assembly.LoadFrom(dllname);
+            }
+            catch (Exception ex) { ns.newNews(ex.Message); return mybox; }
+            try
+            {
+                type = a.GetType(boxname, true, true);
+            }
+            catch (Exception ex) { ns.newNews(ex.Message); return mybox; } 
+            args = new object[] {ns};
+            try
+            {
+                mybox = (Box)Activator.CreateInstance(type,args);
+            }
+            catch (Exception ex) { ns.newNews(ex.Message); return mybox; }
+            mybox.FullName = boxname;
+            return mybox;
+        }
     }
 }
