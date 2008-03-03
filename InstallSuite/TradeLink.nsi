@@ -37,7 +37,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\Quotopia.lnk" "$INSTDIR\Quotopia.exe" "" "$INSTDIR\Quotopia.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Gauntlet.lnk" "$INSTDIR\Gauntlet.exe" "" "$INSTDIR\Gauntlet.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Chartographer.lnk" "$INSTDIR\Chartographer.exe" "" "$INSTDIR\Chartographer.exe" 0
-  CreateShortCut "$SMPROGRAMS\TradeLink\Replay.lnk" "$INSTDIR\TLReplay.exe" "" ""$INSTDIR\TLReplay.exe" 0
+  CreateShortCut "$SMPROGRAMS\TradeLink\Replay.lnk" "$INSTDIR\TLReplay.exe" "" "$INSTDIR\TLReplay.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Time and Sales.lnk" "$INSTDIR\TimeSales.exe" "" "$INSTDIR\TimeSales.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Uninstall TradeLink.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Epf-To-Idx.lnk" "$INSTDIR\EPF2IDX.EXE" "" "$INSTDIR\EPF2IDX.EXE" 0  
@@ -52,7 +52,6 @@ Section "TradeLinkSuite"
   File "TradeLib.dll"
   File "Gauntlet.exe"
   File "Gauntlet.exe.config"
-  File "CommandPrompt.dll"
   File "EarlyClose.csv"
   File "Chartographer.exe.config"
   File "Chartographer.exe"

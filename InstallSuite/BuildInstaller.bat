@@ -13,12 +13,12 @@ echo If you receive errors, please make sure you have compiled
 echo all the applets in RELEASE mode (not debug mode).
 echo.
 echo.
-echo Press any key to continue, or Ctrl+Break to quit...
+echo Press Ctrl+Break to quit.
 pause
 cls
 echo.
 echo Removing last installer...
-del TradeLink.exe
+del TradeLinkSuite.exe
 echo.
 echo Copying latest releases...
 echo.
@@ -31,9 +31,10 @@ echo REPLAY
 xcopy /q /y ..\Replay\bin\Release\TLReplay.exe* .
 echo QUOTOPIA
 xcopy /q /y ..\Quotopia\bin\Release\Quotopia.exe* .
+xcopy /q /i /y ..\Quotopia\bin\Release\Properties .\Properties
 echo GAUNTLET
 xcopy /q /y ..\Gauntlet\bin\Release\Gauntlet.exe* .
-echo TIME&SALES
+echo TIME and SALES
 xcopy /q /y ..\TimeAndSales\bin\Release\TimeSales.exe* .
 echo SPLITEPF
 xcopy /q /y ..\SplitEPF\bin\Release\SplitEPF.exe .
@@ -42,23 +43,39 @@ xcopy /q /y ..\EPF2IDX\bin\Release\EPF2IDX.exe .
 echo CHARTOGRAPHER
 xcopy /q /y ..\Chartographer\bin\Release\Chartographer.exe* .
 echo.
-echo Press enter to push this release to website...
-pause
-echo.
 
 
-echo Checking for NSIS
-if not exist c:\progra~1\nsis\makensis.exe (
+echo Checking for NSIS...
+if not exist "c:\progra~1\nsis\makensis.exe" (
 echo You must install NSIS to build an installer...
 echo http://nsis.sourceforge.net
 echo.
 echo Build failed.
 echo.
 goto :eof
+) else ( 
+echo NSIS found, building installer... 
 )
 
 echo Building TradeLink executable...
 c:\progra~1\nsis\makensis.exe /v1 TradeLink.nsi
 echo Build complete.
+echo.
+
+if exist TradeLinkSuite.exe (
+ren TradeLinkSuite.exe TLS.tmp
+echo Removing working releases...
+del *.exe
+del *.config
+del EarlyClose.csv
+del *.dll
+del /s /f /q Properties
+rmdir properties
+ren TLS.tmp TradeLinkSuite.exe
+echo.
 echo Run TradeLinkSuite.exe to install
+) else (
+echo Installer not found, please see error messages above...
+)
+
 echo.
