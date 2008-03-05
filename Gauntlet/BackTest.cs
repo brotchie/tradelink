@@ -203,11 +203,11 @@ namespace WinGauntlet
                     if (this.USEBOX)
                     {
                         // execute any pending orders on this tick
-                        if (mybroker.Orders.Count>0) fills += mybroker.Execute(tick); 
+                        if (mybroker.GetOrderList().Count>0) fills += mybroker.Execute(tick); 
                         // trade box on this tick, if he generates any orders then send them
                         mybroker.sendOrder(mybox.Trade(tick, bl, mybroker.GetOpenPosition(this.symbol),bi));
                         // quit early if box shuts itself off and no pending orders
-                        if (mybox.Off && (mybroker.Orders.Count == 0)) break;
+                        if (mybox.Off && (mybroker.GetOrderList().Count== 0)) break;
                     }
 
                     if (this.delay != 0)

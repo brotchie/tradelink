@@ -79,20 +79,12 @@ namespace TradeLib
             f.Close();
             return h; 
         }
-        public static string Fills2StringDelim(Hashtable fills,string d)
+        public static string Fills2StringDelim(List<Trade> stocktrades,string d)
         { // works on a queue of Trade objects
             string csv = "";
-            IEnumerator e = fills.GetEnumerator();
-            while (e.MoveNext())
-            {
-                DictionaryEntry dict = (DictionaryEntry)e.Current;
-                Queue stocktrades = (Queue)fills[dict.Key];
-                foreach (object o in stocktrades)
-                {
-                    Trade t = (Trade)o;
-                    csv += t + "\n";
-                }
-            }
+
+            foreach (Trade t in stocktrades)
+                csv += t + Environment.NewLine;
             return csv;
         }
         public static void String2FileAppend(string s, string filepath)

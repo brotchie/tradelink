@@ -229,9 +229,9 @@ namespace WinGauntlet
         {
             if (ordersinwind.Checked)
             {
-                for (int i = 0; i < bt.mybroker.Orders.Count; i++)
+                for (int i = 0; i < bt.mybroker.GetOrderList().Count; i++)
                 {
-                    Order o = bt.mybroker.Orders[i];
+                    Order o = bt.mybroker.GetOrderList()[i];
                     orders.Rows.Add(Util.ToDateTime(o.date).ToString("yyyy/MM/dd"), Util.ToDateTime(o.time, 0).ToString("HH:mm:ss"), o.symbol, o.isMarket ? "Mkt" : (o.isStop ? "Stp" : "Lmt"), o.size, o.side ? "BUY" : "SELL", o.isStop ? o.stopp.ToString("N2") : o.price.ToString("N2"), o.comment);
                 }
                 orders.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
@@ -239,20 +239,20 @@ namespace WinGauntlet
             }
             if (tradesinwind.Checked)
             {
-                for (int i = 0; i < bt.mybroker.FillList.Count; i++)
+                for (int i = 0; i < bt.mybroker.GetTradeList().Count; i++)
                 {
-                    Trade t = bt.mybroker.FillList[i];
+                    Trade t = bt.mybroker.GetTradeList()[i];
                     trades.Rows.Add(Util.ToDateTime(t.xdate).ToString("yyyy/MM/dd"), Util.ToDateTime(t.xtime,t.xsec).ToString("HH:mm:ss"), t.symbol, t.xsize, t.side ? "BUY" : "SELL", t.xprice.ToString("N2"), t.comment);
                 }
                 trades.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
             }
             if (tradesincsv.Checked)
-                Util.String2FileAppend(Util.Fills2StringDelim(bt.mybroker.Fills,","),Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)+"\\Gauntlet.Trades."+bt.name+".csv");
+                Util.String2FileAppend(Util.Fills2StringDelim(bt.mybroker.GetTradeList(),","),Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)+"\\Gauntlet.Trades."+bt.name+".csv");
             if (ordersincsv.Checked)
             {
                 StreamWriter sw = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Orders." + bt.name + ".csv", false);
-                for (int i = 0; i < bt.mybroker.Orders.Count; i++)
-                    sw.WriteLine(bt.mybroker.Orders[i].TLmsg());
+                for (int i = 0; i < bt.mybroker.GetOrderList().Count; i++)
+                    sw.WriteLine(bt.mybroker.GetOrderList()[i].TLmsg());
                 sw.Close();
             }
 

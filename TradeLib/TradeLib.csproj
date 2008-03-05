@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Account.cs" />
     <Compile Include="Bar.cs" />
     <Compile Include="BarLink.cs" />
     <Compile Include="BarList.cs" />

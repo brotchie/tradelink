@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections;
-using System.Text;
 using TradeLib;
 
 namespace TradeLib
@@ -11,44 +9,59 @@ namespace TradeLib
     {
         public event OrderDelegate GotOrder;
         public event FillDelegate GotFill;
-        public Broker() { }
-        public int slippage = 0; // not used presently
-        public List<Order> Orders = new List<Order>();
-        public Hashtable Fills = new Hashtable();
-        public List<Trade> FillList = new List<Trade>();
-        public virtual Boolean sendOrder(Order o)
+        public Broker() 
+        { 
+            MasterOrders.Add(DEFAULT, new List<Order>()); 
+            MasterTrades.Add(DEFAULT,new List<Trade>());
+        }
+        protected Account DEFAULT = new Account("DEFAULT","Defacto account when account not provided");
+        protected Dictionary<Account, List<Order>> MasterOrders = new Dictionary<Account, List<Order>>();
+        protected Dictionary<Account, List<Trade>> MasterTrades = new Dictionary<Account, List<Trade>>();
+        protected List<Order> Orders { get { return MasterOrders[DEFAULT]; } set { MasterOrders[DEFAULT] = value; } }
+        protected List<Trade> FillList { get { return MasterTrades[DEFAULT]; } set { MasterTrades[DEFAULT] = value; } } 
+        protected void AddOrder(Order o,Account a) 
+        { 
+            if (!MasterOrders.ContainsKey(a)) 
+                MasterOrders.Add(a,new List<Order>());
+            o.accountid = a.ID;
+            MasterOrders[a].Add(o);
+        }
+        public bool sendOrder(Order o) { return sendOrder(o, DEFAULT); }
+        public bool sendOrder(Order o,Account a)
         {
             if (!o.isValid) return false;
-            Orders.Add(o);
+            if (!a.isValid) return false;
+            AddOrder(o, a);
             if (GotOrder != null) GotOrder(o);
             return true;
         }
         public int Execute(Tick tick)
         {
             if (!tick.isTrade) return 0;
+            int availablesize = (int)Math.Abs(tick.size);
             int max = this.Orders.Count;
             int filledorders = 0;
-            for (int i = 0; i < Orders.Count; i++)
-            {
-                Order o = Orders[i];
-                int size = tick.size;
-                if (tick.sym!=o.symbol) continue; //make sure tick is for the right stock
-                int mysize = (int)Math.Abs(o.size);
-                if (((mysize<= size) && (o.price == 0) && (o.stopp == 0)) || //market order
-                    (o.side && (mysize<=size) && (tick.trade <= o.price) && (o.stopp == 0)) || // buy limit
-                    (!o.side && (mysize<=size)&&(tick.trade >= o.price) && (o.stopp == 0)) || //sell limit
-                    (o.side && (mysize<=size) && (tick.trade >= o.stopp) && (o.price == 0)) || // buy stop
-                    (!o.side && (mysize<=size) && (tick.trade <= o.stopp) && (o.price == 0))) // sell stop
-                { // sort filled trades by symbol
-                    Orders.RemoveAt(i); // remove it from order list
-                    if (!this.Fills.Contains(o.symbol)) this.Fills.Add(o.symbol, new Queue());
-                    o.Fill(tick); // fill our trade
-                    if (GotFill != null) GotFill((Trade)o);
-                    Queue q = (Queue)this.Fills[o.symbol]; // pull our queue from hash
-                    q.Enqueue((Trade)o); // cast our order to a trade and queue it
-                    this.Fills[o.symbol] = q; // put queue back on the hashtable
-                    this.FillList.Add((Trade)o); // save another copy on linear table
-                    filledorders++; // count the trade
+            foreach (Account a in MasterOrders.Keys)
+            { // go through each account
+                for (int i = 0; i < MasterOrders[a].Count; i++)
+                { // go through each order
+                    Order o = MasterOrders[a][i];
+                    if (tick.sym != o.symbol) continue; //make sure tick is for the right stock
+                    int mysize = (int)Math.Abs(o.size);
+                    if (((mysize <= availablesize) && (o.price == 0) && (o.stopp == 0)) || //market order
+                        (o.side && (mysize <= availablesize) && (tick.trade <= o.price) && (o.stopp == 0)) || // buy limit
+                        (!o.side && (mysize <= availablesize) && (tick.trade >= o.price) && (o.stopp == 0)) || //sell limit
+                        (o.side && (mysize <= availablesize) && (tick.trade >= o.stopp) && (o.price == 0)) || // buy stop
+                        (!o.side && (mysize <= availablesize) && (tick.trade <= o.stopp) && (o.price == 0))) // sell stop
+                    { // sort filled trades by symbol
+                        MasterOrders[a].RemoveAt(i);
+                        if (!MasterTrades.ContainsKey(a)) MasterTrades.Add(a, new List<Trade>());
+                        o.Fill(tick); // fill our trade
+                        availablesize -= mysize; // don't let other trades fill on same tick
+                        if (GotFill != null) GotFill((Trade)o); // notify subscribers
+                        MasterTrades[a].Add((Trade)o);
+                        filledorders++; // count the trade
+                    }
                 }
             }
             return filledorders;
@@ -56,127 +69,29 @@ namespace TradeLib
 
         public void Reset()
         {
-            this.Orders.Clear();
-            this.Fills.Clear();
+            MasterOrders.Clear();
+            MasterTrades.Clear();
         }
-        public void CancelOrders() { this.Orders.Clear(); }
+        public void CancelOrders() { CancelOrders(DEFAULT); }
+        public void CancelOrders(Account a) { MasterOrders[a].Clear(); }
+        public List<Trade> GetTradeList(Account a) { return MasterTrades[a]; }
+        public List<Order> GetOrderList(Account a) { return MasterOrders[a]; }
+        public List<Trade> GetTradeList() { return GetTradeList(DEFAULT); }
+        public List<Order> GetOrderList() { return GetOrderList(DEFAULT); }
 
-        public Queue GetRoundTurns(string symbol)
-        { //gets all closed trades given a symbol
-            Queue RT = new Queue();
-            Trade t;
-            int size = 0;
-            Queue OT = (Queue)this.Fills[symbol];
-            foreach (object o in OT)
-            {
-                t = (Trade)o;
-                int oldsize = size;
-                if (t.side) size += t.xsize;
-                else size -= t.xsize;
-                if ((oldsize != 0) && (size == 0)) RT.Enqueue(t); // save roundturns
-            }
-            return RT;
-        }
-
-        public Queue GetOpenTrades(string symbol)
-        { // gets all unclosed trades given a symbol
-            Queue RT = new Queue();
-            int size = 0;
-            if (!this.Fills.ContainsKey(symbol)) return null;
-            Queue OT = (Queue)this.Fills[symbol];
-            int totfills = OT.Count;
-            for (int i = 0; i<totfills; i++)            
-            {
-                Trade t = (Trade)OT.Dequeue();
-                int oldsize = size;
-                if (t.side) size += t.xsize;
-                else size -= t.xsize;
-                if ((oldsize != 0) && (size == 0)) RT.Enqueue(t); // save roundturns
-                else OT.Enqueue(t);
-            } 
-            return OT;
-        }
-
-        public Position GetOpenPosition(string symbol)
+        public Position GetOpenPosition(string symbol) { return GetOpenPosition(symbol, DEFAULT); }
+        public Position GetOpenPosition(string symbol,Account a)
         {
             Position pos = new Position(symbol);
-            if (!Fills.ContainsKey(symbol)) return pos;
-            Queue OT = (Queue)Fills[symbol];
-            if (OT == null) return pos;
-            foreach (object o in OT) pos.Adjust((Trade)o);
+            if (!MasterTrades.ContainsKey(a)) return pos;
+            List<Trade> OT = MasterTrades[a];
+            foreach (Trade trade in OT) 
+                if (trade.symbol==symbol) 
+                    pos.Adjust(trade);
             return pos;
         }
 
 
-        public static decimal GetFillAvgPriceSide(bool side, Queue RT)
-        { // gets average price for all buys (or sells/shorts) in a queue of fills
-            decimal price = 0;
-            int i = 0;
-            foreach (object o in RT)
-            {
-                Trade t = (Trade)o;
-                if (t.side == side) price += t.xprice * t.xsize;
-                if (t.side == side) i++;
-            }
-            return price / i;
-        }
-
-        public static decimal GetSymbolClosedPL(Queue RT)
-        { // gets closed PL for list of roundturn-completed fills for a given symbol
-            decimal pl = 0;
-            const bool SELL = false;
-            const bool BUY = true;
-            pl = GetFillAvgPriceSide(SELL, RT) - GetFillAvgPriceSide(BUY, RT);
-            return pl;
-        }
-
-        public static decimal GetSymbolOpenPL(Queue OT, decimal MarketPrice)
-        {
-            decimal pl = 0;
-            const bool SELL = false;
-            const bool BUY = true;
-            bool otside = true; // default assume long
-            int size = 0;
-            foreach (object o in OT)
-            {
-                Trade t = (Trade)o;
-                otside = t.side == otside;
-                size += t.xsize;
-            }
-            if (otside) pl = (MarketPrice * size) - GetFillAvgPriceSide(BUY, OT);
-            else pl = GetFillAvgPriceSide(SELL, OT) - (MarketPrice * size);
-            return pl;
-        }
-
-        public Hashtable GetAllClosedPL(Hashtable Fills)
-        {
-            Hashtable symbolpl = new Hashtable();
-            string sym;
-            Queue sfill;
-            IEnumerator e = Fills.GetEnumerator();
-            while (e.MoveNext())
-            {
-                sym = e.Current.ToString();
-                sfill = (Queue)Fills[sym];
-                symbolpl.Add(sym, GetSymbolClosedPL(GetRoundTurns(sym)));
-            }
-            return symbolpl;
-        }
-
-        public Hashtable GetAllOpenPL(Hashtable Fills, decimal MarketPrice)
-        {
-            Hashtable symbolpl = new Hashtable();
-            string sym = null;
-            Queue sfill;
-            IEnumerator e = Fills.GetEnumerator();
-            while (e.MoveNext())
-            {
-                sym = e.Current.ToString();
-                sfill = (Queue)Fills[sym];
-                symbolpl.Add(sym, GetSymbolOpenPL(GetOpenTrades(sym), MarketPrice));
-            }
-            return symbolpl;
-        }
     }
 
 }

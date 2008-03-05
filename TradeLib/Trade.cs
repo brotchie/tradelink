@@ -5,6 +5,7 @@ namespace TradeLib
     [Serializable]
     public class Trade
     {
+        public string accountid = "";
         public string symbol = null;
         public bool side = true;
         public int size = 0;

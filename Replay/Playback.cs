@@ -85,11 +85,11 @@ namespace TLReplay
                 // prints, but for transparency and the simulation behaving as expected, we'll pretend
                 // they don't exist and only execute nyse ticks.
                 // otherwise this line could get moved up (to before where Exchange filter is applied)
-                int fills = broker.Execute(tick);  
-
+                int fills = broker.Execute(tick);
+                List<Trade> list = broker.GetTradeList();
                 if (fills > 0)
-                    for (int i = broker.FillList.Count - fills; i < broker.FillList.Count; i++)
-                        tl.newFill(broker.FillList[i]); // send a message for every order filled
+                    for (int i = list.Count - fills; i < list.Count; i++)
+                        tl.newFill(list[i]); // send a message for every order filled
                 tl.newTick(tick);
 
 

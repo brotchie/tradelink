@@ -26,7 +26,6 @@ namespace TradeLib
         public bool Adjust(Position pos)
         {
             if (this.hasSymbol && (this.Symbol != pos.Symbol)) return false;
-            if ((pos.date<=this.date) || (pos.time<=this.time)) return false; //don't process trades older than last
             if (pos.Flat) return false; // nothing to do
             else if ((pos.Side && this.Side) || (!pos.Side && !this.Side)) // sides match, adding so adjust price
                 this.price = ((this.price * this.size) + (pos.price * pos.size)) / (pos.size + this.size);
