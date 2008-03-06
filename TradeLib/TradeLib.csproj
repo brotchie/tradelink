@@ -54,14 +54,17 @@
     <Compile Include="Chart.Designer.cs">
       <DependentUpon>Chart.cs</DependentUpon>
     </Compile>
+    <Compile Include="Email.cs" />
     <Compile Include="eSigTick.cs" />
     <Compile Include="Index.cs" />
     <Compile Include="IndexBasket.cs" />
+    <Compile Include="Kad.cs" />
     <Compile Include="LimitOrder.cs" />
     <Compile Include="Link.cs" />
     <Compile Include="MarketBasket.cs" />
     <Compile Include="MarketOrder.cs" />
     <Compile Include="News.cs" />
+    <Compile Include="NewsService.cs" />
     <Compile Include="Order.cs" />
     <Compile Include="ParamPrompt.cs">
       <SubType>Form</SubType>
@@ -72,6 +75,7 @@
     <Compile Include="Stock.cs" />
     <Compile Include="StopOrder.cs" />
     <Compile Include="Tick.cs" />
+    <Compile Include="TickWatcher.cs" />
     <Compile Include="Trade.cs" />
     <Compile Include="TradeBox.cs" />
     <Compile Include="TradeLink.cs" />

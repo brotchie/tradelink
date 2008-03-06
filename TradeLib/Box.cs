@@ -29,6 +29,8 @@ namespace TradeLib
         private int sday = 930;
         private int eday = 1600;
         private string loadstr = "";
+        private bool _usekads = false;
+        private bool _email = false;
         private bool _quickorder = true;
         public int DayEndBuff = 2;
 
@@ -150,6 +152,16 @@ namespace TradeLib
             this.SHUTDOWN = false;
             this.D(message);
         }
+        public virtual void E(string to, string from, string subject, string msg)
+        {
+            if (!_email) return;
+            Email.Send(to, from, subject, msg);
+        }
+        public virtual void K(Kad newKad)
+        {
+            if (!_usekads) return;
+            news.newKad(newKad);
+        }
 
         public virtual void D(string debug)
         {
@@ -168,6 +180,10 @@ namespace TradeLib
         public virtual string Version { get { return ver; } set { ver = value; } }
         [CategoryAttribute("TradeLink Box"), DescriptionAttribute("Toggle enforcing of MaxTrades and MaxAdjusts")]
         public bool UseLimits { get { return USELIMITS; } set { USELIMITS = value; } }
+        [CategoryAttribute("TradeLink Box"), DescriptionAttribute("This box uses Kads, an indicator visualization tool for use in box development.")]
+        public bool UseKads { get { return _usekads; } set { _usekads = value; } }
+        [CategoryAttribute("TradeLink Box"), DescriptionAttribute("Allow emails from the box to be sent.")]
+        public bool Emails { get { return _email; } set { _email = value; } }
         [CategoryAttribute("TradeLink Box"), DescriptionAttribute("Sets inclusive start time for box each day.")]
         public int DayStart { get { return sday; } set { sday = value; } }
         [CategoryAttribute("TradeLink Box"), DescriptionAttribute("Sets inclusive stop time for box each day.")]

@@ -156,5 +156,41 @@ namespace TradeLib
             this.ex = ex.Trim();
             this.bid = 0;
         }
+
+        public static Tick NewBid(string sym, decimal bid, int bidsize) { return NewQuote(sym, 0, 0, 0, bid, 0, bidsize, 0, "", ""); }
+        public static Tick NewAsk(string sym, decimal ask, int asksize) { return NewQuote(sym, 0, 0, 0, 0, ask, 0, asksize, "", ""); }
+        public static Tick NewQuote(string sym, int date, int time, int sec, decimal bid, decimal ask, int bs, int os, string be, string oe)
+        {
+            Tick q = new Tick(sym);
+            q.date = date;
+            q.time = time;
+            q.sec = sec;
+            q.bid = bid;
+            q.ask = ask;
+            q.be = be.Trim();
+            q.oe = oe.Trim();
+            q.os = os;
+            q.bs = bs;
+            q.trade = 0;
+            q.size = 0;
+            return q;
+        }
+
+        public static Tick NewTrade(string sym, decimal trade, int size) { return NewTrade(sym, 0, 0, 0, trade, size, ""); }
+        public static Tick NewTrade(string sym, int date, int time, int sec, decimal trade, int size, string ex)
+        {
+            Tick t = new Tick(sym);
+            t.date = date;
+            t.time = time;
+            t.sec = sec;
+            t.trade = trade;
+            t.size = size;
+            t.ex = ex.Trim();
+            t.bid = 0;
+            return t;
+        }
+
+
+
     }
 }
