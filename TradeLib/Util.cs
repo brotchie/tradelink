@@ -42,6 +42,10 @@ namespace TradeLib
         {
             return (dt.Year * 10000) + (dt.Month * 100) + dt.Day;
         }
+        public static int ToTLDate(long DateTimeTicks)
+        {
+            return ToTLDate(new DateTime(DateTimeTicks));
+        }
         public static string CleanVer(string ver)
         {
             Regex re = new Regex("[0-9]+");

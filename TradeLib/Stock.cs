@@ -8,6 +8,7 @@ namespace TradeLib
     public class Stock
     {
         public Stock(string s) { Load(s); }
+        public Stock(string symbol, int Date) { Load(symbol); date = Date; }
         private string symbol = null;
         private decimal dh = 0;
         private decimal dl = 10000000000;
