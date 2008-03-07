@@ -53,7 +53,7 @@ namespace TradeLib
         public BoxInfo Info { get { return _boxinfo; } }
         protected override int Read(Tick t,BarList barlist,BoxInfo bi)
         {
-            this.tick = t; // save tick to member for child classes
+            this.tick = new Tick(t); // save tick to member for child classes
             this.bl = barlist; // save bars for same purpose
             _boxinfo = bi;
 
