@@ -8,6 +8,7 @@ namespace box
         public AlwaysEnter(NewsService ns) : base(ns) { }
         protected override bool EnterLong()
         {
+            D("Entering Long");
             return true;
         }
         protected override bool EnterShort()
@@ -16,7 +17,9 @@ namespace box
         }
         protected override bool Exit()
         {
-            return (Profit > .15m) || (Profit < -.1m);
+            bool exit = (Profit > .15m) || (Profit < -.1m);
+            if (exit) D("Exiting: " + Profit);
+            return exit;
         }
     }
 }
