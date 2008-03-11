@@ -46,6 +46,10 @@ namespace TradeLib
         {
             return ToTLDate(new DateTime(DateTimeTicks));
         }
+        public static int ToTLTime(DateTime dt)
+        {
+            return (dt.Hour * 100) + dt.Minute;
+        }
         public static string CleanVer(string ver)
         {
             Regex re = new Regex("[0-9]+");
