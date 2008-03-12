@@ -140,6 +140,58 @@ namespace TradeLib
             return size;
         }
 
+        private List<string> _iname;
+        private List<int> _indicators;
+        private int _indicount = 0;
+        public void ResetIndicators(int IndicatorCount)
+        {
+            _indicators = new List<int>(IndicatorCount);
+            _indicount = IndicatorCount;
+            _iname = new List<string>(IndicatorCount);
+        }
+        public int[] Indicators() { return _indicators.ToArray(); }
+        public string[] Inames() { return _iname.ToArray(); }
+        protected string GetIname(int i)
+        {
+            if ((i >= _indicators.Count) || (i < 0))
+                throw new IndexOutOfRangeException("Cannot access an index beyond what was defined with ResetIndicators(int IndicatorCount)");
+            return _iname[i];
+        }
+        protected void SetIname(int i, string value)
+        {
+            if ((i >= _indicators.Count) || (i < 0))
+                throw new IndexOutOfRangeException("Cannot access an index beyond what was defined with ResetIndicators(int IndicatorCount)");
+            _iname[i] = value;
+        }
+
+        protected int GetIndicator(int i)
+        {
+            if ((i >= _indicators.Count) || (i < 0))
+                throw new IndexOutOfRangeException("Cannot access an index beyond what was defined with ResetIndicators(int IndicatorCount)");
+            return _indicators[i];
+        }
+        protected void SetIndicator(int i, int value)
+        {
+            if ((i >= _indicators.Count) || (i < 0))
+                throw new IndexOutOfRangeException("Cannot access an index beyond what was defined with ResetIndicators(int IndicatorCount)");
+            _indicators[i] = value;
+        }
+        protected void SetIndicators(int[] ivalues)
+        {
+            if (ivalues.Length != _indicators.Count)
+                throw new Exception("Must provide all indicator values when specifying array.");
+            for (int i = 0; i < ivalues.Length; i++)
+                _indicators[i] = ivalues[i];
+        }
+
+        public virtual void Reset() 
+        { 
+            symbol = null; SHUTDOWN = false; trades = 0; adjusts = 0; 
+            DayStart = 930; DayEnd = 1600;
+            ResetIndicators(_indicount);
+        }
+
+
         public bool Debug { get { return DEBUG; } set { DEBUG = value; } }
         public virtual void Shutdown(string message)
         {
@@ -223,7 +275,6 @@ namespace TradeLib
         protected string CleanVersion { get { return Util.CleanVer(Version); } }
         [BrowsableAttribute(false)]
         public int PosSize { get { return tDir; } }
-        public virtual void Reset() { symbol = null; SHUTDOWN = false; trades = 0; adjusts = 0; DayStart = 930; DayEnd = 1600; }
         [BrowsableAttribute(false)]
         protected int Flat { get { return PosSize * -1; } }
         [BrowsableAttribute(false)]
