@@ -5,7 +5,10 @@ namespace box
 {
     public class AlwaysEnter : TradeBox
     {
-        public AlwaysEnter(NewsService ns) : base(ns) { }
+        public AlwaysEnter(NewsService ns) : base(ns) 
+        {
+            Name = "AlwaysEnter";
+        }
         protected override bool EnterLong()
         {
             D("Entering Long");

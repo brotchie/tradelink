@@ -47,7 +47,7 @@ namespace box
 			this.D("market:"+market.ToString("N2")+" MA:"+MA.ToString("N2"));
 
             // expose indicators (optional, if used by other tools)
-            this.SetIndicators(new int[] { (int)market * 100, (int)MA * 100 });
+            this.Indicators = new int[] { (int)(market * 100), (int)(MA * 100) };
 
             // rules that determine how indicators lead to entry (or not)
 			if (this.Side && (market>MA)) enter = true; // long entry

@@ -14,7 +14,11 @@ namespace box
 {
 	public class A : Box 
 	{
-        public A(NewsService ns) : base(ns) { Version = "$Rev$"; Name = "A"+CleanVersion; }
+        public A(NewsService ns) : base(ns) 
+        { 
+            Version = "$Rev$"; 
+            Name = "A"+CleanVersion; 
+        }
         BarList bars;
         decimal h{ get { return BarMath.HH(bars); } }
         decimal l { get { return BarMath.LL(bars); } }

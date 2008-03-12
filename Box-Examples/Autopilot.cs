@@ -7,7 +7,7 @@ namespace box
 {
     public class Autopilot : Box
     {
-        Autopilot(NewsService ns)
+        public Autopilot(NewsService ns)
             : base(ns)
         {
             Version = "$Rev: 1";
