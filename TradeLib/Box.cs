@@ -17,8 +17,8 @@ namespace TradeLib
         private decimal avgprice = 0;
         private int trades = 0;
         private int adjusts = 0;
-        private bool DEBUG;
-        private bool SHUTDOWN;
+        private bool DEBUG = false;
+        private bool SHUTDOWN = false;
         private bool USELIMITS = false;
         private int MAXTRADES = 10;
         private int MAXADJUSTS = 30;
@@ -39,12 +39,7 @@ namespace TradeLib
         public Box () : this(null) { }
         public Box(NewsService ns) // constructor
         {
-            this.symbol = null;
-            this.SHUTDOWN = false;
-            this.DEBUG = false;
-            this.tDir = 0;
             this.news = ns;
-            Name = name;
         }
         
         public void NewIndex(Index i)
@@ -140,48 +135,67 @@ namespace TradeLib
             return size;
         }
 
-        private List<string> _iname;
-        private List<int> _indicators;
-        private int _indicount = 0;
+        protected List<string> _iname = new List<string>(0);
+        protected List<int> _indicators = new List<int>(0);
+        protected int _indicount = 0;
         public void ResetIndicators(int IndicatorCount)
         {
             _indicators = new List<int>(IndicatorCount);
             _indicount = IndicatorCount;
             _iname = new List<string>(IndicatorCount);
+            for (int i = 0; i < IndicatorCount; i++)
+            {
+                _indicators.Add(0);
+                _iname.Add("i" + i);
+            }
         }
-        public int[] Indicators() { return _indicators.ToArray(); }
-        public string[] Inames() { return _iname.ToArray(); }
+        public bool hasIndicators { get { return _indicators.Count != 0; } }
+        public int[] Indicators
+        {
+            get { return _indicators.ToArray(); }
+            set
+            {
+                if (value.Length != _indicators.Capacity)
+                    throw new Exception("Must provide all indicator values when specifying array.");
+                for (int i = 0; i < value.Length; i++)
+                    _indicators[i] = value[i];
+            }
+        }
+        public string[] Inames
+        {
+            get { return _iname.ToArray(); }
+            set
+            {
+                if (value.Length != _indicators.Capacity)
+                    throw new Exception("Must provide all indicator values when specifying array.");
+                for (int i = 0; i < value.Length; i++)
+                    _iname[i] = value[i];
+            }
+        }
         protected string GetIname(int i)
         {
-            if ((i >= _indicators.Count) || (i < 0))
+            if ((i >= _indicators.Capacity) || (i < 0))
                 throw new IndexOutOfRangeException("Cannot access an index beyond what was defined with ResetIndicators(int IndicatorCount)");
             return _iname[i];
         }
         protected void SetIname(int i, string value)
         {
-            if ((i >= _indicators.Count) || (i < 0))
+            if ((i >= _indicators.Capacity) || (i < 0))
                 throw new IndexOutOfRangeException("Cannot access an index beyond what was defined with ResetIndicators(int IndicatorCount)");
             _iname[i] = value;
         }
 
         protected int GetIndicator(int i)
         {
-            if ((i >= _indicators.Count) || (i < 0))
+            if ((i >= _indicators.Capacity) || (i < 0))
                 throw new IndexOutOfRangeException("Cannot access an index beyond what was defined with ResetIndicators(int IndicatorCount)");
             return _indicators[i];
         }
         protected void SetIndicator(int i, int value)
         {
-            if ((i >= _indicators.Count) || (i < 0))
+            if ((i >= _indicators.Capacity) || (i < 0))
                 throw new IndexOutOfRangeException("Cannot access an index beyond what was defined with ResetIndicators(int IndicatorCount)");
             _indicators[i] = value;
-        }
-        protected void SetIndicators(int[] ivalues)
-        {
-            if (ivalues.Length != _indicators.Count)
-                throw new Exception("Must provide all indicator values when specifying array.");
-            for (int i = 0; i < ivalues.Length; i++)
-                _indicators[i] = ivalues[i];
         }
 
         public virtual void Reset() 

@@ -8,10 +8,10 @@ namespace TradeLib
     // eSignal TradeBox class's functionaltiy
     public class TradeBox : Box
     {
-        public TradeBox(NewsService ns) : base(ns) { EntrySize = 100; Stop = .1m; ProfitTarget = 0; }
+        public TradeBox(NewsService ns) : base(ns) { }
         protected decimal sPrice = 0;
-        protected int lotsize = 0;
-        protected decimal stop = 1;
+        protected int lotsize = 100;
+        protected decimal stop = .1m;
         protected decimal profit = 0;
         protected int profitsize = 0;
         protected bool side = true;
