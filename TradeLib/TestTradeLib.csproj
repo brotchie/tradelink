@@ -38,6 +38,7 @@
     <Compile Include="TestAccount.cs" />
     <Compile Include="TestBoxMath.cs" />
     <Compile Include="TestBroker.cs" />
+    <Compile Include="TestLink.cs" />
     <Compile Include="TestMarketBasket.cs" />
     <Compile Include="TestTickWatcher.cs" />
     <Compile Include="TestUtil.cs" />
