@@ -27,7 +27,7 @@ namespace TradeLib
         public bool OfferReload { get { return !t && Valid && (a.trade == b.ask) && (a.ask == b.ask); } }
         public bool BidReload { get { return !t && Valid && (a.trade == b.bid) && (a.bid == b.bid); } }
         public bool Valid { get { return (a != null) && (b != null) && a.hasTick && b.hasTick; } }
-        public bool Tick(Tick tick) 
+        public virtual bool Tick(Tick tick) 
         {
             if (a == null) a = new Tick(tick);
             else if (!a.hasTick) a = new Tick(a, tick);
