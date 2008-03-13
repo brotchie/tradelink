@@ -130,32 +130,35 @@ namespace TradeLib
             return s;
         }
 
-        public void NewQuote(int date, int time, int sec, decimal bid, decimal ask, int bs, int os, string be, string oe) 
+        public void SetQuote(int date, int time, int sec, decimal bid, decimal ask, int bidsize, int asksize, string bidex, string askex)
         {
-            this.date = date;
-            this.time = time;
-            this.sec = sec;
-            this.bid = bid;
-            this.ask = ask;
-            this.be = be.Trim();
-            this.oe= oe.Trim();
-            this.os = os;
-            this.bs = bs;
-            this.trade = 0;
-            this.size = 0;
-
+        	this.date = date;
+        	this.time = time;
+        	this.sec = sec;
+        	this.bid = bid;
+        	this.ask = ask;
+        	this.bs = bidsize;
+        	this.os = asksize;
+        	this.be = bidex;
+        	this.oe = askex;
+        	this.trade =0;
+        	this.size = 0;
+        }
+        //date, time, sec, Convert.ToDecimal(r[(int)T.PRICE]), isize, r[(int)T.EXCH]
+        public void SetTrade(int date, int time, int sec, decimal price, int size, string exch)
+        {
+        	this.ex = exch;
+        	this.date = date;
+        	this.time = time;
+        	this.sec = sec;
+        	this.trade = price;
+        	this.size = size;
+        	this.bid = 0;
+        	this.ask = 0;
+        	this.os = 0;
+        	this.bs = 0;
         }
 
-        public void NewTrade(int date, int time, int sec, decimal trade, int size, string ex)
-        {
-            this.date = date;
-            this.time = time;
-            this.sec = sec;
-            this.trade = trade;
-            this.size = size;
-            this.ex = ex.Trim();
-            this.bid = 0;
-        }
 
         public static Tick NewBid(string sym, decimal bid, int bidsize) { return NewQuote(sym, 0, 0, 0, bid, 0, bidsize, 0, "", ""); }
         public static Tick NewAsk(string sym, decimal ask, int asksize) { return NewQuote(sym, 0, 0, 0, 0, ask, 0, asksize, "", ""); }

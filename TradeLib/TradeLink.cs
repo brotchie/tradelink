@@ -602,8 +602,8 @@ namespace TradeLib
                                 int time = Convert.ToInt32(r[(int)f.time]);
                                 int sec = Convert.ToInt32(r[(int)f.sec]);
                                 // trade,size,tex,bid,ask,bs,as,be,as
-                                if (r[(int)f.trade].Equals("0")) t.NewQuote(date, time, sec, Convert.ToDecimal(r[(int)f.bid]), Convert.ToDecimal(r[(int)f.ask]), Convert.ToInt32(r[(int)f.bidsize]), Convert.ToInt32(r[(int)f.asksize]), r[(int)f.bidex], r[(int)f.askex]);
-                                else t.NewTrade(date, time, sec, Convert.ToDecimal(r[(int)f.trade]), Convert.ToInt32(r[(int)f.tsize]), r[(int)f.tex]);
+                                if (r[(int)f.trade].Equals("0")) t.SetQuote(date, time, sec, Convert.ToDecimal(r[(int)f.bid]), Convert.ToDecimal(r[(int)f.ask]), Convert.ToInt32(r[(int)f.bidsize]), Convert.ToInt32(r[(int)f.asksize]), r[(int)f.bidex], r[(int)f.askex]);
+                                else t.SetTrade(date, time, sec, Convert.ToDecimal(r[(int)f.trade]), Convert.ToInt32(r[(int)f.tsize]), r[(int)f.tex]);
 
                                 if (t.isTrade)
                                 {

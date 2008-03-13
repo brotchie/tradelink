@@ -46,9 +46,10 @@ namespace TradeLib
                     if (r[(int)Q.TYPE] == TRADE)
                     {
                         int isize = Convert.ToInt32(r[(int)T.SIZE]);
-                        this.NewTrade(date, time, sec, Convert.ToDecimal(r[(int)T.PRICE]), isize, r[(int)T.EXCH]);
+                        
+                        this.SetTrade(date, time, sec, Convert.ToDecimal(r[(int)T.PRICE]), isize, r[(int)T.EXCH]);
                     }
-                    else this.NewQuote(date, time, sec, Convert.ToDecimal(r[(int)Q.BID]), Convert.ToDecimal(r[(int)Q.ASK]), Convert.ToInt32(r[(int)Q.BIDSIZE]), Convert.ToInt32(r[(int)Q.ASKSIZE]), r[(int)Q.BIDEX], r[(int)Q.ASKEX]);
+                    else this.SetQuote(date, time, sec, Convert.ToDecimal(r[(int)Q.BID]), Convert.ToDecimal(r[(int)Q.ASK]), Convert.ToInt32(r[(int)Q.BIDSIZE]), Convert.ToInt32(r[(int)Q.ASKSIZE]), r[(int)Q.BIDEX], r[(int)Q.ASKEX]);
                 }
                 catch (Exception ex) { string s = ex.Message; return false; }
                 return true;
