@@ -100,7 +100,7 @@ namespace EPF2IDX
             o.Multiselect = true;
             o.InitialDirectory = "c:\\program files\\tradelink\\tickdata\\";
             o.ShowDialog();
-            string[] files = o.SafeFileNames;
+            string[] files = o.FileNames;
             for (int i = 0; i < files.Length; i++)
                 Convert(files[i]);
 
