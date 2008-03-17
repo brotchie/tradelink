@@ -1,5 +1,17 @@
 @echo off
 cls
+echo Checking for NSIS...
+if not exist "c:\progra~1\nsis\makensis.exe" (
+echo You must install NSIS to build an installer...
+echo http://nsis.sourceforge.net
+echo.
+echo Build failed.
+echo.
+pause
+goto :eof
+) else ( 
+echo NSIS found, building installer... 
+)
 echo.
 echo NOTE
 echo.
@@ -45,17 +57,7 @@ xcopy /q /y ..\Chartographer\bin\Release\Chartographer.exe* .
 echo.
 
 
-echo Checking for NSIS...
-if not exist "c:\progra~1\nsis\makensis.exe" (
-echo You must install NSIS to build an installer...
-echo http://nsis.sourceforge.net
-echo.
-echo Build failed.
-echo.
-goto :eof
-) else ( 
-echo NSIS found, building installer... 
-)
+
 
 echo Building TradeLink executable...
 c:\progra~1\nsis\makensis.exe /v1 TradeLink.nsi
