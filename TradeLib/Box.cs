@@ -136,11 +136,11 @@ namespace TradeLib
         }
 
         protected List<string> _iname = new List<string>(0);
-        protected List<int> _indicators = new List<int>(0);
+        protected List<object> _indicators = new List<object>(0);
         protected int _indicount = 0;
         public void ResetIndicators(int IndicatorCount)
         {
-            _indicators = new List<int>(IndicatorCount);
+            _indicators = new List<object>(IndicatorCount);
             _indicount = IndicatorCount;
             _iname = new List<string>(IndicatorCount);
             for (int i = 0; i < IndicatorCount; i++)
@@ -150,7 +150,7 @@ namespace TradeLib
             }
         }
         public bool hasIndicators { get { return _indicators.Count != 0; } }
-        public int[] Indicators
+        public object[] Indicators
         {
             get { return _indicators.ToArray(); }
             set
@@ -185,13 +185,13 @@ namespace TradeLib
             _iname[i] = value;
         }
 
-        protected int GetIndicator(int i)
+        protected object GetIndicator(int i)
         {
             if ((i >= _indicators.Capacity) || (i < 0))
                 throw new IndexOutOfRangeException("Cannot access an index beyond what was defined with ResetIndicators(int IndicatorCount)");
             return _indicators[i];
         }
-        protected void SetIndicator(int i, int value)
+        protected void SetIndicator(int i, object value)
         {
             if ((i >= _indicators.Capacity) || (i < 0))
                 throw new IndexOutOfRangeException("Cannot access an index beyond what was defined with ResetIndicators(int IndicatorCount)");

@@ -29,8 +29,8 @@ namespace box
 
             // demo of indicator tracking (used by other tools)
             this.ResetIndicators(2);
-            this.SetIname(imkt, "Mkt*100");
-            this.SetIname(ibar, "2BarMA*100");
+            this.SetIname(imkt, "Mkt");
+            this.SetIname(ibar, "2BarMA");
 		}
 		protected override bool EnterLong()	{ return MAenter(); }
 		protected override bool EnterShort() 	{ return MAenter(); }
@@ -47,7 +47,7 @@ namespace box
 			this.D("market:"+market.ToString("N2")+" MA:"+MA.ToString("N2"));
 
             // expose indicators (optional, if used by other tools)
-            this.Indicators = new int[] { (int)(market * 100), (int)(MA * 100) };
+            this.Indicators = new object[] { market, MA };
 
             // rules that determine how indicators lead to entry (or not)
 			if (this.Side && (market>MA)) enter = true; // long entry
