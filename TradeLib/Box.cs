@@ -318,7 +318,7 @@ namespace TradeLib
             {
                 mybox = (Box)Activator.CreateInstance(type,args);
             }
-            catch (Exception ex) { ns.newNews(ex.Message); return mybox; }
+            catch (Exception ex) { ns.newNews(ex.Message); if (ex.InnerException != null) ns.newNews(ex.InnerException.Message); return mybox; }
             mybox.FullName = boxname;
             return mybox;
         }
