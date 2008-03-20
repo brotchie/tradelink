@@ -8,6 +8,7 @@ namespace TradeLib
     public delegate void NewsDelegate(News news);
 
     // heres our news object
+    [Serializable]
     public class News
     {
         private string news;

@@ -36,6 +36,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestAccount.cs" />
+    <Compile Include="TestBox.cs" />
     <Compile Include="TestBoxMath.cs" />
     <Compile Include="TestBroker.cs" />
     <Compile Include="TestLink.cs" />

@@ -6,6 +6,7 @@ using System.ComponentModel;
 namespace TradeLib
 {
     public delegate void DebugDelegate(string msg);
+    [Serializable]
     public class Box
     {
         NewsService news = null;
@@ -29,7 +30,6 @@ namespace TradeLib
         private int sday = 930;
         private int eday = 1600;
         private string loadstr = "";
-        private bool _usekads = false;
         private bool _email = false;
         private bool _quickorder = true;
         public int DayEndBuff = 2;
@@ -223,11 +223,6 @@ namespace TradeLib
             if (!_email) return;
             Email.Send(to, from, subject, msg);
         }
-        public virtual void K(Kad newKad)
-        {
-            if (!_usekads) return;
-            news.newKad(newKad);
-        }
 
         public virtual void D(string debug)
         {
@@ -246,8 +241,6 @@ namespace TradeLib
         public virtual string Version { get { return ver; } set { ver = value; } }
         [CategoryAttribute("TradeLink Box"), DescriptionAttribute("Toggle enforcing of MaxTrades and MaxAdjusts")]
         public bool UseLimits { get { return USELIMITS; } set { USELIMITS = value; } }
-        [CategoryAttribute("TradeLink Box"), DescriptionAttribute("This box uses Kads, an indicator visualization tool for use in box development.")]
-        public bool UseKads { get { return _usekads; } set { _usekads = value; } }
         [CategoryAttribute("TradeLink Box"), DescriptionAttribute("Allow emails from the box to be sent.")]
         public bool Emails { get { return _email; } set { _email = value; } }
         [CategoryAttribute("TradeLink Box"), DescriptionAttribute("Sets inclusive start time for box each day.")]
@@ -284,6 +277,8 @@ namespace TradeLib
         public int Adjusts { get { return adjusts; } }
 
         [BrowsableAttribute(false)]
+        public NewsService NewsHandler { get { return news; } set { news = value; } }
+        [BrowsableAttribute(false)]
         protected string NameVersion { get { return Name + CleanVersion; } }
         [BrowsableAttribute(false)]
         protected string CleanVersion { get { return Util.CleanVer(Version); } }
@@ -300,25 +295,35 @@ namespace TradeLib
         public static Box FromDLL(string boxname, string dllname,NewsService ns)
         {
             System.Reflection.Assembly a;
+            try
+            {
+                a = System.Reflection.Assembly.LoadFrom(dllname);
+            }
+            catch (Exception ex) { ns.newNews(ex.Message); return new Box(ns); }
+            return FromAssembly(a, boxname, ns);
+        }
+        public static Box FromAssembly(System.Reflection.Assembly a, string boxname, NewsService ns)
+        {
             Type type;
             object[] args;
             Box mybox = new Box(ns);
             try
             {
-                a = System.Reflection.Assembly.LoadFrom(dllname);
-            }
-            catch (Exception ex) { ns.newNews(ex.Message); return mybox; }
-            try
-            {
                 type = a.GetType(boxname, true, true);
             }
-            catch (Exception ex) { ns.newNews(ex.Message); return mybox; } 
-            args = new object[] {ns};
+            catch (Exception ex) { ns.newNews(ex.Message); return mybox; }
+            args = new object[] { ns };
             try
             {
-                mybox = (Box)Activator.CreateInstance(type,args);
+                mybox = (Box)Activator.CreateInstance(type, args);
             }
-            catch (Exception ex) { ns.newNews(ex.Message); if (ex.InnerException != null) ns.newNews(ex.InnerException.Message); return mybox; }
+            catch (Exception ex) 
+            { 
+                ns.newNews(ex.Message); 
+                if (ex.InnerException != null) 
+                    ns.newNews(ex.InnerException.Message); 
+                return mybox; 
+            }
             mybox.FullName = boxname;
             return mybox;
         }

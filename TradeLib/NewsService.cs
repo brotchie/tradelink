@@ -5,6 +5,7 @@ using System.Text;
 namespace TradeLib
 {
     // this class sends our news to subscribers
+    [Serializable]
     public class NewsService
     {
         public event NewsDelegate NewsEventSubscribers;
