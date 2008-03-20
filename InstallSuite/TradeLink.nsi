@@ -79,7 +79,7 @@ Section "TradeLinkSuite"
  
   ; this packages the signed uninstaller
  
-  File $%TEMP%\uninstaller.exe
+ ; File $%TEMP%\uninstaller.exe
 !endif
  
 
