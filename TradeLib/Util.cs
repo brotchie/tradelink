@@ -111,22 +111,26 @@ namespace TradeLib
         {
             List<string> boxlist = new List<string>();
             Assembly a;
-            Type[] t;
             try
             {
                 a = Assembly.LoadFrom(boxdll);
             }
             catch (Exception ex) { boxlist.Add(ex.Message); return boxlist; }
+            return GetBoxList(a);
+        }
+        public static List<string> GetBoxList(Assembly boxdll)
+        {
+            List<string> boxlist = new List<string>();
+            Type[] t;
             try
             {
-                t = a.GetTypes();
+                t = boxdll.GetTypes();
             }
             catch (Exception ex) { boxlist.Add(ex.Message); return boxlist; }
             for (int i = 0; i < t.GetLength(0); i++)
                 if (IsBox(t[i])) boxlist.Add(t[i].FullName);
             return boxlist;
         }
-
         
     }
 }
