@@ -24,7 +24,16 @@ namespace TestTradeLib
                 Tick.NewTrade(s,d,t+2,0,10,100,x),
                 Tick.NewTrade(s,d,t+3,0,10,100,x),
             };
+        const string f = "/SPX";
+        const decimal fnom = 1300;
+        Index[] futures = new Index[] { 
+            new Index(f,fnom,fnom,fnom,fnom,fnom),
+            new Index(f,fnom+2,fnom,fnom+2,fnom,fnom+2),
+            new Index(f,fnom+3,fnom,fnom+3,fnom,fnom+3),
+            new Index(f,fnom+2.5m,fnom,fnom+3,fnom,fnom+2.5m),
+        };
 
+        // test the constructor and make sure it never enters a trade
         [Test]
         public void BlankBox()
         {
@@ -56,6 +65,7 @@ namespace TestTradeLib
             }
         }
 
+        // make sure this box generates an order for every trade
         [Test]
         public void AlwaysEnter()
         {
@@ -71,7 +81,7 @@ namespace TestTradeLib
             Assert.That(debugs == 0);
         }
 
-
+        // make sure debugs are received as news events when debugging is enabled
         [Test]
         public void NewsTest()
         {
@@ -81,9 +91,11 @@ namespace TestTradeLib
             // this time we want to throw news events for debugging statements
             b.Debug = true;
             int good = 0;
+            b.D("Starting debug test for NUnit...");
             for (int i = 0; i < timesales.Length; i++)
                 if (b.Trade(timesales[i], new BarList(), new Position(s), new BoxInfo()).isValid)
                     good++;
+            b.D("NUnit testing complete...");
             Assert.That(good == 3);
             // news from the box was received.
             Assert.That(debugs>0);
@@ -93,6 +105,37 @@ namespace TestTradeLib
         {
             Console.WriteLine(news.Msg);
  	        debugs++;
+        }
+
+        // Make sure indicies are received
+        public class IndexBox : Box
+        {
+            public IndexBox() : base() { GotIndex += new IndexDelegate(IndexBox_GotIndex); }
+            public int indexticks = 0;
+            public bool athigh = false;
+            void IndexBox_GotIndex(Index idx)
+            {
+                athigh = (idx.Value == idx.High);
+                indexticks++;
+            }
+        }
+
+
+        [Test]
+        public void IndexTest()
+        {
+            IndexBox ibox = new IndexBox();
+            int highs = 0;
+            for (int i = 0; i < futures.Length; i++)
+            {
+                // send futures update
+                ibox.NewIndex(futures[i]);
+                // trade the box
+                ibox.Trade(timesales[i], new BarList(), new Position(s), new BoxInfo());
+                if (ibox.athigh) highs++;
+            }
+            Assert.That(highs == 3);
+            Assert.That(ibox.indexticks == 4);
         }
 
     }
