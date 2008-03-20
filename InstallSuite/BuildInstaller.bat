@@ -61,11 +61,22 @@ echo.
 
 echo Building TradeLink executable...
 c:\progra~1\nsis\makensis.exe /v1 TradeLink.nsi
+if ERRORLEVEL 1 (
+echo.
+echo ERROR Building installer...
+echo. 
+echo quitting...
+echo.
+pause
+goto :eof
+) else (
 echo Build complete.
 echo.
+)
 
 if exist TradeLinkSuite.exe (
 ren TradeLinkSuite.exe TLS.tmp
+ren signtool.exe signtool.tmp
 echo Removing working releases...
 del *.exe
 del *.config
@@ -74,7 +85,10 @@ del *.dll
 del /s /f /q Properties
 rmdir properties
 ren TLS.tmp TradeLinkSuite.exe
+ren signtool.tmp signtool.exe
 echo.
+echo Signing installer
+signtool sign /f ..\tls.pfx /p tradelink /d TradeLink /du http://tradelink.googlecode.com TradeLinkSuite.exe
 echo Run TradeLinkSuite.exe to install
 ) else (
 echo Installer not found, please see error messages above...
