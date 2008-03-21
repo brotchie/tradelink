@@ -55,6 +55,7 @@ namespace TradeLib
                 if (tick.sym != "") symbol = tick.sym;
                 else throw new Exception("No symbol specified");
             }
+            if (!pos.isValid) throw new Exception("Invalid Position Provided to Box" + pos.ToString());
             if (tick.sym != Symbol) return o;
             time = tick.time;
             date = tick.date;
@@ -67,7 +68,7 @@ namespace TradeLib
                 this.Shutdown("Trade limit reached.");
                 return o;
             }
-            if ((pos.AvgPrice != AvgPrice) || (pos.Size != PosSize))
+            if ((pos.AvgPrice*pos.Size!=0) && ((pos.AvgPrice != AvgPrice) || (pos.Size != PosSize)))
             {
                 avgprice = pos.AvgPrice;
                 tDir = pos.Size;

@@ -9,10 +9,11 @@ namespace TradeLib
     {
         public event OrderDelegate GotOrder;
         public event FillDelegate GotFill;
+        public event DebugDelegate GotWarning;
         public Broker() 
-        { 
-            MasterOrders.Add(DEFAULT, new List<Order>()); 
-            MasterTrades.Add(DEFAULT,new List<Trade>());
+        {
+            Reset();
+
         }
         protected Account DEFAULT = new Account("DEFAULT","Defacto account when account not provided");
         protected Dictionary<Account, List<Order>> MasterOrders = new Dictionary<Account, List<Order>>();
@@ -29,8 +30,12 @@ namespace TradeLib
         public bool sendOrder(Order o) { return sendOrder(o, DEFAULT); }
         public bool sendOrder(Order o,Account a)
         {
-            if (!o.isValid) return false;
-            if (!a.isValid) return false;
+            if ((!o.isValid) || (!a.isValid))
+            {
+                if (GotWarning != null)
+                    GotWarning(!o.isValid ? "Invalid order: " + o.ToString() : "Invalid Account" + a.ToString());
+                return false;
+            }
             AddOrder(o, a);
             if (GotOrder != null) GotOrder(o);
             return true;
@@ -71,6 +76,8 @@ namespace TradeLib
         {
             MasterOrders.Clear();
             MasterTrades.Clear();
+            MasterOrders.Add(DEFAULT, new List<Order>());
+            MasterTrades.Add(DEFAULT, new List<Trade>());
         }
         public void CancelOrders() { CancelOrders(DEFAULT); }
         public void CancelOrders(Account a) { MasterOrders[a].Clear(); }
