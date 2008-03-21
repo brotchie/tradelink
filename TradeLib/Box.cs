@@ -149,7 +149,9 @@ namespace TradeLib
                 _iname.Add("i" + i);
             }
         }
+        [BrowsableAttribute(false)]
         public bool hasIndicators { get { return _indicators.Count != 0; } }
+        [BrowsableAttribute(false)]
         public object[] Indicators
         {
             get { return _indicators.ToArray(); }
@@ -161,6 +163,7 @@ namespace TradeLib
                     _indicators[i] = value[i];
             }
         }
+        [BrowsableAttribute(false)]
         public string[] Inames
         {
             get { return _iname.ToArray(); }
