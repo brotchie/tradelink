@@ -71,17 +71,7 @@ Section "TradeLinkSuite"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLink" "UninstallString" '"$INSTDIR\uninstall.exe"'
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLink" "NoModify" 1
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLink" "NoRepair" 1
-  
-    ; where you would normally put WriteUninstaller ${INSTDIR}\uninstaller.exe put instead:
- 
-!ifndef INNER
-  SetOutPath ${INSTDIR}
- 
-  ; this packages the signed uninstaller
- 
- ; File $%TEMP%\uninstaller.exe
-!endif
- 
+  WriteUninstaller "uninstall.exe"
 
 SectionEnd
 ;--------------------------------
@@ -89,71 +79,7 @@ SectionEnd
 ; Uninstaller
 
 Section "Uninstall"
-
-
-
-
-SectionEnd
-
-
-
-
-!ifdef INNER
-  !echo "Inner invocation"                  ; just to see what's going on
-  OutFile "$%TEMP%\tempinstaller.exe"       ; not really important where this is
-!else
-  !echo "Outer invocation"
- 
-  ; Call makensis again, defining INNER.  This writes an installer for us which, when
-  ; it is invoked, will just write the uninstaller to some location, and then exit.
-  ; Be sure to substitute the name of this script here.
- 
-  !system "$\"${NSISDIR}\makensis$\" /DINNER TradeLink.nsi" = 0
- 
-  ; So now run that installer we just created as %TEMP%\tempinstaller.exe.  Since it
-  ; calls quit the return value isn't zero.
- 
-  !system "$%TEMP%\tempinstaller.exe" = 2
- 
-  ; That will have written an uninstaller binary for us.  Now we sign it with your
-  ; favourite code signing tool.
- 
-  !system "SIGNTOOL sign /f ..\tls.pfx /p tradelink $%TEMP%\uninstaller.exe" = 0
- 
-  ; Good.  Now we can carry on writing the real installer.
- 
-  OutFile "TradeLinkSuite.exe"
-!endif
- 
- 
-Function .onInit
-!ifdef INNER
- 
-  ; If INNER is defined, then we aren't supposed to do anything except write out
-  ; the installer.  This is better than processing a command line option as it means
-  ; this entire code path is not present in the final (real) installer.
- 
-  WriteUninstaller "$%TEMP%\uninstaller.exe"
-  Quit  ; just bail out quickly when running the "inner" installer
-!endif
- 
-  ; plugins dir should be automatically removed after installer runs
-  InitPluginsDir
-  File /oname=$PLUGINSDIR\splash.bmp "tradelinklogo.bmp"
-  splash::show 5000 $PLUGINSDIR\splash
-
-  Pop $0 ; $0 has '1' if the user closed the splash screen early,
-         ; '0' if everything closed normally, and '-1' if some error occurred.
-FunctionEnd
- 
- 
-!ifdef INNER
-Section "Uninstall"
- 
-  ; your normal uninstaller section or sections (they're not needed in the "outer"
-  ; installer and will just cause warnings because there is no WriteInstaller command)
   
-    
   ; Remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLink"
   DeleteRegKey HKLM SOFTWARE\NSIS_TradeLink
@@ -171,9 +97,21 @@ Section "Uninstall"
   RMDir "$SMPROGRAMS\TradeLink"
   RMDir "$INSTDIR"
   
- 
+
+
+
 SectionEnd
-!endif
+
+Function .onInit
+
+  ; plugins dir should be automatically removed after installer runs
+  InitPluginsDir
+  File /oname=$PLUGINSDIR\splash.bmp "tradelinklogo.bmp"
+  splash::show 5000 $PLUGINSDIR\splash
+
+  Pop $0 ; $0 has '1' if the user closed the splash screen early,
+         ; '0' if everything closed normally, and '-1' if some error occurred.
+FunctionEnd
 
 
 
