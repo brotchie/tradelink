@@ -72,9 +72,24 @@ namespace TestTradeLib
             Always b = new Always();
             Assert.That(b.MinSize == 100);
             int good = 0;
-            for (int i = 0; i < timesales.Length; i++)
-                if (b.Trade(timesales[i], new BarList(), new Position(s), new BoxInfo()).isValid)
+            int i = 0;
+
+            if (b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo()).isValid)
                     good++;
+            Assert.That(b.Trades == 0);
+            Assert.That(b.Adjusts == 0);
+            if (b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo()).isValid)
+                good++;
+            Assert.That(b.Trades == 0);
+            Assert.That(b.Adjusts == 1); 
+            if (b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo()).isValid)
+                good++;
+            Assert.That(b.Trades == 0);
+            Assert.That(b.Adjusts == 2); 
+            if (b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo()).isValid)
+                good++;
+            Assert.That(b.Trades == 0);
+            Assert.That(b.Adjusts == 3);
             // first trade was pre-market so we only have 3 total;
             Assert.That(good == 3);
             // no debugs were sent
@@ -136,6 +151,53 @@ namespace TestTradeLib
             }
             Assert.That(highs == 3);
             Assert.That(ibox.indexticks == 4);
+        }
+
+        public class LimitsTest : Box
+        {
+            public LimitsTest() { UseLimits = true; }
+            protected override int Read(Tick tick, BarList bl, BoxInfo boxinfo)
+            {
+                // go short off first trade
+                if (tick.isTrade && (PosSize == 0)) return MinSize;
+                // cover at the next opportunity
+                else if (tick.isTrade && (PosSize != 0))
+                {
+                    Shutdown("All done for today");
+                    return Flat;
+                }
+                return 0;
+            }
+        }
+
+        [Test]
+        public void UseLimitsTest()
+        {
+            LimitsTest b = new LimitsTest();
+            // we're skipping the first trade bc it's pre-market and we're not testing
+            // that in this test
+            int i = 1;
+            Order o;
+            Position p = new Position(s);
+            Assert.That(b.Trades == 0);
+            Assert.That(b.Adjusts == 0);
+            Assert.That(b.UseLimits);
+            Assert.That(!b.Off);
+            Assert.That(b.PosSize == 0);
+            o = b.Trade(timesales[i++], new BarList(), p, new BoxInfo());
+            Assert.That(o.isValid);
+            // fill our order with next tick and just our position
+            o.Fill(timesales[i]);
+            p.Adjust((Trade)o);
+            Assert.That(b.Adjusts == 1);
+            Assert.That(b.Trades == 0);
+            o = b.Trade(timesales[i++], new BarList(), p, new BoxInfo());
+            Assert.That(o.isValid);
+            Assert.That(b.Adjusts == 2);
+            Assert.That(b.Trades == 1); // should be flat now
+            o = b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo());
+            Assert.That(!o.isValid); // no more orders, as
+            Assert.That(b.Off); // we should be shutdown
         }
 
     }
