@@ -21,8 +21,8 @@ namespace TradeLib
         private bool DEBUG = false;
         private bool SHUTDOWN = false;
         private bool USELIMITS = false;
-        private int MAXTRADES = 10;
-        private int MAXADJUSTS = 30;
+        private int MAXTRADES = Int32.MaxValue;
+        private int MAXADJUSTS = Int32.MaxValue;
         private int MAXSIZE = 100;
         private int MINSIZE = 100;
         private int date = 0;
@@ -115,7 +115,8 @@ namespace TradeLib
             if (o.isValid)
             {
                 adjusts++;
-                if (ts == 0) trades++;
+                // if we're going to flat from non-flat, this is a "trade"
+                if ((Math.Abs(size+ts)==0) && (ts!=0)) trades++;
             }
             return o;
         }
