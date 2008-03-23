@@ -63,7 +63,7 @@ namespace TradeLib
            
             if ((Time < DayStart) || (Time>DayEnd)) return o; // is market open?
             if (Off) return o; // don't trade if shutdown
-            if (UseLimits && (PosSize==0) && ((this.trades >= MAXTRADES) || (this.adjusts >= MAXADJUSTS)))
+            if (UseLimits &&  pos.Flat && ((this.trades >= MAXTRADES) || (this.adjusts >= MAXADJUSTS)))
             {
                 this.Shutdown("Trade limit reached.");
                 return o;
