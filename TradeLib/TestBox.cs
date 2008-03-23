@@ -171,7 +171,7 @@ namespace TestTradeLib
         }
 
         [Test]
-        public void UseLimitsTest()
+        public void ThrottlesTest()
         {
             LimitsTest b = new LimitsTest();
             // we're skipping the first trade bc it's pre-market and we're not testing
@@ -200,6 +200,53 @@ namespace TestTradeLib
             Assert.That(b.Off); // we should be shutdown
         }
 
+        [Test]
+        public void MaxSizeTest()
+        {
+            Always b = new Always();
+            b.MinSize = 100;
+            b.MaxSize = 200;
+            Position p = new Position(s);
+            Order o = new Order();
+            Assert.That(b.MinSize==100);
+            Assert.That(b.MaxSize==200);
+            for (int i = 0; i < timesales.Length; i++)
+            {
+                Tick t = new Tick(timesales[i]);
+                if (o.isValid && t.isTrade)
+                {
+                    o.Fill(t);
+                    p.Adjust((Trade)o);
+                    o = new Order();
+                }
+                Assert.That(p.Size<=b.MaxSize);
+                o = b.Trade(timesales[i], new BarList(), p, new BoxInfo());
+            }
+            Assert.That(p.Size == 200);
+
+            // Now we'll set maxsize to 100
+            b = new Always();
+            b.MinSize = 100;
+            b.MaxSize = 100;
+            p = new Position(s);
+            o = new Order();
+            Assert.That(b.MinSize == 100);
+            Assert.That(b.MaxSize == 100);
+            for (int i = 0; i < timesales.Length; i++)
+            {
+                Tick t = new Tick(timesales[i]);
+                if (o.isValid && t.isTrade)
+                {
+                    o.Fill(t);
+                    p.Adjust((Trade)o);
+                    o = new Order();
+                }
+                Assert.That(p.Size <= b.MaxSize);
+                o = b.Trade(timesales[i], new BarList(), p, new BoxInfo());
+            }
+            Assert.That(p.Size == 100);
+
+        }
     }
 
 }
