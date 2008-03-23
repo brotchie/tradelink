@@ -49,5 +49,25 @@ namespace TestTradeLib
             decimal profitFromP2toLASTTRADE = BoxMath.ClosePositionPL(p2, new Position(lasttrade));
             Assert.That(profitFromP2toLASTTRADE == (lasttrade.xprice-p2.AvgPrice)*Math.Abs(lasttrade.xsize));
         }
+
+        [Test]
+        public void UsingTrades()
+        {
+            // long
+            Position p = new Position(new Trade(s, 80, 100));
+            Assert.That(p.Side);
+            Assert.That(p.Size == 100);
+            decimal pl = p.Adjust(new Trade(s, 84, -100));
+            Assert.That(p.Flat);
+            Assert.That(pl == (84 - 80) * 100);
+            // short
+            pl = 0;
+            p = new Position(new Trade(s, 84, -100));
+            Assert.That(!p.Side);
+            Assert.That(p.Size == -100);
+            pl = p.Adjust(new Trade(s, 80, 100));
+            Assert.That(pl == (84 - 80) * 100);
+            Assert.That(p.Flat);
+        }
     }
 }

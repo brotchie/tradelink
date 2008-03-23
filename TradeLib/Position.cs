@@ -10,7 +10,11 @@ namespace TradeLib
         public Position(string stock, decimal p, int s) { sym = stock; price = p; size = s; }
         public Position(decimal p, int s) { size = s; price = p; }
         public Position(int s, decimal p) { price = p; size = s; }
-        public Position(Trade t) { sym = t.symbol; price = t.xprice; size = t.xsize; date = t.xdate; time = t.time; sec = t.xsec; }
+        public Position(Trade t) 
+        { 
+            sym = t.symbol; price = t.xprice; size = t.xsize; date = t.xdate; time = t.time; sec = t.xsec;
+            size *= t.side ? 1 : -1;
+        }
         private string sym = "";
         private int size = 0;
         private decimal price = 0;
