@@ -89,13 +89,25 @@ namespace TradeLib
         
         public Tick ToTick()
         {
-        	Tick t = new Tick(Name);
+            Tick t = new Tick(Name);
         	t.time = this.Time;
         	t.date = this.Date;
         	t.trade = this.Value;
-            t.size = -1;
+            t.size = -1; // this is to make tick field "isTrade" return true...
         	return t;
         }
+        public Stock ToStock()
+        {
+            Stock s = new Stock(StockifyIndex(Name), this.Date);
+            return s;
+        }
+        public static string StockifyIndex(string IndexName)
+        {
+            string sym = IndexName.Replace("/", "");
+            sym = sym.Replace("$", "");
+            return sym;
+        }
+
 
         public static Index FromTLmsg(string index, string val)
         {
