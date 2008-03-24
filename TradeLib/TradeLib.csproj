@@ -45,6 +45,7 @@
     <Compile Include="BarLink.cs" />
     <Compile Include="BarList.cs" />
     <Compile Include="BarMath.cs" />
+    <Compile Include="Basket.cs" />
     <Compile Include="Box.cs" />
     <Compile Include="BoxInfo.cs" />
     <Compile Include="BoxMath.cs" />
@@ -59,6 +60,7 @@
     <Compile Include="eSigTick.cs" />
     <Compile Include="Index.cs" />
     <Compile Include="IndexBasket.cs" />
+    <Compile Include="Instrument.cs" />
     <Compile Include="Kad.cs" />
     <Compile Include="LimitOrder.cs" />
     <Compile Include="Link.cs" />

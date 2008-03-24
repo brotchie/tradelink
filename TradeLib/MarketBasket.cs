@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace TradeLib
 {
     [Serializable]
-    public class MarketBasket
+    public class MarketBasket : Basket
     {
         public MarketBasket(Stock firststock)
         {
@@ -13,14 +13,16 @@ namespace TradeLib
         public MarketBasket() { }
         public Stock this [int index] { get { return stocks[index]; } set { stocks[index] = value; } }
         List<Stock> stocks = new List<Stock>();
-        public int Count { get { return stocks.Count; } }
+        public override int Count { get { return stocks.Count; } }
         public bool hasStock { get { return stocks.Count >0; } }
-        public void Add(Stock s) { stocks.Add(s); }
+        public override void Add(Instrument s) { if (s.isValid) stocks.Add((Stock)s); }
+        public void Add(Stock s) { if (s.isValid) stocks.Add(s); }
         public void Add(MarketBasket mb)
         {
             for (int i = 0; i < mb.Count; i++)
                 this.Add(mb[i]);
         }
+        public override void Remove(int i) { stocks.RemoveAt(i); }
         public void Remove(Stock s) { stocks.Remove(s); }
         public void Clear() { stocks.Clear(); }
         public Stock Get(int i) { return (Stock)stocks[i]; }
@@ -36,7 +38,8 @@ namespace TradeLib
             if ((serialBasket == null) || (serialBasket == "")) return mb;
             string[] r = serialBasket.Split(',');
             for (int i = 0; i < r.Length; i++)
-                mb.Add(new Stock(r[i]));
+                if ((r[i]!="") && Stock.isStock(r[i]))
+                    mb.Add(new Stock(r[i]));
             return mb;
         }
 

@@ -262,6 +262,67 @@ namespace TradeLib
         const string LIVEWINDOW = "TL-ANVIL-LIVE";
         const string REPLAYWINDOW = "TradeLink Replay";
 
+        public bool Mode(TLTypes mode) { return Mode(mode,false, true); }
+        public bool Mode(TLTypes mode, bool showarning) { return Mode(mode, false, showarning); }
+        public bool Mode(TLTypes mode, bool throwexceptions, bool showwarning)
+        {
+            bool HandleExceptions = !throwexceptions;
+            switch (mode)
+            {
+                case TLTypes.LIVEANVIL:
+                    if (HandleExceptions)
+                    {
+                        try
+                        {
+                            GoLive();
+                        }
+                        catch (TLServerNotFound)
+                        {
+                            
+                            if (showwarning)
+                                MessageBox.Show("No Live broker instance was found.  Make sure broker application + TradeLink server is running.", "TradeLink server not found");
+                            return false;
+                        }
+                    }
+                    else GoLive();
+                    break;
+                case TLTypes.SIMANVIL:
+                    if (HandleExceptions)
+                    {
+                        try
+                        {
+
+                            GoSim();
+                        }
+                        catch (TLServerNotFound)
+                        {
+                            if (showwarning)
+                                MessageBox.Show("No simulation broker instance was found.  Make sure broker application + TradeLink server is running.", "TradeLink server not found");
+                            return false;
+                        }
+                    }
+                    else GoSim();
+                    break;
+                case TLTypes.TLREPLAY:
+                    if (HandleExceptions)
+                    {
+                        try
+                        {
+                            GoHist();
+                        }
+                        catch (TLServerNotFound)
+                        {
+                            if (showwarning)
+                                MessageBox.Show("TradeLink Replay not found. Please start TradeLink Replay.", "TradeLink Server not found");
+                            return false;
+                        }
+                    }
+                    else GoHist();
+                    break;
+            }
+            return true;
+        }
+
 
         /// <summary>
         /// Make's TL client use historical server

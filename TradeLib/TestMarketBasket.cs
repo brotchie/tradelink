@@ -31,5 +31,20 @@ namespace TestTradeLib
             Assert.That(mb.Count==0);
             Assert.That(newbasket.Count==3);
         }
+
+        [Test]
+        public void Serialization()
+        {
+            MarketBasket mb = new MarketBasket();
+            mb.Add(new Stock("IBM"));
+            MarketBasket compare = MarketBasket.FromString(mb.ToString());
+            Assert.That(compare.Count == 1);
+            mb.Clear();
+            compare = MarketBasket.FromString(mb.ToString());
+            Assert.That(compare.Count==0);
+
+
+
+        }
     }
 }

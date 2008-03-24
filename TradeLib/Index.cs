@@ -3,12 +3,13 @@ using System;
 namespace TradeLib
 {
 
-    public class Index
+    public class Index : Instrument
     {
         public static bool isIdx(string sym)
         {
             return (sym.StartsWith("/") || sym.StartsWith("$"));
         }
+        public override bool isValid { get { return Index.isIdx(this.name); } }
         public Index(Index copythisidx)
         {
             Name = copythisidx.Name;
@@ -43,7 +44,7 @@ namespace TradeLib
         decimal last = 0;
         public int Date { get { return date; } set { date = value; } }
         public int Time { get { return time; } set { time = value; } }
-        public string Name { get { return name; } set { if (isIdx(value)) name = value; } }
+        public override string Name { get { return name; } set { if (isIdx(value)) name = value; } }
         public decimal Value { get { return last; } }
         public decimal Open { get { return open; } }
         public decimal High { get { return high; } }

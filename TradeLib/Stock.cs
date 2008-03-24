@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 namespace TradeLib
 {
     [Serializable]
-    public class Stock
+    public class Stock : Instrument
     {
         public Stock(string s) { Load(s); }
         public Stock(string symbol, int Date) { Load(symbol); date = Date; }
@@ -23,7 +23,8 @@ namespace TradeLib
         public decimal DayClose { get { return tc; } set { tc = value; } }
         public decimal YestClose { get { return yc; } set { yc = value; } }
         public string Symbol { get { return symbol; } }
-        public virtual bool isValid { get { return (symbol != null) && isStock(symbol); } }
+        public override string Name { get { return Symbol; } set { } }
+        public override bool isValid { get { return (symbol != null) && isStock(symbol); } }
         public virtual bool Load(string sym)
         {
             sym = sym.ToUpper();

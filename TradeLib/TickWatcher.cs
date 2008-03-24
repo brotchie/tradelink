@@ -6,8 +6,11 @@ namespace TradeLib
     public class TickWatcher
     {
         private int _defaultwait = 300;
+        private bool _alertonfirst = true;
         private Dictionary<string, long> _last = new Dictionary<string, long>();
         public event StockDelegate Alerted;
+        public event StockDelegate FirstTick;
+        public bool FireFirstTick { get { return _alertonfirst; } set { _alertonfirst = value; } }
         public int DefaultWait { get { return _defaultwait; } set { _defaultwait = value; } }
         public bool Watch(Tick tick) { return Watch(tick, _defaultwait); }
         public bool Watch(Tick tick, int NoTicksAlertWait) 
@@ -16,6 +19,9 @@ namespace TradeLib
             if (!_last.ContainsKey(tick.sym))
             {
                 _last.Add(tick.sym, last);
+                if (_alertonfirst) // if we're notifying when first tick arrives, do it.
+                    if (FirstTick != null) 
+                        FirstTick(new Stock(tick.sym, Util.ToTLDate(_last[tick.sym])));
                 return true;
             }
             TimeSpan span = new TimeSpan(Util.ToDateTime(tick.date, tick.time, tick.sec).Ticks - _last[tick.sym]);
