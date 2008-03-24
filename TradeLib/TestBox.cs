@@ -41,8 +41,8 @@ namespace TestTradeLib
             Box b = new Box();
             Assert.That(!b.Off);
             Assert.That(b.QuickOrder);
-            Assert.That(b.Trades == 0);
-            Assert.That(!b.UseLimits);
+            Assert.That(b.Turns == 0);
+            Assert.That(!b.TradeCaps);
             Assert.That(b.NewsHandler == null);
             Assert.That(!b.Debug);
             Assert.That(b.DayStart == 930);
@@ -76,19 +76,19 @@ namespace TestTradeLib
 
             if (b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo()).isValid)
                     good++;
-            Assert.That(b.Trades == 0);
+            Assert.That(b.Turns == 0);
             Assert.That(b.Adjusts == 0);
             if (b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo()).isValid)
                 good++;
-            Assert.That(b.Trades == 0);
+            Assert.That(b.Turns == 0);
             Assert.That(b.Adjusts == 1); 
             if (b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo()).isValid)
                 good++;
-            Assert.That(b.Trades == 0);
+            Assert.That(b.Turns == 0);
             Assert.That(b.Adjusts == 2); 
             if (b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo()).isValid)
                 good++;
-            Assert.That(b.Trades == 0);
+            Assert.That(b.Turns == 0);
             Assert.That(b.Adjusts == 3);
             // first trade was pre-market so we only have 3 total;
             Assert.That(good == 3);
@@ -155,7 +155,7 @@ namespace TestTradeLib
 
         public class LimitsTest : Box
         {
-            public LimitsTest() { UseLimits = true; }
+            public LimitsTest() { TradeCaps = true; }
             protected override int Read(Tick tick, BarList bl, BoxInfo boxinfo)
             {
                 // go short off first trade
@@ -179,9 +179,9 @@ namespace TestTradeLib
             int i = 1;
             Order o;
             Position p = new Position(s);
-            Assert.That(b.Trades == 0);
+            Assert.That(b.Turns == 0);
             Assert.That(b.Adjusts == 0);
-            Assert.That(b.UseLimits);
+            Assert.That(b.TradeCaps);
             Assert.That(!b.Off);
             Assert.That(b.PosSize == 0);
             o = b.Trade(timesales[i++], new BarList(), p, new BoxInfo());
@@ -190,11 +190,11 @@ namespace TestTradeLib
             o.Fill(timesales[i]);
             p.Adjust((Trade)o);
             Assert.That(b.Adjusts == 1);
-            Assert.That(b.Trades == 0);
+            Assert.That(b.Turns == 0);
             o = b.Trade(timesales[i++], new BarList(), p, new BoxInfo());
             Assert.That(o.isValid);
             Assert.That(b.Adjusts == 2);
-            Assert.That(b.Trades == 1); // should be flat now
+            Assert.That(b.Turns == 1); // should be flat now
             o = b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo());
             Assert.That(!o.isValid); // no more orders, as
             Assert.That(b.Off); // we should be shutdown

@@ -63,7 +63,7 @@ namespace TradeLib
            
             if ((Time < DayStart) || (Time>DayEnd)) return o; // is market open?
             if (Off) return o; // don't trade if shutdown
-            if (UseLimits &&  pos.Flat && ((this.trades >= MAXTRADES) || (this.adjusts >= MAXADJUSTS)))
+            if (TradeCaps &&  pos.Flat && ((this.trades >= MAXTRADES) || (this.adjusts >= MAXADJUSTS)))
             {
                 this.Shutdown("Trade limit reached.");
                 return o;
@@ -210,7 +210,7 @@ namespace TradeLib
             ResetIndicators(_indicount);
         }
 
-
+        [CategoryAttribute("TradeLink Box"), DescriptionAttribute("Enables processing of debug messages sent via D().")]
         public bool Debug { get { return DEBUG; } set { DEBUG = value; } }
         public virtual void Shutdown(string message)
         {
@@ -244,8 +244,8 @@ namespace TradeLib
 
         [CategoryAttribute("TradeLink Box"), DescriptionAttribute("User-Supplied version number.")]
         public virtual string Version { get { return ver; } set { ver = value; } }
-        [CategoryAttribute("TradeLink Box"), DescriptionAttribute("Toggle enforcing of MaxTrades and MaxAdjusts")]
-        public bool UseLimits { get { return USELIMITS; } set { USELIMITS = value; } }
+        [CategoryAttribute("TradeLink Box"), DescriptionAttribute("Toggle enforcing of MaxTurns and MaxAdjusts")]
+        public bool TradeCaps { get { return USELIMITS; } set { USELIMITS = value; } }
         [CategoryAttribute("TradeLink Box"), DescriptionAttribute("Allow emails from the box to be sent.")]
         public bool Emails { get { return _email; } set { _email = value; } }
         [CategoryAttribute("TradeLink Box"), DescriptionAttribute("Sets inclusive start time for box each day.")]
@@ -256,9 +256,9 @@ namespace TradeLib
         public int Date { get { return date; } }
         [CategoryAttribute("TradeLink BoxInfo"), DescriptionAttribute("Time")]
         public int Time { get { return time; } }
-        [CategoryAttribute("TradeLink Box"), DescriptionAttribute("If UseLimits is true, Shutdown box when this many trades is reached.")]
-        public int MaxTrades { get { return MAXTRADES; } set { MAXTRADES = value; } }
-        [CategoryAttribute("TradeLink Box"), DescriptionAttribute("If UseLimits is true, Shutdown box after this many adjustments.")]
+        [CategoryAttribute("TradeLink Box"), DescriptionAttribute("If TradeCaps is true, Shutdown box when this many roundturns is reached.")]
+        public int MaxTurns { get { return MAXTRADES; } set { MAXTRADES = value; } }
+        [CategoryAttribute("TradeLink Box"), DescriptionAttribute("If TradeCaps is true, Shutdown box after this many executions.")]
         public int MaxAdjusts { get { return MAXADJUSTS; } set { MAXADJUSTS = value; } }
         [CategoryAttribute("TradeLink Box"), DescriptionAttribute("Maximum size of a single position.")]
         public int MaxSize { get { return MAXSIZE; } set { MAXSIZE = value; } }
@@ -276,9 +276,9 @@ namespace TradeLib
         public string Symbol { get { return symbol; } }
         [CategoryAttribute("TradeLink BoxInfo"), Description("True if the box is Shutdown.")]
         public bool Off { get { return SHUTDOWN; } }
-        [CategoryAttribute("TradeLink BoxInfo"), DescriptionAttribute("Number of trades (long/short) this box has made.")]
-        public int Trades { get { return trades; } }
-        [CategoryAttribute("TradeLink BoxInfo"), DescriptionAttribute("Number of position adjustments this box has made.")]
+        [CategoryAttribute("TradeLink BoxInfo"), DescriptionAttribute("Number of round turns this box has made (doesn't take into account size of a half-turn).")]
+        public int Turns { get { return trades; } }
+        [CategoryAttribute("TradeLink BoxInfo"), DescriptionAttribute("Number of position adjustments- or executions- this box has made.")]
         public int Adjusts { get { return adjusts; } }
 
         [BrowsableAttribute(false)]
