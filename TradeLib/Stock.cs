@@ -34,7 +34,7 @@ namespace TradeLib
         }
         public static bool isStock(string sym)
         {
-            Regex sfilt = new Regex("[$/]{0,1}[a-z]+", RegexOptions.IgnoreCase);
+            Regex sfilt = new Regex("^[^$/][a-z]+", RegexOptions.IgnoreCase);
             if (!sfilt.IsMatch(sym)) return false; // invalid symbol
             return true;
         }
