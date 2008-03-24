@@ -10,6 +10,7 @@ namespace WinGauntlet
 {
     public partial class Gauntlet : Form
     {
+        Box mybox;
         BackTest bt;
         NewsService ns = new NewsService();
         public Gauntlet()
@@ -49,7 +50,7 @@ namespace WinGauntlet
 
         void ns_NewsEventSubscribers(News news)
         {
-            show(news.Msg);
+            show(news.Msg+Environment.NewLine);
         }
 
         void FindStocks(string path)
@@ -181,14 +182,8 @@ namespace WinGauntlet
                     tf.Add(fi[i]);
             }
             bt.name = DateTime.Now.ToString("yyyMMdd.HHmm");
-            bt.Debug(showdebug.Checked); // must occur before bt.Box is called
-            bt.aname = WinGauntlet.Properties.Settings.Default.boxdll;
-            if (!bt.Box((string)boxlist.SelectedItem))
-            {
-                show("Box failed to load... quitting."+Environment.NewLine);
-                return;
-            }
-            
+            if (mybox != null) { bt.mybox = mybox; bt.mybox.Debug = showdebug.Checked; }
+            else { show("You must select a box to run the gauntlet."); return; } 
             string exfilt = "";
             if ((exchlist.SelectedIndices.Count > 0) && 
                 !exchlist.SelectedItem.ToString().Contains("NoFilter")) 
@@ -309,6 +304,15 @@ namespace WinGauntlet
         private void button3_Click(object sender, EventArgs e)
         {
             WinGauntlet.Properties.Settings.Default.Reload();
+        }
+
+        private void boxlist_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                mybox = Box.FromDLL((string)boxlist.SelectedItem, WinGauntlet.Properties.Settings.Default.boxdll, ns);
+            }
+            catch (Exception ex) { show("Box failed to load, quitting... (" + ex.Message + (ex.InnerException != null ? ",ex.InnerException.Message" : "") + ")"); }
         }
 
 

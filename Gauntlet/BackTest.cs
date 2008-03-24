@@ -26,8 +26,7 @@ namespace WinGauntlet
         public string symbol;
         public bool debug = false;
         private Type myboxtype = null;
-        private Box mybox = null;
-        private bool USEBOX = false;
+        public Box mybox = null;
         private bool _idx = true;
         public int time;
         public string aname = "c:\\program files\\tradelink\\tradelink\\box.dll";
@@ -156,7 +155,7 @@ namespace WinGauntlet
                 show("Symbol " + this.symbol + " (" + i + " of " + tf.Count + ") ");
 
                 // reset per-symbol statistics
-                if (USEBOX) mybox.Reset();
+                if (mybox!=null) mybox.Reset();
                 bl = new BarList((BarInterval)bint, symbol);
                 int fills = 0;
                 tick = new eSigTick(); // reset our tick
@@ -168,7 +167,7 @@ namespace WinGauntlet
                 { // process the ticks
                     line++;
                     if ((line % 5000) == 0) show(".");
-                    if (USEBOX && ((itime==0) || (itime!=tick.time)))
+                    if (((itime==0) || (itime!=tick.time)))
                     {
                         // load all the indicies for this time
                         List<Index> itix = FetchIdx(tick.time);
@@ -193,22 +192,23 @@ namespace WinGauntlet
                     { // we hit a new day in the same file, reset day stuff and set our DayEndTime
                         bl.Reset();
                         bl.AddTick(tick); // put our tick back
-                        if (USEBOX)
-                        {
-                            mybox.Reset();
-                            SetDayClose(); // this has to be run after mybox.Reset!!!
-                        }
+
+                        if (mybox!=null) mybox.Reset();
+                        SetDayClose(); // this has to be run after mybox.Reset!!!
                     }
 
-                    if (this.USEBOX)
+
+                    // execute any pending orders on this tick
+                    if (mybroker.GetOrderList().Count>0) fills += mybroker.Execute(tick); 
+                    // trade box on this tick, if he generates any orders then send them
+                    if (mybox != null)
                     {
-                        // execute any pending orders on this tick
-                        if (mybroker.GetOrderList().Count>0) fills += mybroker.Execute(tick); 
-                        // trade box on this tick, if he generates any orders then send them
-                        mybroker.sendOrder(mybox.Trade(tick, bl, mybroker.GetOpenPosition(this.symbol),bi));
+                        mybroker.sendOrder(
+                            mybox.Trade(tick, bl, mybroker.GetOpenPosition(this.symbol), bi));
                         // quit early if box shuts itself off and no pending orders
-                        if (mybox.Off && (mybroker.GetOrderList().Count== 0)) break;
+                        if (mybox.Off && (mybroker.GetOrderList().Count == 0)) break;
                     }
+
 
                     if (this.delay != 0)
                     {
@@ -217,12 +217,12 @@ namespace WinGauntlet
                     }
                     this.ReportProgress((int)((100*line) / totalticks));
                 }
-                show(fills+" trades.");
+                show(fills+" executions.");
                 totfills += fills;
                 this.cf.Close();
             }
             show(Environment.NewLine);
-            show(name+" complete: "+tf.Count+" symbols, "+ totfills + " trades."+Environment.NewLine);
+            show(name+" complete: "+tf.Count+" symbols, "+ totfills + " executions."+Environment.NewLine);
             return totfills;
         }
 
@@ -254,7 +254,6 @@ namespace WinGauntlet
 
         public bool Box(string boxname)
         {
-            USEBOX = (USEBOX) ? false : true;
             Assembly a;
             Type type;
             object[] args;
