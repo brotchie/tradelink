@@ -20,6 +20,7 @@ namespace Quotopia
         public int GetTime { get { DateTime d = DateTime.Now; int i = (d.Hour * 100) + (d.Minute); return i; } }
         public event TickDelegate spillTick;
         public event OrderStatusDel orderStatus;
+        NewsService news = new NewsService();
         const string version = "2.0";
         const string build = "$Rev: 998 $";
         string Ver { get { return version + "." + Util.CleanVer(build); } }
@@ -56,22 +57,13 @@ namespace Quotopia
 
         void FetchTLServer()
         {
-            try
+            TLTypes servers = tl.TLFound();
+            if (tl.Mode(servers, true))
             {
-                TLTypes mode = (TLTypes)Properties.Settings.Default.tlmode;
-
-                // we need to add a method to TradeLib.TradeLink_WM that will
-                // take a TLTypes and set the appropriate client mode
-                // ie:
-                // bool tl.MyMode(TlTypes changeto, bool throwonmissing, bool showdialogue)
-             
+                status("Found TradeLink broker server: " + servers.ToString());
+                show("Found TradeLink broker server: " + servers.ToString());
             }
-            catch (TLServerNotFound)
-            {
-             
-            }
-
-
+            else status("Unable to find any broker instance.  Do you have one running?");
         }
 
 
@@ -93,21 +85,82 @@ namespace Quotopia
             qt.Columns.Add("Low", new Decimal().GetType());
             qt.Columns.Add("YestClose", new Decimal().GetType());
             qt.Columns.Add("Change", new Decimal().GetType());
-            qg.CaptionVisible = false;
+            qg.CaptionVisible = true;
             qg.RowHeadersVisible = false;
             qg.ColumnHeadersVisible = true;
+            qg.ContextMenu = new ContextMenu();
+            qg.ContextMenu.MenuItems.Add("Remove", new EventHandler(rightremove));
+            qg.ContextMenu.MenuItems.Add("Chart", new EventHandler(rightchart));
+            qg.ContextMenu.MenuItems.Add("Ticket", new EventHandler(rightticket));
             qg.BackColor = Quotopia.Properties.Settings.Default.marketbgcolor;
             qg.ForeColor = Quotopia.Properties.Settings.Default.marketfontcolor;
             qg.HeaderBackColor = Quotopia.Properties.Settings.Default.colheaderbg;
             qg.HeaderForeColor = Quotopia.Properties.Settings.Default.colheaderfg;
             qg.GridLineColor = Quotopia.Properties.Settings.Default.gridcolor;
+            qg.AlternatingBackColor = qg.BackColor;
             qg.ReadOnly = true;
             qg.DataSource = qt;
-            qg.Parent = quoteTab;
+            qg.Parent = Markets;
             qg.Dock = DockStyle.Fill;
             qg.KeyUp += new KeyEventHandler(qg_KeyUp);
             qg.MouseUp += new MouseEventHandler(qg_MouseUp);
         }
+
+        void rightticket(object sender, EventArgs e)
+        {
+            Point p = qg.PointToClient(MousePosition);
+            DataGrid.HitTestInfo ht = qg.HitTest(p);
+            if (ht.Type != DataGrid.HitTestType.Cell) return;
+            if (ht.Row < 0) return;
+            string sym = GetVisibleStock(ht.Row);
+            Position me = tl.FastPos(sym);
+            order o = new order(sym, me.Size, me.Side);
+            o.neworder += new QuotopiaOrderDel(o_neworder);
+            spillTick +=new TickDelegate(o.newTick);
+            orderStatus+=new OrderStatusDel(o.orderStatus);
+            p = new Point(MousePosition.X, MousePosition.Y);
+            p.Offset(-315, -25);
+            o.SetDesktopLocation(p.X, p.Y);
+            o.Show();
+        }
+
+        void o_neworder(Order sendOrder)
+        {
+            throw new Exception("The method or operation is not implemented.");
+        }
+
+        void rightremove(object sender, EventArgs e)
+        {
+            Point p = qg.PointToClient(MousePosition);
+            DataGrid.HitTestInfo ht = qg.HitTest(p);
+            if (ht.Type != DataGrid.HitTestType.Cell) return;
+            if (ht.Row < 0) return;
+            string sym = GetVisibleStock(ht.Row);
+            if (MessageBox.Show("Are you sure you want to remove "+sym+"?","Confirm remove",MessageBoxButtons.YesNo)== DialogResult.Yes)
+            {
+                qt.Rows.RemoveAt(ht.Row);
+            }
+        }
+
+
+        void rightchart(object sender, EventArgs e)
+        {
+            Point p = qg.PointToClient(MousePosition);
+            DataGrid.HitTestInfo ht = qg.HitTest(p);
+            if (ht.Type != DataGrid.HitTestType.Cell) return;
+            if (ht.Row < 0) return;
+            string sym = GetVisibleStock(ht.Row);
+            Chart c = new Chart();
+            try
+            {
+                c = new Chart(bardict[sym]);
+            }
+            catch (Exception) { return; }
+            c.Symbol = sym;
+            c.Show();
+        }
+
+
             
         void qg_MouseUp(object sender, MouseEventArgs e)
         {
@@ -121,10 +174,19 @@ namespace Quotopia
         {
             if (e.KeyCode == Keys.Enter)
             {
-                if (Stock.isStock(newsymbol) || Index.isIdx(newsymbol))
+                if (Stock.isStock(newsymbol))
                 {
+                    mb.Add(new Stock(newsymbol));
                     addsymbol(newsymbol);
                     newsymbol = "";
+                    tl.Subscribe(mb);
+                }
+                else if (Index.isIdx(newsymbol))
+                {
+                    ib.Add(new Index(newsymbol));
+                    addsymbol(newsymbol);
+                    newsymbol = "";
+                    tl.RegIndex(ib);
                 }
                 else
                 {
@@ -147,13 +209,19 @@ namespace Quotopia
                 newsymbol += (char)e.KeyValue;
                 status("Adding symbol: " + newsymbol);
             }
-            e.Handled = true;
-            // have to resubscribe here
         }
+
+        Dictionary<string, BarList> bardict = new Dictionary<string, BarList>();
+        void BarUpdate(Tick t) { if (bardict.ContainsKey(t.sym)) bardict[t.sym].AddTick(t); }
+
         void addsymbol(string sym)
         {
-            DataRow r = qt.Rows.Add(sym);
+            // SYM,LAST,TSIZE,BID,ASK,BSIZE,ASIZE,SIZES,OHLC(YEST),CHANGE
+            DataRow r = qt.Rows.Add(sym,0,0,0,0,0,0,"0x0",0,0,0,0,0);
+            if (!bardict.ContainsKey(sym))
+                bardict.Add(sym, new BarList(BarInterval.FiveMin, sym));
             qg.Select(qg.VisibleRowCount - 1); // selects most recently added symbol
+            status("Added " + sym);
         }
 
 
@@ -168,9 +236,11 @@ namespace Quotopia
         }
 
 
-        NewsService news = new NewsService();
-
-
+        string GetVisibleStock(int row)
+        {
+            return ((row < 0) || (row >= qg.VisibleRowCount))
+                ? "" : qg[row, 0].ToString();
+        }
         int[] GetSymbolRows(string sym)
         {
             List<int> r = new List<int>();
@@ -180,10 +250,51 @@ namespace Quotopia
             return r.ToArray();
         }
 
-        void RefreshRow(int r, Tick t)
+        void RefreshRow(Tick t)
         {
+            int[] rows = GetSymbolRows(t.sym);
+            for (int i = 0; i<rows.Length; i++)
+            {
+                // last,size,bid/ask,sizes
+                // fetch OHLC from TL
+                // fetch position from TL
+                int r = rows[i];
+                if (t.isTrade)
+                {
+                    qt.Rows[r]["Last"] = t.trade;
+                    qt.Rows[r]["TSize"] = t.size;
+                }
+                else if (t.FullQuote)
+                {
+
+                    qt.Rows[r]["Bid"] = t.bid;
+                    qt.Rows[r]["Ask"] = t.ask;
+                    qt.Rows[r]["BSize"] = t.bs;
+                    qt.Rows[r]["ASize"] = t.os;
+                    qt.Rows[r]["Sizes"] = t.bs.ToString() + "x" + t.os.ToString();
+                }
+                else if (t.hasBid)
+                {
+                    qt.Rows[r]["Bid"] = t.bid;
+                    qt.Rows[r]["BSize"] = t.bs;
+                    int os = (int)qt.Rows[r]["ASize"];
+                    qt.Rows[r]["Sizes"] = t.bs.ToString() + "x" + os.ToString();
+                }
+                else if (t.hasAsk)
+                {
+                    qt.Rows[r]["Ask"] = t.ask;
+                    qt.Rows[r]["ASize"] = t.os;
+                    int bs = (int)qt.Rows[r]["BSize"];
+                    qt.Rows[r]["Sizes"] = bs.ToString() + "x" + t.os.ToString();
+                }
+                else return;
+            }
+
+
+
 
         }
+
 
         void tl_gotFill(Trade t)
         {
@@ -193,7 +304,9 @@ namespace Quotopia
 
         void tl_gotTick(Tick t)
         {
-            // bars
+            BarUpdate(t);
+            if (spillTick != null) spillTick(t);
+            RefreshRow(t);
             // boxinfo
             // trades boxes
             // spilltick to order tickets
@@ -210,16 +323,6 @@ namespace Quotopia
         void QuotopiaClose()
         {
             tl.Disconnect(); // unregister all stocks and this client
-        }
-
-
-        void ReSubscribe() { ReSubscribe(true); }
-        void ReSubscribe(bool dosubscribe)
-        {
-            // have to resubscribe with TLServer 
-            // when new stocks are entered/imported or deleted
-
-            // don't have to resubscribe if stocks are moved or reordered
         }
 
 
@@ -256,11 +359,15 @@ namespace Quotopia
             statuslab.Text = s;
         }
 
+        MarketBasket mb = new MarketBasket();
+        IndexBasket ib = new IndexBasket();
+
+
         private void importbasketbut_Click(object sender, EventArgs e)
         {
             OpenFileDialog od = new OpenFileDialog();
             od.Multiselect = true;
-            od.Filter = "MarketBasket (*.mb)|*.mb|All files (*.*)|*.*";
+            od.Filter = "Basket (*.mb)|*.mb|All files (*.*)|*.*";
             od.AddExtension = true;
             od.DefaultExt = ".mb";
             od.CheckFileExists = true;
@@ -270,9 +377,25 @@ namespace Quotopia
                 foreach (string f in od.FileNames)
                 {
                     StreamReader sr = new StreamReader(f);
-
+                    string line = sr.ReadLine();
+                    sr.Close();
+                    string[] r = line.Split(',');
+                    int skipped = 0;
+                    for (int i = 0; i < r.Length; i++)
+                    {
+                        bool add = true;
+                        if (Stock.isStock(r[i]))
+                            mb.Add(new Stock(r[i]));
+                        else if (Index.isIdx(r[i]))
+                            ib.Add(new Index(r[i]));
+                        else { add = false; skipped++; }
+                        if (add) addsymbol(r[i]);
+                    }
+                    status("Imported " + (r.Length - skipped) + " instruments.");
                 }
             }
+            tl.Subscribe(mb);
+            tl.RegIndex(ib);
         }
 
     }

@@ -69,7 +69,7 @@
       <Value Profile="(Default)">Black</Value>
     </Setting>
     <Setting Name="colheaderfg" Type="System.Drawing.Color" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">White</Value>
     </Setting>
     <Setting Name="tlmode" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">2</Value>
