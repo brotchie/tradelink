@@ -88,6 +88,8 @@ namespace Quotopia
             qg.CaptionVisible = true;
             qg.RowHeadersVisible = false;
             qg.ColumnHeadersVisible = true;
+            qg.Capture = true;
+            qg.FlatMode = true;
             qg.ContextMenu = new ContextMenu();
             qg.ContextMenu.MenuItems.Add("Remove", new EventHandler(rightremove));
             qg.ContextMenu.MenuItems.Add("Chart", new EventHandler(rightchart));
@@ -102,43 +104,48 @@ namespace Quotopia
             qg.DataSource = qt;
             qg.Parent = Markets;
             qg.Dock = DockStyle.Fill;
+            qg.DoubleClick += new EventHandler(qg_DoubleClick);
+            this.KeyUp += new KeyEventHandler(qg_KeyUp);
             qg.KeyUp += new KeyEventHandler(qg_KeyUp);
             qg.MouseUp += new MouseEventHandler(qg_MouseUp);
         }
 
+        void qg_DoubleClick(object sender, EventArgs e)
+        {
+            rightticket(null, null);
+        }
+
         void rightticket(object sender, EventArgs e)
         {
-            Point p = qg.PointToClient(MousePosition);
-            DataGrid.HitTestInfo ht = qg.HitTest(p);
-            if (ht.Type != DataGrid.HitTestType.Cell) return;
-            if (ht.Row < 0) return;
-            string sym = GetVisibleStock(ht.Row);
+            string sym = GetVisibleStock(qg.CurrentRowIndex);
             Position me = tl.FastPos(sym);
             order o = new order(sym, me.Size, me.Side);
             o.neworder += new QuotopiaOrderDel(o_neworder);
             spillTick +=new TickDelegate(o.newTick);
             orderStatus+=new OrderStatusDel(o.orderStatus);
-            p = new Point(MousePosition.X, MousePosition.Y);
-            p.Offset(-315, -25);
+            System.Drawing.Point p = new System.Drawing.Point(MousePosition.X, MousePosition.Y);
+            p.Offset(-315, 20);
             o.SetDesktopLocation(p.X, p.Y);
             o.Show();
         }
 
         void o_neworder(Order sendOrder)
         {
-            throw new Exception("The method or operation is not implemented.");
+            int res = tl.SendOrder(sendOrder);
+            if (res != 0)
+            {
+                string err = TradeLink.PrettyAnvilError(res);
+                status(err);
+                show(sendOrder.ToString() + "( " + err + " )");
+            }
         }
 
         void rightremove(object sender, EventArgs e)
         {
-            Point p = qg.PointToClient(MousePosition);
-            DataGrid.HitTestInfo ht = qg.HitTest(p);
-            if (ht.Type != DataGrid.HitTestType.Cell) return;
-            if (ht.Row < 0) return;
-            string sym = GetVisibleStock(ht.Row);
+            string sym = GetVisibleStock(qg.CurrentRowIndex);
             if (MessageBox.Show("Are you sure you want to remove "+sym+"?","Confirm remove",MessageBoxButtons.YesNo)== DialogResult.Yes)
             {
-                qt.Rows.RemoveAt(ht.Row);
+                qt.Rows.RemoveAt(qg.CurrentRowIndex);
             }
         }
 
@@ -149,7 +156,7 @@ namespace Quotopia
             DataGrid.HitTestInfo ht = qg.HitTest(p);
             if (ht.Type != DataGrid.HitTestType.Cell) return;
             if (ht.Row < 0) return;
-            string sym = GetVisibleStock(ht.Row);
+            string sym = GetVisibleStock(qg.CurrentRowIndex);
             Chart c = new Chart();
             try
             {
@@ -172,6 +179,9 @@ namespace Quotopia
         string newsymbol = "";
         void qg_KeyUp(object sender, KeyEventArgs e)
         {
+            string preface = "Adding symbol: ";
+            if (newsymbol.Contains("$") || newsymbol.Contains("/")) 
+                preface = "Adding index: ";
             if (e.KeyCode == Keys.Enter)
             {
                 if (Stock.isStock(newsymbol))
@@ -194,6 +204,16 @@ namespace Quotopia
                     newsymbol = "";
                 }
             }
+            else if (e.KeyCode == Keys.OemQuestion)
+            {
+                newsymbol += "/";
+                status(preface + newsymbol);
+            }
+            else if ((e.KeyCode == Keys.D4) && e.Shift)
+            {
+                newsymbol = "$";
+                status(preface + newsymbol);
+            }
             else if ((e.KeyCode == Keys.Escape) || (e.KeyCode == Keys.Delete))
             {
                 newsymbol = "";
@@ -202,7 +222,7 @@ namespace Quotopia
             else if (e.KeyCode == Keys.Back)
             {
                 newsymbol = newsymbol.Substring(0, newsymbol.Length - 2);
-                status("Adding symbol: " + newsymbol);
+                status(preface + newsymbol);
             }
             else
             {
@@ -230,6 +250,7 @@ namespace Quotopia
 
         void tl_gotIndexTick(Index idx)
         {
+            tl_gotTick(idx.ToTick());
             // archive index (just like ticks)
             // high/low coloring (just like ticks)
             // uptick/downtick coloring (just like ticks)
@@ -262,7 +283,8 @@ namespace Quotopia
                 if (t.isTrade)
                 {
                     qt.Rows[r]["Last"] = t.trade;
-                    qt.Rows[r]["TSize"] = t.size;
+                    if (t.size>0) // make sure TSize is reported
+                        qt.Rows[r]["TSize"] = t.size;
                 }
                 else if (t.FullQuote)
                 {

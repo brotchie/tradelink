@@ -47,7 +47,7 @@ namespace Quotopia
             // 
             this.sendbut.BackColor = System.Drawing.SystemColors.Window;
             this.sendbut.FlatAppearance.BorderSize = 0;
-            this.sendbut.Location = new System.Drawing.Point(112, 9);
+            this.sendbut.Location = new System.Drawing.Point(155, 4);
             this.sendbut.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.sendbut.Name = "sendbut";
             this.sendbut.Size = new System.Drawing.Size(50, 23);
@@ -63,7 +63,7 @@ namespace Quotopia
             this.obuybut.Location = new System.Drawing.Point(3, 12);
             this.obuybut.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.obuybut.Name = "obuybut";
-            this.obuybut.Size = new System.Drawing.Size(43, 17);
+            this.obuybut.Size = new System.Drawing.Size(53, 21);
             this.obuybut.TabIndex = 4;
             this.obuybut.Text = "Buy";
             this.obuybut.UseVisualStyleBackColor = true;
@@ -73,10 +73,10 @@ namespace Quotopia
             // 
             this.osellbut.AutoSize = true;
             this.osellbut.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.osellbut.Location = new System.Drawing.Point(52, 12);
+            this.osellbut.Location = new System.Drawing.Point(70, 11);
             this.osellbut.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.osellbut.Name = "osellbut";
-            this.osellbut.Size = new System.Drawing.Size(42, 17);
+            this.osellbut.Size = new System.Drawing.Size(52, 21);
             this.osellbut.TabIndex = 5;
             this.osellbut.Text = "Sell";
             this.osellbut.UseVisualStyleBackColor = true;
@@ -88,7 +88,7 @@ namespace Quotopia
             this.pricelabel.Location = new System.Drawing.Point(4, 63);
             this.pricelabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.pricelabel.Name = "pricelabel";
-            this.pricelabel.Size = new System.Drawing.Size(31, 13);
+            this.pricelabel.Size = new System.Drawing.Size(40, 17);
             this.pricelabel.TabIndex = 6;
             this.pricelabel.Text = "Price";
             // 
@@ -97,10 +97,10 @@ namespace Quotopia
             this.limitbut.AutoSize = true;
             this.limitbut.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.limitbut.Checked = true;
-            this.limitbut.Location = new System.Drawing.Point(4, 38);
+            this.limitbut.Location = new System.Drawing.Point(2, 39);
             this.limitbut.Name = "limitbut";
             this.limitbut.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.limitbut.Size = new System.Drawing.Size(46, 17);
+            this.limitbut.Size = new System.Drawing.Size(58, 21);
             this.limitbut.TabIndex = 10;
             this.limitbut.TabStop = true;
             this.limitbut.Text = "Limit";
@@ -110,9 +110,9 @@ namespace Quotopia
             // 
             this.stopbut.AutoSize = true;
             this.stopbut.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.stopbut.Location = new System.Drawing.Point(51, 38);
+            this.stopbut.Location = new System.Drawing.Point(68, 38);
             this.stopbut.Name = "stopbut";
-            this.stopbut.Size = new System.Drawing.Size(47, 17);
+            this.stopbut.Size = new System.Drawing.Size(58, 21);
             this.stopbut.TabIndex = 11;
             this.stopbut.Text = "Stop";
             this.stopbut.UseVisualStyleBackColor = true;
@@ -123,19 +123,19 @@ namespace Quotopia
             this.groupBox1.Controls.Add(this.osellbut);
             this.groupBox1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.groupBox1.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.groupBox1.Location = new System.Drawing.Point(4, 3);
+            this.groupBox1.Location = new System.Drawing.Point(4, -5);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(102, 32);
+            this.groupBox1.Size = new System.Drawing.Size(134, 37);
             this.groupBox1.TabIndex = 12;
             this.groupBox1.TabStop = false;
             // 
             // marketbut
             // 
             this.marketbut.AutoSize = true;
-            this.marketbut.Location = new System.Drawing.Point(100, 38);
+            this.marketbut.Location = new System.Drawing.Point(131, 38);
             this.marketbut.Name = "marketbut";
             this.marketbut.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.marketbut.Size = new System.Drawing.Size(58, 17);
+            this.marketbut.Size = new System.Drawing.Size(72, 21);
             this.marketbut.TabIndex = 15;
             this.marketbut.TabStop = true;
             this.marketbut.Text = "Market";
@@ -149,14 +149,14 @@ namespace Quotopia
             0,
             0,
             131072});
-            this.oprice.Location = new System.Drawing.Point(40, 60);
+            this.oprice.Location = new System.Drawing.Point(49, 60);
             this.oprice.Maximum = new decimal(new int[] {
             1215752192,
             23,
             0,
             0});
             this.oprice.Name = "oprice";
-            this.oprice.Size = new System.Drawing.Size(57, 20);
+            this.oprice.Size = new System.Drawing.Size(76, 23);
             this.oprice.TabIndex = 16;
             this.oprice.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.oprice.KeyUp += new System.Windows.Forms.KeyEventHandler(this.oprice_KeyUp);
@@ -169,7 +169,7 @@ namespace Quotopia
             0,
             0,
             0});
-            this.osize.Location = new System.Drawing.Point(103, 60);
+            this.osize.Location = new System.Drawing.Point(131, 60);
             this.osize.Maximum = new decimal(new int[] {
             1410065408,
             2,
@@ -181,7 +181,7 @@ namespace Quotopia
             0,
             0});
             this.osize.Name = "osize";
-            this.osize.Size = new System.Drawing.Size(59, 20);
+            this.osize.Size = new System.Drawing.Size(72, 23);
             this.osize.TabIndex = 17;
             this.osize.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.osize.Value = new decimal(new int[] {
@@ -194,11 +194,11 @@ namespace Quotopia
             // order
             // 
             this.AllowDrop = true;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.ClientSize = new System.Drawing.Size(170, 85);
+            this.ClientSize = new System.Drawing.Size(216, 85);
             this.Controls.Add(this.osize);
             this.Controls.Add(this.oprice);
             this.Controls.Add(this.marketbut);
