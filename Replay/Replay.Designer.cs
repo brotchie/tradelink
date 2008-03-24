@@ -46,7 +46,8 @@ namespace TLReplay
             // 
             // monthCalendar1
             // 
-            this.monthCalendar1.Location = new System.Drawing.Point(110, 50);
+            this.monthCalendar1.Location = new System.Drawing.Point(134, 44);
+            this.monthCalendar1.Margin = new System.Windows.Forms.Padding(12, 11, 12, 11);
             this.monthCalendar1.MaxSelectionCount = 1;
             this.monthCalendar1.Name = "monthCalendar1";
             this.monthCalendar1.ShowToday = false;
@@ -56,9 +57,10 @@ namespace TLReplay
             // 
             // inputselectbut
             // 
-            this.inputselectbut.Location = new System.Drawing.Point(233, 10);
+            this.inputselectbut.Location = new System.Drawing.Point(338, 12);
+            this.inputselectbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.inputselectbut.Name = "inputselectbut";
-            this.inputselectbut.Size = new System.Drawing.Size(49, 28);
+            this.inputselectbut.Size = new System.Drawing.Size(65, 34);
             this.inputselectbut.TabIndex = 1;
             this.inputselectbut.Text = "Input";
             this.inputselectbut.UseVisualStyleBackColor = true;
@@ -67,10 +69,11 @@ namespace TLReplay
             // speedbar
             // 
             this.speedbar.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::TLReplay.Properties.Settings.Default, "speed", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.speedbar.Location = new System.Drawing.Point(7, 85);
+            this.speedbar.Location = new System.Drawing.Point(9, 105);
+            this.speedbar.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.speedbar.Name = "speedbar";
             this.speedbar.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.speedbar.Size = new System.Drawing.Size(50, 105);
+            this.speedbar.Size = new System.Drawing.Size(56, 129);
             this.speedbar.TabIndex = 9;
             this.speedbar.Value = global::TLReplay.Properties.Settings.Default.speed;
             this.speedbar.MouseUp += new System.Windows.Forms.MouseEventHandler(this.speedbar_MouseUp);
@@ -78,27 +81,30 @@ namespace TLReplay
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(4, 69);
+            this.label1.Location = new System.Drawing.Point(5, 85);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(38, 13);
+            this.label1.Size = new System.Drawing.Size(49, 17);
             this.label1.TabIndex = 10;
             this.label1.Text = "Speed";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(48, 166);
+            this.label2.Location = new System.Drawing.Point(64, 204);
+            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(27, 13);
+            this.label2.Size = new System.Drawing.Size(35, 17);
             this.label2.TabIndex = 11;
             this.label2.Text = "Fast";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(48, 89);
+            this.label3.Location = new System.Drawing.Point(64, 110);
+            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(30, 13);
+            this.label3.Size = new System.Drawing.Size(37, 17);
             this.label3.TabIndex = 12;
             this.label3.Text = "Slow";
             // 
@@ -106,9 +112,11 @@ namespace TLReplay
             // 
             this.nowplayinggrp.Controls.Add(this.currdate);
             this.nowplayinggrp.Enabled = false;
-            this.nowplayinggrp.Location = new System.Drawing.Point(7, 10);
+            this.nowplayinggrp.Location = new System.Drawing.Point(9, 12);
+            this.nowplayinggrp.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.nowplayinggrp.Name = "nowplayinggrp";
-            this.nowplayinggrp.Size = new System.Drawing.Size(82, 38);
+            this.nowplayinggrp.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.nowplayinggrp.Size = new System.Drawing.Size(109, 47);
             this.nowplayinggrp.TabIndex = 15;
             this.nowplayinggrp.TabStop = false;
             this.nowplayinggrp.Text = "Now Playing";
@@ -116,9 +124,10 @@ namespace TLReplay
             // currdate
             // 
             this.currdate.AutoSize = true;
-            this.currdate.Location = new System.Drawing.Point(19, 16);
+            this.currdate.Location = new System.Drawing.Point(25, 20);
+            this.currdate.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.currdate.Name = "currdate";
-            this.currdate.Size = new System.Drawing.Size(31, 13);
+            this.currdate.Size = new System.Drawing.Size(40, 17);
             this.currdate.TabIndex = 0;
             this.currdate.Text = "none";
             this.currdate.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -126,28 +135,31 @@ namespace TLReplay
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(48, 127);
+            this.label4.Location = new System.Drawing.Point(64, 156);
+            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(47, 13);
+            this.label4.Size = new System.Drawing.Size(61, 17);
             this.label4.TabIndex = 18;
             this.label4.Text = "Realistic";
             // 
             // stopbut
             // 
-            this.stopbut.Image = global::TLReplay.Properties.Resources.stopicon.ToBitmap();
-            this.stopbut.Location = new System.Drawing.Point(146, 10);
+            this.stopbut.Image = ((System.Drawing.Image)(resources.GetObject("stopbut.Image")));
+            this.stopbut.Location = new System.Drawing.Point(190, 12);
+            this.stopbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.stopbut.Name = "stopbut";
-            this.stopbut.Size = new System.Drawing.Size(42, 28);
+            this.stopbut.Size = new System.Drawing.Size(56, 34);
             this.stopbut.TabIndex = 17;
             this.stopbut.UseVisualStyleBackColor = true;
             this.stopbut.Click += new System.EventHandler(this.stopbut_Click);
             // 
             // gobut
             // 
-            this.gobut.Image = global::TLReplay.Properties.Resources.playicon.ToBitmap();
-            this.gobut.Location = new System.Drawing.Point(104, 10);
+            this.gobut.Image = ((System.Drawing.Image)(resources.GetObject("gobut.Image")));
+            this.gobut.Location = new System.Drawing.Point(134, 12);
+            this.gobut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.gobut.Name = "gobut";
-            this.gobut.Size = new System.Drawing.Size(36, 28);
+            this.gobut.Size = new System.Drawing.Size(48, 34);
             this.gobut.TabIndex = 7;
             this.gobut.Text = ">";
             this.gobut.UseVisualStyleBackColor = true;
@@ -155,10 +167,10 @@ namespace TLReplay
             // 
             // Replay
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.ClientSize = new System.Drawing.Size(294, 197);
+            this.ClientSize = new System.Drawing.Size(416, 254);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label3);
@@ -170,6 +182,7 @@ namespace TLReplay
             this.Controls.Add(this.monthCalendar1);
             this.Controls.Add(this.speedbar);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "Replay";
             this.Text = "TradeLink Replay";
             ((System.ComponentModel.ISupportInitialize)(this.speedbar)).EndInit();
