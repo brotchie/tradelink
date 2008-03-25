@@ -105,8 +105,8 @@ namespace Quotopia
             qg.Parent = Markets;
             qg.Dock = DockStyle.Fill;
             qg.DoubleClick += new EventHandler(qg_DoubleClick);
+            quoteTab.KeyUp +=new KeyEventHandler(qg_KeyUp);
             this.KeyUp += new KeyEventHandler(qg_KeyUp);
-            qg.KeyUp += new KeyEventHandler(qg_KeyUp);
             qg.MouseUp += new MouseEventHandler(qg_MouseUp);
         }
 
@@ -171,8 +171,11 @@ namespace Quotopia
             
         void qg_MouseUp(object sender, MouseEventArgs e)
         {
-            if ((e.Clicks==1) && (qg.CurrentRowIndex>=0) && (qg.CurrentRowIndex<qg.VisibleRowCount))
+            if ((e.Clicks == 1) && (qg.CurrentRowIndex >= 0) && (qg.CurrentRowIndex < qg.VisibleRowCount))
+            {
                 qg.Select(qg.CurrentRowIndex);
+                Markets.Select();
+            }
         
         }
 
@@ -219,12 +222,12 @@ namespace Quotopia
                 newsymbol = "";
                 status("Symbol add canceled...");
             }
-            else if (e.KeyCode == Keys.Back)
+            else if ((e.KeyCode == Keys.Back) && (newsymbol.Length>0))
             {
-                newsymbol = newsymbol.Substring(0, newsymbol.Length - 2);
+                newsymbol = newsymbol.Substring(0, newsymbol.Length - 1);
                 status(preface + newsymbol);
             }
-            else
+            else if ((e.KeyValue>(int)Keys.A) && (e.KeyValue<(int)Keys.Z))
             {
                 newsymbol += (char)e.KeyValue;
                 status("Adding symbol: " + newsymbol);
