@@ -22,10 +22,12 @@ namespace TradeLib
         public virtual bool isValid { get { return (xsize != 0) && (xprice != 0) && (xtime != 0) && (xdate != 0) && (symbol != null); } }
         public bool isFilled = false;  // default to false (= order)
         public Trade() : this(null, true, 0, 0, 0, null, 0, 0) { }
-        public Trade(string sym, decimal fillprice, int fillsize)
+        public Trade(string sym, decimal fillprice, int fillsize, DateTime tradedate)
         {
             if (sym != null) symbol = sym.ToUpper();
             if ((fillsize == 0) || (fillprice == 0)) throw new Exception("Invalid trade: Zero price or size provided.");
+            xtime = Util.ToTLTime(tradedate);
+            xdate = Util.ToTLDate(tradedate);
             xsize = fillsize;
             xprice = fillprice;
         }

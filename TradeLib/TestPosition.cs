@@ -11,6 +11,7 @@ namespace TestTradeLib
     {
         public TestPosition() { }
         const string s = "TST";
+        DateTime dt = DateTime.Now;
         [Test]
         public void Basics()
         {
@@ -39,13 +40,13 @@ namespace TestTradeLib
             Assert.That(p.isValid);
             Assert.That(!p.Flat);
             Assert.That(p.Size == 200);
-            p.Adjust(new Trade(s, 13, -100));
+            p.Adjust(new Trade(s, 13, -100,dt));
             Assert.That(p.AvgPrice == 11);
             Assert.That(p.Side);
             Assert.That(p.isValid);
             Assert.That(!p.Flat);
             Assert.That(p.Size == 100);
-            Trade lasttrade = new Trade(s, 12, -100);
+            Trade lasttrade = new Trade(s, 12, -100,dt);
             decimal profitFromP2toLASTTRADE = BoxMath.ClosePositionPL(p2, new Position(lasttrade));
             Assert.That(profitFromP2toLASTTRADE == (lasttrade.xprice-p2.AvgPrice)*Math.Abs(lasttrade.xsize));
         }
@@ -54,18 +55,18 @@ namespace TestTradeLib
         public void UsingTrades()
         {
             // long
-            Position p = new Position(new Trade(s, 80, 100));
+            Position p = new Position(new Trade(s, 80, 100,dt));
             Assert.That(p.Side);
             Assert.That(p.Size == 100);
-            decimal pl = p.Adjust(new Trade(s, 84, -100));
+            decimal pl = p.Adjust(new Trade(s, 84, -100,dt));
             Assert.That(p.Flat);
             Assert.That(pl == (84 - 80) * 100);
             // short
             pl = 0;
-            p = new Position(new Trade(s, 84, -100));
+            p = new Position(new Trade(s, 84, -100,dt));
             Assert.That(!p.Side);
             Assert.That(p.Size == -100);
-            pl = p.Adjust(new Trade(s, 80, 100));
+            pl = p.Adjust(new Trade(s, 80, 100,dt));
             Assert.That(pl == (84 - 80) * 100);
             Assert.That(p.Flat);
         }

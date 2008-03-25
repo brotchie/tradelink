@@ -436,7 +436,7 @@ namespace TradeLib
             }
             catch (KeyNotFoundException)
             {
-                Position p = new Position(AvgPrice(sym),PosSize(sym));
+                Position p = new Position(sym,AvgPrice(sym),PosSize(sym));
                 cpos.Add(sym, p);
                 return p;
             }

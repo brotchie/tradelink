@@ -8,10 +8,9 @@ namespace TradeLib
     {
         public Position(string stock) { sym = stock; }
         public Position(string stock, decimal p, int s) { sym = stock; price = p; size = s; }
-        public Position(decimal p, int s) { size = s; price = p; }
-        public Position(int s, decimal p) { price = p; size = s; }
         public Position(Trade t) 
-        { 
+        {
+            if (!t.isValid) throw new Exception("Can't construct a position object from invalid trade.");
             sym = t.symbol; price = t.xprice; size = t.xsize; date = t.xdate; time = t.time; sec = t.xsec;
             size *= t.side ? 1 : -1;
         }
