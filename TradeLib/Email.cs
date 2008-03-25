@@ -9,7 +9,12 @@ namespace TradeLib
     {
         public static void Send(string to, string from, string subject, string message)
         {
+            Send(to, from, subject, message, new SendCompletedEventHandler(s_SendCompleted));
+        }
+        public static void Send(string to, string from, string subject, string message, SendCompletedEventHandler CompletedCallBack)
+        {
             SmtpClient s = new SmtpClient("smtp.gmail.com");
+            s.EnableSsl = true;
             s.Credentials = new System.Net.NetworkCredential("tradelinkmail", "trad3l1nkma1l");
             s.SendAsync(to, from, subject, message, null);
             s.SendCompleted += new SendCompletedEventHandler(s_SendCompleted);
@@ -17,7 +22,7 @@ namespace TradeLib
 
         static void s_SendCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
         {
-
+            System.Diagnostics.Debug.WriteLine("Email sent. ("+e.Error+")");
         }
 
     }
