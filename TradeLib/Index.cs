@@ -7,7 +7,9 @@ namespace TradeLib
     {
         public static bool isIdx(string sym)
         {
-            return (sym.StartsWith("/") || sym.StartsWith("$"));
+            System.Text.RegularExpressions.Regex r = new System.Text.RegularExpressions.Regex("^[/$][A-Z]{1,4}$");
+            bool match = r.IsMatch(sym.ToUpper());
+            return match;
         }
         public override bool isValid { get { return Index.isIdx(this.name); } }
         public Index(Index copythisidx)
