@@ -5,6 +5,11 @@ using TradeLib;
 
 namespace box
 {
+    /// <summary>
+    /// Grey box that will monitor existing position and exit you if the market crosses the 5 minute moving average for your position.
+    /// 
+    /// Essentially a smarter stop-loss.
+    /// </summary>
     public class Autopilot : Box
     {
         public Autopilot(NewsService ns)

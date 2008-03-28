@@ -4,6 +4,9 @@ using System.Text.RegularExpressions;
 
 namespace TradeLib
 {
+    /// <summary>
+    /// Used to hold information specific to a particular equity instrument, eg name date-traded,etc.
+    /// </summary>
     [Serializable]
     public class Stock : Instrument
     {

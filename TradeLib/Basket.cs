@@ -4,6 +4,9 @@ using System.Text;
 
 namespace TradeLib
 {
+    /// <summary>
+    /// Abstract container for instruments
+    /// </summary>
     public abstract class Basket
     {
         public abstract void Add(Instrument item);

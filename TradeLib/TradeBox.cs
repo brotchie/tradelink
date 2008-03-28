@@ -6,6 +6,9 @@ namespace TradeLib
 {
     // class to mirror (and eventually load javascript equivalent of)
     // eSignal TradeBox class's functionaltiy
+    /// <summary>
+    /// A more feature-rich version of the Box class that provides seperate entry/exit definition, stoploss and profit-taking built-in
+    /// </summary>
     public class TradeBox : Box
     {
         public TradeBox(NewsService ns) : base(ns) { }
@@ -15,9 +18,25 @@ namespace TradeLib
         protected decimal profit = 0;
         protected int profitsize = 0;
         protected bool side = true;
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="TradeBox"/> is processing long trades.
+        /// </summary>
+        /// <value><c>true</c> if it's considering long trades; otherwise, a short trade.</value>
         public bool Side { get { return side; } set { side = value; } }
+        /// <summary>
+        /// Gets or sets the stop loss.
+        /// </summary>
+        /// <value>The stop.</value>
         public decimal Stop { get { return stop; } set { stop = value; } }
+        /// <summary>
+        /// Gets or sets the profit target.
+        /// </summary>
+        /// <value>The profit target.</value>
         public decimal ProfitTarget { get { return profit; } set { profit = value; } }
+        /// <summary>
+        /// Gets or sets the size of the trade when the profit target is reached.
+        /// </summary>
+        /// <value>The size of the trade.</value>
         public int ProfitSize { get { return profitsize; } set { profitsize = value; } }
         protected BarList bl;
         protected Tick tick;

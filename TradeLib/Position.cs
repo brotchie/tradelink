@@ -4,6 +4,9 @@ using System.Text;
 
 namespace TradeLib
 {
+    /// <summary>
+    /// A position type used to describe the position in a stock or instrument.
+    /// </summary>
     public class Position
     {
         public Position(string stock) { sym = stock; }
@@ -31,6 +34,11 @@ namespace TradeLib
         public bool Side { get { return size > 0; } }
         public bool Flat { get { return size==0; } }
         // returns any closed PL calculated on position basis (not per share)
+        /// <summary>
+        /// Adjusts the position by applying a new position.
+        /// </summary>
+        /// <param name="pos">The position adjustment to apply.</param>
+        /// <returns></returns>
         public decimal Adjust(Position pos)
         {
             if (this.hasSymbol && (this.Symbol != pos.Symbol)) throw new Exception("Invalid Position: Position MUST have a symbol.");
@@ -44,6 +52,11 @@ namespace TradeLib
             if (this.Flat) price = 0; // if we're flat after adjusting, size price back to zero
             return pl;
         }
+        /// <summary>
+        /// Adjusts the position by applying a new trade or fill.
+        /// </summary>
+        /// <param name="t">The fill to apply to this position.</param>
+        /// <returns></returns>
         public decimal Adjust(Trade t) { return Adjust(new Position(t)); }
         public static int Norm2Min(int size)
         {

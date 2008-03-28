@@ -5,9 +5,15 @@ using System.Text;
 namespace TradeLib
 {
     // methods receiving news must have this signature
+    /// <summary>
+    /// Safely pass around News instances between TradeLink members.
+    /// </summary>
     public delegate void NewsDelegate(News news);
 
     // heres our news object
+    /// <summary>
+    /// Create news for NewsService instances
+    /// </summary>
     [Serializable]
     public class News
     {

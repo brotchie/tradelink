@@ -6,6 +6,9 @@ namespace TradeLib
 {
 
 
+    /// <summary>
+    /// A single bar of price data, which represents OHLC and volume for an interval of time.
+    /// </summary>
     public class Bar
     {
         private decimal h = decimal.MinValue;
@@ -66,6 +69,11 @@ namespace TradeLib
         public int Bardate { get { return bardate; } }
         private int BarTime(int time) { return time - (time % (int)this.tunits); }
 
+        /// <summary>
+        /// Accepts the specified tick.
+        /// </summary>
+        /// <param name="t">The tick you want to add to the bar.</param>
+        /// <returns>true if the tick is accepted, false if it belongs to another bar.</returns>
         public bool Accept(Tick t)
         {
             if (bartime == 0) { bartime = BarTime(t.time); bardate = t.date;}
@@ -79,6 +87,11 @@ namespace TradeLib
             return true;
         }
         public override string ToString() { return "OHLC ("+bartime+") " + o + "," + h + "," + l + "," + c; }
+        /// <summary>
+        /// Create bar object from a CSV file providing OHLC+Volume data.
+        /// </summary>
+        /// <param name="record">The record in comma-delimited format.</param>
+        /// <returns>The equivalent Bar</returns>
         public static Bar FromCSV(string record)
         {
             // google used as example
@@ -100,12 +113,30 @@ namespace TradeLib
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public enum BarInterval
     {
+        /// <summary>
+        /// One-minute intervals
+        /// </summary>
         Minute = 1,
+        /// <summary>
+        /// Five-minute interval
+        /// </summary>
         FiveMin = 5,
+        /// <summary>
+        /// FifteenMinute intervals
+        /// </summary>
         FifteenMin = 15,
+        /// <summary>
+        /// Hour-long intervals
+        /// </summary>
         Hour = 60,
+        /// <summary>
+        /// Day-long intervals
+        /// </summary>
         Day = 450
     }
 }

@@ -13,7 +13,7 @@ using TradeLib;
 namespace box
 {
 	/// <summary>
-	/// Simple-Moving-Average class
+	/// Simple-Moving-Average class used by other boxes
 	/// </summary>
 	public class SMA
 	{

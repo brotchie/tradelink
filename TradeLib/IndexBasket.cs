@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 namespace TradeLib
 {
+    /// <summary>
+    /// Holds a collection of Index instances
+    /// </summary>
     public class IndexBasket : Basket
     {
         List<Index> l = new List<Index>();

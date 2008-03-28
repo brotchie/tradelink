@@ -7,6 +7,9 @@ using System.Reflection;
 
 namespace TradeLib
 {
+    /// <summary>
+    /// Utility class holding commonly used properties for TradeLinkSuite
+    /// </summary>
     public class Util
     {
         public static string TLBaseDir { get { return @"c:\program files\tradelink\"; } }
@@ -107,6 +110,11 @@ namespace TradeLib
         }
 
         static bool IsBox(Type t) { return (t.BaseType.IsSubclassOf(typeof(Box))) || t.BaseType.Equals(typeof(Box)); }
+        /// <summary>
+        /// Gets teh fully qualified boxnames found in a given file.
+        /// </summary>
+        /// <param name="boxdll">The file path of the assembly containing the boxes.</param>
+        /// <returns></returns>
         public static List<string> GetBoxList(string boxdll)
         {
             List<string> boxlist = new List<string>();
@@ -118,6 +126,11 @@ namespace TradeLib
             catch (Exception ex) { boxlist.Add(ex.Message); return boxlist; }
             return GetBoxList(a);
         }
+        /// <summary>
+        /// Gets all the fully-qualified boxnames found in a given assembly.
+        /// </summary>
+        /// <param name="boxdll">The assembly.</param>
+        /// <returns></returns>
         public static List<string> GetBoxList(Assembly boxdll)
         {
             List<string> boxlist = new List<string>();

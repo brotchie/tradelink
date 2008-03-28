@@ -4,11 +4,26 @@ using TradeLib;
 
 namespace TradeLib
 {
-    public delegate void OrderDelegate(Order o);    
+    /// <summary>
+    /// Used to pass orders safely between TradeLink methods and members.
+    /// </summary>
+    public delegate void OrderDelegate(Order o);
+    /// <summary>
+    /// A simulated broker class for TradeLink.
+    /// </summary>
     public class Broker
     {
+        /// <summary>
+        /// Occurs when [got order].
+        /// </summary>
         public event OrderDelegate GotOrder;
+        /// <summary>
+        /// Occurs when [got fill].
+        /// </summary>
         public event FillDelegate GotFill;
+        /// <summary>
+        /// Occurs when [got warning].  This will happen if an invalid order is received.
+        /// </summary>
         public event DebugDelegate GotWarning;
         public Broker() 
         {
@@ -27,7 +42,18 @@ namespace TradeLib
             o.accountid = a.ID;
             MasterOrders[a].Add(o);
         }
+        /// <summary>
+        /// Sends the order to the broker. (uses the default account)
+        /// </summary>
+        /// <param name="o">The order to be send.</param>
+        /// <returns>true if the order was accepted.</returns>
         public bool sendOrder(Order o) { return sendOrder(o, DEFAULT); }
+        /// <summary>
+        /// Sends the order to the broker for a specific account.
+        /// </summary>
+        /// <param name="o">The order to be sent.</param>
+        /// <param name="a">the account to send with the order.</param>
+        /// <returns>true if the order was accepted, false otherwise.</returns>
         public bool sendOrder(Order o,Account a)
         {
             if ((!o.isValid) || (!a.isValid))
@@ -40,6 +66,11 @@ namespace TradeLib
             if (GotOrder != null) GotOrder(o);
             return true;
         }
+        /// <summary>
+        /// Executes any open orders allowed by the specified tick.
+        /// </summary>
+        /// <param name="tick">The tick.</param>
+        /// <returns>the number of orders executed using the tick.</returns>
         public int Execute(Tick tick)
         {
             if (!tick.isTrade) return 0;
@@ -72,6 +103,9 @@ namespace TradeLib
             return filledorders;
         }
 
+        /// <summary>
+        /// Resets this instance, clears all orders/trades/accounts held by the broker.
+        /// </summary>
         public void Reset()
         {
             MasterOrders.Clear();
@@ -81,12 +115,33 @@ namespace TradeLib
         }
         public void CancelOrders() { CancelOrders(DEFAULT); }
         public void CancelOrders(Account a) { MasterOrders[a].Clear(); }
+        /// <summary>
+        /// Gets the complete execution list for this account
+        /// </summary>
+        /// <param name="a">account to request blotter from.</param>
+        /// <returns></returns>
         public List<Trade> GetTradeList(Account a) { return MasterTrades[a]; }
+        /// <summary>
+        /// Gets the list of open orders for this account.
+        /// </summary>
+        /// <param name="a">Account.</param>
+        /// <returns></returns>
         public List<Order> GetOrderList(Account a) { return MasterOrders[a]; }
         public List<Trade> GetTradeList() { return GetTradeList(DEFAULT); }
         public List<Order> GetOrderList() { return GetOrderList(DEFAULT); }
 
+        /// <summary>
+        /// Gets the open positions for the default account.
+        /// </summary>
+        /// <param name="symbol">The symbol to get a position for.</param>
+        /// <returns>current position</returns>
         public Position GetOpenPosition(string symbol) { return GetOpenPosition(symbol, DEFAULT); }
+        /// <summary>
+        /// Gets the open position for the specified account.
+        /// </summary>
+        /// <param name="symbol">The symbol to get a position for.</param>
+        /// <param name="a">the account.</param>
+        /// <returns>current position</returns>
         public Position GetOpenPosition(string symbol,Account a)
         {
             Position pos = new Position(symbol);

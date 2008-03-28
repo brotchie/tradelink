@@ -2,6 +2,10 @@ using System;
 
 namespace TradeLib
 {
+    /// <summary>
+    /// A tick is both the smallest unit of time and the most simple unit of data in TradeLink (and the markets)
+    /// It is an abstract container for last trade, last trade size, best bid, best offer, bid and offer sizes.
+    /// </summary>
     [Serializable]
     public class Tick
     {

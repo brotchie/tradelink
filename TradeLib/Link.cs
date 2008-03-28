@@ -4,11 +4,22 @@ using System.Text;
 
 namespace TradeLib
 {
+    /// <summary>
+    /// Used to describe trends between consequtive or sequential tick instances.
+    /// </summary>
     public class TickLink
     { // don't have high and low yet
         private Tick a = null;
         private Tick b = null;
+        /// <summary>
+        /// Gets or sets the A tick, or the most recent tick.
+        /// </summary>
+        /// <value>The A.</value>
         public Tick A { get { return a; } set { a = value; } }
+        /// <summary>
+        /// Gets or sets the B tick, the older tick.
+        /// </summary>
+        /// <value>The B.</value>
         public Tick B { get { return b; } set { b = value; } }
         private bool t { get { return a.isTrade; } }
         public bool PlusTick { get { return Valid && t && (_last!=0) && (_last<a.trade); } }

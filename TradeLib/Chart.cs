@@ -8,8 +8,14 @@ using System.Windows.Forms;
 
 namespace TradeLib
 {
+    /// <summary>
+    /// Used to pass changes to barlists
+    /// </summary>
     public delegate void BarListUpdated(BarList newbl);
 
+    /// <summary>
+    /// A generic charting form that plots BarList objects
+    /// </summary>
     public partial class Chart : Form
     {
         public event StockDelegate FetchStock;
@@ -30,6 +36,11 @@ namespace TradeLib
         List<TextLabel> points = new List<TextLabel>();
         public Chart() : this(null,false) { }
         public Chart(BarList b) : this(b, false) { }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Chart"/> class.
+        /// </summary>
+        /// <param name="b">The barlist.</param>
+        /// <param name="allowtype">if set to <c>true</c> [allowtype] will allow typing/changing of new symbols on the chart window.</param>
         public Chart(BarList b,bool allowtype)
         {
             InitializeComponent();
@@ -39,6 +50,10 @@ namespace TradeLib
             if (allowtype) this.KeyUp += new KeyEventHandler(Chart_KeyUp);
         }
 
+        /// <summary>
+        /// Provide this chart with a new barlist, and refresh the display.
+        /// </summary>
+        /// <param name="barlist">The barlist.</param>
         public void NewBarList(BarList barlist)
         {
             bl = barlist;
@@ -72,6 +87,10 @@ namespace TradeLib
         // as price goes up and pricemagnitude goes higher, the y coordinate moves up and goes lower
         int getY(decimal price) { return (int)(border+((highesth-price) * pixperdollar)); }
 
+        /// <summary>
+        /// Gets the title of this chart.
+        /// </summary>
+        /// <value>The title.</value>
         public string Title { get { if (bl==null) return ""; return Symbol + " " + Enum.GetName(typeof(BarInterval), bl.Int).ToString(); } }
         void Chart_Paint(object sender, PaintEventArgs e)
         {

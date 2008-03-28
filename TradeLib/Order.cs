@@ -2,6 +2,9 @@ using System;
 
 namespace TradeLib
 {
+    /// <summary>
+    /// Specify an order to buy or sell a quantity of stock.
+    /// </summary>
     [Serializable]
     public class Order : Trade
     {

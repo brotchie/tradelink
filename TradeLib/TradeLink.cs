@@ -14,6 +14,9 @@ namespace TradeLib
     public delegate void StockDelegate(Stock stock);
     public delegate void SrvFillRequest(Order order);
 
+    /// <summary>
+    /// Used to indicate that a TradeLink Broker Connector was not running.
+    /// </summary>
     public class TLServerNotFound : Exception { }
 
     [Serializable] [XmlRoot("TLMessages",IsNullable=true)]
@@ -34,6 +37,9 @@ namespace TradeLib
         public Object Body { get { return body; } set { body = value; } }
     }
 
+    /// <summary>
+    /// TradeLink implemented ontop of Microsoft Message Queing
+    /// </summary>
     public class TradeLink_MQ : TradeLink
     {
         // clients that want notifications for subscribed stocks can override these methods
@@ -217,6 +223,9 @@ namespace TradeLib
         }
     }
 
+    /// <summary>
+    /// TradeLink implemented ontop of Windows Messaging using WM_COPYDATA messages
+    /// </summary>
     public class TradeLink_WM : TradeLink
     {
         const string myver = "2.0";
@@ -224,6 +233,9 @@ namespace TradeLib
         public string Ver { get { return myver + "." + Util.CleanVer(build); } }
 
         // clients that want notifications for subscribed stocks can override these methods
+        /// <summary>
+        /// Occurs when TradeLink receives any type of message [got message].
+        /// </summary>
         public event MessageDelegate GotMessage;
         public event TickDelegate gotTick;
         public event FillDelegate gotFill;
@@ -237,6 +249,10 @@ namespace TradeLib
         public TradeLink_WM() { }
         private IntPtr MyHandle { set { meh = value; } get { return meh; } }
         private IntPtr HimHandle { get { return himh; } }
+        /// <summary>
+        /// Gets or sets the other side of the link.  Him is a string that indicates the window name of the other guy.
+        /// </summary>
+        /// <value>His windowname.</value>
         public string Him 
         { 
             get 
@@ -249,6 +265,10 @@ namespace TradeLib
                 himh = HisHandle(hiswindow); 
             } 
         }
+        /// <summary>
+        /// Gets or sets me, the windowname of my parent or owning form.
+        /// </summary>
+        /// <value>Me.</value>
         public string Me 
         { 
             get { return mywindow; }
@@ -257,11 +277,20 @@ namespace TradeLib
                 mywindow = value; 
             } 
         }
+        /// <summary>
+        /// Gets or sets my handle of the parent application or form.
+        /// </summary>
+        /// <value>Me H.</value>
         public IntPtr MeH { get { return meh; } set { meh = value; } }
-        const string SIMWINDOW = "TL-ANVIL-SIMU";
-        const string LIVEWINDOW = "TL-ANVIL-LIVE";
+        const string SIMWINDOW = "TL-Broker-SIMU";
+        const string LIVEWINDOW = "TL-Broker-LIVE";
         const string REPLAYWINDOW = "TradeLink Replay";
 
+        /// <summary>
+        /// Sets the preferred communication channel of the link, if multiple channels are avaialble.
+        /// </summary>
+        /// <param name="mode">The mode.</param>
+        /// <returns></returns>
         public bool Mode(TLTypes mode) { return Mode(mode,false, true); }
         public bool Mode(TLTypes mode, bool showarning) { return Mode(mode, false, showarning); }
         public bool Mode(TLTypes mode, bool throwexceptions, bool showwarning)
@@ -329,12 +358,12 @@ namespace TradeLib
         /// </summary>
         public void GoHist() { Disconnect(); Him = REPLAYWINDOW; Register(); }
         /// <summary>
-        /// Makes TL client use Anvil LIVE server (anvil must be logged in and TradeLink loaded)
+        /// Makes TL client use Broker LIVE server (Broker must be logged in and TradeLink loaded)
         /// </summary>
         public void GoLive() { Disconnect(); Him = LIVEWINDOW; Register(); }
 
         /// <summary>
-        /// Makes TL client use Anvil Simulation mode (anvil must be logged in and TradeLink loaded)
+        /// Makes TL client use Broker Simulation mode (Broker must be logged in and TradeLink loaded)
         /// </summary>
         public void GoSim() { Disconnect(); Him = SIMWINDOW; Register(); }
 
@@ -351,7 +380,7 @@ namespace TradeLib
         /// Sends the order.
         /// </summary>
         /// <param name="o">The oorder</param>
-        /// <returns>Zero if succeeded, anvil error code otherwise.</returns>
+        /// <returns>Zero if succeeded, Broker error code otherwise.</returns>
         public int SendOrder(Order o)
         {
             if (o == null) return 0;
@@ -521,6 +550,11 @@ namespace TradeLib
 
 
 
+        /// <summary>
+        /// Gets a handle for a given window name.  Will return InPtr.Zero if no match is found.
+        /// </summary>
+        /// <param name="WindowName">Name of the window.</param>
+        /// <returns></returns>
         static IntPtr HisHandle(string WindowName) 
         {
             IntPtr p = IntPtr.Zero;
@@ -888,53 +922,175 @@ namespace TradeLib
     }
 
 
+    /// <summary>
+    /// TradeLink communication channels found
+    /// </summary>
     [Flags]
     public enum TLTypes
     {
+        /// <summary>
+        /// No TradeLink channels were found.  A TradeLinkServer/BrokerConnector was not running.
+        /// </summary>
         NONE = 0,
+        /// <summary>
+        /// A Live broker instance was found.
+        /// </summary>
         LIVEANVIL = 1,
+        /// <summary>
+        /// A simulation broker instance was found.
+        /// </summary>
         SIMANVIL = 2,
+        /// <summary>
+        /// A tradelink replay instance was found. (TradeLink simulation)
+        /// </summary>
         TLREPLAY = 4,
     }
 
+    /// <summary>
+    /// TradeLink2 message type description, assume a request for said information... unless otherwise specified
+    /// </summary>
     public enum TL2
     {
+        /// <summary>
+        /// message contains an order
+        /// </summary>
         SENDORDER = 1,
+        /// <summary>
+        /// request for an average price
+        /// </summary>
         AVGPRICE,
+        /// <summary>
+        /// request for the open pl of a position
+        /// </summary>
         POSOPENPL,
+        /// <summary>
+        /// request for position's closed pl
+        /// </summary>
         POSCLOSEDPL,
+        /// <summary>
+        /// request for pending sharecount of pending longorders
+        /// </summary>
         POSLONGPENDSHARES,
+        /// <summary>
+        /// request for pending sharecount of pending shortorders
+        /// </summary>
         POSSHORTPENDSHARES,
+        /// <summary>
+        /// current liquidity replenishment point on the bid side
+        /// </summary>
         LRPBID,
+        /// <summary>
+        /// current liquidity replenishment point on the ask side
+        /// </summary>
         LRPASK,
+        /// <summary>
+        /// total shares traded in the position
+        /// </summary>
         POSTOTSHARES,
+        /// <summary>
+        /// last trade price in a stock
+        /// </summary>
         LASTTRADE,
+        /// <summary>
+        /// last trade size in a stock
+        /// </summary>
         LASTSIZE,
+        /// <summary>
+        /// dayhigh for a stock
+        /// </summary>
         NDAYHIGH,
+        /// <summary>
+        /// daylow request for a stock
+        /// </summary>
         NDAYLOW,
+        /// <summary>
+        /// current high for a stock
+        /// </summary>
         INTRADAYHIGH,
+        /// <summary>
+        /// current low for a stock
+        /// </summary>
         INTRADAYLOW,
+        /// <summary>
+        /// open for a stock
+        /// </summary>
         OPENPRICE,
+        /// <summary>
+        /// get closing price, or zero if still open
+        /// </summary>
         CLOSEPRICE,
+        /// <summary>
+        /// are we simulation
+        /// </summary>
         ISSIMULATION = 25,
+        /// <summary>
+        /// current size of any position, or 0 for no position.
+        /// </summary>
         GETSIZE,
+        /// <summary>
+        /// what was yesterday's close?
+        /// </summary>
         YESTCLOSE,
+        /// <summary>
+        /// incoming message saying a new tick had arrived (TL2)
+        /// </summary>
         TICKNOTIFY = 100,
+        /// <summary>
+        /// incoming message signifying a new execution
+        /// </summary>
         EXECUTENOTIFY,
+        /// <summary>
+        /// outgoing message specifying a new tradelink client
+        /// </summary>
         REGISTERCLIENT,
+        /// <summary>
+        /// subscribe a client to a new list of stocks
+        /// </summary>
         REGISTERSTOCK,
+        /// <summary>
+        /// clear all current subscriptions for client
+        /// </summary>
         CLEARSTOCKS,
+        /// <summary>
+        /// unregister the client
+        /// </summary>
         CLEARCLIENT,
+        /// <summary>
+        /// send a keep-alive to the otherside so he knows we're still here
+        /// </summary>
         HEARTBEAT,
+        /// <summary>
+        /// status on our TradeLink "link"
+        /// </summary>
         INFO,
+        /// <summary>
+        /// a new quote has arrived
+        /// </summary>
         QUOTENOTIFY,
-        TRADENOTIFY_NOTUSED, 
+        /// <summary>
+        /// 
+        /// </summary>
+        TRADENOTIFY_NOTUSED,
+        /// <summary>
+        /// send a new list of indicies we want to receive ticks for
+        /// </summary>
         REGISTERINDEX,
+        /// <summary>
+        /// 
+        /// </summary>
         DAYRANGE,
     }
 
+    /// <summary>
+    /// Generic interface for TradeLink implementations.  The TradeLink API.
+    /// </summary>
     public abstract class TradeLink
     {
+        /// <summary>
+        /// Gets a user-friendly string for Assent's Anvil error messages.
+        /// </summary>
+        /// <param name="errorcode">The errorcode.</param>
+        /// <returns></returns>
         public static string PrettyAnvilError(int errorcode)
         {
             string[] e = { "SO_OK", "SO_NO_ACCOUNT", "SO_NO_SERVER_CONNECTION", "SO_STOCK_NOT_INITIALIZED", "SO_BUYING_POWER_EXCEEDED", "SO_SIZE_ZERO", "SO_INCORRECT_PRICE", "SO_INCORRECT_SIDE", "SO_NO_BULLETS_FOR_CHEAP_STOCK", "SO_NO_SHORTSELL_FOR_CHEAP_STOCK", "SO_NO_ONOPENORDER_FOR_NASDAQ_STOCK", "SO_NO_ONCLOSEORDER_FOR_NASDAQ_STOCK", "SO_NO_ONCLOSEORDER_AGAINST_IMBALANCE_AFTER_1540", "SO_NO_ONCLOSEORDER_AFTER_1600", "SO_NO_SIZEORDER_FOR_NON_NASDAQ_STOCK", "SO_NO_STOPORDER_FOR_NASDAQ_STOCK", "SO_MAX_ORDER_SIZE_EXCEEDED", "SO_MAX_POSITION_SIZE_EXCEEDED", "SO_MAX_POSITION_VALUE_EXCEEDED", "SO_TRADING_LOCKED", "SO_TRADING_HISTORY_NOT_LOADED", "SO_NO_SOES_ORDER_WHEN_MARKET_CLOSED", "SO_NO_SDOT_ORDER_WHEN_MARKET_CLOSED", "SO_MAX_OPEN_POSITIONS_EXCEEDED", "SO_MAX_POSITION_PENDING_ORDERS_EXCEEDED", "SO_MAX_TOTAL_SHARES_EXCEEDED", "SO_MAX_TRADED_SHARES_EXCEEDED", "SO_AMEX_ORDER_EXECUTION_BLOCKED", "SO_NYSE_ORDER_EXECUTION_BLOCKED", "SO_NASDAQ_ORDER_EXECUTION_BLOCKED", "SO_ARCA_ORDER_EXECUTION_BLOCKED", "SO_MAX_LOSS_EXCEEDED", "SO_MAX_LOSS_PER_STOCK_EXCEEDED", "SO_MAX_OPEN_LOSS_PER_STOCK_EXCEEDED", "SO_NYSE_ODD_LOT_VIOLATION", "SO_SHORT_EXEMPT_NOT_INSTITUTIONAL", "SO_SELL_SIZE_GREATER_THAN_POSITION", "SO_NO_SHORT_BEFORE_SELL_COVER_POSITION", "SO_SHORT_CAN_EXECUTE_BEFORE_SELL", "SO_SAME_PRICE_VENUE_OVERSELL", "SO_STAGING_TICKET_EXCEEDED", "SO_DESTINATION_NOT_RECOGNIZED", "SO_HIT_OWN_ORDERS", "SO_SHORT_SELL_VIOLATION", "SO_POTENTIAL_OVERSELL" };
@@ -942,7 +1098,7 @@ namespace TradeLib
         }
 
 
-        // the tradelink API (tradelink2)
+
         public abstract void Disconnect();
         public abstract void Register();
         public abstract void Subscribe(MarketBasket mb);

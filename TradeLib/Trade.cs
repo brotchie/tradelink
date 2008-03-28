@@ -2,6 +2,9 @@ using System;
 
 namespace TradeLib
 {
+    /// <summary>
+    /// A trade or execution of a stock order.  Also called a fill.
+    /// </summary>
     [Serializable]
     public class Trade
     {
@@ -20,6 +23,9 @@ namespace TradeLib
         public int xtime = 0;
         public int xdate = 0;
         public virtual bool isValid { get { return (xsize != 0) && (xprice != 0) && (xtime != 0) && (xdate != 0) && (symbol != null); } }
+        /// <summary>
+        /// true if this is a real Trade, otherwise it's still an order.
+        /// </summary>
         public bool isFilled = false;  // default to false (= order)
         public Trade() : this(null, true, 0, 0, 0, null, 0, 0) { }
         public Trade(string sym, decimal fillprice, int fillsize, DateTime tradedate)
@@ -72,6 +78,10 @@ namespace TradeLib
             const char d = ',';
             return xdate.ToString() + d + xtime.ToString() + d + symbol + d + (side ? "BUY" : "SELL") + d + Math.Abs(xsize) + d + xprice + d + comment;
         }
+        /// <summary>
+        /// Convert this Trade to a TradeLink Mesasge.
+        /// </summary>
+        /// <returns></returns>
         public string TLmsg()
         {
             const char d = ',';

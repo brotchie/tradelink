@@ -5,6 +5,9 @@ using System.Text.RegularExpressions;
 
 namespace TradeLib
 {
+    /// <summary>
+    /// Marshalls eSignal-specific tickdata into and out of TradeLink's generic Tick type.
+    /// </summary>
     public class eSigTick : Tick
     {
         // eSignal record order definitions for quotes and trades
@@ -15,6 +18,12 @@ namespace TradeLib
         public eSigTick() : base() {}
         public eSigTick(Tick t) : base(t) { }
 
+        /// <summary>
+        /// Loads a tick straight from an EPF file in the form of a StreamReader
+        /// </summary>
+        /// <param name="symbol">The symbol.</param>
+        /// <param name="sr">The sr.</param>
+        /// <returns></returns>
         public static eSigTick FromStream(string symbol, System.IO.StreamReader sr)
         {
             eSigTick e = new eSigTick();
@@ -83,6 +92,11 @@ namespace TradeLib
         static string epfdate(int d) { string s = d.ToString();  return s.Substring(2); }
         static string epftime(int time, int sec) { int num = time * 100 + sec; string s = num.ToString();  return s.PadLeft(6, '0'); }
 
+        /// <summary>
+        /// Converts the tick to a string-equivalent that can be written to an EPF file.
+        /// </summary>
+        /// <param name="t">The t.</param>
+        /// <returns></returns>
         public static string ToEPF(Tick t)
         {
             string s = "";
@@ -90,6 +104,12 @@ namespace TradeLib
             else s = "T," + epfdate(t.date) + "," + epftime(t.time, t.sec) + "," + t.trade + "," + (t.size) + "," + t.ex;
             return s;
         }
+        /// <summary>
+        /// Create an epf file header.
+        /// </summary>
+        /// <param name="stock">The stock.</param>
+        /// <param name="date">The date.</param>
+        /// <returns></returns>
         public static string EPFheader(string stock, int date)
         {
             string s = "";
@@ -97,11 +117,21 @@ namespace TradeLib
             s += "; Date=" + date.ToString() + Environment.NewLine;
             return s;
         }
+        /// <summary>
+        /// Create an epf file header.
+        /// </summary>
+        /// <param name="s">The stock.</param>
+        /// <returns></returns>
         public static string EPFheader(Stock s)
         {
         	return EPFheader(s.Symbol,s.Date);
         }
-        
+
+        /// <summary>
+        /// Initilize the reading of an EPF file and return the header as a Stock object.
+        /// </summary>
+        /// <param name="EPFfile">The EP ffile.</param>
+        /// <returns></returns>
         public static Stock InitEpf(StreamReader EPFfile) 
         {
             StreamReader cf = EPFfile; 

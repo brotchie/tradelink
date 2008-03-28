@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace TradeLib
 {
+    /// <summary>
+    /// Holds collections of stock instances.
+    /// </summary>
     [Serializable]
     public class MarketBasket : Basket
     {

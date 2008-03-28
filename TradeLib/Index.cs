@@ -3,14 +3,28 @@ using System;
 namespace TradeLib
 {
 
+    /// <summary>
+    /// Used for tracking indicies, such as SP500 futures, NASDAQ, OIH, etc
+    /// </summary>
     public class Index : Instrument
     {
+        /// <summary>
+        /// Determines whether the specified symbol is an index.
+        /// </summary>
+        /// <param name="sym">The sym.</param>
+        /// <returns>
+        /// 	<c>true</c> if the specified sym is idx; otherwise, <c>false</c>.
+        /// </returns>
         public static bool isIdx(string sym)
         {
             System.Text.RegularExpressions.Regex r = new System.Text.RegularExpressions.Regex("^[/$][A-Z]{1,4}$");
             bool match = r.IsMatch(sym.ToUpper());
             return match;
         }
+        /// <summary>
+        /// Gets a value indicating whether this instance is a valid index.
+        /// </summary>
+        /// <value><c>true</c> if this instance is valid; otherwise, <c>false</c>.</value>
         public override bool isValid { get { return Index.isIdx(this.name); } }
         public Index(Index copythisidx)
         {
@@ -64,12 +78,22 @@ namespace TradeLib
             close,
         }
 
+        /// <summary>
+        /// Serializes the specified index.  Used for writing IDX files.
+        /// </summary>
+        /// <param name="i">The index.</param>
+        /// <returns></returns>
         public static string Serialize(Index i)
         {
             string s = "";
             s = i.Name+","+i.Date + "," + i.Time + "," + i.Value + "," + i.Open + "," + i.High + "," + i.Low + "," + i.Close + ",";
             return s;
         }
+        /// <summary>
+        /// Deserializes the specified string into an Index object.  Used for reading IDX files.
+        /// </summary>
+        /// <param name="val">The index in string form.</param>
+        /// <returns></returns>
         public static Index Deserialize(string val)
         {
             string[] r = val.Split(',');
@@ -82,13 +106,22 @@ namespace TradeLib
             return i;
         }
 
+        /// <summary>
+        /// Convert an index into a TradeLinkMessage
+        /// </summary>
+        /// <param name="i">The i.</param>
+        /// <returns></returns>
         public static string ToTLmsg(Index i)
         {
             string s = "";
             s = i.Name + ","+i.Value + "," + i.Open + "," + i.High + "," + i.Low + "," + i.Close + ",";
             return s;
         }
-        
+
+        /// <summary>
+        /// Convert an Index into a Tick.  Mainly for conveince, use with caution.
+        /// </summary>
+        /// <returns></returns>
         public Tick ToTick()
         {
             Tick t = new Tick(Name);
@@ -98,11 +131,20 @@ namespace TradeLib
             t.size = -1; // this is to make tick field "isTrade" return true...
         	return t;
         }
+        /// <summary>
+        /// Create a stock-equivalent instance from this Index.
+        /// </summary>
+        /// <returns></returns>
         public Stock ToStock()
         {
             Stock s = new Stock(StockifyIndex(Name), this.Date);
             return s;
         }
+        /// <summary>
+        /// Create a valid stock symbol name from an index name.
+        /// </summary>
+        /// <param name="IndexName">Name of the index.</param>
+        /// <returns></returns>
         public static string StockifyIndex(string IndexName)
         {
             string sym = IndexName.Replace("/", "");
@@ -111,6 +153,12 @@ namespace TradeLib
         }
 
 
+        /// <summary>
+        /// Create an Index instance from a TradeLink message.
+        /// </summary>
+        /// <param name="index">The index.</param>
+        /// <param name="val">The val.</param>
+        /// <returns></returns>
         public static Index FromTLmsg(string index, string val)
         {
             string[] r = val.Split(',');
