@@ -61,7 +61,6 @@
     <Compile Include="Index.cs" />
     <Compile Include="IndexBasket.cs" />
     <Compile Include="Instrument.cs" />
-    <Compile Include="Kad.cs" />
     <Compile Include="LimitOrder.cs" />
     <Compile Include="Link.cs" />
     <Compile Include="MarketBasket.cs" />

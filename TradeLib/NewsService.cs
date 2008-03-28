@@ -18,7 +18,6 @@ namespace TradeLib
     public class NewsService
     {
         public event NewsDelegate NewsEventSubscribers;
-        public event KadDelegate KadListeners;
 
         /// <summary>
         /// Send some news
@@ -30,10 +29,6 @@ namespace TradeLib
             {
                 NewsEventSubscribers(new News(news));
             }
-        }
-        public void newKad(Kad k)
-        {
-            if (KadListeners != null) KadListeners(k);
         }
         public NewsService() { }
     }
