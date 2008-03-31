@@ -21,6 +21,7 @@ namespace WinGauntlet
             UpdateBoxes(Util.GetBoxList((WinGauntlet.Properties.Settings.Default.boxdll== null) ? "box.dll" : WinGauntlet.Properties.Settings.Default.boxdll));
             exchlist.SelectedItem = "NYS";
             ProgressBar1.Enabled = false;
+            FormClosing+=new FormClosingEventHandler(Gauntlet_FormClosing);
             Grids();
         }
 
@@ -50,7 +51,7 @@ namespace WinGauntlet
 
         void ns_NewsEventSubscribers(News news)
         {
-            show(news.Msg+Environment.NewLine);
+            show(news.Msg);
         }
 
         void FindStocks(string path)
@@ -92,9 +93,11 @@ namespace WinGauntlet
             FolderBrowserDialog fd = new FolderBrowserDialog();
             fd.Description = "Select the folder containing tick files";
             fd.SelectedPath = (WinGauntlet.Properties.Settings.Default.tickfolder == null) ? @"c:\program files\tradelink\tickdata\" : WinGauntlet.Properties.Settings.Default.tickfolder;
-            fd.ShowDialog();
-            WinGauntlet.Properties.Settings.Default.tickfolder = fd.SelectedPath;
-            FindStocks(fd.SelectedPath);
+            if (fd.ShowDialog() == DialogResult.OK)
+            {
+                WinGauntlet.Properties.Settings.Default.tickfolder = fd.SelectedPath;
+                FindStocks(fd.SelectedPath);
+            }
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -105,12 +108,12 @@ namespace WinGauntlet
             of.CheckFileExists = true;
             of.DefaultExt = ".dll";
             of.Filter = "Box DLL|*.dll";
-            of.InitialDirectory = (WinGauntlet.Properties.Settings.Default.boxfolder == null) ? @"c:\program files\tradelink\tradelink\" : WinGauntlet.Properties.Settings.Default.boxfolder;
-            of.FileName = (WinGauntlet.Properties.Settings.Default.boxdll== null) ? "box.dll" : WinGauntlet.Properties.Settings.Default.boxdll;
             of.Multiselect = false;
-            of.ShowDialog();
-            WinGauntlet.Properties.Settings.Default.boxdll = of.FileName;
-            UpdateBoxes(Util.GetBoxList(of.FileName));
+            if (of.ShowDialog() == DialogResult.OK)
+            {
+                WinGauntlet.Properties.Settings.Default.boxdll = of.FileName;
+                UpdateBoxes(Util.GetBoxList(of.FileName));
+            }
         }
 
         void UpdateBoxes(List<string> boxes)
