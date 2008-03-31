@@ -14,6 +14,10 @@ namespace TradeLib
     public class Broker
     {
         /// <summary>
+        /// Occurs when [got tick].
+        /// </summary>
+        public event TickDelegate GotTick;
+        /// <summary>
         /// Occurs when [got order].
         /// </summary>
         public event OrderDelegate GotOrder;
@@ -73,6 +77,7 @@ namespace TradeLib
         /// <returns>the number of orders executed using the tick.</returns>
         public int Execute(Tick tick)
         {
+            if (GotTick != null) GotTick(tick);
             if (!tick.isTrade) return 0;
             int availablesize = (int)Math.Abs(tick.size);
             int max = this.Orders.Count;
