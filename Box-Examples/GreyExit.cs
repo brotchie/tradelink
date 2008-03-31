@@ -10,7 +10,7 @@ namespace box
     /// 
     /// Essentially a smarter stop-loss.
     /// </summary>
-    public class Autopilot : Box
+    public class GreyExit : Box
     {
         public Autopilot(NewsService ns)
             : base(ns)
