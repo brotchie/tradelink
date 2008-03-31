@@ -46,6 +46,7 @@
     <Compile Include="BarList.cs" />
     <Compile Include="BarMath.cs" />
     <Compile Include="Basket.cs" />
+    <Compile Include="BlackBoxEasy.cs" />
     <Compile Include="Box.cs" />
     <Compile Include="BoxInfo.cs" />
     <Compile Include="BoxMath.cs" />
@@ -79,7 +80,6 @@
     <Compile Include="Tick.cs" />
     <Compile Include="TickWatcher.cs" />
     <Compile Include="Trade.cs" />
-    <Compile Include="TradeBox.cs" />
     <Compile Include="TradeLink.cs" />
     <Compile Include="Util.cs" />
     <EmbeddedResource Include="ParamPrompt.resx">

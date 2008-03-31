@@ -4,14 +4,12 @@ using System.Text;
 
 namespace TradeLib
 {
-    // class to mirror (and eventually load javascript equivalent of)
-    // eSignal TradeBox class's functionaltiy
     /// <summary>
-    /// A more feature-rich version of the Box class that provides seperate entry/exit definition, stoploss and profit-taking built-in
+    /// Feature-rich version of Box class.  More structure for trader/user.  Full-concept of a round-turn with explicit entry and exit definition.  Stoploss and profit-taking included.
     /// </summary>
-    public class TradeBox : Box
+    public class BlackBoxEasy : Box
     {
-        public TradeBox(NewsService ns) : base(ns) { }
+        public BlackBoxEasy(NewsService ns) : base(ns) { }
         protected decimal sPrice = 0;
         protected int lotsize = 100;
         protected decimal stop = .1m;
@@ -19,7 +17,7 @@ namespace TradeLib
         protected int profitsize = 0;
         protected bool side = true;
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="TradeBox"/> is processing long trades.
+        /// Gets or sets a value indicating whether this <see cref="BlackBoxEasy"/> is processing long trades.
         /// </summary>
         /// <value><c>true</c> if it's considering long trades; otherwise, a short trade.</value>
         public bool Side { get { return side; } set { side = value; } }
@@ -47,10 +45,40 @@ namespace TradeLib
         protected decimal getMostRecentBidSize() { return tick.bs; }
         protected decimal getMostRecentAskSize() { return tick.os; }
         protected bool newTrade() { return (PosSize != 0) && (AvgPrice == 0); }
+        /// <summary>
+        /// Gets or sets the size of the entry trade.
+        /// </summary>
+        /// <value>The size of the entry.</value>
         protected int EntrySize { get { return lotsize; } set { lotsize = value; } }
+        /// <summary>
+        /// Override this method to provide rules to enter a long trade.
+        /// </summary>
+        /// <returns>
+        /// true if a long trade should be entered with size EntrySize, false to do nothing.
+        /// 
+        /// Default : false (never enter)
+        /// </returns>
         protected virtual bool EnterLong() { return false; }
+        /// <summary>
+        /// Override this method to provide rules to enter a short trade.
+        /// 
+        /// Default : false (never enter)
+        /// </summary>
+        /// <returns>true if a short trade should be entered with size EntrySize, false to do nothing.</returns>
         protected virtual bool EnterShort() { return false;  }
+        /// <summary>
+        /// Override this method to provide rules to exit trades (long AND short). 
+        /// 
+        /// Default : false (never exit)
+        /// </summary>
+        /// <returns>True if the trade should be exited (completely), false to do nothing.</returns>
         protected virtual bool Exit() { return false; }
+        /// <summary>
+        /// Override this method to provide criteria for tick/trades that should be ignored, and not parsed for entry/exit rules.
+        /// 
+        /// Default : false (never ignore)
+        /// </summary>
+        /// <returns>True to ignore a tick, false otherwise.</returns>
         protected virtual bool IgnoreTick() { return false; }
         protected decimal Profit { get { return (PosSize > 0) ? tick.trade - AvgPrice : AvgPrice - tick.trade; } }
         void checkMoveStop()

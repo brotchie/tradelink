@@ -12,7 +12,7 @@ namespace box
     /// </summary>
     public class GreyExit : Box
     {
-        public Autopilot(NewsService ns)
+        public GreyExit(NewsService ns)
             : base(ns)
         {
             Version = "$Rev: 1";

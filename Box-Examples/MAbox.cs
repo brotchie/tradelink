@@ -15,7 +15,7 @@ namespace box
 	/// <summary>
 	/// Moving-average box
 	/// </summary>
-	public class MAbox : TradeBox
+	public class MAbox : BlackBoxEasy
 	{
         // indicator identifiers
         const int imkt = 0;
@@ -23,7 +23,7 @@ namespace box
 		public MAbox(NewsService ns) : base(ns)
 		{
 			Name = "MABox";
-            // auto-money-management features provided by TradeBox
+            // auto-money-management features provided by BlackBoxEasy
 			this.ProfitTarget = 1;
 			this.Stop = .5m;
 

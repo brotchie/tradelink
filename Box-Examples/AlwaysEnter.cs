@@ -10,7 +10,7 @@ namespace box
     /// 
     /// Used for testing applications that use boxes.  (Quotopia, Gauntlet, etc)
     /// </summary>
-    public class AlwaysEnter : TradeBox
+    public class AlwaysEnter : BlackBoxEasy
     {
         public AlwaysEnter(NewsService ns) : base(ns) 
         {
