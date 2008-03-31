@@ -8,6 +8,21 @@ namespace TestTradeLib
     [TestFixture]
     public class TestUtil
     {
+
+        [Test]
+        public void TLDatematch()
+        {
+            int dd = 20070601;
+            int m = 20071201;
+            int m2 = 20060131;
+            Assert.That(Util.TLDateMatch(dd, m, DateMatchType.Year));
+            Assert.That(!Util.TLDateMatch(dd, m, DateMatchType.Month));
+            Assert.That(!Util.TLDateMatch(dd, m, DateMatchType.None));
+            Assert.That(Util.TLDateMatch(dd, m, DateMatchType.Day));
+            Assert.That(Util.TLDateMatch(dd, m, DateMatchType.Day | DateMatchType.Year));
+            Assert.That(!Util.TLDateMatch(dd, m, DateMatchType.Day | DateMatchType.Month));
+            Assert.That(!Util.TLDateMatch(dd, m2, DateMatchType.Day | DateMatchType.Month | DateMatchType.Year));
+        }
         int tldate = 20070731;
         int tltime1 = 931;
         int tltime2 = 1400;

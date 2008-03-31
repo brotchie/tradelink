@@ -15,6 +15,23 @@ namespace TradeLib
         public static string TLBaseDir { get { return @"c:\program files\tradelink\"; } }
         public static string TLProgramDir { get { return TLBaseDir + "TradeLink\\"; } }
         public static string TLTickDir { get { return TLBaseDir + "TickData\\"; } }
+
+
+        public static TickFileInfo ParseFile(string filepath)
+        {
+            TickFileInfo tfi;
+            string fn = System.IO.Path.GetFileNameWithoutExtension(filepath);
+            string ext = System.IO.Path.GetExtension(filepath).Replace(".", "");
+            string date = Regex.Match(fn, "[0-9]+$").Value;
+            try
+            {
+                tfi.type = (TickFileType)Enum.Parse(typeof(TickFileType), ext.ToUpper());
+            }
+            catch (Exception) { tfi.type = TickFileType.Invalid; }
+            tfi.date = ToDateTime(Convert.ToInt32(date));
+            tfi.symbol = Regex.Match(fn, "^[A-Z]+").Value;
+            return tfi;
+        }
         public static DateTime ToDateTime(int TradeLinkDate)
         {
             if (TradeLinkDate < 10000) throw new Exception("Not a date, or invalid date provided");
@@ -53,6 +70,49 @@ namespace TradeLib
         {
             return (dt.Hour * 100) + dt.Minute;
         }
+
+
+        /// <summary>
+        /// Converts a TLDate integer format into an array of ints
+        /// </summary>
+        /// <param name="fulltime">The fulltime.</param>
+        /// <returns>int[3] { year, month, day}</returns>
+        static int[] TLDateSplit(int fulltime)
+        {
+            int[] splittime = new int[3]; // year, month, day
+            splittime[2] = (fulltime - (fulltime % 10000))/10000;
+            splittime[1] = ((fulltime %10000) - ((fulltime % 10000) % 100));
+            splittime[0] = (fulltime-splittime[2]-splittime[1]);
+            return splittime;
+        }
+
+
+
+        /// <summary>
+        /// Tests if two dates are the same, given a mask as DateMatchType.
+        /// 
+        /// ie, 20070605 will match 20070705 if DateMatchType is Day or Year.
+        /// </summary>
+        /// <param name="fulldate">The fulldate in TLDate format (int).</param>
+        /// <param name="matchdate">The matchdate to test against (int).</param>
+        /// <param name="dmt">The "mask" that says what to pay attention to when matching.</param>
+        /// <returns></returns>
+        public static bool TLDateMatch(int fulldate,int matchdate, DateMatchType dmt)
+        {
+            const int d = 0, m=1,y=2;
+            if (dmt == DateMatchType.None) 
+                return false;
+            bool matched = true;
+            // if we're requesting a day match,
+            if ((dmt & DateMatchType.Day) == DateMatchType.Day)
+                matched &= TLDateSplit(fulldate)[d] == TLDateSplit(matchdate)[d];
+            if ((dmt & DateMatchType.Month)==DateMatchType.Month)
+                matched &= TLDateSplit(fulldate)[m] == TLDateSplit(matchdate)[m];
+            if ((dmt & DateMatchType.Year)== DateMatchType.Year)
+                matched &= TLDateSplit(fulldate)[y] == TLDateSplit(matchdate)[y];
+            return matched;
+        }
+
         public static string CleanVer(string ver)
         {
             Regex re = new Regex("[0-9]+");
@@ -145,5 +205,26 @@ namespace TradeLib
             return boxlist;
         }
         
+    }
+    public enum TickFileType
+    {
+        Invalid = 0,
+        EPF,
+        IDX,
+    }
+
+    public struct TickFileInfo
+    {
+        public string symbol;
+        public DateTime date;
+        public TickFileType type;
+    }
+
+    public enum DateMatchType
+    {
+        None = 0,
+        Day = 1,
+        Month = 2,
+        Year = 4,
     }
 }
