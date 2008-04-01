@@ -4,10 +4,7 @@ using TradeLib;
 
 namespace TradeLib
 {
-    /// <summary>
-    /// Used to pass orders safely between TradeLink methods and members.
-    /// </summary>
-    public delegate void OrderDelegate(Order o);
+
     /// <summary>
     /// A simulated broker class for TradeLink.
     /// </summary>
