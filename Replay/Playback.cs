@@ -32,7 +32,7 @@ namespace TLReplay
             int factorsize = 100;
             TickLink link = new TickLink();
             TradeLink_WM tl = sp.tl;
-            tl.gotSrvFillRequest += new SrvFillRequest(tl_gotSrvFillRequest);
+            tl.gotSrvFillRequest += new OrderDelegate(tl_gotSrvFillRequest);
 
             // we need to put something here or in day playback to differentiate reading of indexes
 
