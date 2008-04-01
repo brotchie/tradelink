@@ -21,12 +21,12 @@ namespace TestTradeLib
         public void Basics()
         {
             TickFileFilter tff = new TickFileFilter(new string[] { "GM" });
-            string[] result = tff.Match(filenames);
+            string[] result = tff.Allows(filenames);
             Assert.That(result.Length == 1);
             Assert.That(result[0] == filenames[0]);
             tff = new TickFileFilter();
             tff.DateFilter(20070000, DateMatchType.Year);
-            result = tff.Match(filenames);
+            result = tff.Allows(filenames);
             Assert.That(result.Length == 3);
             Assert.That(result[2] == filenames[3]);
         }
