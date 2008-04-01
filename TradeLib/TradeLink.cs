@@ -41,7 +41,6 @@ namespace TradeLib
     {
         void newTick(Tick tick);
         void newFill(Trade trade);
-        void GotWM_Copy(ref System.Windows.Forms.Message m);
         void GoSrv();
     }
 
