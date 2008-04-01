@@ -10,12 +10,13 @@ namespace TradeLib
     /// <summary>
     /// TradeLink implemented ontop of Microsoft Message Queing
     /// </summary>
-    public class TradeLink_MQ : TradeLink
+    public class TradeLink_MQ : TradeLinkClient
     {
-        // clients that want notifications for subscribed stocks can override these methods
         public event MessageDelegate GotMessage;
         public event TickDelegate gotTick;
         public event FillDelegate gotFill;
+        public event IndexDelegate gotIndexTick;
+        public event OrderDelegate gotSrvFillRequest;
 
         // clients to server
         public override void Register() { TLSend(TL2.REGISTERCLIENT); }
@@ -191,6 +192,28 @@ namespace TradeLib
             heart[cid] = now;
             return since.Seconds;
         }
+        public override int SendOrder(Order order)
+        {
+            throw new Exception("The method or operation is not implemented.");
+        }
+
+        public override void RegIndex(IndexBasket ib)
+        {
+            throw new Exception("The method or operation is not implemented.");
+        }
+        public override void GoHist()
+        {
+            throw new Exception("The method or operation is not implemented.");
+        }
+        public override void GoLive()
+        {
+            throw new Exception("The method or operation is not implemented.");
+        }
+        public override void GoSim()
+        {
+            throw new Exception("The method or operation is not implemented.");
+        }
+
     }
 
     [Serializable]

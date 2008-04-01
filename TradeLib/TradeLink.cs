@@ -8,10 +8,13 @@ namespace TradeLib
     /// <summary>
     /// Generic interface for TradeLink implementations.  The TradeLink API.
     /// </summary>
-    public abstract class TradeLink
+    public abstract class TradeLinkClient
     {
-
-
+        public abstract int SendOrder(Order order);
+        public abstract void RegIndex(IndexBasket ib);
+        public abstract void GoHist();
+        public abstract void GoLive();
+        public abstract void GoSim();
         public abstract void Disconnect();
         public abstract void Register();
         public abstract void Subscribe(MarketBasket mb);
@@ -30,11 +33,42 @@ namespace TradeLib
 
     }
 
+    /// <summary>
+    /// For providing execution and data subscription services to tradelink clients.
+    /// 
+    /// </summary>
+    public interface TradeLinkServer
+    {
+        void newTick(Tick tick);
+        void newFill(Trade trade);
+        void GotWM_Copy(ref System.Windows.Forms.Message m);
+        void GoSrv();
+    }
+
+    /// <summary>
+    /// Get stock and position information
+    /// </summary>
+    interface TradeLinkInfo
+    {
+        decimal AvgPrice(string symbol);
+        decimal DayClose(string symbol);
+        decimal DayHigh(string symbol);
+        decimal DayLow(string symbol);
+        decimal DayOpen(string symbol);
+        int PosSize(string symbol);
+        decimal FastHigh(string symbol);
+        decimal FastLow(string symbol);
+        Position FastPos(string symbol);
+        decimal YestClose(string symbol);
+    }
+
+
     public delegate void MessageDelegate(TL2 msgid, string source);
     public delegate void TickDelegate(Tick t);
     public delegate void FillDelegate(Trade t);
     public delegate void IndexDelegate(Index idx);
     public delegate void StockDelegate(Stock stock);
+    public delegate void OrderDelegate(Order o);
 
     /// <summary>
     /// Used to indicate that a TradeLink Broker Connector was not running.

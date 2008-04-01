@@ -8,12 +8,11 @@ namespace TradeLib
     /// <summary>
     /// TradeLink implemented ontop of Windows Messaging using WM_COPYDATA messages
     /// </summary>
-    public class TradeLink_WM : TradeLink
+    public class TradeLink_WM : TradeLinkClient, TradeLinkServer, TradeLinkInfo
     {
         const string myver = "2.0";
         const string build = "$Rev: 992 $";
         public string Ver { get { return myver + "." + Util.CleanVer(build); } }
-
         // clients that want notifications for subscribed stocks can override these methods
         /// <summary>
         /// Occurs when TradeLink receives any type of message [got message].
@@ -23,6 +22,7 @@ namespace TradeLib
         public event FillDelegate gotFill;
         public event IndexDelegate gotIndexTick;
         public event OrderDelegate gotSrvFillRequest;
+
 
         private IntPtr meh = IntPtr.Zero;
         private IntPtr himh = IntPtr.Zero;
@@ -91,7 +91,7 @@ namespace TradeLib
                         {
 
                             if (showwarning)
-                                MessageBox.Show("No Live broker instance was found.  Make sure broker application + TradeLink server is running.", "TradeLink server not found");
+                                System.Windows.Forms.MessageBox.Show("No Live broker instance was found.  Make sure broker application + TradeLink server is running.", "TradeLink server not found");
                             return false;
                         }
                     }
@@ -108,7 +108,7 @@ namespace TradeLib
                         catch (TLServerNotFound)
                         {
                             if (showwarning)
-                                MessageBox.Show("No simulation broker instance was found.  Make sure broker application + TradeLink server is running.", "TradeLink server not found");
+                                System.Windows.Forms.MessageBox.Show("No simulation broker instance was found.  Make sure broker application + TradeLink server is running.", "TradeLink server not found");
                             return false;
                         }
                     }
@@ -124,7 +124,7 @@ namespace TradeLib
                         catch (TLServerNotFound)
                         {
                             if (showwarning)
-                                MessageBox.Show("TradeLink Replay not found. Please start TradeLink Replay.", "TradeLink Server not found");
+                                System.Windows.Forms.MessageBox.Show("TradeLink Replay not found. Please start TradeLink Replay.", "TradeLink Server not found");
                             return false;
                         }
                     }
@@ -138,16 +138,16 @@ namespace TradeLib
         /// <summary>
         /// Make's TL client use historical server
         /// </summary>
-        public void GoHist() { Disconnect(); Him = REPLAYWINDOW; Register(); }
+        public override void GoHist() { Disconnect(); Him = REPLAYWINDOW; Register(); }
         /// <summary>
         /// Makes TL client use Broker LIVE server (Broker must be logged in and TradeLink loaded)
         /// </summary>
-        public void GoLive() { Disconnect(); Him = LIVEWINDOW; Register(); }
+        public override void GoLive() { Disconnect(); Him = LIVEWINDOW; Register(); }
 
         /// <summary>
         /// Makes TL client use Broker Simulation mode (Broker must be logged in and TradeLink loaded)
         /// </summary>
-        public void GoSim() { Disconnect(); Him = SIMWINDOW; Register(); }
+        public override void GoSim() { Disconnect(); Him = SIMWINDOW; Register(); }
 
         public void GoSrv() { Me = REPLAYWINDOW; }
         protected long TLSend(TL2 type) { return TLSend(type, ""); }
@@ -163,7 +163,7 @@ namespace TradeLib
         /// </summary>
         /// <param name="o">The oorder</param>
         /// <returns>Zero if succeeded, Broker error code otherwise.</returns>
-        public int SendOrder(Order o)
+        public override int SendOrder(Order o)
         {
             if (o == null) return 0;
             string m = o.symbol + "," + (o.side ? "B" : "S") + "," + Math.Abs(o.size) + "," + o.price + "," + o.stopp + "," + o.comment + ",";
@@ -273,7 +273,7 @@ namespace TradeLib
             TLSend(TL2.REGISTERSTOCK, mywindow + "+" + mb.ToString());
         }
 
-        public void RegIndex(IndexBasket ib)
+        public override void RegIndex(IndexBasket ib)
         {
             TLSend(TL2.REGISTERINDEX, mywindow + "+" + ib.ToString());
         }
@@ -296,7 +296,7 @@ namespace TradeLib
         [DllImport("user32.dll")]
         static extern IntPtr FindWindow(string ClassName, string WindowName);
 
-        public static IntPtr FindClient(string name) { return FindWindow(null, name); }
+        private static IntPtr FindClient(string name) { return FindWindow(null, name); }
 
         public static bool Found(string name) { return (FindClient(name) != IntPtr.Zero); }
 
@@ -589,13 +589,13 @@ namespace TradeLib
         private List<string> stocks = new List<string>();
         private List<string> index = new List<string>();
 
-        public string SrvStocks(string him)
+        private string SrvStocks(string him)
         {
             int cid = client.IndexOf(him);
             if (cid == -1) return ""; // client not registered
             return stocks[cid];
         }
-        public string[] SrvGetClients() { return client.ToArray(); }
+        private string[] SrvGetClients() { return client.ToArray(); }
         void SrvRegIndex(string cname, string idxlist)
         {
             int cid = client.IndexOf(cname);
