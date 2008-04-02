@@ -40,12 +40,17 @@ namespace TestTradeLib
             TickLink t = new TickLink();
             int i = 0;
             Assert.That(!t.Valid);
+            Assert.That(!t.FullQuote);
+            Assert.That(!t.Quoted);
             t.Tick(timesales[i++]);
+            Assert.That(t.Quoted);
+            Assert.That(!t.FullQuote);
             Assert.That(!t.Valid);
             Assert.That(t.A.hasTick);
             Assert.That(t.B == null);
             t.Tick(timesales[i++]);
             Assert.That(t.Valid);
+            Assert.That(t.Quoted && t.FullQuote);
             // tick link assertions for raised bid
             t.Tick(timesales[i++]);
             Assert.That(t.Ask-t.Bid == .04m);

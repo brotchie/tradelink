@@ -24,6 +24,8 @@ namespace TradeLib
         private bool t { get { return a.isTrade; } }
         public decimal Ask { get { return _ask; } }
         public decimal Bid { get { return _bid; } }
+        public bool Quoted { get { return (_ask != 0) || (_bid != 0); } }
+        public bool FullQuote { get { return (_ask != 0) && (_bid != 0); } }
         public bool PlusTick { get { return Valid && t && (_last!=0) && (_last<a.trade); } }
         public bool MinusTick { get { return Valid && t && (_last!=0) && (_last>a.trade); } }
         public bool TakesOffer { get { return (Valid && t && b.hasAsk && (a.trade >= b.ask)); } }
