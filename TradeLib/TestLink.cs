@@ -48,6 +48,7 @@ namespace TestTradeLib
             Assert.That(t.Valid);
             // tick link assertions for raised bid
             t.Tick(timesales[i++]);
+            Assert.That(t.Ask-t.Bid == .04m);
             Assert.That(t.Valid);
             Assert.That(t.BidsUp);
             Assert.That(!t.BidsDown);

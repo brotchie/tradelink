@@ -22,6 +22,8 @@ namespace TradeLib
         /// <value>The B.</value>
         public Tick B { get { return b; } set { b = value; } }
         private bool t { get { return a.isTrade; } }
+        public decimal Ask { get { return _ask; } }
+        public decimal Bid { get { return _bid; } }
         public bool PlusTick { get { return Valid && t && (_last!=0) && (_last<a.trade); } }
         public bool MinusTick { get { return Valid && t && (_last!=0) && (_last>a.trade); } }
         public bool TakesOffer { get { return (Valid && t && b.hasAsk && (a.trade >= b.ask)); } }
@@ -39,8 +41,12 @@ namespace TradeLib
         public bool BidReload { get { return !t && Valid && a.hasBid && b.hasBid && (a.trade == b.bid) && (a.bid == b.bid); } }
         public bool Valid { get { return (a != null) && (b != null) && a.hasTick && b.hasTick; } }
         private decimal _last;
+        private decimal _bid;
+        private decimal _ask;
         public virtual bool Tick(Tick tick) 
         {
+            if (tick.hasAsk) _ask = tick.ask;
+            if (tick.hasBid) _bid = tick.bid;
             if ((a!=null) && a.isTrade)
                 _last = a.trade;
             if (a == null) a = new Tick(tick);
