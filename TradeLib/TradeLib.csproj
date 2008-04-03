@@ -59,6 +59,7 @@
     </Compile>
     <Compile Include="Email.cs" />
     <Compile Include="eSigTick.cs" />
+    <Compile Include="HistSim.cs" />
     <Compile Include="Index.cs" />
     <Compile Include="IndexBasket.cs" />
     <Compile Include="Instrument.cs" />
@@ -82,6 +83,8 @@
     <Compile Include="TickWatcher.cs" />
     <Compile Include="Trade.cs" />
     <Compile Include="TradeLink.cs" />
+    <Compile Include="TradeLink_MQ.cs" />
+    <Compile Include="TradeLink_WM.cs" />
     <Compile Include="Util.cs" />
     <EmbeddedResource Include="ParamPrompt.resx">
       <DependentUpon>ParamPrompt.cs</DependentUpon>
