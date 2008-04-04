@@ -41,6 +41,7 @@ namespace TradeLib
     {
         void newTick(Tick tick);
         void newFill(Trade trade);
+        int NumClients { get; }
         void GoSrv();
     }
 

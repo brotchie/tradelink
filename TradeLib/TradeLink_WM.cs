@@ -581,7 +581,10 @@ namespace TradeLib
                     SendMsg(trade.TLmsg(), TL2.EXECUTENOTIFY, client[i]);
         }
 
+        public int NumClients { get { return client.Count; } }
+
         // server structures
+
         private Dictionary<string, decimal> lows = new Dictionary<string, decimal>();
         private Dictionary<string, decimal> highs = new Dictionary<string, decimal>();
         private List<string> client = new List<string>();
@@ -635,6 +638,7 @@ namespace TradeLib
             index[cid] = "";
             SrvBeatHeart(cname);
         }
+
 
         void SrvClearClient(string him)
         {

@@ -15,8 +15,7 @@ namespace TradeLib
         public event MessageDelegate GotMessage;
         public event TickDelegate gotTick;
         public event FillDelegate gotFill;
-        public event IndexDelegate gotIndexTick;
-        public event OrderDelegate gotSrvFillRequest;
+
 
         // clients to server
         public override void Register() { TLSend(TL2.REGISTERCLIENT); }
