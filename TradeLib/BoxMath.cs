@@ -53,8 +53,8 @@ namespace TradeLib
         /// <summary>
         /// Gets the closed PL on a per-share basis, ignoring how many shares are held.
         /// </summary>
-        /// <param name="existing">The existing.</param>
-        /// <param name="closing">The closing.</param>
+        /// <param name="existing">The existing position.</param>
+        /// <param name="closing">The portion of the position that's being closed/changed.</param>
         /// <returns></returns>
         public static decimal CloseSharePL(Position existing, Position closing)
         {
@@ -69,8 +69,8 @@ namespace TradeLib
         /// <summary>
         /// Gets the closed PL on a position basis, the PL that is registered to the account for the entire shares transacted.
         /// </summary>
-        /// <param name="existing">The existing.</param>
-        /// <param name="closing">The closing.</param>
+        /// <param name="existing">The existing position.</param>
+        /// <param name="closing">The portion of the position being changed/closed.</param>
         /// <returns></returns>
         public static decimal ClosePositionPL(Position existing, Position closing)
         {
