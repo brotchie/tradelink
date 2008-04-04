@@ -87,12 +87,10 @@ namespace TradeLib
                 this.Shutdown("Trade limit reached.");
                 return o;
             }
-            if ((pos.AvgPrice*pos.Size!=0) && ((pos.AvgPrice != AvgPrice) || (pos.Size != PosSize)))
+            if ((pos.AvgPrice != AvgPrice) || (pos.Size != PosSize))
             {
                 avgprice = pos.AvgPrice;
                 tDir = pos.Size;
-                decimal pl = pos.Size * (tick.trade - AvgPrice);
-                D("Position: "+PosSize + "@" + AvgPrice + "\t"+pl.ToString("c"));
             }
 
             if (QuickOrder) // user providing only size adjustment
