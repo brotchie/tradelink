@@ -8,6 +8,7 @@ namespace TradeLib
     public class HistSim : TradeLinkServer
     {
         int _simtime = 0;
+        public int NumClients { get { return 0; } }
         string _folder;
         TickFileFilter _filter = new TickFileFilter();
         bool _ticksloaded = false;

@@ -240,8 +240,7 @@ namespace TLReplay
 
         protected override void  OnDoWork(DoWorkEventArgs e)
         {
-            string [] clients = tl.SrvGetClients();
-            if ((tl == null) || (clients.Length==0)) return;
+            if ((tl == null) || (tl.NumClients==0)) return;
             foreach (string filename in tf.Keys)// loop through the list
             {
                 if (CancellationPending) { e.Cancel = true; return; }
