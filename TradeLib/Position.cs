@@ -15,7 +15,7 @@ namespace TradeLib
         {
             if (!t.isValid) throw new Exception("Can't construct a position object from invalid trade.");
             sym = t.symbol; price = t.xprice; size = t.xsize; date = t.xdate; time = t.time; sec = t.xsec;
-            size *= t.side ? 1 : -1;
+            if (size>0) size *= t.side ? 1 : -1;
         }
         private string sym = "";
         private int size = 0;
@@ -29,6 +29,7 @@ namespace TradeLib
         }
         public bool hasSymbol { get { return sym != ""; } }
         public string Symbol { get { return sym; } }
+        public decimal Price { get { return price; } }
         public decimal AvgPrice { get { return price; } }
         public int Size { get { return size; } }
         public bool Side { get { return size > 0; } }
@@ -44,7 +45,7 @@ namespace TradeLib
             if (this.hasSymbol && (this.Symbol != pos.Symbol)) throw new Exception("Invalid Position: Position MUST have a symbol.");
             if (!pos.isValid) throw new Exception("Invalid position adjustment, existing:" + this.ToString() + " adjustment:" + pos.ToString());
             if (pos.Flat) return 0; // nothing to do
-            decimal pl = BoxMath.ClosePositionPL(this,pos);
+            decimal pl = BoxMath.ClosePL(this,pos.ToTrade());
             if (this.Flat) this.price = pos.price; // if we're leaving flat just copy price
             else if ((pos.Side && this.Side) || (!pos.Side && !this.Side)) // sides match, adding so adjust price
                 this.price = ((this.price * this.size) + (pos.price * pos.size)) / (pos.size + this.size);
@@ -67,6 +68,11 @@ namespace TradeLib
         public override string ToString()
         {
             return Symbol+" "+Size+"@"+AvgPrice.ToString("N2");
+        }
+        public Trade ToTrade()
+        {
+            DateTime dt = (date*time!=0) ? Util.ToDateTime(date, time, sec) : DateTime.Now;
+            return new Trade(Symbol, AvgPrice, Size,dt );
         }
     }
 }

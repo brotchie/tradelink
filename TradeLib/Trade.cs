@@ -22,12 +22,16 @@ namespace TradeLib
         public int xsec = 0;
         public int xtime = 0;
         public int xdate = 0;
+        public bool Side { get { return side; } }
+        public int Size { get { return xsize; } }
+        public decimal Price { get { return xprice; } }
         public virtual bool isValid { get { return (xsize != 0) && (xprice != 0) && (xtime != 0) && (xdate != 0) && (symbol != null); } }
         /// <summary>
         /// true if this is a real Trade, otherwise it's still an order.
         /// </summary>
         public bool isFilled = false;  // default to false (= order)
         public Trade() : this(null, true, 0, 0, 0, null, 0, 0) { }
+        public Trade(string symbol, decimal fillprice, int fillsize) : this(symbol, fillprice, fillsize, DateTime.Now) { }
         public Trade(string sym, decimal fillprice, int fillsize, DateTime tradedate)
         {
             if (sym != null) symbol = sym.ToUpper();
@@ -36,6 +40,7 @@ namespace TradeLib
             xdate = Util.ToTLDate(tradedate);
             xsize = fillsize;
             xprice = fillprice;
+            side = (fillsize > 0);
         }
 
         public Trade(string sym, bool side, int size, decimal p, decimal s, string c, int time, int date)

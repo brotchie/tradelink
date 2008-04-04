@@ -148,12 +148,119 @@ namespace TradeLib
         {
             Position pos = new Position(symbol);
             if (!MasterTrades.ContainsKey(a)) return pos;
-            List<Trade> OT = MasterTrades[a];
-            foreach (Trade trade in OT) 
+            foreach (Trade trade in MasterTrades[a]) 
                 if (trade.symbol==symbol) 
                     pos.Adjust(trade);
             return pos;
         }
+
+        /// <summary>
+        /// Gets the closed PL for a particular symbol and brokerage account.
+        /// </summary>
+        /// <param name="symbol">The symbol.</param>
+        /// <param name="a">The Account.</param>
+        /// <returns>Closed PL</returns>
+        public decimal GetClosedPL(string symbol, Account a)
+        {
+            Position pos = new Position(symbol);
+            decimal pl = 0;
+            foreach (Trade trade in MasterTrades[a])
+            {
+                if (trade.symbol == pos.Symbol)
+                    pl += pos.Adjust(trade);
+            }
+            return pl;
+        }
+
+        /// <summary>
+        /// Gets the closed PL for a particular symbol on the default account.
+        /// </summary>
+        /// <param name="symbol">The symbol.</param>
+        /// <returns></returns>
+        public decimal GetClosedPL(string symbol) { return GetClosedPL(symbol, DEFAULT); }
+        /// <summary>
+        /// Gets the closed PL for an entire account. (all symbols)
+        /// </summary>
+        /// <param name="a">The account.</param>
+        /// <returns>Closed PL</returns>
+        public decimal GetClosedPL(Account a)
+        {
+            Dictionary<string, Position> poslist = new Dictionary<string, Position>();
+            Dictionary<string,decimal> pllist = new Dictionary<string,decimal>();
+            foreach (Trade trade in MasterTrades[a])
+            {
+                if (!poslist.ContainsKey(trade.symbol))
+                {
+                    poslist.Add(trade.symbol, new Position(trade.symbol));
+                    pllist.Add(trade.symbol, 0);
+                }
+                pllist[trade.symbol] += poslist[trade.symbol].Adjust(trade);
+            }
+            decimal pl = 0;
+            foreach (string sym in pllist.Keys)
+                pl += pllist[sym];
+            return pl;
+        }
+        /// <summary>
+        /// Gets the closed PL for all symbols on the default account.
+        /// </summary>
+        /// <returns>Closed PL</returns>
+        public decimal GetClosedPL() { return GetClosedPL(DEFAULT); }
+
+        /// <summary>
+        /// Gets the closed points (points = PL on per-share basis) for given symbol/account.
+        /// </summary>
+        /// <param name="symbol">The symbol.</param>
+        /// <param name="account">The account.</param>
+        /// <returns>points</returns>
+        public decimal GetClosedPT(string symbol, Account account)
+        {
+            Position pos = new Position(symbol);
+            decimal points = 0;
+            foreach (Trade t in MasterTrades[account])
+            {
+                points += BoxMath.ClosePT(pos, t);
+                pos.Adjust(t);
+            }
+            return points;
+        }
+        /// <summary>
+        /// Gets the closed PT/Points for given symbol on default account.
+        /// </summary>
+        /// <param name="symbol">The symbol.</param>
+        /// <returns></returns>
+        public decimal GetClosedPT(string symbol) { return GetClosedPT(symbol, DEFAULT); }
+        /// <summary>
+        /// Gets the closed Points on a specific account, all symbols.
+        /// </summary>
+        /// <param name="account">The account.</param>
+        /// <returns></returns>
+        public decimal GetClosedPT(Account account)
+        {
+            Dictionary<string, Position> poslist = new Dictionary<string, Position>();
+            Dictionary<string, decimal> ptlist = new Dictionary<string, decimal>();
+            foreach (Trade trade in MasterTrades[account])
+            {
+                if (!poslist.ContainsKey(trade.symbol))
+                {
+                    poslist.Add(trade.symbol, new Position(trade.symbol));
+                    ptlist.Add(trade.symbol, 0);
+                }
+                ptlist[trade.symbol] += BoxMath.ClosePT(poslist[trade.symbol], trade);
+                poslist[trade.symbol].Adjust(trade);
+            }
+            decimal points = 0;
+            foreach (string sym in ptlist.Keys)
+                points += ptlist[sym];
+            return points;
+
+        }
+        /// <summary>
+        /// Gets the closed Points on the default account.
+        /// </summary>
+        /// <returns></returns>
+        public decimal GetClosedPT() { return GetClosedPT(DEFAULT); }
+
 
 
     }

@@ -5,7 +5,6 @@ namespace TradeLib
 {
     public class BoxMath
     {
-        // this is not very clear from the method names, but these are OpenPL functions
         /// <summary>
         /// Gets the open PL on a per-share basis, ignoring the size of the position.
         /// </summary>
@@ -13,24 +12,24 @@ namespace TradeLib
         /// <param name="AvgPrice">The avg price.</param>
         /// <param name="PosSize">Size of the pos.</param>
         /// <returns></returns>
-        public static decimal SharePL(decimal LastTrade, decimal AvgPrice, int PosSize)
+        public static decimal OpenPT(decimal LastTrade, decimal AvgPrice, int PosSize)
         {
-            return (PosSize == 0) ? 0 : SharePL(LastTrade, AvgPrice, PosSize > 0);
+            return (PosSize == 0) ? 0 : OpenPT(LastTrade, AvgPrice, PosSize > 0);
         }
         /// <summary>
-        /// Gets the open PL on a per-share basis, ignoring the size of the position.
+        /// Gets the open PL on a per-share basis (also called points or PT), ignoring the size of the position.
         /// </summary>
         /// <param name="LastTrade">The last trade.</param>
         /// <param name="AvgPrice">The avg price.</param>
         /// <param name="Side">if set to <c>true</c> [side].</param>
         /// <returns></returns>
-        public static decimal SharePL(decimal LastTrade, decimal AvgPrice, bool Side)
+        public static decimal OpenPT(decimal LastTrade, decimal AvgPrice, bool Side)
         {
             return Side ? LastTrade - AvgPrice : AvgPrice - LastTrade;
         }
-        public static decimal SharePL(decimal LastTrade, Position Pos)
+        public static decimal OpenPT(decimal LastTrade, Position Pos)
         {
-            return SharePL(LastTrade, Pos.AvgPrice, Pos.Size);
+            return OpenPT(LastTrade, Pos.AvgPrice, Pos.Size);
         }
         /// <summary>
         /// Gets the open PL considering all the shares held in a position.
@@ -39,13 +38,13 @@ namespace TradeLib
         /// <param name="AvgPrice">The avg price.</param>
         /// <param name="PosSize">Size of the pos.</param>
         /// <returns></returns>
-        public static decimal PositionPL(decimal LastTrade, decimal AvgPrice, int PosSize)
+        public static decimal OpenPL(decimal LastTrade, decimal AvgPrice, int PosSize)
         {
             return PosSize * (LastTrade - AvgPrice);
         }
-        public static decimal PositionPL(decimal LastTrade, Position Pos)
+        public static decimal OpenPL(decimal LastTrade, Position Pos)
         {
-            return PositionPL(LastTrade, Pos.AvgPrice, Pos.Size);
+            return OpenPL(LastTrade, Pos.AvgPrice, Pos.Size);
         }
 
         // these are for calculating closed pl
@@ -56,14 +55,13 @@ namespace TradeLib
         /// <param name="existing">The existing position.</param>
         /// <param name="closing">The portion of the position that's being closed/changed.</param>
         /// <returns></returns>
-        public static decimal CloseSharePL(Position existing, Position closing)
+        public static decimal ClosePT(Position existing, Trade adjust)
         {
-            if (!existing.isValid || !closing.isValid) 
-                throw new Exception("Invalid position provided. (existing:" + existing.ToString() + " closing:" + closing.ToString());
+            if (!existing.isValid || !adjust.isValid) 
+                throw new Exception("Invalid position provided. (existing:" + existing.ToString() + " adjustment:" + adjust.ToString());
             if (existing.Flat) return 0; // nothing to close
-            if (closing.Flat) return 0; // nothing to close
-            if (existing.Side == closing.Side) return 0; // if we're adding, nothing to close
-            return existing.Side ? closing.AvgPrice - existing.AvgPrice : existing.AvgPrice - closing.AvgPrice;
+            if (existing.Side == adjust.Side) return 0; // if we're adding, nothing to close
+            return existing.Side ? adjust.Price - existing.Price : existing.Price - adjust.Price;
         }
 
         /// <summary>
@@ -72,9 +70,9 @@ namespace TradeLib
         /// <param name="existing">The existing position.</param>
         /// <param name="closing">The portion of the position being changed/closed.</param>
         /// <returns></returns>
-        public static decimal ClosePositionPL(Position existing, Position closing)
+        public static decimal ClosePL(Position existing, Trade adjust)
         {
-            return CloseSharePL(existing, closing) * Math.Abs(closing.Size);
+            return ClosePT(existing, adjust) * Math.Abs(adjust.Size);
         }
 
     }

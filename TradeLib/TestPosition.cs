@@ -47,7 +47,7 @@ namespace TestTradeLib
             Assert.That(!p.Flat);
             Assert.That(p.Size == 100);
             Trade lasttrade = new Trade(s, 12, -100,dt);
-            decimal profitFromP2toLASTTRADE = BoxMath.ClosePositionPL(p2, new Position(lasttrade));
+            decimal profitFromP2toLASTTRADE = BoxMath.ClosePL(p2, lasttrade);
             Assert.That(profitFromP2toLASTTRADE == (lasttrade.xprice-p2.AvgPrice)*Math.Abs(lasttrade.xsize));
         }
 
