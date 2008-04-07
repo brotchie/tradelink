@@ -37,7 +37,6 @@ namespace TestTradeLib
         [Test]
         public void BlankBox()
         {
-
             Box b = new Box();
             Assert.That(!b.Off);
             Assert.That(b.QuickOrder);

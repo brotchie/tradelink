@@ -19,7 +19,7 @@ namespace TradeLib
         private string symbol;
         private int tDir = 0;
         private decimal avgprice = 0;
-        private int trades = 0;
+        private int turns = 0;
         private int adjusts = 0;
         private bool DEBUG = false;
         private bool SHUTDOWN = false;
@@ -84,7 +84,7 @@ namespace TradeLib
            
             if ((Time < DayStart) || (Time>DayEnd)) return o; // is market open?
             if (Off) return o; // don't trade if shutdown
-            if (TradeCaps &&  pos.Flat && ((this.trades >= MAXTRADES) || (this.adjusts >= MAXADJUSTS)))
+            if (TradeCaps &&  pos.Flat && ((this.turns >= MAXTRADES) || (this.adjusts >= MAXADJUSTS)))
             {
                 this.Shutdown("Trade limit reached.");
                 return o;
@@ -122,7 +122,7 @@ namespace TradeLib
                 // if it's a valid order it counts as an adjustment
                 adjusts++;
                 // if we're going to flat from non-flat, this is a "trade"
-                if ((Math.Abs(PosSize + o.SignedSize) == 0) && (PosSize != 0)) trades++;
+                if ((Math.Abs(PosSize + o.SignedSize) == 0) && (PosSize != 0)) turns++;
 
                 // final prep for good orders
                 o.time = Time;
@@ -276,7 +276,7 @@ namespace TradeLib
         /// </summary>
         public virtual void Reset() 
         { 
-            symbol = null; SHUTDOWN = false; trades = 0; adjusts = 0; 
+            symbol = null; SHUTDOWN = false; turns = 0; adjusts = 0; 
             DayStart = 930; DayEnd = 1600;
             ResetIndicators(_indicount);
         }
@@ -464,7 +464,7 @@ namespace TradeLib
         /// </summary>
         /// <value>The turns.</value>
         [CategoryAttribute("TradeLink BoxInfo"), DescriptionAttribute("Number of round turns this box has made (doesn't take into account size of a half-turn).")]
-        public int Turns { get { return trades; } }
+        public int Turns { get { return turns; } }
         /// <summary>
         /// Gets the adjustments completed by this box.
         /// </summary>
