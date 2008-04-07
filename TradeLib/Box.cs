@@ -35,6 +35,8 @@ namespace TradeLib
         private string loadstr = "";
         private bool _email = false;
         private bool _quickorder = true;
+        private bool _multipleorders = false;
+        private int _expectedpossize = 0;
         public int DayEndBuff = 2;
 
 
@@ -105,23 +107,34 @@ namespace TradeLib
             {
                 o = ReadOrder(tick, bl,bi);
             }
+            
+            // ignore order if another one is waiting for a fill
+            if (!_multipleorders && (PosSize != _expectedpossize))
+                o = new Order();
+            else if (!_multipleorders && (PosSize == _expectedpossize) && o.isValid)
+                _expectedpossize += o.SignedSize;
 
             //flat us at the close
             if ((Time >= (DayEnd - DayEndBuff))) 
                 o = this.Adjust(Flat);
             if (o.isValid)
             {
-                // send our order
+                // if it's a valid order it counts as an adjustment
+                adjusts++;
+                // if we're going to flat from non-flat, this is a "trade"
+                if ((Math.Abs(PosSize + o.SignedSize) == 0) && (PosSize != 0)) trades++;
+
+                // final prep for good orders
                 o.time = Time;
                 o.date = Date;
                 this.D("Sent order: " + o);
             }
-            return o;
+            return o; // send our order
         }
 
 
         /// <summary>
-        /// Adjusts the box's current position up or down by the specified number of shares.  
+        /// Adjusts the box's current position up or down by the specified number of shares.
         /// </summary>
         /// <param name="asize">The adjustment size. Zero for no change.</param>
         /// <returns>A market order for specified size</returns>
@@ -135,12 +148,6 @@ namespace TradeLib
             size = NoCrossingFlat(size);
             if (Math.Abs(size + ts) > MAXSIZE) size = (MAXSIZE - Math.Abs(ts)) * (side ? 1 : -1);
             Order o = new Order(Symbol, side, size,Name);
-            if (o.isValid)
-            {
-                adjusts++;
-                // if we're going to flat from non-flat, this is a "trade"
-                if ((Math.Abs(size+ts)==0) && (ts!=0)) trades++;
-            }
             return o;
         }
 
@@ -311,6 +318,13 @@ namespace TradeLib
             if (!_email) return;
             Email.Send(to, from, subject, msg);
         }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether [allow multiple orders].
+        /// </summary>
+        /// <value><c>true</c> if [allow multiple orders]; otherwise, <c>false</c>.</value>
+        [CategoryAttribute("TradeLink Box"), DescriptionAttribute("Whether this box waits for position size to match sent orders, before new order is sent.")]
+        public bool AllowMultipleOrders { get { return _multipleorders; } set { _multipleorders = value; } }
 
         /// <summary>
         /// Sends a debug message from a box.

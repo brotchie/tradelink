@@ -13,6 +13,8 @@ namespace TradeLib
         public bool isMarket { get { return (price == 0) && (stopp == 0); } }
         public bool isLimit { get { return (price != 0); } }
         public bool isStop { get { return (stopp != 0); } }
+        public int SignedSize { get { return Math.Abs(size) * (side ? 1 : -1); } }
+        public int UnSignedSize { get { return Math.Abs(size); } }
         public Order(string sym, bool side, int size, decimal p, decimal s, string c, int time, int date)
         {
             this.symbol = sym.ToUpper();

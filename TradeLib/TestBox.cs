@@ -70,24 +70,34 @@ namespace TestTradeLib
         public void AlwaysEnter()
         {
             Always b = new Always();
+            b.AllowMultipleOrders = true;
             Assert.That(b.MinSize == 100);
             int good = 0;
             int i = 0;
-
-            if (b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo()).isValid)
-                    good++;
+            Order o = new Order();
+            o = b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo());
+            Console.WriteLine("order: " + o); 
+            if (o.isValid)
+                good++;
             Assert.That(b.Turns == 0);
             Assert.That(b.Adjusts == 0);
-            if (b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo()).isValid)
+            o = b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo());
+            Console.WriteLine("order: " + o);
+            if (o.isValid)
                 good++;
             Assert.That(b.Turns == 0);
-            Assert.That(b.Adjusts == 1); 
-            if (b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo()).isValid)
+            Assert.That(b.Adjusts == 1);
+            o = b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo());
+            Console.WriteLine("order: " + o); 
+            if (o.isValid)
                 good++;
             Assert.That(b.Turns == 0);
-            Assert.That(b.Adjusts == 2); 
-            if (b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo()).isValid)
+            Assert.That(b.Adjusts == 2);
+            o = b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo());
+            Console.WriteLine("order: " + o); 
+            if (o.isValid)
                 good++;
+            Console.WriteLine("good:" + good);
             Assert.That(b.Turns == 0);
             Assert.That(b.Adjusts == 3);
             // first trade was pre-market so we only have 3 total;
@@ -96,13 +106,72 @@ namespace TestTradeLib
             Assert.That(debugs == 0);
         }
 
+        [Test]
+        // make sure this box only generates orders when last one has been filled
+        public void OneOrderAtTime() 
+        {
+            Always b = new Always();
+            b.AllowMultipleOrders = false; // this is the default, but it's what we're testing
+            b.MaxSize = Int32.MaxValue; // lets not restrict our maximum position for this example
+            Broker broker = new Broker();
+            Tick t;
+            Assert.That(b.MinSize == 100);
+            int good = 0;
+            int i = 0;
+            Order o = new Order();
+            t = new Tick(timesales[i++]);
+            broker.Execute(t);
+            o = b.Trade(t, new BarList(), broker.GetOpenPosition(s), new BoxInfo());
+            broker.sendOrder(o);
+            Console.WriteLine("order: " + o);
+            if (o.isValid)
+                good++;
+            Assert.That(b.Turns == 0);
+            Assert.That(b.Adjusts == 0);
+            t = new Tick(timesales[i++]);
+            broker.Execute(t);
+            o = b.Trade(t, new BarList(), broker.GetOpenPosition(s), new BoxInfo());
+            broker.sendOrder(o);
+            Console.WriteLine("order: " + o);
+            if (o.isValid)
+                good++;
+            Assert.That(b.Turns == 0);
+            Assert.That(b.Adjusts == 1);
+            t = new Tick(timesales[i++]);
+            broker.Execute(t);
+            o = b.Trade(t, new BarList(), broker.GetOpenPosition(s), new BoxInfo());
+            // lets change this to a limit order, so he doesn't get filled on just any tick
+            o.price = 1;
+            broker.sendOrder(o);
+            Console.WriteLine("order: " + o);
+            if (o.isValid)
+                good++;
+            Assert.That(b.Turns == 0);
+            Assert.That(b.Adjusts == 2);
+            t = new Tick(timesales[i++]);
+            broker.Execute(t);
+            o = b.Trade(t, new BarList(), broker.GetOpenPosition(s), new BoxInfo());
+            broker.sendOrder(o);
+            Console.WriteLine("order: " + o);
+            if (o.isValid)
+                good++;
+            Console.WriteLine("good:" + good);
+            Assert.That(b.Turns == 0);
+            Assert.That(b.Adjusts == 2);
+            // first trade was pre-market 2nd order was never filled so 3rd was ignored... 2 total.
+            Assert.That(good == 2);
+        }
+
+
         // make sure debugs are received as news events when debugging is enabled
         [Test]
         public void NewsTest()
         {
             NewsService ns = new NewsService();
+            // subscribe to news service that will count everytime a debug is sent
             ns.NewsEventSubscribers +=new NewsDelegate(ns_NewsEventSubscribers);
-            Always b = new Always(ns);
+            Always b = new Always(ns); // send debugs from this box to our news service
+            b.AllowMultipleOrders = true; // lets allow multiple orders for more debugging
             // this time we want to throw news events for debugging statements
             b.Debug = true;
             int good = 0;
