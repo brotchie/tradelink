@@ -227,7 +227,7 @@ namespace Quotopia
                 newsymbol = newsymbol.Substring(0, newsymbol.Length - 1);
                 status(preface + newsymbol);
             }
-            else if ((e.KeyValue>(int)Keys.A) && (e.KeyValue<(int)Keys.Z))
+            else if ((e.KeyValue>=(int)Keys.A) && (e.KeyValue<=(int)Keys.Z))
             {
                 newsymbol += (char)e.KeyValue;
                 status("Adding symbol: " + newsymbol);
