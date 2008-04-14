@@ -62,4 +62,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <PropertyGroup>
+    <PostBuildEvent>CALL $(ProjectDir)runtests.cmd $(TargetPath) $(ConfigurationName)</PostBuildEvent>
+  </PropertyGroup>
 </Project>
