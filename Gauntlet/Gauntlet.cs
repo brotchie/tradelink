@@ -6,7 +6,7 @@ using System.Windows.Forms;
 using TradeLib;
 using System.IO;
 
-namespace WinGauntlet
+    namespace WinGauntlet
 {
     public partial class Gauntlet : Form
     {
@@ -245,7 +245,7 @@ namespace WinGauntlet
                 trades.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
             }
             if (tradesincsv.Checked)
-                Util.String2FileAppend(Util.Fills2StringDelim(bt.mybroker.GetTradeList(),","),Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)+"\\Gauntlet.Trades."+bt.name+".csv");
+                Util.FillsToText(bt.mybroker.GetTradeList(),',',Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)+"\\Gauntlet.Trades."+bt.name+".csv");
             if (ordersincsv.Checked)
             {
                 StreamWriter sw = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Orders." + bt.name + ".csv", false);

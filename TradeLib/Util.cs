@@ -150,24 +150,15 @@ namespace TradeLib
             f.Close();
             return h; 
         }
-        public static string Fills2StringDelim(List<Trade> stocktrades,string d)
+        public static void FillsToText(List<Trade> stocktrades,char delimiter,string filepath)
         { // works on a queue of Trade objects
-            string csv = "";
-
-            foreach (Trade t in stocktrades)
-                csv += t + Environment.NewLine;
-            return csv;
-        }
-        public static void String2FileAppend(string s, string filepath)
-        {// will take any string and save it to a given file
-            FileStream file = new FileStream(filepath, FileMode.Create);
-            StreamWriter sw = new StreamWriter(file);
-            string[] sfile = s.Split('\n');
+            StreamWriter sw = new StreamWriter(filepath, false);
             sw.WriteLine("Date,Time,Symbol,Side,xSize,xPrice,Comment");
-            for (int line = 0; line<sfile.Length; line++)  sw.WriteLine(sfile[line]);
+            foreach (Trade t in stocktrades)
+                sw.WriteLine(t.ToString(delimiter));
             sw.Close();
-            file.Close();
         }
+            
 
         static bool IsBox(Type t) { return (t.BaseType.IsSubclassOf(typeof(Box))) || t.BaseType.Equals(typeof(Box)); }
         /// <summary>

@@ -80,7 +80,11 @@ namespace TradeLib
         }
         public override string ToString()
         {
-            const char d = ',';
+            return ToString(',');
+        }
+        public string ToString(char delimiter)
+        {
+            char d = delimiter;
             return xdate.ToString() + d + xtime.ToString() + d + symbol + d + (side ? "BUY" : "SELL") + d + Math.Abs(xsize) + d + xprice + d + comment;
         }
         /// <summary>
