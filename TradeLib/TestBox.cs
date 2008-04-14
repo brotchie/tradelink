@@ -75,28 +75,23 @@ namespace TestTradeLib
             int i = 0;
             Order o = new Order();
             o = b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo());
-            Console.WriteLine("order: " + o); 
             if (o.isValid)
                 good++;
             Assert.That(b.Turns == 0);
             Assert.That(b.Adjusts == 0);
             o = b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo());
-            Console.WriteLine("order: " + o);
             if (o.isValid)
                 good++;
             Assert.That(b.Turns == 0);
             Assert.That(b.Adjusts == 1);
             o = b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo());
-            Console.WriteLine("order: " + o); 
             if (o.isValid)
                 good++;
             Assert.That(b.Turns == 0);
             Assert.That(b.Adjusts == 2);
             o = b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo());
-            Console.WriteLine("order: " + o); 
             if (o.isValid)
                 good++;
-            Console.WriteLine("good:" + good);
             Assert.That(b.Turns == 0);
             Assert.That(b.Adjusts == 3);
             // first trade was pre-market so we only have 3 total;
@@ -122,7 +117,6 @@ namespace TestTradeLib
             broker.Execute(t);
             o = b.Trade(t, new BarList(), broker.GetOpenPosition(s), new BoxInfo());
             broker.sendOrder(o);
-            Console.WriteLine("order: " + o);
             if (o.isValid)
                 good++;
             Assert.That(b.Turns == 0);
@@ -131,7 +125,6 @@ namespace TestTradeLib
             broker.Execute(t);
             o = b.Trade(t, new BarList(), broker.GetOpenPosition(s), new BoxInfo());
             broker.sendOrder(o);
-            Console.WriteLine("order: " + o);
             if (o.isValid)
                 good++;
             Assert.That(b.Turns == 0);
@@ -142,7 +135,6 @@ namespace TestTradeLib
             // lets change this to a limit order, so he doesn't get filled on just any tick
             o.price = 1;
             broker.sendOrder(o);
-            Console.WriteLine("order: " + o);
             if (o.isValid)
                 good++;
             Assert.That(b.Turns == 0);
@@ -151,10 +143,8 @@ namespace TestTradeLib
             broker.Execute(t);
             o = b.Trade(t, new BarList(), broker.GetOpenPosition(s), new BoxInfo());
             broker.sendOrder(o);
-            Console.WriteLine("order: " + o);
             if (o.isValid)
                 good++;
-            Console.WriteLine("good:" + good);
             Assert.That(b.Turns == 0);
             Assert.That(b.Adjusts == 2);
             // first trade was pre-market 2nd order was never filled so 3rd was ignored... 2 total.
