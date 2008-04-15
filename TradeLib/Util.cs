@@ -182,7 +182,7 @@ namespace TradeLib
                     if (cpl != 0) csize = t.xsize; // if we closed any pl, get the size
                 }
                 string[] pl = new string[] { opl.ToString("C2"), cpl.ToString("C2"), posdict[s].Size.ToString(), csize.ToString(), posdict[s].AvgPrice.ToString("N2") };
-                sw.WriteLine(string.Join(delimiter.ToString(),pl)+delimiter);
+                sw.WriteLine(string.Join(delimiter.ToString(),pl));
             }
             sw.Close();           
 
