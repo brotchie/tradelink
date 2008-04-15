@@ -158,6 +158,35 @@ namespace TradeLib
                 sw.WriteLine(t.ToString(delimiter));
             sw.Close();
         }
+
+        public static void ClosedPLToText(List<Trade> tradelist, char delimiter, string filepath)
+        {
+            StreamWriter sw = new StreamWriter(filepath, false);
+            sw.WriteLine("Date,Time,Symbol,Side,xSize,xPrice,Comment,OpenPL,ClosedPL,OpenSize,ClosedSize,AvgPrice");
+            Dictionary<string, Position> posdict = new Dictionary<string, Position>();
+            foreach (Trade t in tradelist)
+            {
+                sw.Write(t.ToString(delimiter)+delimiter);
+                string s = t.symbol;
+                decimal cpl = 0;
+                decimal opl = 0;
+                int csize = 0;
+                if (!posdict.ContainsKey(s)) 
+                {
+                    posdict.Add(s, new Position(t));
+                }
+                else 
+                {
+                    cpl = posdict[s].Adjust(t); // update the trade and get any closed pl
+                    opl = BoxMath.OpenPL(t.xprice,posdict[s]); // get any leftover open pl
+                    if (cpl != 0) csize = t.xsize; // if we closed any pl, get the size
+                }
+                string[] pl = new string[] { opl.ToString("C2"), cpl.ToString("C2"), posdict[s].Size.ToString("N2"), csize.ToString(), posdict[s].AvgPrice.ToString("N2") };
+                sw.WriteLine(string.Join(delimiter.ToString(),pl)+delimiter);
+            }
+            sw.Close();           
+
+        }
             
 
         static bool IsBox(Type t) { return (t.BaseType.IsSubclassOf(typeof(Box))) || t.BaseType.Equals(typeof(Box)); }

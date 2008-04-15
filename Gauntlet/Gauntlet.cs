@@ -245,7 +245,7 @@ using System.IO;
                 trades.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
             }
             if (tradesincsv.Checked)
-                Util.FillsToText(bt.mybroker.GetTradeList(),',',Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)+"\\Gauntlet.Trades."+bt.name+".csv");
+                Util.ClosedPLToText(bt.mybroker.GetTradeList(),',',Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)+"\\Gauntlet.Trades."+bt.name+".csv");
             if (ordersincsv.Checked)
             {
                 StreamWriter sw = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Orders." + bt.name + ".csv", false);

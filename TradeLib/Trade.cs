@@ -84,8 +84,9 @@ namespace TradeLib
         }
         public string ToString(char delimiter)
         {
-            char d = delimiter;
-            return xdate.ToString() + d + xtime.ToString() + d + symbol + d + (side ? "BUY" : "SELL") + d + Math.Abs(xsize) + d + xprice + d + comment;
+            int usize = Math.Abs(xsize);
+            string[] trade = new string[] { xdate.ToString(), xtime.ToString(), symbol, (side ? "BUY" : "SELL"), usize.ToString(), xprice.ToString("N2"), comment };
+            return string.Join(delimiter.ToString(), trade);
         }
         /// <summary>
         /// Convert this Trade to a TradeLink Mesasge.
