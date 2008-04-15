@@ -88,6 +88,14 @@ namespace TradeLib
             string[] trade = new string[] { xdate.ToString(), xtime.ToString(), symbol, (side ? "BUY" : "SELL"), usize.ToString(), xprice.ToString("N2"), comment };
             return string.Join(delimiter.ToString(), trade);
         }
+        public static Trade FromString(string tradestring) { return FromString(tradestring, ','); }
+        public static Trade FromString(string tradestring, char delimiter)
+        {
+            string[] rec = tradestring.Split(delimiter);
+            Trade t = new Trade(rec[2], rec[3] == "BUY", Convert.ToInt32(rec[4]), Convert.ToDecimal(rec[5]), 0, rec[6], Convert.ToInt32(rec[1]), Convert.ToInt32(rec[0]));
+            t.Fill(t.price);
+            return t;
+        }
         /// <summary>
         /// Convert this Trade to a TradeLink Mesasge.
         /// </summary>
