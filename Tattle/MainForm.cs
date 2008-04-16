@@ -1,0 +1,232 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
+using System.IO;
+using TradeLib;
+using System.Reflection;
+
+namespace Tattle
+{
+    public partial class MainForm : Form
+    {
+        DataTable dt = new DataTable();
+        DataGrid dg = new DataGrid();
+        const string fid = "Gauntlet.Trades";
+        FileSystemWatcher fw;
+        public MainForm()
+        {
+            InitializeComponent();
+
+            dt.Columns.Add("Stat");
+            dt.Columns.Add("Result");
+            dg.RowHeadersVisible = false;
+            dg.DataSource = dt;
+            dg.Parent = splitContainer1.Panel2;
+            dg.Dock = DockStyle.Fill;
+            dg.ReadOnly = true;
+            dg.BackColor = Color.White;
+            dg.HeaderBackColor = dg.BackColor;
+            dg.HeaderForeColor = dg.ForeColor;
+            dg.BackgroundColor = Color.White;
+            dg.CaptionVisible = false;
+            dg.Font = new Font(FontFamily.GenericSansSerif, 10);
+            WatchPath();
+            BackColor = Color.White;
+            splitContainer1.Panel2.BackColor = Color.White;
+            tradefiles.SelectedIndexChanged += new EventHandler(tradefiles_SelectedIndexChanged);
+        }
+
+        void WatchPath() { WatchPath(Environment.GetFolderPath(Environment.SpecialFolder.Personal)); }
+        void WatchPath(string path)
+        {
+            fw = new FileSystemWatcher(path, fid+"*.csv");
+            fw.IncludeSubdirectories = false;
+            fw.EnableRaisingEvents = true;
+            fw.Created += new FileSystemEventHandler(fw_Created);
+            fw.Renamed += new RenamedEventHandler(fw_Renamed);
+            fw.Deleted += new FileSystemEventHandler(fw_Deleted);
+            ResetFiles(path);
+        }
+        void ResetFiles(string path)
+        {
+            DirectoryInfo di = new DirectoryInfo(path);
+            FileInfo[] fis = di.GetFiles("*.csv");
+            tradefiles.Items.Clear();
+            int newest = 0;
+            foreach (FileInfo fi in fis)
+            {
+                if (fi.Name.Contains(fid))
+                {
+                    tradefiles.Items.Add(fi.Name);
+                    System.Text.RegularExpressions.Match datepart =
+                        System.Text.RegularExpressions.Regex.Match(fi.Name, "[0-9]{8}", System.Text.RegularExpressions.RegexOptions.None);
+
+                    int thisdate = Convert.ToInt32(datepart.ToString());
+                    if (thisdate > newest)
+                    {
+                        newest = thisdate;
+                        tradefiles.SelectedIndex = tradefiles.Items.Count - 1;
+                    }
+                }
+            }
+            tradefiles_SelectedIndexChanged(null, null);
+        }
+
+
+
+        void fw_Deleted(object sender, FileSystemEventArgs e)
+        {
+            remresult(e.Name);
+        }
+
+        void fw_Renamed(object sender, RenamedEventArgs e)
+        {
+            remresult(e.Name);
+        }
+
+        void fw_Created(object sender, FileSystemEventArgs e)
+        {
+            newresult(e.Name);
+        }
+
+        void remresult(string name)
+        {
+            if (tradefiles.InvokeRequired)
+                Invoke(new DebugDelegate(remresult), new object[] { name });
+            else if (name.Contains(fid))
+            {
+                tradefiles.Items.Remove(name);
+            }
+        }
+
+        void newresult(string name)
+        {
+            if (tradefiles.InvokeRequired)
+                Invoke(new DebugDelegate(newresult), new object[] { name });
+            else
+            {
+                if (!name.Contains(fid)) return;
+                tradefiles.Items.Add(name);
+                tradefiles.SelectedIndex = tradefiles.Items.Count - 1;
+                DisplayResults(FetchResults((string)tradefiles.SelectedItem));
+            }
+        }
+
+        void tradefiles_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            DisplayResults(FetchResults((string)tradefiles.SelectedItem));
+        }
+
+
+        Results FetchResults(string name)
+        {
+            StreamReader sr = new StreamReader(fw.Path +@"\"+ name);
+            sr.ReadLine();
+            Results r = new Results();
+            while (!sr.EndOfStream)
+            {
+                TradeResult tr = TradeResult.Init(sr.ReadLine());
+                if (!r.SymbolsTraded.Contains(tr.Source.symbol))
+                    r.SymbolsTraded += tr.Source.symbol + ",";
+                r.Trades++;
+                r.HundredLots += (int)(tr.Source.Size / 100);
+                r.GrossPL += tr.ClosedPL;
+                if (tr.ClosedPL>0) r.Winners++;
+                if (tr.ClosedPL < 0) r.Losers++;
+                if ((tr.OpenSize == 0) && (tr.ClosedPL == 0)) r.Flats++;
+                if (tr.ClosedPL > r.MaxWin) r.MaxWin = tr.ClosedPL;
+                if (tr.ClosedPL < r.MaxLoss) r.MaxLoss = tr.ClosedPL;
+                if (tr.OpenPL > r.MaxOpenWin) r.MaxOpenWin = tr.OpenPL;
+                if (tr.OpenPL < r.MaxOpenLoss) r.MaxOpenLoss = tr.OpenPL;
+            }
+            sr.Close();
+            return r;
+
+        }
+
+
+/*
+        void DisplayResults(Results r)
+        {
+            dt.Clear();
+            Type t = r.GetType();
+            FieldInfo[] pis = t.GetFields();
+            foreach (FieldInfo pi in pis)
+            {
+                object res = t.InvokeMember(pi.Name,BindingFlags.GetField| BindingFlags.DeclaredOnly,null,r,null);
+                dt.Rows.Add(pi.Name,res.ToString());
+            }
+        }
+ */
+
+        void DisplayResults(Results r)
+        {
+            dt.Clear();
+            s("GrossPL", r.GrossPL);
+            s("Winners", r.Winners);
+            s("Losers", r.Losers);
+            s("Flats", r.Flats);
+            s("MaxWin", r.MaxWin);
+            s("MaxLoss", r.MaxLoss);
+            s("100Lots", r.HundredLots);
+            s("NetPL", r.NetPL);
+            s("GrossMargin", r.GrossMargin);
+            s("W/L", r.WLRatio);
+            s("Symbols", r.SymbolsTraded);
+        }
+
+        void s(string name, object value) { dt.Rows.Add(name, value.ToString()); }
+
+
+    }
+
+    public class Results
+    {
+        public string SymbolsTraded = "";
+        public decimal GrossPL = 0;
+        public decimal NetPL { get { return GrossPL - Commissions; } }
+        public int Winners = 0;
+        public int Losers = 0;
+        public int Flats = 0;
+        public decimal MaxWin =0 ;
+        public decimal MaxLoss = 0;
+        public decimal MaxOpenWin=0;
+        public decimal MaxOpenLoss=0;
+        public int HundredLots=0;
+        public int Trades=0;
+        public decimal CommissionPerShare = 0.01m;
+        public decimal Commissions { get { return HundredLots * 100 * CommissionPerShare; } }
+        public decimal WLRatio { get { return (Losers==0) ? 0 : Winners/Losers; }}
+        public decimal GrossMargin { get { return (GrossPL==0) ? 0 : NetPL / GrossPL; } }
+    }
+
+    public class TradeResult : Trade
+    {
+        public Trade Source;
+        public decimal OpenPL;
+        public decimal ClosedPL;
+        public int OpenSize;
+        public int ClosedSize;
+        public decimal AvgPrice;
+        const int s = 7;
+        // we're reading these values from file, 
+        // bc it's faster than recalculating each time
+        public static TradeResult Init(string resultline)
+        {
+            string[] res = resultline.Split(',');
+            TradeResult r = new TradeResult();
+            r.Source = Trade.FromString(resultline);
+            r.OpenPL = Convert.ToDecimal(res[s]);
+            r.ClosedPL = Convert.ToDecimal(res[s + 1]);
+            r.OpenSize = Convert.ToInt32(res[s + 2]);
+            r.ClosedSize = Convert.ToInt32(res[s + 3]);
+            r.AvgPrice = Convert.ToDecimal(res[s + 4]);
+            return r;
+        }
+
+    }
+}
