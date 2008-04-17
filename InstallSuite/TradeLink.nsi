@@ -39,6 +39,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\Chartographer.lnk" "$INSTDIR\Chartographer.exe" "" "$INSTDIR\Chartographer.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Replay.lnk" "$INSTDIR\TLReplay.exe" "" "$INSTDIR\TLReplay.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Time and Sales.lnk" "$INSTDIR\TimeSales.exe" "" "$INSTDIR\TimeSales.exe" 0
+  CreateShortCut "$SMPROGRAMS\TradeLink\Tattle.lnk" "$INSTDIR\Tattle.exe" "" "$INSTDIR\Tattle.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Uninstall TradeLink.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Epf-To-Idx.lnk" "$INSTDIR\EPF2IDX.EXE" "" "$INSTDIR\EPF2IDX.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\SplitEPF.lnk" "$INSTDIR\SplitEPF.EXE" "" "$INSTDIR\SplitEPF.EXE" 0  
@@ -59,6 +60,7 @@ Section "TradeLinkSuite"
   File "TimeSales.exe"
   File "EPF2IDX.exe"
   File "SplitEPF.exe"
+  File "Tattle.exe"
   File "calcpl.xla"  
   File /r /x ".svn" "Properties"
   ; Write the installation path into the registry

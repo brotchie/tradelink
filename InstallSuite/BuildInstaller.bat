@@ -54,6 +54,8 @@ echo EPF2IDX
 xcopy /q /y ..\EPF2IDX\bin\Release\EPF2IDX.exe .
 echo CHARTOGRAPHER
 xcopy /q /y ..\Chartographer\bin\Release\Chartographer.exe* .
+echo TATTLE
+xcopy /q /y ..\Tattle\bin\Release\Tattle.exe* .
 echo.
 
 
