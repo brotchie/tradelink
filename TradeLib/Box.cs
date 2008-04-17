@@ -6,6 +6,7 @@ using System.ComponentModel;
 namespace TradeLib
 {
     public delegate void DebugDelegate(string msg);
+    public delegate void ObjectArrayDelegate(object[] parameters);
     /// <summary>
     /// A container for trading strategies or trading rules, and the things necessary to trade and track these rules on a single stock or instrument.
     /// </summary>
@@ -14,6 +15,7 @@ namespace TradeLib
     {
         NewsService news = null;
         protected event IndexDelegate GotIndex;
+        public event ObjectArrayDelegate IndicatorUpdate;
         private string name = "Unnamed";
         private string ver = "$Rev: 1036 $";
         private string symbol;
@@ -60,6 +62,11 @@ namespace TradeLib
         	if (GotIndex!=null) GotIndex(i);
         }
 
+        protected void UpdateIndicators()
+        {
+            if (IndicatorUpdate != null) IndicatorUpdate(Indicators);
+        }
+
         /// <summary>
         /// Trades specified tick.  This method will call an inherited overridden member Read if QuickOrder is true or ReadOrder if QuickOrder is false.
         /// </summary>
@@ -95,6 +102,10 @@ namespace TradeLib
                 tDir = pos.Size;
             }
 
+            object[] old = new object[Indicators.Length];
+            Indicators.CopyTo(old,0);
+
+
             if (QuickOrder) // user providing only size adjustment
             {
                 // get our adjustment
@@ -107,6 +118,9 @@ namespace TradeLib
             {
                 o = ReadOrder(tick, bl,bi);
             }
+
+            if (!old.Equals(Indicators))
+                UpdateIndicators();
             
             // ignore order if another one is waiting for a fill
             if (!_multipleorders && (PosSize != _expectedpossize))
@@ -178,7 +192,7 @@ namespace TradeLib
         /// Resets the indicators tracked by this box to zero.
         /// </summary>
         /// <param name="IndicatorCount">The indicator count.</param>
-        public void ResetIndicators(int IndicatorCount)
+        protected void ResetIndicators(int IndicatorCount)
         {
             _indicators = new List<object>(IndicatorCount);
             _indicount = IndicatorCount;
@@ -214,7 +228,7 @@ namespace TradeLib
         /// </summary>
         /// <value>The inames.</value>
         [BrowsableAttribute(false)]
-        public string[] Inames
+        public string[] IndicatorNames
         {
             get { return _iname.ToArray(); }
             set
