@@ -46,8 +46,8 @@ namespace Tattle
             this.splitContainer1.Panel1.Controls.Add(this.tradefiles);
             this.splitContainer1.Panel1MinSize = 50;
             this.splitContainer1.Panel2MinSize = 50;
-            this.splitContainer1.Size = new System.Drawing.Size(453, 308);
-            this.splitContainer1.SplitterDistance = 242;
+            this.splitContainer1.Size = new System.Drawing.Size(581, 308);
+            this.splitContainer1.SplitterDistance = 310;
             this.splitContainer1.TabIndex = 0;
             // 
             // tradefiles
@@ -57,14 +57,14 @@ namespace Tattle
             this.tradefiles.ItemHeight = 16;
             this.tradefiles.Location = new System.Drawing.Point(0, 0);
             this.tradefiles.Name = "tradefiles";
-            this.tradefiles.Size = new System.Drawing.Size(242, 308);
+            this.tradefiles.Size = new System.Drawing.Size(310, 308);
             this.tradefiles.TabIndex = 0;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(453, 308);
+            this.ClientSize = new System.Drawing.Size(581, 308);
             this.Controls.Add(this.splitContainer1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";

@@ -13,7 +13,7 @@ namespace Tattle
 {
     public partial class MainForm : Form
     {
-        DataTable dt = new DataTable();
+        DataTable dt = new DataTable("results");
         DataGrid dg = new DataGrid();
         const string fid = "Gauntlet.Trades";
         FileSystemWatcher fw;
@@ -149,40 +149,27 @@ namespace Tattle
         }
 
 
-/*
+
         void DisplayResults(Results r)
         {
             dt.Clear();
             Type t = r.GetType();
-            FieldInfo[] pis = t.GetFields();
-            foreach (FieldInfo pi in pis)
+            FieldInfo[] fis = t.GetFields();
+            foreach (FieldInfo fi in fis)
             {
-                object res = t.InvokeMember(pi.Name,BindingFlags.GetField| BindingFlags.DeclaredOnly,null,r,null);
-                dt.Rows.Add(pi.Name,res.ToString());
+                string format = null;
+                if (fi.GetType() == typeof(Decimal)) format = "N2";
+                dt.Rows.Add(fi.Name, (format!=null) ? string.Format(format,fi.GetValue(r)) : fi.GetValue(r).ToString());
+            }
+            PropertyInfo[] pis = t.GetProperties();
+            foreach (PropertyInfo pi in pis)
+            {
+                string format = null;
+                if (pi.GetType() == typeof(Decimal)) format = "N2";
+                dt.Rows.Add(pi.Name, (format!=null) ? string.Format(format, pi.GetValue(r,null)) : pi.GetValue(r,null).ToString());
             }
         }
- */
-
-        void DisplayResults(Results r)
-        {
-            dt.Clear();
-            s("GrossPL", r.GrossPL);
-            s("Winners", r.Winners);
-            s("Losers", r.Losers);
-            s("Flats", r.Flats);
-            s("MaxWin", r.MaxWin);
-            s("MaxLoss", r.MaxLoss);
-            s("100Lots", r.HundredLots);
-            s("NetPL", r.NetPL);
-            s("GrossMargin", r.GrossMargin);
-            s("W/L", r.WLRatio);
-            s("Symbols", r.SymbolsTraded);
-        }
-
-        void s(string name, object value) { dt.Rows.Add(name, value.ToString()); }
-
-
-    }
+   }
 
     public class Results
     {
