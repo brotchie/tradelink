@@ -51,7 +51,10 @@ using System.IO;
 
         void ns_NewsEventSubscribers(News news)
         {
-            show(news.Msg);
+            if (news.Msg.Contains(mybox.Name))
+                show(Environment.NewLine + news.Msg);
+            else
+                show(news.Msg);
         }
 
         void FindStocks(string path)
@@ -140,6 +143,8 @@ using System.IO;
                 else lastmessage.Text = lastmessage.Text + message;
             }
         }
+
+        
 
         private void queuebut_Click(object sender, EventArgs e)
         {
@@ -253,6 +258,20 @@ using System.IO;
                     sw.WriteLine(bt.mybroker.GetOrderList()[i].TLmsg());
                 sw.Close();
             }
+            if (indicatorscsv.Checked)
+            {
+                StreamWriter sw = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Indicators."+bt.name+".csv",false);
+                sw.WriteLine(string.Join(",",mybox.IndicatorNames));
+                
+                for (int i = 0; i< Indicators.Count; i++)
+                {
+                    List<string> ivals = new List<string>();
+                    for (int j = 0; j<Indicators[i].Length; j++)
+                        ivals.Add(Indicators[i][j].ToString());
+                    sw.WriteLine(string.Join(",",ivals.ToArray()));
+                }
+                sw.Close();
+            }
 
 
             
@@ -316,7 +335,15 @@ using System.IO;
                 mybox = Box.FromDLL((string)boxlist.SelectedItem, WinGauntlet.Properties.Settings.Default.boxdll, ns);
             }
             catch (Exception ex) { show("Box failed to load, quitting... (" + ex.Message + (ex.InnerException != null ? ",ex.InnerException.Message" : "") + ")"); }
+            mybox.IndicatorUpdate += new ObjectArrayDelegate(mybox_IndicatorUpdate);
         }
+
+        void mybox_IndicatorUpdate(object[] parameters)
+        {
+            Indicators.Add(parameters);
+        }
+
+        public List<object[]> Indicators = new List<object[]>();
 
 
 

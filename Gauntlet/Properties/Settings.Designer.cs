@@ -166,5 +166,17 @@ namespace WinGauntlet.Properties {
                 this["tradesinwind"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool indicatorsincsv {
+            get {
+                return ((bool)(this["indicatorsincsv"]));
+            }
+            set {
+                this["indicatorsincsv"] = value;
+            }
+        }
     }
 }

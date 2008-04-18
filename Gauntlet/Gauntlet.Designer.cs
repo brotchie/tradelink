@@ -74,6 +74,7 @@ namespace WinGauntlet
             this.trades = new System.Windows.Forms.DataGridView();
             this.messagepage = new System.Windows.Forms.TabPage();
             this.messages = new System.Windows.Forms.RichTextBox();
+            this.indicatorscsv = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.studypage.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -88,7 +89,7 @@ namespace WinGauntlet
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(11, 43);
-            this.button1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button1.Margin = new System.Windows.Forms.Padding(4);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(28, 22);
             this.button1.TabIndex = 0;
@@ -104,7 +105,7 @@ namespace WinGauntlet
             this.tabControl1.Controls.Add(this.messagepage);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
-            this.tabControl1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabControl1.Margin = new System.Windows.Forms.Padding(4);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(611, 331);
@@ -126,9 +127,9 @@ namespace WinGauntlet
             this.studypage.Controls.Add(this.boxlist);
             this.studypage.Controls.Add(this.stocklist);
             this.studypage.Location = new System.Drawing.Point(4, 25);
-            this.studypage.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.studypage.Margin = new System.Windows.Forms.Padding(4);
             this.studypage.Name = "studypage";
-            this.studypage.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.studypage.Padding = new System.Windows.Forms.Padding(4);
             this.studypage.Size = new System.Drawing.Size(603, 302);
             this.studypage.TabIndex = 0;
             this.studypage.Text = "Studies";
@@ -169,7 +170,7 @@ namespace WinGauntlet
             this.usedates.Appearance = System.Windows.Forms.Appearance.Button;
             this.usedates.AutoSize = true;
             this.usedates.Location = new System.Drawing.Point(12, 132);
-            this.usedates.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.usedates.Margin = new System.Windows.Forms.Padding(4);
             this.usedates.Name = "usedates";
             this.usedates.Size = new System.Drawing.Size(55, 27);
             this.usedates.TabIndex = 13;
@@ -182,7 +183,7 @@ namespace WinGauntlet
             this.usestocks.Appearance = System.Windows.Forms.Appearance.Button;
             this.usestocks.AutoSize = true;
             this.usestocks.Location = new System.Drawing.Point(5, 7);
-            this.usestocks.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.usestocks.Margin = new System.Windows.Forms.Padding(4);
             this.usestocks.Name = "usestocks";
             this.usestocks.Size = new System.Drawing.Size(60, 27);
             this.usestocks.TabIndex = 12;
@@ -196,7 +197,7 @@ namespace WinGauntlet
             this.daylist.FormattingEnabled = true;
             this.daylist.ItemHeight = 16;
             this.daylist.Location = new System.Drawing.Point(199, 132);
-            this.daylist.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.daylist.Margin = new System.Windows.Forms.Padding(4);
             this.daylist.MultiColumn = true;
             this.daylist.Name = "daylist";
             this.daylist.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
@@ -210,7 +211,7 @@ namespace WinGauntlet
             this.monthlist.FormattingEnabled = true;
             this.monthlist.ItemHeight = 16;
             this.monthlist.Location = new System.Drawing.Point(145, 132);
-            this.monthlist.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.monthlist.Margin = new System.Windows.Forms.Padding(4);
             this.monthlist.Name = "monthlist";
             this.monthlist.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.monthlist.Size = new System.Drawing.Size(44, 100);
@@ -223,7 +224,7 @@ namespace WinGauntlet
             this.yearlist.FormattingEnabled = true;
             this.yearlist.ItemHeight = 16;
             this.yearlist.Location = new System.Drawing.Point(80, 132);
-            this.yearlist.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.yearlist.Margin = new System.Windows.Forms.Padding(4);
             this.yearlist.Name = "yearlist";
             this.yearlist.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.yearlist.Size = new System.Drawing.Size(56, 100);
@@ -266,7 +267,7 @@ namespace WinGauntlet
             // queuebut
             // 
             this.queuebut.Location = new System.Drawing.Point(80, 240);
-            this.queuebut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.queuebut.Margin = new System.Windows.Forms.Padding(4);
             this.queuebut.Name = "queuebut";
             this.queuebut.Size = new System.Drawing.Size(509, 25);
             this.queuebut.TabIndex = 4;
@@ -279,7 +280,7 @@ namespace WinGauntlet
             this.boxlist.FormattingEnabled = true;
             this.boxlist.ItemHeight = 16;
             this.boxlist.Location = new System.Drawing.Point(339, 132);
-            this.boxlist.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.boxlist.Margin = new System.Windows.Forms.Padding(4);
             this.boxlist.MultiColumn = true;
             this.boxlist.Name = "boxlist";
             this.boxlist.Size = new System.Drawing.Size(249, 100);
@@ -292,7 +293,7 @@ namespace WinGauntlet
             this.stocklist.FormattingEnabled = true;
             this.stocklist.ItemHeight = 16;
             this.stocklist.Location = new System.Drawing.Point(80, 7);
-            this.stocklist.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.stocklist.Margin = new System.Windows.Forms.Padding(4);
             this.stocklist.MultiColumn = true;
             this.stocklist.Name = "stocklist";
             this.stocklist.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
@@ -301,6 +302,7 @@ namespace WinGauntlet
             // 
             // optionpage
             // 
+            this.optionpage.Controls.Add(this.indicatorscsv);
             this.optionpage.Controls.Add(this.tradesincsv);
             this.optionpage.Controls.Add(this.tradesinwind);
             this.optionpage.Controls.Add(this.ordersincsv);
@@ -321,9 +323,9 @@ namespace WinGauntlet
             this.optionpage.Controls.Add(this.label1);
             this.optionpage.Controls.Add(this.button1);
             this.optionpage.Location = new System.Drawing.Point(4, 25);
-            this.optionpage.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.optionpage.Margin = new System.Windows.Forms.Padding(4);
             this.optionpage.Name = "optionpage";
-            this.optionpage.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.optionpage.Padding = new System.Windows.Forms.Padding(4);
             this.optionpage.Size = new System.Drawing.Size(603, 302);
             this.optionpage.TabIndex = 1;
             this.optionpage.Text = "Options";
@@ -336,7 +338,7 @@ namespace WinGauntlet
             this.tradesincsv.CheckState = System.Windows.Forms.CheckState.Checked;
             this.tradesincsv.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "tradesincsv", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.tradesincsv.Location = new System.Drawing.Point(273, 212);
-            this.tradesincsv.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tradesincsv.Margin = new System.Windows.Forms.Padding(4);
             this.tradesincsv.Name = "tradesincsv";
             this.tradesincsv.Size = new System.Drawing.Size(121, 21);
             this.tradesincsv.TabIndex = 24;
@@ -350,7 +352,7 @@ namespace WinGauntlet
             this.tradesinwind.CheckState = System.Windows.Forms.CheckState.Checked;
             this.tradesinwind.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "tradesinwind", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.tradesinwind.Location = new System.Drawing.Point(273, 183);
-            this.tradesinwind.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tradesinwind.Margin = new System.Windows.Forms.Padding(4);
             this.tradesinwind.Name = "tradesinwind";
             this.tradesinwind.Size = new System.Drawing.Size(148, 21);
             this.tradesinwind.TabIndex = 23;
@@ -363,7 +365,7 @@ namespace WinGauntlet
             this.ordersincsv.Checked = global::WinGauntlet.Properties.Settings.Default.ordersincsv;
             this.ordersincsv.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "ordersincsv", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.ordersincsv.Location = new System.Drawing.Point(273, 156);
-            this.ordersincsv.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ordersincsv.Margin = new System.Windows.Forms.Padding(4);
             this.ordersincsv.Name = "ordersincsv";
             this.ordersincsv.Size = new System.Drawing.Size(120, 21);
             this.ordersincsv.TabIndex = 22;
@@ -377,7 +379,7 @@ namespace WinGauntlet
             this.ordersinwind.CheckState = System.Windows.Forms.CheckState.Checked;
             this.ordersinwind.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "ordersinwind", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.ordersinwind.Location = new System.Drawing.Point(273, 127);
-            this.ordersinwind.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ordersinwind.Margin = new System.Windows.Forms.Padding(4);
             this.ordersinwind.Name = "ordersinwind";
             this.ordersinwind.Size = new System.Drawing.Size(147, 21);
             this.ordersinwind.TabIndex = 21;
@@ -387,7 +389,7 @@ namespace WinGauntlet
             // button4
             // 
             this.button4.Location = new System.Drawing.Point(72, 7);
-            this.button4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button4.Margin = new System.Windows.Forms.Padding(4);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(68, 28);
             this.button4.TabIndex = 20;
@@ -398,7 +400,7 @@ namespace WinGauntlet
             // button3
             // 
             this.button3.Location = new System.Drawing.Point(148, 7);
-            this.button3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button3.Margin = new System.Windows.Forms.Padding(4);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(81, 28);
             this.button3.TabIndex = 19;
@@ -413,7 +415,7 @@ namespace WinGauntlet
             this.messagewrite.CheckState = System.Windows.Forms.CheckState.Checked;
             this.messagewrite.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "writeonmessages", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.messagewrite.Location = new System.Drawing.Point(8, 127);
-            this.messagewrite.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.messagewrite.Margin = new System.Windows.Forms.Padding(4);
             this.messagewrite.Name = "messagewrite";
             this.messagewrite.Size = new System.Drawing.Size(185, 21);
             this.messagewrite.TabIndex = 18;
@@ -427,7 +429,7 @@ namespace WinGauntlet
             this.clearmessages.CheckState = System.Windows.Forms.CheckState.Checked;
             this.clearmessages.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "clearmessages", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.clearmessages.Location = new System.Drawing.Point(8, 268);
-            this.clearmessages.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.clearmessages.Margin = new System.Windows.Forms.Padding(4);
             this.clearmessages.Name = "clearmessages";
             this.clearmessages.Size = new System.Drawing.Size(181, 21);
             this.clearmessages.TabIndex = 17;
@@ -441,7 +443,7 @@ namespace WinGauntlet
             this.cleartrades.CheckState = System.Windows.Forms.CheckState.Checked;
             this.cleartrades.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "cleartrades", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.cleartrades.Location = new System.Drawing.Point(8, 240);
-            this.cleartrades.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cleartrades.Margin = new System.Windows.Forms.Padding(4);
             this.cleartrades.Name = "cleartrades";
             this.cleartrades.Size = new System.Drawing.Size(162, 21);
             this.cleartrades.TabIndex = 16;
@@ -455,7 +457,7 @@ namespace WinGauntlet
             this.clearorders.CheckState = System.Windows.Forms.CheckState.Checked;
             this.clearorders.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "clearorders", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.clearorders.Location = new System.Drawing.Point(8, 212);
-            this.clearorders.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.clearorders.Margin = new System.Windows.Forms.Padding(4);
             this.clearorders.Name = "clearorders";
             this.clearorders.Size = new System.Drawing.Size(161, 21);
             this.clearorders.TabIndex = 15;
@@ -469,7 +471,7 @@ namespace WinGauntlet
             this.saveonexit.CheckState = System.Windows.Forms.CheckState.Checked;
             this.saveonexit.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "saveonexit", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.saveonexit.Location = new System.Drawing.Point(8, 183);
-            this.saveonexit.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.saveonexit.Margin = new System.Windows.Forms.Padding(4);
             this.saveonexit.Name = "saveonexit";
             this.saveonexit.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.saveonexit.Size = new System.Drawing.Size(108, 21);
@@ -480,7 +482,7 @@ namespace WinGauntlet
             // savesettings
             // 
             this.savesettings.Location = new System.Drawing.Point(8, 7);
-            this.savesettings.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.savesettings.Margin = new System.Windows.Forms.Padding(4);
             this.savesettings.Name = "savesettings";
             this.savesettings.Size = new System.Drawing.Size(56, 28);
             this.savesettings.TabIndex = 13;
@@ -508,7 +510,7 @@ namespace WinGauntlet
             "NMS",
             "PSE"});
             this.exchlist.Location = new System.Drawing.Point(384, 49);
-            this.exchlist.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.exchlist.Margin = new System.Windows.Forms.Padding(4);
             this.exchlist.MultiColumn = true;
             this.exchlist.Name = "exchlist";
             this.exchlist.Size = new System.Drawing.Size(123, 68);
@@ -527,7 +529,7 @@ namespace WinGauntlet
             // button2
             // 
             this.button2.Location = new System.Drawing.Point(11, 73);
-            this.button2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button2.Margin = new System.Windows.Forms.Padding(4);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(27, 21);
             this.button2.TabIndex = 3;
@@ -538,7 +540,7 @@ namespace WinGauntlet
             // 
             this.showdebug.AutoSize = true;
             this.showdebug.Location = new System.Drawing.Point(8, 155);
-            this.showdebug.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.showdebug.Margin = new System.Windows.Forms.Padding(4);
             this.showdebug.Name = "showdebug";
             this.showdebug.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.showdebug.Size = new System.Drawing.Size(126, 21);
@@ -560,7 +562,7 @@ namespace WinGauntlet
             // 
             this.orderpage.Controls.Add(this.orders);
             this.orderpage.Location = new System.Drawing.Point(4, 25);
-            this.orderpage.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.orderpage.Margin = new System.Windows.Forms.Padding(4);
             this.orderpage.Name = "orderpage";
             this.orderpage.Size = new System.Drawing.Size(603, 302);
             this.orderpage.TabIndex = 2;
@@ -584,10 +586,11 @@ namespace WinGauntlet
             this.orders.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.orders.Dock = System.Windows.Forms.DockStyle.Fill;
             this.orders.Location = new System.Drawing.Point(0, 0);
-            this.orders.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.orders.Margin = new System.Windows.Forms.Padding(4);
             this.orders.Name = "orders";
             this.orders.ReadOnly = true;
             this.orders.RowHeadersVisible = false;
+            this.orders.RowTemplate.Height = 24;
             this.orders.Size = new System.Drawing.Size(603, 302);
             this.orders.TabIndex = 0;
             // 
@@ -595,7 +598,7 @@ namespace WinGauntlet
             // 
             this.tradepage.Controls.Add(this.trades);
             this.tradepage.Location = new System.Drawing.Point(4, 25);
-            this.tradepage.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tradepage.Margin = new System.Windows.Forms.Padding(4);
             this.tradepage.Name = "tradepage";
             this.tradepage.Size = new System.Drawing.Size(603, 302);
             this.tradepage.TabIndex = 3;
@@ -619,10 +622,11 @@ namespace WinGauntlet
             this.trades.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.trades.Dock = System.Windows.Forms.DockStyle.Fill;
             this.trades.Location = new System.Drawing.Point(0, 0);
-            this.trades.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.trades.Margin = new System.Windows.Forms.Padding(4);
             this.trades.Name = "trades";
             this.trades.ReadOnly = true;
             this.trades.RowHeadersVisible = false;
+            this.trades.RowTemplate.Height = 24;
             this.trades.Size = new System.Drawing.Size(603, 302);
             this.trades.TabIndex = 0;
             // 
@@ -630,7 +634,7 @@ namespace WinGauntlet
             // 
             this.messagepage.Controls.Add(this.messages);
             this.messagepage.Location = new System.Drawing.Point(4, 25);
-            this.messagepage.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.messagepage.Margin = new System.Windows.Forms.Padding(4);
             this.messagepage.Name = "messagepage";
             this.messagepage.Size = new System.Drawing.Size(603, 302);
             this.messagepage.TabIndex = 4;
@@ -643,12 +647,24 @@ namespace WinGauntlet
             this.messages.DataBindings.Add(new System.Windows.Forms.Binding("ReadOnly", global::WinGauntlet.Properties.Settings.Default, "writeonmessages", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.messages.Dock = System.Windows.Forms.DockStyle.Fill;
             this.messages.Location = new System.Drawing.Point(0, 0);
-            this.messages.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.messages.Margin = new System.Windows.Forms.Padding(4);
             this.messages.Name = "messages";
             this.messages.ReadOnly = global::WinGauntlet.Properties.Settings.Default.writeonmessages;
             this.messages.Size = new System.Drawing.Size(603, 302);
             this.messages.TabIndex = 0;
             this.messages.Text = "";
+            // 
+            // indicatorscsv
+            // 
+            this.indicatorscsv.AutoSize = true;
+            this.indicatorscsv.Checked = global::WinGauntlet.Properties.Settings.Default.indicatorsincsv;
+            this.indicatorscsv.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "indicatorsincsv", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.indicatorscsv.Location = new System.Drawing.Point(273, 240);
+            this.indicatorscsv.Name = "indicatorscsv";
+            this.indicatorscsv.Size = new System.Drawing.Size(137, 21);
+            this.indicatorscsv.TabIndex = 25;
+            this.indicatorscsv.Text = "Indicators in CSV";
+            this.indicatorscsv.UseVisualStyleBackColor = true;
             // 
             // Gauntlet
             // 
@@ -657,7 +673,7 @@ namespace WinGauntlet
             this.ClientSize = new System.Drawing.Size(611, 331);
             this.Controls.Add(this.tabControl1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Gauntlet";
             this.Text = "Gauntlet";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Gauntlet_FormClosing);
@@ -722,6 +738,7 @@ namespace WinGauntlet
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.CheckBox indicatorscsv;
     }
 }
 
