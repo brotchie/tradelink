@@ -138,7 +138,7 @@ namespace TradeLib
         }
         public static Hashtable GetCloseTime()
         {
-            StreamReader f = new StreamReader("c:\\program files\\tradelink\\tradelink\\EarlyClose.csv");
+            StreamReader f = new StreamReader("EarlyClose.csv");
             string[] r = new string[2];
             string line = "";
             Hashtable h = new Hashtable();
