@@ -102,10 +102,6 @@ namespace TradeLib
                 tDir = pos.Size;
             }
 
-            object[] old = new object[Indicators.Length];
-            Indicators.CopyTo(old,0);
-
-
             if (QuickOrder) // user providing only size adjustment
             {
                 // get our adjustment
@@ -119,32 +115,38 @@ namespace TradeLib
                 o = ReadOrder(tick, bl,bi);
             }
 
-            if (!old.Equals(Indicators))
-                UpdateIndicators();
-            
-            // ignore order if another one is waiting for a fill
-            if (!_multipleorders && (PosSize != _expectedpossize))
+            if (!OrdersAllowed) // if we're not allowed, mark order as invalid
                 o = new Order();
-            else if (!_multipleorders && (PosSize == _expectedpossize) && o.isValid)
-                _expectedpossize += o.SignedSize;
 
             //flat us at the close
-            if ((Time >= (DayEnd - DayEndBuff))) 
+            if (!_sentshut && (Time >= (DayEnd - DayEndBuff)))
+            {
                 o = this.Adjust(Flat);
+                o.time = Time;
+                o.date = Date;
+                _sentshut = true;
+            }
             if (o.isValid)
             {
                 // if it's a valid order it counts as an adjustment
                 adjusts++;
                 // if we're going to flat from non-flat, this is a "trade"
-                if ((Math.Abs(PosSize + o.SignedSize) == 0) && (PosSize != 0)) turns++;
+                if ((Math.Abs(PosSize + o.SignedSize) == 0) && (PosSize != 0)) 
+                    turns++;
 
                 // final prep for good orders
+                _expectedpossize += o.SignedSize;
                 o.time = Time;
                 o.date = Date;
-                this.D("Sent order: " + o);
             }
+            
+            if (o.isValid) this.D("Sent order: " + o);
             return o; // send our order
         }
+
+        private bool _sentshut = false;
+
+        private bool OrdersAllowed { get { return (_multipleorders || (!_multipleorders && (PosSize == _expectedpossize))); } }
 
 
         /// <summary>
@@ -196,6 +198,7 @@ namespace TradeLib
         {
             _indicators = new List<object>(IndicatorCount);
             _indicount = IndicatorCount;
+            if ((_iname.Count > 0) && (_iname[0] != "i0")) return; // don't rename indicators if named already
             _iname = new List<string>(IndicatorCount);
             for (int i = 0; i < IndicatorCount; i++)
             {
@@ -289,7 +292,7 @@ namespace TradeLib
         /// Reset this box instance.  (eg for another box run, a new trading day, etc)
         /// </summary>
         public virtual void Reset() 
-        { 
+        {
             symbol = null; SHUTDOWN = false; turns = 0; adjusts = 0; 
             DayStart = 930; DayEnd = 1600;
             ResetIndicators(_indicount);
