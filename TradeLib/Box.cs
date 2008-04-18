@@ -198,12 +198,14 @@ namespace TradeLib
         {
             _indicators = new List<object>(IndicatorCount);
             _indicount = IndicatorCount;
-            if ((_iname.Count > 0) && (_iname[0] != "i0")) return; // don't rename indicators if named already
-            _iname = new List<string>(IndicatorCount);
+            bool hasiname = ((_iname.Count > 0) && (_iname[0] != "i0")); 
+            if (!hasiname) 
+                _iname = new List<string>(IndicatorCount);
             for (int i = 0; i < IndicatorCount; i++)
             {
                 _indicators.Add(0);
-                _iname.Add("i" + i);
+                if (!hasiname)
+                    _iname.Add("i" + i);
             }
         }
         /// <summary>
