@@ -230,6 +230,9 @@ using System.IO;
 
         void bt_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            string unique = "";
+            if (csvnamesunique.Checked)
+                unique = "."+bt.name;
             if (ordersinwind.Checked)
             {
                 for (int i = 0; i < bt.mybroker.GetOrderList().Count; i++)
@@ -250,17 +253,17 @@ using System.IO;
                 trades.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
             }
             if (tradesincsv.Checked)
-                Util.ClosedPLToText(bt.mybroker.GetTradeList(),',',Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)+"\\Gauntlet.Trades."+bt.name+".csv");
+                Util.ClosedPLToText(bt.mybroker.GetTradeList(),',',Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)+"\\Gauntlet.Trades"+unique+".csv");
             if (ordersincsv.Checked)
             {
-                StreamWriter sw = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Orders." + bt.name + ".csv", false);
+                StreamWriter sw = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Orders" + unique + ".csv", false);
                 for (int i = 0; i < bt.mybroker.GetOrderList().Count; i++)
                     sw.WriteLine(bt.mybroker.GetOrderList()[i].TLmsg());
                 sw.Close();
             }
             if (indicatorscsv.Checked)
             {
-                StreamWriter sw = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Indicators."+bt.name+".csv",false);
+                StreamWriter sw = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Indicators"+unique+".csv",false);
                 sw.WriteLine(string.Join(",",mybox.IndicatorNames));
                 
                 for (int i = 0; i< Indicators.Count; i++)

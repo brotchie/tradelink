@@ -50,6 +50,7 @@ namespace WinGauntlet
             this.boxlist = new System.Windows.Forms.ListBox();
             this.stocklist = new System.Windows.Forms.ListBox();
             this.optionpage = new System.Windows.Forms.TabPage();
+            this.indicatorscsv = new System.Windows.Forms.CheckBox();
             this.tradesincsv = new System.Windows.Forms.CheckBox();
             this.tradesinwind = new System.Windows.Forms.CheckBox();
             this.ordersincsv = new System.Windows.Forms.CheckBox();
@@ -74,7 +75,7 @@ namespace WinGauntlet
             this.trades = new System.Windows.Forms.DataGridView();
             this.messagepage = new System.Windows.Forms.TabPage();
             this.messages = new System.Windows.Forms.RichTextBox();
-            this.indicatorscsv = new System.Windows.Forms.CheckBox();
+            this.csvnamesunique = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.studypage.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -302,6 +303,7 @@ namespace WinGauntlet
             // 
             // optionpage
             // 
+            this.optionpage.Controls.Add(this.csvnamesunique);
             this.optionpage.Controls.Add(this.indicatorscsv);
             this.optionpage.Controls.Add(this.tradesincsv);
             this.optionpage.Controls.Add(this.tradesinwind);
@@ -330,6 +332,18 @@ namespace WinGauntlet
             this.optionpage.TabIndex = 1;
             this.optionpage.Text = "Options";
             this.optionpage.UseVisualStyleBackColor = true;
+            // 
+            // indicatorscsv
+            // 
+            this.indicatorscsv.AutoSize = true;
+            this.indicatorscsv.Checked = global::WinGauntlet.Properties.Settings.Default.indicatorsincsv;
+            this.indicatorscsv.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "indicatorsincsv", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.indicatorscsv.Location = new System.Drawing.Point(273, 240);
+            this.indicatorscsv.Name = "indicatorscsv";
+            this.indicatorscsv.Size = new System.Drawing.Size(137, 21);
+            this.indicatorscsv.TabIndex = 25;
+            this.indicatorscsv.Text = "Indicators in CSV";
+            this.indicatorscsv.UseVisualStyleBackColor = true;
             // 
             // tradesincsv
             // 
@@ -654,17 +668,18 @@ namespace WinGauntlet
             this.messages.TabIndex = 0;
             this.messages.Text = "";
             // 
-            // indicatorscsv
+            // csvnamesunique
             // 
-            this.indicatorscsv.AutoSize = true;
-            this.indicatorscsv.Checked = global::WinGauntlet.Properties.Settings.Default.indicatorsincsv;
-            this.indicatorscsv.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "indicatorsincsv", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.indicatorscsv.Location = new System.Drawing.Point(273, 240);
-            this.indicatorscsv.Name = "indicatorscsv";
-            this.indicatorscsv.Size = new System.Drawing.Size(137, 21);
-            this.indicatorscsv.TabIndex = 25;
-            this.indicatorscsv.Text = "Indicators in CSV";
-            this.indicatorscsv.UseVisualStyleBackColor = true;
+            this.csvnamesunique.AutoSize = true;
+            this.csvnamesunique.Checked = global::WinGauntlet.Properties.Settings.Default.csvnamesunique;
+            this.csvnamesunique.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.csvnamesunique.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "csvnamesunique", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.csvnamesunique.Location = new System.Drawing.Point(273, 268);
+            this.csvnamesunique.Name = "csvnamesunique";
+            this.csvnamesunique.Size = new System.Drawing.Size(170, 21);
+            this.csvnamesunique.TabIndex = 26;
+            this.csvnamesunique.Text = "Unique CSV filenames";
+            this.csvnamesunique.UseVisualStyleBackColor = true;
             // 
             // Gauntlet
             // 
@@ -739,6 +754,7 @@ namespace WinGauntlet
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.CheckBox indicatorscsv;
+        private System.Windows.Forms.CheckBox csvnamesunique;
     }
 }
 
