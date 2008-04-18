@@ -49,8 +49,11 @@ namespace Tattle
             fw.Created += new FileSystemEventHandler(fw_Created);
             fw.Renamed += new RenamedEventHandler(fw_Renamed);
             fw.Deleted += new FileSystemEventHandler(fw_Deleted);
+            fw.Changed += new FileSystemEventHandler(fw_Changed);
             ResetFiles(path);
         }
+
+
         void ResetFiles(string path)
         {
             DirectoryInfo di = new DirectoryInfo(path);
@@ -64,19 +67,26 @@ namespace Tattle
                     tradefiles.Items.Add(fi.Name);
                     System.Text.RegularExpressions.Match datepart =
                         System.Text.RegularExpressions.Regex.Match(fi.Name, "[0-9]{8}", System.Text.RegularExpressions.RegexOptions.None);
-
-                    int thisdate = Convert.ToInt32(datepart.ToString());
-                    if (thisdate > newest)
+                    if (datepart.Success)
                     {
-                        newest = thisdate;
-                        tradefiles.SelectedIndex = tradefiles.Items.Count - 1;
+                        int thisdate = Convert.ToInt32(datepart.ToString());
+                        if (thisdate > newest)
+                        {
+                            newest = thisdate;
+                            tradefiles.SelectedIndex = tradefiles.Items.Count - 1;
+                        }
                     }
+                    else tradefiles.SelectedIndex = tradefiles.Items.Count - 1;
                 }
             }
             tradefiles_SelectedIndexChanged(null, null);
         }
 
-
+        void fw_Changed(object sender, FileSystemEventArgs e)
+        {
+            DisplayResults(FetchResults(e.Name));
+            tradefiles.SelectedItem = e.Name;
+        }
 
         void fw_Deleted(object sender, FileSystemEventArgs e)
         {
@@ -124,6 +134,7 @@ namespace Tattle
 
         Results FetchResults(string name)
         {
+            if (name == null) return new Results();
             StreamReader sr = new StreamReader(fw.Path +@"\"+ name);
             sr.ReadLine();
             Results r = new Results();
