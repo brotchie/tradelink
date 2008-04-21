@@ -88,6 +88,7 @@ namespace TradeLib
             if (tick.sym != Symbol) return o;
             time = tick.time;
             date = tick.date;
+            sec = tick.sec;
 
            
             if ((Time < DayStart) || (Time>DayEnd)) return o; // is market open?
