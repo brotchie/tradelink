@@ -32,6 +32,7 @@ namespace TradeLib
         private int MINSIZE = 100;
         private int date = 0;
         private int time = 0;
+        private int sec = 0;
         private int sday = 930;
         private int eday = 1600;
         private string loadstr = "";
@@ -412,6 +413,8 @@ namespace TradeLib
         /// <value>The date.</value>
         [CategoryAttribute("TradeLink BoxInfo"), DescriptionAttribute("Date")]
         public int Date { get { return date; } }
+        [CategoryAttribute("TradeLink BoxInfo"), DescriptionAttribute("Sec")]
+        public int Sec { get { return sec; } }
         /// <summary>
         /// Gets the current time.
         /// </summary>
