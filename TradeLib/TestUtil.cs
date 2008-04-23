@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using TradeLib;
 using System;
+using System.Collections.Generic;
 
 
 namespace TestTradeLib
@@ -54,5 +55,56 @@ namespace TestTradeLib
         {
             d = Util.ToDateTime(0);
         }
+
+
+        [Test]
+        public void TradesToClosedPLString()
+        {
+            List<Trade> tradelist = new List<Trade>();
+            string s = "WAG";
+            tradelist.Add(new Trade(s, 47.04m, 300)); // enter
+            tradelist.Add(new Trade(s, 47.31m, 500)); // add
+            tradelist.Add(new Trade(s, 47.74m, -800)); // exit
+
+            string[] closedpl = Util.TradesToClosedPL(tradelist);
+            for (int i = 0; i<closedpl.Length; i++)
+            {
+                string plline = closedpl[i];
+                string[] plrec = plline.Split(',');
+
+                // check record length matches expected
+                int numfields = Enum.GetNames(typeof(TradePLField)).Length;
+                Assert.That(numfields == plrec.Length);
+
+                // validate the values
+                switch (i)
+                {
+                    case 0 :
+                        Assert.That(plrec[(int)TradePLField.OpenPL] == "0.00",plrec[(int)TradePLField.OpenPL] );
+                        Assert.That(plrec[(int)TradePLField.ClosedPL] == "0.00",plrec[(int)TradePLField.ClosedPL] );
+                        Assert.That(plrec[(int)TradePLField.OpenSize] == "300", plrec[(int)TradePLField.OpenSize]);
+                        Assert.That(plrec[(int)TradePLField.ClosedSize] == "0", plrec[(int)TradePLField.ClosedSize]);
+                        Assert.That(plrec[(int)TradePLField.AvgPrice] == "47.04", plrec[(int)TradePLField.AvgPrice]);
+                        break;
+                    case 1 :
+                        Assert.That(plrec[(int)TradePLField.OpenPL] == "81.00", plrec[(int)TradePLField.OpenPL]);
+                        Assert.That(plrec[(int)TradePLField.ClosedPL] == "0.00", plrec[(int)TradePLField.ClosedPL]);
+                        Assert.That(plrec[(int)TradePLField.OpenSize] == "800", plrec[(int)TradePLField.OpenSize]);
+                        Assert.That(plrec[(int)TradePLField.ClosedSize] == "0", plrec[(int)TradePLField.ClosedSize]);
+                        Assert.That(plrec[(int)TradePLField.AvgPrice] == "47.21", plrec[(int)TradePLField.AvgPrice]);
+                        break;
+                    case 2 :
+                        Assert.That(plrec[(int)TradePLField.OpenPL] == "0.00", plrec[(int)TradePLField.OpenPL]);
+                        Assert.That(plrec[(int)TradePLField.ClosedPL] == "425.00", plrec[(int)TradePLField.ClosedPL]);
+                        Assert.That(plrec[(int)TradePLField.OpenSize] == "0", plrec[(int)TradePLField.OpenSize]);
+                        Assert.That(plrec[(int)TradePLField.ClosedSize] == "-800", plrec[(int)TradePLField.ClosedSize]);
+                        Assert.That(plrec[(int)TradePLField.AvgPrice] == "0.00", plrec[(int)TradePLField.AvgPrice]);
+                        break;
+                }
+            }
+        }
     }
+
+
+
 }

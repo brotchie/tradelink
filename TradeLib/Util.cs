@@ -159,33 +159,46 @@ namespace TradeLib
             sw.Close();
         }
 
-        public static void ClosedPLToText(List<Trade> tradelist, char delimiter, string filepath)
+        public static string[] TradesToClosedPL(List<Trade> tradelist) { return TradesToClosedPL(tradelist, ','); }
+
+        public static string[] TradesToClosedPL(List<Trade> tradelist, char delimiter)
         {
-            StreamWriter sw = new StreamWriter(filepath, false);
-            sw.WriteLine("Date,Time,Symbol,Side,xSize,xPrice,Comment,OpenPL,ClosedPL,OpenSize,ClosedSize,AvgPrice");
+            List<string> rowoutput = new List<string>();
             Dictionary<string, Position> posdict = new Dictionary<string, Position>();
             foreach (Trade t in tradelist)
             {
-                sw.Write(t.ToString(delimiter)+delimiter);
+                string r = t.ToString(delimiter) + delimiter;
                 string s = t.symbol;
                 decimal cpl = 0;
                 decimal opl = 0;
                 int csize = 0;
-                if (!posdict.ContainsKey(s)) 
+                if (!posdict.ContainsKey(s))
                 {
                     posdict.Add(s, new Position(t));
                 }
-                else 
+                else
                 {
                     cpl = posdict[s].Adjust(t); // update the trade and get any closed pl
-                    opl = BoxMath.OpenPL(t.xprice,posdict[s]); // get any leftover open pl
+                    opl = BoxMath.OpenPL(t.xprice, posdict[s]); // get any leftover open pl
                     if (cpl != 0) csize = t.xsize; // if we closed any pl, get the size
                 }
-                string[] pl = new string[] { opl.ToString("N2"), cpl.ToString("N2"), posdict[s].Size.ToString(), csize.ToString(), posdict[s].AvgPrice.ToString("N2") };
-                sw.WriteLine(string.Join(delimiter.ToString(),pl));
+                string[] pl = new string[] { opl.ToString("f2"), cpl.ToString("f2"), posdict[s].Size.ToString(), csize.ToString(), posdict[s].AvgPrice.ToString("f2") };
+                r += string.Join(delimiter.ToString(), pl);
+                rowoutput.Add(r);
             }
-            sw.Close();           
+            return rowoutput.ToArray();
 
+        }
+
+        public static void ClosedPLToText(List<Trade> tradelist, char delimiter, string filepath)
+        {
+            StreamWriter sw = new StreamWriter(filepath, false);
+            string header = string.Join(delimiter.ToString(), Enum.GetNames(typeof(TradePLField)));
+            sw.WriteLine(header);
+            string[] lines = TradesToClosedPL(tradelist, delimiter);
+            foreach (string line in lines)
+                sw.WriteLine(line);
+            sw.Close();           
         }
             
 
@@ -246,5 +259,21 @@ namespace TradeLib
         Day = 1,
         Month = 2,
         Year = 4,
+    }
+
+    public enum TradePLField
+    {
+        Date = 0,
+        Time,
+        Symbol,
+        Side,
+        xSize,
+        xPrice,
+        Comment,
+        OpenPL,
+        ClosedPL,
+        OpenSize,
+        ClosedSize,
+        AvgPrice,
     }
 }
