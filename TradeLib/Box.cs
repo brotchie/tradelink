@@ -174,9 +174,9 @@ namespace TradeLib
         /// </summary>
         /// <param name="size">The size.</param>
         /// <returns></returns>
-        protected int Norm2Min(int size)
+        protected int Norm2Min(decimal size)
         {
-            int wmult = (int)Math.Ceiling((decimal)size/MINSIZE);
+            int wmult = (int)Math.Ceiling(size/MINSIZE);
             return wmult * MINSIZE;
         }
 
