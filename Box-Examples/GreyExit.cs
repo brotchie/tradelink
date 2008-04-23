@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using TradeLib;
 
+// we need this library to be able to read the parameter comments from our box
+using System.ComponentModel;
+
 namespace box
 {
     /// <summary>
@@ -12,18 +15,32 @@ namespace box
     /// </summary>
     public class GreyExit : Box
     {
+
+        // here's the exit size we allow the user to choose at startup
+
+        [DescriptionAttribute("% of our trade to exit when MA is crossed")]
+        public decimal ExitSizePercent { get { return exitpercent; } set { exitpercent = value; } }
+
+
         public GreyExit(NewsService ns)
             : base(ns)
         {
             Version = "$Rev: 1";
-            Name = "AutoPilot"+CleanVersion;
+            Name = "GreyBox"+CleanVersion;
+
+            // here's how we prompt for parameters
+            ParamPrompt param = new ParamPrompt(this); // read the parameters
+            param.Show(); // display the prompt
         }
 
-        decimal sum = 0;
-        int ticks = 0;
-        int secperint = 300;
-        int starttime = 0;
-        decimal MA = 0;
+        // we define these working variables as private 
+        // this way they aren't displayed to the user when prompting for parameters
+        private decimal exitpercent = 0;
+        private decimal sum = 0;
+        private int ticks = 0;
+        private int secperint = 300;
+        private int starttime = 0;
+        private decimal MA = 0;
 
         protected override int Read(Tick tick, BarList bl,BoxInfo bi)
         {
@@ -37,7 +54,7 @@ namespace box
                 if (starttime==0) return 0;
 
                 bool pricecross = (((PosSize > 0) && (tick.trade < MA)) || ((PosSize < 0) && (tick.trade > MA)));
-                return  (pricecross) ? -1 * PosSize : 0;
+                return  (pricecross) ? Norm2Min(Flat*exitpercent) : 0;
             }
             return 0;
            
