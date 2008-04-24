@@ -39,6 +39,7 @@
     <Compile Include="TestBox.cs" />
     <Compile Include="TestBoxMath.cs" />
     <Compile Include="TestBroker.cs" />
+    <Compile Include="TestHistSim.cs" />
     <Compile Include="TestIndex.cs" />
     <Compile Include="TestLink.cs" />
     <Compile Include="TestMarketBasket.cs" />
