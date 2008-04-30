@@ -58,7 +58,7 @@ namespace TLReplay
             // inputselectbut
             // 
             this.inputselectbut.Location = new System.Drawing.Point(338, 12);
-            this.inputselectbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.inputselectbut.Margin = new System.Windows.Forms.Padding(4);
             this.inputselectbut.Name = "inputselectbut";
             this.inputselectbut.Size = new System.Drawing.Size(65, 34);
             this.inputselectbut.TabIndex = 1;
@@ -70,7 +70,7 @@ namespace TLReplay
             // 
             this.speedbar.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::TLReplay.Properties.Settings.Default, "speed", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.speedbar.Location = new System.Drawing.Point(9, 105);
-            this.speedbar.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.speedbar.Margin = new System.Windows.Forms.Padding(4);
             this.speedbar.Name = "speedbar";
             this.speedbar.Orientation = System.Windows.Forms.Orientation.Vertical;
             this.speedbar.Size = new System.Drawing.Size(56, 129);
@@ -113,9 +113,9 @@ namespace TLReplay
             this.nowplayinggrp.Controls.Add(this.currdate);
             this.nowplayinggrp.Enabled = false;
             this.nowplayinggrp.Location = new System.Drawing.Point(9, 12);
-            this.nowplayinggrp.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.nowplayinggrp.Margin = new System.Windows.Forms.Padding(4);
             this.nowplayinggrp.Name = "nowplayinggrp";
-            this.nowplayinggrp.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.nowplayinggrp.Padding = new System.Windows.Forms.Padding(4);
             this.nowplayinggrp.Size = new System.Drawing.Size(109, 47);
             this.nowplayinggrp.TabIndex = 15;
             this.nowplayinggrp.TabStop = false;
@@ -146,7 +146,7 @@ namespace TLReplay
             // 
             this.stopbut.Image = ((System.Drawing.Image)(resources.GetObject("stopbut.Image")));
             this.stopbut.Location = new System.Drawing.Point(190, 12);
-            this.stopbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.stopbut.Margin = new System.Windows.Forms.Padding(4);
             this.stopbut.Name = "stopbut";
             this.stopbut.Size = new System.Drawing.Size(56, 34);
             this.stopbut.TabIndex = 17;
@@ -157,7 +157,7 @@ namespace TLReplay
             // 
             this.gobut.Image = ((System.Drawing.Image)(resources.GetObject("gobut.Image")));
             this.gobut.Location = new System.Drawing.Point(134, 12);
-            this.gobut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gobut.Margin = new System.Windows.Forms.Padding(4);
             this.gobut.Name = "gobut";
             this.gobut.Size = new System.Drawing.Size(48, 34);
             this.gobut.TabIndex = 7;
@@ -182,9 +182,9 @@ namespace TLReplay
             this.Controls.Add(this.monthCalendar1);
             this.Controls.Add(this.speedbar);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Replay";
-            this.Text = "TradeLink Replay";
+            this.Text = "TL-BROKER-SIMU";
             ((System.ComponentModel.ISupportInitialize)(this.speedbar)).EndInit();
             this.nowplayinggrp.ResumeLayout(false);
             this.nowplayinggrp.PerformLayout();

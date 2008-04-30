@@ -12,7 +12,6 @@ namespace TradeLib
     {
         public abstract int SendOrder(Order order);
         public abstract void RegIndex(IndexBasket ib);
-        public abstract void GoHist();
         public abstract void GoLive();
         public abstract void GoSim();
         public abstract void Disconnect();

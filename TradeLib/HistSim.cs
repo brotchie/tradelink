@@ -5,6 +5,7 @@ using System.IO;
 
 namespace TradeLib
 {
+    // experimental
     public class HistSim 
     {
         public event TickDelegate GotTick;
@@ -26,7 +27,6 @@ namespace TradeLib
             _folder = TickFolder;
             if (tff != null)
                 _filter = tff;
-            _broker.
         }
 
         public void Load()

@@ -64,9 +64,8 @@ namespace TradeLib
         /// </summary>
         /// <value>Me H.</value>
         public IntPtr MeH { get { return meh; } set { meh = value; } }
-        const string SIMWINDOW = "TL-Broker-SIMU";
-        const string LIVEWINDOW = "TL-Broker-LIVE";
-        const string REPLAYWINDOW = "TradeLink Replay";
+        const string SIMWINDOW = "TL-BROKER-SIMU";
+        const string LIVEWINDOW = "TL-BROKER-LIVE";
 
         /// <summary>
         /// Sets the preferred communication channel of the link, if multiple channels are avaialble.
@@ -80,7 +79,7 @@ namespace TradeLib
             bool HandleExceptions = !throwexceptions;
             switch (mode)
             {
-                case TLTypes.LIVEANVIL:
+                case TLTypes.LIVEBROKER:
                     if (HandleExceptions)
                     {
                         try
@@ -97,7 +96,7 @@ namespace TradeLib
                     }
                     else GoLive();
                     break;
-                case TLTypes.SIMANVIL:
+                case TLTypes.SIMBROKER:
                     if (HandleExceptions)
                     {
                         try
@@ -114,31 +113,10 @@ namespace TradeLib
                     }
                     else GoSim();
                     break;
-                case TLTypes.TLREPLAY:
-                    if (HandleExceptions)
-                    {
-                        try
-                        {
-                            GoHist();
-                        }
-                        catch (TLServerNotFound)
-                        {
-                            if (showwarning)
-                                System.Windows.Forms.MessageBox.Show("TradeLink Replay not found. Please start TradeLink Replay.", "TradeLink Server not found");
-                            return false;
-                        }
-                    }
-                    else GoHist();
-                    break;
             }
             return true;
         }
 
-
-        /// <summary>
-        /// Make's TL client use historical server
-        /// </summary>
-        public override void GoHist() { Disconnect(); Him = REPLAYWINDOW; Register(); }
         /// <summary>
         /// Makes TL client use Broker LIVE server (Broker must be logged in and TradeLink loaded)
         /// </summary>
@@ -149,7 +127,7 @@ namespace TradeLib
         /// </summary>
         public override void GoSim() { Disconnect(); Him = SIMWINDOW; Register(); }
 
-        public void GoSrv() { Me = REPLAYWINDOW; }
+        public void GoSrv() { Me = SIMWINDOW; }
         protected long TLSend(TL2 type) { return TLSend(type, ""); }
         protected long TLSend(TL2 type, string m)
         {
@@ -304,9 +282,8 @@ namespace TradeLib
         public TLTypes TLFound()
         {
             TLTypes f = TLTypes.NONE;
-            if (Found(SIMWINDOW)) f |= TLTypes.SIMANVIL;
-            if (Found(LIVEWINDOW)) f |= TLTypes.LIVEANVIL;
-            if (Found(REPLAYWINDOW)) f |= TLTypes.TLREPLAY;
+            if (Found(SIMWINDOW)) f |= TLTypes.SIMBROKER;
+            if (Found(LIVEWINDOW)) f |= TLTypes.LIVEBROKER;
             return f;
         }
 
@@ -408,7 +385,7 @@ namespace TradeLib
                 {
                     TL2 type = (TL2)cds.dwData;
                     string msg = Marshal.PtrToStringAnsi(cds.lpData);
-                    if (Me == REPLAYWINDOW) // we're a server
+                    if ((Me == SIMWINDOW) || (Me== LIVEWINDOW)) // we're a server
                     {
                         switch (type)
                         {
@@ -719,17 +696,13 @@ namespace TradeLib
         /// </summary>
         NONE = 0,
         /// <summary>
-        /// A Live broker instance was found.
+        /// A Live broker was found.
         /// </summary>
-        LIVEANVIL = 1,
+        LIVEBROKER = 1,
         /// <summary>
-        /// A simulation broker instance was found.
+        /// A simulation broker was found.
         /// </summary>
-        SIMANVIL = 2,
-        /// <summary>
-        /// A tradelink replay instance was found. (TradeLink simulation)
-        /// </summary>
-        TLREPLAY = 4,
+        SIMBROKER = 2,
     }
 
     /// <summary>
