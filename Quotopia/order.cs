@@ -82,7 +82,8 @@ namespace Quotopia
                 s = Convert.ToInt32(osize.Value);
             }
             catch (InvalidCastException) { castexcep = true; }
-            return (sym != null) && (s > 0) && !castexcep && (p > 0);
+            if (marketbut.Checked) p = 0;
+            return (sym != null) && (s > 0) && !castexcep && ((p > 0) || marketbut.Checked);
         }
 
         private void limitbut_Click(object sender, EventArgs e)

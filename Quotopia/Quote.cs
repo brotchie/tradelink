@@ -171,11 +171,15 @@ namespace Quotopia
             
         void qg_MouseUp(object sender, MouseEventArgs e)
         {
-            if ((e.Clicks == 1) && (qg.CurrentRowIndex >= 0) && (qg.CurrentRowIndex < qg.VisibleRowCount))
+            if ((e.Clicks == 2) && (qg.CurrentRowIndex >= 0) && (qg.CurrentRowIndex < qg.VisibleRowCount))
+            {
+                rightticket(null, null);
+            }
+            else if ((e.Clicks == 1) && (qg.CurrentRowIndex >= 0) && (qg.CurrentRowIndex < qg.VisibleRowCount))
             {
                 qg.Select(qg.CurrentRowIndex);
-                Markets.Select();
             }
+
         
         }
 
