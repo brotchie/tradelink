@@ -61,7 +61,6 @@ Section "TradeLinkSuite"
   File "EPF2IDX.exe"
   File "SplitEPF.exe"
   File "Tattle.exe"
-  File "calcpl.xla"  
   File /r /x ".svn" "Properties"
   ; Write the installation path into the registry
   WriteRegStr HKLM SOFTWARE\NSIS_TradeLink "Install_Dir" "$INSTDIR"
