@@ -144,7 +144,7 @@ namespace TradeLib
         public override int SendOrder(Order o)
         {
             if (o == null) return 0;
-            string m = o.symbol + "," + (o.side ? "B" : "S") + "," + Math.Abs(o.size) + "," + o.price + "," + o.stopp + "," + o.comment + ",";
+            string m = o.Serialize();
             return (int)TLSend(TL2.SENDORDER, m);
         }
 

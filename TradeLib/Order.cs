@@ -68,6 +68,16 @@ namespace TradeLib
             if (this.isFilled) return base.ToString();
             return this.date + ":" + this.time + (side ? " BUY" : " SELL") + Math.Abs(size) + " " + this.symbol + "@" + ((this.price == 0) ? "Market" : this.price.ToString());
         }
+
+        public string Serialize()
+        {
+            return symbol + "," + (side ? "B" : "S") + "," + Math.Abs(size) + "," + price + "," + stopp + "," + comment + ",";
+        }
+
+        public static Order Deserialize(string message)
+        {
+            throw new Exception("not implemented");
+        }
     }
 
 }
