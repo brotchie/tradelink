@@ -69,15 +69,49 @@ namespace TradeLib
             return this.date + ":" + this.time + (side ? " BUY" : " SELL") + Math.Abs(size) + " " + this.symbol + "@" + ((this.price == 0) ? "Market" : this.price.ToString());
         }
 
-        public string Serialize()
+        /// <summary>
+        /// Serialize order as a string
+        /// </summary>
+        /// <returns></returns>
+        public override string Serialize()
         {
-            return symbol + "," + (side ? "B" : "S") + "," + Math.Abs(size) + "," + price + "," + stopp + "," + comment + ",";
+            const char d = ',';
+            return symbol + d + (side ? "B" : "S") + d + Math.Abs(size) + d + price + d + stopp + d + comment + d + ex + d + accountid + d + this.Security.ToString() + d + this.Currency.ToString();
         }
+        /// <summary>
+        /// Deserialize string to Order
+        /// </summary>
+        /// <returns></returns>
+        public new static Order Deserialize(string message)
+        {
+            message = message.Remove(message.Length - 1); // remove last comma
+            string[] rec = message.Split(','); // get the record
+            bool side = Convert.ToBoolean(rec[(int)OrderField.Side]);
+            int size = Convert.ToInt32(rec[(int)OrderField.Size]);
+            decimal xprice = Convert.ToDecimal(rec[(int)OrderField.Price]);
+            string sym = rec[(int)OrderField.Symbol];
+            Order o = new Order(sym, side, size);
+            o.comment = rec[(int)OrderField.Comment];
+            o.Account = rec[(int)OrderField.Account];
+            o.Exchange = rec[(int)OrderField.Exchange];
+            o.Currency = (Currency)Enum.Parse(typeof(Currency), rec[(int)OrderField.Currency]);
+            o.Security = (Security)Enum.Parse(typeof(Security), rec[(int)OrderField.Security]);
+            return o;
+        }
+    }
 
-        public static Order Deserialize(string message)
-        {
-            throw new Exception("not implemented");
-        }
+    public enum OrderField
+    {
+        Symbol = 0,
+        Side,
+        Size,
+        Price,
+        Stop,
+        Comment,
+        Exchange,
+        Account,
+        Security,
+        Currency,
     }
 
 }

@@ -40,7 +40,7 @@ namespace TradeLib
         { 
             if (!MasterOrders.ContainsKey(a)) 
                 MasterOrders.Add(a,new List<Order>());
-            o.accountid = a.ID;
+            o.Account = a.ID;
             MasterOrders[a].Add(o);
         }
         /// <summary>
@@ -263,6 +263,16 @@ namespace TradeLib
 
 
 
+    }
+
+    public enum Brokers
+    {
+        TradeLinkSimulation = 0,
+        Assent,
+        InteractiveBrokers,
+        Genesis,
+        Bright,
+        Echo,
     }
 
 }

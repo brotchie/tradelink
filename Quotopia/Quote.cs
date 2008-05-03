@@ -60,8 +60,9 @@ namespace Quotopia
             TLTypes servers = tl.TLFound();
             if (tl.Mode(servers, true))
             {
-                status("Found TradeLink broker server: " + servers.ToString());
-                show("Found TradeLink broker server: " + servers.ToString());
+                string name = tl.BrokerName.ToString();
+                status("Found TradeLink broker server: " + name);
+                show("Found TradeLink broker server: " + name);
             }
             else status("Unable to find any broker instance.  Do you have one running?");
         }

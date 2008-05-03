@@ -258,7 +258,7 @@ using System.IO;
             {
                 StreamWriter sw = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Orders" + unique + ".csv", false);
                 for (int i = 0; i < bt.mybroker.GetOrderList().Count; i++)
-                    sw.WriteLine(bt.mybroker.GetOrderList()[i].TLmsg());
+                    sw.WriteLine(bt.mybroker.GetOrderList()[i].Serialize());
                 sw.Close();
             }
             if (indicatorscsv.Checked)

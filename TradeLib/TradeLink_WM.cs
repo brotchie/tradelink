@@ -113,8 +113,12 @@ namespace TradeLib
                     }
                     else GoSim();
                     break;
+                default:
+                    if (showwarning) 
+                        System.Windows.Forms.MessageBox.Show("No simulation broker instance was found.  Make sure broker application + TradeLink server is running.", "TradeLink server not found");
+                    break;
             }
-            return true;
+            return false;
         }
 
         /// <summary>
@@ -217,6 +221,8 @@ namespace TradeLib
         /// <returns>decimal representing average price</returns>
         public decimal AvgPrice(string sym) { return unpack(TLSend(TL2.AVGPRICE, sym)); }
 
+        public Brokers BrokerName { get { return (Brokers)TLSend(TL2.BROKERNAME); } }
+
         public Position FastPos(string sym)
         {
             try
@@ -286,27 +292,6 @@ namespace TradeLib
             if (Found(LIVEWINDOW)) f |= TLTypes.LIVEBROKER;
             return f;
         }
-
-        /*
-        //TL1.0 dll wrappage
-        [DllImport("c:///program files/tradelink/eTradeLink.dll")]
-        static extern int getSize(string symbol,string windowname);
-        [DllImport("c:///program files/tradelink/eTradeLink.dll")]
-        static extern decimal getAvgPrice(string symbol,string windowname);
-        [DllImport("c:///program files/tradelink/eTradeLink.dll")]
-        static extern decimal getDayHigh(string symbol,string windowname);
-        [DllImport("c:///program files/tradelink/eTradeLink.dll")]
-        static extern decimal getDayLow(string symbol,string windowname);
-        [DllImport("c:///program files/tradelink/eTradeLink.dll")]
-        static extern decimal getDayOpen(string symbol,string windowname);
-        [DllImport("c:///program files/tradelink/eTradeLink.dll")]
-        static extern decimal getDayClose(string symbol,string windowname);
-        [DllImport("c:///program files/tradelink/eTradeLink.dll")]
-        static extern decimal getYestClose(string symbol,string windowname);
-        */
-
-
-
 
 
         /// <summary>
@@ -479,8 +464,11 @@ namespace TradeLib
                                 break;
                             case TL2.EXECUTENOTIFY:
                                 // date,time,symbol,side,size,price,comment
-                                Trade tr = new Trade(r[(int)xf.sym], Convert.ToBoolean(r[(int)xf.side]), Convert.ToInt32(r[(int)xf.size]), 0, 0, r[(int)xf.desc], Convert.ToInt32(r[(int)xf.time]), Convert.ToInt32(r[(int)xf.date]));
-                                tr.Fill(Convert.ToDecimal(r[(int)xf.price]));
+                                Trade tr = new Trade(r[(int)xf.sym],Convert.ToDecimal(r[(int)xf.price]),Convert.ToInt32(r[(int)xf.size]));
+                                tr.side = Convert.ToBoolean(r[(int)xf.side]);
+                                tr.comment = r[(int)xf.desc];
+                                tr.xtime = Convert.ToInt32(r[(int)xf.time]);
+                                tr.xdate = Convert.ToInt32(r[(int)xf.date]);
                                 tr.xsec = Convert.ToInt32(r[(int)xf.sec]);
                                 try
                                 {
@@ -555,7 +543,7 @@ namespace TradeLib
             else SrvPos[trade.symbol].Adjust(trade);
             for (int i = 0; i < client.Count; i++) // send tick to each client that has subscribed to tick's stock
                 if ((client[i] != null) && (stocks[i].Contains(trade.symbol)))
-                    SendMsg(trade.TLmsg(), TL2.EXECUTENOTIFY, client[i]);
+                    SendMsg(trade.Serialize(), TL2.EXECUTENOTIFY, client[i]);
         }
 
         public int NumClients { get { return client.Count; } }
@@ -708,136 +696,50 @@ namespace TradeLib
     /// <summary>
     /// TradeLink2 message type description, assume a request for said information... unless otherwise specified
     /// </summary>
-    public enum TL2
-    {
-        /// <summary>
-        /// message contains an order
-        /// </summary>
-        SENDORDER = 1,
-        /// <summary>
-        /// request for an average price
-        /// </summary>
-        AVGPRICE,
-        /// <summary>
-        /// request for the open pl of a position
-        /// </summary>
-        POSOPENPL,
-        /// <summary>
-        /// request for position's closed pl
-        /// </summary>
-        POSCLOSEDPL,
-        /// <summary>
-        /// request for pending sharecount of pending longorders
-        /// </summary>
-        POSLONGPENDSHARES,
-        /// <summary>
-        /// request for pending sharecount of pending shortorders
-        /// </summary>
-        POSSHORTPENDSHARES,
-        /// <summary>
-        /// current liquidity replenishment point on the bid side
-        /// </summary>
-        LRPBID,
-        /// <summary>
-        /// current liquidity replenishment point on the ask side
-        /// </summary>
-        LRPASK,
-        /// <summary>
-        /// total shares traded in the position
-        /// </summary>
-        POSTOTSHARES,
-        /// <summary>
-        /// last trade price in a stock
-        /// </summary>
-        LASTTRADE,
-        /// <summary>
-        /// last trade size in a stock
-        /// </summary>
-        LASTSIZE,
-        /// <summary>
-        /// dayhigh for a stock
-        /// </summary>
-        NDAYHIGH,
-        /// <summary>
-        /// daylow request for a stock
-        /// </summary>
-        NDAYLOW,
-        /// <summary>
-        /// current high for a stock
-        /// </summary>
-        INTRADAYHIGH,
-        /// <summary>
-        /// current low for a stock
-        /// </summary>
-        INTRADAYLOW,
-        /// <summary>
-        /// open for a stock
-        /// </summary>
-        OPENPRICE,
-        /// <summary>
-        /// get closing price, or zero if still open
-        /// </summary>
-        CLOSEPRICE,
-        /// <summary>
-        /// are we simulation
-        /// </summary>
-        ISSIMULATION = 25,
-        /// <summary>
-        /// current size of any position, or 0 for no position.
-        /// </summary>
-        GETSIZE,
-        /// <summary>
-        /// what was yesterday's close?
-        /// </summary>
-        YESTCLOSE,
-        /// <summary>
-        /// incoming message saying a new tick had arrived (TL2)
-        /// </summary>
-        TICKNOTIFY = 100,
-        /// <summary>
-        /// incoming message signifying a new execution
-        /// </summary>
-        EXECUTENOTIFY,
-        /// <summary>
-        /// outgoing message specifying a new tradelink client
-        /// </summary>
-        REGISTERCLIENT,
-        /// <summary>
-        /// subscribe a client to a new list of stocks
-        /// </summary>
-        REGISTERSTOCK,
-        /// <summary>
-        /// clear all current subscriptions for client
-        /// </summary>
-        CLEARSTOCKS,
-        /// <summary>
-        /// unregister the client
-        /// </summary>
-        CLEARCLIENT,
-        /// <summary>
-        /// send a keep-alive to the otherside so he knows we're still here
-        /// </summary>
-        HEARTBEAT,
-        /// <summary>
-        /// status on our TradeLink "link"
-        /// </summary>
-        INFO,
-        /// <summary>
-        /// a new quote has arrived
-        /// </summary>
-        QUOTENOTIFY,
-        /// <summary>
-        /// 
-        /// </summary>
-        TRADENOTIFY_NOTUSED,
-        /// <summary>
-        /// send a new list of indicies we want to receive ticks for
-        /// </summary>
-        REGISTERINDEX,
-        /// <summary>
-        /// 
-        /// </summary>
-        DAYRANGE,
+    public enum TL2 {
+	    OK = 0,
+	    SENDORDER = 1,
+	    AVGPRICE,
+	    POSOPENPL,
+	    POSCLOSEDPL,
+	    POSLONGPENDSHARES,
+	    POSSHORTPENDSHARES,
+	    LRPBID,
+	    LRPASK,
+	    POSTOTSHARES,
+	    LASTTRADE,
+	    LASTSIZE,
+	    NDAYHIGH,
+	    NDAYLOW,
+	    INTRADAYHIGH,
+	    INTRADAYLOW,
+	    OPENPRICE,
+	    CLOSEPRICE,
+	    NLASTTRADE = 20,
+	    NBIDSIZE,
+	    NASKSIZE,
+	    NBID,	
+	    NASK,	
+	    ISSIMULATION,
+	    GETSIZE,
+	    YESTCLOSE,
+	    BROKERNAME,
+	    TICKNOTIFY = 100,
+	    EXECUTENOTIFY,
+	    REGISTERCLIENT,
+	    REGISTERSTOCK,
+	    CLEARSTOCKS,
+	    CLEARCLIENT,
+	    HEARTBEAT,
+	    INFO,
+	    QUOTENOTIFY,
+	    TRADENOTIFY,
+	    REGISTERINDEX,
+	    DAYRANGE,
+	    GOTNULLORDER = 996,
+	    UNKNOWNMSG,
+	    UNKNOWNSYM,
+	    TL_CONNECTOR_MISSING,
     }
 
 }
