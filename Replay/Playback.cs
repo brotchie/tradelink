@@ -13,14 +13,25 @@ namespace TLReplay
     public class StockPlayback : BackgroundWorker
     {
         Broker broker = new Broker();
+        List<Trade> allfills = new List<Trade>();
 
 
 
         public StockPlayback()
         {
             WorkerSupportsCancellation = true;
-
+            broker = new Broker();
+            List<Trade> allfills = new List<Trade>();
+            broker.GotFill += new FillDelegate(broker_GotFill);
         }
+
+        void broker_GotFill(Trade t)
+        {
+            allfills.Add(t);
+        }
+
+
+
 
         protected override void OnDoWork(DoWorkEventArgs e)
         {
@@ -33,6 +44,7 @@ namespace TLReplay
             TickLink link = new TickLink();
             TradeLink_WM tl = sp.tl;
             tl.gotSrvFillRequest += new OrderDelegate(tl_gotSrvFillRequest);
+           
 
             // we need to put something here or in day playback to differentiate reading of indexes
 
@@ -86,17 +98,12 @@ namespace TLReplay
                 // they don't exist and only execute nyse ticks.
                 // otherwise this line could get moved up (to before where Exchange filter is applied)
                 int fills = broker.Execute(tick);
-                List<Trade> list = broker.GetTradeList();
                 if (fills > 0)
-                    for (int i = list.Count - fills; i < list.Count; i++)
-                        tl.newFill(list[i]); // send a message for every order filled
+                    for (int i = allfills.Count - fills; i < allfills.Count; i++)
+                        tl.newFill(allfills[i]); // send a message for every order filled
                 tl.newTick(tick);
-
-
-
             }
         }
-            
 
         void tl_gotSrvFillRequest(Order order)
         {

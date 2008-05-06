@@ -32,23 +32,30 @@ namespace TradeLib
 
         }
         protected Account DEFAULT = new Account("DEFAULT","Defacto account when account not provided");
-        protected Dictionary<Account, List<Order>> MasterOrders = new Dictionary<Account, List<Order>>();
-        protected Dictionary<Account, List<Trade>> MasterTrades = new Dictionary<Account, List<Trade>>();
-        protected List<Order> Orders { get { return MasterOrders[DEFAULT]; } set { MasterOrders[DEFAULT] = value; } }
-        protected List<Trade> FillList { get { return MasterTrades[DEFAULT]; } set { MasterTrades[DEFAULT] = value; } } 
+        protected Dictionary<string, List<Order>> MasterOrders = new Dictionary<string, List<Order>>();
+        protected Dictionary<string, List<Trade>> MasterTrades = new Dictionary<string, List<Trade>>();
+        protected List<Order> Orders { get { return MasterOrders[DEFAULT.ID]; } set { MasterOrders[DEFAULT.ID] = value; } }
+        protected List<Trade> FillList { get { return MasterTrades[DEFAULT.ID]; } set { MasterTrades[DEFAULT.ID] = value; } } 
         protected void AddOrder(Order o,Account a) 
-        { 
-            if (!MasterOrders.ContainsKey(a)) 
-                MasterOrders.Add(a,new List<Order>());
+        {
+            if (!a.isValid) throw new Exception("Invalid account provided");
+            if (!MasterOrders.ContainsKey(a.ID)) 
+                MasterOrders.Add(a.ID,new List<Order>());
             o.Account = a.ID;
-            MasterOrders[a].Add(o);
+            MasterOrders[a.ID].Add(o);
         }
         /// <summary>
         /// Sends the order to the broker. (uses the default account)
         /// </summary>
         /// <param name="o">The order to be send.</param>
         /// <returns>true if the order was accepted.</returns>
-        public bool sendOrder(Order o) { return sendOrder(o, DEFAULT); }
+        public bool sendOrder(Order o) 
+        { 
+            if (o.Account=="")
+                return sendOrder(o, DEFAULT);
+            return sendOrder(o, new Account(o.Account));
+
+        }
         /// <summary>
         /// Sends the order to the broker for a specific account.
         /// </summary>
@@ -79,7 +86,7 @@ namespace TradeLib
             int availablesize = (int)Math.Abs(tick.size);
             int max = this.Orders.Count;
             int filledorders = 0;
-            foreach (Account a in MasterOrders.Keys)
+            foreach (string a in MasterOrders.Keys)
             { // go through each account
                 for (int i = 0; i < MasterOrders[a].Count; i++)
                 { // go through each order
@@ -112,23 +119,23 @@ namespace TradeLib
         {
             MasterOrders.Clear();
             MasterTrades.Clear();
-            MasterOrders.Add(DEFAULT, new List<Order>());
-            MasterTrades.Add(DEFAULT, new List<Trade>());
+            MasterOrders.Add(DEFAULT.ID, new List<Order>());
+            MasterTrades.Add(DEFAULT.ID, new List<Trade>());
         }
         public void CancelOrders() { CancelOrders(DEFAULT); }
-        public void CancelOrders(Account a) { MasterOrders[a].Clear(); }
+        public void CancelOrders(Account a) { MasterOrders[a.ID].Clear(); }
         /// <summary>
         /// Gets the complete execution list for this account
         /// </summary>
         /// <param name="a">account to request blotter from.</param>
         /// <returns></returns>
-        public List<Trade> GetTradeList(Account a) { return MasterTrades[a]; }
+        public List<Trade> GetTradeList(Account a) { return MasterTrades[a.ID]; }
         /// <summary>
         /// Gets the list of open orders for this account.
         /// </summary>
         /// <param name="a">Account.</param>
         /// <returns></returns>
-        public List<Order> GetOrderList(Account a) { return MasterOrders[a]; }
+        public List<Order> GetOrderList(Account a) { return MasterOrders[a.ID]; }
         public List<Trade> GetTradeList() { return GetTradeList(DEFAULT); }
         public List<Order> GetOrderList() { return GetOrderList(DEFAULT); }
 
@@ -147,8 +154,8 @@ namespace TradeLib
         public Position GetOpenPosition(string symbol,Account a)
         {
             Position pos = new Position(symbol);
-            if (!MasterTrades.ContainsKey(a)) return pos;
-            foreach (Trade trade in MasterTrades[a]) 
+            if (!MasterTrades.ContainsKey(a.ID)) return pos;
+            foreach (Trade trade in MasterTrades[a.ID]) 
                 if (trade.symbol==symbol) 
                     pos.Adjust(trade);
             return pos;
@@ -164,7 +171,7 @@ namespace TradeLib
         {
             Position pos = new Position(symbol);
             decimal pl = 0;
-            foreach (Trade trade in MasterTrades[a])
+            foreach (Trade trade in MasterTrades[a.ID])
             {
                 if (trade.symbol == pos.Symbol)
                     pl += pos.Adjust(trade);
@@ -187,7 +194,7 @@ namespace TradeLib
         {
             Dictionary<string, Position> poslist = new Dictionary<string, Position>();
             Dictionary<string,decimal> pllist = new Dictionary<string,decimal>();
-            foreach (Trade trade in MasterTrades[a])
+            foreach (Trade trade in MasterTrades[a.ID])
             {
                 if (!poslist.ContainsKey(trade.symbol))
                 {
@@ -217,7 +224,7 @@ namespace TradeLib
         {
             Position pos = new Position(symbol);
             decimal points = 0;
-            foreach (Trade t in MasterTrades[account])
+            foreach (Trade t in MasterTrades[account.ID])
             {
                 points += BoxMath.ClosePT(pos, t);
                 pos.Adjust(t);
@@ -239,7 +246,7 @@ namespace TradeLib
         {
             Dictionary<string, Position> poslist = new Dictionary<string, Position>();
             Dictionary<string, decimal> ptlist = new Dictionary<string, decimal>();
-            foreach (Trade trade in MasterTrades[account])
+            foreach (Trade trade in MasterTrades[account.ID])
             {
                 if (!poslist.ContainsKey(trade.symbol))
                 {

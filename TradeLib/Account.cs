@@ -15,8 +15,8 @@ namespace TradeLib
         /// Gets a value indicating whether this instance is valid.
         /// </summary>
         /// <value><c>true</c> if this instance is valid; otherwise, <c>false</c>.</value>
-        public bool isValid { get { return (ID!=null);} }
-        string _id;
+        public bool isValid { get { return (ID!=null) && (ID!="");} }
+        string _id = "";
         /// <summary>
         /// Gets the ID of this account.
         /// </summary>

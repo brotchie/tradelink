@@ -29,24 +29,19 @@ namespace Quotopia
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Quote));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Quote));
             this.quoteTab = new System.Windows.Forms.TabControl();
             this.Markets = new System.Windows.Forms.TabPage();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.importbasketbut = new System.Windows.Forms.ToolStripButton();
+            this.exportbasketbut = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.statuslab = new System.Windows.Forms.ToolStripLabel();
             this.TradeTab = new System.Windows.Forms.TabPage();
             this.TradesView = new System.Windows.Forms.DataGridView();
-            this.Date = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Sec = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Symbol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Side = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.xSize = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.xPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Comment = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Settings = new System.Windows.Forms.TabPage();
             this.aboutbut = new System.Windows.Forms.Button();
             this.savesymbollist = new System.Windows.Forms.CheckBox();
@@ -117,9 +112,15 @@ namespace Quotopia
             this.OrderSideCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.OrderTimeCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.OrderDateCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.importbasketbut = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.exportbasketbut = new System.Windows.Forms.ToolStripButton();
+            this.Date = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Sec = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Symbol = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Side = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.xSize = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.xPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Comment = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ColAccount = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.quoteTab.SuspendLayout();
             this.Markets.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -183,6 +184,32 @@ namespace Quotopia
             this.toolStrip1.TabIndex = 0;
             this.toolStrip1.Text = "toolStrip1";
             // 
+            // importbasketbut
+            // 
+            this.importbasketbut.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.importbasketbut.ForeColor = System.Drawing.Color.Black;
+            this.importbasketbut.Image = ((System.Drawing.Image)(resources.GetObject("importbasketbut.Image")));
+            this.importbasketbut.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.importbasketbut.Name = "importbasketbut";
+            this.importbasketbut.Size = new System.Drawing.Size(49, 24);
+            this.importbasketbut.Text = "Open";
+            this.importbasketbut.Click += new System.EventHandler(this.importbasketbut_Click);
+            // 
+            // exportbasketbut
+            // 
+            this.exportbasketbut.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.exportbasketbut.ForeColor = System.Drawing.Color.Black;
+            this.exportbasketbut.Image = ((System.Drawing.Image)(resources.GetObject("exportbasketbut.Image")));
+            this.exportbasketbut.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.exportbasketbut.Name = "exportbasketbut";
+            this.exportbasketbut.Size = new System.Drawing.Size(44, 24);
+            this.exportbasketbut.Text = "Save";
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 27);
+            // 
             // statuslab
             // 
             this.statuslab.ForeColor = System.Drawing.Color.Black;
@@ -230,7 +257,8 @@ namespace Quotopia
             this.Side,
             this.xSize,
             this.xPrice,
-            this.Comment});
+            this.Comment,
+            this.ColAccount});
             this.TradesView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TradesView.EnableHeadersVisualStyles = false;
             this.TradesView.GridColor = System.Drawing.SystemColors.ControlDarkDark;
@@ -247,62 +275,11 @@ namespace Quotopia
             dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this.TradesView.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.TradesView.RowHeadersVisible = false;
+            this.TradesView.RowTemplate.Height = 24;
             this.TradesView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.TradesView.ShowEditingIcon = false;
             this.TradesView.Size = new System.Drawing.Size(820, 530);
             this.TradesView.TabIndex = 0;
-            // 
-            // Date
-            // 
-            this.Date.HeaderText = "Date";
-            this.Date.Name = "Date";
-            this.Date.ReadOnly = true;
-            // 
-            // Time
-            // 
-            this.Time.HeaderText = "Time";
-            this.Time.Name = "Time";
-            this.Time.ReadOnly = true;
-            // 
-            // Sec
-            // 
-            this.Sec.HeaderText = "Seconds";
-            this.Sec.Name = "Sec";
-            this.Sec.ReadOnly = true;
-            this.Sec.Visible = false;
-            // 
-            // Symbol
-            // 
-            this.Symbol.HeaderText = "Symbol";
-            this.Symbol.Name = "Symbol";
-            this.Symbol.ReadOnly = true;
-            // 
-            // Side
-            // 
-            this.Side.HeaderText = "Side";
-            this.Side.Name = "Side";
-            this.Side.ReadOnly = true;
-            // 
-            // xSize
-            // 
-            this.xSize.HeaderText = "Size";
-            this.xSize.Name = "xSize";
-            this.xSize.ReadOnly = true;
-            // 
-            // xPrice
-            // 
-            dataGridViewCellStyle2.Format = "N2";
-            dataGridViewCellStyle2.NullValue = null;
-            this.xPrice.DefaultCellStyle = dataGridViewCellStyle2;
-            this.xPrice.HeaderText = "Price";
-            this.xPrice.Name = "xPrice";
-            this.xPrice.ReadOnly = true;
-            // 
-            // Comment
-            // 
-            this.Comment.HeaderText = "Comment";
-            this.Comment.Name = "Comment";
-            this.Comment.ReadOnly = true;
             // 
             // Settings
             // 
@@ -1081,31 +1058,63 @@ namespace Quotopia
             this.OrderDateCol.Name = "OrderDateCol";
             this.OrderDateCol.ReadOnly = true;
             // 
-            // importbasketbut
+            // Date
             // 
-            this.importbasketbut.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.importbasketbut.ForeColor = System.Drawing.Color.Black;
-            this.importbasketbut.Image = ((System.Drawing.Image)(resources.GetObject("importbasketbut.Image")));
-            this.importbasketbut.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.importbasketbut.Name = "importbasketbut";
-            this.importbasketbut.Size = new System.Drawing.Size(49, 24);
-            this.importbasketbut.Text = "Open";
-            this.importbasketbut.Click += new System.EventHandler(this.importbasketbut_Click);
+            this.Date.HeaderText = "Date";
+            this.Date.Name = "Date";
+            this.Date.ReadOnly = true;
             // 
-            // toolStripSeparator1
+            // Time
             // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 27);
+            this.Time.HeaderText = "Time";
+            this.Time.Name = "Time";
+            this.Time.ReadOnly = true;
             // 
-            // exportbasketbut
+            // Sec
             // 
-            this.exportbasketbut.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.exportbasketbut.ForeColor = System.Drawing.Color.Black;
-            this.exportbasketbut.Image = ((System.Drawing.Image)(resources.GetObject("exportbasketbut.Image")));
-            this.exportbasketbut.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.exportbasketbut.Name = "exportbasketbut";
-            this.exportbasketbut.Size = new System.Drawing.Size(44, 24);
-            this.exportbasketbut.Text = "Save";
+            this.Sec.HeaderText = "Seconds";
+            this.Sec.Name = "Sec";
+            this.Sec.ReadOnly = true;
+            this.Sec.Visible = false;
+            // 
+            // Symbol
+            // 
+            this.Symbol.HeaderText = "Symbol";
+            this.Symbol.Name = "Symbol";
+            this.Symbol.ReadOnly = true;
+            // 
+            // Side
+            // 
+            this.Side.HeaderText = "Side";
+            this.Side.Name = "Side";
+            this.Side.ReadOnly = true;
+            // 
+            // xSize
+            // 
+            this.xSize.HeaderText = "Size";
+            this.xSize.Name = "xSize";
+            this.xSize.ReadOnly = true;
+            // 
+            // xPrice
+            // 
+            dataGridViewCellStyle2.Format = "N2";
+            dataGridViewCellStyle2.NullValue = null;
+            this.xPrice.DefaultCellStyle = dataGridViewCellStyle2;
+            this.xPrice.HeaderText = "Price";
+            this.xPrice.Name = "xPrice";
+            this.xPrice.ReadOnly = true;
+            // 
+            // Comment
+            // 
+            this.Comment.HeaderText = "Comment";
+            this.Comment.Name = "Comment";
+            this.Comment.ReadOnly = true;
+            // 
+            // ColAccount
+            // 
+            this.ColAccount.HeaderText = "Account";
+            this.ColAccount.Name = "ColAccount";
+            this.ColAccount.ReadOnly = true;
             // 
             // Quote
             // 
@@ -1190,14 +1199,6 @@ namespace Quotopia
         private System.Windows.Forms.RadioButton simAnvilbut;
         private System.Windows.Forms.RadioButton histsimbut;
         private System.Windows.Forms.RadioButton liveanvilbut;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Date;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Time;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Sec;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Symbol;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Side;
-        private System.Windows.Forms.DataGridViewTextBoxColumn xSize;
-        private System.Windows.Forms.DataGridViewTextBoxColumn xPrice;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Comment;
         private System.Windows.Forms.CheckBox saveticks;
         private System.Windows.Forms.Button archivefolderbut;
         private System.Windows.Forms.GroupBox boxgroup;
@@ -1238,5 +1239,14 @@ namespace Quotopia
         private System.Windows.Forms.ToolStripButton importbasketbut;
         private System.Windows.Forms.ToolStripButton exportbasketbut;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Date;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Time;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Sec;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Symbol;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Side;
+        private System.Windows.Forms.DataGridViewTextBoxColumn xSize;
+        private System.Windows.Forms.DataGridViewTextBoxColumn xPrice;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Comment;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ColAccount;
     }
 }

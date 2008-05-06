@@ -329,7 +329,7 @@ namespace Quotopia
         void tl_gotFill(Trade t)
         {
             if ((t.symbol == null) || (t == null)) return;
-            TradesView.Rows.Add(t.xdate, t.xtime, t.xsec, t.symbol, (t.side ? "BUY" : "SELL"), t.xsize, t.xprice, t.comment); // if we accept trade, add it to list
+            TradesView.Rows.Add(t.xdate, t.xtime, t.xsec, t.symbol, (t.side ? "BUY" : "SELL"), t.xsize, t.xprice, t.comment,t.Account.ToString()); // if we accept trade, add it to list
         }
 
         void tl_gotTick(Tick t)
