@@ -19,8 +19,10 @@ namespace TLReplay
         public Replay()
         {
             InitializeComponent();
-            tl.GoSrv();
             tl.MeH = this.Handle;
+            tl.Me = Text;
+            tl.GoSrv();
+
         }
 
 
