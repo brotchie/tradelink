@@ -22,6 +22,7 @@ namespace TradeLib
         public event FillDelegate gotFill;
         public event IndexDelegate gotIndexTick;
         public event OrderDelegate gotSrvFillRequest;
+        public event OrderDelegate gotOrder;
 
 
         private IntPtr meh = IntPtr.Zero;
@@ -85,6 +86,7 @@ namespace TradeLib
                         try
                         {
                             GoLive();
+                            return true;
                         }
                         catch (TLServerNotFound)
                         {
@@ -103,6 +105,7 @@ namespace TradeLib
                         {
 
                             GoSim();
+                            return true;
                         }
                         catch (TLServerNotFound)
                         {
@@ -464,12 +467,7 @@ namespace TradeLib
                                 break;
                             case TL2.EXECUTENOTIFY:
                                 // date,time,symbol,side,size,price,comment
-                                Trade tr = new Trade(r[(int)xf.sym],Convert.ToDecimal(r[(int)xf.price]),Convert.ToInt32(r[(int)xf.size]));
-                                tr.side = Convert.ToBoolean(r[(int)xf.side]);
-                                tr.comment = r[(int)xf.desc];
-                                tr.xtime = Convert.ToInt32(r[(int)xf.time]);
-                                tr.xdate = Convert.ToInt32(r[(int)xf.date]);
-                                tr.xsec = Convert.ToInt32(r[(int)xf.sec]);
+                                Trade tr = Trade.Deserialize(msg);
                                 try
                                 {
                                     cpos[tr.symbol] = new Position(tr.symbol, AvgPrice(tr.symbol), PosSize(tr.symbol));
@@ -479,6 +477,10 @@ namespace TradeLib
                                     cpos.Add(tr.symbol, new Position(tr.symbol, AvgPrice(tr.symbol), PosSize(tr.symbol)));
                                 }
                                 if (gotFill != null) gotFill(tr);
+                                break;
+                            case TL2.ORDERNOTIFY:
+                                Order o = Order.Deserialize(msg);
+                                if (gotOrder!=null) gotOrder(o);
                                 break;
                         }
                         if (GotMessage != null) GotMessage(type, hiswindow);
@@ -496,7 +498,8 @@ namespace TradeLib
         private void SrvDoExecute(string msg)
         {
             string[] r = msg.Split(',');
-            Order o = new Order(r[0], (r[1].Contains("B")), Convert.ToInt32(r[2]), Convert.ToDecimal(r[3]), Convert.ToDecimal(r[4]), r[5], 0, 0);
+            Order o = Order.Deserialize(msg);
+            if (gotOrder != null) gotOrder(o);
             if (gotSrvFillRequest != null) gotSrvFillRequest(o);
         }
 
@@ -507,8 +510,6 @@ namespace TradeLib
                 if ((client[i] != null) && (index[i].Contains(itick.Name)))
                     SendMsg(Index.Serialize(itick), TL2.TICKNOTIFY, client[i]);
         }
-
-
 
         // server to clients
         /// <summary>
@@ -731,6 +732,7 @@ namespace TradeLib
 	    CLEARSTOCKS,
 	    CLEARCLIENT,
 	    HEARTBEAT,
+        ORDERNOTIFY,
 	    INFO,
 	    QUOTENOTIFY,
 	    TRADENOTIFY,

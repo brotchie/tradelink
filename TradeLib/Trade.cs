@@ -151,7 +151,6 @@ namespace TradeLib
         /// <returns></returns>
         public static Trade Deserialize(string message)
         {
-            message = message.Remove(message.Length - 1); // remove last comma
             string[] rec = message.Split(',');
             bool side = Convert.ToBoolean(rec[(int)TradeField.Side]);
             int size = Convert.ToInt32(rec[(int)TradeField.Size]);

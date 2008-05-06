@@ -8,7 +8,7 @@ namespace TradeLib
     [Serializable]
     public class Order : Trade
     {
-        public Order() { }
+        public Order() : base() { }
         public override bool isValid { get { return (symbol != null) && (size != 0); } }
         public bool isMarket { get { return (price == 0) && (stopp == 0); } }
         public bool isLimit { get { return (price != 0); } }
@@ -76,7 +76,7 @@ namespace TradeLib
         public override string Serialize()
         {
             const char d = ',';
-            return symbol + d + (side ? "B" : "S") + d + Math.Abs(size) + d + price + d + stopp + d + comment + d + ex + d + accountid + d + this.Security.ToString() + d + this.Currency.ToString();
+            return symbol + d + (side ? "true" : "false") + d + Math.Abs(size) + d + price + d + stopp + d + comment + d + ex + d + accountid + d + this.Security.ToString() + d + this.Currency.ToString();
         }
         /// <summary>
         /// Deserialize string to Order
@@ -84,13 +84,15 @@ namespace TradeLib
         /// <returns></returns>
         public new static Order Deserialize(string message)
         {
-            message = message.Remove(message.Length - 1); // remove last comma
             string[] rec = message.Split(','); // get the record
             bool side = Convert.ToBoolean(rec[(int)OrderField.Side]);
             int size = Convert.ToInt32(rec[(int)OrderField.Size]);
-            decimal xprice = Convert.ToDecimal(rec[(int)OrderField.Price]);
+            decimal oprice = Convert.ToDecimal(rec[(int)OrderField.Price]);
+            decimal ostop = Convert.ToDecimal(rec[(int)OrderField.Stop]);
             string sym = rec[(int)OrderField.Symbol];
             Order o = new Order(sym, side, size);
+            o.price = oprice;
+            o.stopp = ostop;
             o.comment = rec[(int)OrderField.Comment];
             o.Account = rec[(int)OrderField.Account];
             o.Exchange = rec[(int)OrderField.Exchange];
