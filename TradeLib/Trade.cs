@@ -29,7 +29,7 @@ namespace TradeLib
         public int xsec = 0;
         public int xtime = 0;
         public int xdate = 0;
-        public bool isFilled = false;  // default to false (= order)
+        public bool isFilled { get { return (xprice * xsize) != 0; } }
         public bool Side { get { return side; } }
         public int Size { get { return xsize; } }
         public Trade(Trade copytrade)
@@ -52,7 +52,6 @@ namespace TradeLib
             xsec = copytrade.xsec;
             xtime = copytrade.xtime;
             xdate = copytrade.xdate;
-            isFilled = copytrade.isFilled;
         }
         public decimal Price { get { return xprice; } }
         public virtual bool isValid { get { return (xsize != 0) && (xprice != 0) && (xtime != 0) && (xdate != 0) && (symbol != null); } }
@@ -83,7 +82,6 @@ namespace TradeLib
             this.comment = c;
             this.time = time;
             this.date = date;
-            this.isFilled = true;
         }
         public void Fill(decimal xp)
         {
@@ -91,7 +89,6 @@ namespace TradeLib
             this.xsize = this.size;
             this.xtime = this.time;
             this.xdate = this.date;
-            this.isFilled = true;
         }
         public void Fill(Tick t)
         {
@@ -99,14 +96,12 @@ namespace TradeLib
             this.xsize = this.size;
             this.xtime = t.time;
             this.xdate = t.date;
-            this.isFilled = true;
         }
         public void Fill(decimal xp, int xs, int xt)
         {
             this.xprice = xp;
             this.xsize = xs;
             this.xtime = xt;
-            this.isFilled = true;
         }
         public void Fill(decimal xprice, int xsize, int xtime, int xdate, int xsec)
         {
@@ -115,7 +110,6 @@ namespace TradeLib
             this.xtime = xtime;
             this.xdate = xdate;
             this.xsec = xsec;
-            this.isFilled = true;
         }
 
         public override string ToString()
@@ -143,7 +137,7 @@ namespace TradeLib
         public virtual string Serialize()
         {
             const char d = ',';
-            return xdate.ToString() + d + xtime.ToString() + d + xsec.ToString() + d + symbol + d + side.ToString() + d + xsize.ToString() + d + xprice.ToString() + d + comment + d + ex + d + accountid + d + this.Security.ToString() + d + this.Currency.ToString();
+            return xdate.ToString() + d + xtime.ToString() + d + xsec.ToString() + d + symbol + d + side.ToString() + d + xsize.ToString() + d + xprice.ToString() + d + comment + d + accountid + d + this.Security.ToString() + d + this.Currency.ToString();
         }
         /// <summary>
         /// Deserialize string to Trade
@@ -163,7 +157,6 @@ namespace TradeLib
             t.xsec = Convert.ToInt32(rec[(int)TradeField.xSeconds]);
             t.comment = rec[(int)TradeField.Comment];
             t.Account = rec[(int)TradeField.Account];
-            t.Exchange = rec[(int)TradeField.Exchange];
             t.Currency = (Currency)Enum.Parse(typeof(Currency), rec[(int)TradeField.Currency]);
             t.Security = (Security)Enum.Parse(typeof(Security), rec[(int)TradeField.Security]);
             return t;
@@ -180,7 +173,6 @@ namespace TradeLib
         Size,
         Price,
         Comment,
-        Exchange,
         Account,
         Security,
         Currency,

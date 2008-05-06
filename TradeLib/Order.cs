@@ -25,7 +25,6 @@ namespace TradeLib
             this.comment = c;
             this.time = time;
             this.date = date;
-            this.isFilled = false;
         }
         public Order(string sym, bool side, int size)
         {
@@ -37,7 +36,6 @@ namespace TradeLib
             this.time = 0;
             this.date = 0;
             this.size = System.Math.Abs(size);
-            this.isFilled = false;
         }
         public Order(string sym, bool side, int size, string c)
         {
@@ -49,7 +47,6 @@ namespace TradeLib
             this.time = 0;
             this.date = 0;
             this.size = System.Math.Abs(size);
-            this.isFilled = false;
         }
         public Order(string sym, int size)
         {
@@ -61,7 +58,6 @@ namespace TradeLib
             this.time = 0;
             this.date = 0;
             this.size = System.Math.Abs(size);
-            this.isFilled = false;
         }
         public override string ToString()
         {

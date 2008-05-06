@@ -65,8 +65,8 @@ namespace TradeLib
         /// </summary>
         /// <value>Me H.</value>
         public IntPtr MeH { get { return meh; } set { meh = value; } }
-        const string SIMWINDOW = "TL-BROKER-SIMU";
-        const string LIVEWINDOW = "TL-BROKER-LIVE";
+        public const string SIMWINDOW = "TL-BROKER-SIMU";
+        public const string LIVEWINDOW = "TL-BROKER-LIVE";
 
         /// <summary>
         /// Sets the preferred communication channel of the link, if multiple channels are avaialble.
@@ -244,7 +244,6 @@ namespace TradeLib
         {
             try
             {
-                TLSend(TL2.CLEARSTOCKS, mywindow);
                 TLSend(TL2.CLEARCLIENT, mywindow);
             }
             catch (TLServerNotFound) { }
@@ -499,8 +498,9 @@ namespace TradeLib
         {
             string[] r = msg.Split(',');
             Order o = Order.Deserialize(msg);
-            if (gotOrder != null) gotOrder(o);
             if (gotSrvFillRequest != null) gotSrvFillRequest(o);
+            for (int i = 0; i < client.Count; i++)
+                SendMsg(msg, TL2.ORDERNOTIFY, client[i]);
         }
 
         public void newIndexTick(Index itick)
@@ -544,7 +544,10 @@ namespace TradeLib
             else SrvPos[trade.symbol].Adjust(trade);
             for (int i = 0; i < client.Count; i++) // send tick to each client that has subscribed to tick's stock
                 if ((client[i] != null) && (stocks[i].Contains(trade.symbol)))
-                    SendMsg(trade.Serialize(), TL2.EXECUTENOTIFY, client[i]);
+                {
+                    string msg = trade.Serialize();
+                    SendMsg(msg, TL2.EXECUTENOTIFY, client[i]);
+                }
         }
 
         public int NumClients { get { return client.Count; } }
@@ -609,9 +612,11 @@ namespace TradeLib
         void SrvClearClient(string him)
         {
             int cid = client.IndexOf(him);
-            if (cid == -1) return;
-            stocks[cid] = "";
-            client[cid] = "";
+            if (cid == -1) return; // don't have this client to clear him
+            client.RemoveAt(cid);
+            stocks.RemoveAt(cid);
+            heart.RemoveAt(cid);
+            index.RemoveAt(cid);
         }
 
         void SrvBeatHeart(string cname)
