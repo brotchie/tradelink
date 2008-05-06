@@ -72,6 +72,7 @@ namespace TradeLib
         public override string Serialize()
         {
             const char d = ',';
+            if (this.isFilled) return base.Serialize();
             return symbol + d + (side ? "true" : "false") + d + Math.Abs(size) + d + price + d + stopp + d + comment + d + ex + d + accountid + d + this.Security.ToString() + d + this.Currency.ToString();
         }
         /// <summary>
