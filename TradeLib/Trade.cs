@@ -29,15 +29,38 @@ namespace TradeLib
         public int xsec = 0;
         public int xtime = 0;
         public int xdate = 0;
+        public bool isFilled = false;  // default to false (= order)
         public bool Side { get { return side; } }
         public int Size { get { return xsize; } }
+        public Trade(Trade copytrade)
+        {
+            // copy constructor, for copying using by-value (rather than by default of by-reference)
+            cur = copytrade.cur;
+            type = copytrade.type;
+            ex = copytrade.ex;
+            accountid = copytrade.accountid;
+            symbol = copytrade.symbol;
+            side = copytrade.side;
+            size = copytrade.size;
+            price = copytrade.price;
+            stopp = copytrade.stopp;
+            comment = copytrade.comment;
+            date = copytrade.date;
+            time = copytrade.time;
+            xsize = copytrade.xsize;
+            xprice = copytrade.xprice;
+            xsec = copytrade.xsec;
+            xtime = copytrade.xtime;
+            xdate = copytrade.xdate;
+            isFilled = copytrade.isFilled;
+        }
         public decimal Price { get { return xprice; } }
         public virtual bool isValid { get { return (xsize != 0) && (xprice != 0) && (xtime != 0) && (xdate != 0) && (symbol != null); } }
         /// <summary>
         /// true if this is a real Trade, otherwise it's still an order.
         /// </summary>
-        public bool isFilled = false;  // default to false (= order)
-        public Trade() : this(null, true, 0, 0, 0, null, 0, 0) { }
+
+        public Trade() { }
         public Trade(string symbol, decimal fillprice, int fillsize) : this(symbol, fillprice, fillsize, DateTime.Now) { }
         public Trade(string sym, decimal fillprice, int fillsize, DateTime tradedate)
         {
