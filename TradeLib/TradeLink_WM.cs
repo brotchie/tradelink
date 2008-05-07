@@ -224,7 +224,14 @@ namespace TradeLib
         /// <returns>decimal representing average price</returns>
         public decimal AvgPrice(string sym) { return unpack(TLSend(TL2.AVGPRICE, sym)); }
 
-        public Brokers BrokerName { get { return (Brokers)TLSend(TL2.BROKERNAME); } }
+        public Brokers BrokerName 
+        { 
+            get 
+            { 
+                long res = TLSend(TL2.BROKERNAME);
+                return (Brokers)res;
+            } 
+        }
 
         public Position FastPos(string sym)
         {
