@@ -75,5 +75,16 @@ namespace TradeLib
             return ClosePT(existing, adjust) * Math.Abs(adjust.Size);
         }
 
+        /// <summary>
+        /// Normalizes any order size to the minimum lot size specified by MinSize.
+        /// </summary>
+        /// <param name="size">The size.</param>
+        /// <returns></returns>
+        public static int Norm2Min(decimal size,int MINSIZE)
+        {
+            int wmult = (int)Math.Ceiling(size / MINSIZE);
+            return wmult * MINSIZE;
+        }
+
     }
 }

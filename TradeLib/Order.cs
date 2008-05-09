@@ -15,6 +15,27 @@ namespace TradeLib
         public bool isStop { get { return (stopp != 0); } }
         public int SignedSize { get { return Math.Abs(size) * (side ? 1 : -1); } }
         public int UnSignedSize { get { return Math.Abs(size); } }
+        public Order(Order copythis)
+        {
+            this.symbol = copythis.symbol;
+            this.stopp = copythis.stopp;
+            this.comment = copythis.comment;
+            this.cur = copythis.cur;
+            this.accountid = copythis.accountid;
+            this.date = copythis.date;
+            this.ex = copythis.ex;
+            this.price = copythis.price;
+            this.Security = copythis.Security;
+            this.side = copythis.side;
+            this.size = copythis.size;
+            this.time = copythis.time;
+            // shouldn't be used but we'll take them anyways
+            this.xdate = copythis.xdate;
+            this.xprice = copythis.xprice;
+            this.xsec = copythis.xsec;
+            this.xsize = copythis.xsize;
+            this.xtime = copythis.xtime;
+        }
         public Order(string sym, bool side, int size, decimal p, decimal s, string c, int time, int date)
         {
             this.symbol = sym.ToUpper();

@@ -32,7 +32,7 @@ namespace TestTradeLib
             ct.tl.gotTick += new TickDelegate(tlclient_gotTick);
 
             FOUND = st.tl.TLFound();
-            CONNECTED = ct.tl.Mode(FOUND);
+            CONNECTED = ct.tl.Mode(FOUND,false,false);
 
         }
 
@@ -40,10 +40,10 @@ namespace TestTradeLib
         public void StartupTests()
         {
             // discover our server out there
-            Assert.That(FOUND== TLTypes.SIMBROKER);
+            Assert.That(FOUND == TLTypes.SIMBROKER, "make sure you don't have TLServers running");
 
             // should be able to connect to whatever server we find
-            Assert.That(CONNECTED);
+            Assert.That(CONNECTED,"make sure you don't have TLServers running");
 
         }
 
