@@ -83,7 +83,7 @@ namespace TradeLib
         public override string ToString()
         {
             if (this.isFilled) return base.ToString();
-            return this.date + ":" + this.time + (side ? " BUY" : " SELL") + Math.Abs(size) + " " + this.symbol + "@" + ((this.price == 0) ? "Market" : this.price.ToString("N2"));
+            return this.date + ":" + this.time + (side ? " BUY" : " SELL") + Math.Abs(size) + " " + this.symbol + "@" + ((this.price == 0) ? "Market" : this.price.ToString("N2")) + ((this.accountid!="") ? "["+accountid+"]" : "");
         }
 
         /// <summary>
