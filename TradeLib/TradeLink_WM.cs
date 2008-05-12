@@ -150,7 +150,8 @@ namespace TradeLib
         /// <returns>Zero if succeeded, Broker error code otherwise.</returns>
         public override int SendOrder(Order o)
         {
-            if (o == null) return 0;
+            if (o == null) return (int)TL2.GOTNULLORDER;
+            if (!o.isValid) return (int)TL2.OK;
             string m = o.Serialize();
             return (int)TLSend(TL2.SENDORDER, m);
         }
@@ -706,54 +707,6 @@ namespace TradeLib
         SIMBROKER = 2,
     }
 
-    /// <summary>
-    /// TradeLink2 message type description, assume a request for said information... unless otherwise specified
-    /// </summary>
-    public enum TL2 {
-	    OK = 0,
-	    SENDORDER = 1,
-	    AVGPRICE,
-	    POSOPENPL,
-	    POSCLOSEDPL,
-	    POSLONGPENDSHARES,
-	    POSSHORTPENDSHARES,
-	    LRPBID,
-	    LRPASK,
-	    POSTOTSHARES,
-	    LASTTRADE,
-	    LASTSIZE,
-	    NDAYHIGH,
-	    NDAYLOW,
-	    INTRADAYHIGH,
-	    INTRADAYLOW,
-	    OPENPRICE,
-	    CLOSEPRICE,
-	    NLASTTRADE = 20,
-	    NBIDSIZE,
-	    NASKSIZE,
-	    NBID,	
-	    NASK,	
-	    ISSIMULATION,
-	    GETSIZE,
-	    YESTCLOSE,
-	    BROKERNAME,
-	    TICKNOTIFY = 100,
-	    EXECUTENOTIFY,
-	    REGISTERCLIENT,
-	    REGISTERSTOCK,
-	    CLEARSTOCKS,
-	    CLEARCLIENT,
-	    HEARTBEAT,
-        ORDERNOTIFY,
-	    INFO,
-	    QUOTENOTIFY,
-	    TRADENOTIFY,
-	    REGISTERINDEX,
-	    DAYRANGE,
-	    GOTNULLORDER = 996,
-	    UNKNOWNMSG,
-	    UNKNOWNSYM,
-	    TL_CONNECTOR_MISSING,
-    }
+
 
 }
