@@ -23,6 +23,7 @@ namespace TradeLib
         public event IndexDelegate gotIndexTick;
         public event OrderDelegate gotSrvFillRequest;
         public event OrderDelegate gotOrder;
+        public event DebugDelegate gotAccounts;
 
 
         private IntPtr meh = IntPtr.Zero;
@@ -224,6 +225,15 @@ namespace TradeLib
         /// <param name="sym">The symbol</param>
         /// <returns>decimal representing average price</returns>
         public decimal AvgPrice(string sym) { return unpack(TLSend(TL2.AVGPRICE, sym)); }
+
+        /// <summary>
+        /// Send an account request, response is returned via the gotAccounts event.
+        /// </summary>
+        /// <returns>error code, and list of accounts via the gotAccounts event.</returns>
+        /// 
+        public int RequestAccounts() { return (int)TLSend(TL2.ACCOUNTREQUEST, Me); }
+
+
 
         public Brokers BrokerName 
         { 
@@ -488,6 +498,10 @@ namespace TradeLib
                             case TL2.ORDERNOTIFY:
                                 Order o = Order.Deserialize(msg);
                                 if (gotOrder!=null) gotOrder(o);
+                                break;
+
+                            case TL2.ACCOUNTRESPONSE:
+                                if (gotAccounts != null) gotAccounts(msg);
                                 break;
                         }
                         if (GotMessage != null) GotMessage(type, hiswindow);
