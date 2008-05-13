@@ -138,6 +138,7 @@ namespace TradeLib
         DAYRANGE,
         ACCOUNTRESPONSE,
         ACCOUNTREQUEST,
+        CLIENTNOTREGISTERED = 995,
         GOTNULLORDER = 996,
         UNKNOWNMSG,
         UNKNOWNSYM,
