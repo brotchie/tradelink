@@ -157,8 +157,12 @@ namespace TradeLib
             t.xsec = Convert.ToInt32(rec[(int)TradeField.xSeconds]);
             t.comment = rec[(int)TradeField.Comment];
             t.Account = rec[(int)TradeField.Account];
-            t.Currency = (Currency)Enum.Parse(typeof(Currency), rec[(int)TradeField.Currency]);
-            t.Security = (Security)Enum.Parse(typeof(Security), rec[(int)TradeField.Security]);
+            try
+            {
+                t.Currency = (Currency)Enum.Parse(typeof(Currency), rec[(int)TradeField.Currency]);
+                t.Security = (Security)Enum.Parse(typeof(Security), rec[(int)TradeField.Security]);
+            }
+            catch (Exception) { }
             return t;
         }
     }
