@@ -6,7 +6,7 @@ namespace TradeLib
     /// <summary>
     /// Holds a succession of bars.  Will acceptt ticks and automatically create new bars as needed.
     /// </summary>
-    public class BarList
+    public class BarList : TickIndicator
     {
         public Bar this[int index]
         {
@@ -48,17 +48,17 @@ namespace TradeLib
         public string Symbol { get { return sym; } }
 
         public int NumBars() { return DefaultBar.Count; }
+        public Bar RecentBar { get { return this.Get(BarZero); } }
         /// <summary>
         /// Gets the bar zero.  This is the last or most recent bar in the list.
         /// </summary>
         public int BarZero { get { return NumBars() - 1; } }
         public int Last { get { return BarZero; } }
-        protected bool NEWBAR = false;
         /// <summary>
         /// Gets a value indicating whether most recently added bar is a [new bar].
         /// </summary>
         /// <value><c>true</c> if [new bar]; otherwise, <c>false</c>.</value>
-        public bool NewBar { get { return NEWBAR; } }
+        public bool NewBar { get { return this.HasBar() && RecentBar.isNew; } }
         protected BarInterval interval = BarInterval.FiveMin;
         protected List<Bar> DefaultBar
         {
@@ -106,24 +106,31 @@ namespace TradeLib
             }
             return bars[i];
         }
+        public void AddTick(Tick t) { newTick(t); }
         /// <summary>
         /// Adds the tick to the barlist, creates other bars if needed.
         /// </summary>
         /// <param name="t">The tick to add.</param>
-        public void AddTick(Tick t)
+        public bool newTick(Tick t)
         {
-            NEWBAR = false;
-            if (t.sym != Symbol) return; //don't process ticks for other stocks
-            if (!t.isTrade) return; // don't process quotes
+            if ((t.sym != Symbol) && (Symbol==""))
+                this.sym = t.sym; // if we have no symbol, take ticks symbol
+            else if ((t.sym!=Symbol) && (Symbol!=""))
+                return NewBar; //don't process ticks for other stocks
+            if (!t.isTrade) return NewBar; // don't process quotes
             // if we have no bars, add bar with a tick
             if (NumBars() == 0)
             {
-                minlist.Add(new Bar(t, BarInterval.Minute));
-                fivelist.Add(new Bar(t, BarInterval.FiveMin));
-                fifteenlist.Add(new Bar(t, BarInterval.FifteenMin));
-                hourlist.Add(new Bar(t, BarInterval.Hour));
-                daylist.Add(new Bar(t, BarInterval.Day));
-                NEWBAR = true;
+                minlist.Add(new Bar(BarInterval.Minute));
+                fivelist.Add(new Bar(BarInterval.FiveMin));
+                fifteenlist.Add(new Bar(BarInterval.FifteenMin));
+                hourlist.Add(new Bar(BarInterval.Hour));
+                daylist.Add(new Bar(BarInterval.Day));
+                minlist[minlist.Count - 1].newTick(t);
+                fivelist[fivelist.Count - 1].newTick(t);
+                fifteenlist[fifteenlist.Count - 1].newTick(t);
+                hourlist[hourlist.Count - 1].newTick(t);
+                daylist[daylist.Count - 1].newTick(t);
             }
             else
             {
@@ -134,15 +141,16 @@ namespace TradeLib
                     Int = inv;
                     Bar cbar = (Bar)DefaultBar[NumBars() - 1];
                     // if tick fits in current bar, then we're done for this interval
-                    if (cbar.Accept(t)) continue;
+                    if (cbar.newTick(t)) continue;
                     else
                     {
-                        DefaultBar.Add(new Bar(t, Int)); // otherwise we need another bar in this interval
-                        NEWBAR = true;
+                        DefaultBar.Add(new Bar(Int)); // otherwise we need another bar in this interval
+                        DefaultBar[DefaultBar.Count - 1].newTick(t);
                     }
                 }
                 Int = saveint;
             }
+            return NewBar;
         }
 
         /// <summary>

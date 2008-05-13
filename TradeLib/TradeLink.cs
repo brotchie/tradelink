@@ -136,6 +136,8 @@ namespace TradeLib
         TRADENOTIFY,
         REGISTERINDEX,
         DAYRANGE,
+        ACCOUNTRESPONSE,
+        ACCOUNTREQUEST,
         GOTNULLORDER = 996,
         UNKNOWNMSG,
         UNKNOWNSYM,

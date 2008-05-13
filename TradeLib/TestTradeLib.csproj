@@ -40,6 +40,8 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestAccount.cs" />
+    <Compile Include="TestBar.cs" />
+    <Compile Include="TestBarList.cs" />
     <Compile Include="TestBox.cs" />
     <Compile Include="TestBoxMath.cs" />
     <Compile Include="TestBroker.cs" />

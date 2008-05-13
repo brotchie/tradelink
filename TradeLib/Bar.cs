@@ -9,13 +9,14 @@ namespace TradeLib
     /// <summary>
     /// A single bar of price data, which represents OHLC and volume for an interval of time.
     /// </summary>
-    public class Bar
+    public class Bar : TickIndicator
     {
         private decimal h = decimal.MinValue;
         private decimal l = decimal.MaxValue;
         private decimal o = 0;
         private decimal c = 0;
         private int v = 0;
+        private int tradesinbar = 0;
         private BarInterval tunits = BarInterval.FiveMin; //5min bar default
         private int bartime = 0;
         private int bardate = 0;
@@ -26,8 +27,11 @@ namespace TradeLib
         public decimal Open { get { return o; } }
         public decimal Close { get { return c; } }
         public int Volume { get { return v; } }
+        public bool isNew { get { return tradesinbar==1; } }
+        public bool isValid { get { return (h >= l) && (o != 0) && (c != 0); } }
+        public int TradeCount { get { return tradesinbar; } }
 
-        public Bar() : this(new Tick(), BarInterval.FiveMin) { }
+        public Bar() : this(BarInterval.FiveMin) { }
         public Bar(decimal open, decimal high, decimal low, decimal close, int vol, int date, int time)
         {
             h = high;
@@ -59,27 +63,29 @@ namespace TradeLib
         }
         
         
-        public Bar(Tick t) : this(t, BarInterval.FiveMin) { }
-        public Bar(Tick t, BarInterval tu) 
+        public Bar(BarInterval tu) 
         {
             tunits = tu;
-            Accept(t);
         }
         public int Bartime { get { return bartime; } }
         public int Bardate { get { return bardate; } }
         private int BarTime(int time) { return time - (time % (int)this.tunits); }
+        public bool Accept(Tick t) { return newTick(t); }
 
         /// <summary>
         /// Accepts the specified tick.
         /// </summary>
         /// <param name="t">The tick you want to add to the bar.</param>
         /// <returns>true if the tick is accepted, false if it belongs to another bar.</returns>
-        public bool Accept(Tick t)
+        public bool newTick(Tick t)
         {
             if (bartime == 0) { bartime = BarTime(t.time); bardate = t.date;}
             if (bardate != t.date) DAYEND = true;
             else DAYEND = false;
             if ((BarTime(t.time) != bartime) || (bardate!=t.date)) return false; // not our tick
+            if (!t.isTrade) return true; // if it's not a trade, accept tick but don't update anything
+            tradesinbar++; // count it
+            v += t.size; // add trade size to bar volume
             if (o == 0) o = t.trade;
             if (t.trade > h) h = t.trade;
             if (t.trade < l) l = t.trade;
