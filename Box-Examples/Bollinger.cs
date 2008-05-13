@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using TradeLib;
 
-namespace Atlas
+namespace box
 {
     public class Bollinger : TickIndicator, BarListIndicator
     {
