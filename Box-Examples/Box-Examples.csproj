@@ -40,11 +40,13 @@
   <ItemGroup>
     <Compile Include="A.cs" />
     <Compile Include="AlwaysEnter.cs" />
+    <Compile Include="Blade.cs" />
     <Compile Include="Bollinger.cs" />
     <Compile Include="GreyExit.cs" />
     <Compile Include="MAbox.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SMA.cs" />
+    <Compile Include="TestBlade.cs" />
     <Compile Include="TestBollinger.cs" />
   </ItemGroup>
   <ItemGroup>
