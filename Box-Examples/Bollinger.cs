@@ -5,7 +5,7 @@ using TradeLib;
 
 namespace Atlas
 {
-    public class Bollinger
+    public class Bollinger : TickIndicator, BarListIndicator
     {
         private int sds;
         private int lookback;
@@ -40,7 +40,7 @@ namespace Atlas
 
         public Bollinger() : this(2,10) { }
 
-        public void newTick  ( Tick t )
+        public bool newTick  ( Tick t )
         {
             if (isbarcons) throw new Exception("You can't call newTick method without using the right constructor");
                 if (t.isTrade)
@@ -70,12 +70,13 @@ namespace Atlas
                 sd = Math.Sqrt((double)devavg);
                 ub = mean + sds * (decimal)sd;
                 lb = mean - sds * (decimal)sd;
+                return true;
         }
 
         public bool hasLookbacks
         { get { return (l.Count == lookback); } }
         
-        public void newBar(BarList bl)
+        public bool newBar(BarList bl)
         {
             Bar obar = bl.Get(bl.BarZero);
             if (!isbarcons) throw new Exception("You can't call a newBar method without using the right constructor.");
@@ -107,6 +108,7 @@ namespace Atlas
                 sd = Math.Sqrt((double)devavg);
                 ub = mean + sds * (decimal)sd;
                 lb = mean - sds * (decimal)sd;
+                return true;
         }
 
 
