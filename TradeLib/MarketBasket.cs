@@ -31,9 +31,9 @@ namespace TradeLib
         public Stock Get(int i) { return (Stock)stocks[i]; }
         public override string  ToString()
         {
-            string s = "";
-            for (int i = 0; i < stocks.Count; i++) s += Get(i) + ",";
-            return s;
+            List<string> s = new List<string>();
+            for (int i = 0; i < stocks.Count; i++) s.Add(Get(i).Symbol);
+            return string.Join(",", s.ToArray());
         }
         public static MarketBasket FromString(string serialBasket)
         {
