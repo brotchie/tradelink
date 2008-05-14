@@ -126,6 +126,7 @@ namespace TradeLib
                 o = this.Adjust(Flat);
                 o.time = Time;
                 o.date = Date;
+                this.Shutdown("end-of-day");
                 _sentshut = true;
             }
             if (o.isValid)
