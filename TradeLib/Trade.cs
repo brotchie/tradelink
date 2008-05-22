@@ -12,9 +12,7 @@ namespace TradeLib
         protected Security type = Security.STK;
         protected string ex = "NYSE";
         string _localsymbol;
-        string _expiry;
         public string LocalSymbol { get { return _localsymbol; } set { _localsymbol = value; } }
-        public string Expiry { get { return _expiry; } set { _expiry = value; } }
         public Currency Currency { get { return cur; } set { cur = value; } }
         public Security Security { get { return type; } set { type = value; } }
         public string Exchange { get { return ex; } set { ex = value; } }
@@ -141,7 +139,7 @@ namespace TradeLib
         public virtual string Serialize()
         {
             const char d = ',';
-            return xdate.ToString() + d + xtime.ToString() + d + xsec.ToString() + d + symbol + d + side.ToString() + d + xsize.ToString() + d + xprice.ToString() + d + comment + d + accountid + d + this.Security.ToString() + d + this.Currency.ToString() + d + LocalSymbol + d + Expiry; ;
+            return xdate.ToString() + d + xtime.ToString() + d + xsec.ToString() + d + symbol + d + side.ToString() + d + xsize.ToString() + d + xprice.ToString() + d + comment + d + accountid + d + this.Security.ToString() + d + this.Currency.ToString() + d + LocalSymbol; ;
         }
         /// <summary>
         /// Deserialize string to Trade
@@ -162,7 +160,6 @@ namespace TradeLib
             t.comment = rec[(int)TradeField.Comment];
             t.Account = rec[(int)TradeField.Account];
             t.LocalSymbol = rec[(int)TradeField.LocalSymbol];
-            t.Expiry = rec[(int)TradeField.Expiry];
             try
             {
                 t.Currency = (Currency)Enum.Parse(typeof(Currency), rec[(int)TradeField.Currency]);
@@ -187,6 +184,5 @@ namespace TradeLib
         Security,
         Currency,
         LocalSymbol,
-        Expiry,
     }
 }
