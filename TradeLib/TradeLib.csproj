@@ -82,6 +82,7 @@
     <Compile Include="Stock.cs" />
     <Compile Include="StopOrder.cs" />
     <Compile Include="Tick.cs" />
+    <Compile Include="TickArchiver.cs" />
     <Compile Include="TickFileFilter.cs" />
     <Compile Include="TickWatcher.cs" />
     <Compile Include="Trade.cs" />
