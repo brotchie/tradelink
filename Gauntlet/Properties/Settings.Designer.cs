@@ -37,7 +37,7 @@ namespace WinGauntlet.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("c:\\program files\\tradelink\\tradelink\\box.dll")]
+        [global::System.Configuration.DefaultSettingValueAttribute("c:\\program files\\tradelink\\tradelinksuite\\box.dll")]
         public string boxdll {
             get {
                 return ((string)(this["boxdll"]));
@@ -49,7 +49,7 @@ namespace WinGauntlet.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("c:\\program files\\tradelink\\tradelink\\")]
+        [global::System.Configuration.DefaultSettingValueAttribute("c:\\program files\\tradelink\\tradelinksuite\\")]
         public string boxfolder {
             get {
                 return ((string)(this["boxfolder"]));

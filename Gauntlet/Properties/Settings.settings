@@ -6,10 +6,10 @@
       <Value Profile="(Default)">c:\program files\tradelink\tickdata\</Value>
     </Setting>
     <Setting Name="boxdll" Type="System.String" Scope="User">
-      <Value Profile="(Default)">c:\program files\tradelink\tradelink\box.dll</Value>
+      <Value Profile="(Default)">c:\program files\tradelink\tradelinksuite\box.dll</Value>
     </Setting>
     <Setting Name="boxfolder" Type="System.String" Scope="User">
-      <Value Profile="(Default)">c:\program files\tradelink\tradelink\</Value>
+      <Value Profile="(Default)">c:\program files\tradelink\tradelinksuite\</Value>
     </Setting>
     <Setting Name="saveonexit" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>

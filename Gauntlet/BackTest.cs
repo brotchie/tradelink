@@ -29,7 +29,7 @@ namespace WinGauntlet
         public Box mybox = null;
         private bool _idx = true;
         public int time;
-        public string aname = "c:\\program files\\tradelink\\tradelink\\box.dll";
+        public string aname = "c:\\program files\\tradelink\\tradelinksuite\\box.dll";
         public BarList bl = new BarList();
         public eSigTick tick = new eSigTick();
         public int bint = 5;
