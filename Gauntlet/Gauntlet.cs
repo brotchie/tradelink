@@ -64,8 +64,15 @@ using System.IO;
             yearlist.Items.Clear();
             daylist.Items.Clear();
             monthlist.Items.Clear();
-            DirectoryInfo di = new DirectoryInfo(path);
-            FileInfo [] fi = di.GetFiles("*.epf");
+            DirectoryInfo di;
+            FileInfo[] fi;
+
+            try
+            {
+                di = new DirectoryInfo(path);
+                fi = di.GetFiles("*.epf");
+            }
+            catch (Exception ex) { show("exception loading stocks: " + ex.ToString()); return; }
             for (int i = 0; i < fi.Length; i++)
             {
                 Stock s = StockFromFileName(fi[i].Name);
