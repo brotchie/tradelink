@@ -9,7 +9,7 @@ Icon "tradelinkinstaller.ico"
 OutFile "TradeLinkSuite.exe"
 
 ; The default installation directory
-InstallDir $PROGRAMFILES\TradeLink\TradeLink
+InstallDir $PROGRAMFILES\TradeLink\TradeLinkSuite
 
 ; Registry key to check for directory (so if you install again, it will 
 ; overwrite the old one automatically)
