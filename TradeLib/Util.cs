@@ -13,7 +13,7 @@ namespace TradeLib
     public class Util
     {
         public static string TLBaseDir { get { return @"c:\program files\tradelink\"; } }
-        public static string TLProgramDir { get { return TLBaseDir + "TradeLink\\"; } }
+        public static string TLProgramDir { get { return TLBaseDir + "TradeLinkSuite\\"; } }
         public static string TLTickDir { get { return TLBaseDir + "TickData\\"; } }
 
 
