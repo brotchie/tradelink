@@ -56,13 +56,16 @@ echo CHARTOGRAPHER
 xcopy /q /y ..\Chartographer\bin\Release\Chartographer.exe* .
 echo TATTLE
 xcopy /q /y ..\Tattle\bin\Release\Tattle.exe* .
+echo KADINA
+xcopy /q /y ..\Kadina\bin\Release\Kadina.exe* .
 echo.
 
 
 
 
+
 echo Building TradeLink executable...
-c:\progra~1\nsis\makensis.exe /v1 TradeLink.nsi
+c:\progra~1\nsis\makensis.exe /v1 TradeLinkSuite.nsi
 if ERRORLEVEL 1 (
 echo.
 echo ERROR Building installer...
