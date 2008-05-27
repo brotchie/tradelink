@@ -7,7 +7,7 @@ namespace box
 {
     public class Bollinger : TickIndicator, BarListIndicator
     {
-        private int sds;
+        private decimal sds;
         private int lookback;
         private BarInterval bi;
         private decimal count = 0;
@@ -22,7 +22,7 @@ namespace box
         List<decimal> l = new List<decimal>();
         
         
-        public Bollinger(int sds, BarInterval bi, int lookback)
+        public Bollinger(decimal sds, BarInterval bi, int lookback)
         { this.sds = sds;
         this.bi = bi;
         this.lookback = lookback;
@@ -31,7 +31,7 @@ namespace box
 
 
         
-        public Bollinger(int sds, int lookback)
+        public Bollinger(decimal sds, int lookback)
         {
             this.sds = sds;
             this.lookback = lookback;
