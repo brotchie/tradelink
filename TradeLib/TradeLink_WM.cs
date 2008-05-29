@@ -448,22 +448,14 @@ namespace TradeLib
                         switch (type)
                         {
                             case TL2.TICKNOTIFY:
-                                Tick t = new Tick();
-                                t.sym = r[(int)f.symbol];
-                                if (Index.isIdx(t.sym))
+                                if (Index.isIdx(r[(int)TickField.symbol]))
                                 {
                                     // we got an index update
                                     Index i = Index.Deserialize(msg);
                                     if (gotIndexTick != null) gotIndexTick(i);
                                     break;
                                 }
-                                int date = Convert.ToInt32(r[(int)f.date]);
-                                int time = Convert.ToInt32(r[(int)f.time]);
-                                int sec = Convert.ToInt32(r[(int)f.sec]);
-                                // trade,size,tex,bid,ask,bs,as,be,as
-                                if (r[(int)f.trade].Equals("0")) t.SetQuote(date, time, sec, Convert.ToDecimal(r[(int)f.bid]), Convert.ToDecimal(r[(int)f.ask]), Convert.ToInt32(r[(int)f.bidsize]), Convert.ToInt32(r[(int)f.asksize]), r[(int)f.bidex], r[(int)f.askex]);
-                                else t.SetTrade(date, time, sec, Convert.ToDecimal(r[(int)f.trade]), Convert.ToInt32(r[(int)f.tsize]), r[(int)f.tex]);
-
+                                Tick t = Tick.Deserialize(msg);
                                 if (t.isTrade)
                                 {
                                     try
@@ -550,7 +542,7 @@ namespace TradeLib
 
             for (int i = 0; i < client.Count; i++) // send tick to each client that has subscribed to tick's stock
                 if ((client[i] != null) && (stocks[i].Contains(tick.sym)))
-                    SendMsg(tick.toTLmsg(), TL2.TICKNOTIFY, client[i]);
+                    SendMsg(tick.Serialize(), TL2.TICKNOTIFY, client[i]);
         }
 
         Dictionary<string, Position> SrvPos = new Dictionary<string, Position>();
@@ -665,38 +657,6 @@ namespace TradeLib
             int frac = (int)(d - whole);
             long packed = (whole << 16) + frac;
             return packed;
-        }
-
-
-
-
-
-        enum xf // execution message fields from TL server
-        {
-            date = 0,
-            time,
-            sec,
-            sym,
-            side,
-            size,
-            price,
-            desc
-        }
-        enum f
-        { // tick message fields from TL server
-            symbol = 0,
-            date,
-            time,
-            sec,
-            trade,
-            tsize,
-            tex,
-            bid,
-            ask,
-            bidsize,
-            asksize,
-            bidex,
-            askex,
         }
     }
 

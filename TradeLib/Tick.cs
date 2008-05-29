@@ -126,12 +126,29 @@ namespace TradeLib
             else return sym+" "+this.bid + "x" + this.ask + " (" + this.bs + "x" + this.os + ") " + this.be + "," + this.oe;
         }
 
-        public string toTLmsg()
+        public string Serialize()
         {
             Tick t = this;
             const char d = ',';
             string s = t.sym + d + t.date + d + t.time + d + t.sec + d + t.trade + d + t.size + d + t.ex + d + t.bid + d + t.ask + d + t.bs + d + t.os + d + t.be + d + t.oe + d;
             return s;
+        }
+
+        public static Tick Deserialize(string msg)
+        {
+            string [] r = msg.Split(',');
+            Tick t = new Tick();
+            t.sym = r[(int)TickField.symbol];
+            t.trade = Convert.ToDecimal(r[(int)TickField.trade]);
+            t.size = Convert.ToInt32(r[(int)TickField.tsize]);
+            t.bid = Convert.ToDecimal(r[(int)TickField.bid]);
+            t.ask = Convert.ToDecimal(r[(int)TickField.ask]);
+            t.os = Convert.ToInt32(r[(int)TickField.asksize]);
+            t.bs = Convert.ToInt32(r[(int)TickField.bidsize]);
+            t.ex = r[(int)TickField.tex];
+            t.be = r[(int)TickField.bidex];
+            t.oe = r[(int)TickField.askex];
+            return t;
         }
 
         public void SetQuote(int date, int time, int sec, decimal bid, decimal ask, int bidsize, int asksize, string bidex, string askex)
@@ -199,5 +216,22 @@ namespace TradeLib
 
 
 
+    }
+
+    enum TickField
+    { // tick message fields from TL server
+        symbol = 0,
+        date,
+        time,
+        sec,
+        trade,
+        tsize,
+        tex,
+        bid,
+        ask,
+        bidsize,
+        asksize,
+        bidex,
+        askex,
     }
 }
