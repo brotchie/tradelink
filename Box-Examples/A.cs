@@ -31,7 +31,6 @@ namespace box
         decimal h{ get { return BarMath.HH(bars); } }
         decimal l { get { return BarMath.LL(bars); } }
         decimal o { get { return bars.Get(0).Open; } }
-        decimal PL(decimal t) { if (PosSize == 0) return 0; return (PosSize > 0) ? t - AvgPrice : AvgPrice - t; }
 
         // here are the parameters that define how close we need to be to the open
         const decimal a = .06m; // minimum asymmetry allowed for entry
@@ -43,15 +42,21 @@ namespace box
         // here are the trading rules that implement our strategy's intention
         protected override int Read(Tick tick, BarList bl,BoxInfo bi)
         {
+            // indicator setup
             bars = bl;
             if (!bl.Has(2)) return 0; // must have at least one one bar
+
+            // asymmetry tests
             if (((h - o) > a) && ((o - l) > a)) { Shutdown("Not enough Asymetry to trade."); return 0; }
             if ((h - l) < r) return 0; // must have the range
             if (((h-o)<=a) && ((h-tick.trade)>e)) return MaxSize;
             if (((o-l)<=a) && ((tick.trade-l)>e)) return MaxSize*-1;
+
+            // profit and loss tests
             decimal PL = BoxMath.OpenPT(tick.trade, AvgPrice, PosSize);
             if (PL > p) return Flat;
             if (PL < s) return Flat;
+
             return 0;
         }
     }
