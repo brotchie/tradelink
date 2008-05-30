@@ -34,11 +34,11 @@ namespace box
         decimal PL(decimal t) { if (PosSize == 0) return 0; return (PosSize > 0) ? t - AvgPrice : AvgPrice - t; }
 
         // here are the parameters that define how close we need to be to the open
-        const decimal a = .06m;
-        const decimal r = .37m;
-        const decimal e = .1m;
-        const decimal p = .2m;
-        const decimal s = .11m;
+        const decimal a = .06m; // minimum asymmetry allowed for entry
+        const decimal r = .37m; // minimum range required for asymmetry test
+        const decimal e = .1m; // how close market must be to asymmetry before entry
+        const decimal p = .2m; // profit target
+        const decimal s = -.11m; // stop loss
         
         // here are the trading rules that implement our strategy's intention
         protected override int Read(Tick tick, BarList bl,BoxInfo bi)
@@ -49,8 +49,9 @@ namespace box
             if ((h - l) < r) return 0; // must have the range
             if (((h-o)<=a) && ((h-tick.trade)>e)) return MaxSize;
             if (((o-l)<=a) && ((tick.trade-l)>e)) return MaxSize*-1;
-            if (PL(tick.trade)>p) return PosSize*-1;
-            if (PL(tick.trade)>s) return PosSize*-1;
+            decimal PL = BoxMath.OpenPT(tick.trade, AvgPrice, PosSize);
+            if (PL > p) return Flat;
+            if (PL < s) return Flat;
             return 0;
         }
     }
