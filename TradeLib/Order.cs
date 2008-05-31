@@ -30,6 +30,7 @@ namespace TradeLib
             this.size = copythis.size;
             this.time = copythis.time;
             this.LocalSymbol = copythis.LocalSymbol;
+            this.id = copythis.id;
             // shouldn't be used but we'll take them anyways
             this.xdate = copythis.xdate;
             this.xprice = copythis.xprice;
@@ -95,7 +96,9 @@ namespace TradeLib
         {
             const char d = ',';
             if (this.isFilled) return base.Serialize();
-            return symbol + d + (side ? "true" : "false") + d + Math.Abs(size) + d + price + d + stopp + d + comment + d + ex + d + accountid + d + this.Security.ToString() + d + this.Currency.ToString() + d + LocalSymbol;
+            //return symbol + d + (side ? "true" : "false")+d + Math.Abs(size) + d + price + d + stopp + d + comment + d + ex + d + accountid + d + this.Security.ToString() + d + this.Currency.ToString() + d + LocalSymbol;
+            string [] r = new string[] { symbol,(side ? "true" : "false"),UnSignedSize.ToString(),price.ToString(),stopp.ToString(),comment,ex,accountid,this.Security.ToString(),this.Currency.ToString(),LocalSymbol,id.ToString()};
+            return string.Join(",", r);
         }
         /// <summary>
         /// Deserialize string to Order
@@ -118,6 +121,7 @@ namespace TradeLib
             o.LocalSymbol = rec[(int)OrderField.LocalSymbol];
             o.Currency = (Currency)Enum.Parse(typeof(Currency), rec[(int)OrderField.Currency]);
             o.Security = (Security)Enum.Parse(typeof(Security), rec[(int)OrderField.Security]);
+            o.id = Convert.ToInt32(rec[(int)OrderField.OrderID]);
             return o;
         }
     }
@@ -135,6 +139,7 @@ namespace TradeLib
         Security,
         Currency,
         LocalSymbol, // non-pretty symbol or contract symbol for futures
+        OrderID,
     }
 
 }

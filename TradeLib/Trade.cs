@@ -8,6 +8,7 @@ namespace TradeLib
     [Serializable]
     public class Trade
     {
+        public int id = 0;
         protected Currency cur = Currency.USD;
         protected Security type = Security.STK;
         protected string ex = "NYSE";
@@ -37,6 +38,7 @@ namespace TradeLib
         public Trade(Trade copytrade)
         {
             // copy constructor, for copying using by-value (rather than by default of by-reference)
+            id = copytrade.id;
             cur = copytrade.cur;
             type = copytrade.type;
             ex = copytrade.ex;
