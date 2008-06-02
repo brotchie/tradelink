@@ -274,6 +274,7 @@ namespace TradeLib
 
     public enum Brokers
     {
+        Unknown = -1,
         TradeLinkSimulation = 0,
         Assent,
         InteractiveBrokers,
