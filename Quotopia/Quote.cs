@@ -53,6 +53,12 @@ namespace Quotopia
             tl.gotFill += new FillDelegate(tl_gotFill);
             tl.gotIndexTick += new IndexDelegate(tl_gotIndexTick);
             news.NewsEventSubscribers += new NewsDelegate(news_NewsEventSubscribers);
+            FormClosing += new FormClosingEventHandler(Quote_FormClosing);
+        }
+
+        void Quote_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            tl.Disconnect();
         }
 
         void FetchTLServer()
