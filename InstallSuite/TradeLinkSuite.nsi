@@ -13,7 +13,7 @@ InstallDir $PROGRAMFILES\TradeLink\TradeLinkSuite
 
 ; Registry key to check for directory (so if you install again, it will 
 ; overwrite the old one automatically)
-InstallDirRegKey HKLM "Software\NSIS_TradeLink" "Install_Dir"
+InstallDirRegKey HKLM "Software\TradeLinkSuite" "Install_Dir"
 
 ; Pages
 Page components
@@ -23,7 +23,7 @@ Page instfiles
 UninstPage uninstConfirm
 UninstPage instfiles
 
-CompletedText "For additional documentation, see http://code.google.com/p/tradelink"
+CompletedText "For additional documentation, see http://tradelink.googlecode.com"
 
 ; The stuff to install
 Section "TradeLinkSuite"
@@ -66,15 +66,15 @@ Section "TradeLinkSuite"
   File "Tattle.exe"
   File /r /x ".svn" "Properties"
   ; Write the installation path into the registry
-  WriteRegStr HKLM SOFTWARE\NSIS_TradeLink "Install_Dir" "$INSTDIR"
+  WriteRegStr HKLM SOFTWARE\TradeLinkSuite "Install_Dir" "$INSTDIR"
   	
   
   
   ; Write the uninstall keys for Windows
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLink" "DisplayName" "TradeLink"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLink" "UninstallString" '"$INSTDIR\uninstall.exe"'
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLink" "NoModify" 1
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLink" "NoRepair" 1
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "DisplayName" "TradeLinkSuite"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "UninstallString" '"$INSTDIR\uninstall.exe"'
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "NoModify" 1
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "NoRepair" 1
   WriteUninstaller "uninstall.exe"
 
 SectionEnd
@@ -85,8 +85,8 @@ SectionEnd
 Section "Uninstall"
   
   ; Remove registry keys
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLink"
-  DeleteRegKey HKLM SOFTWARE\NSIS_TradeLink
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite"
+  DeleteRegKey HKLM SOFTWARE\TradeLinkSuite
 
   ; Remove files and uninstaller
   Delete $INSTDIR\TradeLinkSuite.nsi
