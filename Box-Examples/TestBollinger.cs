@@ -97,7 +97,6 @@ namespace box
             foreach (Tick t in ticklist)
             {
                 bl.AddTick(t);
-                Console.WriteLine(bbb.Sd + " " + bbb.Upperband + " " + bbb.Lowerband);
                 bbb.newBar(bl);
             }
 
@@ -105,7 +104,6 @@ namespace box
             Assert.That(bbb.Devavg == 2, bbb.Devavg.ToString());
             Assert.That(bbb.Sd == 1.4142135623730950488016887242097, bbb.Sd.ToString());
             Assert.That(bbb.Upperband == 5.8284271247462M, bbb.Upperband.ToString());
-            // Assert.That(bbb.Lowerband == 0.1715728752538M, bbb.Lowerband.ToString());
         }
         [Test]
         public void BollingerBarlisttestlookbacks()
@@ -117,7 +115,6 @@ namespace box
             foreach (Tick t in ticklist)
             {
                 bl.AddTick(t);
-                Console.WriteLine(bbb.Sd + " " + bbb.Upperband + " " + bbb.Lowerband);
                 bbb.newBar(bl);
             }
 

@@ -29,24 +29,30 @@ namespace box
                 Tick.NewTrade(sym,d,t+6,0,16,100,x),
                 Tick.NewTrade(sym,d,t+7,0,10,100,x), // blade down
                 Tick.NewTrade(sym,d,t+7,10,10,100,x), // still a blade down (same bar)
+                Tick.NewTrade(sym,d,t+8,0,15,100,x), 
+                Tick.NewTrade(sym,d,t+15,0,15,800,x), // volume spike
+                Tick.NewTrade(sym,d,t+20,0,15,100,x), 
+                Tick.NewTrade(sym,d,t+25,0,15,100,x), 
             };
 
             BarList bl = new BarList(BarInterval.FiveMin,sym);
             Blade b = new Blade(.2m); // 20 percent move is a blade
-            int up=0,down=0,newbar=0;
+            int up=0,down=0,newbar=0,bigvol=0;
 
             foreach (Tick k in ticklist)
             {
                 bl.AddTick(k);
                 b.newBar(bl);
                 if (bl.NewBar) newbar++;
-                if (b.BladesUP) up++;
-                if (b.BladesDOWN) down++;
+                if (b.isBladeUP) up++;
+                if (b.isBladeDOWN) down++;
+                if (b.isBigVolume) bigvol++;
             }
 
-            Assert.That(up == 1);
-            Assert.That(down == 2);
-            Assert.That(newbar == 2);
+            Assert.That(up == 1,up.ToString());
+            Assert.That(down == 2,down.ToString());
+            Assert.That(newbar == 5,newbar.ToString());
+            Assert.That(bigvol == 1,bigvol.ToString());
 
         }
     }
