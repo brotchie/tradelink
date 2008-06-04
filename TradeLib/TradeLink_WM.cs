@@ -24,6 +24,7 @@ namespace TradeLib
         public event OrderDelegate gotSrvFillRequest;
         public event OrderDelegate gotOrder;
         public event DebugDelegate gotAccounts;
+        public event IntDelegate gotOrderCancel;
 
 
         private IntPtr meh = IntPtr.Zero;
@@ -225,6 +226,11 @@ namespace TradeLib
         /// <param name="sym">The symbol</param>
         /// <returns>decimal representing average price</returns>
         public decimal AvgPrice(string sym) { return unpack(TLSend(TL2.AVGPRICE, sym)); }
+        /// <summary>
+        /// Request an order be canceled
+        /// </summary>
+        /// <param name="orderid">the id of the order being canceled</param>
+        public void CancelOrder(Int64 orderid) { TLSend(TL2.ORDERCANCELREQUEST, orderid.ToString()); }
 
         /// <summary>
         /// Send an account request, response is returned via the gotAccounts event.
@@ -447,6 +453,9 @@ namespace TradeLib
                         string[] r = msg.Split(',');
                         switch (type)
                         {
+                            case TL2.ORDERCANCELRESPONSE :
+                                if (gotOrderCancel != null) gotOrderCancel(Convert.ToInt64(msg));
+                                break;
                             case TL2.TICKNOTIFY:
                                 if (Index.isIdx(r[(int)TickField.symbol]))
                                 {
