@@ -42,6 +42,7 @@ namespace TestTradeLib
             const string x = "NYSE";
             const string a = "ACCOUNT";
             const string u = "COMMENT";
+            const string ot = "GTC";
             const decimal p = 10;
             const int z = 100;
             const Currency c = Currency.USD;
@@ -53,6 +54,7 @@ namespace TestTradeLib
             o.Currency = c;
             o.Security = t;
             o.comment = u;
+            o.TIF = ot;
             // convert it to a message
             string msg = o.Serialize();
 
@@ -73,6 +75,7 @@ namespace TestTradeLib
             Assert.That(n.comment == u,n.comment);
             Assert.That(n.Security == t,n.Security.ToString());
             Assert.That(n.Currency == c,n.Currency.ToString());
+            Assert.That(n.TIF == ot, n.TIF);
         }
     }
 }

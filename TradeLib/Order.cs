@@ -9,6 +9,7 @@ namespace TradeLib
     public class Order : Trade
     {
         public Order() : base() { }
+        public string TIF = "DAY";
         public override bool isValid { get { return (symbol != null) && (size != 0); } }
         public bool isMarket { get { return (price == 0) && (stopp == 0); } }
         public bool isLimit { get { return (price != 0); } }
@@ -31,6 +32,7 @@ namespace TradeLib
             this.time = copythis.time;
             this.LocalSymbol = copythis.LocalSymbol;
             this.id = copythis.id;
+            this.TIF = copythis.TIF;
             // shouldn't be used but we'll take them anyways
             this.xdate = copythis.xdate;
             this.xprice = copythis.xprice;
@@ -97,7 +99,7 @@ namespace TradeLib
             const char d = ',';
             if (this.isFilled) return base.Serialize();
             //return symbol + d + (side ? "true" : "false")+d + Math.Abs(size) + d + price + d + stopp + d + comment + d + ex + d + accountid + d + this.Security.ToString() + d + this.Currency.ToString() + d + LocalSymbol;
-            string [] r = new string[] { symbol,(side ? "true" : "false"),UnSignedSize.ToString(),price.ToString(),stopp.ToString(),comment,ex,accountid,this.Security.ToString(),this.Currency.ToString(),LocalSymbol,id.ToString()};
+            string [] r = new string[] { symbol,(side ? "true" : "false"),UnSignedSize.ToString(),price.ToString(),stopp.ToString(),comment,ex,accountid,this.Security.ToString(),this.Currency.ToString(),LocalSymbol,id.ToString(),TIF};
             return string.Join(",", r);
         }
         /// <summary>
@@ -122,6 +124,7 @@ namespace TradeLib
             o.Currency = (Currency)Enum.Parse(typeof(Currency), rec[(int)OrderField.Currency]);
             o.Security = (Security)Enum.Parse(typeof(Security), rec[(int)OrderField.Security]);
             o.id = Convert.ToInt32(rec[(int)OrderField.OrderID]);
+            o.TIF = rec[(int)OrderField.OrderTIF];
             return o;
         }
     }
@@ -140,6 +143,7 @@ namespace TradeLib
         Currency,
         LocalSymbol, // non-pretty symbol or contract symbol for futures
         OrderID,
+        OrderTIF,
     }
 
 }
