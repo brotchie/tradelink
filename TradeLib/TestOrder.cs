@@ -77,5 +77,37 @@ namespace TestTradeLib
             Assert.That(n.Currency == c,n.Currency.ToString());
             Assert.That(n.TIF == ot, n.TIF);
         }
+
+        [Test]
+        public void EqualsTest()
+        {
+            // following equals guidelines listed here:
+            // http://msdn.microsoft.com/en-us/library/ms173147(VS.80).aspx
+
+            // x.Equals(x) returns true.
+            Order x = new Order("XTST", -300);
+            Assert.That(x.Equals(x), x.ToString());
+
+            // x.Equals(y) returns the same value as y.Equals(x).
+            Order y = new Order("YTST",200);
+            bool v1 = x.Equals(y);
+            bool v2 = y.Equals(x);
+            Assert.That(v1 == v2, x.ToString() + y.ToString());
+
+            // if (x.Equals(y) && y.Equals(z)) returns true, then x.Equals(z) returns true.
+            y = new Order(x);
+            Order z = new Order(x);
+            Assert.That(x.Equals(y) && y.Equals(z) && x.Equals(z));
+
+            // Successive invocations of x.Equals(y) return the same value as long as the objects referenced by x and y are not modified.
+            v1 = x.Equals(y);
+            v2 = x.Equals(y);
+            Assert.That(v1 == v2);
+
+            // x.Equals(null) returns false.
+            Assert.That(!x.Equals(null));
+
+
+        }
     }
 }

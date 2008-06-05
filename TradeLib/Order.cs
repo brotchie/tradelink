@@ -127,6 +127,33 @@ namespace TradeLib
             o.TIF = rec[(int)OrderField.OrderTIF];
             return o;
         }
+
+        public override int GetHashCode()
+        {
+            return symbol.GetHashCode() + accountid.GetHashCode() + (int)(price * 100) + (int)(stopp * 100) + ex.GetHashCode() + SignedSize + LocalSymbol.GetHashCode() + (int)Currency + (int)Security;
+        }
+        public override bool Equals(object obj)
+        {
+            if (obj == null) return false;
+            Order o = (Order)obj;
+            return Equals(o);
+        }
+
+        public bool Equals(Order o)
+        {
+            if (o == null) return false;
+            bool r = true;
+            r &= price == o.price;
+            r &= stopp == o.stopp;
+            r &= symbol == o.symbol;
+            r &= accountid == o.accountid;
+            r &= ex == o.ex;
+            r &= TIF == o.TIF;
+            r &= LocalSymbol == o.LocalSymbol;
+            r &= SignedSize == o.SignedSize;
+            r &= Security == o.Security;
+            return r;
+        }
     }
 
     public enum OrderField
