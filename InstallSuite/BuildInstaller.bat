@@ -58,8 +58,9 @@ echo TATTLE
 xcopy /q /y ..\Tattle\bin\Release\Tattle.exe* .
 echo KADINA
 xcopy /q /y ..\Kadina\bin\Release\Kadina.exe* .
+echo TRIPT
+xcopy /q /y ..\Tript\bin\Release\Tript.exe* .
 echo.
-
 
 
 

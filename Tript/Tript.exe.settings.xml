@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SETTINGS>
+	<DEFAULTNAMESPACES>
+		<NAMESPACE>System</NAMESPACE>
+		<NAMESPACE>System.Collections.Generic</NAMESPACE>
+		<NAMESPACE>System.IO</NAMESPACE>
+		<NAMESPACE>System.Text</NAMESPACE>
+		<NAMESPACE>System.Xml</NAMESPACE>
+		<NAMESPACE>System.Windows.Forms</NAMESPACE>
+		<NAMESPACE>TradeLib</NAMESPACE>
+	</DEFAULTNAMESPACES>
+	<DEFAULTIMPORTS>
+		<DLL>System.dll</DLL>
+		<DLL>System.Xml.dll</DLL>
+		<DLL>System.Windows.Forms.dll</DLL>
+		<DLL>tradelib.dll</DLL>
+	</DEFAULTIMPORTS>
+</SETTINGS>
