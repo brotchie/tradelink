@@ -87,10 +87,15 @@
     <Compile Include="TickWatcher.cs" />
     <Compile Include="Trade.cs" />
     <Compile Include="TradeLink.cs" />
+    <Compile Include="TradeLink_Client_WM.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="TradeLink_MQ.cs" />
-    <Compile Include="TradeLink_WM.cs">
+    <Compile Include="TradeLink_Server_WM.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Util.cs" />
+    <Compile Include="WMUtil.cs" />
     <EmbeddedResource Include="ParamPrompt.resx">
       <DependentUpon>ParamPrompt.cs</DependentUpon>
       <SubType>Designer</SubType>

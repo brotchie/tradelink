@@ -29,32 +29,32 @@ namespace Quotopia
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle26 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle27 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle46 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle47 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle28 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle29 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle30 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle31 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle32 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle33 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle34 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle35 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle36 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle37 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle38 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle39 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle40 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle41 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle42 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle43 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle44 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Quote));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle45 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle21 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle21 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle22 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle19 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Quote));
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle20 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle23 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle25 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle24 = new System.Windows.Forms.DataGridViewCellStyle();
             this.quoteTab = new System.Windows.Forms.TabControl();
             this.Markets = new System.Windows.Forms.TabPage();
             this.MarketsView = new System.Windows.Forms.DataGridView();
@@ -119,7 +119,6 @@ namespace Quotopia
             this.datagroup = new System.Windows.Forms.GroupBox();
             this.saveticks = new System.Windows.Forms.CheckBox();
             this.archivefolderbut = new System.Windows.Forms.Button();
-            this.histsimbut = new System.Windows.Forms.RadioButton();
             this.liveanvilbut = new System.Windows.Forms.RadioButton();
             this.simAnvilbut = new System.Windows.Forms.RadioButton();
             this.vizGroupBox = new System.Windows.Forms.GroupBox();
@@ -191,7 +190,7 @@ namespace Quotopia
             this.quoteTab.Name = "quoteTab";
             this.quoteTab.SelectedIndex = 0;
             this.quoteTab.ShowToolTips = true;
-            this.quoteTab.Size = new System.Drawing.Size(627, 461);
+            this.quoteTab.Size = new System.Drawing.Size(836, 567);
             this.quoteTab.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.quoteTab.TabIndex = 0;
             // 
@@ -201,9 +200,10 @@ namespace Quotopia
             this.Markets.Controls.Add(this.MarketsView);
             this.Markets.ForeColor = System.Drawing.Color.White;
             this.Markets.Location = new System.Drawing.Point(4, 4);
+            this.Markets.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Markets.Name = "Markets";
-            this.Markets.Padding = new System.Windows.Forms.Padding(3);
-            this.Markets.Size = new System.Drawing.Size(619, 435);
+            this.Markets.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Markets.Size = new System.Drawing.Size(828, 538);
             this.Markets.TabIndex = 0;
             this.Markets.Text = "Markets";
             this.Markets.UseVisualStyleBackColor = true;
@@ -211,23 +211,23 @@ namespace Quotopia
             // MarketsView
             // 
             this.MarketsView.AllowUserToOrderColumns = true;
-            dataGridViewCellStyle26.BackColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle26.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle26.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle26.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            this.MarketsView.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle26;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            this.MarketsView.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             this.MarketsView.BackgroundColor = System.Drawing.Color.Black;
             this.MarketsView.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.MarketsView.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
             this.MarketsView.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle27.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle27.BackColor = System.Drawing.SystemColors.WindowFrame;
-            dataGridViewCellStyle27.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F);
-            dataGridViewCellStyle27.ForeColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle27.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle27.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle27.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.MarketsView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle27;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.WindowFrame;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F);
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.MarketsView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             this.MarketsView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.SymbolCol,
             this.LastPrintCol,
@@ -250,42 +250,43 @@ namespace Quotopia
             this.xTrendCol,
             this.TimeCol});
             this.MarketsView.ContextMenuStrip = this.rightclickrow;
-            dataGridViewCellStyle46.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle46.BackColor = System.Drawing.SystemColors.WindowFrame;
-            dataGridViewCellStyle46.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F);
-            dataGridViewCellStyle46.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle46.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle46.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle46.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.MarketsView.DefaultCellStyle = dataGridViewCellStyle46;
+            dataGridViewCellStyle21.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle21.BackColor = System.Drawing.SystemColors.WindowFrame;
+            dataGridViewCellStyle21.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F);
+            dataGridViewCellStyle21.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle21.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle21.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle21.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.MarketsView.DefaultCellStyle = dataGridViewCellStyle21;
             this.MarketsView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MarketsView.EnableHeadersVisualStyles = false;
             this.MarketsView.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F);
             this.MarketsView.GridColor = System.Drawing.Color.Black;
-            this.MarketsView.Location = new System.Drawing.Point(3, 3);
+            this.MarketsView.Location = new System.Drawing.Point(4, 4);
             this.MarketsView.Margin = new System.Windows.Forms.Padding(0);
             this.MarketsView.Name = "MarketsView";
             this.MarketsView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle47.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle47.BackColor = System.Drawing.SystemColors.WindowFrame;
-            dataGridViewCellStyle47.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F);
-            dataGridViewCellStyle47.ForeColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle47.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle47.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle47.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.MarketsView.RowHeadersDefaultCellStyle = dataGridViewCellStyle47;
+            dataGridViewCellStyle22.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle22.BackColor = System.Drawing.SystemColors.WindowFrame;
+            dataGridViewCellStyle22.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F);
+            dataGridViewCellStyle22.ForeColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle22.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle22.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle22.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.MarketsView.RowHeadersDefaultCellStyle = dataGridViewCellStyle22;
             this.MarketsView.RowHeadersVisible = false;
             this.MarketsView.RowTemplate.DefaultCellStyle.BackColor = System.Drawing.Color.Black;
             this.MarketsView.RowTemplate.DefaultCellStyle.ForeColor = System.Drawing.Color.White;
             this.MarketsView.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.SystemColors.Highlight;
             this.MarketsView.RowTemplate.DefaultCellStyle.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            this.MarketsView.RowTemplate.Height = 24;
             this.MarketsView.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.MarketsView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.MarketsView.ShowCellErrors = false;
             this.MarketsView.ShowCellToolTips = false;
             this.MarketsView.ShowEditingIcon = false;
             this.MarketsView.ShowRowErrors = false;
-            this.MarketsView.Size = new System.Drawing.Size(613, 429);
+            this.MarketsView.Size = new System.Drawing.Size(820, 530);
             this.MarketsView.TabIndex = 0;
             this.MarketsView.CellValidated += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellValueChanged);
             this.MarketsView.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.MarketsView_CellContentDoubleClick);
@@ -296,12 +297,12 @@ namespace Quotopia
             // SymbolCol
             // 
             this.SymbolCol.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle28.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle28.BackColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle28.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle28.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle28.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            this.SymbolCol.DefaultCellStyle = dataGridViewCellStyle28;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle3.BackColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            this.SymbolCol.DefaultCellStyle = dataGridViewCellStyle3;
             this.SymbolCol.Frozen = true;
             this.SymbolCol.HeaderText = "Symbol";
             this.SymbolCol.Name = "SymbolCol";
@@ -310,10 +311,10 @@ namespace Quotopia
             // 
             // LastPrintCol
             // 
-            dataGridViewCellStyle29.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle29.Format = "N2";
-            dataGridViewCellStyle29.NullValue = null;
-            this.LastPrintCol.DefaultCellStyle = dataGridViewCellStyle29;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle4.Format = "N2";
+            dataGridViewCellStyle4.NullValue = null;
+            this.LastPrintCol.DefaultCellStyle = dataGridViewCellStyle4;
             this.LastPrintCol.HeaderText = "Last";
             this.LastPrintCol.Name = "LastPrintCol";
             this.LastPrintCol.ReadOnly = true;
@@ -323,14 +324,14 @@ namespace Quotopia
             // LastSizeCol
             // 
             this.LastSizeCol.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle30.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle30.BackColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle30.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle30.Format = "N0";
-            dataGridViewCellStyle30.NullValue = null;
-            dataGridViewCellStyle30.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle30.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            this.LastSizeCol.DefaultCellStyle = dataGridViewCellStyle30;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle5.BackColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle5.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle5.Format = "N0";
+            dataGridViewCellStyle5.NullValue = null;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            this.LastSizeCol.DefaultCellStyle = dataGridViewCellStyle5;
             this.LastSizeCol.HeaderText = "TSize";
             this.LastSizeCol.Name = "LastSizeCol";
             this.LastSizeCol.ReadOnly = true;
@@ -340,11 +341,11 @@ namespace Quotopia
             // Blank
             // 
             this.Blank.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle31.BackColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle31.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle31.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle31.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            this.Blank.DefaultCellStyle = dataGridViewCellStyle31;
+            dataGridViewCellStyle6.BackColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle6.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            this.Blank.DefaultCellStyle = dataGridViewCellStyle6;
             this.Blank.HeaderText = "";
             this.Blank.Name = "Blank";
             this.Blank.ReadOnly = true;
@@ -354,10 +355,10 @@ namespace Quotopia
             // BidCol
             // 
             this.BidCol.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle32.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle32.Format = "N2";
-            dataGridViewCellStyle32.NullValue = null;
-            this.BidCol.DefaultCellStyle = dataGridViewCellStyle32;
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle7.Format = "N2";
+            dataGridViewCellStyle7.NullValue = null;
+            this.BidCol.DefaultCellStyle = dataGridViewCellStyle7;
             this.BidCol.HeaderText = "Bid";
             this.BidCol.Name = "BidCol";
             this.BidCol.ReadOnly = true;
@@ -368,10 +369,10 @@ namespace Quotopia
             // OfferCol
             // 
             this.OfferCol.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle33.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle33.Format = "N2";
-            dataGridViewCellStyle33.NullValue = null;
-            this.OfferCol.DefaultCellStyle = dataGridViewCellStyle33;
+            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle8.Format = "N2";
+            dataGridViewCellStyle8.NullValue = null;
+            this.OfferCol.DefaultCellStyle = dataGridViewCellStyle8;
             this.OfferCol.HeaderText = "Ask";
             this.OfferCol.Name = "OfferCol";
             this.OfferCol.ReadOnly = true;
@@ -382,8 +383,8 @@ namespace Quotopia
             // QuoteSizeCol
             // 
             this.QuoteSizeCol.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle34.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.QuoteSizeCol.DefaultCellStyle = dataGridViewCellStyle34;
+            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.QuoteSizeCol.DefaultCellStyle = dataGridViewCellStyle9;
             this.QuoteSizeCol.HeaderText = "Sizes";
             this.QuoteSizeCol.Name = "QuoteSizeCol";
             this.QuoteSizeCol.ReadOnly = true;
@@ -392,8 +393,8 @@ namespace Quotopia
             // 
             // BidSizeCol
             // 
-            dataGridViewCellStyle35.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.BidSizeCol.DefaultCellStyle = dataGridViewCellStyle35;
+            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.BidSizeCol.DefaultCellStyle = dataGridViewCellStyle10;
             this.BidSizeCol.HeaderText = "BidSize";
             this.BidSizeCol.Name = "BidSizeCol";
             this.BidSizeCol.ReadOnly = true;
@@ -402,8 +403,8 @@ namespace Quotopia
             // 
             // OfferSizeCol
             // 
-            dataGridViewCellStyle36.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.OfferSizeCol.DefaultCellStyle = dataGridViewCellStyle36;
+            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.OfferSizeCol.DefaultCellStyle = dataGridViewCellStyle11;
             this.OfferSizeCol.HeaderText = "AskSize";
             this.OfferSizeCol.Name = "OfferSizeCol";
             this.OfferSizeCol.ReadOnly = true;
@@ -413,8 +414,8 @@ namespace Quotopia
             // PosSizeCol
             // 
             this.PosSizeCol.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            dataGridViewCellStyle37.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.PosSizeCol.DefaultCellStyle = dataGridViewCellStyle37;
+            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.PosSizeCol.DefaultCellStyle = dataGridViewCellStyle12;
             this.PosSizeCol.HeaderText = "Position";
             this.PosSizeCol.Name = "PosSizeCol";
             this.PosSizeCol.ReadOnly = true;
@@ -424,9 +425,9 @@ namespace Quotopia
             // AvgPriceCol
             // 
             this.AvgPriceCol.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle38.Format = "N2";
-            dataGridViewCellStyle38.NullValue = null;
-            this.AvgPriceCol.DefaultCellStyle = dataGridViewCellStyle38;
+            dataGridViewCellStyle13.Format = "N2";
+            dataGridViewCellStyle13.NullValue = null;
+            this.AvgPriceCol.DefaultCellStyle = dataGridViewCellStyle13;
             this.AvgPriceCol.HeaderText = "AvgPrice";
             this.AvgPriceCol.Name = "AvgPriceCol";
             this.AvgPriceCol.ReadOnly = true;
@@ -436,13 +437,13 @@ namespace Quotopia
             // MinSizeCol
             // 
             this.MinSizeCol.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle39.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle39.BackColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle39.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle39.Format = "N0";
-            dataGridViewCellStyle39.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle39.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            this.MinSizeCol.DefaultCellStyle = dataGridViewCellStyle39;
+            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle14.BackColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle14.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle14.Format = "N0";
+            dataGridViewCellStyle14.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle14.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            this.MinSizeCol.DefaultCellStyle = dataGridViewCellStyle14;
             this.MinSizeCol.HeaderText = "Adjust";
             this.MinSizeCol.Name = "MinSizeCol";
             this.MinSizeCol.Resizable = System.Windows.Forms.DataGridViewTriState.True;
@@ -462,9 +463,9 @@ namespace Quotopia
             // DayLowCol
             // 
             this.DayLowCol.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle40.Format = "N2";
-            dataGridViewCellStyle40.NullValue = null;
-            this.DayLowCol.DefaultCellStyle = dataGridViewCellStyle40;
+            dataGridViewCellStyle15.Format = "N2";
+            dataGridViewCellStyle15.NullValue = null;
+            this.DayLowCol.DefaultCellStyle = dataGridViewCellStyle15;
             this.DayLowCol.HeaderText = "Low";
             this.DayLowCol.Name = "DayLowCol";
             this.DayLowCol.ReadOnly = true;
@@ -474,9 +475,9 @@ namespace Quotopia
             // DayOpenCol
             // 
             this.DayOpenCol.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle41.Format = "N2";
-            dataGridViewCellStyle41.NullValue = null;
-            this.DayOpenCol.DefaultCellStyle = dataGridViewCellStyle41;
+            dataGridViewCellStyle16.Format = "N2";
+            dataGridViewCellStyle16.NullValue = null;
+            this.DayOpenCol.DefaultCellStyle = dataGridViewCellStyle16;
             this.DayOpenCol.HeaderText = "Open";
             this.DayOpenCol.Name = "DayOpenCol";
             this.DayOpenCol.ReadOnly = true;
@@ -486,9 +487,9 @@ namespace Quotopia
             // DayHighCol
             // 
             this.DayHighCol.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle42.Format = "N2";
-            dataGridViewCellStyle42.NullValue = null;
-            this.DayHighCol.DefaultCellStyle = dataGridViewCellStyle42;
+            dataGridViewCellStyle17.Format = "N2";
+            dataGridViewCellStyle17.NullValue = null;
+            this.DayHighCol.DefaultCellStyle = dataGridViewCellStyle17;
             this.DayHighCol.HeaderText = "High";
             this.DayHighCol.Name = "DayHighCol";
             this.DayHighCol.ReadOnly = true;
@@ -498,9 +499,9 @@ namespace Quotopia
             // YestCloseCol
             // 
             this.YestCloseCol.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle43.Format = "N2";
-            dataGridViewCellStyle43.NullValue = null;
-            this.YestCloseCol.DefaultCellStyle = dataGridViewCellStyle43;
+            dataGridViewCellStyle18.Format = "N2";
+            dataGridViewCellStyle18.NullValue = null;
+            this.YestCloseCol.DefaultCellStyle = dataGridViewCellStyle18;
             this.YestCloseCol.HeaderText = "YestClose";
             this.YestCloseCol.Name = "YestCloseCol";
             this.YestCloseCol.ReadOnly = true;
@@ -509,10 +510,10 @@ namespace Quotopia
             // 
             // NetChangeCol
             // 
-            dataGridViewCellStyle44.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle44.Format = "+###0.00;-###0.00";
-            dataGridViewCellStyle44.NullValue = null;
-            this.NetChangeCol.DefaultCellStyle = dataGridViewCellStyle44;
+            dataGridViewCellStyle19.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle19.Format = "+###0.00;-###0.00";
+            dataGridViewCellStyle19.NullValue = null;
+            this.NetChangeCol.DefaultCellStyle = dataGridViewCellStyle19;
             this.NetChangeCol.HeaderText = "NetChange";
             this.NetChangeCol.Name = "NetChangeCol";
             this.NetChangeCol.ReadOnly = true;
@@ -529,8 +530,8 @@ namespace Quotopia
             // 
             // TimeCol
             // 
-            dataGridViewCellStyle45.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.TimeCol.DefaultCellStyle = dataGridViewCellStyle45;
+            dataGridViewCellStyle20.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.TimeCol.DefaultCellStyle = dataGridViewCellStyle20;
             this.TimeCol.HeaderText = "Time";
             this.TimeCol.Name = "TimeCol";
             this.TimeCol.ReadOnly = true;
@@ -544,7 +545,7 @@ namespace Quotopia
             this.columnsdropdown,
             this.boxdropdown});
             this.rightclickrow.Name = "rightclickrow";
-            this.rightclickrow.Size = new System.Drawing.Size(139, 92);
+            this.rightclickrow.Size = new System.Drawing.Size(132, 92);
             this.rightclickrow.Opening += new System.ComponentModel.CancelEventHandler(this.rightclickrow_Opening);
             this.rightclickrow.Click += new System.EventHandler(this.rightclickrow_Click);
             // 
@@ -552,7 +553,7 @@ namespace Quotopia
             // 
             this.showchart.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.showchart.Name = "showchart";
-            this.showchart.Size = new System.Drawing.Size(138, 22);
+            this.showchart.Size = new System.Drawing.Size(131, 22);
             this.showchart.Text = "Chart";
             this.showchart.ToolTipText = "Chart symbol";
             // 
@@ -565,7 +566,7 @@ namespace Quotopia
             this.flatthisqtr,
             this.flatallpositions});
             this.flatmenuright.Name = "flatmenuright";
-            this.flatmenuright.Size = new System.Drawing.Size(138, 22);
+            this.flatmenuright.Size = new System.Drawing.Size(131, 22);
             this.flatmenuright.Text = "Flat";
             this.flatmenuright.TextDirection = System.Windows.Forms.ToolStripTextDirection.Horizontal;
             this.flatmenuright.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
@@ -574,32 +575,32 @@ namespace Quotopia
             // flatthisfull
             // 
             this.flatthisfull.Name = "flatthisfull";
-            this.flatthisfull.Size = new System.Drawing.Size(185, 22);
+            this.flatthisfull.Size = new System.Drawing.Size(184, 22);
             this.flatthisfull.Text = "flat THIS 100%";
             // 
             // flatthishalf
             // 
             this.flatthishalf.Name = "flatthishalf";
-            this.flatthishalf.Size = new System.Drawing.Size(185, 22);
+            this.flatthishalf.Size = new System.Drawing.Size(184, 22);
             this.flatthishalf.Text = "flat THIS 50%";
             // 
             // flatthisqtr
             // 
             this.flatthisqtr.Name = "flatthisqtr";
-            this.flatthisqtr.Size = new System.Drawing.Size(185, 22);
+            this.flatthisqtr.Size = new System.Drawing.Size(184, 22);
             this.flatthisqtr.Text = "flat THIS 25%";
             // 
             // flatallpositions
             // 
             this.flatallpositions.Name = "flatallpositions";
-            this.flatallpositions.Size = new System.Drawing.Size(185, 22);
+            this.flatallpositions.Size = new System.Drawing.Size(184, 22);
             this.flatallpositions.Text = "flat ALL positions";
             // 
             // columnsdropdown
             // 
             this.columnsdropdown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.columnsdropdown.Name = "columnsdropdown";
-            this.columnsdropdown.Size = new System.Drawing.Size(138, 22);
+            this.columnsdropdown.Size = new System.Drawing.Size(131, 22);
             this.columnsdropdown.Text = "Columns";
             this.columnsdropdown.ToolTipText = "Toggle displayed fields";
             this.columnsdropdown.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.columnsdropdown_DropDownItemClicked);
@@ -607,7 +608,7 @@ namespace Quotopia
             // boxdropdown
             // 
             this.boxdropdown.Name = "boxdropdown";
-            this.boxdropdown.Size = new System.Drawing.Size(138, 22);
+            this.boxdropdown.Size = new System.Drawing.Size(131, 22);
             this.boxdropdown.Text = "Boxes";
             this.boxdropdown.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.boxdropdown_DropDownItemClicked);
             this.boxdropdown.DropDownOpening += new System.EventHandler(this.boxdropdown_DropDownOpening);
@@ -618,9 +619,10 @@ namespace Quotopia
             this.TradeTab.Controls.Add(this.TradesView);
             this.TradeTab.ForeColor = System.Drawing.SystemColors.MenuText;
             this.TradeTab.Location = new System.Drawing.Point(4, 4);
+            this.TradeTab.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.TradeTab.Name = "TradeTab";
-            this.TradeTab.Padding = new System.Windows.Forms.Padding(3);
-            this.TradeTab.Size = new System.Drawing.Size(619, 435);
+            this.TradeTab.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.TradeTab.Size = new System.Drawing.Size(828, 538);
             this.TradeTab.TabIndex = 3;
             this.TradeTab.Text = "Trades";
             this.TradeTab.UseVisualStyleBackColor = true;
@@ -634,14 +636,14 @@ namespace Quotopia
             this.TradesView.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.TradesView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.TradesView.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.TradesView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle23.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle23.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle23.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle23.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle23.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle23.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle23.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.TradesView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle23;
             this.TradesView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.TradesView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Date,
@@ -655,21 +657,22 @@ namespace Quotopia
             this.TradesView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TradesView.EnableHeadersVisualStyles = false;
             this.TradesView.GridColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.TradesView.Location = new System.Drawing.Point(3, 3);
+            this.TradesView.Location = new System.Drawing.Point(4, 4);
+            this.TradesView.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.TradesView.Name = "TradesView";
             this.TradesView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle21.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle21.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle21.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle21.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle21.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle21.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle21.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.TradesView.RowHeadersDefaultCellStyle = dataGridViewCellStyle21;
+            dataGridViewCellStyle25.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle25.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle25.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle25.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle25.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle25.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle25.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.TradesView.RowHeadersDefaultCellStyle = dataGridViewCellStyle25;
             this.TradesView.RowHeadersVisible = false;
             this.TradesView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.TradesView.ShowEditingIcon = false;
-            this.TradesView.Size = new System.Drawing.Size(613, 429);
+            this.TradesView.Size = new System.Drawing.Size(820, 530);
             this.TradesView.TabIndex = 0;
             // 
             // Date
@@ -711,9 +714,9 @@ namespace Quotopia
             // 
             // xPrice
             // 
-            dataGridViewCellStyle2.Format = "N2";
-            dataGridViewCellStyle2.NullValue = null;
-            this.xPrice.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle24.Format = "N2";
+            dataGridViewCellStyle24.NullValue = null;
+            this.xPrice.DefaultCellStyle = dataGridViewCellStyle24;
             this.xPrice.HeaderText = "Price";
             this.xPrice.Name = "xPrice";
             this.xPrice.ReadOnly = true;
@@ -738,18 +741,20 @@ namespace Quotopia
             this.Settings.Controls.Add(this.vizGroupBox);
             this.Settings.ForeColor = System.Drawing.SystemColors.MenuText;
             this.Settings.Location = new System.Drawing.Point(4, 4);
+            this.Settings.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Settings.Name = "Settings";
-            this.Settings.Padding = new System.Windows.Forms.Padding(3);
-            this.Settings.Size = new System.Drawing.Size(619, 435);
+            this.Settings.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Settings.Size = new System.Drawing.Size(828, 538);
             this.Settings.TabIndex = 1;
             this.Settings.Text = "Settings";
             this.Settings.UseVisualStyleBackColor = true;
             // 
             // aboutbut
             // 
-            this.aboutbut.Location = new System.Drawing.Point(203, 13);
+            this.aboutbut.Location = new System.Drawing.Point(271, 16);
+            this.aboutbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.aboutbut.Name = "aboutbut";
-            this.aboutbut.Size = new System.Drawing.Size(59, 23);
+            this.aboutbut.Size = new System.Drawing.Size(79, 28);
             this.aboutbut.TabIndex = 21;
             this.aboutbut.Text = "About";
             this.aboutbut.UseVisualStyleBackColor = true;
@@ -760,10 +765,11 @@ namespace Quotopia
             this.savesymbollist.AutoSize = true;
             this.savesymbollist.Checked = global::Quotopia.Properties.Settings.Default.savesymbollist;
             this.savesymbollist.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::Quotopia.Properties.Settings.Default, "savesymbollist", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.savesymbollist.Location = new System.Drawing.Point(313, 19);
+            this.savesymbollist.Location = new System.Drawing.Point(417, 23);
+            this.savesymbollist.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.savesymbollist.Name = "savesymbollist";
             this.savesymbollist.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.savesymbollist.Size = new System.Drawing.Size(107, 17);
+            this.savesymbollist.Size = new System.Drawing.Size(135, 21);
             this.savesymbollist.TabIndex = 20;
             this.savesymbollist.Text = "Save Symbol List";
             this.savesymbollist.UseVisualStyleBackColor = true;
@@ -773,10 +779,11 @@ namespace Quotopia
             this.saveexitbut.AutoSize = true;
             this.saveexitbut.Checked = global::Quotopia.Properties.Settings.Default.saveonexit;
             this.saveexitbut.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::Quotopia.Properties.Settings.Default, "saveonexit", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.saveexitbut.Location = new System.Drawing.Point(431, 19);
+            this.saveexitbut.Location = new System.Drawing.Point(575, 23);
+            this.saveexitbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.saveexitbut.Name = "saveexitbut";
             this.saveexitbut.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.saveexitbut.Size = new System.Drawing.Size(108, 17);
+            this.saveexitbut.Size = new System.Drawing.Size(134, 21);
             this.saveexitbut.TabIndex = 9;
             this.saveexitbut.Text = "AutoSave on Exit";
             this.saveexitbut.UseVisualStyleBackColor = true;
@@ -794,9 +801,11 @@ namespace Quotopia
             this.boxgroup.Controls.Add(this.boxdlllabel);
             this.boxgroup.Controls.Add(this.LoadDllButton);
             this.boxgroup.Controls.Add(this.minsizelabel);
-            this.boxgroup.Location = new System.Drawing.Point(279, 167);
+            this.boxgroup.Location = new System.Drawing.Point(372, 206);
+            this.boxgroup.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.boxgroup.Name = "boxgroup";
-            this.boxgroup.Size = new System.Drawing.Size(260, 130);
+            this.boxgroup.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.boxgroup.Size = new System.Drawing.Size(347, 160);
             this.boxgroup.TabIndex = 8;
             this.boxgroup.TabStop = false;
             this.boxgroup.Text = "Boxes";
@@ -807,10 +816,11 @@ namespace Quotopia
             this.boxdebug.Checked = global::Quotopia.Properties.Settings.Default.boxdebug;
             this.boxdebug.CheckState = System.Windows.Forms.CheckState.Checked;
             this.boxdebug.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::Quotopia.Properties.Settings.Default, "boxdebug", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.boxdebug.Location = new System.Drawing.Point(155, 50);
+            this.boxdebug.Location = new System.Drawing.Point(207, 62);
+            this.boxdebug.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.boxdebug.Name = "boxdebug";
             this.boxdebug.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.boxdebug.Size = new System.Drawing.Size(99, 17);
+            this.boxdebug.Size = new System.Drawing.Size(123, 21);
             this.boxdebug.TabIndex = 14;
             this.boxdebug.Text = "Box Debugging";
             this.boxdebug.UseVisualStyleBackColor = true;
@@ -819,9 +829,10 @@ namespace Quotopia
             // 
             this.disableboxbut.AutoSize = true;
             this.disableboxbut.Checked = true;
-            this.disableboxbut.Location = new System.Drawing.Point(111, 19);
+            this.disableboxbut.Location = new System.Drawing.Point(148, 23);
+            this.disableboxbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.disableboxbut.Name = "disableboxbut";
-            this.disableboxbut.Size = new System.Drawing.Size(92, 17);
+            this.disableboxbut.Size = new System.Drawing.Size(115, 21);
             this.disableboxbut.TabIndex = 13;
             this.disableboxbut.TabStop = true;
             this.disableboxbut.Text = "Disable Boxes";
@@ -833,9 +844,10 @@ namespace Quotopia
             this.boxenablebox.AutoSize = true;
             this.boxenablebox.Checked = global::Quotopia.Properties.Settings.Default.enablebox;
             this.boxenablebox.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::Quotopia.Properties.Settings.Default, "enablebox", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.boxenablebox.Location = new System.Drawing.Point(10, 19);
+            this.boxenablebox.Location = new System.Drawing.Point(13, 23);
+            this.boxenablebox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.boxenablebox.Name = "boxenablebox";
-            this.boxenablebox.Size = new System.Drawing.Size(90, 17);
+            this.boxenablebox.Size = new System.Drawing.Size(112, 21);
             this.boxenablebox.TabIndex = 12;
             this.boxenablebox.Text = "Enable Boxes";
             this.boxenablebox.UseVisualStyleBackColor = true;
@@ -849,7 +861,8 @@ namespace Quotopia
             0,
             0,
             0});
-            this.minsizebox.Location = new System.Drawing.Point(98, 101);
+            this.minsizebox.Location = new System.Drawing.Point(131, 124);
+            this.minsizebox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.minsizebox.Maximum = new decimal(new int[] {
             100000000,
             0,
@@ -861,7 +874,7 @@ namespace Quotopia
             0,
             0});
             this.minsizebox.Name = "minsizebox";
-            this.minsizebox.Size = new System.Drawing.Size(44, 20);
+            this.minsizebox.Size = new System.Drawing.Size(57, 22);
             this.minsizebox.TabIndex = 11;
             this.minsizebox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.minsizebox.Value = global::Quotopia.Properties.Settings.Default.MinimumSize;
@@ -869,17 +882,19 @@ namespace Quotopia
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(7, 76);
+            this.label6.Location = new System.Drawing.Point(9, 94);
+            this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(87, 13);
+            this.label6.Size = new System.Drawing.Size(114, 17);
             this.label6.TabIndex = 10;
             this.label6.Text = "Unload All Boxes";
             // 
             // unloadallboxbut
             // 
-            this.unloadallboxbut.Location = new System.Drawing.Point(122, 73);
+            this.unloadallboxbut.Location = new System.Drawing.Point(163, 90);
+            this.unloadallboxbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.unloadallboxbut.Name = "unloadallboxbut";
-            this.unloadallboxbut.Size = new System.Drawing.Size(20, 18);
+            this.unloadallboxbut.Size = new System.Drawing.Size(27, 22);
             this.unloadallboxbut.TabIndex = 9;
             this.unloadallboxbut.UseVisualStyleBackColor = true;
             this.unloadallboxbut.Click += new System.EventHandler(this.unloadallboxbut_Click);
@@ -887,9 +902,10 @@ namespace Quotopia
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(156, 108);
+            this.label5.Location = new System.Drawing.Point(208, 133);
+            this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(47, 13);
+            this.label5.Size = new System.Drawing.Size(60, 17);
             this.label5.TabIndex = 8;
             this.label5.Text = "MaxSize";
             // 
@@ -901,7 +917,8 @@ namespace Quotopia
             0,
             0,
             0});
-            this.maxsize.Location = new System.Drawing.Point(209, 101);
+            this.maxsize.Location = new System.Drawing.Point(279, 124);
+            this.maxsize.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.maxsize.Maximum = new decimal(new int[] {
             100000000,
             0,
@@ -913,7 +930,7 @@ namespace Quotopia
             0,
             0});
             this.maxsize.Name = "maxsize";
-            this.maxsize.Size = new System.Drawing.Size(45, 20);
+            this.maxsize.Size = new System.Drawing.Size(59, 22);
             this.maxsize.TabIndex = 7;
             this.maxsize.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.maxsize.Value = global::Quotopia.Properties.Settings.Default.MaximumSize;
@@ -921,17 +938,19 @@ namespace Quotopia
             // boxdlllabel
             // 
             this.boxdlllabel.AutoSize = true;
-            this.boxdlllabel.Location = new System.Drawing.Point(7, 52);
+            this.boxdlllabel.Location = new System.Drawing.Point(9, 64);
+            this.boxdlllabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.boxdlllabel.Name = "boxdlllabel";
-            this.boxdlllabel.Size = new System.Drawing.Size(109, 13);
+            this.boxdlllabel.Size = new System.Drawing.Size(144, 17);
             this.boxdlllabel.TabIndex = 1;
             this.boxdlllabel.Text = "Load Boxes from DLL";
             // 
             // LoadDllButton
             // 
-            this.LoadDllButton.Location = new System.Drawing.Point(122, 50);
+            this.LoadDllButton.Location = new System.Drawing.Point(163, 62);
+            this.LoadDllButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.LoadDllButton.Name = "LoadDllButton";
-            this.LoadDllButton.Size = new System.Drawing.Size(20, 17);
+            this.LoadDllButton.Size = new System.Drawing.Size(27, 21);
             this.LoadDllButton.TabIndex = 0;
             this.LoadDllButton.UseVisualStyleBackColor = true;
             this.LoadDllButton.Click += new System.EventHandler(this.LoadDllButton_Click);
@@ -939,17 +958,19 @@ namespace Quotopia
             // minsizelabel
             // 
             this.minsizelabel.AutoSize = true;
-            this.minsizelabel.Location = new System.Drawing.Point(6, 108);
+            this.minsizelabel.Location = new System.Drawing.Point(8, 133);
+            this.minsizelabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.minsizelabel.Name = "minsizelabel";
-            this.minsizelabel.Size = new System.Drawing.Size(73, 13);
+            this.minsizelabel.Size = new System.Drawing.Size(96, 17);
             this.minsizelabel.TabIndex = 6;
             this.minsizelabel.Text = "Default Adjust";
             // 
             // resetsetbut
             // 
-            this.resetsetbut.Location = new System.Drawing.Point(72, 13);
+            this.resetsetbut.Location = new System.Drawing.Point(96, 16);
+            this.resetsetbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.resetsetbut.Name = "resetsetbut";
-            this.resetsetbut.Size = new System.Drawing.Size(59, 23);
+            this.resetsetbut.Size = new System.Drawing.Size(79, 28);
             this.resetsetbut.TabIndex = 6;
             this.resetsetbut.Text = "Discard";
             this.resetsetbut.UseVisualStyleBackColor = true;
@@ -957,9 +978,10 @@ namespace Quotopia
             // 
             // restoredefaultsbut
             // 
-            this.restoredefaultsbut.Location = new System.Drawing.Point(137, 13);
+            this.restoredefaultsbut.Location = new System.Drawing.Point(183, 16);
+            this.restoredefaultsbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.restoredefaultsbut.Name = "restoredefaultsbut";
-            this.restoredefaultsbut.Size = new System.Drawing.Size(60, 23);
+            this.restoredefaultsbut.Size = new System.Drawing.Size(80, 28);
             this.restoredefaultsbut.TabIndex = 5;
             this.restoredefaultsbut.Text = "Defaults";
             this.restoredefaultsbut.UseVisualStyleBackColor = true;
@@ -967,9 +989,10 @@ namespace Quotopia
             // 
             // saveSettingsbut
             // 
-            this.saveSettingsbut.Location = new System.Drawing.Point(6, 13);
+            this.saveSettingsbut.Location = new System.Drawing.Point(8, 16);
+            this.saveSettingsbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.saveSettingsbut.Name = "saveSettingsbut";
-            this.saveSettingsbut.Size = new System.Drawing.Size(61, 23);
+            this.saveSettingsbut.Size = new System.Drawing.Size(81, 28);
             this.saveSettingsbut.TabIndex = 4;
             this.saveSettingsbut.Text = "Save";
             this.saveSettingsbut.UseVisualStyleBackColor = true;
@@ -979,12 +1002,13 @@ namespace Quotopia
             // 
             this.datagroup.Controls.Add(this.saveticks);
             this.datagroup.Controls.Add(this.archivefolderbut);
-            this.datagroup.Controls.Add(this.histsimbut);
             this.datagroup.Controls.Add(this.liveanvilbut);
             this.datagroup.Controls.Add(this.simAnvilbut);
-            this.datagroup.Location = new System.Drawing.Point(279, 42);
+            this.datagroup.Location = new System.Drawing.Point(372, 52);
+            this.datagroup.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.datagroup.Name = "datagroup";
-            this.datagroup.Size = new System.Drawing.Size(260, 119);
+            this.datagroup.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.datagroup.Size = new System.Drawing.Size(347, 146);
             this.datagroup.TabIndex = 2;
             this.datagroup.TabStop = false;
             this.datagroup.Text = "Data";
@@ -994,45 +1018,36 @@ namespace Quotopia
             this.saveticks.AutoSize = true;
             this.saveticks.Checked = true;
             this.saveticks.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.saveticks.Location = new System.Drawing.Point(10, 96);
+            this.saveticks.Location = new System.Drawing.Point(13, 118);
+            this.saveticks.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.saveticks.Name = "saveticks";
-            this.saveticks.Size = new System.Drawing.Size(122, 17);
+            this.saveticks.Size = new System.Drawing.Size(155, 21);
             this.saveticks.TabIndex = 11;
             this.saveticks.Text = "Save ticks for replay";
             this.saveticks.UseVisualStyleBackColor = true;
             // 
             // archivefolderbut
             // 
-            this.archivefolderbut.Location = new System.Drawing.Point(138, 92);
+            this.archivefolderbut.Location = new System.Drawing.Point(184, 113);
+            this.archivefolderbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.archivefolderbut.Name = "archivefolderbut";
-            this.archivefolderbut.Size = new System.Drawing.Size(109, 23);
+            this.archivefolderbut.Size = new System.Drawing.Size(145, 28);
             this.archivefolderbut.TabIndex = 10;
             this.archivefolderbut.Text = "Save Location";
             this.archivefolderbut.UseVisualStyleBackColor = true;
             this.archivefolderbut.Click += new System.EventHandler(this.archivefolderbut_Click);
             // 
-            // histsimbut
-            // 
-            this.histsimbut.AutoSize = true;
-            this.histsimbut.Location = new System.Drawing.Point(10, 68);
-            this.histsimbut.Name = "histsimbut";
-            this.histsimbut.Size = new System.Drawing.Size(82, 17);
-            this.histsimbut.TabIndex = 9;
-            this.histsimbut.TabStop = true;
-            this.histsimbut.Text = "Tick Replay";
-            this.histsimbut.UseVisualStyleBackColor = true;
-            this.histsimbut.Click += new System.EventHandler(this.histsimbut_CheckedChanged);
-            // 
             // liveanvilbut
             // 
             this.liveanvilbut.AutoSize = true;
-            this.liveanvilbut.Location = new System.Drawing.Point(10, 45);
+            this.liveanvilbut.Location = new System.Drawing.Point(13, 55);
+            this.liveanvilbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.liveanvilbut.Name = "liveanvilbut";
             this.liveanvilbut.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.liveanvilbut.Size = new System.Drawing.Size(71, 17);
+            this.liveanvilbut.Size = new System.Drawing.Size(98, 21);
             this.liveanvilbut.TabIndex = 8;
             this.liveanvilbut.TabStop = true;
-            this.liveanvilbut.Text = "Live Anvil";
+            this.liveanvilbut.Text = "Live Broker";
             this.liveanvilbut.UseVisualStyleBackColor = true;
             this.liveanvilbut.Click += new System.EventHandler(this.liveanvilbut_CheckedChanged);
             // 
@@ -1040,13 +1055,14 @@ namespace Quotopia
             // 
             this.simAnvilbut.AutoSize = true;
             this.simAnvilbut.Checked = true;
-            this.simAnvilbut.Location = new System.Drawing.Point(10, 23);
+            this.simAnvilbut.Location = new System.Drawing.Point(13, 28);
+            this.simAnvilbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.simAnvilbut.Name = "simAnvilbut";
             this.simAnvilbut.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.simAnvilbut.Size = new System.Drawing.Size(99, 17);
+            this.simAnvilbut.Size = new System.Drawing.Size(137, 21);
             this.simAnvilbut.TabIndex = 7;
             this.simAnvilbut.TabStop = true;
-            this.simAnvilbut.Text = "Simulation Anvil";
+            this.simAnvilbut.Text = "Simulation Broker";
             this.simAnvilbut.UseVisualStyleBackColor = true;
             this.simAnvilbut.Click += new System.EventHandler(this.simAnvilbut_CheckedChanged);
             // 
@@ -1066,9 +1082,11 @@ namespace Quotopia
             this.vizGroupBox.Controls.Add(this.fontBut);
             this.vizGroupBox.Controls.Add(this.bgCollabel);
             this.vizGroupBox.Controls.Add(this.bgcolbut);
-            this.vizGroupBox.Location = new System.Drawing.Point(8, 46);
+            this.vizGroupBox.Location = new System.Drawing.Point(11, 57);
+            this.vizGroupBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.vizGroupBox.Name = "vizGroupBox";
-            this.vizGroupBox.Size = new System.Drawing.Size(265, 251);
+            this.vizGroupBox.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.vizGroupBox.Size = new System.Drawing.Size(353, 309);
             this.vizGroupBox.TabIndex = 1;
             this.vizGroupBox.TabStop = false;
             this.vizGroupBox.Text = "Appearance";
@@ -1076,17 +1094,19 @@ namespace Quotopia
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(129, 76);
+            this.label9.Location = new System.Drawing.Point(172, 94);
+            this.label9.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(58, 13);
+            this.label9.Size = new System.Drawing.Size(77, 17);
             this.label9.TabIndex = 21;
             this.label9.Text = "Chart color";
             // 
             // chartcolbut
             // 
-            this.chartcolbut.Location = new System.Drawing.Point(233, 76);
+            this.chartcolbut.Location = new System.Drawing.Point(311, 94);
+            this.chartcolbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.chartcolbut.Name = "chartcolbut";
-            this.chartcolbut.Size = new System.Drawing.Size(21, 18);
+            this.chartcolbut.Size = new System.Drawing.Size(28, 22);
             this.chartcolbut.TabIndex = 20;
             this.chartcolbut.UseVisualStyleBackColor = true;
             this.chartcolbut.Click += new System.EventHandler(this.chartcolbut_Click);
@@ -1094,35 +1114,39 @@ namespace Quotopia
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(129, 51);
+            this.label8.Location = new System.Drawing.Point(172, 63);
+            this.label8.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(102, 13);
+            this.label8.Size = new System.Drawing.Size(136, 17);
             this.label8.TabIndex = 19;
             this.label8.Text = "Header Font + Color";
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(129, 25);
+            this.label7.Location = new System.Drawing.Point(172, 31);
+            this.label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(102, 13);
+            this.label7.Size = new System.Drawing.Size(134, 17);
             this.label7.TabIndex = 18;
             this.label7.Text = "Header background";
             // 
             // colheadfgcolbut
             // 
-            this.colheadfgcolbut.Location = new System.Drawing.Point(233, 46);
+            this.colheadfgcolbut.Location = new System.Drawing.Point(311, 57);
+            this.colheadfgcolbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.colheadfgcolbut.Name = "colheadfgcolbut";
-            this.colheadfgcolbut.Size = new System.Drawing.Size(21, 21);
+            this.colheadfgcolbut.Size = new System.Drawing.Size(28, 26);
             this.colheadfgcolbut.TabIndex = 17;
             this.colheadfgcolbut.UseVisualStyleBackColor = true;
             this.colheadfgcolbut.Click += new System.EventHandler(this.colheadfgcolbut_Click);
             // 
             // colheadcolbut
             // 
-            this.colheadcolbut.Location = new System.Drawing.Point(234, 19);
+            this.colheadcolbut.Location = new System.Drawing.Point(312, 23);
+            this.colheadcolbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.colheadcolbut.Name = "colheadcolbut";
-            this.colheadcolbut.Size = new System.Drawing.Size(20, 22);
+            this.colheadcolbut.Size = new System.Drawing.Size(27, 27);
             this.colheadcolbut.TabIndex = 16;
             this.colheadcolbut.UseVisualStyleBackColor = true;
             this.colheadcolbut.Click += new System.EventHandler(this.colheadcolbut_Click);
@@ -1135,9 +1159,11 @@ namespace Quotopia
             this.groupBox2.Controls.Add(this.button2);
             this.groupBox2.Controls.Add(this.button1);
             this.groupBox2.Controls.Add(this.label1);
-            this.groupBox2.Location = new System.Drawing.Point(3, 100);
+            this.groupBox2.Location = new System.Drawing.Point(4, 123);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(257, 74);
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox2.Size = new System.Drawing.Size(343, 91);
             this.groupBox2.TabIndex = 15;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Ticks";
@@ -1146,9 +1172,10 @@ namespace Quotopia
             // 
             this.tcolfgbut.AutoSize = true;
             this.tcolfgbut.Checked = true;
-            this.tcolfgbut.Location = new System.Drawing.Point(148, 17);
+            this.tcolfgbut.Location = new System.Drawing.Point(197, 21);
+            this.tcolfgbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tcolfgbut.Name = "tcolfgbut";
-            this.tcolfgbut.Size = new System.Drawing.Size(103, 17);
+            this.tcolfgbut.Size = new System.Drawing.Size(133, 21);
             this.tcolfgbut.TabIndex = 13;
             this.tcolfgbut.TabStop = true;
             this.tcolfgbut.Text = "Color foreground";
@@ -1158,9 +1185,10 @@ namespace Quotopia
             // tcolbgbut
             // 
             this.tcolbgbut.AutoSize = true;
-            this.tcolbgbut.Location = new System.Drawing.Point(148, 45);
+            this.tcolbgbut.Location = new System.Drawing.Point(197, 55);
+            this.tcolbgbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tcolbgbut.Name = "tcolbgbut";
-            this.tcolbgbut.Size = new System.Drawing.Size(109, 17);
+            this.tcolbgbut.Size = new System.Drawing.Size(138, 21);
             this.tcolbgbut.TabIndex = 12;
             this.tcolbgbut.Text = "Color background";
             this.tcolbgbut.UseVisualStyleBackColor = true;
@@ -1168,26 +1196,29 @@ namespace Quotopia
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 21);
+            this.label2.Location = new System.Drawing.Point(8, 26);
+            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(78, 13);
+            this.label2.Size = new System.Drawing.Size(99, 17);
             this.label2.TabIndex = 11;
             this.label2.Text = "Downtick color";
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(100, 16);
+            this.button2.Location = new System.Drawing.Point(133, 20);
+            this.button2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(20, 18);
+            this.button2.Size = new System.Drawing.Size(27, 22);
             this.button2.TabIndex = 7;
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(100, 44);
+            this.button1.Location = new System.Drawing.Point(133, 54);
+            this.button1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(20, 18);
+            this.button1.Size = new System.Drawing.Size(27, 22);
             this.button1.TabIndex = 6;
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
@@ -1195,9 +1226,10 @@ namespace Quotopia
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 50);
+            this.label1.Location = new System.Drawing.Point(8, 62);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(64, 13);
+            this.label1.Size = new System.Drawing.Size(82, 17);
             this.label1.TabIndex = 10;
             this.label1.Text = "Uptick color";
             // 
@@ -1209,9 +1241,11 @@ namespace Quotopia
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.button3);
-            this.groupBox1.Location = new System.Drawing.Point(3, 180);
+            this.groupBox1.Location = new System.Drawing.Point(4, 222);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(257, 65);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox1.Size = new System.Drawing.Size(343, 80);
             this.groupBox1.TabIndex = 14;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Highs and Lows";
@@ -1219,9 +1253,10 @@ namespace Quotopia
             // hlcolfgbut
             // 
             this.hlcolfgbut.AutoSize = true;
-            this.hlcolfgbut.Location = new System.Drawing.Point(148, 19);
+            this.hlcolfgbut.Location = new System.Drawing.Point(197, 23);
+            this.hlcolfgbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.hlcolfgbut.Name = "hlcolfgbut";
-            this.hlcolfgbut.Size = new System.Drawing.Size(103, 17);
+            this.hlcolfgbut.Size = new System.Drawing.Size(133, 21);
             this.hlcolfgbut.TabIndex = 15;
             this.hlcolfgbut.Text = "Color foreground";
             this.hlcolfgbut.UseVisualStyleBackColor = true;
@@ -1230,9 +1265,10 @@ namespace Quotopia
             // 
             this.hlcolbgbut.AutoSize = true;
             this.hlcolbgbut.Checked = true;
-            this.hlcolbgbut.Location = new System.Drawing.Point(148, 42);
+            this.hlcolbgbut.Location = new System.Drawing.Point(197, 52);
+            this.hlcolbgbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.hlcolbgbut.Name = "hlcolbgbut";
-            this.hlcolbgbut.Size = new System.Drawing.Size(109, 17);
+            this.hlcolbgbut.Size = new System.Drawing.Size(138, 21);
             this.hlcolbgbut.TabIndex = 14;
             this.hlcolbgbut.TabStop = true;
             this.hlcolbgbut.Text = "Color background";
@@ -1241,9 +1277,10 @@ namespace Quotopia
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(100, 15);
+            this.button4.Location = new System.Drawing.Point(133, 18);
+            this.button4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(21, 17);
+            this.button4.Size = new System.Drawing.Size(28, 21);
             this.button4.TabIndex = 9;
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
@@ -1251,26 +1288,29 @@ namespace Quotopia
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(6, 44);
+            this.label3.Location = new System.Drawing.Point(8, 54);
+            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(74, 13);
+            this.label3.Size = new System.Drawing.Size(97, 17);
             this.label3.TabIndex = 12;
             this.label3.Text = "DayHigh color";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(6, 21);
+            this.label4.Location = new System.Drawing.Point(8, 26);
+            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(72, 13);
+            this.label4.Size = new System.Drawing.Size(93, 17);
             this.label4.TabIndex = 13;
             this.label4.Text = "DayLow color";
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(101, 41);
+            this.button3.Location = new System.Drawing.Point(135, 50);
+            this.button3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(20, 18);
+            this.button3.Size = new System.Drawing.Size(27, 22);
             this.button3.TabIndex = 8;
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
@@ -1278,17 +1318,19 @@ namespace Quotopia
             // gridcolorlab
             // 
             this.gridcolorlab.AutoSize = true;
-            this.gridcolorlab.Location = new System.Drawing.Point(6, 76);
+            this.gridcolorlab.Location = new System.Drawing.Point(8, 94);
+            this.gridcolorlab.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.gridcolorlab.Name = "gridcolorlab";
-            this.gridcolorlab.Size = new System.Drawing.Size(53, 13);
+            this.gridcolorlab.Size = new System.Drawing.Size(72, 17);
             this.gridcolorlab.TabIndex = 5;
             this.gridcolorlab.Text = "Grid Color";
             // 
             // gridcolorbut
             // 
-            this.gridcolorbut.Location = new System.Drawing.Point(103, 76);
+            this.gridcolorbut.Location = new System.Drawing.Point(137, 94);
+            this.gridcolorbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.gridcolorbut.Name = "gridcolorbut";
-            this.gridcolorbut.Size = new System.Drawing.Size(20, 18);
+            this.gridcolorbut.Size = new System.Drawing.Size(27, 22);
             this.gridcolorbut.TabIndex = 4;
             this.gridcolorbut.UseVisualStyleBackColor = true;
             this.gridcolorbut.Click += new System.EventHandler(this.gridcolorbut_Click);
@@ -1296,17 +1338,19 @@ namespace Quotopia
             // fntlabel
             // 
             this.fntlabel.AutoSize = true;
-            this.fntlabel.Location = new System.Drawing.Point(6, 51);
+            this.fntlabel.Location = new System.Drawing.Point(8, 63);
+            this.fntlabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.fntlabel.Name = "fntlabel";
-            this.fntlabel.Size = new System.Drawing.Size(64, 13);
+            this.fntlabel.Size = new System.Drawing.Size(85, 17);
             this.fntlabel.TabIndex = 3;
             this.fntlabel.Text = "Font + Color";
             // 
             // fontBut
             // 
-            this.fontBut.Location = new System.Drawing.Point(103, 47);
+            this.fontBut.Location = new System.Drawing.Point(137, 58);
+            this.fontBut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.fontBut.Name = "fontBut";
-            this.fontBut.Size = new System.Drawing.Size(20, 20);
+            this.fontBut.Size = new System.Drawing.Size(27, 25);
             this.fontBut.TabIndex = 2;
             this.fontBut.UseVisualStyleBackColor = true;
             this.fontBut.Click += new System.EventHandler(this.fontBut_Click);
@@ -1314,17 +1358,19 @@ namespace Quotopia
             // bgCollabel
             // 
             this.bgCollabel.AutoSize = true;
-            this.bgCollabel.Location = new System.Drawing.Point(6, 25);
+            this.bgCollabel.Location = new System.Drawing.Point(8, 31);
+            this.bgCollabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.bgCollabel.Name = "bgCollabel";
-            this.bgCollabel.Size = new System.Drawing.Size(91, 13);
+            this.bgCollabel.Size = new System.Drawing.Size(119, 17);
             this.bgCollabel.TabIndex = 1;
             this.bgCollabel.Text = "Background color";
             // 
             // bgcolbut
             // 
-            this.bgcolbut.Location = new System.Drawing.Point(103, 21);
+            this.bgcolbut.Location = new System.Drawing.Point(137, 26);
+            this.bgcolbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.bgcolbut.Name = "bgcolbut";
-            this.bgcolbut.Size = new System.Drawing.Size(20, 20);
+            this.bgcolbut.Size = new System.Drawing.Size(27, 25);
             this.bgcolbut.TabIndex = 0;
             this.bgcolbut.UseVisualStyleBackColor = true;
             this.bgcolbut.Click += new System.EventHandler(this.bgcolbut_Click);
@@ -1334,8 +1380,9 @@ namespace Quotopia
             this.LogTab.BackColor = System.Drawing.Color.Transparent;
             this.LogTab.Controls.Add(this.statusWindow);
             this.LogTab.Location = new System.Drawing.Point(4, 4);
+            this.LogTab.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.LogTab.Name = "LogTab";
-            this.LogTab.Size = new System.Drawing.Size(619, 435);
+            this.LogTab.Size = new System.Drawing.Size(828, 538);
             this.LogTab.TabIndex = 2;
             this.LogTab.Text = "Messages";
             this.LogTab.UseVisualStyleBackColor = true;
@@ -1348,9 +1395,10 @@ namespace Quotopia
             this.statusWindow.Dock = System.Windows.Forms.DockStyle.Fill;
             this.statusWindow.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.statusWindow.Location = new System.Drawing.Point(0, 0);
+            this.statusWindow.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.statusWindow.Name = "statusWindow";
             this.statusWindow.ReadOnly = true;
-            this.statusWindow.Size = new System.Drawing.Size(619, 435);
+            this.statusWindow.Size = new System.Drawing.Size(828, 538);
             this.statusWindow.TabIndex = 0;
             this.statusWindow.Text = "";
             this.statusWindow.DoubleClick += new System.EventHandler(this.clearDebugButton_Click_1);
@@ -1399,15 +1447,16 @@ namespace Quotopia
             // 
             // Quote
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.WindowFrame;
-            this.ClientSize = new System.Drawing.Size(627, 461);
+            this.ClientSize = new System.Drawing.Size(836, 567);
             this.Controls.Add(this.quoteTab);
             this.DataBindings.Add(new System.Windows.Forms.Binding("Location", global::Quotopia.Properties.Settings.Default, "location", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.ForeColor = System.Drawing.SystemColors.Window;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Location = global::Quotopia.Properties.Settings.Default.location;
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "Quote";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Quotopia";
@@ -1480,7 +1529,6 @@ namespace Quotopia
         private System.Windows.Forms.Button restoredefaultsbut;
         private System.Windows.Forms.Button resetsetbut;
         private System.Windows.Forms.RadioButton simAnvilbut;
-        private System.Windows.Forms.RadioButton histsimbut;
         private System.Windows.Forms.RadioButton liveanvilbut;
         private System.Windows.Forms.DataGridViewTextBoxColumn Date;
         private System.Windows.Forms.DataGridViewTextBoxColumn Time;

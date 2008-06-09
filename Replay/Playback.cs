@@ -42,7 +42,7 @@ namespace TLReplay
             int lines = 0;
             int factorsize = 100;
             TickLink link = new TickLink();
-            TradeLink_WM tl = sp.tl;
+            TradeLink_Server_WM tl = sp.tl;
             tl.gotSrvFillRequest += new OrderDelegate(tl_gotSrvFillRequest);
            
 
@@ -125,8 +125,8 @@ namespace TLReplay
         public string Symbol { get { return sym; } set { sym = value; } }
         public int Ticks { get { return approxticks; } set { approxticks = value; } }
         public decimal DelayMult { get { return delay; } set { delay = value; } }
-        public TradeLink_WM tl = null;
-        public StockPlayBackArgs(StreamReader EPFfile,TradeLink_WM tlink) 
+        public TradeLink_Server_WM tl = null;
+        public StockPlayBackArgs(StreamReader EPFfile,TradeLink_Server_WM tlink) 
         {
             tl = tlink;
             cf = EPFfile; 
@@ -147,12 +147,12 @@ namespace TLReplay
 
     public class IndexArgs
     {
-        public TradeLink_WM tl = null;
+        public TradeLink_Server_WM tl = null;
         public StreamReader cf = null;
         string index = "";
         public string Index { get { return index; } }
         public decimal DelayMult = 0;
-        public IndexArgs(string name, StreamReader indexfile, TradeLink_WM link)
+        public IndexArgs(string name, StreamReader indexfile, TradeLink_Server_WM link)
         {
             cf = indexfile;
             index = name;
@@ -214,8 +214,8 @@ namespace TLReplay
         int delay = 1;
         public void ExchFilter(string ExchangeFilter) { exfilter = ExchangeFilter.Trim(); }
         public void DelayMult(int delay) { this.delay = delay; }
-        TradeLink_WM tl = null;
-        public TradeLink_WM TLInst { get { return tl; } set { tl = value; } }
+        TradeLink_Server_WM tl = null;
+        public TradeLink_Server_WM TLInst { get { return tl; } set { tl = value; } }
 
         public DayPlayback(string tickdatapath) : this (tickdatapath,"","(SP#F)|([.]IDX)") { }
         public DayPlayback(string tickdatapath,string include) : this(tickdatapath,include,"(SP#F)|([.]IDX)") { }

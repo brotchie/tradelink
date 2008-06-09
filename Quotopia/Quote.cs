@@ -28,38 +28,7 @@ namespace Quotopia
         {
             InitializeComponent();
             Size = Quotopia.Properties.Settings.Default.wsize;
-            show("Quotopia" + Ver + " (Tradelink" + tl.Ver + ")");
-            string name = "Quotopia";
-
-            if (TradeLink_WM.Found(name))
-            {
-                int inst = -1;
-                do
-                {
-                    inst++;
-                } while (TradeLink_WM.Found(name + "." + inst.ToString()));
-                name += "."+inst.ToString();
-            }
-            this.Text = name;
-            tl.MeH = this.Handle; // gives our window handle to tradelink
-            tl.Me = this.Text; // gives tradelink our window name
-            try
-            {
-                TLTypes mode = (TLTypes)Properties.Settings.Default.tlmode;
-                SimStateChanged(mode,false);
-            }
-            catch (TLServerNotFound)
-            {
-                TLTypes srvs = tl.TLFound();
-                if ((srvs & TLTypes.SIMANVIL) == TLTypes.SIMANVIL) SimStateChanged(TLTypes.SIMANVIL);
-                else if ((srvs & TLTypes.TLREPLAY) == TLTypes.TLREPLAY) SimStateChanged(TLTypes.TLREPLAY);
-                else if ((srvs & TLTypes.LIVEANVIL) == TLTypes.LIVEANVIL) SimStateChanged(TLTypes.LIVEANVIL);
-                else
-                {
-                    MessageBox.Show("You must start Replay or Anvil+TradeLink to use Quotopia.", "TradeLink Server not found");
-                    simAnvilbut.Checked = false;
-                }
-            }
+            show(Text + Ver + " (Tradelink" + tl.Ver + ")");
             
             tl.gotTick += new TickDelegate(tl_gotTickWrap);
             tl.gotFill += new FillDelegate(tl_gotFill);
@@ -457,7 +426,7 @@ namespace Quotopia
                     
             }
         }
-        TradeLink_WM tl = new TradeLink_WM();
+        TradeLink_Client_WM tl = new TradeLink_Client_WM("Quotopia",true);
         ~Quote() { QuotopiaClose(); }
         void QuotopiaClose()
         {
@@ -597,15 +566,6 @@ namespace Quotopia
         }
 
 
-        protected override void  WndProc(ref Message m)
-
-        {
-            tl.GotWM_Copy(ref m);
-            base.WndProc(ref m);
-        }
-
-        
-
         private void bgcolbut_Click(object sender, EventArgs e)
         {
             ColorDialog bg = new ColorDialog();
@@ -641,7 +601,7 @@ namespace Quotopia
         {
             switch (mode)
             {
-                case TLTypes.LIVEANVIL:
+                case TLTypes.LIVEBROKER:
                     if (HandleExceptions)
                     {
                         try
@@ -661,7 +621,7 @@ namespace Quotopia
                     liveanvilbut.Checked = true;
                     archivefolderbut.Enabled = true;
                     break;
-                case TLTypes.SIMANVIL:
+                case TLTypes.SIMBROKER:
                     if (HandleExceptions)
                     {
                         try
@@ -681,26 +641,6 @@ namespace Quotopia
                     saveticks.Enabled = true;
                     simAnvilbut.Checked = true;
                     archivefolderbut.Enabled = true;
-                    break;
-                case TLTypes.TLREPLAY:
-                    if (HandleExceptions)
-                    {
-                        try
-                        {
-                            tl.GoHist();
-                        }
-                        catch (TLServerNotFound) 
-                        { 
-                            MessageBox.Show("TradeLink Replay not found. Please start TradeLink Replay.", "TradeLink Server not found");
-                            histsimbut.Checked = false;
-                            return; 
-                        }
-                    }
-                    else tl.GoHist();
-                    saveticks.Checked = false;
-                    saveticks.Enabled = false;
-                    archivefolderbut.Enabled = false;
-                    histsimbut.Checked = true;
                     break;
             }
             Quotopia.Properties.Settings.Default.tlmode = (int)mode;
@@ -809,7 +749,7 @@ namespace Quotopia
                 if (r != 0)
                 {
                     //setBg(e.RowIndex,"SymbolCol",Color.Yellow);
-                    showc(o.ToString()+" [ANVILERROR: (" + r + ") " + TradeLink.PrettyAnvilError(r) + "] ",Color.Red);
+                    showc(o.ToString()+" [ANVILERROR: (" + r + ") " + Util.PrettyError(tl.BrokerName,r) + "] ",Color.Red);
                 }
                 //else setBg(e.RowIndex,"SymbolCol",MarketsView.RowTemplate.DefaultCellStyle.BackColor);
             }
@@ -823,7 +763,7 @@ namespace Quotopia
                 if (r != 0)
                 {
                     //setBg(e.RowIndex, "SymbolCol", Color.Yellow);
-                    showc(o.ToString() + " [ANVILERROR: (" + r + ") " + TradeLink.PrettyAnvilError(r) + "] ", Color.Red);
+                    showc(o.ToString() + " [ANVILERROR: (" + r + ") " + Util.PrettyError(tl.BrokerName,r) + "] ", Color.Red);
                 }
                 //else setBg(e.RowIndex, "SymbolCol", MarketsView.RowTemplate.DefaultCellStyle.BackColor);
             }
@@ -834,7 +774,7 @@ namespace Quotopia
             sendOrder.time = GetTime;
             sendOrder.date = GetDate;
             int r = tl.SendOrder(sendOrder);
-            if (r != 0) showc(sendOrder.ToString() + " [ANVILERROR: (" + r + ") " + TradeLink.PrettyAnvilError(r) + "] ", Color.Red);
+            if (r != 0) showc(sendOrder.ToString() + " [ANVILERROR: (" + r + ") " + Util.PrettyError(tl.BrokerName,r) + "] ", Color.Red);
             if (orderStatus != null) orderStatus(sendOrder.symbol, r);
         }
 
@@ -1069,12 +1009,12 @@ namespace Quotopia
 
         private void liveanvilbut_CheckedChanged(object sender, EventArgs e)
         {
-            SimStateChanged(TLTypes.LIVEANVIL);
+            SimStateChanged(TLTypes.LIVEBROKER);
         }
 
         private void simAnvilbut_CheckedChanged(object sender, EventArgs e)
         {
-            SimStateChanged(TLTypes.SIMANVIL);
+            SimStateChanged(TLTypes.SIMBROKER);
         }
 
         private void archivefolderbut_Click(object sender, EventArgs e)
@@ -1085,10 +1025,6 @@ namespace Quotopia
             Quotopia.Properties.Settings.Default.ticfolderpath = f.SelectedPath;
         }
 
-        private void histsimbut_CheckedChanged(object sender, EventArgs e)
-        {
-            SimStateChanged(TLTypes.TLREPLAY);
-        }
 
         private void MarketsView_MouseUp(object sender, MouseEventArgs e)
         {

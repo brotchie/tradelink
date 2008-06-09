@@ -56,7 +56,6 @@
     <Compile Include="TestTickWatcher.cs" />
     <Compile Include="TestTrade.cs" />
     <Compile Include="TestTradeLink_WM.cs">
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="TestUtil.cs" />
   </ItemGroup>

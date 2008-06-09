@@ -11,7 +11,7 @@ namespace TLReplay
 {
     public partial class Replay : Form
     {
-        TradeLink_WM tl = new TradeLink_WM();
+        TradeLink_Server_WM tl;
         DayPlayback play = null;
         Broker broker = new Broker();
 
@@ -19,10 +19,7 @@ namespace TLReplay
         public Replay()
         {
             InitializeComponent();
-            tl.MeH = this.Handle;
-            tl.Me = Text;
-            tl.GoSrv();
-
+            tl = new TradeLink_Server_WM(Text);
         }
 
 
@@ -48,11 +45,6 @@ namespace TLReplay
             TLReplay.Properties.Settings.Default.tickfolderpath = f.SelectedPath;
         }
 
-        protected override void WndProc(ref Message m)
-        {
-            tl.GotWM_Copy(ref m);
-            base.WndProc(ref m);
-        }
 
         private void gobut_Click(object sender, EventArgs e)
         {

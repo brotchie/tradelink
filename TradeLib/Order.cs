@@ -96,7 +96,6 @@ namespace TradeLib
         /// <returns></returns>
         public override string Serialize()
         {
-            const char d = ',';
             if (this.isFilled) return base.Serialize();
             //return symbol + d + (side ? "true" : "false")+d + Math.Abs(size) + d + price + d + stopp + d + comment + d + ex + d + accountid + d + this.Security.ToString() + d + this.Currency.ToString() + d + LocalSymbol;
             string [] r = new string[] { symbol,(side ? "true" : "false"),UnSignedSize.ToString(),price.ToString(),stopp.ToString(),comment,ex,accountid,this.Security.ToString(),this.Currency.ToString(),LocalSymbol,id.ToString(),TIF};
