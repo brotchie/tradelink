@@ -15,6 +15,7 @@ namespace box
         public bool ZeroAvgVolIsBig { get { return _zerovolavgisbig; } set { _zerovolavgisbig = value; } }
         public decimal BigVolumePercentage { get { return _bigvolper; } set { _bigvolper = value; } }
         public decimal BladePercentage { get { return _percent; } set { _percent = value; } }
+        public Blade() { }
         public Blade(decimal BladePercent) { _percent = BladePercent; }
         public Blade(decimal BladePercent, decimal BigVolPercent) { _percent = BladePercent; _bigvolper = BigVolPercent; }
         public decimal AvgVol(BarList bl) // gets the average volume across all bars
