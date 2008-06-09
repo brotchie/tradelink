@@ -18,11 +18,11 @@ namespace TradeLib
 
 
         // clients to server
-        public override void Register() { TLSend(TL2.REGISTERCLIENT); }
-        public override void Subscribe(MarketBasket mb) { TLSend(new LinkMessage(TL2.REGISTERSTOCK, mb)); }
-        public override void Disconnect() { TLSend(TL2.CLEARSTOCKS); TLSend(TL2.CLEARCLIENT); }
-        public override void Unsubscribe() { TLSend(TL2.CLEARSTOCKS); }
-        public override int HeartBeat() { return 1; } //TLSend(TL2.HEARTBEAT); }
+        public void Register() { TLSend(TL2.REGISTERCLIENT); }
+        public void Subscribe(MarketBasket mb) { TLSend(new LinkMessage(TL2.REGISTERSTOCK, mb)); }
+        public void Disconnect() { TLSend(TL2.CLEARSTOCKS); TLSend(TL2.CLEARCLIENT); }
+        public void Unsubscribe() { TLSend(TL2.CLEARSTOCKS); }
+        public int HeartBeat() { return 1; } //TLSend(TL2.HEARTBEAT); }
 
         // server to clients
         public void newTick(Tick t)
@@ -191,20 +191,20 @@ namespace TradeLib
             heart[cid] = now;
             return since.Seconds;
         }
-        public override int SendOrder(Order order)
+        public int SendOrder(Order order)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public override void RegIndex(IndexBasket ib)
+        public void RegIndex(IndexBasket ib)
         {
             throw new Exception("The method or operation is not implemented.");
         }
-        public override void GoLive()
+        public void GoLive()
         {
             throw new Exception("The method or operation is not implemented.");
         }
-        public override void GoSim()
+        public void GoSim()
         {
             throw new Exception("The method or operation is not implemented.");
         }

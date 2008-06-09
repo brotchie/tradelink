@@ -141,7 +141,7 @@ namespace Quotopia
             int res = tl.SendOrder(sendOrder);
             if (res != 0)
             {
-                string err = TradeLinkClient.PrettyError(tl.BrokerName,res);
+                string err = Util.PrettyError(tl.BrokerName,res);
                 status(err);
                 show(sendOrder.ToString() + "( " + err + " )");
             }

@@ -88,7 +88,8 @@
     <Compile Include="Trade.cs" />
     <Compile Include="TradeLink.cs" />
     <Compile Include="TradeLink_MQ.cs" />
-    <Compile Include="TradeLink_WM.cs" />
+    <Compile Include="TradeLink_WM.cs">
+    </Compile>
     <Compile Include="Util.cs" />
     <EmbeddedResource Include="ParamPrompt.resx">
       <DependentUpon>ParamPrompt.cs</DependentUpon>

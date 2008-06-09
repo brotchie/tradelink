@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace TradeLib
 {
@@ -129,12 +130,12 @@ namespace TradeLib
         /// <summary>
         /// Makes TL client use Broker LIVE server (Broker must be logged in and TradeLink loaded)
         /// </summary>
-        public override void GoLive() { Disconnect(); Him = LIVEWINDOW; Register(); }
+        public void GoLive() { Disconnect(); Him = LIVEWINDOW; Register(); }
 
         /// <summary>
         /// Makes TL client use Broker Simulation mode (Broker must be logged in and TradeLink loaded)
         /// </summary>
-        public override void GoSim() { Disconnect(); Him = SIMWINDOW; Register(); }
+        public void GoSim() { Disconnect(); Him = SIMWINDOW; Register(); }
 
         public void GoSrv() { Me = SIMWINDOW; }
         protected long TLSend(TL2 type) { return TLSend(type, ""); }
@@ -150,7 +151,7 @@ namespace TradeLib
         /// </summary>
         /// <param name="o">The oorder</param>
         /// <returns>Zero if succeeded, Broker error code otherwise.</returns>
-        public override int SendOrder(Order o)
+        public int SendOrder(Order o)
         {
             if (o == null) return (int)TL2.GOTNULLORDER;
             if (!o.isValid) return (int)TL2.OK;
@@ -264,7 +265,7 @@ namespace TradeLib
             }
         }
 
-        public override void Disconnect()
+        public void Disconnect()
         {
             try
             {
@@ -273,27 +274,27 @@ namespace TradeLib
             catch (TLServerNotFound) { }
         }
 
-        public override void Register()
+        public void Register()
         {
             TLSend(TL2.REGISTERCLIENT, mywindow);
         }
 
-        public override void Subscribe(MarketBasket mb)
+        public void Subscribe(MarketBasket mb)
         {
             TLSend(TL2.REGISTERSTOCK, mywindow + "+" + mb.ToString());
         }
 
-        public override void RegIndex(IndexBasket ib)
+        public void RegIndex(IndexBasket ib)
         {
             TLSend(TL2.REGISTERINDEX, mywindow + "+" + ib.ToString());
         }
 
-        public override void Unsubscribe()
+        public void Unsubscribe()
         {
             TLSend(TL2.CLEARSTOCKS, mywindow);
         }
 
-        public override int HeartBeat()
+        public int HeartBeat()
         {
             return (int)TLSend(TL2.HEARTBEAT, mywindow);
         }
