@@ -78,6 +78,7 @@ namespace box
         
         public bool newBar(BarList bl)
         {
+            if (!bl.isValid) return false;
             Bar obar = bl.Get(bl.BarZero);
             if (!isbarcons) throw new Exception("You can't call a newBar method without using the right constructor.");
             if (bl.NewBar)

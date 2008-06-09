@@ -28,6 +28,7 @@ namespace box
         }
         public bool newBar(BarList bl)
         {
+            if (!bl.isValid) return false;
             Bar c = bl.RecentBar;
             if (!c.isValid) return false;
             decimal avgvol = AvgVol(bl);

@@ -27,6 +27,7 @@ namespace TradeLib
             Int = PreferredInterval;
             sym = stock;
         }
+        public bool isValid { get { return Has(1); } }
         public bool HasBar() { return NumBars() > 0; }
         public bool Has(int MinimumBars) { return NumBars() >= MinimumBars; }
         /// <summary>
