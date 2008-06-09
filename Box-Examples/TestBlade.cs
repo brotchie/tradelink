@@ -36,7 +36,9 @@ namespace box
             };
 
             BarList bl = new BarList(BarInterval.FiveMin,sym);
-            Blade b = new Blade(.2m); // 20 percent move is a blade
+            Blade b = new Blade();
+            Assert.That(b.BladePercentage != 0);
+            b = new Blade(.2m); // 20 percent move is a blade
             int up=0,down=0,newbar=0,bigvol=0;
 
             foreach (Tick k in ticklist)
