@@ -30,7 +30,6 @@ namespace TradeLib
         void newTick(Tick tick);
         void newFill(Trade trade);
         int NumClients { get; }
-        void GoSrv();
     }
 
     /// <summary>
@@ -63,6 +62,16 @@ namespace TradeLib
     /// Used to indicate that a TradeLink Broker Connector was not running.
     /// </summary>
     public class TLServerNotFound : Exception { }
+
+    /// <summary>
+    /// Brokerage types
+    /// </summary>
+    public enum TLTypes
+    {
+        NONE = 0,
+        SIMBROKER = 2,
+        LIVEBROKER = 4,
+    }
 
 
     /// <summary>
