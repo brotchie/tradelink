@@ -18,7 +18,9 @@ using System.IO;
             InitializeComponent();
             ns.NewsEventSubscribers += new NewsDelegate(ns_NewsEventSubscribers);
             FindStocks((WinGauntlet.Properties.Settings.Default.tickfolder == null) ? @"c:\program files\tradelink\tickdata\" : WinGauntlet.Properties.Settings.Default.tickfolder);
-            UpdateBoxes(Util.GetBoxList((WinGauntlet.Properties.Settings.Default.boxdll== null) ? "box.dll" : WinGauntlet.Properties.Settings.Default.boxdll));
+            string fn = (WinGauntlet.Properties.Settings.Default.boxdll== null) ? "box.dll" : WinGauntlet.Properties.Settings.Default.boxdll;
+            if (File.Exists(fn))
+                UpdateBoxes(Util.GetBoxList(fn));
             exchlist.SelectedItem = "NYS";
             ProgressBar1.Enabled = false;
             FormClosing+=new FormClosingEventHandler(Gauntlet_FormClosing);
