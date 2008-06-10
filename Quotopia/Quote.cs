@@ -30,7 +30,7 @@ namespace Quotopia
             Size = Quotopia.Properties.Settings.Default.wsize;
             show(Text + Ver + " (Tradelink" + tl.Ver + ")");
             
-            tl.gotTick += new TickDelegate(tl_gotTickWrap);
+            tl.gotTick += new TickDelegate(tl_gotTick);
             tl.gotFill += new FillDelegate(tl_gotFill);
             tl.gotIndexTick += new IndexDelegate(tl_gotIndexTick);
             MarketsView.MouseWheel += new MouseEventHandler(MarketsView_MouseWheel);
@@ -40,18 +40,8 @@ namespace Quotopia
             UpdateBoxList();
             trendpic["uptick"] = Quotopia.Properties.Resources.uptick;
             trendpic["downtick"] = Quotopia.Properties.Resources.downtick;
+            show("BrokerServer: "+tl.BrokerName);
             
-        }
-        void tl_gotTickWrap(Tick t)
-        {
-            BackgroundWorker bw = new BackgroundWorker();
-            bw.DoWork +=new DoWorkEventHandler(bw_DoWork);
-            bw.RunWorkerAsync(t);
-        }
-
-        void bw_DoWork(object sender, DoWorkEventArgs e)
-        {
-            tl_gotTick((Tick)e.Argument);
         }
 
         DataGridViewCellStyle upstyle = new DataGridViewCellStyle();
@@ -85,7 +75,7 @@ namespace Quotopia
                 bid = (tlinklist[sym].A.bid != 0) ? tlinklist[sym].A.bid : tlinklist[sym].B.bid;
                 ask = tlinklist[sym].A.ask != 0 ? tlinklist[sym].A.ask : tlinklist[sym].B.ask;
             }
-            catch (NullReferenceException) { }
+            catch (Exception) { }
 
             // coloring
 
@@ -155,7 +145,11 @@ namespace Quotopia
                 e.FormattingApplied = true;
             }
             else if (col.Equals("TrendCol"))
-                e.Value = tlinklist[sym].ToString();
+            {
+                TickLink t = null;
+                tlinklist.TryGetValue(sym, out t);
+                if (t!=null) e.Value = t.ToString();
+            }
             else if (col.Equals("NetChangeCol"))
             {
                 try
@@ -426,7 +420,7 @@ namespace Quotopia
                     
             }
         }
-        TradeLink_Client_WM tl = new TradeLink_Client_WM("Quotopia",true);
+        TradeLink_Client_WM tl = new TradeLink_Client_WM("quotopiac",true);
         ~Quote() { QuotopiaClose(); }
         void QuotopiaClose()
         {

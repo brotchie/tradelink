@@ -200,9 +200,9 @@ namespace Quotopia
             this.Markets.Controls.Add(this.MarketsView);
             this.Markets.ForeColor = System.Drawing.Color.White;
             this.Markets.Location = new System.Drawing.Point(4, 4);
-            this.Markets.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Markets.Margin = new System.Windows.Forms.Padding(4);
             this.Markets.Name = "Markets";
-            this.Markets.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Markets.Padding = new System.Windows.Forms.Padding(4);
             this.Markets.Size = new System.Drawing.Size(828, 538);
             this.Markets.TabIndex = 0;
             this.Markets.Text = "Markets";
@@ -619,9 +619,9 @@ namespace Quotopia
             this.TradeTab.Controls.Add(this.TradesView);
             this.TradeTab.ForeColor = System.Drawing.SystemColors.MenuText;
             this.TradeTab.Location = new System.Drawing.Point(4, 4);
-            this.TradeTab.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.TradeTab.Margin = new System.Windows.Forms.Padding(4);
             this.TradeTab.Name = "TradeTab";
-            this.TradeTab.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.TradeTab.Padding = new System.Windows.Forms.Padding(4);
             this.TradeTab.Size = new System.Drawing.Size(828, 538);
             this.TradeTab.TabIndex = 3;
             this.TradeTab.Text = "Trades";
@@ -658,7 +658,7 @@ namespace Quotopia
             this.TradesView.EnableHeadersVisualStyles = false;
             this.TradesView.GridColor = System.Drawing.SystemColors.ControlDarkDark;
             this.TradesView.Location = new System.Drawing.Point(4, 4);
-            this.TradesView.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.TradesView.Margin = new System.Windows.Forms.Padding(4);
             this.TradesView.Name = "TradesView";
             this.TradesView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
             dataGridViewCellStyle25.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
@@ -741,9 +741,9 @@ namespace Quotopia
             this.Settings.Controls.Add(this.vizGroupBox);
             this.Settings.ForeColor = System.Drawing.SystemColors.MenuText;
             this.Settings.Location = new System.Drawing.Point(4, 4);
-            this.Settings.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Settings.Margin = new System.Windows.Forms.Padding(4);
             this.Settings.Name = "Settings";
-            this.Settings.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Settings.Padding = new System.Windows.Forms.Padding(4);
             this.Settings.Size = new System.Drawing.Size(828, 538);
             this.Settings.TabIndex = 1;
             this.Settings.Text = "Settings";
@@ -752,7 +752,7 @@ namespace Quotopia
             // aboutbut
             // 
             this.aboutbut.Location = new System.Drawing.Point(271, 16);
-            this.aboutbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.aboutbut.Margin = new System.Windows.Forms.Padding(4);
             this.aboutbut.Name = "aboutbut";
             this.aboutbut.Size = new System.Drawing.Size(79, 28);
             this.aboutbut.TabIndex = 21;
@@ -766,7 +766,7 @@ namespace Quotopia
             this.savesymbollist.Checked = global::Quotopia.Properties.Settings.Default.savesymbollist;
             this.savesymbollist.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::Quotopia.Properties.Settings.Default, "savesymbollist", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.savesymbollist.Location = new System.Drawing.Point(417, 23);
-            this.savesymbollist.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.savesymbollist.Margin = new System.Windows.Forms.Padding(4);
             this.savesymbollist.Name = "savesymbollist";
             this.savesymbollist.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.savesymbollist.Size = new System.Drawing.Size(135, 21);
@@ -780,7 +780,7 @@ namespace Quotopia
             this.saveexitbut.Checked = global::Quotopia.Properties.Settings.Default.saveonexit;
             this.saveexitbut.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::Quotopia.Properties.Settings.Default, "saveonexit", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.saveexitbut.Location = new System.Drawing.Point(575, 23);
-            this.saveexitbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.saveexitbut.Margin = new System.Windows.Forms.Padding(4);
             this.saveexitbut.Name = "saveexitbut";
             this.saveexitbut.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.saveexitbut.Size = new System.Drawing.Size(134, 21);
@@ -802,9 +802,9 @@ namespace Quotopia
             this.boxgroup.Controls.Add(this.LoadDllButton);
             this.boxgroup.Controls.Add(this.minsizelabel);
             this.boxgroup.Location = new System.Drawing.Point(372, 206);
-            this.boxgroup.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.boxgroup.Margin = new System.Windows.Forms.Padding(4);
             this.boxgroup.Name = "boxgroup";
-            this.boxgroup.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.boxgroup.Padding = new System.Windows.Forms.Padding(4);
             this.boxgroup.Size = new System.Drawing.Size(347, 160);
             this.boxgroup.TabIndex = 8;
             this.boxgroup.TabStop = false;
@@ -817,7 +817,7 @@ namespace Quotopia
             this.boxdebug.CheckState = System.Windows.Forms.CheckState.Checked;
             this.boxdebug.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::Quotopia.Properties.Settings.Default, "boxdebug", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.boxdebug.Location = new System.Drawing.Point(207, 62);
-            this.boxdebug.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.boxdebug.Margin = new System.Windows.Forms.Padding(4);
             this.boxdebug.Name = "boxdebug";
             this.boxdebug.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this.boxdebug.Size = new System.Drawing.Size(123, 21);
@@ -830,7 +830,7 @@ namespace Quotopia
             this.disableboxbut.AutoSize = true;
             this.disableboxbut.Checked = true;
             this.disableboxbut.Location = new System.Drawing.Point(148, 23);
-            this.disableboxbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.disableboxbut.Margin = new System.Windows.Forms.Padding(4);
             this.disableboxbut.Name = "disableboxbut";
             this.disableboxbut.Size = new System.Drawing.Size(115, 21);
             this.disableboxbut.TabIndex = 13;
@@ -845,7 +845,7 @@ namespace Quotopia
             this.boxenablebox.Checked = global::Quotopia.Properties.Settings.Default.enablebox;
             this.boxenablebox.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::Quotopia.Properties.Settings.Default, "enablebox", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.boxenablebox.Location = new System.Drawing.Point(13, 23);
-            this.boxenablebox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.boxenablebox.Margin = new System.Windows.Forms.Padding(4);
             this.boxenablebox.Name = "boxenablebox";
             this.boxenablebox.Size = new System.Drawing.Size(112, 21);
             this.boxenablebox.TabIndex = 12;
@@ -862,7 +862,7 @@ namespace Quotopia
             0,
             0});
             this.minsizebox.Location = new System.Drawing.Point(131, 124);
-            this.minsizebox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.minsizebox.Margin = new System.Windows.Forms.Padding(4);
             this.minsizebox.Maximum = new decimal(new int[] {
             100000000,
             0,
@@ -892,7 +892,7 @@ namespace Quotopia
             // unloadallboxbut
             // 
             this.unloadallboxbut.Location = new System.Drawing.Point(163, 90);
-            this.unloadallboxbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.unloadallboxbut.Margin = new System.Windows.Forms.Padding(4);
             this.unloadallboxbut.Name = "unloadallboxbut";
             this.unloadallboxbut.Size = new System.Drawing.Size(27, 22);
             this.unloadallboxbut.TabIndex = 9;
@@ -918,7 +918,7 @@ namespace Quotopia
             0,
             0});
             this.maxsize.Location = new System.Drawing.Point(279, 124);
-            this.maxsize.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.maxsize.Margin = new System.Windows.Forms.Padding(4);
             this.maxsize.Maximum = new decimal(new int[] {
             100000000,
             0,
@@ -948,7 +948,7 @@ namespace Quotopia
             // LoadDllButton
             // 
             this.LoadDllButton.Location = new System.Drawing.Point(163, 62);
-            this.LoadDllButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.LoadDllButton.Margin = new System.Windows.Forms.Padding(4);
             this.LoadDllButton.Name = "LoadDllButton";
             this.LoadDllButton.Size = new System.Drawing.Size(27, 21);
             this.LoadDllButton.TabIndex = 0;
@@ -968,7 +968,7 @@ namespace Quotopia
             // resetsetbut
             // 
             this.resetsetbut.Location = new System.Drawing.Point(96, 16);
-            this.resetsetbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.resetsetbut.Margin = new System.Windows.Forms.Padding(4);
             this.resetsetbut.Name = "resetsetbut";
             this.resetsetbut.Size = new System.Drawing.Size(79, 28);
             this.resetsetbut.TabIndex = 6;
@@ -979,7 +979,7 @@ namespace Quotopia
             // restoredefaultsbut
             // 
             this.restoredefaultsbut.Location = new System.Drawing.Point(183, 16);
-            this.restoredefaultsbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.restoredefaultsbut.Margin = new System.Windows.Forms.Padding(4);
             this.restoredefaultsbut.Name = "restoredefaultsbut";
             this.restoredefaultsbut.Size = new System.Drawing.Size(80, 28);
             this.restoredefaultsbut.TabIndex = 5;
@@ -990,7 +990,7 @@ namespace Quotopia
             // saveSettingsbut
             // 
             this.saveSettingsbut.Location = new System.Drawing.Point(8, 16);
-            this.saveSettingsbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.saveSettingsbut.Margin = new System.Windows.Forms.Padding(4);
             this.saveSettingsbut.Name = "saveSettingsbut";
             this.saveSettingsbut.Size = new System.Drawing.Size(81, 28);
             this.saveSettingsbut.TabIndex = 4;
@@ -1005,9 +1005,9 @@ namespace Quotopia
             this.datagroup.Controls.Add(this.liveanvilbut);
             this.datagroup.Controls.Add(this.simAnvilbut);
             this.datagroup.Location = new System.Drawing.Point(372, 52);
-            this.datagroup.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.datagroup.Margin = new System.Windows.Forms.Padding(4);
             this.datagroup.Name = "datagroup";
-            this.datagroup.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.datagroup.Padding = new System.Windows.Forms.Padding(4);
             this.datagroup.Size = new System.Drawing.Size(347, 146);
             this.datagroup.TabIndex = 2;
             this.datagroup.TabStop = false;
@@ -1019,7 +1019,7 @@ namespace Quotopia
             this.saveticks.Checked = true;
             this.saveticks.CheckState = System.Windows.Forms.CheckState.Checked;
             this.saveticks.Location = new System.Drawing.Point(13, 118);
-            this.saveticks.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.saveticks.Margin = new System.Windows.Forms.Padding(4);
             this.saveticks.Name = "saveticks";
             this.saveticks.Size = new System.Drawing.Size(155, 21);
             this.saveticks.TabIndex = 11;
@@ -1029,7 +1029,7 @@ namespace Quotopia
             // archivefolderbut
             // 
             this.archivefolderbut.Location = new System.Drawing.Point(184, 113);
-            this.archivefolderbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.archivefolderbut.Margin = new System.Windows.Forms.Padding(4);
             this.archivefolderbut.Name = "archivefolderbut";
             this.archivefolderbut.Size = new System.Drawing.Size(145, 28);
             this.archivefolderbut.TabIndex = 10;
@@ -1041,7 +1041,7 @@ namespace Quotopia
             // 
             this.liveanvilbut.AutoSize = true;
             this.liveanvilbut.Location = new System.Drawing.Point(13, 55);
-            this.liveanvilbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.liveanvilbut.Margin = new System.Windows.Forms.Padding(4);
             this.liveanvilbut.Name = "liveanvilbut";
             this.liveanvilbut.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.liveanvilbut.Size = new System.Drawing.Size(98, 21);
@@ -1056,7 +1056,7 @@ namespace Quotopia
             this.simAnvilbut.AutoSize = true;
             this.simAnvilbut.Checked = true;
             this.simAnvilbut.Location = new System.Drawing.Point(13, 28);
-            this.simAnvilbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.simAnvilbut.Margin = new System.Windows.Forms.Padding(4);
             this.simAnvilbut.Name = "simAnvilbut";
             this.simAnvilbut.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.simAnvilbut.Size = new System.Drawing.Size(137, 21);
@@ -1083,9 +1083,9 @@ namespace Quotopia
             this.vizGroupBox.Controls.Add(this.bgCollabel);
             this.vizGroupBox.Controls.Add(this.bgcolbut);
             this.vizGroupBox.Location = new System.Drawing.Point(11, 57);
-            this.vizGroupBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.vizGroupBox.Margin = new System.Windows.Forms.Padding(4);
             this.vizGroupBox.Name = "vizGroupBox";
-            this.vizGroupBox.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.vizGroupBox.Padding = new System.Windows.Forms.Padding(4);
             this.vizGroupBox.Size = new System.Drawing.Size(353, 309);
             this.vizGroupBox.TabIndex = 1;
             this.vizGroupBox.TabStop = false;
@@ -1104,7 +1104,7 @@ namespace Quotopia
             // chartcolbut
             // 
             this.chartcolbut.Location = new System.Drawing.Point(311, 94);
-            this.chartcolbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.chartcolbut.Margin = new System.Windows.Forms.Padding(4);
             this.chartcolbut.Name = "chartcolbut";
             this.chartcolbut.Size = new System.Drawing.Size(28, 22);
             this.chartcolbut.TabIndex = 20;
@@ -1134,7 +1134,7 @@ namespace Quotopia
             // colheadfgcolbut
             // 
             this.colheadfgcolbut.Location = new System.Drawing.Point(311, 57);
-            this.colheadfgcolbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.colheadfgcolbut.Margin = new System.Windows.Forms.Padding(4);
             this.colheadfgcolbut.Name = "colheadfgcolbut";
             this.colheadfgcolbut.Size = new System.Drawing.Size(28, 26);
             this.colheadfgcolbut.TabIndex = 17;
@@ -1144,7 +1144,7 @@ namespace Quotopia
             // colheadcolbut
             // 
             this.colheadcolbut.Location = new System.Drawing.Point(312, 23);
-            this.colheadcolbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.colheadcolbut.Margin = new System.Windows.Forms.Padding(4);
             this.colheadcolbut.Name = "colheadcolbut";
             this.colheadcolbut.Size = new System.Drawing.Size(27, 27);
             this.colheadcolbut.TabIndex = 16;
@@ -1160,9 +1160,9 @@ namespace Quotopia
             this.groupBox2.Controls.Add(this.button1);
             this.groupBox2.Controls.Add(this.label1);
             this.groupBox2.Location = new System.Drawing.Point(4, 123);
-            this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox2.Size = new System.Drawing.Size(343, 91);
             this.groupBox2.TabIndex = 15;
             this.groupBox2.TabStop = false;
@@ -1173,7 +1173,7 @@ namespace Quotopia
             this.tcolfgbut.AutoSize = true;
             this.tcolfgbut.Checked = true;
             this.tcolfgbut.Location = new System.Drawing.Point(197, 21);
-            this.tcolfgbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tcolfgbut.Margin = new System.Windows.Forms.Padding(4);
             this.tcolfgbut.Name = "tcolfgbut";
             this.tcolfgbut.Size = new System.Drawing.Size(133, 21);
             this.tcolfgbut.TabIndex = 13;
@@ -1186,7 +1186,7 @@ namespace Quotopia
             // 
             this.tcolbgbut.AutoSize = true;
             this.tcolbgbut.Location = new System.Drawing.Point(197, 55);
-            this.tcolbgbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tcolbgbut.Margin = new System.Windows.Forms.Padding(4);
             this.tcolbgbut.Name = "tcolbgbut";
             this.tcolbgbut.Size = new System.Drawing.Size(138, 21);
             this.tcolbgbut.TabIndex = 12;
@@ -1206,7 +1206,7 @@ namespace Quotopia
             // button2
             // 
             this.button2.Location = new System.Drawing.Point(133, 20);
-            this.button2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button2.Margin = new System.Windows.Forms.Padding(4);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(27, 22);
             this.button2.TabIndex = 7;
@@ -1216,7 +1216,7 @@ namespace Quotopia
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(133, 54);
-            this.button1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button1.Margin = new System.Windows.Forms.Padding(4);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(27, 22);
             this.button1.TabIndex = 6;
@@ -1242,9 +1242,9 @@ namespace Quotopia
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.button3);
             this.groupBox1.Location = new System.Drawing.Point(4, 222);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox1.Size = new System.Drawing.Size(343, 80);
             this.groupBox1.TabIndex = 14;
             this.groupBox1.TabStop = false;
@@ -1254,7 +1254,7 @@ namespace Quotopia
             // 
             this.hlcolfgbut.AutoSize = true;
             this.hlcolfgbut.Location = new System.Drawing.Point(197, 23);
-            this.hlcolfgbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.hlcolfgbut.Margin = new System.Windows.Forms.Padding(4);
             this.hlcolfgbut.Name = "hlcolfgbut";
             this.hlcolfgbut.Size = new System.Drawing.Size(133, 21);
             this.hlcolfgbut.TabIndex = 15;
@@ -1266,7 +1266,7 @@ namespace Quotopia
             this.hlcolbgbut.AutoSize = true;
             this.hlcolbgbut.Checked = true;
             this.hlcolbgbut.Location = new System.Drawing.Point(197, 52);
-            this.hlcolbgbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.hlcolbgbut.Margin = new System.Windows.Forms.Padding(4);
             this.hlcolbgbut.Name = "hlcolbgbut";
             this.hlcolbgbut.Size = new System.Drawing.Size(138, 21);
             this.hlcolbgbut.TabIndex = 14;
@@ -1278,7 +1278,7 @@ namespace Quotopia
             // button4
             // 
             this.button4.Location = new System.Drawing.Point(133, 18);
-            this.button4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button4.Margin = new System.Windows.Forms.Padding(4);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(28, 21);
             this.button4.TabIndex = 9;
@@ -1308,7 +1308,7 @@ namespace Quotopia
             // button3
             // 
             this.button3.Location = new System.Drawing.Point(135, 50);
-            this.button3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button3.Margin = new System.Windows.Forms.Padding(4);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(27, 22);
             this.button3.TabIndex = 8;
@@ -1328,7 +1328,7 @@ namespace Quotopia
             // gridcolorbut
             // 
             this.gridcolorbut.Location = new System.Drawing.Point(137, 94);
-            this.gridcolorbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gridcolorbut.Margin = new System.Windows.Forms.Padding(4);
             this.gridcolorbut.Name = "gridcolorbut";
             this.gridcolorbut.Size = new System.Drawing.Size(27, 22);
             this.gridcolorbut.TabIndex = 4;
@@ -1348,7 +1348,7 @@ namespace Quotopia
             // fontBut
             // 
             this.fontBut.Location = new System.Drawing.Point(137, 58);
-            this.fontBut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.fontBut.Margin = new System.Windows.Forms.Padding(4);
             this.fontBut.Name = "fontBut";
             this.fontBut.Size = new System.Drawing.Size(27, 25);
             this.fontBut.TabIndex = 2;
@@ -1368,7 +1368,7 @@ namespace Quotopia
             // bgcolbut
             // 
             this.bgcolbut.Location = new System.Drawing.Point(137, 26);
-            this.bgcolbut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.bgcolbut.Margin = new System.Windows.Forms.Padding(4);
             this.bgcolbut.Name = "bgcolbut";
             this.bgcolbut.Size = new System.Drawing.Size(27, 25);
             this.bgcolbut.TabIndex = 0;
@@ -1380,7 +1380,7 @@ namespace Quotopia
             this.LogTab.BackColor = System.Drawing.Color.Transparent;
             this.LogTab.Controls.Add(this.statusWindow);
             this.LogTab.Location = new System.Drawing.Point(4, 4);
-            this.LogTab.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.LogTab.Margin = new System.Windows.Forms.Padding(4);
             this.LogTab.Name = "LogTab";
             this.LogTab.Size = new System.Drawing.Size(828, 538);
             this.LogTab.TabIndex = 2;
@@ -1395,7 +1395,7 @@ namespace Quotopia
             this.statusWindow.Dock = System.Windows.Forms.DockStyle.Fill;
             this.statusWindow.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.statusWindow.Location = new System.Drawing.Point(0, 0);
-            this.statusWindow.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.statusWindow.Margin = new System.Windows.Forms.Padding(4);
             this.statusWindow.Name = "statusWindow";
             this.statusWindow.ReadOnly = true;
             this.statusWindow.Size = new System.Drawing.Size(828, 538);
@@ -1456,9 +1456,9 @@ namespace Quotopia
             this.ForeColor = System.Drawing.SystemColors.Window;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Location = global::Quotopia.Properties.Settings.Default.location;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Quote";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Quotopia";
             this.Load += new System.EventHandler(this.Quote_Load);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Quote_FormClosing);
