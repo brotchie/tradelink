@@ -29,64 +29,17 @@ namespace Quotopia
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle21 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle22 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle19 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Quote));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle20 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle23 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle25 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle24 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.quoteTab = new System.Windows.Forms.TabControl();
             this.Markets = new System.Windows.Forms.TabPage();
-            this.MarketsView = new System.Windows.Forms.DataGridView();
-            this.SymbolCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.LastPrintCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.LastSizeCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Blank = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.BidCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.OfferCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.QuoteSizeCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.BidSizeCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.OfferSizeCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.PosSizeCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.AvgPriceCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.MinSizeCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.TrendCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.DayLowCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.DayOpenCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.DayHighCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.YestCloseCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.NetChangeCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.xTrendCol = new System.Windows.Forms.DataGridViewImageColumn();
-            this.TimeCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.rightclickrow = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.showchart = new System.Windows.Forms.ToolStripMenuItem();
-            this.flatmenuright = new System.Windows.Forms.ToolStripMenuItem();
-            this.flatthisfull = new System.Windows.Forms.ToolStripMenuItem();
-            this.flatthishalf = new System.Windows.Forms.ToolStripMenuItem();
-            this.flatthisqtr = new System.Windows.Forms.ToolStripMenuItem();
-            this.flatallpositions = new System.Windows.Forms.ToolStripMenuItem();
-            this.columnsdropdown = new System.Windows.Forms.ToolStripMenuItem();
-            this.boxdropdown = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.importbasketbut = new System.Windows.Forms.ToolStripButton();
+            this.exportbasketbut = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.statuslab = new System.Windows.Forms.ToolStripLabel();
             this.TradeTab = new System.Windows.Forms.TabPage();
             this.TradesView = new System.Windows.Forms.DataGridView();
             this.Date = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -97,6 +50,7 @@ namespace Quotopia
             this.xSize = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.xPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Comment = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ColAccount = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Settings = new System.Windows.Forms.TabPage();
             this.aboutbut = new System.Windows.Forms.Button();
             this.savesymbollist = new System.Windows.Forms.CheckBox();
@@ -119,6 +73,7 @@ namespace Quotopia
             this.datagroup = new System.Windows.Forms.GroupBox();
             this.saveticks = new System.Windows.Forms.CheckBox();
             this.archivefolderbut = new System.Windows.Forms.Button();
+            this.histsimbut = new System.Windows.Forms.RadioButton();
             this.liveanvilbut = new System.Windows.Forms.RadioButton();
             this.simAnvilbut = new System.Windows.Forms.RadioButton();
             this.vizGroupBox = new System.Windows.Forms.GroupBox();
@@ -150,6 +105,15 @@ namespace Quotopia
             this.bgcolbut = new System.Windows.Forms.Button();
             this.LogTab = new System.Windows.Forms.TabPage();
             this.statusWindow = new System.Windows.Forms.RichTextBox();
+            this.rightclickrow = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.showchart = new System.Windows.Forms.ToolStripMenuItem();
+            this.flatmenuright = new System.Windows.Forms.ToolStripMenuItem();
+            this.flatthisfull = new System.Windows.Forms.ToolStripMenuItem();
+            this.flatthishalf = new System.Windows.Forms.ToolStripMenuItem();
+            this.flatthisqtr = new System.Windows.Forms.ToolStripMenuItem();
+            this.flatallpositions = new System.Windows.Forms.ToolStripMenuItem();
+            this.columnsdropdown = new System.Windows.Forms.ToolStripMenuItem();
+            this.boxdropdown = new System.Windows.Forms.ToolStripMenuItem();
             this.OrderUserCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.OrderStopCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.OrderPriceCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -157,11 +121,9 @@ namespace Quotopia
             this.OrderSideCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.OrderTimeCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.OrderDateCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.quoteStoreBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.quoteTab.SuspendLayout();
             this.Markets.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.MarketsView)).BeginInit();
-            this.rightclickrow.SuspendLayout();
+            this.toolStrip1.SuspendLayout();
             this.TradeTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.TradesView)).BeginInit();
             this.Settings.SuspendLayout();
@@ -173,7 +135,7 @@ namespace Quotopia
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.LogTab.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.quoteStoreBindingSource)).BeginInit();
+            this.rightclickrow.SuspendLayout();
             this.SuspendLayout();
             // 
             // quoteTab
@@ -197,7 +159,7 @@ namespace Quotopia
             // Markets
             // 
             this.Markets.BackColor = System.Drawing.Color.Black;
-            this.Markets.Controls.Add(this.MarketsView);
+            this.Markets.Controls.Add(this.toolStrip1);
             this.Markets.ForeColor = System.Drawing.Color.White;
             this.Markets.Location = new System.Drawing.Point(4, 4);
             this.Markets.Margin = new System.Windows.Forms.Padding(4);
@@ -208,410 +170,52 @@ namespace Quotopia
             this.Markets.Text = "Markets";
             this.Markets.UseVisualStyleBackColor = true;
             // 
-            // MarketsView
+            // toolStrip1
             // 
-            this.MarketsView.AllowUserToOrderColumns = true;
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            this.MarketsView.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
-            this.MarketsView.BackgroundColor = System.Drawing.Color.Black;
-            this.MarketsView.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.MarketsView.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
-            this.MarketsView.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.WindowFrame;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F);
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.MarketsView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
-            this.MarketsView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.SymbolCol,
-            this.LastPrintCol,
-            this.LastSizeCol,
-            this.Blank,
-            this.BidCol,
-            this.OfferCol,
-            this.QuoteSizeCol,
-            this.BidSizeCol,
-            this.OfferSizeCol,
-            this.PosSizeCol,
-            this.AvgPriceCol,
-            this.MinSizeCol,
-            this.TrendCol,
-            this.DayLowCol,
-            this.DayOpenCol,
-            this.DayHighCol,
-            this.YestCloseCol,
-            this.NetChangeCol,
-            this.xTrendCol,
-            this.TimeCol});
-            this.MarketsView.ContextMenuStrip = this.rightclickrow;
-            dataGridViewCellStyle21.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle21.BackColor = System.Drawing.SystemColors.WindowFrame;
-            dataGridViewCellStyle21.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F);
-            dataGridViewCellStyle21.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle21.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle21.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle21.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.MarketsView.DefaultCellStyle = dataGridViewCellStyle21;
-            this.MarketsView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MarketsView.EnableHeadersVisualStyles = false;
-            this.MarketsView.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F);
-            this.MarketsView.GridColor = System.Drawing.Color.Black;
-            this.MarketsView.Location = new System.Drawing.Point(4, 4);
-            this.MarketsView.Margin = new System.Windows.Forms.Padding(0);
-            this.MarketsView.Name = "MarketsView";
-            this.MarketsView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle22.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle22.BackColor = System.Drawing.SystemColors.WindowFrame;
-            dataGridViewCellStyle22.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F);
-            dataGridViewCellStyle22.ForeColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle22.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle22.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle22.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.MarketsView.RowHeadersDefaultCellStyle = dataGridViewCellStyle22;
-            this.MarketsView.RowHeadersVisible = false;
-            this.MarketsView.RowTemplate.DefaultCellStyle.BackColor = System.Drawing.Color.Black;
-            this.MarketsView.RowTemplate.DefaultCellStyle.ForeColor = System.Drawing.Color.White;
-            this.MarketsView.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            this.MarketsView.RowTemplate.DefaultCellStyle.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            this.MarketsView.RowTemplate.Height = 24;
-            this.MarketsView.RowTemplate.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.MarketsView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.MarketsView.ShowCellErrors = false;
-            this.MarketsView.ShowCellToolTips = false;
-            this.MarketsView.ShowEditingIcon = false;
-            this.MarketsView.ShowRowErrors = false;
-            this.MarketsView.Size = new System.Drawing.Size(820, 530);
-            this.MarketsView.TabIndex = 0;
-            this.MarketsView.CellValidated += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellValueChanged);
-            this.MarketsView.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.MarketsView_CellContentDoubleClick);
-            this.MarketsView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.MarketsView_MouseUp);
-            this.MarketsView.RowUnshared += new System.Windows.Forms.DataGridViewRowEventHandler(this.MarketsView_RowUnshared);
-            this.MarketsView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MarketsView_KeyDown);
+            this.toolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.importbasketbut,
+            this.exportbasketbut,
+            this.toolStripSeparator1,
+            this.statuslab});
+            this.toolStrip1.Location = new System.Drawing.Point(4, 4);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Size = new System.Drawing.Size(820, 25);
+            this.toolStrip1.TabIndex = 0;
+            this.toolStrip1.Text = "toolStrip1";
             // 
-            // SymbolCol
+            // importbasketbut
             // 
-            this.SymbolCol.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle3.BackColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            this.SymbolCol.DefaultCellStyle = dataGridViewCellStyle3;
-            this.SymbolCol.Frozen = true;
-            this.SymbolCol.HeaderText = "Symbol";
-            this.SymbolCol.Name = "SymbolCol";
-            this.SymbolCol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.SymbolCol.Width = 78;
+            this.importbasketbut.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.importbasketbut.ForeColor = System.Drawing.Color.Black;
+            this.importbasketbut.Image = ((System.Drawing.Image)(resources.GetObject("importbasketbut.Image")));
+            this.importbasketbut.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.importbasketbut.Name = "importbasketbut";
+            this.importbasketbut.Size = new System.Drawing.Size(47, 22);
+            this.importbasketbut.Text = "Open";
+            this.importbasketbut.Click += new System.EventHandler(this.importbasketbut_Click);
             // 
-            // LastPrintCol
+            // exportbasketbut
             // 
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle4.Format = "N2";
-            dataGridViewCellStyle4.NullValue = null;
-            this.LastPrintCol.DefaultCellStyle = dataGridViewCellStyle4;
-            this.LastPrintCol.HeaderText = "Last";
-            this.LastPrintCol.Name = "LastPrintCol";
-            this.LastPrintCol.ReadOnly = true;
-            this.LastPrintCol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.LastPrintCol.Width = 57;
+            this.exportbasketbut.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.exportbasketbut.ForeColor = System.Drawing.Color.Black;
+            this.exportbasketbut.Image = ((System.Drawing.Image)(resources.GetObject("exportbasketbut.Image")));
+            this.exportbasketbut.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.exportbasketbut.Name = "exportbasketbut";
+            this.exportbasketbut.Size = new System.Drawing.Size(44, 22);
+            this.exportbasketbut.Text = "Save";
             // 
-            // LastSizeCol
+            // toolStripSeparator1
             // 
-            this.LastSizeCol.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle5.BackColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle5.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle5.Format = "N0";
-            dataGridViewCellStyle5.NullValue = null;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            this.LastSizeCol.DefaultCellStyle = dataGridViewCellStyle5;
-            this.LastSizeCol.HeaderText = "TSize";
-            this.LastSizeCol.Name = "LastSizeCol";
-            this.LastSizeCol.ReadOnly = true;
-            this.LastSizeCol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.LastSizeCol.Width = 58;
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
             // 
-            // Blank
+            // statuslab
             // 
-            this.Blank.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle6.BackColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle6.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            this.Blank.DefaultCellStyle = dataGridViewCellStyle6;
-            this.Blank.HeaderText = "";
-            this.Blank.Name = "Blank";
-            this.Blank.ReadOnly = true;
-            this.Blank.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.Blank.Width = 5;
-            // 
-            // BidCol
-            // 
-            this.BidCol.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle7.Format = "N2";
-            dataGridViewCellStyle7.NullValue = null;
-            this.BidCol.DefaultCellStyle = dataGridViewCellStyle7;
-            this.BidCol.HeaderText = "Bid";
-            this.BidCol.Name = "BidCol";
-            this.BidCol.ReadOnly = true;
-            this.BidCol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.BidCol.ToolTipText = "Hit Bid for MinSize";
-            this.BidCol.Width = 52;
-            // 
-            // OfferCol
-            // 
-            this.OfferCol.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle8.Format = "N2";
-            dataGridViewCellStyle8.NullValue = null;
-            this.OfferCol.DefaultCellStyle = dataGridViewCellStyle8;
-            this.OfferCol.HeaderText = "Ask";
-            this.OfferCol.Name = "OfferCol";
-            this.OfferCol.ReadOnly = true;
-            this.OfferCol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.OfferCol.ToolTipText = "Take Offer for MinSize";
-            this.OfferCol.Width = 55;
-            // 
-            // QuoteSizeCol
-            // 
-            this.QuoteSizeCol.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.QuoteSizeCol.DefaultCellStyle = dataGridViewCellStyle9;
-            this.QuoteSizeCol.HeaderText = "Sizes";
-            this.QuoteSizeCol.Name = "QuoteSizeCol";
-            this.QuoteSizeCol.ReadOnly = true;
-            this.QuoteSizeCol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.QuoteSizeCol.Width = 65;
-            // 
-            // BidSizeCol
-            // 
-            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.BidSizeCol.DefaultCellStyle = dataGridViewCellStyle10;
-            this.BidSizeCol.HeaderText = "BidSize";
-            this.BidSizeCol.Name = "BidSizeCol";
-            this.BidSizeCol.ReadOnly = true;
-            this.BidSizeCol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.BidSizeCol.Visible = false;
-            // 
-            // OfferSizeCol
-            // 
-            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.OfferSizeCol.DefaultCellStyle = dataGridViewCellStyle11;
-            this.OfferSizeCol.HeaderText = "AskSize";
-            this.OfferSizeCol.Name = "OfferSizeCol";
-            this.OfferSizeCol.ReadOnly = true;
-            this.OfferSizeCol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.OfferSizeCol.Visible = false;
-            // 
-            // PosSizeCol
-            // 
-            this.PosSizeCol.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.DisplayedCells;
-            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.PosSizeCol.DefaultCellStyle = dataGridViewCellStyle12;
-            this.PosSizeCol.HeaderText = "Position";
-            this.PosSizeCol.Name = "PosSizeCol";
-            this.PosSizeCol.ReadOnly = true;
-            this.PosSizeCol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.PosSizeCol.Visible = false;
-            // 
-            // AvgPriceCol
-            // 
-            this.AvgPriceCol.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle13.Format = "N2";
-            dataGridViewCellStyle13.NullValue = null;
-            this.AvgPriceCol.DefaultCellStyle = dataGridViewCellStyle13;
-            this.AvgPriceCol.HeaderText = "AvgPrice";
-            this.AvgPriceCol.Name = "AvgPriceCol";
-            this.AvgPriceCol.ReadOnly = true;
-            this.AvgPriceCol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.AvgPriceCol.Visible = false;
-            // 
-            // MinSizeCol
-            // 
-            this.MinSizeCol.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle14.BackColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle14.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle14.Format = "N0";
-            dataGridViewCellStyle14.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle14.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            this.MinSizeCol.DefaultCellStyle = dataGridViewCellStyle14;
-            this.MinSizeCol.HeaderText = "Adjust";
-            this.MinSizeCol.Name = "MinSizeCol";
-            this.MinSizeCol.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.MinSizeCol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.MinSizeCol.ToolTipText = "Default size";
-            this.MinSizeCol.Width = 50;
-            // 
-            // TrendCol
-            // 
-            this.TrendCol.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this.TrendCol.HeaderText = "Trend";
-            this.TrendCol.Name = "TrendCol";
-            this.TrendCol.ReadOnly = true;
-            this.TrendCol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.TrendCol.Width = 68;
-            // 
-            // DayLowCol
-            // 
-            this.DayLowCol.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle15.Format = "N2";
-            dataGridViewCellStyle15.NullValue = null;
-            this.DayLowCol.DefaultCellStyle = dataGridViewCellStyle15;
-            this.DayLowCol.HeaderText = "Low";
-            this.DayLowCol.Name = "DayLowCol";
-            this.DayLowCol.ReadOnly = true;
-            this.DayLowCol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.DayLowCol.Visible = false;
-            // 
-            // DayOpenCol
-            // 
-            this.DayOpenCol.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle16.Format = "N2";
-            dataGridViewCellStyle16.NullValue = null;
-            this.DayOpenCol.DefaultCellStyle = dataGridViewCellStyle16;
-            this.DayOpenCol.HeaderText = "Open";
-            this.DayOpenCol.Name = "DayOpenCol";
-            this.DayOpenCol.ReadOnly = true;
-            this.DayOpenCol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.DayOpenCol.Visible = false;
-            // 
-            // DayHighCol
-            // 
-            this.DayHighCol.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle17.Format = "N2";
-            dataGridViewCellStyle17.NullValue = null;
-            this.DayHighCol.DefaultCellStyle = dataGridViewCellStyle17;
-            this.DayHighCol.HeaderText = "High";
-            this.DayHighCol.Name = "DayHighCol";
-            this.DayHighCol.ReadOnly = true;
-            this.DayHighCol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.DayHighCol.Visible = false;
-            // 
-            // YestCloseCol
-            // 
-            this.YestCloseCol.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle18.Format = "N2";
-            dataGridViewCellStyle18.NullValue = null;
-            this.YestCloseCol.DefaultCellStyle = dataGridViewCellStyle18;
-            this.YestCloseCol.HeaderText = "YestClose";
-            this.YestCloseCol.Name = "YestCloseCol";
-            this.YestCloseCol.ReadOnly = true;
-            this.YestCloseCol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.YestCloseCol.Visible = false;
-            // 
-            // NetChangeCol
-            // 
-            dataGridViewCellStyle19.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle19.Format = "+###0.00;-###0.00";
-            dataGridViewCellStyle19.NullValue = null;
-            this.NetChangeCol.DefaultCellStyle = dataGridViewCellStyle19;
-            this.NetChangeCol.HeaderText = "NetChange";
-            this.NetChangeCol.Name = "NetChangeCol";
-            this.NetChangeCol.ReadOnly = true;
-            this.NetChangeCol.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.NetChangeCol.Visible = false;
-            // 
-            // xTrendCol
-            // 
-            this.xTrendCol.HeaderText = "TrendPic";
-            this.xTrendCol.Image = ((System.Drawing.Image)(resources.GetObject("xTrendCol.Image")));
-            this.xTrendCol.Name = "xTrendCol";
-            this.xTrendCol.ReadOnly = true;
-            this.xTrendCol.Visible = false;
-            // 
-            // TimeCol
-            // 
-            dataGridViewCellStyle20.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.TimeCol.DefaultCellStyle = dataGridViewCellStyle20;
-            this.TimeCol.HeaderText = "Time";
-            this.TimeCol.Name = "TimeCol";
-            this.TimeCol.ReadOnly = true;
-            this.TimeCol.Visible = false;
-            // 
-            // rightclickrow
-            // 
-            this.rightclickrow.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.showchart,
-            this.flatmenuright,
-            this.columnsdropdown,
-            this.boxdropdown});
-            this.rightclickrow.Name = "rightclickrow";
-            this.rightclickrow.Size = new System.Drawing.Size(132, 92);
-            this.rightclickrow.Opening += new System.ComponentModel.CancelEventHandler(this.rightclickrow_Opening);
-            this.rightclickrow.Click += new System.EventHandler(this.rightclickrow_Click);
-            // 
-            // showchart
-            // 
-            this.showchart.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.showchart.Name = "showchart";
-            this.showchart.Size = new System.Drawing.Size(131, 22);
-            this.showchart.Text = "Chart";
-            this.showchart.ToolTipText = "Chart symbol";
-            // 
-            // flatmenuright
-            // 
-            this.flatmenuright.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.flatmenuright.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.flatthisfull,
-            this.flatthishalf,
-            this.flatthisqtr,
-            this.flatallpositions});
-            this.flatmenuright.Name = "flatmenuright";
-            this.flatmenuright.Size = new System.Drawing.Size(131, 22);
-            this.flatmenuright.Text = "Flat";
-            this.flatmenuright.TextDirection = System.Windows.Forms.ToolStripTextDirection.Horizontal;
-            this.flatmenuright.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
-            this.flatmenuright.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.flatmenuright_DropDownItemClicked);
-            // 
-            // flatthisfull
-            // 
-            this.flatthisfull.Name = "flatthisfull";
-            this.flatthisfull.Size = new System.Drawing.Size(184, 22);
-            this.flatthisfull.Text = "flat THIS 100%";
-            // 
-            // flatthishalf
-            // 
-            this.flatthishalf.Name = "flatthishalf";
-            this.flatthishalf.Size = new System.Drawing.Size(184, 22);
-            this.flatthishalf.Text = "flat THIS 50%";
-            // 
-            // flatthisqtr
-            // 
-            this.flatthisqtr.Name = "flatthisqtr";
-            this.flatthisqtr.Size = new System.Drawing.Size(184, 22);
-            this.flatthisqtr.Text = "flat THIS 25%";
-            // 
-            // flatallpositions
-            // 
-            this.flatallpositions.Name = "flatallpositions";
-            this.flatallpositions.Size = new System.Drawing.Size(184, 22);
-            this.flatallpositions.Text = "flat ALL positions";
-            // 
-            // columnsdropdown
-            // 
-            this.columnsdropdown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.columnsdropdown.Name = "columnsdropdown";
-            this.columnsdropdown.Size = new System.Drawing.Size(131, 22);
-            this.columnsdropdown.Text = "Columns";
-            this.columnsdropdown.ToolTipText = "Toggle displayed fields";
-            this.columnsdropdown.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.columnsdropdown_DropDownItemClicked);
-            // 
-            // boxdropdown
-            // 
-            this.boxdropdown.Name = "boxdropdown";
-            this.boxdropdown.Size = new System.Drawing.Size(131, 22);
-            this.boxdropdown.Text = "Boxes";
-            this.boxdropdown.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.boxdropdown_DropDownItemClicked);
-            this.boxdropdown.DropDownOpening += new System.EventHandler(this.boxdropdown_DropDownOpening);
+            this.statuslab.ForeColor = System.Drawing.Color.Black;
+            this.statuslab.Name = "statuslab";
+            this.statuslab.Size = new System.Drawing.Size(227, 22);
+            this.statuslab.Text = "Enter a symbol or open a basket.";
             // 
             // TradeTab
             // 
@@ -636,14 +240,14 @@ namespace Quotopia
             this.TradesView.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.TradesView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.TradesView.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle23.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle23.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle23.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle23.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle23.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle23.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle23.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.TradesView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle23;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.TradesView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.TradesView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.TradesView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Date,
@@ -653,7 +257,8 @@ namespace Quotopia
             this.Side,
             this.xSize,
             this.xPrice,
-            this.Comment});
+            this.Comment,
+            this.ColAccount});
             this.TradesView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TradesView.EnableHeadersVisualStyles = false;
             this.TradesView.GridColor = System.Drawing.SystemColors.ControlDarkDark;
@@ -661,15 +266,16 @@ namespace Quotopia
             this.TradesView.Margin = new System.Windows.Forms.Padding(4);
             this.TradesView.Name = "TradesView";
             this.TradesView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle25.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle25.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle25.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle25.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle25.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle25.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle25.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.TradesView.RowHeadersDefaultCellStyle = dataGridViewCellStyle25;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.TradesView.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.TradesView.RowHeadersVisible = false;
+            this.TradesView.RowTemplate.Height = 24;
             this.TradesView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.TradesView.ShowEditingIcon = false;
             this.TradesView.Size = new System.Drawing.Size(820, 530);
@@ -714,9 +320,9 @@ namespace Quotopia
             // 
             // xPrice
             // 
-            dataGridViewCellStyle24.Format = "N2";
-            dataGridViewCellStyle24.NullValue = null;
-            this.xPrice.DefaultCellStyle = dataGridViewCellStyle24;
+            dataGridViewCellStyle2.Format = "N2";
+            dataGridViewCellStyle2.NullValue = null;
+            this.xPrice.DefaultCellStyle = dataGridViewCellStyle2;
             this.xPrice.HeaderText = "Price";
             this.xPrice.Name = "xPrice";
             this.xPrice.ReadOnly = true;
@@ -726,6 +332,12 @@ namespace Quotopia
             this.Comment.HeaderText = "Comment";
             this.Comment.Name = "Comment";
             this.Comment.ReadOnly = true;
+            // 
+            // ColAccount
+            // 
+            this.ColAccount.HeaderText = "Account";
+            this.ColAccount.Name = "ColAccount";
+            this.ColAccount.ReadOnly = true;
             // 
             // Settings
             // 
@@ -758,7 +370,6 @@ namespace Quotopia
             this.aboutbut.TabIndex = 21;
             this.aboutbut.Text = "About";
             this.aboutbut.UseVisualStyleBackColor = true;
-            this.aboutbut.Click += new System.EventHandler(this.aboutbut_Click);
             // 
             // savesymbollist
             // 
@@ -837,7 +448,6 @@ namespace Quotopia
             this.disableboxbut.TabStop = true;
             this.disableboxbut.Text = "Disable Boxes";
             this.disableboxbut.UseVisualStyleBackColor = true;
-            this.disableboxbut.CheckedChanged += new System.EventHandler(this.disableboxbut_CheckedChanged);
             // 
             // boxenablebox
             // 
@@ -851,7 +461,6 @@ namespace Quotopia
             this.boxenablebox.TabIndex = 12;
             this.boxenablebox.Text = "Enable Boxes";
             this.boxenablebox.UseVisualStyleBackColor = true;
-            this.boxenablebox.CheckedChanged += new System.EventHandler(this.boxenablebox_CheckedChanged);
             // 
             // minsizebox
             // 
@@ -874,7 +483,7 @@ namespace Quotopia
             0,
             0});
             this.minsizebox.Name = "minsizebox";
-            this.minsizebox.Size = new System.Drawing.Size(57, 22);
+            this.minsizebox.Size = new System.Drawing.Size(59, 22);
             this.minsizebox.TabIndex = 11;
             this.minsizebox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.minsizebox.Value = global::Quotopia.Properties.Settings.Default.MinimumSize;
@@ -897,7 +506,6 @@ namespace Quotopia
             this.unloadallboxbut.Size = new System.Drawing.Size(27, 22);
             this.unloadallboxbut.TabIndex = 9;
             this.unloadallboxbut.UseVisualStyleBackColor = true;
-            this.unloadallboxbut.Click += new System.EventHandler(this.unloadallboxbut_Click);
             // 
             // label5
             // 
@@ -930,7 +538,7 @@ namespace Quotopia
             0,
             0});
             this.maxsize.Name = "maxsize";
-            this.maxsize.Size = new System.Drawing.Size(59, 22);
+            this.maxsize.Size = new System.Drawing.Size(60, 22);
             this.maxsize.TabIndex = 7;
             this.maxsize.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.maxsize.Value = global::Quotopia.Properties.Settings.Default.MaximumSize;
@@ -953,7 +561,6 @@ namespace Quotopia
             this.LoadDllButton.Size = new System.Drawing.Size(27, 21);
             this.LoadDllButton.TabIndex = 0;
             this.LoadDllButton.UseVisualStyleBackColor = true;
-            this.LoadDllButton.Click += new System.EventHandler(this.LoadDllButton_Click);
             // 
             // minsizelabel
             // 
@@ -974,7 +581,6 @@ namespace Quotopia
             this.resetsetbut.TabIndex = 6;
             this.resetsetbut.Text = "Discard";
             this.resetsetbut.UseVisualStyleBackColor = true;
-            this.resetsetbut.Click += new System.EventHandler(this.resetsetbut_Click);
             // 
             // restoredefaultsbut
             // 
@@ -985,7 +591,6 @@ namespace Quotopia
             this.restoredefaultsbut.TabIndex = 5;
             this.restoredefaultsbut.Text = "Defaults";
             this.restoredefaultsbut.UseVisualStyleBackColor = true;
-            this.restoredefaultsbut.Click += new System.EventHandler(this.restoredefaultsbut_Click);
             // 
             // saveSettingsbut
             // 
@@ -996,12 +601,12 @@ namespace Quotopia
             this.saveSettingsbut.TabIndex = 4;
             this.saveSettingsbut.Text = "Save";
             this.saveSettingsbut.UseVisualStyleBackColor = true;
-            this.saveSettingsbut.Click += new System.EventHandler(this.saveSettingsbut_Click);
             // 
             // datagroup
             // 
             this.datagroup.Controls.Add(this.saveticks);
             this.datagroup.Controls.Add(this.archivefolderbut);
+            this.datagroup.Controls.Add(this.histsimbut);
             this.datagroup.Controls.Add(this.liveanvilbut);
             this.datagroup.Controls.Add(this.simAnvilbut);
             this.datagroup.Location = new System.Drawing.Point(372, 52);
@@ -1035,7 +640,18 @@ namespace Quotopia
             this.archivefolderbut.TabIndex = 10;
             this.archivefolderbut.Text = "Save Location";
             this.archivefolderbut.UseVisualStyleBackColor = true;
-            this.archivefolderbut.Click += new System.EventHandler(this.archivefolderbut_Click);
+            // 
+            // histsimbut
+            // 
+            this.histsimbut.AutoSize = true;
+            this.histsimbut.Location = new System.Drawing.Point(13, 84);
+            this.histsimbut.Margin = new System.Windows.Forms.Padding(4);
+            this.histsimbut.Name = "histsimbut";
+            this.histsimbut.Size = new System.Drawing.Size(100, 21);
+            this.histsimbut.TabIndex = 9;
+            this.histsimbut.TabStop = true;
+            this.histsimbut.Text = "Tick Replay";
+            this.histsimbut.UseVisualStyleBackColor = true;
             // 
             // liveanvilbut
             // 
@@ -1044,12 +660,11 @@ namespace Quotopia
             this.liveanvilbut.Margin = new System.Windows.Forms.Padding(4);
             this.liveanvilbut.Name = "liveanvilbut";
             this.liveanvilbut.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.liveanvilbut.Size = new System.Drawing.Size(98, 21);
+            this.liveanvilbut.Size = new System.Drawing.Size(86, 21);
             this.liveanvilbut.TabIndex = 8;
             this.liveanvilbut.TabStop = true;
-            this.liveanvilbut.Text = "Live Broker";
+            this.liveanvilbut.Text = "Live Anvil";
             this.liveanvilbut.UseVisualStyleBackColor = true;
-            this.liveanvilbut.Click += new System.EventHandler(this.liveanvilbut_CheckedChanged);
             // 
             // simAnvilbut
             // 
@@ -1059,12 +674,11 @@ namespace Quotopia
             this.simAnvilbut.Margin = new System.Windows.Forms.Padding(4);
             this.simAnvilbut.Name = "simAnvilbut";
             this.simAnvilbut.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.simAnvilbut.Size = new System.Drawing.Size(137, 21);
+            this.simAnvilbut.Size = new System.Drawing.Size(125, 21);
             this.simAnvilbut.TabIndex = 7;
             this.simAnvilbut.TabStop = true;
-            this.simAnvilbut.Text = "Simulation Broker";
+            this.simAnvilbut.Text = "Simulation Anvil";
             this.simAnvilbut.UseVisualStyleBackColor = true;
-            this.simAnvilbut.Click += new System.EventHandler(this.simAnvilbut_CheckedChanged);
             // 
             // vizGroupBox
             // 
@@ -1109,7 +723,6 @@ namespace Quotopia
             this.chartcolbut.Size = new System.Drawing.Size(28, 22);
             this.chartcolbut.TabIndex = 20;
             this.chartcolbut.UseVisualStyleBackColor = true;
-            this.chartcolbut.Click += new System.EventHandler(this.chartcolbut_Click);
             // 
             // label8
             // 
@@ -1139,7 +752,6 @@ namespace Quotopia
             this.colheadfgcolbut.Size = new System.Drawing.Size(28, 26);
             this.colheadfgcolbut.TabIndex = 17;
             this.colheadfgcolbut.UseVisualStyleBackColor = true;
-            this.colheadfgcolbut.Click += new System.EventHandler(this.colheadfgcolbut_Click);
             // 
             // colheadcolbut
             // 
@@ -1149,7 +761,6 @@ namespace Quotopia
             this.colheadcolbut.Size = new System.Drawing.Size(27, 27);
             this.colheadcolbut.TabIndex = 16;
             this.colheadcolbut.UseVisualStyleBackColor = true;
-            this.colheadcolbut.Click += new System.EventHandler(this.colheadcolbut_Click);
             // 
             // groupBox2
             // 
@@ -1180,7 +791,6 @@ namespace Quotopia
             this.tcolfgbut.TabStop = true;
             this.tcolfgbut.Text = "Color foreground";
             this.tcolfgbut.UseVisualStyleBackColor = true;
-            this.tcolfgbut.CheckedChanged += new System.EventHandler(this.tcolfgbut_CheckedChanged);
             // 
             // tcolbgbut
             // 
@@ -1211,7 +821,6 @@ namespace Quotopia
             this.button2.Size = new System.Drawing.Size(27, 22);
             this.button2.TabIndex = 7;
             this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // button1
             // 
@@ -1221,7 +830,6 @@ namespace Quotopia
             this.button1.Size = new System.Drawing.Size(27, 22);
             this.button1.TabIndex = 6;
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // label1
             // 
@@ -1273,7 +881,6 @@ namespace Quotopia
             this.hlcolbgbut.TabStop = true;
             this.hlcolbgbut.Text = "Color background";
             this.hlcolbgbut.UseVisualStyleBackColor = true;
-            this.hlcolbgbut.CheckedChanged += new System.EventHandler(this.hlcolbgbut_CheckedChanged);
             // 
             // button4
             // 
@@ -1283,7 +890,6 @@ namespace Quotopia
             this.button4.Size = new System.Drawing.Size(28, 21);
             this.button4.TabIndex = 9;
             this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // label3
             // 
@@ -1313,7 +919,6 @@ namespace Quotopia
             this.button3.Size = new System.Drawing.Size(27, 22);
             this.button3.TabIndex = 8;
             this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // gridcolorlab
             // 
@@ -1333,7 +938,6 @@ namespace Quotopia
             this.gridcolorbut.Size = new System.Drawing.Size(27, 22);
             this.gridcolorbut.TabIndex = 4;
             this.gridcolorbut.UseVisualStyleBackColor = true;
-            this.gridcolorbut.Click += new System.EventHandler(this.gridcolorbut_Click);
             // 
             // fntlabel
             // 
@@ -1353,7 +957,6 @@ namespace Quotopia
             this.fontBut.Size = new System.Drawing.Size(27, 25);
             this.fontBut.TabIndex = 2;
             this.fontBut.UseVisualStyleBackColor = true;
-            this.fontBut.Click += new System.EventHandler(this.fontBut_Click);
             // 
             // bgCollabel
             // 
@@ -1373,7 +976,6 @@ namespace Quotopia
             this.bgcolbut.Size = new System.Drawing.Size(27, 25);
             this.bgcolbut.TabIndex = 0;
             this.bgcolbut.UseVisualStyleBackColor = true;
-            this.bgcolbut.Click += new System.EventHandler(this.bgcolbut_Click);
             // 
             // LogTab
             // 
@@ -1401,7 +1003,76 @@ namespace Quotopia
             this.statusWindow.Size = new System.Drawing.Size(828, 538);
             this.statusWindow.TabIndex = 0;
             this.statusWindow.Text = "";
-            this.statusWindow.DoubleClick += new System.EventHandler(this.clearDebugButton_Click_1);
+            // 
+            // rightclickrow
+            // 
+            this.rightclickrow.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.showchart,
+            this.flatmenuright,
+            this.columnsdropdown,
+            this.boxdropdown});
+            this.rightclickrow.Name = "rightclickrow";
+            this.rightclickrow.Size = new System.Drawing.Size(132, 92);
+            // 
+            // showchart
+            // 
+            this.showchart.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.showchart.Name = "showchart";
+            this.showchart.Size = new System.Drawing.Size(131, 22);
+            this.showchart.Text = "Chart";
+            this.showchart.ToolTipText = "Chart symbol";
+            // 
+            // flatmenuright
+            // 
+            this.flatmenuright.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.flatmenuright.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.flatthisfull,
+            this.flatthishalf,
+            this.flatthisqtr,
+            this.flatallpositions});
+            this.flatmenuright.Name = "flatmenuright";
+            this.flatmenuright.Size = new System.Drawing.Size(131, 22);
+            this.flatmenuright.Text = "Flat";
+            this.flatmenuright.TextDirection = System.Windows.Forms.ToolStripTextDirection.Horizontal;
+            this.flatmenuright.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
+            // 
+            // flatthisfull
+            // 
+            this.flatthisfull.Name = "flatthisfull";
+            this.flatthisfull.Size = new System.Drawing.Size(184, 22);
+            this.flatthisfull.Text = "flat THIS 100%";
+            // 
+            // flatthishalf
+            // 
+            this.flatthishalf.Name = "flatthishalf";
+            this.flatthishalf.Size = new System.Drawing.Size(184, 22);
+            this.flatthishalf.Text = "flat THIS 50%";
+            // 
+            // flatthisqtr
+            // 
+            this.flatthisqtr.Name = "flatthisqtr";
+            this.flatthisqtr.Size = new System.Drawing.Size(184, 22);
+            this.flatthisqtr.Text = "flat THIS 25%";
+            // 
+            // flatallpositions
+            // 
+            this.flatallpositions.Name = "flatallpositions";
+            this.flatallpositions.Size = new System.Drawing.Size(184, 22);
+            this.flatallpositions.Text = "flat ALL positions";
+            // 
+            // columnsdropdown
+            // 
+            this.columnsdropdown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.columnsdropdown.Name = "columnsdropdown";
+            this.columnsdropdown.Size = new System.Drawing.Size(131, 22);
+            this.columnsdropdown.Text = "Columns";
+            this.columnsdropdown.ToolTipText = "Toggle displayed fields";
+            // 
+            // boxdropdown
+            // 
+            this.boxdropdown.Name = "boxdropdown";
+            this.boxdropdown.Size = new System.Drawing.Size(131, 22);
+            this.boxdropdown.Text = "Boxes";
             // 
             // OrderUserCol
             // 
@@ -1458,15 +1129,13 @@ namespace Quotopia
             this.Location = global::Quotopia.Properties.Settings.Default.location;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Quote";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Quotopia";
-            this.Load += new System.EventHandler(this.Quote_Load);
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Quote_FormClosing);
-            this.Resize += new System.EventHandler(this.Quote_Resize);
             this.quoteTab.ResumeLayout(false);
             this.Markets.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.MarketsView)).EndInit();
-            this.rightclickrow.ResumeLayout(false);
+            this.Markets.PerformLayout();
+            this.toolStrip1.ResumeLayout(false);
+            this.toolStrip1.PerformLayout();
             this.TradeTab.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.TradesView)).EndInit();
             this.Settings.ResumeLayout(false);
@@ -1484,7 +1153,7 @@ namespace Quotopia
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.LogTab.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.quoteStoreBindingSource)).EndInit();
+            this.rightclickrow.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -1495,7 +1164,6 @@ namespace Quotopia
         private System.Windows.Forms.TabPage Markets;
         private System.Windows.Forms.TabPage Settings;
         private System.Windows.Forms.TabPage LogTab;
-        private System.Windows.Forms.DataGridView MarketsView;
         private System.Windows.Forms.Button LoadDllButton;
         private System.Windows.Forms.TabPage TradeTab;
         private System.Windows.Forms.DataGridView TradesView;
@@ -1529,15 +1197,8 @@ namespace Quotopia
         private System.Windows.Forms.Button restoredefaultsbut;
         private System.Windows.Forms.Button resetsetbut;
         private System.Windows.Forms.RadioButton simAnvilbut;
+        private System.Windows.Forms.RadioButton histsimbut;
         private System.Windows.Forms.RadioButton liveanvilbut;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Date;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Time;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Sec;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Symbol;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Side;
-        private System.Windows.Forms.DataGridViewTextBoxColumn xSize;
-        private System.Windows.Forms.DataGridViewTextBoxColumn xPrice;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Comment;
         private System.Windows.Forms.CheckBox saveticks;
         private System.Windows.Forms.Button archivefolderbut;
         private System.Windows.Forms.GroupBox boxgroup;
@@ -1572,27 +1233,20 @@ namespace Quotopia
         private System.Windows.Forms.RadioButton boxenablebox;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Button chartcolbut;
-        private System.Windows.Forms.DataGridViewTextBoxColumn SymbolCol;
-        private System.Windows.Forms.DataGridViewTextBoxColumn LastPrintCol;
-        private System.Windows.Forms.DataGridViewTextBoxColumn LastSizeCol;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Blank;
-        private System.Windows.Forms.DataGridViewTextBoxColumn BidCol;
-        private System.Windows.Forms.DataGridViewTextBoxColumn OfferCol;
-        private System.Windows.Forms.DataGridViewTextBoxColumn QuoteSizeCol;
-        private System.Windows.Forms.DataGridViewTextBoxColumn BidSizeCol;
-        private System.Windows.Forms.DataGridViewTextBoxColumn OfferSizeCol;
-        private System.Windows.Forms.DataGridViewTextBoxColumn PosSizeCol;
-        private System.Windows.Forms.DataGridViewTextBoxColumn AvgPriceCol;
-        private System.Windows.Forms.DataGridViewTextBoxColumn MinSizeCol;
-        private System.Windows.Forms.DataGridViewTextBoxColumn TrendCol;
-        private System.Windows.Forms.DataGridViewTextBoxColumn DayLowCol;
-        private System.Windows.Forms.DataGridViewTextBoxColumn DayOpenCol;
-        private System.Windows.Forms.DataGridViewTextBoxColumn DayHighCol;
-        private System.Windows.Forms.DataGridViewTextBoxColumn YestCloseCol;
-        private System.Windows.Forms.DataGridViewTextBoxColumn NetChangeCol;
-        private System.Windows.Forms.DataGridViewImageColumn xTrendCol;
-        private System.Windows.Forms.DataGridViewTextBoxColumn TimeCol;
-        private System.Windows.Forms.BindingSource quoteStoreBindingSource;
         private System.Windows.Forms.CheckBox boxdebug;
+        private System.Windows.Forms.ToolStrip toolStrip1;
+        private System.Windows.Forms.ToolStripLabel statuslab;
+        private System.Windows.Forms.ToolStripButton importbasketbut;
+        private System.Windows.Forms.ToolStripButton exportbasketbut;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Date;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Time;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Sec;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Symbol;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Side;
+        private System.Windows.Forms.DataGridViewTextBoxColumn xSize;
+        private System.Windows.Forms.DataGridViewTextBoxColumn xPrice;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Comment;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ColAccount;
     }
 }
