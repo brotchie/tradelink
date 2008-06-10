@@ -19,7 +19,7 @@ namespace TLReplay
         public Replay()
         {
             InitializeComponent();
-            tl = new TradeLink_Server_WM(Text);
+            tl = new TradeLink_Server_WM(false);
         }
 
 

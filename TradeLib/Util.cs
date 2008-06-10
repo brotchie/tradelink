@@ -252,6 +252,7 @@ namespace TradeLib
             switch (message)
             {
                 // tradelink messages
+                case TL2.FEATURE_NOT_IMPLEMENTED: return "Feature not implemented yet.";
                 case TL2.UNKNOWNSYM: return "Unknown symbol.";
                 case TL2.UNKNOWNMSG: return "Unknown message.";
                 case TL2.TL_CONNECTOR_MISSING: return "TradeLink Server not found.";

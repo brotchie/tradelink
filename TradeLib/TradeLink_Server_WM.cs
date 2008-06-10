@@ -212,8 +212,11 @@ namespace TradeLib
                 case TL2.HEARTBEAT:
                     SrvBeatHeart(msg);
                     break;
+                case TL2.BROKERNAME :
+                    result = (long)Brokers.TradeLinkSimulation;
+                    break;
                 default:
-                    result = (long)TL2.UNKNOWNMSG;
+                    result = (long)TL2.FEATURE_NOT_IMPLEMENTED;
                     break;
             }
             m.Result = (IntPtr)result;

@@ -73,7 +73,7 @@ namespace TLReplay
             this.speedbar.Margin = new System.Windows.Forms.Padding(4);
             this.speedbar.Name = "speedbar";
             this.speedbar.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.speedbar.Size = new System.Drawing.Size(56, 129);
+            this.speedbar.Size = new System.Drawing.Size(53, 129);
             this.speedbar.TabIndex = 9;
             this.speedbar.Value = global::TLReplay.Properties.Settings.Default.speed;
             this.speedbar.MouseUp += new System.Windows.Forms.MouseEventHandler(this.speedbar_MouseUp);
@@ -184,7 +184,7 @@ namespace TLReplay
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Replay";
-            this.Text = "TL-BROKER-SIMU";
+            this.Text = "TradeLink Replay";
             ((System.ComponentModel.ISupportInitialize)(this.speedbar)).EndInit();
             this.nowplayinggrp.ResumeLayout(false);
             this.nowplayinggrp.PerformLayout();
