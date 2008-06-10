@@ -86,6 +86,7 @@ ren signtool.exe signtool.tmp
 echo Removing working releases...
 del *.exe
 del *.config
+del *.xml
 del EarlyClose.csv
 del *.dll
 del /s /f /q Properties
