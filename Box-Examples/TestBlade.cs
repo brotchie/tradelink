@@ -57,5 +57,28 @@ namespace box
             Assert.That(bigvol == 1,bigvol.ToString());
 
         }
+
+        [Test]
+        public void QuoteOnlyTest()
+        {
+            Tick[] timesales = new Tick[] {
+                Tick.NewBid("TST",100m,100),
+                Tick.NewAsk("TST",100.1m,200),
+            };
+
+            Blade b = new Blade();
+            BarList bl = new BarList(BarInterval.FiveMin,"TST");
+
+            foreach (Tick k in timesales)
+            {
+                bl.newTick(k);
+                b.newBar(bl);
+            }
+
+            // average volume should be zero bc
+            // with only quotes we should have no bars to process
+            Assert.That(b.AvgVol(bl) == 0, b.AvgVol(bl).ToString());
+            Assert.That(!bl.Has(1), bl.ToString());
+        }
     }
 }

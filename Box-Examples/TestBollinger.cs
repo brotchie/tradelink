@@ -124,6 +124,29 @@ namespace box
             Assert.That(bbb.Upperband == 5.73606797749978M, bbb.Upperband.ToString());
             Assert.That(bbb.Lowerband == 1.26393202250022M, bbb.Lowerband.ToString());
         }
+
+        [Test]
+        public void QuoteOnlyTest()
+        {
+            Tick[] timesales = new Tick[] {
+                Tick.NewBid("TST",100m,100),
+                Tick.NewAsk("TST",100.1m,200),
+            };
+
+            Bollinger b = new Bollinger();
+            BarList bl = new BarList(BarInterval.FiveMin, "TST");
+
+            foreach (Tick k in timesales)
+            {
+                bl.newTick(k);
+                b.newBar(bl);
+            }
+
+            // average volume should be zero bc
+            // with only quotes we should have no bars to process
+            Assert.That(b.Mean== 0, b.Mean.ToString());
+            Assert.That(!bl.Has(1), bl.ToString());
+        }
     
     
     }
