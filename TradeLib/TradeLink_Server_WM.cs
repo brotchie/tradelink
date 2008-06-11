@@ -7,7 +7,7 @@ namespace TradeLib
 {
     public class TradeLink_Server_WM : Form, TradeLinkServer
     {
-        public TradeLink_Server_WM() : this(false) { }
+        public TradeLink_Server_WM() : this(TLTypes.HISTORICALBROKER) { }
         public TradeLink_Server_WM(string servername) : base()
         {
             this.Text = servername;
@@ -16,7 +16,9 @@ namespace TradeLib
             this.ShowInTaskbar = false;
             this.Hide();
         }
-        public TradeLink_Server_WM(bool liveserver) : this(liveserver ? WMUtil.LIVEWINDOW : WMUtil.SIMWINDOW) { }
+        public TradeLink_Server_WM(TLTypes servertype) : 
+            this(servertype==TLTypes.LIVEBROKER? WMUtil.LIVEWINDOW :
+                (servertype == TLTypes.SIMBROKER ? WMUtil.SIMWINDOW : WMUtil.REPLAYWINDOW)) { }
 
         public event OrderDelegate gotSrvFillRequest;
         Dictionary<string, decimal> chighs = new Dictionary<string, decimal>();
@@ -37,6 +39,13 @@ namespace TradeLib
             for (int i = 0; i < index.Count; i++)
                 if ((client[i] != null) && (index[i].Contains(itick.Name)))
                     WMUtil.SendMsg(itick.Serialize(), TL2.TICKNOTIFY, Handle,client[i]);
+        }
+
+        public void newOrder(Order o)
+        {
+            for (int i = 0; i < client.Count; i++)
+                if ((client[i] != null) && (client[i] != ""))
+                    WMUtil.SendMsg(o.Serialize(), TL2.ORDERNOTIFY, Handle, client[i]);
         }
 
         // server to clients

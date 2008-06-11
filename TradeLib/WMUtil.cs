@@ -37,6 +37,7 @@ namespace TradeLib
 
         public const string SIMWINDOW = "TL-BROKER-SIMU";
         public const string LIVEWINDOW = "TL-BROKER-LIVE";
+        public const string REPLAYWINDOW = "TL-BROKER-RPLY";
 
         //SendMessage
         [DllImport("user32.dll")]

@@ -68,6 +68,7 @@ namespace TradeLib
         public bool Mode(TLTypes mode, bool throwexceptions, bool showwarning)
         {
             bool HandleExceptions = !throwexceptions;
+            LinkType = TLTypes.NONE; // reset before changing link mode
             switch (mode)
             {
                 case TLTypes.LIVEBROKER:
@@ -107,6 +108,24 @@ namespace TradeLib
                     else GoSim();
                     return true;
                     break;
+                case TLTypes.HISTORICALBROKER:
+                    if (HandleExceptions)
+                    {
+                        try
+                        {
+                            GoHist();
+                            return true;
+                        }
+                        catch (TLServerNotFound)
+                        {
+                            if (showwarning)
+                                System.Windows.Forms.MessageBox.Show("No historical broker instance found.  Make sure Replay Server is running.");
+                            return false;
+                        }
+                    }
+                    else GoHist();
+                    return true;
+                    break;
                 default:
                     if (showwarning) 
                         System.Windows.Forms.MessageBox.Show("No simulation broker instance was found.  Make sure broker application + TradeLink server is running.", "TradeLink server not found");
@@ -115,17 +134,22 @@ namespace TradeLib
             return false;
         }
 
-        public bool LiveServer = false;
+        public TLTypes LinkType = TLTypes.NONE;
 
         /// <summary>
         /// Makes TL client use Broker LIVE server (Broker must be logged in and TradeLink loaded)
         /// </summary>
-        public void GoLive() { Disconnect(); himh = WMUtil.HisHandle(WMUtil.LIVEWINDOW); LiveServer = true; Register(); }
+        public void GoLive() { Disconnect(); himh = WMUtil.HisHandle(WMUtil.LIVEWINDOW); LinkType = TLTypes.LIVEBROKER; Register(); }
 
         /// <summary>
         /// Makes TL client use Broker Simulation mode (Broker must be logged in and TradeLink loaded)
         /// </summary>
-        public void GoSim() { Disconnect(); himh = WMUtil.HisHandle(WMUtil.SIMWINDOW); LiveServer = false; Register(); }
+        public void GoSim() { Disconnect(); himh = WMUtil.HisHandle(WMUtil.SIMWINDOW); LinkType = TLTypes.SIMBROKER;  Register(); }
+
+        /// <summary>
+        /// Attemptions connection to TL Replay Server
+        /// </summary>
+        public void GoHist() { Disconnect(); himh = WMUtil.HisHandle(WMUtil.REPLAYWINDOW); LinkType = TLTypes.HISTORICALBROKER; Register(); }
 
         IntPtr himh = IntPtr.Zero;
         protected long TLSend(TL2 type) { return TLSend(type, ""); }
@@ -299,6 +323,7 @@ namespace TradeLib
             TLTypes f = TLTypes.NONE;
             if (WMUtil.Found(WMUtil.SIMWINDOW)) f |= TLTypes.SIMBROKER;
             if (WMUtil.Found(WMUtil.LIVEWINDOW)) f |= TLTypes.LIVEBROKER;
+            if (WMUtil.Found(WMUtil.REPLAYWINDOW)) f |= TLTypes.HISTORICALBROKER;
             return f;
         }
 

@@ -71,6 +71,7 @@ namespace TradeLib
         NONE = 0,
         SIMBROKER = 2,
         LIVEBROKER = 4,
+        HISTORICALBROKER = 8,
     }
 
 

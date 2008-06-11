@@ -38,12 +38,11 @@ namespace TestTradeLib
         [Test]
         public void StartupTests()
         {
+            // we're expecting this server type
+            TLTypes expect = TLTypes.HISTORICALBROKER;
             // discover our states
             TLTypes FOUND = c.TLFound();
-            bool CONNECTED = c.Mode(TLTypes.SIMBROKER,true,false);
-
-            // discover our server out there
-            Assert.That(FOUND == TLTypes.SIMBROKER, "make sure you don't have TLServers running");
+            bool CONNECTED = c.Mode(FOUND&expect,true,false);
 
             // should be able to connect to whatever server we find
             Assert.That(CONNECTED,"make sure you don't have TLServers running");
