@@ -86,7 +86,7 @@ namespace EPF2IDX
 				if (v>h) h = v;
 				if (v<l) l = v;
 				Index i = new Index(et.sym,v,o,h,l,v,et.date,et.time); // map to our index
-				idx.WriteLine(Index.Serialize(i)); // write our index
+				idx.WriteLine(i.Serialize()); // write our index
 			}
 			idx.Close();
 			epf.Close();
