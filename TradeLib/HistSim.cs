@@ -5,79 +5,133 @@ using System.IO;
 
 namespace TradeLib
 {
-    // experimental
     public class HistSim 
     {
         public event TickDelegate GotTick;
-        public event FillDelegate GotFill;
         public event DebugDelegate GotDebug;
         public event IndexDelegate GotIndex;
-        int _simtime = 0;
-        public int NumClients { get { return 0; } }
         string _folder;
         TickFileFilter _filter = new TickFileFilter();
-        bool _ticksloaded = false;
-        bool _loadindex = true;
         Broker _broker = new Broker();
+        string[] _indexfiles;
         string[] _tickfiles;
+        List<Instrument> Instruments = new List<Instrument>();
         public Broker SimBroker { get { return _broker; } set { _broker = value; } }
         public HistSim() : this(Util.TLTickDir, null) { }
+        public HistSim(TickFileFilter tff) : this(Util.TLTickDir, tff) { }
         public HistSim(string TickFolder, TickFileFilter tff)
         {
             _folder = TickFolder;
             if (tff != null)
                 _filter = tff;
         }
-
-        public void Load()
+        private void D(string message)
         {
-            string[] files = Directory.GetFiles(_folder);
+            if (GotDebug!=null) GotDebug(message);
+        }
+
+        public void Initialize()
+        {
+            // get our listings of historical files (idx and epf)
+            string[] files = Directory.GetFiles(_folder,"*.EPF");
             _tickfiles = _filter.Allows(files);
-
+            D("got tickfiles: "+string.Join(",",_tickfiles));
+            files = Directory.GetFiles(_folder,"*.IDX");
+            _indexfiles = _filter.Allows(files);
+            D("got indexfiles: "+string.Join(",",_indexfiles));
+            // now we have our list, initialize instruments from files
+            foreach (string file in _tickfiles)
+                Instruments.Add(Stock.FromFile(file));
+            foreach (string file in _indexfiles)
+                Instruments.Add(Index.FromFile(file));
+            D("Initialized " + (_tickfiles.Length + _indexfiles.Length) + " instruments.");
         }
-        private void show(string message) { if (GotDebug!=null) GotDebug(message); }
 
-        private Dictionary<string, List<Index>> idxstream = new Dictionary<string, List<Index>>();
-
-        private void LoadIndexFiles(int date)
+        public void PlayTo(DateTime time)
         {
-            idxstream.Clear();
-            Dictionary<string, StreamReader> idxfile = new Dictionary<string, StreamReader>();
-            DirectoryInfo di = new DirectoryInfo(_folder);
-            FileInfo[] files = di.GetFiles("*"+date+"*.idx");
-            for (int i = 0; i < files.Length; i++)
-                if (!idxfile.ContainsKey(files[i].FullName))
-                    idxfile.Add(files[i].FullName, new StreamReader(files[i].FullName));
-                else idxfile[files[i].FullName] = new StreamReader(files[i].FullName);
-            show(Environment.NewLine);
-            show("Preparing "+idxfile.Count+ " indicies: ");
-            foreach (string stock in idxfile.Keys)
+            IndexPlayTo(time); // do indicies first
+            StockPlayTo(time); // then do stocks
+        }
+
+        List<Tick> tickcache = new List<Tick>();
+        List<Index> indexcache = new List<Index>();
+        List<string> cachedsymbols = new List<string>();
+
+        private void StockPlayTo(DateTime time)
+        {
+            while (FlushTickCache(time)) // continue flushing cache until nothing left to flush
+                FillCache(); // repopulate cache (ignored symbols already cached)
+        }
+
+        private void IndexPlayTo(DateTime time)
+        {
+            while (FlushIndexCache(time))// continue flushing cache until nothing left to flush
+                FillCache(); // repopulate cache (ignore symbols already cached)
+        }
+
+        void FillCache()
+        {  
+            // if a tick is in the cache it's because it's too new (in future)
+            // so we only need to fetch ticks for uncached symbols
+            foreach (Instrument i in Instruments)
             {
-                if (!idxstream.ContainsKey(stock))
-                    idxstream.Add(stock, new List<Index>());
-                string sym = "";
-                while (!idxfile[stock].EndOfStream)
-                { // read every index into memory
-                    string line = idxfile[stock].ReadLine();
-                    Index fi = Index.Deserialize(line);
-                    idxstream[stock].Add(fi);
-                    sym = fi.Name;
+                if (cachedsymbols.Contains(i.Name)) continue;
+
+                // if it's not already cached we need the next tick/index:
+                switch (i.SecurityType)
+                {
+                    case Security.STK:
+                        Stock s = (Stock)i;
+                        tickcache.Add(s.NextTick); // add to cache
+                        cachedsymbols.Add(i.Name); // update index of cached symbols
+                        break;
+                    case Security.IDX:
+                        Index x = (Index)i;
+                        indexcache.Add(x.NextTick); // add to index cache
+                        cachedsymbols.Add(i.Name);
+                        break;
                 }
-                show("Prepared "+sym+".");
             }
         }
 
-
-        List<Index> FetchIdx(int time)
+        void FetchIndexes()
         {
-            List<Index> res = new List<Index>();
-            foreach (string file in idxstream.Keys)
-            {
-                for (int i = 0; i < idxstream[file].Count; i++)
-                    if (idxstream[file][i].Time == time)
-                        res.Add(idxstream[file][i]);
-            }
-            return res;
         }
+
+        bool FlushIndexCache(DateTime time)
+        {
+            bool didsomething = false;
+            for (int i = 0; i < indexcache.Count; i++)
+                if (time >= Util.ToDateTime(indexcache[i].Date, indexcache[i].Time, 0)) // indicies don't have seconds
+                {
+                    if (GotIndex != null)
+                        GotIndex(indexcache[i]); // send cached item as event
+                    cachedsymbols.Remove(indexcache[i].Name); // update symbol cache
+                    indexcache.RemoveAt(i);// remove item from cache
+                    didsomething = true;
+                }
+            return didsomething;
+        }
+
+        bool FlushTickCache(DateTime time)
+        {
+            bool didsomething = false;
+            for (int i = 0; i < tickcache.Count; i++)
+                if (time >= Util.ToDateTime(tickcache[i].date, tickcache[i].time, tickcache[i].sec))
+                {
+                    if (GotTick != null)
+                        GotTick(tickcache[i]); // send cached item as event
+                    cachedsymbols.Remove(tickcache[i].sym); // update symbol cache
+                    tickcache.RemoveAt(i); // remove item from cache
+                    didsomething = true;
+                }
+            return didsomething;
+        }
+
+
+
+
+
+
     }
 }

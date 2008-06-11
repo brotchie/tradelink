@@ -83,7 +83,7 @@ namespace TradeTron
             }
             try
             {
-                filedict[i.Name].WriteLine(TradeLib.Index.Serialize(i));
+                filedict[i.Name].WriteLine(i.Serialize());
             }
             catch (Exception) { return false; }
             filedict[i.Name].Flush();

@@ -8,6 +8,10 @@ namespace TradeLib
     /// </summary>
     public class Index : Instrument
     {
+        public override Security SecurityType
+        {
+            get { return Security.IDX; }
+        }
         /// <summary>
         /// Determines whether the specified symbol is an index.
         /// </summary>
@@ -37,6 +41,7 @@ namespace TradeLib
             date = copythisidx.date;
             time = copythisidx.time;
         }
+        public Index() { }
         public Index(string symbol) : this(symbol, 0, 0, 0, 1000000, 0,0,0) { }
         public Index(string symbol, decimal tick, decimal o, decimal h, decimal l, decimal c) : this(symbol, tick, o, h, l, c, 0, 0) { }
         public Index(string symbol, decimal tick, decimal o, decimal h, decimal l, decimal c, int date, int time)
@@ -66,7 +71,7 @@ namespace TradeLib
         public decimal High { get { return high; } }
         public decimal Low { get { return low; } }
         public decimal Close { get { return close; } }
-        enum iorder
+        private enum iorder
         {
             sym = 0,
             date,
@@ -81,12 +86,11 @@ namespace TradeLib
         /// <summary>
         /// Serializes the specified index.  Used for writing IDX files.
         /// </summary>
-        /// <param name="i">The index.</param>
         /// <returns></returns>
-        public static string Serialize(Index i)
+        public string Serialize()
         {
             string s = "";
-            s = i.Name+","+i.Date + "," + i.Time + "," + i.Value + "," + i.Open + "," + i.High + "," + i.Low + "," + i.Close + ",";
+            s = Name+","+Date + "," + Time + "," + Value + "," + Open + "," + High + "," + Low + "," + Close + ",";
             return s;
         }
         /// <summary>
@@ -104,18 +108,6 @@ namespace TradeLib
             }
             catch (InvalidCastException) { }
             return i;
-        }
-
-        /// <summary>
-        /// Convert an index into a TradeLinkMessage
-        /// </summary>
-        /// <param name="i">The i.</param>
-        /// <returns></returns>
-        public static string ToTLmsg(Index i)
-        {
-            string s = "";
-            s = i.Name + ","+i.Value + "," + i.Open + "," + i.High + "," + i.Low + "," + i.Close + ",";
-            return s;
         }
 
         /// <summary>
@@ -152,22 +144,15 @@ namespace TradeLib
             return sym;
         }
 
-
-        /// <summary>
-        /// Create an Index instance from a TradeLink message.
-        /// </summary>
-        /// <param name="index">The index.</param>
-        /// <param name="val">The val.</param>
-        /// <returns></returns>
-        public static Index FromTLmsg(string index, string val)
+        private System.IO.StreamReader _histfile = null;
+        public bool hasHistorical { get { return _histfile != null; } }
+        public Index NextTick { get { if (!hasHistorical) return new Index(); return Index.Deserialize(_histfile.ReadLine()); } }
+        public static Index FromFile(string filename)
         {
-            string[] r = val.Split(',');
-            Index i = new Index(index);
-            try
-            {
-                i = new Index(index, Convert.ToDecimal(r[1]), Convert.ToDecimal(r[2]), Convert.ToDecimal(r[3]), Convert.ToDecimal(r[4]), Convert.ToDecimal(r[5]));
-            }
-            catch (Exception) { return null; }
+            System.IO.StreamReader sr = new System.IO.StreamReader(filename);
+            Index i = new Index();
+            i = Index.Deserialize(sr.ReadLine());
+            i._histfile = sr;
             return i;
         }
     }

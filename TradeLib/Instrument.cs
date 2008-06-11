@@ -11,5 +11,6 @@ namespace TradeLib
     {
         public abstract string Name { get; set; }
         public abstract bool isValid { get; }
+        public abstract Security SecurityType { get; }
     }
 }

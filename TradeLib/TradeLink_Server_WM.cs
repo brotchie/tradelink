@@ -36,7 +36,7 @@ namespace TradeLib
             if (itick.Name == "") return;
             for (int i = 0; i < index.Count; i++)
                 if ((client[i] != null) && (index[i].Contains(itick.Name)))
-                    WMUtil.SendMsg(Index.Serialize(itick), TL2.TICKNOTIFY, Handle,client[i]);
+                    WMUtil.SendMsg(itick.Serialize(), TL2.TICKNOTIFY, Handle,client[i]);
         }
 
         // server to clients
