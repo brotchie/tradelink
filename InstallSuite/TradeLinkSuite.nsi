@@ -37,7 +37,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\Quotopia.lnk" "$INSTDIR\Quotopia.exe" "" "$INSTDIR\Quotopia.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Gauntlet.lnk" "$INSTDIR\Gauntlet.exe" "" "$INSTDIR\Gauntlet.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Chartographer.lnk" "$INSTDIR\Chartographer.exe" "" "$INSTDIR\Chartographer.exe" 0
-  CreateShortCut "$SMPROGRAMS\TradeLink\Replay.lnk" "$INSTDIR\TLReplay.exe" "" "$INSTDIR\TLReplay.exe" 0
+  CreateShortCut "$SMPROGRAMS\TradeLink\Replay.lnk" "$INSTDIR\Replay.exe" "" "$INSTDIR\Replay.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Time and Sales.lnk" "$INSTDIR\TimeSales.exe" "" "$INSTDIR\TimeSales.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Tattle.lnk" "$INSTDIR\Tattle.exe" "" "$INSTDIR\Tattle.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Uninstall TradeLinkSuite.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
@@ -50,8 +50,7 @@ Section "TradeLinkSuite"
   ; Put file there
   File "Kadina.exe"
   File "Kadina.exe.config"
-  File "TLReplay.exe"
-  File "TLReplay.exe.config"
+  File "Replay.exe"
   File "box.dll"
   File "Quotopia.exe"
   File "Quotopia.exe.config"

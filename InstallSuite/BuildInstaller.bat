@@ -40,7 +40,7 @@ echo TRADELIB
 xcopy /q /y ..\Tradelib\bin\Release\TradeLib.dll .
 xcopy /q /y ..\TradeLib\bin\Release\EarlyClose.csv .
 echo REPLAY
-xcopy /q /y ..\Replay\bin\Release\TLReplay.exe* .
+xcopy /q /y ..\Replay\bin\Release\Replay.exe* .
 echo QUOTOPIA
 xcopy /q /y ..\Quotopia\bin\Release\Quotopia.exe* .
 xcopy /q /i /y ..\Quotopia\bin\Release\Properties .\Properties
