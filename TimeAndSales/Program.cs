@@ -14,7 +14,11 @@ namespace TimeSales
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new TnS());
+            try
+            {
+                Application.Run(new TnS());
+            }
+            catch (Exception) { }
         }
     }
 }
