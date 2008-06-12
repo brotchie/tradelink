@@ -4,11 +4,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{EBD170C1-16CD-4D07-8A46-029CAE6BA868}</ProjectGuid>
+    <ProjectGuid>{4D860426-D12D-445C-9081-5663EF37D8AF}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TLReplay</RootNamespace>
-    <AssemblyName>TLReplay</AssemblyName>
+    <RootNamespace>Replay</RootNamespace>
+    <AssemblyName>Replay</AssemblyName>
     <ApplicationIcon>Replay.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -48,21 +48,19 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Replay.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>Replay.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Replay.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>Replay.cs</DependentUpon>
+    </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -75,8 +73,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Replay.ico" />
-    <None Include="Resources\stopicon.ico" />
-    <None Include="Resources\playicon.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TradeLib\TradeLib.csproj">

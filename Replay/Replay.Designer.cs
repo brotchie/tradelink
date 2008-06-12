@@ -1,4 +1,4 @@
-namespace TLReplay
+namespace Replay
 {
     partial class Replay
     {
@@ -30,164 +30,181 @@ namespace TLReplay
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Replay));
             this.monthCalendar1 = new System.Windows.Forms.MonthCalendar();
-            this.inputselectbut = new System.Windows.Forms.Button();
-            this.speedbar = new System.Windows.Forms.TrackBar();
+            this.trackBar1 = new System.Windows.Forms.TrackBar();
+            this.playbut = new System.Windows.Forms.Button();
+            this.stopbut = new System.Windows.Forms.Button();
+            this.inputbut = new System.Windows.Forms.Button();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.statuslab = new System.Windows.Forms.ToolStripStatusLabel();
+            this.progressbar = new System.Windows.Forms.ToolStripProgressBar();
+            this.daystartpicker = new System.Windows.Forms.DateTimePicker();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.nowplayinggrp = new System.Windows.Forms.GroupBox();
-            this.currdate = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.stopbut = new System.Windows.Forms.Button();
-            this.gobut = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.speedbar)).BeginInit();
-            this.nowplayinggrp.SuspendLayout();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
+            this.statusStrip1.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // monthCalendar1
             // 
-            this.monthCalendar1.Location = new System.Drawing.Point(134, 44);
-            this.monthCalendar1.Margin = new System.Windows.Forms.Padding(12, 11, 12, 11);
+            this.monthCalendar1.Location = new System.Drawing.Point(140, 38);
             this.monthCalendar1.MaxSelectionCount = 1;
             this.monthCalendar1.Name = "monthCalendar1";
             this.monthCalendar1.ShowToday = false;
-            this.monthCalendar1.ShowTodayCircle = false;
             this.monthCalendar1.TabIndex = 0;
-            this.monthCalendar1.DateSelected += new System.Windows.Forms.DateRangeEventHandler(this.monthCalendar1_DateSelected);
             // 
-            // inputselectbut
+            // trackBar1
             // 
-            this.inputselectbut.Location = new System.Drawing.Point(338, 12);
-            this.inputselectbut.Margin = new System.Windows.Forms.Padding(4);
-            this.inputselectbut.Name = "inputselectbut";
-            this.inputselectbut.Size = new System.Drawing.Size(65, 34);
-            this.inputselectbut.TabIndex = 1;
-            this.inputselectbut.Text = "Input";
-            this.inputselectbut.UseVisualStyleBackColor = true;
-            this.inputselectbut.Click += new System.EventHandler(this.inputselectbut_Click);
+            this.trackBar1.Location = new System.Drawing.Point(20, 32);
+            this.trackBar1.Name = "trackBar1";
+            this.trackBar1.Orientation = System.Windows.Forms.Orientation.Vertical;
+            this.trackBar1.Size = new System.Drawing.Size(53, 142);
+            this.trackBar1.TabIndex = 1;
+            this.trackBar1.Value = 5;
             // 
-            // speedbar
+            // playbut
             // 
-            this.speedbar.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::TLReplay.Properties.Settings.Default, "speed", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.speedbar.Location = new System.Drawing.Point(9, 105);
-            this.speedbar.Margin = new System.Windows.Forms.Padding(4);
-            this.speedbar.Name = "speedbar";
-            this.speedbar.Orientation = System.Windows.Forms.Orientation.Vertical;
-            this.speedbar.Size = new System.Drawing.Size(53, 129);
-            this.speedbar.TabIndex = 9;
-            this.speedbar.Value = global::TLReplay.Properties.Settings.Default.speed;
-            this.speedbar.MouseUp += new System.Windows.Forms.MouseEventHandler(this.speedbar_MouseUp);
+            this.playbut.Location = new System.Drawing.Point(12, 13);
+            this.playbut.Name = "playbut";
+            this.playbut.Size = new System.Drawing.Size(53, 23);
+            this.playbut.TabIndex = 2;
+            this.playbut.Text = "Play";
+            this.playbut.UseVisualStyleBackColor = true;
+            this.playbut.Click += new System.EventHandler(this.playbut_Click);
+            // 
+            // stopbut
+            // 
+            this.stopbut.Location = new System.Drawing.Point(72, 13);
+            this.stopbut.Name = "stopbut";
+            this.stopbut.Size = new System.Drawing.Size(54, 23);
+            this.stopbut.TabIndex = 3;
+            this.stopbut.Text = "Stop";
+            this.stopbut.UseVisualStyleBackColor = true;
+            this.stopbut.Click += new System.EventHandler(this.stopbut_Click);
+            // 
+            // inputbut
+            // 
+            this.inputbut.Location = new System.Drawing.Point(318, 21);
+            this.inputbut.Name = "inputbut";
+            this.inputbut.Size = new System.Drawing.Size(60, 23);
+            this.inputbut.TabIndex = 4;
+            this.inputbut.Text = "Input";
+            this.inputbut.UseVisualStyleBackColor = true;
+            this.inputbut.Click += new System.EventHandler(this.inputbut_Click);
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.statuslab,
+            this.progressbar});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 230);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(390, 22);
+            this.statusStrip1.SizingGrip = false;
+            this.statusStrip1.TabIndex = 5;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // statuslab
+            // 
+            this.statuslab.BackColor = System.Drawing.SystemColors.Control;
+            this.statuslab.Name = "statuslab";
+            this.statuslab.Size = new System.Drawing.Size(273, 17);
+            this.statuslab.Spring = true;
+            this.statuslab.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // progressbar
+            // 
+            this.progressbar.BackColor = System.Drawing.SystemColors.Control;
+            this.progressbar.Name = "progressbar";
+            this.progressbar.Size = new System.Drawing.Size(100, 16);
+            this.progressbar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            // 
+            // daystartpicker
+            // 
+            this.daystartpicker.CustomFormat = "hh:mm tt";
+            this.daystartpicker.DropDownAlign = System.Windows.Forms.LeftRightAlignment.Right;
+            this.daystartpicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.daystartpicker.Location = new System.Drawing.Point(229, 21);
+            this.daystartpicker.Name = "daystartpicker";
+            this.daystartpicker.ShowUpDown = true;
+            this.daystartpicker.Size = new System.Drawing.Size(83, 22);
+            this.daystartpicker.TabIndex = 6;
+            this.daystartpicker.Value = new System.DateTime(2008, 6, 12, 9, 30, 0, 0);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(5, 85);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label1.Location = new System.Drawing.Point(63, 94);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(49, 17);
-            this.label1.TabIndex = 10;
-            this.label1.Text = "Speed";
+            this.label1.Size = new System.Drawing.Size(37, 17);
+            this.label1.TabIndex = 7;
+            this.label1.Text = "Real";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(64, 204);
-            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label2.Location = new System.Drawing.Point(238, 2);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(35, 17);
-            this.label2.TabIndex = 11;
-            this.label2.Text = "Fast";
+            this.label2.Size = new System.Drawing.Size(63, 17);
+            this.label2.TabIndex = 8;
+            this.label2.Text = "DayStart";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(64, 110);
-            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label3.Location = new System.Drawing.Point(63, 32);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(37, 17);
-            this.label3.TabIndex = 12;
+            this.label3.TabIndex = 9;
             this.label3.Text = "Slow";
-            // 
-            // nowplayinggrp
-            // 
-            this.nowplayinggrp.Controls.Add(this.currdate);
-            this.nowplayinggrp.Enabled = false;
-            this.nowplayinggrp.Location = new System.Drawing.Point(9, 12);
-            this.nowplayinggrp.Margin = new System.Windows.Forms.Padding(4);
-            this.nowplayinggrp.Name = "nowplayinggrp";
-            this.nowplayinggrp.Padding = new System.Windows.Forms.Padding(4);
-            this.nowplayinggrp.Size = new System.Drawing.Size(109, 47);
-            this.nowplayinggrp.TabIndex = 15;
-            this.nowplayinggrp.TabStop = false;
-            this.nowplayinggrp.Text = "Now Playing";
-            // 
-            // currdate
-            // 
-            this.currdate.AutoSize = true;
-            this.currdate.Location = new System.Drawing.Point(25, 20);
-            this.currdate.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.currdate.Name = "currdate";
-            this.currdate.Size = new System.Drawing.Size(40, 17);
-            this.currdate.TabIndex = 0;
-            this.currdate.Text = "none";
-            this.currdate.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(64, 156);
-            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label4.Location = new System.Drawing.Point(65, 157);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(61, 17);
-            this.label4.TabIndex = 18;
-            this.label4.Text = "Realistic";
+            this.label4.Size = new System.Drawing.Size(35, 17);
+            this.label4.TabIndex = 10;
+            this.label4.Text = "Fast";
             // 
-            // stopbut
+            // groupBox1
             // 
-            this.stopbut.Image = ((System.Drawing.Image)(resources.GetObject("stopbut.Image")));
-            this.stopbut.Location = new System.Drawing.Point(190, 12);
-            this.stopbut.Margin = new System.Windows.Forms.Padding(4);
-            this.stopbut.Name = "stopbut";
-            this.stopbut.Size = new System.Drawing.Size(56, 34);
-            this.stopbut.TabIndex = 17;
-            this.stopbut.UseVisualStyleBackColor = true;
-            this.stopbut.Click += new System.EventHandler(this.stopbut_Click);
-            // 
-            // gobut
-            // 
-            this.gobut.Image = ((System.Drawing.Image)(resources.GetObject("gobut.Image")));
-            this.gobut.Location = new System.Drawing.Point(134, 12);
-            this.gobut.Margin = new System.Windows.Forms.Padding(4);
-            this.gobut.Name = "gobut";
-            this.gobut.Size = new System.Drawing.Size(48, 34);
-            this.gobut.TabIndex = 7;
-            this.gobut.Text = ">";
-            this.gobut.UseVisualStyleBackColor = true;
-            this.gobut.Click += new System.EventHandler(this.gobut_Click);
+            this.groupBox1.Controls.Add(this.label3);
+            this.groupBox1.Controls.Add(this.label1);
+            this.groupBox1.Controls.Add(this.label4);
+            this.groupBox1.Controls.Add(this.trackBar1);
+            this.groupBox1.Location = new System.Drawing.Point(12, 47);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(114, 180);
+            this.groupBox1.TabIndex = 11;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Playback";
             // 
             // Replay
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.ClientSize = new System.Drawing.Size(416, 254);
-            this.Controls.Add(this.label4);
+            this.ClientSize = new System.Drawing.Size(390, 252);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.label3);
+            this.Controls.Add(this.daystartpicker);
+            this.Controls.Add(this.statusStrip1);
+            this.Controls.Add(this.inputbut);
             this.Controls.Add(this.stopbut);
-            this.Controls.Add(this.nowplayinggrp);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.gobut);
-            this.Controls.Add(this.inputselectbut);
+            this.Controls.Add(this.playbut);
             this.Controls.Add(this.monthCalendar1);
-            this.Controls.Add(this.speedbar);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Replay";
             this.Text = "TradeLink Replay";
-            ((System.ComponentModel.ISupportInitialize)(this.speedbar)).EndInit();
-            this.nowplayinggrp.ResumeLayout(false);
-            this.nowplayinggrp.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -196,16 +213,19 @@ namespace TLReplay
         #endregion
 
         private System.Windows.Forms.MonthCalendar monthCalendar1;
-        private System.Windows.Forms.Button inputselectbut;
-        private System.Windows.Forms.Button gobut;
-        private System.Windows.Forms.TrackBar speedbar;
+        private System.Windows.Forms.TrackBar trackBar1;
+        private System.Windows.Forms.Button playbut;
+        private System.Windows.Forms.Button stopbut;
+        private System.Windows.Forms.Button inputbut;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel statuslab;
+        private System.Windows.Forms.ToolStripProgressBar progressbar;
+        private System.Windows.Forms.DateTimePicker daystartpicker;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.GroupBox nowplayinggrp;
-        private System.Windows.Forms.Button stopbut;
-        private System.Windows.Forms.Label currdate;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.GroupBox groupBox1;
     }
 }
 

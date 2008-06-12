@@ -6,99 +6,109 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using TradeLib;
+using System.IO;
 
-namespace TLReplay
+namespace Replay
 {
     public partial class Replay : Form
     {
-        TradeLink_Server_WM tl;
-        DayPlayback play = null;
-        Broker broker = new Broker();
-
+        TradeLink_Server_WM tl = new TradeLink_Server_WM(TLTypes.HISTORICALBROKER);
+        Playback _playback = null;
+        string tickfolder = Util.TLTickDir;
 
         public Replay()
         {
             InitializeComponent();
-            tl = new TradeLink_Server_WM(TLTypes.HISTORICALBROKER);
         }
 
 
-
-        ~Replay()
+        private void inputbut_Click(object sender, EventArgs e)
         {
-            Properties.Settings.Default.Save();
-        }
-
-        private void monthCalendar1_DateSelected(object sender, DateRangeEventArgs e)
-        {
-            int date = (e.Start.Year * 10000) + (e.Start.Month * 100) + e.Start.Day;
-        }
-
-        private void inputselectbut_Click(object sender, EventArgs e)
-        {
-            FolderBrowserDialog f = new FolderBrowserDialog();
-            f.SelectedPath = TLReplay.Properties.Settings.Default.tickfolderpath;
-            f.ShowNewFolderButton = false;
-            f.RootFolder = Environment.SpecialFolder.ProgramFiles;
-            f.Description = "Current Tick Source: " + TLReplay.Properties.Settings.Default.tickfolderpath + Environment.NewLine+"New Tick Source:";
-            f.ShowDialog();
-            TLReplay.Properties.Settings.Default.tickfolderpath = f.SelectedPath;
-        }
-
-
-        private void gobut_Click(object sender, EventArgs e)
-        {
-            int date = (10000*monthCalendar1.SelectionStart.Year) + (100*monthCalendar1.SelectionStart.Month) + monthCalendar1.SelectionStart.Day;
-            
-            try
+            FolderBrowserDialog fd = new FolderBrowserDialog();
+            fd.Description = "Choose folder containing tick or index archive files...";
+            if (fd.ShowDialog() == DialogResult.OK)
             {
-                int[] d = BarMath.Date(date);
-                currdate.Text = d[1].ToString() + "/" + d[2].ToString() + "/" + d[0].ToString();
+                tickfolder = fd.SelectedPath;
             }
-            catch (Exception) { MessageBox.Show("Your date is invalid.", "Replay can't start."); return; }
 
-            play = new DayPlayback(Properties.Settings.Default.tickfolderpath + "\\", date.ToString());
-            play.TLInst = tl;
-
-            gobut.Enabled = false;
-            nowplayinggrp.Enabled = true;
-            speedbar.Enabled = false;
-            inputselectbut.Enabled = false;
-            monthCalendar1.Enabled = false;
-
-            play.ExchFilter("NYS");
-            play.DelayMult(speedbar.Value/5);
-
-            play.RunWorkerCompleted += new RunWorkerCompletedEventHandler(play_RunWorkerCompleted);
-            play.RunWorkerAsync();
-            Refresh();
         }
 
-        void play_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        void status(string msg)
         {
-            gobut.Enabled = true;
-            nowplayinggrp.Enabled = false;
-            speedbar.Enabled = true;
-            inputselectbut.Enabled = true;
-            monthCalendar1.Enabled = true;
+            if (statusStrip1.InvokeRequired)
+                statusStrip1.Invoke(new DebugDelegate(status), new object[] { msg });
+            else
+                statuslab.Text = msg;
         }
 
-
-        private void pausebut_Click(object sender, EventArgs e)
+        private void playbut_Click(object sender, EventArgs e)
         {
-            play.CancelAsync();
+            if (!Directory.Exists(tickfolder))
+            {
+                status("Tick folder " + tickfolder + " doesn't exist,  stopping.");
+                return;
+            }
+            TickFileFilter tff = new TickFileFilter();
+            tff.DateFilter(Util.ToTLDate(monthCalendar1.SelectionEnd),DateMatchType.Day|DateMatchType.Month|DateMatchType.Year);
+            HistSim h = new HistSim(tickfolder, tff);
+            h.GotTick += new TickDelegate(h_GotTick);
+            h.GotIndex += new IndexDelegate(h_GotIndex);
+            h.SimBroker.GotOrder += new OrderDelegate(SimBroker_GotOrder);
+            h.SimBroker.GotFill += new FillDelegate(SimBroker_GotFill);
+            _playback = new Playback(h);
+            _playback.RunWorkerCompleted += new RunWorkerCompletedEventHandler(_playback_RunWorkerCompleted);
+            _playback.ProgressChanged+=new ProgressChangedEventHandler(_playback_ProgressChanged);
+            _playback.RunWorkerAsync(new PlayBackArgs((int)trackBar1.Value/5,daystartpicker.Value));
+            status("Playback started...");
+            playbut.Enabled = false;
+            stopbut.Enabled = true;
+            trackBar1.Enabled = false;
+        }
 
+        void _playback_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            progressbar.Value = e.ProgressPercentage;
+            status("Playing... " + e.ProgressPercentage + "%");
+        }
+
+        void _playback_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Cancelled)
+                status("Playback was canceled.");
+            else if (e.Error != null)
+                status("Playback stopped: " + e.Error.ToString());
+            else
+                status("Playback completed successfully");
+            progressbar.Value = 0;
+        }
+
+        void SimBroker_GotFill(Trade t)
+        {
+            tl.newFill(t);
+        }
+
+        void SimBroker_GotOrder(Order o)
+        {
+            tl.newOrder(o);
+        }
+
+        void h_GotIndex(Index idx)
+        {
+            tl.newIndexTick(idx);
+        }
+
+        void h_GotTick(Tick t)
+        {
+            tl.newTick(t);
         }
 
         private void stopbut_Click(object sender, EventArgs e)
         {
-            play.CancelAsync();
-        }
-
-        private void speedbar_MouseUp(object sender, MouseEventArgs e)
-        {
-            if ((e.Clicks > 0) && (e.Button == MouseButtons.Middle)) 
-                speedbar.Value = 5;
+            _playback.CancelAsync();
+            status("Cancel requested.");
+            stopbut.Enabled = false;
+            playbut.Enabled = true;
+            trackBar1.Enabled = true;
         }
 
 
