@@ -33,13 +33,18 @@ namespace Tript
         public override void Write(string value)
         {
             if (control.IsHandleCreated)
+            {
                 control.AppendText(value);
+            }
             else BufferText(value);
         }
 
         public override void WriteLine(string value)
         {
             base.WriteLine(value + Environment.NewLine);
+            control.SelectionStart = control.Text.Length;
+            control.SelectionLength = 0;
+            control.ScrollToCaret();
         }
 
         void BufferText(string s)

@@ -32,7 +32,7 @@ namespace Tript
             if (outbox.InvokeRequired)
                 outbox.Invoke(new DebugDelegate(output), new object[] { outputtext });
             else
-                outbox.AppendText(outputtext);
+                outbox.Text = outputtext + outbox.Text;
         }
 
         void run() { runbut_Click(null, null); }
