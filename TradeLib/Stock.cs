@@ -60,7 +60,16 @@ namespace TradeLib
         /// <summary>
         /// Fetches next historical tick for stock, or invalid tick if no historical data is available.
         /// </summary>
-        public Tick NextTick { get { if (!hasHistorical) return new Tick(); return (Tick)eSigTick.FromStream(_histfile); } }
+        public Tick NextTick 
+        { 
+            get 
+            { 
+                if (!hasHistorical) return new Tick(); 
+                Tick t = (Tick)eSigTick.FromStream(Symbol, _histfile); 
+                if (!t.isValid) _histfile.Close(); 
+                return t; 
+            } 
+        }
         /// <summary>
         /// Initializes a stock object with historical data from tick archive file
         /// </summary>

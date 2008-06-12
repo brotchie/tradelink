@@ -14,8 +14,8 @@ namespace TradeLib
         string[] _indexfiles;
         string[] _tickfiles;
         bool _inited = false;
-        DateTime _nextticktime = ENDSIM;
-        DateTime _nextindextime = ENDSIM;
+        DateTime _nextticktime = DateTime.MinValue;
+        DateTime _nextindextime = DateTime.MinValue;
         int _executions = 0;
         int _tickcount = 0;
         int _indexcount = 0;
@@ -116,14 +116,12 @@ namespace TradeLib
         {
             while (FlushTickCache(time)) // continue flushing cache until nothing left to flush
                 FillCache(); // repopulate cache (ignored symbols already cached)
-            updatenextticktime(); // refresh next occuring time
         }
 
         private void IndexPlayTo(DateTime time)
         {
             while (FlushIndexCache(time))// continue flushing cache until nothing left to flush
                 FillCache(); // repopulate cache (ignore symbols already cached)
-            updatenextindextime(); // refresh next occuring time
         }
 
         void FillCache()
@@ -151,6 +149,8 @@ namespace TradeLib
                         break;
                 }
             }
+            updatenextindextime();
+            updatenextticktime();
         }
 
         bool FlushIndexCache(DateTime time)
@@ -204,7 +204,7 @@ namespace TradeLib
             for (int i = 0; i < tickcache.Count; i++)
             {
                 DateTime comparetime = Util.ToDateTime(tickcache[i].date, tickcache[i].time, tickcache[i].sec);
-                recent = (recent <= comparetime) ? comparetime : recent;
+                recent = (comparetime<=recent) ? comparetime : recent;
             }
             _nextticktime = recent;
         }
