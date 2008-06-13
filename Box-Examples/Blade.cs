@@ -37,11 +37,13 @@ namespace box
             isBigVolume = (ZeroAvgVolIsBig && voltest) || (!ZeroAvgVolIsBig && (avgvol != 0) && voltest);
             isBladeDOWN = ((c.Open - c.Close) > moverequired);
             isBladeUP = ((c.Close-c.Open) > moverequired);
+            pctChange = c.Close / c.Open - 1;
             return true;
         }
 
         public bool isBigVolume = false;
         public bool isBladeUP = false;
         public bool isBladeDOWN = false;
+        public decimal pctChange;
     }
 }
