@@ -149,9 +149,9 @@ namespace TradeLib
             t.ex = r[(int)TickField.tex];
             t.be = r[(int)TickField.bidex];
             t.oe = r[(int)TickField.askex];
-            t.time = r[(int)TickField.time];
-            t.sec = r[(int)TickField.sec];
-            t.date = r[(int)TickField.date];
+            t.time = Convert.ToInt32(r[(int)TickField.time]);
+            t.sec = Convert.ToInt32(r[(int)TickField.sec]);
+            t.date = Convert.ToInt32(r[(int)TickField.date]);
             return t;
         }
 
