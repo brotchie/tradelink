@@ -145,7 +145,7 @@ namespace TradeLib
         }
 
         private System.IO.StreamReader _histfile = null;
-        public bool hasHistorical { get { return _histfile != null; } }
+        public bool hasHistorical { get { return (_histfile != null) && !_histfile.EndOfStream; } }
         public Index NextTick { get { if (!hasHistorical) return new Index(); Index i = Index.Deserialize(_histfile.ReadLine()); if (i == null) _histfile.Close(); return i; } }
         public static Index FromFile(string filename)
         {
