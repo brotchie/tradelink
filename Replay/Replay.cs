@@ -14,11 +14,13 @@ namespace Replay
     {
         TradeLink_Server_WM tl = new TradeLink_Server_WM(TLTypes.HISTORICALBROKER);
         Playback _playback = null;
+        HistSim h = null;
         string tickfolder = Util.TLTickDir;
 
         public Replay()
         {
             InitializeComponent();
+            tl.gotSrvFillRequest += new OrderDelegate(tl_gotSrvFillRequest);
         }
 
 
@@ -50,7 +52,7 @@ namespace Replay
             }
             TickFileFilter tff = new TickFileFilter();
             tff.DateFilter(Util.ToTLDate(monthCalendar1.SelectionEnd),DateMatchType.Day|DateMatchType.Month|DateMatchType.Year);
-            HistSim h = new HistSim(tickfolder, tff);
+            h = new HistSim(tickfolder, tff);
             h.GotTick += new TickDelegate(h_GotTick);
             h.GotIndex += new IndexDelegate(h_GotIndex);
             h.SimBroker.GotOrder += new OrderDelegate(SimBroker_GotOrder);
@@ -63,6 +65,14 @@ namespace Replay
             playbut.Enabled = false;
             stopbut.Enabled = true;
             trackBar1.Enabled = false;
+        }
+
+        void tl_gotSrvFillRequest(Order o)
+        {
+            // pass tradelink fill requests through to the histsim broker
+            // (if histsim has been started)
+            if (h!=null)
+                h.SimBroker.sendOrder(o);
         }
 
         void _playback_ProgressChanged(object sender, ProgressChangedEventArgs e)

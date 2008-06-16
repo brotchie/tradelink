@@ -50,7 +50,7 @@ namespace Replay
             // 
             // monthCalendar1
             // 
-            this.monthCalendar1.Location = new System.Drawing.Point(140, 38);
+            this.monthCalendar1.Location = new System.Drawing.Point(138, 42);
             this.monthCalendar1.MaxSelectionCount = 1;
             this.monthCalendar1.Name = "monthCalendar1";
             this.monthCalendar1.ShowToday = false;
@@ -87,7 +87,7 @@ namespace Replay
             // 
             // inputbut
             // 
-            this.inputbut.Location = new System.Drawing.Point(318, 21);
+            this.inputbut.Location = new System.Drawing.Point(319, 11);
             this.inputbut.Name = "inputbut";
             this.inputbut.Size = new System.Drawing.Size(60, 23);
             this.inputbut.TabIndex = 4;
@@ -100,9 +100,9 @@ namespace Replay
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.statuslab,
             this.progressbar});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 230);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 253);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(390, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(396, 22);
             this.statusStrip1.SizingGrip = false;
             this.statusStrip1.TabIndex = 5;
             this.statusStrip1.Text = "statusStrip1";
@@ -111,7 +111,7 @@ namespace Replay
             // 
             this.statuslab.BackColor = System.Drawing.SystemColors.Control;
             this.statuslab.Name = "statuslab";
-            this.statuslab.Size = new System.Drawing.Size(273, 17);
+            this.statuslab.Size = new System.Drawing.Size(279, 17);
             this.statuslab.Spring = true;
             this.statuslab.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -127,7 +127,7 @@ namespace Replay
             this.daystartpicker.CustomFormat = "hh:mm tt";
             this.daystartpicker.DropDownAlign = System.Windows.Forms.LeftRightAlignment.Right;
             this.daystartpicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.daystartpicker.Location = new System.Drawing.Point(229, 21);
+            this.daystartpicker.Location = new System.Drawing.Point(229, 14);
             this.daystartpicker.Name = "daystartpicker";
             this.daystartpicker.ShowUpDown = true;
             this.daystartpicker.Size = new System.Drawing.Size(83, 22);
@@ -146,7 +146,7 @@ namespace Replay
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(238, 2);
+            this.label2.Location = new System.Drawing.Point(160, 19);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(63, 17);
             this.label2.TabIndex = 8;
@@ -188,7 +188,7 @@ namespace Replay
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.ClientSize = new System.Drawing.Size(390, 252);
+            this.ClientSize = new System.Drawing.Size(396, 275);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.daystartpicker);
