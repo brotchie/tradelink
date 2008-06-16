@@ -59,6 +59,7 @@
     <Compile Include="TestTradeLink_WM.cs">
     </Compile>
     <Compile Include="TestUtil.cs" />
+    <Compile Include="TestWMUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="TradeLib.csproj">

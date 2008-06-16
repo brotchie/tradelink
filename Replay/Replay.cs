@@ -21,6 +21,38 @@ namespace Replay
         {
             InitializeComponent();
             tl.gotSrvFillRequest += new OrderDelegate(tl_gotSrvFillRequest);
+            tl.PositionPriceRequest += new TradeLink_Server_WM.DecimalStringDelegate(tl_PositionPriceRequest);
+            tl.PositionSizeRequest += new TradeLink_Server_WM.IntStringDelegate(tl_PositionSizeRequest);
+            tl.DayHighRequest += new TradeLink_Server_WM.DecimalStringDelegate(tl_DayHighRequest);
+            tl.DayLowRequest += new TradeLink_Server_WM.DecimalStringDelegate(tl_DayLowRequest);
+        }
+
+        decimal tl_DayLowRequest(string s)
+        {
+            decimal price = 0;
+            lows.TryGetValue(s, out price);
+            return price;
+        }
+
+        decimal tl_DayHighRequest(string s)
+        {
+            decimal price = 0;
+            highs.TryGetValue(s, out price);
+            return price;
+        }
+
+        int tl_PositionSizeRequest(string s)
+        {
+            if (h.SimBroker != null)
+                return h.SimBroker.GetOpenPosition(s).Size;
+            return 0;
+        }
+
+        decimal tl_PositionPriceRequest(string s)
+        {
+            if (h.SimBroker != null)
+                return h.SimBroker.GetOpenPosition(s).AvgPrice;
+            return 0;
         }
 
 
@@ -50,6 +82,8 @@ namespace Replay
                 status("Tick folder " + tickfolder + " doesn't exist,  stopping.");
                 return;
             }
+            highs = new Dictionary<string, decimal>();
+            lows = new Dictionary<string, decimal>();
             TickFileFilter tff = new TickFileFilter();
             tff.DateFilter(Util.ToTLDate(monthCalendar1.SelectionEnd),DateMatchType.Day|DateMatchType.Month|DateMatchType.Year);
             h = new HistSim(tickfolder, tff);
@@ -107,8 +141,27 @@ namespace Replay
             tl.newIndexTick(idx);
         }
 
+        Dictionary<string, decimal> highs = new Dictionary<string, decimal>();
+        Dictionary<string, decimal> lows = new Dictionary<string, decimal>();
         void h_GotTick(Tick t)
         {
+            if (t.isTrade)
+            {
+                decimal price = 0;
+                if (highs.TryGetValue(t.sym, out price))
+                {
+                    if (t.trade > price)
+                        highs[t.sym] = t.trade;
+                }
+                else highs.Add(t.sym, t.trade);
+                if (lows.TryGetValue(t.sym, out price))
+                {
+                    if (t.trade < price)
+                        lows[t.sym] = t.trade;
+                }
+                else lows.Add(t.sym, t.trade);
+            }
+
             tl.newTick(t);
         }
 

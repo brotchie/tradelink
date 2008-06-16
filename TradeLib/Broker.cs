@@ -103,8 +103,8 @@ namespace TradeLib
                         if (!MasterTrades.ContainsKey(a)) MasterTrades.Add(a, new List<Trade>());
                         o.Fill(tick); // fill our trade
                         availablesize -= mysize; // don't let other trades fill on same tick
-                        if (GotFill != null) GotFill((Trade)o); // notify subscribers
-                        MasterTrades[a].Add((Trade)o);
+                        MasterTrades[a].Add((Trade)o); // record trade
+                        if (GotFill != null) GotFill((Trade)o); // notify subscribers after recording trade
                         filledorders++; // count the trade
                     }
                 }

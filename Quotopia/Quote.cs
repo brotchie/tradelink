@@ -78,11 +78,10 @@ namespace Quotopia
             qt.Columns.Add("BSize", new Int32().GetType());
             qt.Columns.Add("ASize", new Int32().GetType());
             qt.Columns.Add("Sizes", "".GetType());
-            qt.Columns.Add("Open", new Decimal().GetType());
+            qt.Columns.Add("AvgPrice", new Decimal().GetType());
+            qt.Columns.Add("PosSize", new Int32().GetType());
             qt.Columns.Add("High", new Decimal().GetType());
             qt.Columns.Add("Low", new Decimal().GetType());
-            qt.Columns.Add("YestClose", new Decimal().GetType());
-            qt.Columns.Add("Change", new Decimal().GetType());
             qg.CaptionVisible = true;
             qg.RowHeadersVisible = false;
             qg.ColumnHeadersVisible = true;
@@ -242,7 +241,7 @@ namespace Quotopia
         void addsymbol(string sym)
         {
             // SYM,LAST,TSIZE,BID,ASK,BSIZE,ASIZE,SIZES,OHLC(YEST),CHANGE
-            DataRow r = qt.Rows.Add(sym,0,0,0,0,0,0,"0x0",0,0,0,0,0);
+            DataRow r = qt.Rows.Add(sym,0,0,0,0,0,0,"0x0",0,0,0,0);
             if (!bardict.ContainsKey(sym))
                 bardict.Add(sym, new BarList(BarInterval.FiveMin, sym));
             qg.Select(qg.VisibleRowCount - 1); // selects most recently added symbol
@@ -278,55 +277,74 @@ namespace Quotopia
 
         void RefreshRow(Tick t)
         {
-            int[] rows = GetSymbolRows(t.sym);
-            for (int i = 0; i<rows.Length; i++)
+            if (qg.InvokeRequired)
+                qg.Invoke(new TickDelegate(RefreshRow), new object[] { t });
+            else
             {
-                // last,size,bid/ask,sizes
-                // fetch OHLC from TL
-                // fetch position from TL
-                int r = rows[i];
-                if (t.isTrade)
+                int[] rows = GetSymbolRows(t.sym);
+                decimal high = tl.DayHigh(t.sym);
+                decimal low = tl.DayLow(t.sym);
+                for (int i = 0; i < rows.Length; i++)
                 {
-                    qt.Rows[r]["Last"] = t.trade;
-                    if (t.size>0) // make sure TSize is reported
-                        qt.Rows[r]["TSize"] = t.size;
-                }
-                else if (t.FullQuote)
-                {
+                    // last,size,bid/ask,sizes
+                    // fetch OHLC from TL
+                    // fetch position from TL
+                    int r = rows[i];
+                    if (t.isTrade)
+                    {
+                        qt.Rows[r]["Last"] = t.trade;
+                        if (t.size > 0) // make sure TSize is reported
+                            qt.Rows[r]["TSize"] = t.size;
+                    }
+                    else if (t.FullQuote)
+                    {
 
-                    qt.Rows[r]["Bid"] = t.bid;
-                    qt.Rows[r]["Ask"] = t.ask;
-                    qt.Rows[r]["BSize"] = t.bs;
-                    qt.Rows[r]["ASize"] = t.os;
-                    qt.Rows[r]["Sizes"] = t.bs.ToString() + "x" + t.os.ToString();
+                        qt.Rows[r]["Bid"] = t.bid;
+                        qt.Rows[r]["Ask"] = t.ask;
+                        qt.Rows[r]["BSize"] = t.bs;
+                        qt.Rows[r]["ASize"] = t.os;
+                        qt.Rows[r]["Sizes"] = t.bs.ToString() + "x" + t.os.ToString();
+                    }
+                    else if (t.hasBid)
+                    {
+                        qt.Rows[r]["Bid"] = t.bid;
+                        qt.Rows[r]["BSize"] = t.bs;
+                        int os = (int)qt.Rows[r]["ASize"];
+                        qt.Rows[r]["Sizes"] = t.bs.ToString() + "x" + os.ToString();
+                    }
+                    else if (t.hasAsk)
+                    {
+                        qt.Rows[r]["Ask"] = t.ask;
+                        qt.Rows[r]["ASize"] = t.os;
+                        int bs = (int)qt.Rows[r]["BSize"];
+                        qt.Rows[r]["Sizes"] = bs.ToString() + "x" + t.os.ToString();
+                    }
+                    qt.Rows[r]["High"] = high.ToString("N2");
+                    qt.Rows[r]["Low"] = low.ToString("N2");
+
+
                 }
-                else if (t.hasBid)
-                {
-                    qt.Rows[r]["Bid"] = t.bid;
-                    qt.Rows[r]["BSize"] = t.bs;
-                    int os = (int)qt.Rows[r]["ASize"];
-                    qt.Rows[r]["Sizes"] = t.bs.ToString() + "x" + os.ToString();
-                }
-                else if (t.hasAsk)
-                {
-                    qt.Rows[r]["Ask"] = t.ask;
-                    qt.Rows[r]["ASize"] = t.os;
-                    int bs = (int)qt.Rows[r]["BSize"];
-                    qt.Rows[r]["Sizes"] = bs.ToString() + "x" + t.os.ToString();
-                }
-                else return;
             }
-
-
-
-
         }
 
 
         void tl_gotFill(Trade t)
         {
-            if ((t.symbol == null) || (t == null)) return;
-            TradesView.Rows.Add(t.xdate, t.xtime, t.xsec, t.symbol, (t.side ? "BUY" : "SELL"), t.xsize, t.xprice, t.comment,t.Account.ToString()); // if we accept trade, add it to list
+            if (InvokeRequired)
+                Invoke(new FillDelegate(tl_gotFill), new object[] { t });
+            else
+            {
+                if (!t.isValid) return;
+                int[] rows = GetSymbolRows(t.symbol);
+                int size = tl.PosSize(t.symbol);
+                decimal price = tl.AvgPrice(t.symbol);
+                for (int i = 0; i < rows.Length; i++)
+                {
+                    qt.Rows[rows[i]]["PosSize"] = size.ToString();
+                    qt.Rows[rows[i]]["AvgPrice"] = price.ToString("N2");
+                }
+                TradesView.Rows.Add(t.xdate, t.xtime, t.xsec, t.symbol, (t.side ? "BUY" : "SELL"), t.xsize, t.xprice, t.comment, t.Account.ToString()); // if we accept trade, add it to list
+            }
         }
 
         void tl_gotTick(Tick t)

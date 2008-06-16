@@ -7,6 +7,14 @@ namespace TradeLib
 {
     public class TradeLink_Server_WM : Form, TradeLinkServer
     {
+        public delegate decimal DecimalStringDelegate(string s);
+        public delegate int IntStringDelegate(string s);
+        public event DecimalStringDelegate PositionPriceRequest;
+        public event IntStringDelegate PositionSizeRequest;
+        public event DecimalStringDelegate DayHighRequest;
+        public event DecimalStringDelegate DayLowRequest;
+        public event OrderDelegate gotSrvFillRequest;
+
         public TradeLink_Server_WM() : this(TLTypes.HISTORICALBROKER) { }
         public TradeLink_Server_WM(string servername) : base()
         {
@@ -20,32 +28,42 @@ namespace TradeLib
             this(servertype==TLTypes.LIVEBROKER? WMUtil.LIVEWINDOW :
                 (servertype == TLTypes.SIMBROKER ? WMUtil.SIMWINDOW : WMUtil.REPLAYWINDOW)) { }
 
-        public event OrderDelegate gotSrvFillRequest;
-        Dictionary<string, decimal> chighs = new Dictionary<string, decimal>();
-        Dictionary<string, decimal> clows = new Dictionary<string, decimal>();
-        Dictionary<string, Position> cpos = new Dictionary<string, Position>();
-
         private void SrvDoExecute(string msg)
         {
-            Order o = Order.Deserialize(msg);
-            if (gotSrvFillRequest != null) gotSrvFillRequest(o);
-            for (int i = 0; i < client.Count; i++)
-                WMUtil.SendMsg(msg, TL2.ORDERNOTIFY, Handle,client[i]);
+            if (this.InvokeRequired)
+                this.Invoke(new DebugDelegate(SrvDoExecute), new object[] { msg });
+            else
+            {
+                Order o = Order.Deserialize(msg);
+                if (gotSrvFillRequest != null) gotSrvFillRequest(o);
+                for (int i = 0; i < client.Count; i++)
+                    WMUtil.SendMsg(msg, TL2.ORDERNOTIFY, Handle, client[i]);
+            }
         }
 
         public void newIndexTick(Index itick)
         {
-            if (itick.Name == "") return;
-            for (int i = 0; i < index.Count; i++)
-                if ((client[i] != null) && (index[i].Contains(itick.Name)))
-                    WMUtil.SendMsg(itick.Serialize(), TL2.TICKNOTIFY, Handle,client[i]);
+            if (this.InvokeRequired)
+                this.Invoke(new IndexDelegate(newIndexTick), new object[] { itick });
+            else
+            {
+                if (!itick.isValid) return;
+                for (int i = 0; i < index.Count; i++)
+                    if ((client[i] != null) && (index[i].Contains(itick.Name)))
+                        WMUtil.SendMsg(itick.Serialize(), TL2.TICKNOTIFY, Handle, client[i]);
+            }
         }
 
         public void newOrder(Order o)
         {
-            for (int i = 0; i < client.Count; i++)
-                if ((client[i] != null) && (client[i] != ""))
-                    WMUtil.SendMsg(o.Serialize(), TL2.ORDERNOTIFY, Handle, client[i]);
+            if (this.InvokeRequired)
+                this.Invoke(new OrderDelegate(newOrder), new object[] { o });
+            else
+            {
+                for (int i = 0; i < client.Count; i++)
+                    if ((client[i] != null) && (client[i] != ""))
+                        WMUtil.SendMsg(o.Serialize(), TL2.ORDERNOTIFY, Handle, client[i]);
+            }
         }
 
         // server to clients
@@ -55,20 +73,17 @@ namespace TradeLib
         /// <param name="tick">The tick to include in the notification.</param>
         public void newTick(Tick tick)
         {
-            if (tick.sym == "") return; // can't process symbol-less ticks
-            if (tick.isTrade)
+            if (this.InvokeRequired)
+                this.Invoke(new TickDelegate(newTick), new object[] { tick });
+            else
             {
-                if (!highs.ContainsKey(tick.sym)) { highs.Add(tick.sym, tick.trade); lows.Add(tick.sym, tick.trade); }
-                if (tick.trade > highs[tick.sym]) highs[tick.sym] = tick.trade;
-                if (tick.trade < lows[tick.sym]) lows[tick.sym] = tick.trade;
+                if (!tick.isValid) return; // need a valid tick
+                for (int i = 0; i < client.Count; i++) // send tick to each client that has subscribed to tick's stock
+                    if ((client[i] != null) && (stocks[i].Contains(tick.sym)))
+                        WMUtil.SendMsg(tick.Serialize(), TL2.TICKNOTIFY, Handle, client[i]);
             }
-
-            for (int i = 0; i < client.Count; i++) // send tick to each client that has subscribed to tick's stock
-                if ((client[i] != null) && (stocks[i].Contains(tick.sym)))
-                    WMUtil.SendMsg(tick.Serialize(), TL2.TICKNOTIFY, Handle,client[i]);
         }
 
-        Dictionary<string, Position> SrvPos = new Dictionary<string, Position>();
 
         /// <summary>
         /// Notifies subscribed clients of a new execution.
@@ -76,23 +91,21 @@ namespace TradeLib
         /// <param name="trade">The trade to include in the notification.</param>
         public void newFill(Trade trade)
         {
-            if (trade.symbol == "") return; // can't process symbol-less trades
-            if (!SrvPos.ContainsKey(trade.symbol)) SrvPos.Add(trade.symbol, new Position(trade));
-            else SrvPos[trade.symbol].Adjust(trade);
-            for (int i = 0; i < client.Count; i++) // send tick to each client that has subscribed to tick's stock
-                if ((client[i] != null) && (stocks[i].Contains(trade.symbol)))
-                {
-                    string msg = trade.Serialize();
-                    WMUtil.SendMsg(msg, TL2.EXECUTENOTIFY, Handle,client[i]);
-                }
+            if (this.InvokeRequired)
+                this.Invoke(new FillDelegate(newFill), new object[] { trade });
+            else
+            {
+                // make sure our trade is filled and initialized properly
+                if (!trade.isValid || !trade.isFilled) return;
+                for (int i = 0; i < client.Count; i++) // send tick to each client that has subscribed to tick's stock
+                    if ((client[i] != null) && (stocks[i].Contains(trade.symbol)))
+                        WMUtil.SendMsg(trade.Serialize(), TL2.EXECUTENOTIFY, Handle, client[i]);
+            }
         }
 
         public int NumClients { get { return client.Count; } }
 
         // server structures
-
-        private Dictionary<string, decimal> lows = new Dictionary<string, decimal>();
-        private Dictionary<string, decimal> highs = new Dictionary<string, decimal>();
         private List<string> client = new List<string>();
         private List<DateTime> heart = new List<DateTime>();
         private List<string> stocks = new List<string>();
@@ -179,24 +192,20 @@ namespace TradeLib
             switch (tlm.type)
             {
                 case TL2.GETSIZE:
-                    if (SrvPos.ContainsKey(msg))
-                        result = SrvPos[msg].Size;
-                    else result = 0;
+                    if (PositionSizeRequest != null)
+                        result = PositionSizeRequest(msg);
                     break;
                 case TL2.AVGPRICE:
-                    if (SrvPos.ContainsKey(msg))
-                        result = WMUtil.pack(SrvPos[msg].AvgPrice);
-                    else result = 0;
+                    if (PositionPriceRequest != null)
+                        result = WMUtil.pack(PositionPriceRequest(msg));
                     break;
                 case TL2.NDAYHIGH:
-                    if (highs.ContainsKey(msg))
-                        result = WMUtil.pack(highs[msg]);
-                    else result = 0;
+                    if (DayHighRequest!=null)
+                        result = WMUtil.pack(DayHighRequest(msg));
                     break;
                 case TL2.NDAYLOW:
-                    if (lows.ContainsKey(msg))
-                        result = WMUtil.pack(lows[msg]);
-                    else result = 0;
+                    if (DayLowRequest!=null)
+                        result = WMUtil.pack(DayLowRequest(msg));
                     break;
                 case TL2.SENDORDER:
                     SrvDoExecute(msg);

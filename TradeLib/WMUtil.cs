@@ -22,8 +22,9 @@ namespace TradeLib
         // used to pack a decimal to a long for use in returning LPARAMS via COPYDATA
         public static long pack(decimal d)
         {
+            if (d == 0) return 0;
             int whole = (int)Math.Truncate(d);
-            int frac = (int)(d - whole);
+            int frac = (int)(1000*(d - whole));
             long packed = (whole << 16) + frac;
             return packed;
         }

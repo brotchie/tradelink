@@ -33,18 +33,23 @@ namespace Quotopia
         delegate void SetTickCallBack(Tick t);
         public void newTick(Tick tick)
         {
-            if ((tick == null) || (tick.sym != sym)) return;
-            if (touched) return;
-
-            decimal changedval = obuybut.Checked ? (limitbut.Checked ? tick.ask : tick.bid ) : (limitbut.Checked ? tick.bid : tick.ask);
-            if (changedval != 0)
+            if (this.InvokeRequired)
+                this.Invoke(new TickDelegate(newTick), new object[] { tick });
+            else
             {
-                if (this.oprice.InvokeRequired)
+                if ((tick == null) || (tick.sym != sym)) return;
+                if (touched) return;
+
+                decimal changedval = obuybut.Checked ? (limitbut.Checked ? tick.ask : tick.bid) : (limitbut.Checked ? tick.bid : tick.ask);
+                if (changedval != 0)
                 {
-                    SetTickCallBack d = new SetTickCallBack(newTick);
-                    this.Invoke(d, new object[] { tick });
+                    if (this.oprice.InvokeRequired)
+                    {
+                        SetTickCallBack d = new SetTickCallBack(newTick);
+                        this.Invoke(d, new object[] { tick });
+                    }
+                    else oprice.Value = (decimal)changedval;
                 }
-                else oprice.Value = (decimal)changedval;
             }
         }
 
