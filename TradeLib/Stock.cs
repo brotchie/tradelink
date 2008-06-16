@@ -55,7 +55,7 @@ namespace TradeLib
         /// <summary>
         /// Says whether stock contains historical data.
         /// </summary>
-        public bool hasHistorical { get { return (_histfile != null); } }
+        public bool hasHistorical { get { return (_histfile != null) && !_histfile.EndOfStream; } }
         private System.IO.StreamReader _histfile = null;
         /// <summary>
         /// Fetches next historical tick for stock, or invalid tick if no historical data is available.
