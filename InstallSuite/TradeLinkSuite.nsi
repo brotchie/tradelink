@@ -97,7 +97,16 @@ Section "Uninstall"
   Delete "$INSTDIR\Properties\*.*"
   RMDir "$INSTDIR\Properties"
   ; Remove shortcuts, if any
-  Delete "$SMPROGRAMS\TradeLink\*.*"
+  Delete "$SMPROGRAMS\TradeLink\Kadina.lnk"
+  Delete "$SMPROGRAMS\TradeLink\Quotopia.lnk"
+  Delete "$SMPROGRAMS\TradeLink\Time and Sales.lnk"
+  Delete "$SMPROGRAMS\TradeLink\Replay.lnk"
+  Delete "$SMPROGRAMS\TradeLink\Gauntlet.lnk"
+  Delete "$SMPROGRAMS\TradeLink\Epf-To-Idx.lnk"
+  Delete "$SMPROGRAMS\TradeLink\SplitEPF.lnk"
+  Delete "$SMPROGRAMS\TradeLink\Tattle.lnk"
+  Delete "$SMPROGRAMS\TradeLink\Tript.lnk"
+  Delete "$SMPROGRAMS\TradeLink\Uninstall TradeLinkSuite"
 
   ; Remove directories used
   RMDir "$SMPROGRAMS\TradeLink"
