@@ -412,6 +412,7 @@ namespace Quotopia
             this.boxgroup.Controls.Add(this.boxdlllabel);
             this.boxgroup.Controls.Add(this.LoadDllButton);
             this.boxgroup.Controls.Add(this.minsizelabel);
+            this.boxgroup.Enabled = false;
             this.boxgroup.Location = new System.Drawing.Point(372, 206);
             this.boxgroup.Margin = new System.Windows.Forms.Padding(4);
             this.boxgroup.Name = "boxgroup";
@@ -609,6 +610,7 @@ namespace Quotopia
             this.datagroup.Controls.Add(this.histsimbut);
             this.datagroup.Controls.Add(this.liveanvilbut);
             this.datagroup.Controls.Add(this.simAnvilbut);
+            this.datagroup.Enabled = false;
             this.datagroup.Location = new System.Drawing.Point(372, 52);
             this.datagroup.Margin = new System.Windows.Forms.Padding(4);
             this.datagroup.Name = "datagroup";
@@ -696,6 +698,7 @@ namespace Quotopia
             this.vizGroupBox.Controls.Add(this.fontBut);
             this.vizGroupBox.Controls.Add(this.bgCollabel);
             this.vizGroupBox.Controls.Add(this.bgcolbut);
+            this.vizGroupBox.Enabled = false;
             this.vizGroupBox.Location = new System.Drawing.Point(11, 57);
             this.vizGroupBox.Margin = new System.Windows.Forms.Padding(4);
             this.vizGroupBox.Name = "vizGroupBox";
