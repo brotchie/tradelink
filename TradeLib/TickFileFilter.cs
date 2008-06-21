@@ -133,5 +133,8 @@ namespace TradeLib
             public DateMatchType type;
         }
 
+        public static int TLYearMask(int year) { return year * 10000; }
+        public static int TLMonthMask(int month) { return month * 100; }
+
     }
 }
