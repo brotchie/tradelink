@@ -28,6 +28,7 @@ namespace TradeLib
         public event IndexDelegate GotIndex;
         
         // user-facing interfaces
+        public TickFileFilter FileFilter { get { return _filter; } set { _filter = value; D("Restarting simulator with " + _filter.ToString());  Reset(); } }
         public int ApproxTotalTicks { get { return (int)Math.Floor((double)_bytestoprocess/39); } }
         public int TickCount { get { return _tickcount; } }
         public int IndexCount { get { return _indexcount; } }
@@ -104,8 +105,14 @@ namespace TradeLib
 
         public void PlayTo(DateTime time)
         {
-            IndexPlayTo(time); // do indicies first
-            StockPlayTo(time); // then do stocks
+            if (!_inited)
+                Initialize();
+            if (_inited)
+            {
+                IndexPlayTo(time); // do indicies first
+                StockPlayTo(time); // then do stocks
+            }
+            else throw new Exception("Histsim was unable to initialize");
         }
 
         List<Tick> tickcache = new List<Tick>();
