@@ -11,6 +11,10 @@ namespace TradeLib
     public class Broker
     {
         /// <summary>
+        /// Occurs when [got order cancel].
+        /// </summary>
+        public event IntDelegate GotOrderCancel;
+        /// <summary>
         /// Occurs when [got tick].
         /// </summary>
         public event TickDelegate GotTick;
@@ -35,14 +39,32 @@ namespace TradeLib
         protected Dictionary<string, List<Order>> MasterOrders = new Dictionary<string, List<Order>>();
         protected Dictionary<string, List<Trade>> MasterTrades = new Dictionary<string, List<Trade>>();
         protected List<Order> Orders { get { return MasterOrders[DEFAULT.ID]; } set { MasterOrders[DEFAULT.ID] = value; } }
-        protected List<Trade> FillList { get { return MasterTrades[DEFAULT.ID]; } set { MasterTrades[DEFAULT.ID] = value; } } 
+        protected List<Trade> FillList { get { return MasterTrades[DEFAULT.ID]; } set { MasterTrades[DEFAULT.ID] = value; } }
+        int _nextorderid = 1;
         protected void AddOrder(Order o,Account a) 
         {
             if (!a.isValid) throw new Exception("Invalid account provided");
             if (!MasterOrders.ContainsKey(a.ID)) 
                 MasterOrders.Add(a.ID,new List<Order>());
             o.Account = a.ID;
+            if (o.id == 0)
+                o.id = _nextorderid++;
             MasterOrders[a.ID].Add(o);
+        }
+        public bool CancelOrder(long orderid)
+        {
+            foreach (string a in MasterOrders.Keys) // go through every account
+            {
+                for (int i = 0; i < MasterOrders[a].Count; i++) // and every order
+                    if (MasterOrders[a][i].id == (int)orderid) // if we have order with requested id
+                    {
+                        if (GotOrderCancel != null) //send cancel notifcation to any subscribers
+                            GotOrderCancel(orderid); 
+                        MasterOrders[a].RemoveAt(i); // remove/cancel order
+                        return true;
+                    }
+            }
+            return false;
         }
         /// <summary>
         /// Sends the order to the broker. (uses the default account)
