@@ -141,7 +141,7 @@ namespace TradeLib
         public virtual string Serialize()
         {
             const char d = ',';
-            return xdate.ToString() + d + xtime.ToString() + d + xsec.ToString() + d + symbol + d + side.ToString() + d + xsize.ToString() + d + xprice.ToString() + d + comment + d + accountid + d + this.Security.ToString() + d + this.Currency.ToString() + d + LocalSymbol; ;
+            return xdate.ToString() + d + xtime.ToString() + d + xsec.ToString() + d + symbol + d + side.ToString() + d + xsize.ToString() + d + xprice.ToString() + d + comment + d + accountid + d + this.Security.ToString() + d + this.Currency.ToString() + d + LocalSymbol + d + id.ToString(); ;
         }
         /// <summary>
         /// Deserialize string to Trade
@@ -162,6 +162,7 @@ namespace TradeLib
             t.comment = rec[(int)TradeField.Comment];
             t.Account = rec[(int)TradeField.Account];
             t.LocalSymbol = rec[(int)TradeField.LocalSymbol];
+            t.id = Convert.ToInt32(rec[(int)TradeField.ID]);
             try
             {
                 t.Currency = (Currency)Enum.Parse(typeof(Currency), rec[(int)TradeField.Currency]);
@@ -186,5 +187,6 @@ namespace TradeLib
         Security,
         Currency,
         LocalSymbol,
+        ID,
     }
 }
