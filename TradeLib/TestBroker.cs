@@ -51,11 +51,10 @@ namespace TestTradeLib
         void broker_GotFill(Trade t)
         {
             fills++;
-
         }
 
-        int gottick = 0;
-        Tick receivedtick;
+        int gottickDP = 0;
+        Tick receivedtickDP;
 
         [Test]
         public void DataProvider()
@@ -66,18 +65,88 @@ namespace TestTradeLib
             // and interapplication communication
             Broker broker = new Broker();
             broker.GotTick += new TickDelegate(broker_GotTick);
-            Assert.That((receivedtick == null) && (gottick == 0));
+            Assert.That((receivedtickDP == null) && (gottickDP == 0));
             broker.Execute(t); // should fire a gotTick
-            Assert.That(gottick != 0);
-            Assert.That((receivedtick != null) && (receivedtick.trade == t.trade));
+            Assert.That(gottickDP != 0);
+            Assert.That((receivedtickDP != null) && (receivedtickDP.trade == t.trade));
 
         }
-
         void broker_GotTick(Tick tick)
         {
-            receivedtick = new Tick(tick);
-            gottick++;
+            receivedtickDP = new Tick(tick);
+            gottickDP++;
         }
+
+        int gottickbook = 0;
+        Tick tickbook;
+
+        public void BBOProvider()
+        {
+            // this test is to show that GotTicks fired from Brokers will
+            // reflect any BBO-affecting information in this broker's open-order queue
+            const decimal price = 10m;
+            const int size = 700;
+
+            // setup the book
+            Tick t = Tick.NewBid(s, price, size);
+
+            // initialize our test variables
+            Broker broker = new Broker();
+            decimal limit = price + 1m;
+            int limitsize = size * 2;
+            broker.GotTick +=new TickDelegate(broker_GotTick2);
+            Assert.That((gottickbook==0) && (tickbook==null));
+
+            // verify received tick matches our limit order
+            broker.sendOrder(new BuyLimit(s, size, limit));  // throws gottick if it's top of book
+            Assert.That(gottickbook == 1, gottickbook.ToString());
+            Assert.That((tickbook.bid == limit) && (tickbook.bs == size), tickbook.ToString());
+
+            // if our order stays in queue, next tick should reflect our order as the best bid
+            broker.Execute(t); // should throw gotTick
+            Assert.That(gottickbook == 2, gottickbook.ToString());
+            Assert.That((tickbook.bid == limit) && (tickbook.bs == size), tickbook.ToString());
+
+            // lets do same as previous two examples, except put our limit at current best bid
+            broker.CancelOrders();
+            broker.sendOrder(new BuyLimit(s, limitsize, price)); // increases size only
+            broker.Execute(t);
+            Assert.That(gottickbook == 4, gottickbook.ToString());
+            Assert.That((tickbook.bid == price) && (tickbook.bs == limitsize), tickbook.ToString());
+
+            // lets throw an order below best bid and make sure it DOESN'T do anything
+            broker.CancelOrders();
+            broker.sendOrder(new BuyLimit(s, size, price - 1)); // no gotTick this time
+            broker.Execute(t);
+            Assert.That(gottickbook == 5, gottickbook.ToString());
+            Assert.That((tickbook.bid == price) && (tickbook.bs == size), tickbook.ToString());
+
+            // make sure buy stop does nothing
+            broker.sendOrder(new BuyStop(s, size, price)); // no gotTick
+            broker.Execute(t);
+            Assert.That(gottickbook == 6, gottickbook.ToString());
+            Assert.That((tickbook.bid==price) && (tickbook.bs==size),tickbook.ToString());
+
+            // make sure buy market does nothing
+            broker.sendOrder(new BuyMarket(s, size)); // no gotTick
+            broker.Execute(t);
+            Assert.That(gottickbook == 7, gottickbook.ToString());
+            Assert.That((tickbook.bid == price) && (tickbook.bs == size), tickbook.ToString());
+
+            // other test that could be inserted:
+            // sell stop (doesn't affect)
+            // sell market (doesn't affect)
+            // throw order below best offer (affects best office size + price)
+            // throw order at best offer with more size (affects size at best offer)
+            // throw order above best offer (shouldn't affect book)
+        }
+
+        void broker_GotTick2(Tick tick)
+        {
+            gottickbook++;
+            tickbook = new Tick(tick);
+        }
+
 
 
 
