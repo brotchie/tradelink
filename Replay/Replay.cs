@@ -25,6 +25,13 @@ namespace Replay
             tl.PositionSizeRequest += new TradeLink_Server_WM.IntStringDelegate(tl_PositionSizeRequest);
             tl.DayHighRequest += new TradeLink_Server_WM.DecimalStringDelegate(tl_DayHighRequest);
             tl.DayLowRequest += new TradeLink_Server_WM.DecimalStringDelegate(tl_DayLowRequest);
+            tl.OrderCancelRequest += new IntDelegate(tl_OrderCancelRequest);
+        }
+
+        void tl_OrderCancelRequest(long number)
+        {
+            if (h == null) return;
+            h.SimBroker.CancelOrder(number); // send cancel request to broker
         }
 
         decimal tl_DayLowRequest(string s)
@@ -91,6 +98,7 @@ namespace Replay
             h.GotIndex += new IndexDelegate(h_GotIndex);
             h.SimBroker.GotOrder += new OrderDelegate(SimBroker_GotOrder);
             h.SimBroker.GotFill += new FillDelegate(SimBroker_GotFill);
+            h.SimBroker.GotOrderCancel += new IntDelegate(SimBroker_GotOrderCancel);
             _playback = new Playback(h);
             _playback.RunWorkerCompleted += new RunWorkerCompletedEventHandler(_playback_RunWorkerCompleted);
             _playback.ProgressChanged+=new ProgressChangedEventHandler(_playback_ProgressChanged);
@@ -101,18 +109,32 @@ namespace Replay
             trackBar1.Enabled = false;
         }
 
+        void SimBroker_GotOrderCancel(long number)
+        {
+            tl.newOrderCancel(number);
+        }
+
         void tl_gotSrvFillRequest(Order o)
         {
             // pass tradelink fill requests through to the histsim broker
             // (if histsim has been started)
-            if (h!=null)
+            if (h != null)
+            {
+                if (o.time * o.date == 0)
+                {
+                    o.time = Util.ToTLTime(h.NextTickTime);
+                    o.date = Util.ToTLDate(h.NextTickTime);
+                }
                 h.SimBroker.sendOrder(o);
+            }
         }
 
         void _playback_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             progressbar.Value = e.ProgressPercentage;
-            status("Playing... " + e.ProgressPercentage + "%");
+            string time = "";
+            if (h != null) time = " [" + h.NextTickTime + "] ";
+            status("Playing... " +time+ e.ProgressPercentage + "%");
         }
 
         void _playback_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

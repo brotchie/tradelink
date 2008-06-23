@@ -43,8 +43,48 @@ namespace Quotopia
             tl.gotTick += new TickDelegate(tl_gotTick);
             tl.gotFill += new FillDelegate(tl_gotFill);
             tl.gotIndexTick += new IndexDelegate(tl_gotIndexTick);
+            tl.gotOrder += new OrderDelegate(tl_gotOrder);
+            tl.gotOrderCancel += new IntDelegate(tl_gotOrderCancel);
+            ordergrid.ContextMenuStrip = new ContextMenuStrip();
+            ordergrid.ContextMenuStrip.Items.Add("Cancel", null, new EventHandler(cancelorder));
             news.NewsEventSubscribers += new NewsDelegate(news_NewsEventSubscribers);
             FormClosing += new FormClosingEventHandler(Quote_FormClosing);
+        }
+
+        void tl_gotOrderCancel(long number)
+        {
+            if (ordergrid.InvokeRequired)
+                ordergrid.Invoke(new IntDelegate(tl_gotOrderCancel), new object[] { number });
+            else
+            {
+                int oidx = orderidx((int)number); // get row number of this order in the grid
+                if ((oidx > -1) && (oidx < ordergrid.Rows.Count)) // if row number is valid
+                    ordergrid.Rows.RemoveAt(oidx); // remove the canceled order
+            }
+        }
+
+        void cancelorder(object sender, EventArgs e)
+        {
+            for (int i = 0; i < ordergrid.SelectedRows.Count; i++)
+            {
+                int oid = (int)ordergrid["oid", ordergrid.SelectedRows[i].Index].Value;
+                tl.CancelOrder((long)oid);
+                show("Sending cancel for " + oid.ToString());
+            }
+        }
+
+        void tl_gotOrder(Order o)
+        {
+            if (orderidx(o.id)==-1) // if we don't have this order, add it
+                ordergrid.Rows.Add(new object[] { o.id, o.symbol, o.SignedSize, (o.price == 0 ? "Market" : o.price.ToString()), (o.stopp==0 ? "" : o.stopp.ToString()), o.Account });
+        }
+
+        int orderidx(int orderid)
+        {
+            for (int i = 0; i < ordergrid.Rows.Count; i++) // see if's an existing existing order
+                if ((int)ordergrid["oid", i].Value == orderid)
+                    return i;
+            return -1;
         }
 
         void Quote_FormClosing(object sender, FormClosingEventArgs e)
@@ -335,6 +375,17 @@ namespace Quotopia
             else
             {
                 if (!t.isValid) return;
+                int oidx = orderidx(t.id); // get order id for this order
+                if (oidx != -1)
+                {
+                    int osign = (t.side ? 1 : -1);
+                    int signedtsize = t.xsize * osign;
+                    int signedosize = (int)ordergrid["osize", oidx].Value;
+                    if (signedosize == signedtsize) // if sizes are same whole order was filled, remove
+                        ordergrid.Rows.RemoveAt(oidx);
+                    else // otherwise remove portion that was filled and leave rest on order
+                        ordergrid["osize", oidx].Value = Math.Abs(signedosize - signedtsize) * osign;
+                }
                 int[] rows = GetSymbolRows(t.symbol);
                 int size = tl.PosSize(t.symbol);
                 decimal price = tl.AvgPrice(t.symbol);

@@ -31,8 +31,12 @@ namespace Quotopia
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Quote));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this.quoteTab = new System.Windows.Forms.TabControl();
             this.Markets = new System.Windows.Forms.TabPage();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
@@ -40,6 +44,14 @@ namespace Quotopia
             this.exportbasketbut = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.statuslab = new System.Windows.Forms.ToolStripLabel();
+            this.ordertab = new System.Windows.Forms.TabPage();
+            this.ordergrid = new System.Windows.Forms.DataGridView();
+            this.oid = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.osymbol = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.osize = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.oprice = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ostop = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.oaccount = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.TradeTab = new System.Windows.Forms.TabPage();
             this.TradesView = new System.Windows.Forms.DataGridView();
             this.Date = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -124,6 +136,8 @@ namespace Quotopia
             this.quoteTab.SuspendLayout();
             this.Markets.SuspendLayout();
             this.toolStrip1.SuspendLayout();
+            this.ordertab.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ordergrid)).BeginInit();
             this.TradeTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.TradesView)).BeginInit();
             this.Settings.SuspendLayout();
@@ -142,6 +156,7 @@ namespace Quotopia
             // 
             this.quoteTab.Alignment = System.Windows.Forms.TabAlignment.Bottom;
             this.quoteTab.Controls.Add(this.Markets);
+            this.quoteTab.Controls.Add(this.ordertab);
             this.quoteTab.Controls.Add(this.TradeTab);
             this.quoteTab.Controls.Add(this.Settings);
             this.quoteTab.Controls.Add(this.LogTab);
@@ -217,6 +232,107 @@ namespace Quotopia
             this.statuslab.Size = new System.Drawing.Size(227, 22);
             this.statuslab.Text = "Enter a symbol or open a basket.";
             // 
+            // ordertab
+            // 
+            this.ordertab.Controls.Add(this.ordergrid);
+            this.ordertab.Location = new System.Drawing.Point(4, 4);
+            this.ordertab.Name = "ordertab";
+            this.ordertab.Size = new System.Drawing.Size(828, 538);
+            this.ordertab.TabIndex = 4;
+            this.ordertab.Text = "Orders";
+            this.ordertab.UseVisualStyleBackColor = true;
+            // 
+            // ordergrid
+            // 
+            this.ordergrid.AllowUserToAddRows = false;
+            this.ordergrid.AllowUserToDeleteRows = false;
+            this.ordergrid.BackgroundColor = System.Drawing.SystemColors.Window;
+            this.ordergrid.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.ordergrid.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
+            this.ordergrid.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.ordergrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            this.ordergrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.ordergrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.oid,
+            this.osymbol,
+            this.osize,
+            this.oprice,
+            this.ostop,
+            this.oaccount});
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.ordergrid.DefaultCellStyle = dataGridViewCellStyle2;
+            this.ordergrid.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ordergrid.Location = new System.Drawing.Point(0, 0);
+            this.ordergrid.Name = "ordergrid";
+            this.ordergrid.ReadOnly = true;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.ordergrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            this.ordergrid.RowHeadersVisible = false;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.ordergrid.RowsDefaultCellStyle = dataGridViewCellStyle4;
+            this.ordergrid.RowTemplate.DefaultCellStyle.BackColor = System.Drawing.SystemColors.Window;
+            this.ordergrid.RowTemplate.DefaultCellStyle.ForeColor = System.Drawing.SystemColors.WindowText;
+            this.ordergrid.RowTemplate.Height = 24;
+            this.ordergrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.ordergrid.Size = new System.Drawing.Size(828, 538);
+            this.ordergrid.TabIndex = 0;
+            // 
+            // oid
+            // 
+            this.oid.HeaderText = "ID";
+            this.oid.Name = "oid";
+            this.oid.ReadOnly = true;
+            // 
+            // osymbol
+            // 
+            this.osymbol.HeaderText = "Symbol";
+            this.osymbol.Name = "osymbol";
+            this.osymbol.ReadOnly = true;
+            // 
+            // osize
+            // 
+            this.osize.HeaderText = "Size";
+            this.osize.Name = "osize";
+            this.osize.ReadOnly = true;
+            // 
+            // oprice
+            // 
+            this.oprice.HeaderText = "Price";
+            this.oprice.Name = "oprice";
+            this.oprice.ReadOnly = true;
+            // 
+            // ostop
+            // 
+            this.ostop.HeaderText = "Stop";
+            this.ostop.Name = "ostop";
+            this.ostop.ReadOnly = true;
+            // 
+            // oaccount
+            // 
+            this.oaccount.HeaderText = "Account";
+            this.oaccount.Name = "oaccount";
+            this.oaccount.ReadOnly = true;
+            // 
             // TradeTab
             // 
             this.TradeTab.BackColor = System.Drawing.Color.White;
@@ -240,14 +356,14 @@ namespace Quotopia
             this.TradesView.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.TradesView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.TradesView.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.TradesView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.TradesView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
             this.TradesView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.TradesView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Date,
@@ -266,14 +382,14 @@ namespace Quotopia
             this.TradesView.Margin = new System.Windows.Forms.Padding(4);
             this.TradesView.Name = "TradesView";
             this.TradesView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.TradesView.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.TradesView.RowHeadersDefaultCellStyle = dataGridViewCellStyle7;
             this.TradesView.RowHeadersVisible = false;
             this.TradesView.RowTemplate.Height = 24;
             this.TradesView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
@@ -320,9 +436,9 @@ namespace Quotopia
             // 
             // xPrice
             // 
-            dataGridViewCellStyle2.Format = "N2";
-            dataGridViewCellStyle2.NullValue = null;
-            this.xPrice.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle6.Format = "N2";
+            dataGridViewCellStyle6.NullValue = null;
+            this.xPrice.DefaultCellStyle = dataGridViewCellStyle6;
             this.xPrice.HeaderText = "Price";
             this.xPrice.Name = "xPrice";
             this.xPrice.ReadOnly = true;
@@ -1139,6 +1255,8 @@ namespace Quotopia
             this.Markets.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
+            this.ordertab.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.ordergrid)).EndInit();
             this.TradeTab.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.TradesView)).EndInit();
             this.Settings.ResumeLayout(false);
@@ -1251,5 +1369,13 @@ namespace Quotopia
         private System.Windows.Forms.DataGridViewTextBoxColumn xPrice;
         private System.Windows.Forms.DataGridViewTextBoxColumn Comment;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColAccount;
+        private System.Windows.Forms.TabPage ordertab;
+        private System.Windows.Forms.DataGridView ordergrid;
+        private System.Windows.Forms.DataGridViewTextBoxColumn oid;
+        private System.Windows.Forms.DataGridViewTextBoxColumn osymbol;
+        private System.Windows.Forms.DataGridViewTextBoxColumn osize;
+        private System.Windows.Forms.DataGridViewTextBoxColumn oprice;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ostop;
+        private System.Windows.Forms.DataGridViewTextBoxColumn oaccount;
     }
 }
