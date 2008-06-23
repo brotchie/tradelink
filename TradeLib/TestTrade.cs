@@ -37,6 +37,8 @@ namespace TestTradeLib
             int size = 100;
             DateTime date = DateTime.Now;
             Trade t = new Trade(sym, price, size, date);
+            int magicid = 555;
+            t.id = magicid;
             // serialize it for transmission
             string msg = t.Serialize();
             // deserialize it
@@ -56,6 +58,7 @@ namespace TestTradeLib
             Assert.That(newtrade.xdate != 0);
             Assert.That(newtrade.xtime != 0);
             Assert.That(newtrade.xsize == size);
+            Assert.That(newtrade.id == magicid);
         }
 
     }
