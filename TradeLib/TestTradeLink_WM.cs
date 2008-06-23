@@ -106,6 +106,7 @@ namespace TestTradeLib
 
         void tl_gotSrvFillRequest(Order o)
         {
+            s.newOrder(o);
             fillrequest++;
         }
 
