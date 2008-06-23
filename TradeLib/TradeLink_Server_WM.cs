@@ -14,6 +14,7 @@ namespace TradeLib
         public event DecimalStringDelegate DayHighRequest;
         public event DecimalStringDelegate DayLowRequest;
         public event OrderDelegate gotSrvFillRequest;
+        public event IntDelegate OrderCancelRequest;
 
         public TradeLink_Server_WM() : this(TLTypes.HISTORICALBROKER) { }
         public TradeLink_Server_WM(string servername) : base()
@@ -28,16 +29,14 @@ namespace TradeLib
             this(servertype==TLTypes.LIVEBROKER? WMUtil.LIVEWINDOW :
                 (servertype == TLTypes.SIMBROKER ? WMUtil.SIMWINDOW : WMUtil.REPLAYWINDOW)) { }
 
-        private void SrvDoExecute(string msg)
+        private void SrvDoExecute(string msg) // handle an order (= execute request)
         {
             if (this.InvokeRequired)
                 this.Invoke(new DebugDelegate(SrvDoExecute), new object[] { msg });
             else
             {
                 Order o = Order.Deserialize(msg);
-                if (gotSrvFillRequest != null) gotSrvFillRequest(o);
-                for (int i = 0; i < client.Count; i++)
-                    WMUtil.SendMsg(msg, TL2.ORDERNOTIFY, Handle, client[i]);
+                if (gotSrvFillRequest != null) gotSrvFillRequest(o); //request fill
             }
         }
 
@@ -177,6 +176,12 @@ namespace TradeLib
             heart[cid] = DateTime.Now;
         }
 
+        public void newOrderCancel(long orderid_being_cancled)
+        {
+            foreach (string c in client) // send order cancel notifcation to clients
+                WMUtil.SendMsg(orderid_being_cancled.ToString(), TL2.ORDERCANCELRESPONSE, Handle, c);
+        }
+
 
         protected override void WndProc(ref Message m)
         {
@@ -191,6 +196,10 @@ namespace TradeLib
             long result = (long)TL2.OK;
             switch (tlm.type)
             {
+                case TL2.ORDERCANCELREQUEST:
+                    if (OrderCancelRequest != null)
+                        OrderCancelRequest(Convert.ToInt32(msg));
+                    break;
                 case TL2.GETSIZE:
                     if (PositionSizeRequest != null)
                         result = PositionSizeRequest(msg);
