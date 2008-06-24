@@ -8,7 +8,7 @@ namespace TradeLib
     [Serializable]
     public class Trade
     {
-        public int id = 0;
+        public uint id = 0;
         protected Currency cur = Currency.USD;
         protected Security type = Security.STK;
         protected string ex = "NYSE";
@@ -162,7 +162,7 @@ namespace TradeLib
             t.comment = rec[(int)TradeField.Comment];
             t.Account = rec[(int)TradeField.Account];
             t.LocalSymbol = rec[(int)TradeField.LocalSymbol];
-            t.id = Convert.ToInt32(rec[(int)TradeField.ID]);
+            t.id = Convert.ToUInt32(rec[(int)TradeField.ID]);
             try
             {
                 t.Currency = (Currency)Enum.Parse(typeof(Currency), rec[(int)TradeField.Currency]);

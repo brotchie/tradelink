@@ -40,7 +40,7 @@ namespace TradeLib
         protected Dictionary<string, List<Trade>> MasterTrades = new Dictionary<string, List<Trade>>();
         protected List<Order> Orders { get { return MasterOrders[DEFAULT.ID]; } set { MasterOrders[DEFAULT.ID] = value; } }
         protected List<Trade> FillList { get { return MasterTrades[DEFAULT.ID]; } set { MasterTrades[DEFAULT.ID] = value; } }
-        int _nextorderid = 1;
+        uint _nextorderid = 1;
         protected void AddOrder(Order o,Account a) 
         {
             if (!a.isValid) throw new Exception("Invalid account provided");

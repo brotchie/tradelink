@@ -37,7 +37,7 @@ namespace TestTradeLib
             int size = 100;
             DateTime date = DateTime.Now;
             Trade t = new Trade(sym, price, size, date);
-            int magicid = 555;
+            uint magicid = 555;
             t.id = magicid;
             // serialize it for transmission
             string msg = t.Serialize();
