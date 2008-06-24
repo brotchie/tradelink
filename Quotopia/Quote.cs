@@ -57,7 +57,7 @@ namespace Quotopia
                 ordergrid.Invoke(new IntDelegate(tl_gotOrderCancel), new object[] { number });
             else
             {
-                int oidx = orderidx((int)number); // get row number of this order in the grid
+                int oidx = orderidx((uint)number); // get row number of this order in the grid
                 if ((oidx > -1) && (oidx < ordergrid.Rows.Count)) // if row number is valid
                     ordergrid.Rows.RemoveAt(oidx); // remove the canceled order
             }
@@ -67,7 +67,7 @@ namespace Quotopia
         {
             for (int i = 0; i < ordergrid.SelectedRows.Count; i++)
             {
-                int oid = (int)ordergrid["oid", ordergrid.SelectedRows[i].Index].Value;
+                uint oid = (uint)ordergrid["oid", ordergrid.SelectedRows[i].Index].Value;
                 tl.CancelOrder((long)oid);
                 show("Sending cancel for " + oid.ToString());
             }
@@ -76,13 +76,13 @@ namespace Quotopia
         void tl_gotOrder(Order o)
         {
             if (orderidx(o.id)==-1) // if we don't have this order, add it
-                ordergrid.Rows.Add(new object[] { o.id, o.symbol, o.SignedSize, (o.price == 0 ? "Market" : o.price.ToString()), (o.stopp==0 ? "" : o.stopp.ToString()), o.Account });
+                ordergrid.Rows.Add(new object[] { o.id, o.symbol, (o.Side ? "BUY" : "SELL"),o.UnSignedSize, (o.price == 0 ? "Market" : o.price.ToString()), (o.stopp==0 ? "" : o.stopp.ToString()), o.Account });
         }
 
-        int orderidx(int orderid)
+        int orderidx(uint orderid)
         {
             for (int i = 0; i < ordergrid.Rows.Count; i++) // see if's an existing existing order
-                if ((int)ordergrid["oid", i].Value == orderid)
+                if ((uint)ordergrid["oid", i].Value == orderid)
                     return i;
             return -1;
         }
@@ -110,18 +110,18 @@ namespace Quotopia
 
         void QuoteGridSetup()
         {
-            qt.Columns.Add("Symbol", "".GetType());
-            qt.Columns.Add("Last", new Decimal().GetType());
-            qt.Columns.Add("TSize", new Int32().GetType());
-            qt.Columns.Add("Bid", new Decimal().GetType());
-            qt.Columns.Add("Ask", new Decimal().GetType());
-            qt.Columns.Add("BSize", new Int32().GetType());
-            qt.Columns.Add("ASize", new Int32().GetType());
-            qt.Columns.Add("Sizes", "".GetType());
-            qt.Columns.Add("AvgPrice", new Decimal().GetType());
-            qt.Columns.Add("PosSize", new Int32().GetType());
-            qt.Columns.Add("High", new Decimal().GetType());
-            qt.Columns.Add("Low", new Decimal().GetType());
+            qt.Columns.Add("Symbol");
+            qt.Columns.Add("Last");
+            qt.Columns.Add("TSize");
+            qt.Columns.Add("Bid");
+            qt.Columns.Add("Ask");
+            qt.Columns.Add("BSize");
+            qt.Columns.Add("ASize");
+            qt.Columns.Add("Sizes");
+            qt.Columns.Add("AvgPrice");
+            qt.Columns.Add("PosSize");
+            qt.Columns.Add("High");
+            qt.Columns.Add("Low");
             qg.CaptionVisible = true;
             qg.RowHeadersVisible = false;
             qg.ColumnHeadersVisible = true;
@@ -155,6 +155,7 @@ namespace Quotopia
         void rightticket(object sender, EventArgs e)
         {
             string sym = GetVisibleStock(qg.CurrentRowIndex);
+            if (Index.isIdx(sym)) return;
             Position me = tl.FastPos(sym);
             order o = new order(sym, me.Size, me.Side);
             o.neworder += new QuotopiaOrderDel(o_neworder);
@@ -281,7 +282,7 @@ namespace Quotopia
         void addsymbol(string sym)
         {
             // SYM,LAST,TSIZE,BID,ASK,BSIZE,ASIZE,SIZES,OHLC(YEST),CHANGE
-            DataRow r = qt.Rows.Add(sym,0,0,0,0,0,0,"0x0",0,0,0,0);
+            DataRow r = qt.Rows.Add(sym, "", "", "", "", "", "", "", "", "", "", "");
             if (!bardict.ContainsKey(sym))
                 bardict.Add(sym, new BarList(BarInterval.FiveMin, sym));
             qg.Select(qg.VisibleRowCount - 1); // selects most recently added symbol
@@ -332,29 +333,29 @@ namespace Quotopia
                     int r = rows[i];
                     if (t.isTrade)
                     {
-                        qt.Rows[r]["Last"] = t.trade;
+                        qt.Rows[r]["Last"] = t.trade.ToString("N2");
                         if (t.size > 0) // make sure TSize is reported
                             qt.Rows[r]["TSize"] = t.size;
                     }
                     else if (t.FullQuote)
                     {
 
-                        qt.Rows[r]["Bid"] = t.bid;
-                        qt.Rows[r]["Ask"] = t.ask;
+                        qt.Rows[r]["Bid"] = t.bid.ToString("N2");
+                        qt.Rows[r]["Ask"] = t.ask.ToString("N2");
                         qt.Rows[r]["BSize"] = t.bs;
                         qt.Rows[r]["ASize"] = t.os;
                         qt.Rows[r]["Sizes"] = t.bs.ToString() + "x" + t.os.ToString();
                     }
                     else if (t.hasBid)
                     {
-                        qt.Rows[r]["Bid"] = t.bid;
+                        qt.Rows[r]["Bid"] = t.bid.ToString("N2");
                         qt.Rows[r]["BSize"] = t.bs;
                         int os = (int)qt.Rows[r]["ASize"];
                         qt.Rows[r]["Sizes"] = t.bs.ToString() + "x" + os.ToString();
                     }
                     else if (t.hasAsk)
                     {
-                        qt.Rows[r]["Ask"] = t.ask;
+                        qt.Rows[r]["Ask"] = t.ask.ToString("N2");
                         qt.Rows[r]["ASize"] = t.os;
                         int bs = (int)qt.Rows[r]["BSize"];
                         qt.Rows[r]["Sizes"] = bs.ToString() + "x" + t.os.ToString();
@@ -394,7 +395,7 @@ namespace Quotopia
                     qt.Rows[rows[i]]["PosSize"] = size.ToString();
                     qt.Rows[rows[i]]["AvgPrice"] = price.ToString("N2");
                 }
-                TradesView.Rows.Add(t.xdate, t.xtime, t.xsec, t.symbol, (t.side ? "BUY" : "SELL"), t.xsize, t.xprice, t.comment, t.Account.ToString()); // if we accept trade, add it to list
+                TradesView.Rows.Add(t.xdate, t.xtime, t.xsec, t.symbol, (t.side ? "BUY" : "SELL"), t.xsize, t.xprice.ToString("N2"), t.comment, t.Account.ToString()); // if we accept trade, add it to list
             }
         }
 
