@@ -350,14 +350,16 @@ namespace Quotopia
                     {
                         qt.Rows[r]["Bid"] = t.bid.ToString("N2");
                         qt.Rows[r]["BSize"] = t.bs;
-                        int os = (int)qt.Rows[r]["ASize"];
+                        string s = qt.Rows[r]["ASize"].ToString();
+                        int os = (s != "") ? Convert.ToInt32(s) : 0;
                         qt.Rows[r]["Sizes"] = t.bs.ToString() + "x" + os.ToString();
                     }
                     else if (t.hasAsk)
                     {
                         qt.Rows[r]["Ask"] = t.ask.ToString("N2");
                         qt.Rows[r]["ASize"] = t.os;
-                        int bs = (int)qt.Rows[r]["BSize"];
+                        string s = qt.Rows[r]["BSize"].ToString();
+                        int bs = (s!="") ? Convert.ToInt32(s) : 0;
                         qt.Rows[r]["Sizes"] = bs.ToString() + "x" + t.os.ToString();
                     }
                     qt.Rows[r]["High"] = high.ToString("N2");
