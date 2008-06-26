@@ -23,6 +23,18 @@ namespace TestTradeLib
             Assert.That(t.isValid);
             Assert.That(t.isTrade);
             Assert.That(!t.isQuote);
+
+            t = new Tick("TST");
+            t.TradeSize = 100;
+            Assert.That(t.TradeSize == t.ts * 100, t.TradeSize.ToString());
+
+            t = new Tick("TST");
+            t.BidSize = 200;
+            Assert.That(t.BidSize == t.bs * 100, t.BidSize.ToString());
+
+            t = new Tick("TST");
+            t.AskSize = 300;
+            Assert.That(t.AskSize == t.os*100, t.AskSize.ToString());
         }
 
         [Test]
