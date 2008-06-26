@@ -7,7 +7,7 @@ namespace TradeLib
     /// <summary>
     /// Used to describe trends between consequtive or sequential tick instances.
     /// </summary>
-    public class TickLink
+    public class TickLink : TickIndicator
     { // don't have high and low yet
         private Tick a = null;
         private Tick b = null;
@@ -45,7 +45,7 @@ namespace TradeLib
         private decimal _last;
         private decimal _bid;
         private decimal _ask;
-        public virtual bool Tick(Tick tick) 
+        public virtual bool newTick(Tick tick) 
         {
             if (tick.hasAsk) _ask = tick.ask;
             if (tick.hasBid) _bid = tick.bid;
