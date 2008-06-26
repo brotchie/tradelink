@@ -9,6 +9,12 @@ namespace TradeLib
     [Serializable]
     public class MarketBasket : Basket
     {
+        public MarketBasket(string onesymbol) : this(new string[] { onesymbol }) { }
+        public MarketBasket(string[] symbolist)
+        {
+            foreach (string s in symbolist)
+                Add(new Stock(s));
+        }
         public MarketBasket(Stock firststock)
         {
             Add(firststock);
@@ -24,6 +30,16 @@ namespace TradeLib
         {
             for (int i = 0; i < mb.Count; i++)
                 this.Add(mb[i]);
+        }
+        public void Subtract(MarketBasket mb)
+        {
+            List<int> remove = new List<int>();
+            for (int i = 0; i < stocks.Count; i++)
+                for (int j = 0; j < mb.Count; j++)
+                    if (stocks[i].Symbol == mb[j].Symbol)
+                        remove.Add(i);
+            for (int i = remove.Count - 1; i >= 0; i--)
+                stocks.RemoveAt(remove[i]);
         }
         public override void Remove(int i) { stocks.RemoveAt(i); }
         public void Remove(Stock s) { stocks.Remove(s); }

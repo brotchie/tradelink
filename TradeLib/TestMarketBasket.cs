@@ -33,6 +33,17 @@ namespace TestTradeLib
         }
 
         [Test]
+        public void Multiple()
+        {
+            MarketBasket mb = new MarketBasket(new string[] { "IBM","LVS","T","GS","MHS" } );
+            MarketBasket rem = new MarketBasket(new string[] { "LVS", "MHS" });
+            Assert.That(mb.Count == 5);
+            Assert.That(rem.Count == 2);
+            mb.Subtract(rem);
+            Assert.That(mb.Count == 3,mb.Count.ToString());
+        }
+
+        [Test]
         public void Serialization()
         {
             MarketBasket mb = new MarketBasket();

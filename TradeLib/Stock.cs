@@ -36,6 +36,10 @@ namespace TradeLib
         public string Symbol { get { return symbol; }  }
         public override string Name { get { return Symbol; } set { } }
         public override bool isValid { get { return (symbol != null) && isStock(symbol); } }
+        public override int GetHashCode()
+        {
+            return symbol.GetHashCode() + date;
+        }
         /// <summary>
         /// Test if symbol is valid stock name
         /// </summary>
