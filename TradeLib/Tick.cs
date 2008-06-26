@@ -35,6 +35,9 @@ namespace TradeLib
         public bool atLow(decimal low) { return (isTrade && (trade <= low)); }
         public bool atHigh(BoxInfo bi) { return (isTrade && (trade >= bi.High)); }
         public bool atLow(BoxInfo bi) { return (isTrade && (trade <= bi.Low)); }
+        public int BidSize { get { return bs * 100; } set { bs = (int)(value / 100); } }
+        public int AskSize { get { return os * 100; } set { bs = (int)(value / 100); } }
+        public int TradeSize { get { return ts*100; } set { size = (int)(value / 100); } }
         public int ts { get { return size / 100; } } // normalized to bs/os
         public Tick() { }
         public Tick(string symbol) { this.sym = symbol; }
@@ -185,8 +188,8 @@ namespace TradeLib
         }
 
 
-        public static Tick NewBid(string sym, decimal bid, int bidsize) { return NewQuote(sym, 0, 0, 0, bid, 0, bidsize, 0, "", ""); }
-        public static Tick NewAsk(string sym, decimal ask, int asksize) { return NewQuote(sym, 0, 0, 0, 0, ask, 0, asksize, "", ""); }
+        public static Tick NewBid(string sym, decimal bid, int bidsize) { return NewQuote(sym, 0, 0, 0, bid, 0, (int)(bidsize/100), 0, "", ""); }
+        public static Tick NewAsk(string sym, decimal ask, int asksize) { return NewQuote(sym, 0, 0, 0, 0, ask, 0, (int)(asksize/100), "", ""); }
         public static Tick NewQuote(string sym, int date, int time, int sec, decimal bid, decimal ask, int bs, int os, string be, string oe)
         {
             Tick q = new Tick(sym);

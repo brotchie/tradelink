@@ -26,6 +26,42 @@ namespace TestTradeLib
         }
 
         [Test]
+        public void StaticFactories()
+        {
+            // factory inputs
+            const string s = "TST";
+            const decimal p = 13m;
+            const int z = 400;
+            
+            // produce a new ask tick
+            Tick t = Tick.NewAsk(s, p, z);
+            Assert.That(t.hasAsk && !t.hasBid, t.ToString());
+            Assert.That(t.ask==p, t.ask.ToString());
+            Assert.That(t.AskSize == z, t.AskSize.ToString());
+            Assert.That(t.os == (int)(z / 100), t.os.ToString());
+            Assert.That(t.sym == s);
+
+            // produce bid tick
+            t = Tick.NewBid(s, p, z);
+            Assert.That(t.hasBid && !t.hasAsk, t.ToString());
+            Assert.That(t.bid== p, t.bid.ToString());
+            Assert.That(t.BidSize == z, t.BidSize.ToString());
+            Assert.That(t.bs == (int)(z / 100), t.bs.ToString()); 
+            Assert.That(t.sym == s);
+
+            // produce a trade tick
+            t = Tick.NewTrade(s, p, z);
+            Assert.That(t.isTrade && !t.isQuote, t.ToString());
+            Assert.That(t.trade == p, t.trade.ToString());
+            Assert.That(t.TradeSize == z, t.TradeSize.ToString());
+            Assert.That(t.ts == (int)(z / 100), t.ts.ToString());
+            Assert.That(t.sym == s);
+
+
+
+        }
+
+        [Test]
         public void Serialization()
         {
             const string t = "TST";
