@@ -472,11 +472,11 @@ namespace TradeLib
         [CategoryAttribute("TradeLink Box"), DescriptionAttribute("Name of this box.")]
         public string Name { get { return name; } set { name = value; } }
         /// <summary>
-        /// Gets the currently trading symbol.
+        /// Gets or sets the currently trading symbol.
         /// </summary>
         /// <value>The symbol.</value>
         [CategoryAttribute("TradeLink BoxInfo"), DescriptionAttribute("Current symbol")]
-        public string Symbol { get { return symbol; } }
+        public string Symbol { get { return symbol; } set { symbol = value; } }
         /// <summary>
         /// Gets a value indicating whether this <see cref="Box"/> is shutdown.
         /// </summary>
