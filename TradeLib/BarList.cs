@@ -154,6 +154,17 @@ namespace TradeLib
             return NewBar;
         }
 
+        public Stock ToStock()
+        {
+            if (!HasBar()) throw new Exception("Can't generate a stock instance from an empty barlist!");
+            Stock s = new Stock(Symbol, this.RecentBar.Bardate);
+            s.DayHigh = BarMath.HH(this);
+            s.DayLow = BarMath.LL(this);
+            s.DayOpen = this[0].Open;
+            s.DayClose = this.RecentBar.Close;
+            return s;
+        }
+
         /// <summary>
         /// Create a barlist from a succession of bar records provided as comma-delimited OHLC+volume data.
         /// </summary>
