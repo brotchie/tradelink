@@ -28,10 +28,11 @@ namespace TradeLib
         public event IndexDelegate GotIndex;
         
         // user-facing interfaces
-        public TickFileFilter FileFilter { get { return _filter; } set { _filter = value; D("Restarting simulator with " + _filter.ToString());  Reset(); } }
+        public TickFileFilter FileFilter { get { return _filter; } set { _filter = value; D("Restarting simulator with " + _filter.ToString()); Reset(); Initialize(); } }
         public int ApproxTotalTicks { get { return (int)Math.Floor((double)_bytestoprocess/39); } }
         public int TickCount { get { return _tickcount; } }
         public int IndexCount { get { return _indexcount; } }
+        public int CountedTicks { get { return _tickcount + _indexcount; } }
         public int SimBrokerFillCount { get { return _executions; } }
         public DateTime NextIndexTime { get { return _nextindextime; } }
         public DateTime NextTickTime { get { return _nextticktime; } }
@@ -92,13 +93,18 @@ namespace TradeLib
             D("Read initial ticks into cache...");
 
             // get total bytes represented by files
+            
             DirectoryInfo di = new DirectoryInfo(_folder);
-            FileInfo[] fi = di.GetFiles(tickext, SearchOption.AllDirectories);
+            FileInfo[] fi = di.GetFiles("*.*", SearchOption.AllDirectories);
             foreach (FileInfo thisfi in fi)
-                _bytestoprocess += thisfi.Length;
-            fi = di.GetFiles(idxext, SearchOption.AllDirectories);
-            foreach (FileInfo thisfi in fi)
-                _bytestoprocess += thisfi.Length;
+            {
+                foreach (string file in _tickfiles)
+                    if (thisfi.FullName==file)
+                        _bytestoprocess += thisfi.Length;
+                foreach (string file in _indexfiles)
+                    if (thisfi.FullName == file)
+                        _bytestoprocess += thisfi.Length;
+            }
             D("Approximately " + ApproxTotalTicks + " ticks to process...");
             _inited = true;
         }
@@ -144,15 +150,23 @@ namespace TradeLib
                 {
                     case Security.STK:
                         Stock s = (Stock)i;
-                        tickcache.Add(s.NextTick); // add next tick to cache
-                        _tickcount++;
-                        cachedsymbols.Add(i.Name); // update index of cached symbols
+                        Tick next = s.NextTick;
+                        if (next.isValid)
+                        {
+                            tickcache.Add(next); // add next tick to cache
+                            _tickcount++;
+                            cachedsymbols.Add(i.Name); // update index of cached symbols
+                        }
                         break;
                     case Security.IDX:
                         Index x = (Index)i;
-                        indexcache.Add(x.NextTick); // add next to index cache
-                        _indexcount++;
-                        cachedsymbols.Add(i.Name);
+                        Index nexti = x.NextTick;
+                        if (nexti.isValid)
+                        {
+                            indexcache.Add(nexti); // add next to index cache
+                            _indexcount++;
+                            cachedsymbols.Add(i.Name);
+                        }
                         break;
                 }
             }
