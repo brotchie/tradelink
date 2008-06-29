@@ -47,7 +47,6 @@
     <Compile Include="TestBroker.cs" />
     <Compile Include="TestHistSim.cs" />
     <Compile Include="TestIndex.cs" />
-    <Compile Include="TestLink.cs" />
     <Compile Include="TestMarketBasket.cs" />
     <Compile Include="TestOrder.cs" />
     <Compile Include="TestPosition.cs" />
