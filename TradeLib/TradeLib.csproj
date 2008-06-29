@@ -66,7 +66,6 @@
     <Compile Include="Indicator.cs" />
     <Compile Include="Instrument.cs" />
     <Compile Include="LimitOrder.cs" />
-    <Compile Include="Link.cs" />
     <Compile Include="MarketBasket.cs" />
     <Compile Include="MarketOrder.cs" />
     <Compile Include="News.cs" />
