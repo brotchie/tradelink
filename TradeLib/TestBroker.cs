@@ -100,38 +100,38 @@ namespace TestTradeLib
             // verify received tick matches our limit order
             broker.sendOrder(new BuyLimit(s, size, limit));  // throws gottick if it's top of book
             Assert.That(gottickbook == 1, gottickbook.ToString());
-            Assert.That((tickbook.bid == limit) && (tickbook.bs == size), tickbook.ToString());
+            Assert.That((tickbook.bid == limit) && (tickbook.BidSize== size), tickbook.ToString());
 
             // if our order stays in queue, next tick should reflect our order as the best bid
             broker.Execute(t); // should throw gotTick
             Assert.That(gottickbook == 2, gottickbook.ToString());
-            Assert.That((tickbook.bid == limit) && (tickbook.bs == size), tickbook.ToString());
+            Assert.That((tickbook.bid == limit) && (tickbook.BidSize == size), tickbook.ToString());
 
             // lets do same as previous two examples, except put our limit at current best bid
             broker.CancelOrders();
             broker.sendOrder(new BuyLimit(s, limitsize, price)); // increases size only
-            broker.Execute(t);
+            broker.Execute(t); 
             Assert.That(gottickbook == 4, gottickbook.ToString());
-            Assert.That((tickbook.bid == price) && (tickbook.bs == limitsize), tickbook.ToString());
+            Assert.That((tickbook.bid == price) && (tickbook.BidSize == limitsize), tickbook.ToString());
 
             // lets throw an order below best bid and make sure it DOESN'T do anything
             broker.CancelOrders();
+            broker.Execute(t); // got tick here
             broker.sendOrder(new BuyLimit(s, size, price - 1)); // no gotTick this time
-            broker.Execute(t);
             Assert.That(gottickbook == 5, gottickbook.ToString());
-            Assert.That((tickbook.bid == price) && (tickbook.bs == size), tickbook.ToString());
+            Assert.That((tickbook.bid == price) && (tickbook.BidSize == size), tickbook.ToString());
 
             // make sure buy stop does nothing
             broker.sendOrder(new BuyStop(s, size, price)); // no gotTick
             broker.Execute(t);
             Assert.That(gottickbook == 6, gottickbook.ToString());
-            Assert.That((tickbook.bid==price) && (tickbook.bs==size),tickbook.ToString());
+            Assert.That((tickbook.bid == price) && (tickbook.BidSize == size), tickbook.ToString());
 
             // make sure buy market does nothing
             broker.sendOrder(new BuyMarket(s, size)); // no gotTick
             broker.Execute(t);
             Assert.That(gottickbook == 7, gottickbook.ToString());
-            Assert.That((tickbook.bid == price) && (tickbook.bs == size), tickbook.ToString());
+            Assert.That((tickbook.bid == price) && (tickbook.BidSize== size), tickbook.ToString());
 
             // other test that could be inserted:
             // sell stop (doesn't affect)
