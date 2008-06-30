@@ -42,25 +42,7 @@ namespace TradeLib
         protected List<Trade> FillList { get { return MasterTrades[DEFAULT.ID]; } set { MasterTrades[DEFAULT.ID] = value; } }
         uint _nextorderid = 1;
 
-        BBO TickToBBO(Tick t)
-        {
-            BBO book;
-            book.bid = t.bid;
-            book.bsize = t.BidSize;
-            book.osize = t.AskSize;
-            book.ask = t.ask;
-            return book;
-        }
 
-        Tick BBOtoTick(string symbol,BBO bbo)
-        {
-            Tick t = new Tick(symbol);
-            t.bid = bbo.bid;
-            t.BidSize = bbo.bsize;
-            t.ask = bbo.ask;
-            t.AskSize = bbo.osize;
-            return t;
-        }
         protected void AddOrder(Order o,Account a) 
         {
             if (!a.isValid) throw new Exception("Invalid account provided"); // account must be good
@@ -70,30 +52,6 @@ namespace TradeLib
             if (o.id == 0) // if order id isn't set, set it
                 o.id = _nextorderid++;
             MasterOrders[a.ID].Add(o); // record the order
-            // if it's not a limit order we're done
-            if (!o.isLimit) return;
-            BBO book; // setup our book
-            bool hasbook = bbodict.TryGetValue(o.symbol, out book); // see if we have book for this stock
-            if (!hasbook) bbodict.Add(o.symbol,book);
-            if (o.side) // do buy side of book
-            {
-                if ((book.bid == 0) || (book.bid <= o.price)) // see if we have first or better price
-                {
-                    book.bid = o.price; // update price
-                    book.bsize += o.UnSignedSize; // if price was same them update size
-                    if (GotTick != null) GotTick(BBOtoTick(o.symbol,book));
-                }
-            }
-            else // now do same for sell side
-            {
-                if ((book.ask == 0) || (book.ask >= o.price))
-                {
-                    book.ask = o.price;
-                    book.osize += o.UnSignedSize;
-                    if (GotTick != null) GotTick(BBOtoTick(o.symbol,book));
-                }
-            }
-            bbodict[o.symbol] = book; // now book is up-to-date
         }
         public bool CancelOrder(long orderid)
         {
@@ -115,7 +73,7 @@ namespace TradeLib
         /// </summary>
         /// <param name="o">The order to be send.</param>
         /// <returns>true if the order was accepted.</returns>
-        public bool sendOrder(Order o) 
+        public uint sendOrder(Order o) 
         { 
             if (o.Account=="")
                 return sendOrder(o, DEFAULT);
@@ -128,7 +86,7 @@ namespace TradeLib
         /// <param name="o">The order to be sent.</param>
         /// <param name="a">the account to send with the order.</param>
         /// <returns>order id if order was accepted, zero otherwise</returns>
-        public int sendOrder(Order o,Account a)
+        public uint sendOrder(Order o,Account a)
         {
             if ((!o.isValid) || (!a.isValid))
             {
@@ -140,35 +98,7 @@ namespace TradeLib
             if (GotOrder != null) GotOrder(o);
             return o.id;
         }
-        // return existing tick if tick is better than BBO
-        // leave it, otherwise return bbo
-        void UpdateBook(Tick incomingtick)
-        {
-            // if it's a trade, no book to update... just fire the tick
-            if (incomingtick.isTrade) { if (GotTick != null) GotTick(incomingtick); return; }
-            BBO currentbook;
-            // if we don't have a book for this stock, create one and fire the tick
-            if (!bbodict.TryGetValue(incomingtick.sym, out currentbook))
-            {
-                if (GotTick != null) GotTick(incomingtick);
-                bbodict.Add(incomingtick.sym, TickToBBO(incomingtick));
-                return;
-            }
-            // whats left is some book is present
-            // 
-            
-        }
 
-        Dictionary<string,BBO> bbodict = new Dictionary<string,BBO>();
-        struct BBO
-        {
-            public decimal bid;
-            public decimal ask;
-            public int bsize;
-            public int osize;
-            public bool hasAsk { get { return ask*osize!=0; } }
-            public bool hasBid { get { return bid * bsize != 0; } }
-        }
         /// <summary>
         /// Executes any open orders allowed by the specified tick.
         /// </summary>
@@ -176,8 +106,8 @@ namespace TradeLib
         /// <returns>the number of orders executed using the tick.</returns>
         public int Execute(Tick tick)
         {
-            UpdateBook(tick);
             if (!tick.isTrade) return 0;
+            if (GotTick != null) GotTick(tick);
             int availablesize = (int)Math.Abs(tick.size);
             int max = this.Orders.Count;
             int filledorders = 0;
@@ -217,7 +147,7 @@ namespace TradeLib
             MasterOrders.Add(DEFAULT.ID, new List<Order>());
             MasterTrades.Add(DEFAULT.ID, new List<Trade>());
         }
-        public void CancelOrders() { CancelOrders(DEFAULT); bbodict.Clear(); }
+        public void CancelOrders() { CancelOrders(DEFAULT);  }
         public void CancelOrders(Account a) { MasterOrders[a.ID].Clear(); }
         /// <summary>
         /// Gets the complete execution list for this account
