@@ -9,6 +9,7 @@ namespace TradeLib
     public class Order : Trade
     {
         public Order() : base() { }
+        public Order(bool side) : base() { this.side = side; } 
         public string TIF = "DAY";
         public override bool isValid { get { return (symbol != null) && (size != 0); } }
         public bool isMarket { get { return (price == 0) && (stopp == 0); } }
