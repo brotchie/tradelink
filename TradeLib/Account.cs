@@ -17,6 +17,8 @@ namespace TradeLib
         /// <value><c>true</c> if this instance is valid; otherwise, <c>false</c>.</value>
         public bool isValid { get { return (ID!=null) && (ID!="");} }
         bool _execute = true;
+        bool _notify = true;
+        public bool Notify { get { return _notify; } set { _notify = value; } }
         public bool Execute { get { return _execute; } set { _execute = value; } }
         string _id = "";
         /// <summary>

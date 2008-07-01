@@ -44,38 +44,40 @@ namespace TradeLib
         
         uint _nextorderid = 1;
 
-        public Order BestBid(Account account) { return BestBidOrOffer(account, true); }
-        public Order BestBid() { return BestBidOrOffer(true); }
-        public Order BestOffer(Account  account) { return BestBidOrOffer(account, false); }
-        public Order BestOffer() { return BestBidOrOffer(false); }
+        public Order BestBid(string symbol,Account account) { return BestBidOrOffer(symbol,true,account); }
+        public Order BestBid(string symbol) { return BestBidOrOffer(symbol,true); }
+        public Order BestOffer(string symbol, Account  account) { return BestBidOrOffer(symbol,false,account); }
+        public Order BestOffer(string symbol) { return BestBidOrOffer(symbol,false); }
 
-        public Order BestBidOrOffer(bool side)
+        public Order BestBidOrOffer(string symbol,bool side)
         {
             Order best = new Order();
             foreach (Account a in MasterOrders.Keys)
             {
-                if (best.isValid)
+                if (!best.isValid)
                 {
-                    best = new Order(BestBidOrOffer(a,side));
+                    best = new Order(BestBidOrOffer(symbol,side,a));
                     continue;
                 }
-                best = BestBidOrOffer(best, BestBidOrOffer(a,side));
+                best = BestBidOrOffer(best, BestBidOrOffer(symbol,side,a));
             }
             return best;
         }
 
-        public Order BestBidOrOffer(Account Account, bool side)
+        public Order BestBidOrOffer(string sym, bool side,Account Account)
         {
             Order best = new Order();
             foreach (Order o in MasterOrders[Account])
             {
+                if (o.symbol != sym) continue;
                 if (o.Side != side) continue;
                 if (!best.isValid)
                 {
                     best = new Order(o);
                     continue;
                 }
-                best = BestBidOrOffer(best, o);
+                Order test = BestBidOrOffer(best, o);
+                if (test.isValid) best = new Order(test);
             }
             return best;
         }
@@ -119,8 +121,8 @@ namespace TradeLib
                 for (int i = 0; i < MasterOrders[a].Count; i++) // and every order
                     if (MasterOrders[a][i].id == (int)orderid) // if we have order with requested id
                     {
-                        if (GotOrderCancel != null) //send cancel notifcation to any subscribers
-                            GotOrderCancel(orderid); 
+                        if ((GotOrderCancel != null) && a.Notify)
+                            GotOrderCancel(orderid); //send cancel notifcation to any subscribers
                         MasterOrders[a].RemoveAt(i); // remove/cancel order
                         return true;
                     }
@@ -154,7 +156,8 @@ namespace TradeLib
                 return 0;
             }
             AddOrder(o, a);
-            if (GotOrder != null) GotOrder(o);
+            if ((GotOrder != null) && a.Notify) 
+                GotOrder(o);
             return o.id;
         }
 
@@ -165,8 +168,8 @@ namespace TradeLib
         /// <returns>the number of orders executed using the tick.</returns>
         public int Execute(Tick tick)
         {
-            if (!tick.isTrade) return 0;
             if (GotTick != null) GotTick(tick);
+            if (!tick.isTrade) return 0;
             int availablesize = (int)Math.Abs(tick.size);
             int max = this.Orders.Count;
             int filledorders = 0;
@@ -191,7 +194,8 @@ namespace TradeLib
                         o.Fill(tick); // fill our trade
                         availablesize -= mysize; // don't let other trades fill on same tick
                         MasterTrades[a.ID].Add((Trade)o); // record trade
-                        if (GotFill != null) GotFill((Trade)o); // notify subscribers after recording trade
+                        if ((GotFill != null) && a.Notify) 
+                            GotFill((Trade)o); // notify subscribers after recording trade
                         filledorders++; // count the trade
                     }
                 }
