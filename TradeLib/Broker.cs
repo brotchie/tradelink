@@ -222,7 +222,7 @@ namespace TradeLib
         /// </summary>
         /// <param name="a">Account.</param>
         /// <returns></returns>
-        public List<Order> GetOrderList(Account a) { return MasterOrders[a]; }
+        public List<Order> GetOrderList(Account a) { List<Order> res; bool worked = MasterOrders.TryGetValue(a, out res); return worked ? res : new List<Order>(); }
         public List<Trade> GetTradeList() { return GetTradeList(DEFAULT); }
         public List<Order> GetOrderList() { return GetOrderList(DEFAULT); }
 
