@@ -16,6 +16,8 @@ namespace TradeLib
         /// </summary>
         /// <value><c>true</c> if this instance is valid; otherwise, <c>false</c>.</value>
         public bool isValid { get { return (ID!=null) && (ID!="");} }
+        bool _execute = true;
+        public bool Execute { get { return _execute; } set { _execute = value; } }
         string _id = "";
         /// <summary>
         /// Gets the ID of this account.
@@ -31,6 +33,20 @@ namespace TradeLib
         public override string ToString()
         {
             return ID;
+        }
+        public override int GetHashCode()
+        {
+            return _id.GetHashCode();
+        }
+        public override bool Equals(object obj)
+        {
+            if (obj == null) return false;
+            Account o = (Account)obj;
+            return Equals(o);
+        }
+        public bool Equals(Account a)
+        {
+            return this._id.Equals(a.ID);
         }
     }
 }

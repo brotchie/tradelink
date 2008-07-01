@@ -37,22 +37,22 @@ namespace TradeLib
         }
         public const string DEFAULTBOOK = "DEFAULT";
         protected Account DEFAULT = new Account(DEFAULTBOOK,"Defacto account when account not provided");
-        protected Dictionary<string, List<Order>> MasterOrders = new Dictionary<string, List<Order>>();
+        protected Dictionary<Account, List<Order>> MasterOrders = new Dictionary<Account, List<Order>>();
         protected Dictionary<string, List<Trade>> MasterTrades = new Dictionary<string, List<Trade>>();
-        protected List<Order> Orders { get { return MasterOrders[DEFAULT.ID]; } set { MasterOrders[DEFAULT.ID] = value; } }
+        protected List<Order> Orders { get { return MasterOrders[DEFAULT]; } set { MasterOrders[DEFAULT] = value; } }
         protected List<Trade> FillList { get { return MasterTrades[DEFAULT.ID]; } set { MasterTrades[DEFAULT.ID] = value; } }
-        public string[] BookNames { get { string[] tmp = new string[MasterOrders.Keys.Count]; MasterOrders.Keys.CopyTo(tmp, 0); return tmp; } }
+        
         uint _nextorderid = 1;
 
-        public Order BestBid(string account) { return BestBidOrOffer(account, true); }
+        public Order BestBid(Account account) { return BestBidOrOffer(account, true); }
         public Order BestBid() { return BestBidOrOffer(true); }
-        public Order BestOffer(string account) { return BestBidOrOffer(account, false); }
+        public Order BestOffer(Account  account) { return BestBidOrOffer(account, false); }
         public Order BestOffer() { return BestBidOrOffer(false); }
 
         public Order BestBidOrOffer(bool side)
         {
             Order best = new Order();
-            foreach (string a in MasterOrders.Keys)
+            foreach (Account a in MasterOrders.Keys)
             {
                 if (best.isValid)
                 {
@@ -64,7 +64,7 @@ namespace TradeLib
             return best;
         }
 
-        public Order BestBidOrOffer(string Account, bool side)
+        public Order BestBidOrOffer(Account Account, bool side)
         {
             Order best = new Order();
             foreach (Order o in MasterOrders[Account])
@@ -104,17 +104,17 @@ namespace TradeLib
         protected void AddOrder(Order o,Account a) 
         {
             if (!a.isValid) throw new Exception("Invalid account provided"); // account must be good
-            if (!MasterOrders.ContainsKey(a.ID))  // see if we have a book for this account
-                MasterOrders.Add(a.ID,new List<Order>()); // if not, create one
+            if (!MasterOrders.ContainsKey(a))  // see if we have a book for this account
+                MasterOrders.Add(a,new List<Order>()); // if not, create one
             o.Account = a.ID; // make sure order knows his account
             if (o.id == 0) // if order id isn't set, set it
                 o.id = _nextorderid++;
-            MasterOrders[a.ID].Add(o); // record the order
+            MasterOrders[a].Add(o); // record the order
         }
         public bool CancelOrder(uint orderid) { return CancelOrder((long)orderid); }
         public bool CancelOrder(long orderid)
         {
-            foreach (string a in MasterOrders.Keys) // go through every account
+            foreach (Account a in MasterOrders.Keys) // go through every account
             {
                 for (int i = 0; i < MasterOrders[a].Count; i++) // and every order
                     if (MasterOrders[a][i].id == (int)orderid) // if we have order with requested id
@@ -170,10 +170,13 @@ namespace TradeLib
             int availablesize = (int)Math.Abs(tick.size);
             int max = this.Orders.Count;
             int filledorders = 0;
-            foreach (string a in MasterOrders.Keys)
+            foreach (Account a in MasterOrders.Keys)
             { // go through each account
+                // if account has requested no executions, skip it
+                if (!a.Execute) continue;
+                // go through each order in the account
                 for (int i = 0; i < MasterOrders[a].Count; i++)
-                { // go through each order
+                { 
                     Order o = MasterOrders[a][i];
                     if (tick.sym != o.symbol) continue; //make sure tick is for the right stock
                     int mysize = (int)Math.Abs(o.size);
@@ -184,10 +187,10 @@ namespace TradeLib
                         (!o.side && (mysize <= availablesize) && (tick.trade <= o.stopp) && (o.price == 0))) // sell stop
                     { // sort filled trades by symbol
                         MasterOrders[a].RemoveAt(i);
-                        if (!MasterTrades.ContainsKey(a)) MasterTrades.Add(a, new List<Trade>());
+                        if (!MasterTrades.ContainsKey(a.ID)) MasterTrades.Add(a.ID, new List<Trade>());
                         o.Fill(tick); // fill our trade
                         availablesize -= mysize; // don't let other trades fill on same tick
-                        MasterTrades[a].Add((Trade)o); // record trade
+                        MasterTrades[a.ID].Add((Trade)o); // record trade
                         if (GotFill != null) GotFill((Trade)o); // notify subscribers after recording trade
                         filledorders++; // count the trade
                     }
@@ -203,11 +206,11 @@ namespace TradeLib
         {
             MasterOrders.Clear();
             MasterTrades.Clear();
-            MasterOrders.Add(DEFAULT.ID, new List<Order>());
+            MasterOrders.Add(DEFAULT, new List<Order>());
             MasterTrades.Add(DEFAULT.ID, new List<Trade>());
         }
         public void CancelOrders() { CancelOrders(DEFAULT);  }
-        public void CancelOrders(Account a) { MasterOrders[a.ID].Clear(); }
+        public void CancelOrders(Account a) { MasterOrders[a].Clear(); }
         /// <summary>
         /// Gets the complete execution list for this account
         /// </summary>
@@ -219,7 +222,7 @@ namespace TradeLib
         /// </summary>
         /// <param name="a">Account.</param>
         /// <returns></returns>
-        public List<Order> GetOrderList(Account a) { return MasterOrders[a.ID]; }
+        public List<Order> GetOrderList(Account a) { return MasterOrders[a]; }
         public List<Trade> GetTradeList() { return GetTradeList(DEFAULT); }
         public List<Order> GetOrderList() { return GetOrderList(DEFAULT); }
 
