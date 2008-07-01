@@ -35,24 +35,83 @@ namespace TradeLib
             Reset();
 
         }
-        protected Account DEFAULT = new Account("DEFAULT","Defacto account when account not provided");
+        public const string DEFAULTBOOK = "DEFAULT";
+        protected Account DEFAULT = new Account(DEFAULTBOOK,"Defacto account when account not provided");
         protected Dictionary<string, List<Order>> MasterOrders = new Dictionary<string, List<Order>>();
         protected Dictionary<string, List<Trade>> MasterTrades = new Dictionary<string, List<Trade>>();
         protected List<Order> Orders { get { return MasterOrders[DEFAULT.ID]; } set { MasterOrders[DEFAULT.ID] = value; } }
         protected List<Trade> FillList { get { return MasterTrades[DEFAULT.ID]; } set { MasterTrades[DEFAULT.ID] = value; } }
+        public string[] BookNames { get { string[] tmp = new string[MasterOrders.Keys.Count]; MasterOrders.Keys.CopyTo(tmp, 0); return tmp; } }
         uint _nextorderid = 1;
+
+        public Order BestBid(string account) { return BestBidOrOffer(account, true); }
+        public Order BestBid() { return BestBidOrOffer(true); }
+        public Order BestOffer(string account) { return BestBidOrOffer(account, false); }
+        public Order BestOffer() { return BestBidOrOffer(false); }
+
+        public Order BestBidOrOffer(bool side)
+        {
+            Order best = new Order();
+            foreach (string a in MasterOrders.Keys)
+            {
+                if (best.isValid)
+                {
+                    best = new Order(BestBidOrOffer(a,side));
+                    continue;
+                }
+                best = BestBidOrOffer(best, BestBidOrOffer(a,side));
+            }
+            return best;
+        }
+
+        public Order BestBidOrOffer(string Account, bool side)
+        {
+            Order best = new Order();
+            foreach (Order o in MasterOrders[Account])
+            {
+                if (o.Side != side) continue;
+                if (!best.isValid)
+                {
+                    best = new Order(o);
+                    continue;
+                }
+                best = BestBidOrOffer(best, o);
+            }
+            return best;
+        }
+
+        // takes two orders and returns the better one
+        // if orders aren't for same side or symbol or not limit, returns invalid order
+        // if orders are equally good, adds them together
+        public Order BestBidOrOffer(Order first,Order second)
+        {
+            if ((first.symbol!= second.symbol) || (first.side!=second.side) || !first.isLimit || !second.isLimit)
+                return new Order(); // if not comparable return an invalid order
+            if ((first.side && (first.price > second.price)) || // if first is better, use it
+                (!first.side && (first.price < second.price)))
+                return new Order(first);
+            else if ((first.side && (first.price < second.price)) || // if second is better, use it
+                (!first.side && (first.price > second.price)))
+                return new Order(second);
+
+            // if order is matching then add the sizes
+            Order add = new Order(first);
+            add.size = add.UnSignedSize + second.UnSignedSize * (add.Side ? 1 : -1);
+            return add;
+        }
 
 
         protected void AddOrder(Order o,Account a) 
         {
             if (!a.isValid) throw new Exception("Invalid account provided"); // account must be good
-            if (!MasterOrders.ContainsKey(a.ID))  // see if we have a blotter for this account
-                MasterOrders.Add(a.ID,new List<Order>()); // if not,c reate one
+            if (!MasterOrders.ContainsKey(a.ID))  // see if we have a book for this account
+                MasterOrders.Add(a.ID,new List<Order>()); // if not, create one
             o.Account = a.ID; // make sure order knows his account
             if (o.id == 0) // if order id isn't set, set it
                 o.id = _nextorderid++;
             MasterOrders[a.ID].Add(o); // record the order
         }
+        public bool CancelOrder(uint orderid) { return CancelOrder((long)orderid); }
         public bool CancelOrder(long orderid)
         {
             foreach (string a in MasterOrders.Keys) // go through every account

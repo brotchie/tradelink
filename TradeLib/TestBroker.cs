@@ -77,7 +77,50 @@ namespace TestTradeLib
             gottickDP++;
         }
 
+        [Test]
+        void BBO()
+        {
+            Broker broker = new Broker();
+            const string s = "TST";
+            const decimal p1 = 10m;
+            const decimal p2 = 11m;
+            const int x = 100;
+            Order bid,offer;
 
+            // send bid, make sure it's BBO (since it's only order on any book)
+            broker.sendOrder(new BuyLimit(s, x, p1));
+            bid = broker.BestBid();
+            offer = broker.BestOffer();
+            Assert.That(bid.isValid && (bid.price==p1) && (bid.size==x), bid.ToString());
+            Assert.That(!offer.isValid, offer.ToString());
+
+            // add better bid, make sure it's BBO
+            uint id1 = broker.sendOrder(new BuyLimit(s, x, p2));
+            bid = broker.BestBid();
+            offer = broker.BestOffer();
+            Assert.That(bid.isValid && (bid.price == p2) && (bid.size == x), bid.ToString());
+            Assert.That(!offer.isValid, offer.ToString());
+
+            // add another bid at same price on another account, make sure it's additive
+            uint id2 = broker.sendOrder(new BuyLimit(s, x, p2),new Account("ANOTHER_ACCOUNT"));
+            bid = broker.BestBid();
+            offer = broker.BestOffer();
+            Assert.That(bid.isValid && (bid.price == p2) && (bid.size == (2*x)), bid.ToString());
+            Assert.That(!offer.isValid, offer.ToString());
+
+            // cancel order and make sure bbo returns
+            broker.CancelOrder(id1);
+            broker.CancelOrder(id2);
+            bid = broker.BestBid();
+            offer = broker.BestOffer();
+            Assert.That(bid.isValid && (bid.price == p1) && (bid.size == x), bid.ToString());
+            Assert.That(!offer.isValid, offer.ToString());
+
+            // other test ideas
+            // replicate above tests for sell-side
+
+
+        }
 
 
 
