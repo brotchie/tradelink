@@ -16,7 +16,7 @@ namespace Replay
         Playback _playback = null;
         HistSim h = null;
         string tickfolder = Util.TLTickDir;
-
+        static Account HISTBOOK = new Account("_HISTBOOK");
         public Replay()
         {
             InitializeComponent();
@@ -26,6 +26,11 @@ namespace Replay
             tl.DayHighRequest += new TradeLink_Server_WM.DecimalStringDelegate(tl_DayHighRequest);
             tl.DayLowRequest += new TradeLink_Server_WM.DecimalStringDelegate(tl_DayLowRequest);
             tl.OrderCancelRequest += new IntDelegate(tl_OrderCancelRequest);
+            
+            // setup our special book used to hold bids and offers from historical sources
+            // (this is for determining top of book between historical sources and our own orders)
+            HISTBOOK.Execute = false; // make sure our special book is never executed by simulator
+            HISTBOOK.Notify = false; // don't notify 
         }
 
         void tl_OrderCancelRequest(long number)
@@ -125,7 +130,20 @@ namespace Replay
                     o.time = Util.ToTLTime(h.NextTickTime);
                     o.date = Util.ToTLDate(h.NextTickTime);
                 }
+                // before we send the order, get top of book for same side
+                Order oldbbo = h.SimBroker.BestBidOrOffer(o.symbol,o.Side);
+                oldbbo.Account = "";
+
+                // then send the order
                 h.SimBroker.sendOrder(o);
+
+                // get the new top of book
+                Order newbbo = h.SimBroker.BestBidOrOffer(o.symbol,o.Side);
+                newbbo.Account = "";
+
+                // if it's changed, notify clients
+                if (oldbbo != newbbo)
+                    tl.newTick(OrderToTick(newbbo));
             }
         }
 
@@ -182,9 +200,78 @@ namespace Replay
                         lows[t.sym] = t.trade;
                 }
                 else lows.Add(t.sym, t.trade);
+                tl.newTick(t); // notify of the trade
             }
+            else
+            {   // it's a quote so we need to update the book
 
-            tl.newTick(t);
+                // first though get the BBO from hist book to detect improvements
+                Order oldbid = h.SimBroker.BestBid(t.sym);
+                Order oldask = h.SimBroker.BestOffer(t.sym);
+
+                // then update the historical book
+                PlaceHistoricalOrder(t);
+
+                // fetch the new book
+                Order newbid = h.SimBroker.BestBid(t.sym);
+                Order newask = h.SimBroker.BestOffer(t.sym);
+
+                // reset accounts so equality comparisons work properly in next step
+                oldbid.Account = "";
+                oldask.Account = "";
+                newbid.Account = "";
+                newask.Account = "";
+
+                // if there are changes, notify clients
+                if (oldbid != newbid)
+                    tl.newTick(OrderToTick(newbid));
+                if (oldask != newask)
+                    tl.newTick(OrderToTick(newask));
+            }
+        }
+
+        Tick OrderToTick(Order o)
+        {
+            return o.isLimit ? (o.Side ? Tick.NewBid(o.symbol, o.price, o.UnSignedSize) : Tick.NewAsk(o.symbol, o.price, o.UnSignedSize)) : new Tick();
+        }
+
+        
+
+        void PlaceHistoricalOrder(Tick t)
+            // this function converts a historical quote into an order
+            // and places it on a special order book replay uses to determine
+            // the BBO for historical tick streams and the BBO between historical ticks
+            // and the other order books
+        {
+            if (t.isTrade) return;
+
+            if (t.hasAsk)
+            {
+                // if we already have a book for this side we can get rid of it
+                foreach (uint oid in hasHistBook(t.sym, false))
+                    h.SimBroker.CancelOrder((long)oid); 
+                h.SimBroker.sendOrder(new SellLimit(t.sym, t.AskSize, t.ask),HISTBOOK);
+            }
+            if (t.hasBid)
+            {
+                // if we already have a book for this side we can get rid of it
+                foreach (uint oid in hasHistBook(t.sym, true))
+                    h.SimBroker.CancelOrder((long)oid);
+                h.SimBroker.sendOrder(new BuyLimit(t.sym, t.BidSize, t.bid), HISTBOOK);
+            }
+            
+        }
+
+        uint[] hasHistBook(string sym, bool side)
+            // this function tests whether replay's special "historical" book
+            // exits for a given market symbol and side
+        {
+            List<uint> idxlist = new List<uint>();
+            List<Order> olist = h.SimBroker.GetOrderList(HISTBOOK);
+            for (int i = 0; i < olist.Count; i++)
+                if ((olist[i].symbol == sym) && (olist[i].Side == side))
+                    idxlist.Add(olist[i].id);
+            return idxlist.ToArray();
         }
 
         private void stopbut_Click(object sender, EventArgs e)
