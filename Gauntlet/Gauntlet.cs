@@ -164,7 +164,15 @@ using System.IO;
             //bt.mybroker.GotFill += new FillDelegate(mybroker_GotFill);
             //bt.mybroker.GotOrder += new OrderDelegate(mybroker_GotOrder);
             List<FileInfo> tf = new List<FileInfo>();
-            DirectoryInfo di = new DirectoryInfo(WinGauntlet.Properties.Settings.Default.tickfolder);
+            string dir = WinGauntlet.Properties.Settings.Default.tickfolder;
+            if (!Directory.Exists(dir))
+            {
+                string msg = "You must select a valid tick directory containing historical tick files.";
+                MessageBox.Show(msg,"Nonexistent tick directory");
+                show(msg);
+                return;
+            }
+            DirectoryInfo di = new DirectoryInfo(dir);
             FileInfo [] fi = di.GetFiles("*.EPF");
             for (int i = 0; i < fi.Length; i++)
             {
@@ -198,6 +206,14 @@ using System.IO;
                     (us && symmatch))
                     tf.Add(fi[i]);
             }
+            if (tf.Count == 0)
+            {
+                string msg = "You didn't select any valid tick files, or none were available.";
+                MessageBox.Show(msg, "No tick files selected.");
+                show(msg);
+                return;
+            }
+
             bt.name = DateTime.Now.ToString("yyyMMdd.HHmm");
             if (mybox != null) { bt.mybox = mybox; bt.mybox.Debug = showdebug.Checked; }
             else { show("You must select a box to run the gauntlet."); return; } 
