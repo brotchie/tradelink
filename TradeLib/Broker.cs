@@ -13,7 +13,7 @@ namespace TradeLib
         /// <summary>
         /// Occurs when [got order cancel].
         /// </summary>
-        public event IntDelegate GotOrderCancel;
+        public event UIntDelegate GotOrderCancel;
         /// <summary>
         /// Occurs when [got tick].
         /// </summary>
@@ -41,7 +41,7 @@ namespace TradeLib
         protected Dictionary<string, List<Trade>> MasterTrades = new Dictionary<string, List<Trade>>();
         protected List<Order> Orders { get { return MasterOrders[DEFAULT]; } set { MasterOrders[DEFAULT] = value; } }
         protected List<Trade> FillList { get { return MasterTrades[DEFAULT.ID]; } set { MasterTrades[DEFAULT.ID] = value; } }
-        
+        public string[] Accounts { get { List<string> alist = new List<string>(); foreach (Account a in MasterOrders.Keys) alist.Add(a.ID); return alist.ToArray(); } }
         uint _nextorderid = 1;
 
         public Order BestBid(string symbol,Account account) { return BestBidOrOffer(symbol,true,account); }
@@ -113,20 +113,23 @@ namespace TradeLib
                 o.id = _nextorderid++;
             MasterOrders[a].Add(o); // record the order
         }
-        public bool CancelOrder(uint orderid) { return CancelOrder((long)orderid); }
-        public bool CancelOrder(long orderid)
+        public bool CancelOrder(uint orderid)
         {
-            foreach (Account a in MasterOrders.Keys) // go through every account
-            {
-                for (int i = 0; i < MasterOrders[a].Count; i++) // and every order
-                    if (MasterOrders[a][i].id == (int)orderid) // if we have order with requested id
-                    {
-                        if ((GotOrderCancel != null) && a.Notify)
-                            GotOrderCancel(orderid); //send cancel notifcation to any subscribers
-                        MasterOrders[a].RemoveAt(i); // remove/cancel order
-                        return true;
-                    }
-            }
+            bool worked = false;
+            foreach (Account a in MasterOrders.Keys)
+                worked |= CancelOrder(a, orderid);
+            return worked;
+        }
+        public bool CancelOrder(Account a, uint orderid)
+        {
+            for (int i = 0; i < MasterOrders[a].Count; i++) // and every order
+                if (MasterOrders[a][i].id == orderid) // if we have order with requested id
+                {
+                    if ((GotOrderCancel != null) && a.Notify)
+                        GotOrderCancel(orderid); //send cancel notifcation to any subscribers
+                    MasterOrders[a].RemoveAt(i); // remove/cancel order
+                    return true;
+                }
             return false;
         }
         /// <summary>
@@ -208,13 +211,24 @@ namespace TradeLib
         /// </summary>
         public void Reset()
         {
+            CancelOrders();
             MasterOrders.Clear();
             MasterTrades.Clear();
             MasterOrders.Add(DEFAULT, new List<Order>());
             MasterTrades.Add(DEFAULT.ID, new List<Trade>());
         }
-        public void CancelOrders() { CancelOrders(DEFAULT);  }
-        public void CancelOrders(Account a) { MasterOrders[a].Clear(); }
+        public void CancelOrders() 
+        {
+            foreach (Account a in MasterOrders.Keys)
+                CancelOrders(a);
+        }
+        public void CancelOrders(Account a) 
+        { 
+            foreach (Order o in MasterOrders[a])
+                if ((GotOrderCancel != null) && a.Notify)
+                    GotOrderCancel(o.id); //send cancel notifcation to any subscribers
+            MasterOrders[a].Clear();  // clear the account
+        }
         /// <summary>
         /// Gets the complete execution list for this account
         /// </summary>

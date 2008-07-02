@@ -52,6 +52,7 @@ namespace TradeLib
 
         public void Reset()
         {
+
             _inited = false;
             _indexfiles = null;
             _tickfiles = null;

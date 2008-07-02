@@ -57,6 +57,7 @@ namespace TradeLib
     public delegate void StockDelegate(Stock stock);
     public delegate void OrderDelegate(Order o);
     public delegate void IntDelegate(Int64 number);
+    public delegate void UIntDelegate(UInt32 number);
 
     /// <summary>
     /// Used to indicate that a TradeLink Broker Connector was not running.

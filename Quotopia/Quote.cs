@@ -43,19 +43,19 @@ namespace Quotopia
             tl.gotFill += new FillDelegate(tl_gotFill);
             tl.gotIndexTick += new IndexDelegate(tl_gotIndexTick);
             tl.gotOrder += new OrderDelegate(tl_gotOrder);
-            tl.gotOrderCancel += new IntDelegate(tl_gotOrderCancel);
+            tl.gotOrderCancel += new UIntDelegate(tl_gotOrderCancel);
             ordergrid.ContextMenuStrip = new ContextMenuStrip();
             ordergrid.ContextMenuStrip.Items.Add("Cancel", null, new EventHandler(cancelorder));
             FormClosing += new FormClosingEventHandler(Quote_FormClosing);
         }
 
-        void tl_gotOrderCancel(long number)
+        void tl_gotOrderCancel(uint number)
         {
             if (ordergrid.InvokeRequired)
-                ordergrid.Invoke(new IntDelegate(tl_gotOrderCancel), new object[] { number });
+                ordergrid.Invoke(new UIntDelegate(tl_gotOrderCancel), new object[] { number });
             else
             {
-                int oidx = orderidx((uint)number); // get row number of this order in the grid
+                int oidx = orderidx(number); // get row number of this order in the grid
                 if ((oidx > -1) && (oidx < ordergrid.Rows.Count)) // if row number is valid
                     ordergrid.Rows.RemoveAt(oidx); // remove the canceled order
             }

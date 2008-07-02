@@ -14,7 +14,7 @@ namespace Replay
     {
         TradeLink_Server_WM tl = new TradeLink_Server_WM(TLTypes.HISTORICALBROKER);
         Playback _playback = null;
-        HistSim h = null;
+        HistSim h = new HistSim();
         string tickfolder = Util.TLTickDir;
         static Account HISTBOOK = new Account("_HISTBOOK");
         public Replay()
@@ -25,7 +25,15 @@ namespace Replay
             tl.PositionSizeRequest += new TradeLink_Server_WM.IntStringDelegate(tl_PositionSizeRequest);
             tl.DayHighRequest += new TradeLink_Server_WM.DecimalStringDelegate(tl_DayHighRequest);
             tl.DayLowRequest += new TradeLink_Server_WM.DecimalStringDelegate(tl_DayLowRequest);
-            tl.OrderCancelRequest += new IntDelegate(tl_OrderCancelRequest);
+            tl.OrderCancelRequest += new UIntDelegate(tl_OrderCancelRequest);
+            tl.gotSrvAcctRequest += new TradeLink_Server_WM.StringDelegate(tl_gotSrvAcctRequest);
+
+            h.GotTick += new TickDelegate(h_GotTick);
+            h.GotIndex += new IndexDelegate(h_GotIndex);
+            h.SimBroker.GotOrder += new OrderDelegate(SimBroker_GotOrder);
+            h.SimBroker.GotFill += new FillDelegate(SimBroker_GotFill);
+            h.SimBroker.GotOrderCancel += new UIntDelegate(SimBroker_GotOrderCancel);
+
             
             // setup our special book used to hold bids and offers from historical sources
             // (this is for determining top of book between historical sources and our own orders)
@@ -33,7 +41,13 @@ namespace Replay
             HISTBOOK.Notify = false; // don't notify 
         }
 
-        void tl_OrderCancelRequest(long number)
+        string tl_gotSrvAcctRequest()
+        {
+            if (h == null) return "";
+            return string.Join(",", h.SimBroker.Accounts);
+        }
+
+        void tl_OrderCancelRequest(uint number)
         {
             if (h == null) return;
             h.SimBroker.CancelOrder(number); // send cancel request to broker
@@ -98,12 +112,7 @@ namespace Replay
             lows = new Dictionary<string, decimal>();
             TickFileFilter tff = new TickFileFilter();
             tff.DateFilter(Util.ToTLDate(monthCalendar1.SelectionEnd),DateMatchType.Day|DateMatchType.Month|DateMatchType.Year);
-            h = new HistSim(tickfolder, tff);
-            h.GotTick += new TickDelegate(h_GotTick);
-            h.GotIndex += new IndexDelegate(h_GotIndex);
-            h.SimBroker.GotOrder += new OrderDelegate(SimBroker_GotOrder);
-            h.SimBroker.GotFill += new FillDelegate(SimBroker_GotFill);
-            h.SimBroker.GotOrderCancel += new IntDelegate(SimBroker_GotOrderCancel);
+            h.FileFilter = tff;
             _playback = new Playback(h);
             _playback.RunWorkerCompleted += new RunWorkerCompletedEventHandler(_playback_RunWorkerCompleted);
             _playback.ProgressChanged+=new ProgressChangedEventHandler(_playback_ProgressChanged);
@@ -114,7 +123,7 @@ namespace Replay
             trackBar1.Enabled = false;
         }
 
-        void SimBroker_GotOrderCancel(long number)
+        void SimBroker_GotOrderCancel(uint number)
         {
             tl.newOrderCancel(number);
         }
@@ -150,9 +159,8 @@ namespace Replay
         void _playback_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             progressbar.Value = e.ProgressPercentage;
-            string time = "";
-            if (h != null) time = " [" + h.NextTickTime + "] ";
-            status("Playing... " +time+ e.ProgressPercentage + "%");
+            string time = (h != null) ? h.NextTickTime.ToString() : "";
+            status("Playing: " +time+ " ("+e.ProgressPercentage + "%)");
         }
 
         void _playback_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -164,6 +172,7 @@ namespace Replay
             else
                 status("Playback completed successfully");
             progressbar.Value = 0;
+            h.Reset();
         }
 
         void SimBroker_GotFill(Trade t)
@@ -249,14 +258,14 @@ namespace Replay
             {
                 // if we already have a book for this side we can get rid of it
                 foreach (uint oid in hasHistBook(t.sym, false))
-                    h.SimBroker.CancelOrder((long)oid); 
+                    h.SimBroker.CancelOrder(oid); 
                 h.SimBroker.sendOrder(new SellLimit(t.sym, t.AskSize, t.ask),HISTBOOK);
             }
             if (t.hasBid)
             {
                 // if we already have a book for this side we can get rid of it
                 foreach (uint oid in hasHistBook(t.sym, true))
-                    h.SimBroker.CancelOrder((long)oid);
+                    h.SimBroker.CancelOrder(oid);
                 h.SimBroker.sendOrder(new BuyLimit(t.sym, t.BidSize, t.bid), HISTBOOK);
             }
             

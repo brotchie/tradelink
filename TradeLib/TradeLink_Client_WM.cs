@@ -20,7 +20,7 @@ namespace TradeLib
         public event IndexDelegate gotIndexTick;
         public event OrderDelegate gotOrder;
         public event DebugDelegate gotAccounts;
-        public event IntDelegate gotOrderCancel;
+        public event UIntDelegate gotOrderCancel;
 
         public TradeLink_Client_WM() : this("TradeLinkClient",true) { }
 
@@ -343,7 +343,7 @@ namespace TradeLib
             switch (tlm.type)
             {
                 case TL2.ORDERCANCELRESPONSE:
-                    if (gotOrderCancel != null) gotOrderCancel(Convert.ToInt64(msg));
+                    if (gotOrderCancel != null) gotOrderCancel(Convert.ToUInt32(msg));
                     break;
                 case TL2.TICKNOTIFY:
                     if (Index.isIdx(r[(int)TickField.symbol]))
