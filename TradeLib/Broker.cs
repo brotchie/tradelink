@@ -10,10 +10,11 @@ namespace TradeLib
     /// </summary>
     public class Broker
     {
+        public delegate void OrderCancelDelegate(string sym, bool side, uint id);
         /// <summary>
         /// Occurs when [got order cancel].
         /// </summary>
-        public event UIntDelegate GotOrderCancel;
+        public event OrderCancelDelegate GotOrderCancel;
         /// <summary>
         /// Occurs when [got tick].
         /// </summary>
@@ -133,7 +134,7 @@ namespace TradeLib
                 if (MasterOrders[a][i].id == orderid) // if we have order with requested id
                 {
                     if ((GotOrderCancel != null) && a.Notify)
-                        GotOrderCancel(orderid); //send cancel notifcation to any subscribers
+                        GotOrderCancel(MasterOrders[a][i].symbol, MasterOrders[a][i].Side,orderid); //send cancel notifcation to any subscribers
                     MasterOrders[a].RemoveAt(i); // remove/cancel order
                     return true;
                 }
@@ -233,7 +234,7 @@ namespace TradeLib
         { 
             foreach (Order o in MasterOrders[a])
                 if ((GotOrderCancel != null) && a.Notify)
-                    GotOrderCancel(o.id); //send cancel notifcation to any subscribers
+                    GotOrderCancel(o.symbol,o.Side,o.id); //send cancel notifcation to any subscribers
             MasterOrders[a].Clear();  // clear the account
         }
         /// <summary>

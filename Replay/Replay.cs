@@ -32,7 +32,7 @@ namespace Replay
             h.GotIndex += new IndexDelegate(h_GotIndex);
             h.SimBroker.GotOrder += new OrderDelegate(SimBroker_GotOrder);
             h.SimBroker.GotFill += new FillDelegate(SimBroker_GotFill);
-            h.SimBroker.GotOrderCancel += new UIntDelegate(SimBroker_GotOrderCancel);
+            h.SimBroker.GotOrderCancel += new Broker.OrderCancelDelegate(SimBroker_GotOrderCancel);
 
             
             // setup our special book used to hold bids and offers from historical sources
@@ -40,6 +40,8 @@ namespace Replay
             HISTBOOK.Execute = false; // make sure our special book is never executed by simulator
             HISTBOOK.Notify = false; // don't notify 
         }
+
+
 
         string tl_gotSrvAcctRequest()
         {
@@ -123,10 +125,15 @@ namespace Replay
             trackBar1.Enabled = false;
         }
 
-        void SimBroker_GotOrderCancel(uint number)
+        void SimBroker_GotOrderCancel(string sym, bool side,uint id)
         {
-            tl.newOrderCancel(number);
+            // if we get an order cancel notify from the broker, pass along to our clients
+            tl.newOrderCancel(id);
+            // send the updated book to our clients for same side as order
+            tl.newTick(OrderToTick(h.SimBroker.BestBidOrOffer(sym, side)));
         }
+
+        
 
         void tl_gotSrvFillRequest(Order o)
         {
