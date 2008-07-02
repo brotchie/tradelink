@@ -241,7 +241,21 @@ namespace Replay
 
         Tick OrderToTick(Order o)
         {
-            return o.isLimit ? (o.Side ? Tick.NewBid(o.symbol, o.price, o.UnSignedSize) : Tick.NewAsk(o.symbol, o.price, o.UnSignedSize)) : new Tick();
+            Tick t = new Tick(o.symbol);
+            if (!o.isLimit) return t;
+            if (o.Side)
+            {
+                t.bid = o.price;
+                t.BidSize = o.UnSignedSize;
+                t.be = o.Exchange;
+            }
+            else
+            {
+                t.ask = o.price;
+                t.AskSize = o.UnSignedSize;
+                t.oe = o.Exchange;
+            }
+            return t;
         }
 
         
@@ -259,14 +273,18 @@ namespace Replay
                 // if we already have a book for this side we can get rid of it
                 foreach (uint oid in hasHistBook(t.sym, false))
                     h.SimBroker.CancelOrder(oid); 
-                h.SimBroker.sendOrder(new SellLimit(t.sym, t.AskSize, t.ask),HISTBOOK);
+                Order o = new SellLimit(t.sym, t.AskSize, t.ask);
+                o.Exchange = t.oe;
+                h.SimBroker.sendOrder(o,HISTBOOK);
             }
             if (t.hasBid)
             {
                 // if we already have a book for this side we can get rid of it
                 foreach (uint oid in hasHistBook(t.sym, true))
                     h.SimBroker.CancelOrder(oid);
-                h.SimBroker.sendOrder(new BuyLimit(t.sym, t.BidSize, t.bid), HISTBOOK);
+                Order o = new BuyLimit(t.sym, t.BidSize, t.bid);
+                o.Exchange = t.be;
+                h.SimBroker.sendOrder(o, HISTBOOK);
             }
             
         }

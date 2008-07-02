@@ -52,16 +52,23 @@ namespace TradeLib
         public Order BestBidOrOffer(string symbol,bool side)
         {
             Order best = new Order();
+            Order next = new Order();
             foreach (Account a in MasterOrders.Keys)
             {
+                // get our first order
                 if (!best.isValid)
                 {
+                    // if we don't have a valid one yet, check this account
                     best = new Order(BestBidOrOffer(symbol,side,a));
-                    continue;
+                    continue;  // keep checking the accounts till we find a valid one
                 }
-                best = BestBidOrOffer(best, BestBidOrOffer(symbol,side,a));
+                // now we have our first order, which will be best if we can't find a second one
+                next = new Order(BestBidOrOffer(symbol,side,a));
+                if (!next.isValid) continue; // keep going till we have a second order
+                best = BestBidOrOffer(best, next); // when we have two, compare and get best
+                // then keep fetching next valid order to see if it's better
             }
-            return best;
+            return best; // if there's no more orders left, this is best
         }
 
         public Order BestBidOrOffer(string sym, bool side,Account Account)
