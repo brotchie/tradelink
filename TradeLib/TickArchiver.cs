@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using TradeLib;
 using System.IO;
 
-namespace TradeTron
+namespace TradeLib
 {
     public class TickArchiver
     {
