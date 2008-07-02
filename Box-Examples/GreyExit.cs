@@ -22,8 +22,8 @@ namespace box
         public decimal ExitSizePercent { get { return exitpercent; } set { exitpercent = value; } }
 
 
-        public GreyExit(NewsService ns)
-            : base(ns)
+        public GreyExit()
+            : base()
         {
             Version = "$Rev: 1";
             Name = "GreyBox"+CleanVersion;

@@ -20,7 +20,6 @@ namespace Quotopia
         public int GetTime { get { DateTime d = DateTime.Now; int i = (d.Hour * 100) + (d.Minute); return i; } }
         public event TickDelegate spillTick;
         public event OrderStatusDel orderStatus;
-        NewsService news = new NewsService();
         const string version = "2.1";
         const string build = "$Rev$";
         string Ver { get { return version + "." + Util.CleanVer(build); } }
@@ -47,7 +46,6 @@ namespace Quotopia
             tl.gotOrderCancel += new IntDelegate(tl_gotOrderCancel);
             ordergrid.ContextMenuStrip = new ContextMenuStrip();
             ordergrid.ContextMenuStrip.Items.Add("Cancel", null, new EventHandler(cancelorder));
-            news.NewsEventSubscribers += new NewsDelegate(news_NewsEventSubscribers);
             FormClosing += new FormClosingEventHandler(Quote_FormClosing);
         }
 
@@ -425,7 +423,7 @@ namespace Quotopia
         }
 
 
-        void news_NewsEventSubscribers(News news)
+        void news_NewsEventSubscribers(Debug news)
         {
             showc(news.Msg, Color.Blue);
         }

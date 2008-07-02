@@ -20,7 +20,7 @@ namespace box
         // indicator identifiers
         const int imkt = 0;
         const int ibar = 1;
-		public MAbox(NewsService ns) : base(ns)
+		public MAbox() : base()
 		{
 			Name = "MABox";
             // auto-money-management features provided by BlackBoxEasy

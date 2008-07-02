@@ -9,7 +9,7 @@ namespace TradeLib
     /// </summary>
     public class BlackBoxEasy : Box
     {
-        public BlackBoxEasy(NewsService ns) : base(ns) { }
+        public BlackBoxEasy() : base() { }
         protected decimal sPrice = 0;
         protected int lotsize = 100;
         protected decimal stop = .1m;

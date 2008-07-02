@@ -58,6 +58,7 @@
       <DependentUpon>Chart.cs</DependentUpon>
     </Compile>
     <Compile Include="Currency.cs" />
+    <Compile Include="Debug.cs" />
     <Compile Include="Email.cs" />
     <Compile Include="eSigTick.cs" />
     <Compile Include="HistSim.cs" />
@@ -68,8 +69,6 @@
     <Compile Include="LimitOrder.cs" />
     <Compile Include="MarketBasket.cs" />
     <Compile Include="MarketOrder.cs" />
-    <Compile Include="News.cs" />
-    <Compile Include="NewsService.cs" />
     <Compile Include="Order.cs" />
     <Compile Include="ParamPrompt.cs">
       <SubType>Form</SubType>

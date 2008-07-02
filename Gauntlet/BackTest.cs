@@ -12,10 +12,10 @@ namespace WinGauntlet
 
     public class BackTest : BackgroundWorker
     {
+        public event DebugFullDelegate BTStatus;
         private string include = "";
         private string exclude = "";
         private string PATH = null;
-        private NewsService news = null;
         public Broker mybroker;
         public string name;
         private TextReader cf;
@@ -51,11 +51,9 @@ namespace WinGauntlet
             }
             catch (Exception ex) { string es = ex.Message; }
         }
-        public BackTest() : this(null) { }
-        public BackTest(NewsService ns) 
+        public BackTest() 
         {
             this.name = "GauntletRun";
-            this.news = ns;
             this.mybroker = new Broker();
             EarlyClose = Util.GetCloseTime();
             this.WorkerReportsProgress = true;
@@ -268,7 +266,7 @@ namespace WinGauntlet
             }
             catch (Exception ex) { show(ex.Message+Environment.NewLine); return false; }
             this.myboxtype = type;
-            args = new object[] {this.news};
+            args = new object[] {};
             try
             {
                 mybox = (Box)Activator.CreateInstance(myboxtype,args);
@@ -286,9 +284,8 @@ namespace WinGauntlet
 
         public void show(string debug)
         {
-            if (this.news != null) this.news.newNews(debug);
-            else Console.WriteLine(debug);
-            return;
+            if (BTStatus != null)
+                BTStatus(TradeLib.Debug.Create(debug, DebugLevel.Status));
         }
 
     }

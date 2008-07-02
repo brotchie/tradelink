@@ -13,7 +13,7 @@ namespace TradeLib
     [Serializable]
     public class Box
     {
-        NewsService news = null;
+        public event DebugFullDelegate GotDebug;
         protected event IndexDelegate GotIndex;
         public event ObjectArrayDelegate IndicatorUpdate;
         private string name = "Unnamed";
@@ -44,14 +44,12 @@ namespace TradeLib
 
 
         
-        public Box () : this(null) { }
         /// <summary>
         /// Initializes a new instance of the <see cref="Box"/> class.
         /// </summary>
         /// <param name="ns">The NewsService that will receive news events (debugs, errors) from this box.</param>
-        public Box(NewsService ns) // constructor
+        public Box() // constructor
         {
-            this.news = ns;
         }
 
         /// <summary>
@@ -348,6 +346,14 @@ namespace TradeLib
         [CategoryAttribute("TradeLink Box"), DescriptionAttribute("Whether this box waits for position size to match sent orders, before new order is sent.")]
         public bool AllowMultipleOrders { get { return _multipleorders; } set { _multipleorders = value; } }
 
+        public void S(string status)
+        {
+            string prefix = "[" + Name + "] " + Symbol + " " + Date + ":" + Time + " ";
+            if (GotDebug != null) 
+                GotDebug(TradeLib.Debug.Create(prefix + status, DebugLevel.Status)); 
+        }
+
+
         /// <summary>
         /// Sends a debug message from a box.
         /// </summary>
@@ -355,15 +361,13 @@ namespace TradeLib
         public virtual void D(string debug)
         {
             if (!this.DEBUG) return;
-            if (this.news != null) this.news.newNews("["+Name+"] "+Symbol+" "+Date+":"+Time+" "+debug);
-            else Console.WriteLine(debug);
-            return;
+            d(debug);
         }
         /// <summary>
         /// Sends a debug message even when debugging is disabled.
         /// </summary>
         /// <param name="deb">The deb.</param>
-        public virtual void d(string deb) { if (this.news != null) this.news.newNews("[" + Name + "] " + Symbol+ " " + deb); }
+        public virtual void d(string debug) { if (GotDebug != null) GotDebug(TradeLib.Debug.Create("[" + Name + "] " + Symbol + " " + Date + ":" + Time + " " + debug, DebugLevel.Debug)); }
 
 
         /// <summary>
@@ -496,13 +500,7 @@ namespace TradeLib
         [CategoryAttribute("TradeLink BoxInfo"), DescriptionAttribute("Number of position adjustments- or executions- this box has made.")]
         public int Adjusts { get { return adjusts; } }
 
-        /// <summary>
-        /// Gets or sets the news service that handles news events from this box, especially the debug messages.
-        /// </summary>
-        /// <value>The news handler.</value>
-        [BrowsableAttribute(false)]
-        public NewsService NewsHandler { get { return news; } set { news = value; } }
-        [BrowsableAttribute(false)]
+         [BrowsableAttribute(false)]
         protected string NameVersion { get { return Name + CleanVersion; } }
         [BrowsableAttribute(false)]
         protected string CleanVersion { get { return Util.CleanVer(Version); } }
@@ -539,15 +537,15 @@ namespace TradeLib
         /// <param name="dllname">The dllname.</param>
         /// <param name="ns">The NewsService this box will use.</param>
         /// <returns></returns>
-        public static Box FromDLL(string boxname, string dllname,NewsService ns)
+        public static Box FromDLL(string boxname, string dllname)
         {
             System.Reflection.Assembly a;
             try
             {
                 a = System.Reflection.Assembly.LoadFrom(dllname);
             }
-            catch (Exception ex) { ns.newNews(ex.Message); return new Box(ns); }
-            return FromAssembly(a, boxname, ns);
+            catch (Exception ex) { Box b = new Box(); b.Name = ex.Message; return b; }
+            return FromAssembly(a, boxname);
         }
         /// <summary>
         /// Create a box from an Assembly containing Box classes.
@@ -556,30 +554,27 @@ namespace TradeLib
         /// <param name="boxname">The fully-qualified boxname.</param>
         /// <param name="ns">The NewsService where this box will send debugs and errors.</param>
         /// <returns></returns>
-        public static Box FromAssembly(System.Reflection.Assembly a, string boxname, NewsService ns)
+        public static Box FromAssembly(System.Reflection.Assembly a, string boxname)
         {
             Type type;
             object[] args;
-            Box mybox = new Box(ns);
+            Box b = new Box();
             try
             {
                 type = a.GetType(boxname, true, true);
             }
-            catch (Exception ex) { ns.newNews(ex.Message); return mybox; }
-            args = new object[] { ns };
+            catch (Exception ex) { b = new Box(); b.Name = ex.Message; return b; }
+            args = new object[] { };
             try
             {
-                mybox = (Box)Activator.CreateInstance(type, args);
+                b = (Box)Activator.CreateInstance(type, args);
             }
             catch (Exception ex) 
-            { 
-                ns.newNews(ex.Message); 
-                if (ex.InnerException != null) 
-                    ns.newNews(ex.InnerException.Message); 
-                return mybox; 
+            {
+                b = new Box(); b.Name = ex.InnerException.Message; return b;
             }
-            mybox.FullName = boxname;
-            return mybox;
+            b.FullName = boxname;
+            return b;
         }
     }
 }

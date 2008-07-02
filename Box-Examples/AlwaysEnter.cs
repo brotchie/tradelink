@@ -12,7 +12,7 @@ namespace box
     /// </summary>
     public class AlwaysEnter : BlackBoxEasy
     {
-        public AlwaysEnter(NewsService ns) : base(ns) 
+        public AlwaysEnter() : base() 
         {
             Name = "AlwaysEnter";
         }

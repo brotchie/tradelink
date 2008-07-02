@@ -12,11 +12,9 @@ using System.IO;
     {
         Box mybox;
         BackTest bt;
-        NewsService ns = new NewsService();
         public Gauntlet()
         {
             InitializeComponent();
-            ns.NewsEventSubscribers += new NewsDelegate(ns_NewsEventSubscribers);
             FindStocks((WinGauntlet.Properties.Settings.Default.tickfolder == null) ? @"c:\program files\tradelink\tickdata\" : WinGauntlet.Properties.Settings.Default.tickfolder);
             string fn = (WinGauntlet.Properties.Settings.Default.boxdll== null) ? "box.dll" : WinGauntlet.Properties.Settings.Default.boxdll;
             if (File.Exists(fn))
@@ -51,13 +49,6 @@ using System.IO;
         }
 
 
-        void ns_NewsEventSubscribers(News news)
-        {
-            if (news.Msg.Contains(mybox.Name))
-                show(Environment.NewLine + news.Msg);
-            else
-                show(news.Msg);
-        }
 
         void FindStocks(string path)
         {
@@ -157,7 +148,8 @@ using System.IO;
 
         private void queuebut_Click(object sender, EventArgs e)
         {
-            bt = new BackTest(ns);
+            bt = new BackTest();
+            bt.BTStatus += new DebugFullDelegate(bt_BTStatus);
             if (cleartrades.Checked) trades.Rows.Clear();
             if (clearorders.Checked) orders.Rows.Clear();
             if (clearmessages.Checked) messages.Clear();
@@ -228,6 +220,11 @@ using System.IO;
             ProgressBar1.Enabled = true;
             queuebut.Enabled = false;
             bt.RunWorkerAsync(tf);
+        }
+
+        void bt_BTStatus(Debug debug)
+        {
+            show(debug.Msg);
         }
 
         void mybroker_GotOrder(Order o)
@@ -360,10 +357,19 @@ using System.IO;
         {
             try
             {
-                mybox = Box.FromDLL((string)boxlist.SelectedItem, WinGauntlet.Properties.Settings.Default.boxdll, ns);
+                mybox = Box.FromDLL((string)boxlist.SelectedItem, WinGauntlet.Properties.Settings.Default.boxdll);
             }
-            catch (Exception ex) { show("Box failed to load, quitting... (" + ex.Message + (ex.InnerException != null ? ",ex.InnerException.Message" : "") + ")"); }
+            catch (Exception ex) { show("Box failed to load, quitting... (" + ex.Message + (ex.InnerException != null ? ex.InnerException.Message.ToString() : "") + ")"); }
             mybox.IndicatorUpdate += new ObjectArrayDelegate(mybox_IndicatorUpdate);
+            mybox.GotDebug += new DebugFullDelegate(mybox_GotDebug);
+        }
+
+        void mybox_GotDebug(Debug debug)
+        {
+            if (debug.Msg.Contains(mybox.Name))
+                show(Environment.NewLine + debug.Msg);
+            else
+                show(debug.Msg);
         }
 
         void mybox_IndicatorUpdate(object[] parameters)

@@ -18,7 +18,6 @@ namespace Kadina
         Stock stock;
         Broker broker = new Broker();
         Box mybox;
-        NewsService ns = new NewsService();
         System.IO.StreamReader sr;
         PlayTo pt = PlayTo.TenTrade;
         public event TickDelegate KadTick;
@@ -43,7 +42,6 @@ namespace Kadina
         {
             InitializeComponent();
             boxlist.DropDownItemClicked += new ToolStripItemClickedEventHandler(boxlist_DropDownItemClicked);
-            ns.NewsEventSubscribers += new NewsDelegate(ns_NewsEventSubscribers);
             playtobut.DropDownItemClicked += new ToolStripItemClickedEventHandler(playtobut_DropDownItemClicked);
             broker.GotOrder += new OrderDelegate(broker_GotOrder);
             broker.GotFill += new FillDelegate(broker_GotFill);
@@ -436,14 +434,6 @@ namespace Kadina
             }
         }
 
-
-
-
-        void ns_NewsEventSubscribers(News news)
-        {
-            debug(news.Msg);
-        }
-
         int time = 0;
         void playtobut_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
@@ -480,17 +470,25 @@ namespace Kadina
         {
             try
             {
-                mybox = Box.FromDLL(name, boxdll, ns);
+                mybox = Box.FromDLL(name, boxdll);
             }
             catch (Exception ex) { debug(ex.Message); debug("Error, quitting..."); return; }
             if ((mybox != null) && (mybox.FullName == name))
             {
                 mybox.Debug = boxdebugs;
-                //mybox.IndicatorUpdate += new ObjectArrayDelegate(mybox_IndicatorUpdate);
+                mybox.GotDebug += new DebugFullDelegate(mybox_GotDebug);
                 status(boxname + " is current box.");
             }
             else status("Box did not load.");
 
+        }
+
+        void mybox_GotDebug(Debug msg)
+        {
+            if (msg.Level == DebugLevel.Debug)
+                debug(msg.Msg);
+            else if (msg.Level == DebugLevel.Status)
+                status(msg.Msg);
         }
 
         void mybox_IndicatorUpdate(object[] parameters)

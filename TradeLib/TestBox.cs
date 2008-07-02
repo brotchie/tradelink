@@ -42,7 +42,6 @@ namespace TestTradeLib
             Assert.That(b.QuickOrder);
             Assert.That(b.Turns == 0);
             Assert.That(!b.TradeCaps);
-            Assert.That(b.NewsHandler == null);
             Assert.That(!b.Debug);
             Assert.That(b.DayStart == 930);
             // this box doesn't do anything, so it returns a blank/invalid order
@@ -55,8 +54,7 @@ namespace TestTradeLib
         }
         class Always : Box 
         {
-            public Always() : base() { MinSize = 100; }
-            public Always(NewsService ns) : base(ns) { MinSize = 100; }
+            public Always() { MinSize = 100; }
             protected override int  Read(Tick tick, BarList bl, BoxInfo boxinfo)
             {
                 D("entering");
@@ -156,10 +154,9 @@ namespace TestTradeLib
         [Test]
         public void NewsTest()
         {
-            NewsService ns = new NewsService();
             // subscribe to news service that will count everytime a debug is sent
-            ns.NewsEventSubscribers +=new NewsDelegate(ns_NewsEventSubscribers);
-            Always b = new Always(ns); // send debugs from this box to our news service
+            Always b = new Always(); // send debugs from this box to our news service
+            b.GotDebug += new DebugFullDelegate(b_GotDebug);
             b.AllowMultipleOrders = true; // lets allow multiple orders for more debugging
             // this time we want to throw news events for debugging statements
             b.Debug = true;
@@ -174,10 +171,11 @@ namespace TestTradeLib
             Assert.That(debugs>0);
 
         }
-        void  ns_NewsEventSubscribers(News news)
+
+        void b_GotDebug(Debug debug)
         {
-            Console.WriteLine(news.Msg);
- 	        debugs++;
+            Console.WriteLine(debug.Msg);
+            debugs++;
         }
 
         // Make sure indicies are received

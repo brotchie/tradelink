@@ -20,7 +20,7 @@ namespace box
     /// </summary>
 	public class A : Box 
 	{
-        public A(NewsService ns) : base(ns) 
+        public A() : base() 
         { 
             Version = "$Rev$"; 
             Name = "A"+CleanVersion; 
