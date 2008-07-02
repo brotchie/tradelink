@@ -34,6 +34,7 @@ Section "TradeLinkSuite"
   SetOutPath $INSTDIR
   
   CreateDirectory "$SMPROGRAMS\TradeLink"
+  CreateShortCut "$SMPROGRAMS\TradeLink\Asp.lnk" "$INSTDIR\ASP.exe" "" "$INSTDIR\ASP.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Quotopia.lnk" "$INSTDIR\Quotopia.exe" "" "$INSTDIR\Quotopia.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Gauntlet.lnk" "$INSTDIR\Gauntlet.exe" "" "$INSTDIR\Gauntlet.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Chartographer.lnk" "$INSTDIR\Chartographer.exe" "" "$INSTDIR\Chartographer.exe" 0
@@ -65,6 +66,7 @@ Section "TradeLinkSuite"
   File "SplitEPF.exe"
   File "Tattle.exe"
   File "Tript.exe"
+  File "ASP.exe"
   File "Tript.exe.settings.xml"
   File /r /x ".svn" "Properties"
   ; Write the installation path into the registry
@@ -97,6 +99,7 @@ Section "Uninstall"
   Delete "$INSTDIR\Properties\*.*"
   RMDir "$INSTDIR\Properties"
   ; Remove shortcuts, if any
+  Delete "$SMPROGRAMS\TradeLink\Asp.lnk"  
   Delete "$SMPROGRAMS\TradeLink\Kadina.lnk"
   Delete "$SMPROGRAMS\TradeLink\Quotopia.lnk"
   Delete "$SMPROGRAMS\TradeLink\Time and Sales.lnk"

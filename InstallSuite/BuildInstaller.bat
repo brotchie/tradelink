@@ -34,6 +34,8 @@ del TradeLinkSuite.exe
 echo.
 echo Copying latest releases...
 echo.
+echo ASP
+xcopy /q /y ..\ASP\bin\Release\ASP.exe* .
 echo BOX-EXAMPLES
 xcopy /q /y ..\Box-Examples\bin\Release\box.dll .
 echo TRADELIB

@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+# Visual C# Express 2005
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeLib", "TradeLib\TradeLib.csproj", "{A0FE06A2-F31B-49DE-8901-917B5D593E43}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeSales", "TimeAndSales\TimeSales.csproj", "{5FE9B310-BE7C-4ADE-8D33-DB8646D8FC3C}"
@@ -26,6 +26,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kadina", "Kadina\Kadina.csproj", "{CBFC2B24-738F-4F0C-8B57-BE478BB15382}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tript", "Tript\Tript.csproj", "{7CECE073-B5C3-4CBA-ACFB-4A569687BC75}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASP", "ASP\ASP.csproj", "{3A103592-BBF4-450B-8972-F4B9EB5B10E2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -85,6 +87,10 @@ Global
 		{7CECE073-B5C3-4CBA-ACFB-4A569687BC75}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7CECE073-B5C3-4CBA-ACFB-4A569687BC75}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7CECE073-B5C3-4CBA-ACFB-4A569687BC75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A103592-BBF4-450B-8972-F4B9EB5B10E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A103592-BBF4-450B-8972-F4B9EB5B10E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A103592-BBF4-450B-8972-F4B9EB5B10E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A103592-BBF4-450B-8972-F4B9EB5B10E2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
