@@ -27,6 +27,8 @@ namespace Replay
             tl.DayLowRequest += new TradeLink_Server_WM.DecimalStringDelegate(tl_DayLowRequest);
             tl.OrderCancelRequest += new UIntDelegate(tl_OrderCancelRequest);
             tl.gotSrvAcctRequest += new TradeLink_Server_WM.StringDelegate(tl_gotSrvAcctRequest);
+            tl.gotSrvAcctClosedPLRequest += new TradeLink_Server_WM.DecimalStringDelegate(tl_gotSrvAcctClosedPLRequest);
+            tl.gotSrvAcctOpenPLRequest += new TradeLink_Server_WM.DecimalStringDelegate(tl_gotSrvAcctOpenPLRequest);
 
             h.GotTick += new TickDelegate(h_GotTick);
             h.GotIndex += new IndexDelegate(h_GotIndex);
@@ -39,6 +41,16 @@ namespace Replay
             // (this is for determining top of book between historical sources and our own orders)
             HISTBOOK.Execute = false; // make sure our special book is never executed by simulator
             HISTBOOK.Notify = false; // don't notify 
+        }
+
+        decimal tl_gotSrvAcctOpenPLRequest(string s)
+        {
+            return 0; // not implemented yet
+        }
+
+        decimal tl_gotSrvAcctClosedPLRequest(string s)
+        {
+            return 0; // not implemented yet
         }
 
 
@@ -71,15 +83,33 @@ namespace Replay
 
         int tl_PositionSizeRequest(string s)
         {
-            if (h.SimBroker != null)
+            if (!s.Contains(",") && (h.SimBroker != null))
                 return h.SimBroker.GetOpenPosition(s).Size;
+            else if (s.Contains(",") && (h.SimBroker != null))
+            {
+                string[] r = s.Split(',');
+                string sym = r[0];
+                string acct = r[1];
+                foreach (string a in h.SimBroker.Accounts)
+                    if (acct == a)
+                        return h.SimBroker.GetOpenPosition(sym, new Account(acct)).Size;
+            }
             return 0;
         }
 
         decimal tl_PositionPriceRequest(string s)
         {
-            if (h.SimBroker != null)
+            if (!s.Contains(",") && (h.SimBroker != null))
                 return h.SimBroker.GetOpenPosition(s).AvgPrice;
+            else if (s.Contains(",") && (h.SimBroker!=null))
+            {
+                string[] r = s.Split(',');
+                string sym = r[0];
+                string acct = r[1];
+                foreach (string a in h.SimBroker.Accounts)
+                    if (acct == a)
+                        return h.SimBroker.GetOpenPosition(sym, new Account(acct)).AvgPrice;
+            }
             return 0;
         }
 
