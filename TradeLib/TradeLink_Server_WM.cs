@@ -10,6 +10,8 @@ namespace TradeLib
         public delegate decimal DecimalStringDelegate(string s);
         public delegate int IntStringDelegate(string s);
         public delegate string StringDelegate();
+        public event DecimalStringDelegate gotSrvAcctOpenPLRequest;
+        public event DecimalStringDelegate gotSrvAcctClosedPLRequest;
         public event StringDelegate gotSrvAcctRequest;
         public event DecimalStringDelegate PositionPriceRequest;
         public event IntStringDelegate PositionSizeRequest;
@@ -198,6 +200,14 @@ namespace TradeLib
             long result = (long)TL2.OK;
             switch (tlm.type)
             {
+                case TL2.ACCOUNTOPENPL:
+                    if (gotSrvAcctOpenPLRequest == null) break;
+                    result = WMUtil.pack(gotSrvAcctOpenPLRequest(msg));
+                    break;
+                case TL2.ACCOUNTCLOSEDPL:
+                    if (gotSrvAcctClosedPLRequest == null) break;
+                    result = WMUtil.pack(gotSrvAcctClosedPLRequest(msg));
+                    break;
                 case TL2.ACCOUNTREQUEST:
                     if (gotSrvAcctRequest == null) break;
                     WMUtil.SendMsg(gotSrvAcctRequest(), TL2.ACCOUNTRESPONSE, Handle, msg);

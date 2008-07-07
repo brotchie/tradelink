@@ -214,6 +214,11 @@ namespace TradeLib
                 return low;
             }
         }
+
+        public decimal AccountOpenPL() { return WMUtil.unpack(TLSend(TL2.ACCOUNTOPENPL, "")); }
+        public decimal AccountOpenPL(string acct) { return WMUtil.unpack(TLSend(TL2.ACCOUNTOPENPL, acct)); }
+        public decimal AccountClosedPL() { return WMUtil.unpack(TLSend(TL2.ACCOUNTCLOSEDPL, "")); }
+        public decimal AccountClosedPL(string acct) { return WMUtil.unpack(TLSend(TL2.ACCOUNTCLOSEDPL, acct)); }
         /// <summary>
         /// Today's closing price (zero if still open)
         /// </summary>
@@ -232,12 +237,14 @@ namespace TradeLib
         /// <param name="sym">The symbol</param>
         /// <returns>decimal</returns>
         public decimal DayOpen(string sym) { return WMUtil.unpack(TLSend(TL2.OPENPRICE, sym)); }
+        public int PosSize(string sym,string account) { return (int)TLSend(TL2.GETSIZE, sym+","+account); }
         /// <summary>
         /// Gets position size
         /// </summary>
         /// <param name="sym">The symbol</param>
         /// <returns>signed integer representing position size in shares</returns>
         public int PosSize(string sym) { return (int)TLSend(TL2.GETSIZE, sym); }
+        public decimal AvgPrice(string sym, string account) { return WMUtil.unpack(TLSend(TL2.AVGPRICE, sym+","+account)); }
         /// <summary>
         /// Returns average price for a position
         /// </summary>

@@ -108,6 +108,8 @@ namespace TradeLib
         GETSIZE,
         YESTCLOSE,
         BROKERNAME,
+        ACCOUNTOPENPL,
+        ACCOUNTCLOSEDPL,
         TICKNOTIFY = 100,
         EXECUTENOTIFY,
         REGISTERCLIENT,
