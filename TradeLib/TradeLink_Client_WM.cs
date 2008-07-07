@@ -9,7 +9,7 @@ namespace TradeLib
     public class TradeLink_Client_WM : Form , TradeLinkClient
     {
         const string myver = "2.1";
-        const string build = "$Rev: 992 $";
+        const string build = "$Rev$";
         public string Ver { get { return myver + "." + Util.CleanVer(build); } }
         // clients that want notifications for subscribed stocks can override these methods
         /// <summary>
