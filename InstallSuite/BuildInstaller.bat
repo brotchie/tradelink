@@ -1,4 +1,5 @@
 @echo off
+echo Getting latest version information, please wait...
 FOR /F "tokens=2 skip=4" %%G IN ('svn info --revision HEAD') DO ^
 IF NOT DEFINED REVISION SET REVISION=%%G
 cls
@@ -15,21 +16,10 @@ goto :eof
 echo NSIS found, building installer for TradeLinkSuite-%REVISION%
 )
 echo.
-echo NOTE
+echo NOTE:
 echo.
-echo This script will build an installer from your last
-echo compiled release configurations of all TradeLink applets.
+echo Please be sure you've compiled the solution in RELEASE mode.
 echo.
-echo If you have not compiled the 'TradeLinkSuite' solution,
-echo This script or dependent scripts may fail.
-echo.
-echo If you receive errors, please make sure you have compiled
-echo all the applets in RELEASE mode (not debug mode).
-echo.
-echo.
-echo Press Ctrl+Break to quit.
-pause
-cls
 echo.
 echo Removing last installer...
 del TradeLinkSuite.exe
