@@ -1,4 +1,6 @@
 @echo off
+FOR /F "tokens=2 skip=4" %%G IN ('svn info --revision HEAD') DO ^
+IF NOT DEFINED REVISION SET REVISION=%%G
 cls
 echo Checking for NSIS...
 if not exist "c:\progra~1\nsis\makensis.exe" (
@@ -10,7 +12,7 @@ echo.
 pause
 goto :eof
 ) else ( 
-echo NSIS found, building installer... 
+echo NSIS found, building installer for TradeLinkSuite-%REVISION%
 )
 echo.
 echo NOTE
@@ -93,12 +95,8 @@ del EarlyClose.csv
 del *.dll
 del /s /f /q Properties
 rmdir properties
-ren TLS.tmp TradeLinkSuite.exe
+ren TLS.tmp TradeLinkSuite-%REVISION%.exe
 ren signtool.tmp signtool.exe
-echo.
-echo Signing installer
-signtool sign /f ..\tls.pfx /p tradelink /d TradeLink /du http://tradelink.googlecode.com TradeLinkSuite.exe
-echo Run TradeLinkSuite.exe to install
 ) else (
 echo Installer not found, please see error messages above...
 )
