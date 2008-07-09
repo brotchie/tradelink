@@ -49,6 +49,7 @@ Section "TradeLinkSuite"
   
   
   ; Put file there
+  File "VERSION.txt"
   File "Kadina.exe"
   File "Kadina.exe.config"
   File "Replay.exe"

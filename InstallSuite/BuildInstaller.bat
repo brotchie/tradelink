@@ -2,6 +2,7 @@
 echo Getting latest version information, please wait...
 FOR /F "tokens=2 skip=4" %%G IN ('svn info --revision HEAD') DO ^
 IF NOT DEFINED REVISION SET REVISION=%%G
+echo %REVISION% >> VERSION.txt
 cls
 echo Checking for NSIS...
 if not exist "c:\progra~1\nsis\makensis.exe" (
@@ -78,6 +79,7 @@ if exist TradeLinkSuite.exe (
 ren TradeLinkSuite.exe TLS.tmp
 ren signtool.exe signtool.tmp
 echo Removing working releases...
+del VERSION.txt
 del *.exe
 del *.config
 del *.xml
