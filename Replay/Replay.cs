@@ -45,12 +45,40 @@ namespace Replay
 
         decimal tl_gotSrvAcctOpenPLRequest(string s)
         {
-            return 0; // not implemented yet
+            // make sure broker exists
+            if (h==null) return 0;
+            // prepare the account we're getting open pl for
+            string acct = s=="" ? Broker.DEFAULTBOOK : s;
+            // get trades from this account
+            List<Trade> fills = h.SimBroker.GetTradeList(new Account(acct));
+            // setup storage for positions we'll create from trades
+            Dictionary<string,Position> posdict = new Dictionary<string,Position>();
+            // go through every trade and populate the position
+            foreach (Trade t in fills)
+            {
+                Position p = null;
+                if (!posdict.TryGetValue(t.symbol, out p))
+                    posdict.Add(t.symbol, new Position(t));
+                else
+                    posdict[t.symbol].Adjust(t);
+            }
+            // for every-non flat position, calculate the pl and add to the total
+            decimal totalopenpl = 0;
+            foreach (Position p in posdict.Values)
+                if (!p.Flat)
+                    totalopenpl += BoxMath.OpenPL(last[p.Symbol], p);
+            return totalopenpl;
         }
 
         decimal tl_gotSrvAcctClosedPLRequest(string s)
         {
-            return 0; // not implemented yet
+            if (h == null) return 0;
+            string accts = string.Join(",",h.SimBroker.Accounts);
+            if (s == "")
+                return h.SimBroker.GetClosedPL(new Account(Broker.DEFAULTBOOK));
+            else if (accts.Contains(s))
+                return h.SimBroker.GetClosedPL(new Account(s));
+            return 0;
         }
 
 
@@ -229,11 +257,15 @@ namespace Replay
 
         Dictionary<string, decimal> highs = new Dictionary<string, decimal>();
         Dictionary<string, decimal> lows = new Dictionary<string, decimal>();
+        Dictionary<string, decimal> last = new Dictionary<string, decimal>();
         void h_GotTick(Tick t)
         {
             if (t.isTrade)
             {
                 decimal price = 0;
+                if (last.TryGetValue(t.sym, out price))
+                    last[t.sym] = t.trade;
+                else last.Add(t.sym, t.trade);
                 if (highs.TryGetValue(t.sym, out price))
                 {
                     if (t.trade > price)
