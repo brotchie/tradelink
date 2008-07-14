@@ -58,6 +58,7 @@ namespace TradeLib
     public delegate void OrderDelegate(Order o);
     public delegate void IntDelegate(Int64 number);
     public delegate void UIntDelegate(UInt32 number);
+    public delegate void TL2MsgDelegate(TL2 [] messages);
 
     /// <summary>
     /// Used to indicate that a TradeLink Broker Connector was not running.
@@ -127,6 +128,8 @@ namespace TradeLib
         ACCOUNTREQUEST,
         ORDERCANCELREQUEST,
         ORDERCANCELRESPONSE,
+        FEATUREREQUEST,
+        FEATURERESPONSE,
         FEATURE_NOT_IMPLEMENTED = 994,
         CLIENTNOTREGISTERED = 995,
         GOTNULLORDER = 996,

@@ -21,6 +21,7 @@ namespace TradeLib
         public event OrderDelegate gotOrder;
         public event DebugDelegate gotAccounts;
         public event UIntDelegate gotOrderCancel;
+        public event TL2MsgDelegate gotSupportedFeatures;
 
         public TradeLink_Client_WM() : this("TradeLinkClient",true) { }
 
@@ -171,6 +172,8 @@ namespace TradeLib
             string m = o.Serialize();
             return (int)TLSend(TL2.SENDORDER, m);
         }
+
+        public void RequestFeatures() { TLSend(TL2.FEATUREREQUEST,Text); }
 
         Dictionary<string, decimal> chighs = new Dictionary<string, decimal>();
         Dictionary<string, decimal> clows = new Dictionary<string, decimal>();
@@ -399,6 +402,20 @@ namespace TradeLib
 
                 case TL2.ACCOUNTRESPONSE:
                     if (gotAccounts != null) gotAccounts(msg);
+                    break;
+                case TL2.FEATURERESPONSE:
+                    string[] p = msg.Split(',');
+                    List<TL2> f = new List<TL2>();
+                    foreach (string s in p)
+                    {
+                        try
+                        {
+                            f.Add((TL2)Convert.ToInt32(s));
+                        }
+                        catch (Exception) { }
+                    }
+                    if (gotSupportedFeatures != null) 
+                        gotSupportedFeatures(f.ToArray());
                     break;
             }
             result = 0;

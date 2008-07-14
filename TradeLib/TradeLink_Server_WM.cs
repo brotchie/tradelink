@@ -258,11 +258,58 @@ namespace TradeLib
                 case TL2.BROKERNAME :
                     result = (long)Brokers.TradeLinkSimulation;
                     break;
+                case TL2.FEATUREREQUEST:
+                    TL2[] f = GetFeatures();
+                    List<string> mf = new List<string>();
+                    foreach (TL2 t in f)
+                    {
+                        int ti = (int)t;
+                        mf.Add(ti.ToString());
+                    }
+                    string msf = string.Join(",", mf.ToArray());
+                    WMUtil.SendMsg(msf, TL2.FEATURERESPONSE, Handle, msg);
+                    break;
                 default:
                     result = (long)TL2.FEATURE_NOT_IMPLEMENTED;
                     break;
             }
             m.Result = (IntPtr)result;
         }
+
+        TL2[] GetFeatures()
+        {
+            List<TL2> f = new List<TL2>();
+
+            f.Add(TL2.ACCOUNTCLOSEDPL);
+            f.Add(TL2.ACCOUNTOPENPL);
+            f.Add(TL2.ACCOUNTREQUEST);
+            f.Add(TL2.ACCOUNTRESPONSE);
+            f.Add(TL2.AVGPRICE);
+            f.Add(TL2.BROKERNAME);
+            f.Add(TL2.CLEARCLIENT);
+            f.Add(TL2.CLEARSTOCKS);
+            f.Add(TL2.EXECUTENOTIFY);
+            f.Add(TL2.FEATUREREQUEST);
+            f.Add(TL2.FEATURERESPONSE);
+            f.Add(TL2.GETSIZE);
+            f.Add(TL2.HEARTBEAT);
+            f.Add(TL2.NDAYHIGH);
+            f.Add(TL2.NDAYLOW);
+            f.Add(TL2.OPENPRICE);
+            f.Add(TL2.ORDERCANCELREQUEST);
+            f.Add(TL2.ORDERCANCELRESPONSE);
+            f.Add(TL2.ORDERNOTIFY);
+            f.Add(TL2.POSCLOSEDPL);
+            f.Add(TL2.POSOPENPL);
+            f.Add(TL2.REGISTERCLIENT);
+            f.Add(TL2.REGISTERINDEX);
+            f.Add(TL2.REGISTERSTOCK);
+            f.Add(TL2.SENDORDER);
+            f.Add(TL2.TICKNOTIFY);
+            f.Add(TL2.TRADENOTIFY);
+            return f.ToArray();
+        }
+
+
     }
 }
