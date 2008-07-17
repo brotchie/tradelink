@@ -12,7 +12,7 @@ namespace TradeLib
         protected Currency cur = Currency.USD;
         protected Security type = Security.STK;
         protected string ex = "NYSE";
-        string _localsymbol;
+        string _localsymbol = "";
         public string LocalSymbol { get { return _localsymbol; } set { _localsymbol = value; } }
         public Currency Currency { get { return cur; } set { cur = value; } }
         public Security Security { get { return type; } set { type = value; } }
