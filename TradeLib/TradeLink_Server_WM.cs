@@ -31,7 +31,7 @@ namespace TradeLib
         }
         public TradeLink_Server_WM(TLTypes servertype) : 
             this(servertype==TLTypes.LIVEBROKER? WMUtil.LIVEWINDOW :
-                (servertype == TLTypes.SIMBROKER ? WMUtil.SIMWINDOW : WMUtil.REPLAYWINDOW)) { }
+                (servertype == TLTypes.SIMBROKER ? WMUtil.SIMWINDOW : (servertype== TLTypes.HISTORICALBROKER? WMUtil.REPLAYWINDOW : WMUtil.TESTWINDOW))) { }
 
         private void SrvDoExecute(string msg) // handle an order (= execute request)
         {

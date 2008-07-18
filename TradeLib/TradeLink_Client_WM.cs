@@ -127,9 +127,27 @@ namespace TradeLib
                     else GoHist();
                     return true;
                     break;
+                case TLTypes.TESTBROKER:
+                    if (HandleExceptions)
+                    {
+                        try
+                        {
+                            GoTest();
+                            return true;
+                        }
+                        catch (TLServerNotFound)
+                        {
+                            if (showwarning)
+                                System.Windows.Forms.MessageBox.Show("No test broker instance found.  Make sure you started a TradeLink_Server object with TLType.TEST.");
+                            return false;
+                        }
+                    }
+                    else GoTest();
+                    return true;
+                    break;
                 default:
                     if (showwarning) 
-                        System.Windows.Forms.MessageBox.Show("No simulation broker instance was found.  Make sure broker application + TradeLink server is running.", "TradeLink server not found");
+                        System.Windows.Forms.MessageBox.Show("No valid broker instance was found.  Make sure broker application + TradeLink server is running.", "TradeLink server not found");
                     break;
             }
             return false;
@@ -152,6 +170,10 @@ namespace TradeLib
         /// </summary>
         public void GoHist() { Disconnect(); himh = WMUtil.HisHandle(WMUtil.REPLAYWINDOW); LinkType = TLTypes.HISTORICALBROKER; Register(); }
 
+        /// <summary>
+        /// Used for testing the TL-BROKER api (programmatically)
+        /// </summary>
+        public void GoTest() { Disconnect(); himh = WMUtil.HisHandle(WMUtil.TESTWINDOW); LinkType = TLTypes.TESTBROKER; Register(); }
         IntPtr himh = IntPtr.Zero;
         protected long TLSend(TL2 type) { return TLSend(type, ""); }
         protected long TLSend(TL2 type, string m)
