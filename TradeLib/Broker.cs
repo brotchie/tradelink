@@ -75,6 +75,7 @@ namespace TradeLib
         public Order BestBidOrOffer(string sym, bool side,Account Account)
         {
             Order best = new Order();
+            if (!MasterOrders.ContainsKey(Account)) return best;
             foreach (Order o in MasterOrders[Account])
             {
                 if (o.symbol != sym) continue;
@@ -130,6 +131,7 @@ namespace TradeLib
         }
         public bool CancelOrder(Account a, uint orderid)
         {
+            if (!MasterOrders.ContainsKey(a)) return false;
             for (int i = 0; i < MasterOrders[a].Count; i++) // and every order
                 if (MasterOrders[a][i].id == orderid) // if we have order with requested id
                 {
@@ -231,7 +233,8 @@ namespace TradeLib
                 CancelOrders(a);
         }
         public void CancelOrders(Account a) 
-        { 
+        {
+            if (!MasterOrders.ContainsKey(a)) return;
             foreach (Order o in MasterOrders[a])
                 if ((GotOrderCancel != null) && a.Notify)
                     GotOrderCancel(o.symbol,o.Side,o.id); //send cancel notifcation to any subscribers
@@ -242,7 +245,7 @@ namespace TradeLib
         /// </summary>
         /// <param name="a">account to request blotter from.</param>
         /// <returns></returns>
-        public List<Trade> GetTradeList(Account a) { return MasterTrades[a.ID]; }
+        public List<Trade> GetTradeList(Account a) { List<Trade> res; bool worked = MasterTrades.TryGetValue(a.ID, out res); return worked ? res : new List<Trade>(); }
         /// <summary>
         /// Gets the list of open orders for this account.
         /// </summary>
@@ -284,6 +287,7 @@ namespace TradeLib
         {
             Position pos = new Position(symbol);
             decimal pl = 0;
+            if (!MasterTrades.ContainsKey(a.ID)) return pl;
             foreach (Trade trade in MasterTrades[a.ID])
             {
                 if (trade.symbol == pos.Symbol)
@@ -307,6 +311,7 @@ namespace TradeLib
         {
             Dictionary<string, Position> poslist = new Dictionary<string, Position>();
             Dictionary<string,decimal> pllist = new Dictionary<string,decimal>();
+            if (!MasterTrades.ContainsKey(a.ID)) return 0;
             foreach (Trade trade in MasterTrades[a.ID])
             {
                 if (!poslist.ContainsKey(trade.symbol))
@@ -337,6 +342,7 @@ namespace TradeLib
         {
             Position pos = new Position(symbol);
             decimal points = 0;
+            if (!MasterTrades.ContainsKey(account.ID)) return points;
             foreach (Trade t in MasterTrades[account.ID])
             {
                 points += BoxMath.ClosePT(pos, t);
@@ -359,6 +365,7 @@ namespace TradeLib
         {
             Dictionary<string, Position> poslist = new Dictionary<string, Position>();
             Dictionary<string, decimal> ptlist = new Dictionary<string, decimal>();
+            if (!MasterTrades.ContainsKey(account.ID)) return 0;
             foreach (Trade trade in MasterTrades[account.ID])
             {
                 if (!poslist.ContainsKey(trade.symbol))
