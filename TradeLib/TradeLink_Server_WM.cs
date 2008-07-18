@@ -57,14 +57,16 @@ namespace TradeLib
             }
         }
 
-        public void newOrder(Order o)
+        delegate void tlneworderdelegate(Order o, bool allclients);
+        public void newOrder(Order o) { newOrder(o, false); }
+        public void newOrder(Order o, bool allclients)
         {
             if (this.InvokeRequired)
-                this.Invoke(new OrderDelegate(newOrder), new object[] { o });
+                this.Invoke(new tlneworderdelegate(newOrder), new object[] { o,allclients });
             else
             {
                 for (int i = 0; i < client.Count; i++)
-                    if ((client[i] != null) && (client[i] != ""))
+                    if ((client[i] != null) && (client[i] != "") && (stocks[i].Contains(o.symbol) || allclients))
                         WMUtil.SendMsg(o.Serialize(), TL2.ORDERNOTIFY, Handle, client[i]);
             }
         }
@@ -87,21 +89,22 @@ namespace TradeLib
             }
         }
 
-
+        delegate void tlnewfilldelegate(Trade t, bool allclients);
         /// <summary>
         /// Notifies subscribed clients of a new execution.
         /// </summary>
         /// <param name="trade">The trade to include in the notification.</param>
-        public void newFill(Trade trade)
+        public void newFill(Trade trade) { newFill(trade, false); }
+        public void newFill(Trade trade,bool allclients)
         {
             if (this.InvokeRequired)
-                this.Invoke(new FillDelegate(newFill), new object[] { trade });
+                this.Invoke(new tlnewfilldelegate(newFill), new object[] { trade,allclients });
             else
             {
                 // make sure our trade is filled and initialized properly
                 if (!trade.isValid || !trade.isFilled) return;
                 for (int i = 0; i < client.Count; i++) // send tick to each client that has subscribed to tick's stock
-                    if ((client[i] != null) && (stocks[i].Contains(trade.symbol)))
+                    if ((client[i] != null) && ((stocks[i].Contains(trade.symbol) || allclients)))
                         WMUtil.SendMsg(trade.Serialize(), TL2.EXECUTENOTIFY, Handle, client[i]);
             }
         }

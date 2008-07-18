@@ -242,12 +242,12 @@ namespace Replay
 
         void SimBroker_GotFill(Trade t)
         {
-            tl.newFill(t);
+            tl.newFill(t,true);
         }
 
         void SimBroker_GotOrder(Order o)
         {
-            tl.newOrder(o);
+            tl.newOrder(o,true);
         }
 
         void h_GotIndex(Index idx)
