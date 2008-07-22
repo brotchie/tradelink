@@ -11,6 +11,7 @@ namespace TradeLib
         public Order() : base() { }
         public Order(bool side) : base() { this.side = side; } 
         public string TIF = "DAY";
+        public int sec = 0;
         public override bool isValid { get { return (symbol != null) && (size != 0); } }
         public bool isMarket { get { return (price == 0) && (stopp == 0); } }
         public bool isLimit { get { return (price != 0); } }
@@ -99,7 +100,7 @@ namespace TradeLib
         {
             if (this.isFilled) return base.Serialize();
             //return symbol + d + (side ? "true" : "false")+d + Math.Abs(size) + d + price + d + stopp + d + comment + d + ex + d + accountid + d + this.Security.ToString() + d + this.Currency.ToString() + d + LocalSymbol;
-            string [] r = new string[] { symbol,(side ? "true" : "false"),UnSignedSize.ToString(),price.ToString(),stopp.ToString(),comment,ex,accountid,this.Security.ToString(),this.Currency.ToString(),LocalSymbol,id.ToString(),TIF};
+            string [] r = new string[] { symbol,(side ? "true" : "false"),UnSignedSize.ToString(),price.ToString(),stopp.ToString(),comment,ex,accountid,this.Security.ToString(),this.Currency.ToString(),LocalSymbol,id.ToString(),TIF,date.ToString(),time.ToString(),sec.ToString()};
             return string.Join(",", r);
         }
         /// <summary>
@@ -125,6 +126,13 @@ namespace TradeLib
             o.Security = (Security)Enum.Parse(typeof(Security), rec[(int)OrderField.Security]);
             o.id = Convert.ToUInt32(rec[(int)OrderField.OrderID]);
             o.TIF = rec[(int)OrderField.OrderTIF];
+            try
+            {
+                o.date = Convert.ToInt32(rec[(int)OrderField.oDate]);
+                o.time = Convert.ToInt32(rec[(int)OrderField.oTime]);
+                o.sec = Convert.ToInt32(rec[(int)OrderField.oSec]);
+            }
+            catch (Exception) { } 
             return o;
         }
 
@@ -171,6 +179,9 @@ namespace TradeLib
         LocalSymbol, // non-pretty symbol or contract symbol for futures
         OrderID,
         OrderTIF,
+        oDate,
+        oTime,
+        oSec,
     }
 
 }

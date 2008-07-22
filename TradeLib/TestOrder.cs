@@ -48,6 +48,9 @@ namespace TestTradeLib
             const Currency c = Currency.USD;
             const Security t = Security.STK;
             Order o = new Order(s, z);
+            o.sec = 2;
+            o.date = 20080718;
+            o.time = 948;
             o.price = p;
             o.Account = a;
             o.Exchange = x;
@@ -76,6 +79,9 @@ namespace TestTradeLib
             Assert.That(n.Security == t,n.Security.ToString());
             Assert.That(n.Currency == c,n.Currency.ToString());
             Assert.That(n.TIF == ot, n.TIF);
+            Assert.That(n.date == o.date, n.date.ToString());
+            Assert.That(n.time == o.time, n.time.ToString());
+            Assert.That(n.sec == o.sec, n.sec.ToString());
         }
 
         [Test]
