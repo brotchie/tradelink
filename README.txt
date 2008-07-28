@@ -1,8 +1,9 @@
 
 To use,
 
-1. Download and install SharpDevelop
+1. Download and install Visual Express c# 2005 OR SharpDevelop
 
+http://www.microsoft.com/express/2005/
 http://www.icsharpcode.net/OpenSource/SD/Download/#SharpDevelop22
 
 Make sure to install prerequisites (.NET framework 2)
