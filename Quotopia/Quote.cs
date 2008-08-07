@@ -20,10 +20,6 @@ namespace Quotopia
         public int GetTime { get { DateTime d = DateTime.Now; int i = (d.Hour * 100) + (d.Minute); return i; } }
         public event TickDelegate spillTick;
         public event OrderStatusDel orderStatus;
-        const string version = "2.1";
-        const string build = "$Rev$";
-        string Ver { get { return version + "." + Util.CleanVer(build); } }
-
 
         public Quote()
         {
@@ -36,7 +32,7 @@ namespace Quotopia
             }
             
             Size = Quotopia.Properties.Settings.Default.wsize;
-            show(Text + Ver + " (Tradelink" + tl.Ver + ")");
+            show(Util.TLSIdentity());
             QuoteGridSetup();
             FetchTLServer();
             tl.gotTick += new TickDelegate(tl_gotTick);

@@ -38,6 +38,7 @@ namespace Tattle
             BackColor = Color.White;
             splitContainer1.Panel2.BackColor = Color.White;
             tradefiles.SelectedIndexChanged += new EventHandler(tradefiles_SelectedIndexChanged);
+            Text = "Tattle " + Util.TLVersion();
         }
 
         void WatchPath() { WatchPath(Environment.GetFolderPath(Environment.SpecialFolder.Personal)); }

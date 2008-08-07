@@ -58,6 +58,29 @@ namespace TradeLib
             return new DateTime(year, month, day, hour, min, TradeLinkSec);
         }
 
+        public static string TLVersion()
+        {
+            string buildfile = TLProgramDir+@"\VERSION.txt";
+            const string major = "0.2.";
+            const string backupminor = "$Rev$";
+            string minor = CleanVer(backupminor);
+            if (File.Exists(buildfile))
+            {
+                try
+                {
+                    StreamReader sr = new StreamReader(buildfile);
+                    minor = sr.ReadToEnd();
+                    sr.Close();
+                }
+                catch (Exception) { }
+            }
+            return major + minor;
+        }
+        public static string TLSIdentity()
+        {
+            return "TradeLinkSuite-" + TLVersion();
+        }
+
         public static int ToTLDate(DateTime dt)
         {
             return (dt.Year * 10000) + (dt.Month * 100) + dt.Day;

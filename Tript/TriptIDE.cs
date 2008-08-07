@@ -20,6 +20,7 @@ namespace Tript
             _redirect = new TextBoxWriter(outbox); 
             Console.SetOut(_redirect); // redirect console writes to output textbox in tript
             editorbox.TextChanged +=new EventHandler(editorbox_TextChanged);
+            output(Util.TLSIdentity());
         }
 
         void  editorbox_TextChanged(object sender, EventArgs e)

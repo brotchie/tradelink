@@ -31,6 +31,7 @@ namespace TimeSales
             bw.ProgressChanged += new ProgressChangedEventHandler(bw_ProgressChanged);
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_RunWorkerCompleted);
             this.Shown +=new EventHandler(toolStripButton1_Click);
+            status("Click 'Open' to load time and sales.    " + Util.TLSIdentity());
 
         }
 

@@ -36,6 +36,8 @@ namespace Replay
             h.SimBroker.GotFill += new FillDelegate(SimBroker_GotFill);
             h.SimBroker.GotOrderCancel += new Broker.OrderCancelDelegate(SimBroker_GotOrderCancel);
 
+            status(Util.TLSIdentity());
+
             
             // setup our special book used to hold bids and offers from historical sources
             // (this is for determining top of book between historical sources and our own orders)
@@ -188,7 +190,8 @@ namespace Replay
             // if we get an order cancel notify from the broker, pass along to our clients
             tl.newOrderCancel(id);
             // send the updated book to our clients for same side as order
-            tl.newTick(OrderToTick(h.SimBroker.BestBidOrOffer(sym, side)));
+            Tick book = OrderToTick(h.SimBroker.BestBidOrOffer(sym, side));
+            tl.newTick(book);
         }
 
         
@@ -217,7 +220,10 @@ namespace Replay
 
                 // if it's changed, notify clients
                 if (oldbbo != newbbo)
-                    tl.newTick(OrderToTick(newbbo));
+                {
+                    Tick newtick = OrderToTick(newbbo);
+                    tl.newTick(newtick);
+                }
             }
         }
 
@@ -312,6 +318,9 @@ namespace Replay
         {
             Tick t = new Tick(o.symbol);
             if (!o.isLimit) return t;
+            t.time = o.time;
+            t.date = o.date;
+            t.sec = o.sec;
             if (o.Side)
             {
                 t.bid = o.price;
@@ -343,6 +352,9 @@ namespace Replay
                 foreach (uint oid in hasHistBook(t.sym, false))
                     h.SimBroker.CancelOrder(oid); 
                 Order o = new SellLimit(t.sym, t.AskSize, t.ask);
+                o.date = t.date;
+                o.time = t.time;
+                o.sec = t.sec;
                 o.Exchange = t.oe;
                 h.SimBroker.sendOrder(o,HISTBOOK);
             }
@@ -352,6 +364,9 @@ namespace Replay
                 foreach (uint oid in hasHistBook(t.sym, true))
                     h.SimBroker.CancelOrder(oid);
                 Order o = new BuyLimit(t.sym, t.BidSize, t.bid);
+                o.date = t.date;
+                o.time = t.time;
+                o.sec = t.sec; 
                 o.Exchange = t.be;
                 h.SimBroker.sendOrder(o, HISTBOOK);
             }

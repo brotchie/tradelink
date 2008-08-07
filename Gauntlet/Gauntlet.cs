@@ -23,6 +23,7 @@ using System.IO;
             ProgressBar1.Enabled = false;
             FormClosing+=new FormClosingEventHandler(Gauntlet_FormClosing);
             Grids();
+            show(Util.TLSIdentity());
         }
 
         void Grids()

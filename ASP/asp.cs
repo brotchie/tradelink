@@ -24,6 +24,7 @@ namespace ASP
             tl.gotTick += new TickDelegate(tl_gotTick);
             tl.gotFill += new FillDelegate(tl_gotFill);
             this.FormClosing += new FormClosingEventHandler(ASP_FormClosing);
+            status(Util.TLSIdentity());
         }
 
         void ASP_FormClosing(object sender, FormClosingEventArgs e)

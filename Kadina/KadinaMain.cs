@@ -57,6 +57,7 @@ namespace Kadina
             bw.WorkerReportsProgress = false;
             bw.WorkerSupportsCancellation = true;
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(PlayComplete);
+            status(Util.TLSIdentity());
         }
 
 

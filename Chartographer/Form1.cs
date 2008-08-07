@@ -29,6 +29,7 @@ namespace Chartographer
             this.Move += new EventHandler(Form1_Move);
             Chartographer.Properties.Settings.Default.PropertyChanged += new PropertyChangedEventHandler(Default_PropertyChanged);
             client.DownloadStringCompleted += new DownloadStringCompletedEventHandler(client_DownloadStringCompleted);
+            Text = "Chart " + Util.TLVersion();
         }
 
         void Default_PropertyChanged(object sender, PropertyChangedEventArgs e)
