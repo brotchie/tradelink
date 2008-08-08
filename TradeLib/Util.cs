@@ -283,12 +283,55 @@ namespace TradeLib
                     // broker-specific messages
                     if (broker == Brokers.Assent)
                         return Enum.GetName(typeof(AnvilSendOrderError), errorcode);
+                    if (broker == Brokers.Echo)
+                        return Enum.GetName(typeof(SterlingSubmitOrderError), errorcode);
                     break;
             }
             return "Unknown error: " + errorcode.ToString();
         }
         
     }
+
+    enum SterlingSubmitOrderError
+    {
+        No_Errors = 0,
+        Invalid_Account = -1,
+        Invalid_Side = -2,
+        Invalid_Qty = -3,
+        Invalid_Symbol = -4,
+        Invalid_PriceType = -5,
+        Invalid_Tif = -6,
+        Invalid_Destination = -7,
+        Exposure_Limit_Violation = -8,
+        NYSE_Rules_Violation = -9,
+        NYSE_Second_Violation = -10,
+        Disable_SelectNet_Short_Sales = -11,
+        Long_Sale_Position_Rules_Violation = -12,
+        Short_Sale_Position_Rules_Violation = -13,
+        GTC_Orders_Not_Enabled = -14,
+        ActiveX_API_Not_Enabled = -15,
+        Sterling_Trader_Pro_is_Offline = -16,
+        Security_Not_Marked_as_Located = -17,
+        Order_Size_Violation = -18,
+        Position_Limit_Violation = -19,
+        Buying_Power_Margin_Control_Violation = -20,
+        PL_Control_Violation = -21,
+        Account_Not_Enabled_for_this_Product = -22,
+        Trader_Not_Enabled_for_Futures = -23,
+        Minimum_Balance_Violation = -24,
+        Trader_Not_Enabled_To = -25,
+        Order_dollar_limit_exceeded = -26,
+        Trade_Not_Enabled_for_Options = -27,
+        Soft_Share_Limit_Exceeded = -28,
+        For_Internal_Use_Only = -29,
+        For_Internal_Use_Only2 = -30,
+        Sell_to_Open_Position_Not_Enabled_for_Options = -31,
+        Allow_Close_and_Cancel_Only = -32,
+    }
+
+
+
+ 
 
     enum AnvilSendOrderError
     {
