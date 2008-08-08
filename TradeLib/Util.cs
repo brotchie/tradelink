@@ -57,23 +57,29 @@ namespace TradeLib
             }
             return new DateTime(year, month, day, hour, min, TradeLinkSec);
         }
-
-        public static string TLVersion()
+        public const string ZEROBUILD = "0";
+        public static string BuildFromFile(string filepath)
         {
-            string buildfile = TLProgramDir+@"\VERSION.txt";
-            const string major = "0.2.";
-            const string backupminor = "$Rev$";
-            string minor = CleanVer(backupminor);
-            if (File.Exists(buildfile))
+            string build = ZEROBUILD;
+            if (File.Exists(filepath))
             {
                 try
                 {
-                    StreamReader sr = new StreamReader(buildfile);
-                    minor = sr.ReadToEnd();
+                    StreamReader sr = new StreamReader(filepath);
+                    build = sr.ReadToEnd();
                     sr.Close();
                 }
                 catch (Exception) { }
             }
+            return build;
+        }
+
+        public static string TLVersion()
+        {
+            const string major = "0.2.";
+            const string backupminor = "$Rev$";
+            string build = BuildFromFile(TLProgramDir + @"\VERSION.txt");
+            string minor = build == ZEROBUILD ? CleanVer(backupminor) : build;
             return major + minor;
         }
         public static string TLSIdentity()
