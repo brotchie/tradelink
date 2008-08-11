@@ -21,8 +21,10 @@ namespace TradeLib
         /// </returns>
         public static bool isIdx(string sym)
         {
-            System.Text.RegularExpressions.Regex r = new System.Text.RegularExpressions.Regex("^[/$][A-Z0-9#]{1,4}$");
-            bool match = r.IsMatch(sym.ToUpper());
+            System.Text.RegularExpressions.Regex r = new System.Text.RegularExpressions.Regex("[A-Z0-9#]{1,4}$");
+            System.Text.RegularExpressions.Regex r2 = new System.Text.RegularExpressions.Regex("^[/$]");
+            string us = sym.ToUpper();
+            bool match = r.IsMatch(us) && (r2.IsMatch(us) || us.Contains("#"));
             return match;
         }
         /// <summary>
