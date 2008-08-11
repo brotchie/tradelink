@@ -263,9 +263,24 @@ namespace Quotopia
                 newsymbol = newsymbol.Substring(0, newsymbol.Length - 1);
                 status(preface + newsymbol);
             }
-            else if ((e.KeyValue>=(int)Keys.A) && (e.KeyValue<=(int)Keys.Z))
+            else if (((e.KeyValue>=(int)Keys.A) && (e.KeyValue<=(int)Keys.Z)) 
+                || ((e.KeyValue>=(int)Keys.D0) && (e.KeyValue<=(int)Keys.D9)) || e.Shift)
             {
-                newsymbol += (char)e.KeyValue;
+                string val = "";
+                if (e.Shift)
+                {
+                    switch (e.KeyCode)
+                    {
+                        case Keys.D3: val = "#";
+                            break;
+                    }
+                }
+                else
+                {
+                    char v = (char)e.KeyValue;
+                    val += v;
+                }
+                newsymbol += val;
                 status("Adding symbol: " + newsymbol);
             }
         }

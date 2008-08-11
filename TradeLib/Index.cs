@@ -21,7 +21,7 @@ namespace TradeLib
         /// </returns>
         public static bool isIdx(string sym)
         {
-            System.Text.RegularExpressions.Regex r = new System.Text.RegularExpressions.Regex("^[/$][A-Z]{1,4}$");
+            System.Text.RegularExpressions.Regex r = new System.Text.RegularExpressions.Regex("^[/$][A-Z0-9#]{1,4}$");
             bool match = r.IsMatch(sym.ToUpper());
             return match;
         }
