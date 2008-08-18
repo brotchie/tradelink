@@ -32,7 +32,6 @@ namespace TestTradeLib
             Assert.That(i("/ "));
             Assert.That(i(""));
             Assert.That(v("/QQQQ"));
-            Assert.That(i("/QQQQQ"));
         }
 
         bool v(string s) { return Index.isIdx(s); } // should be valid

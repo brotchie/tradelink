@@ -78,7 +78,7 @@ namespace TestTradeLib
         }
 
         [Test]
-        void BBO()
+        public void BBO()
         {
             Broker broker = new Broker();
             const string s = "TST";
