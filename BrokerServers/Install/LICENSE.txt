@@ -1,0 +1,40 @@
+
+BrokerServer License Agreement and License Terms
+
+By installing this software you have read and accepted all 
+of the following terms.  If you do not agree you should 
+not install this software.
+
+Installing this software grants me a limited single-user license 
+of the BrokerServer software, DLLs (dynamic link library file), 
+documentation and program examples.  I understand I may utilize this 
+license on any computer, or multiple computers such that I have one 
+BrokerServer license per brokerage account.  
+
+Other Terms of License:
+I agree not to sell or transfer my license to others.
+I agree not and I may not allow others to use my BrokerServer license.  
+I agree not to provide copies of of BrokerServer- in source or binary form- 
+to any other individual without prior written consent from Franta.com.
+
+I agree that I will not attempt to modify the BrokerServer code or binary objects
+or remove copy protection or software licenses.  
+I agree not to redistribute BrokerServer programs, examples, code or DLL files, 
+duplicate or modify this license in any way.  
+
+I understand that my license to TradeLink can be removed at any time without 
+I agree not to allow 3rd parties to examine, disassemble or otherwise reengineer 
+the BrokerServer DLLs or EXE files.
+
+I understand I use BrokerServer at my own risk.  I understand BrokerServer has been 
+extensively tested,  and my license was extended to me after this testing showed BrokerServer 
+to be stable and safe.  However, I understand Josh Franta and franta.com make no 
+guarantees regarding the operation or behavior of BrokerServer or it's interaction with other programs 
+(including my broker).  
+
+I accept and agree I will not hold BrokerServer, Josh Franta or franta.com liable 
+or responsible for any trading losses, software or data losses, downtime of 
+my business or computer systems or any other losses or problems resulting 
+from my decision to use BrokerServer.
+
+I agree that I have read and accepted all of the above agreement.

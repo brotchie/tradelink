@@ -1,0 +1,16 @@
+; AnvilServer2.def : Declares the module parameters for the DLL.
+
+LIBRARY      "AnvilServer2"
+
+EXPORTS
+    ; Explicit exports can go here
+InitializeAnvilExtension				@1
+TerminateAnvilExtension					@2
+GetAnvilExtensionVersion				@3
+GetAnvilExtensionMenu					@4
+DoAnvilExtensionCommand					@5
+GetAnvilExtensionDescription			@6
+IsAnvilExtensionDebug					@8
+GetBusinessHeaderVersion				@9
+GetReceiverHeaderVersion				@10
+GetObserverHeaderVersion				@11
