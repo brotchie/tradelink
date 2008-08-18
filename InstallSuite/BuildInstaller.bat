@@ -55,6 +55,8 @@ echo KADINA
 xcopy /q /y ..\Kadina\bin\Release\Kadina.exe* .
 echo TRIPT
 xcopy /q /y ..\Tript\bin\Release\Tript.exe* .
+echo RESEARCHLIB
+xcopy /q /y ..\ResearchLib\bin\Release\ResearchLib.dll .
 echo.
 
 

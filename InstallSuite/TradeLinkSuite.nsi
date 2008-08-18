@@ -69,6 +69,7 @@ Section "TradeLinkSuite"
   File "Tript.exe"
   File "ASP.exe"
   File "Tript.exe.settings.xml"
+  File "ResearchLib.dll"
   File /r /x ".svn" "Properties"
   ; Write the installation path into the registry
   WriteRegStr HKLM SOFTWARE\TradeLinkSuite "Install_Dir" "$INSTDIR"

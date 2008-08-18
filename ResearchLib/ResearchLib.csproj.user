@@ -1,0 +1,6 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <StartAction>Program</StartAction>
+    <StartProgram>C:\Documents and Settings\josh\My Documents\SharpDevelop Projects\UpDownViewer\bin\Debug\UpDownViewer.exe</StartProgram>
+  </PropertyGroup>
+</Project>
