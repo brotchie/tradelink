@@ -8,7 +8,7 @@ namespace TradeLib
 {
     public class Auth
     {
-        public Auth(string authUrl) { url = authUrl; }
+        public Auth(string authUrl) { url = authUrl+"?"; }
         string url = "";
         public bool isAuthorized(string key)
         {
@@ -21,7 +21,7 @@ namespace TradeLib
             if (appendrandom)
             {
                 Random rand = new Random((int)DateTime.Now.Ticks);
-                rurl += "&r=" + rand.Next().ToString();
+                rurl += "r=" + rand.Next().ToString();
             }
             string res = "";
             try 
