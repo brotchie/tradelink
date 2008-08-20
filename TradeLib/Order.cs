@@ -44,7 +44,7 @@ namespace TradeLib
         }
         public Order(string sym, bool side, int size, decimal p, decimal s, string c, int time, int date)
         {
-            this.symbol = sym.ToUpper();
+            this.symbol = sym;
             this.side = side;
             this.size = System.Math.Abs(size);
             this.price = p;
@@ -55,7 +55,7 @@ namespace TradeLib
         }
         public Order(string sym, bool side, int size)
         {
-            this.symbol = sym.ToUpper();
+            this.symbol = sym;
             this.side = side;
             this.price = 0;
             this.stopp = 0;
@@ -66,7 +66,7 @@ namespace TradeLib
         }
         public Order(string sym, bool side, int size, string c)
         {
-            this.symbol = sym.ToUpper();
+            this.symbol = sym;
             this.side = side;
             this.price = 0;
             this.stopp = 0;
@@ -77,7 +77,7 @@ namespace TradeLib
         }
         public Order(string sym, int size)
         {
-            this.symbol = sym.ToUpper();
+            this.symbol = sym;
             this.side = size > 0;
             this.price = 0;
             this.stopp = 0;
