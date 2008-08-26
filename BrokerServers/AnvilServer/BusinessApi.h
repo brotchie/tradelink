@@ -17,7 +17,7 @@
 #define BUSINESS_API __declspec(dllimport)
 #endif
 
-const char* const BusinessHeaderVersion = "2.6.8.15";
+const char* const BusinessHeaderVersion = "2.7.0.1";
 
 #include "ObserverApi.h"
 #include "CommonIds.h"
@@ -602,6 +602,7 @@ enum SendOrderError
     SO_INCORRECT_SIDE,
     SO_NO_BULLETS_FOR_CHEAP_STOCK,
     SO_NO_SHORTSELL_FOR_CHEAP_STOCK,
+	SO_NO_SHORTSELL_FOR_HARD_TO_BORROW_STOCK,
     SO_NO_ONOPENORDER_FOR_NASDAQ_STOCK,
     SO_NO_ONCLOSEORDER_FOR_NASDAQ_STOCK,
     SO_NO_ONCLOSEORDER_AGAINST_IMBALANCE_AFTER_1540,
@@ -644,6 +645,14 @@ enum SendOrderError
 
 //    SO_SHORT_SELL_VIOLATION,
 	SO_POTENTIAL_OVERSELL,
+	
+	SO_BLOCK_ERRONEOUS_TRADE,
+	SO_WARN_ERRONEOUS_TRADE,
+	SO_ALLOW_ERRONEOUS_TRADE,
+
+	SO_SDOT_ROUTING_BLOCK,
+	SO_SDOT_NEWPOS_BLOCK,
+	SO_ARCA_NEWPOS_BLOCK,
 };
 
 class BUSINESS_API TradePack : public MoneySize
@@ -2085,6 +2094,8 @@ public:
     const Money& GetMaxMoneyInvestedLongInventory(bool inventory) const{return inventory ? GetMaxMoneyInvestedLong() : m_maxMoneyInvestedLong;}
     const Money& GetMaxMoneyInvestedShortInventory(bool inventory) const{return inventory ? GetMaxMoneyInvestedShort() : m_maxMoneyInvestedShort;}
 
+	unsigned int GetMaxShortShares()const{return m_MaxShortShares;} 
+
 /*
     const Money& GetMoneyPendingLongProper() const{return m_moneyPendingLong;}
     const Money& GetMoneyPendingShortProper() const{return m_moneyPendingShort;}
@@ -2105,6 +2116,7 @@ protected:
     unsigned int m_bullets;
     int m_size;
 
+	unsigned int m_MaxShortShares;
     int m_sharesPendingLong;
     int m_sharesPendingShort;
 
@@ -4022,6 +4034,11 @@ void WINAPI B_Terminate();
 void WINAPI B_SetMarketReceiver(Observable* receiver);
 Observable* WINAPI B_GetMarketReceiver();
 
+//void WINAPI B_SetOptionsReceiver(Observable* receiver);
+Observable* WINAPI B_GetOptionsReceiver();
+bool WINAPI B_IsOptionsLogged();
+bool WINAPI B_IsOptionsLogFailed();
+
 Observable* WINAPI B_GetAdminObservable();
 Observable* WINAPI B_GetNewPositionObservable();
 Observable* WINAPI B_GetPositionSizeObservable(Observable* account);
@@ -4053,6 +4070,7 @@ Observable* WINAPI B_GetAccountReceiver(const Observable* account = NULL);
 bool WINAPI B_IsAccountLogged(const Observable* account = NULL);
 bool WINAPI B_IsAccountLoggedToMarketData(const Observable* account = NULL);
 bool WINAPI B_IsAccountLoggedToExecutor(const Observable* account = NULL);
+//bool WINAPI B_IsAccountLoggedToOptions(const Observable* account = NULL);
 bool WINAPI B_IsAccountPrimary(const Observable* account = NULL);
 const char* WINAPI B_GetAccountFirm(const Observable* account = NULL);
 bool WINAPI B_IsAccountSimulation(const Observable* account = NULL);
@@ -4141,7 +4159,10 @@ const Money& WINAPI B_GetAccountMoneyTradedOvernight(const Observable* account =
 void WINAPI B_DestroyAccount(const Observable* account = NULL);
 void WINAPI B_DestroyAllAccounts();
 unsigned int WINAPI B_GetAccountCount();
-void WINAPI B_ReconnectAllAccounts(const char* ip, unsigned short port, const char* localIp, const char* executorIp, unsigned short executorPort, const char* executorLocalIp, bool simulation, bool multicast, bool compression, unsigned int orderLoadMode, bool cancelAllOnDisconnect);
+void WINAPI B_ReconnectAllAccounts(const char* ip, unsigned short port, const char* localIp,
+	const char* executorIp, unsigned short executorPort, const char* executorLocalIp,
+//	const char* optionsIp, unsigned short optionsPort, const char* optionsLocalIp,
+	bool simulation, bool multicast, bool compression, unsigned int orderLoadMode, bool cancelAllOnDisconnect);
 
 const StockBase* WINAPI B_FindStockHandle(const char* symbol);
 const StockBase* WINAPI B_GetStockHandle(const char* symbol);
@@ -4942,7 +4963,7 @@ bool WINAPI B_IsMmidRegionalOrNas(const char* mmid);
 bool WINAPI B_IsMmidCaes(const char* mmid);
 //bool WINAPI B_IsMmidCaesOrSize(const char* mmid);
 
-void WINAPI B_SendInitialRequests();
+//void WINAPI B_SendInitialRequests();
 void WINAPI B_CancelSmartOrders(unsigned int flags, const char* destination, const char* symbol, Observable* account = NULL);//destination = NULL - all destinations, symbol = NULL - all symbols
 unsigned int WINAPI B_CancelStockBestWorstOrder(Position* pos, unsigned int flags, const char* destination, bool worst, bool includeChildOrders);
 unsigned int WINAPI B_CancelStockAllButBestWorstOrder(Position* pos, unsigned int flags, const char* destination, bool worst, bool includeChildOrders);
@@ -5019,6 +5040,7 @@ unsigned int WINAPI B_GetBookSizeByPrice(const StockBase* stockHandle, unsigned 
 unsigned int WINAPI B_GetStockSizeByPrice(const StockBase* stockHandle, unsigned short bookId, bool side, const Money& price, bool roundedTo2Digits, bool ecnsOnly, unsigned int* participants = NULL);
 
 bool WINAPI B_IsMarketReceiverConnected();
+bool WINAPI B_IsOptionsReceiverConnected();
 bool WINAPI B_IsMarketSummaryReceiverConnected();
 bool WINAPI B_IsMarketSummaryReceiverConnecting();
 
@@ -5299,7 +5321,10 @@ enum AccountConstraints
     AC_MAX_OPEN_LOSS_PER_STOCK,
     AC_INSTITUTIONAL,
 	AC_WARN_MAX_MARKED_NET_LOSS,
-	AC_WARN_MAX_OPEN_LOSS
+	AC_WARN_MAX_OPEN_LOSS,
+	/*AC_BLOCK_ERRONEOUS_TRADE,
+	AC_WARN_ERRONEOUS_TRADE,
+	AC_ALLOW_ERRONEOUS_TRADE*/
 };
 
 unsigned int WINAPI B_SetAccountConstraints(const Money* buyingPowerUserCap,
@@ -5496,6 +5521,11 @@ void WINAPI B_SetDefaultExecutorIpPort(const char* ip, unsigned short port, cons
 const char* WINAPI B_GetDefaultExecutorIp();
 unsigned short WINAPI B_GetDefaultExecutorPort();
 const char* WINAPI B_GetDefaultExecutorLocalIp();
+
+void WINAPI B_SetDefaultOptionsIpPort(const char* ip, unsigned short port, const char* localIp);
+const char* WINAPI B_GetDefaultOptionsIp();
+unsigned short WINAPI B_GetDefaultOptionsPort();
+const char* WINAPI B_GetDefaultOptionsLocalIp();
 
 const Money& WINAPI B_GetMoneyZero();
 const Money& WINAPI B_GetMoneyPenny();
@@ -5958,6 +5988,24 @@ void* WINAPI B_CreateCrossPositionSmartOrderIterator();
 void WINAPI B_AddPositionSmartOrdersToIterator(void* iterator, const Position* position, bool buy);
 void WINAPI B_AddPositionSmartDeadOrdersToIterator(void* iterator, const Position* position, bool buy);
 //const Order* WINAPI B_GetNextCrossPositionSmartOrder(void* iteratorHandle);
+
+void WINAPI B_AddMarketReceiver(unsigned int ip, unsigned short port, unsigned int bindIp);
+void WINAPI B_SetAdditionalMarketReceiverBindIp(unsigned int ip, unsigned short port, unsigned int bindIp);
+void WINAPI B_RemoveMarketReceiver(unsigned int ip, unsigned short port);
+unsigned int WINAPI B_GetAdditionalMarketReceiverCount();
+void* WINAPI B_CreateAdditionalMarketReceiverIterator();
+Observable* WINAPI B_GetNextAdditionalMarketReceiver(void* iterator);
+bool WINAPI B_IsReceiverAdditional(const Observable* receiver);
+
+enum ErroneousTradeSetting
+{
+    BLOCK_ERRONEOUS_TRADE,
+    WARN_ERRONEOUS_TRADE,
+    ALLOW_ERRONEOUS_TRADE,
+};
+ErroneousTradeSetting WINAPI B_GetErroneousTradeSetting(const Observable* account = NULL);
+void WINAPI B_SetErroneousTradeSetting(ErroneousTradeSetting erroneousTradeSetting, Observable* account = NULL);
+
 
 #ifdef __cplusplus
 } //extern "C"

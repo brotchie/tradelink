@@ -8,7 +8,7 @@ del BrokerServer*.exe
 echo %REVISION% >> VERSION.txt
 echo Getting latest releases...
 echo.
-set ANVILDIR=AnvilRelease_x32_2_6_8_16
+set ANVILDIR=AnvilRelease_x32_2_7_0_5
 echo ANVILSERVER %ANVILDIR%
 xcopy /q /y ..\AnvilServer\Release\AnvilServer.dll %ANVILDIR%
 echo.

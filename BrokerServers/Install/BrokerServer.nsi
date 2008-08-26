@@ -34,10 +34,10 @@ Page instfiles
 UninstPage uninstConfirm
 UninstPage instfiles
 
-LicenseText "TradeLink BrokerServer Limited Use License"
+LicenseText "TradeLink BrokerServer Agreement"
 LicenseData "LICENSE.txt"
 LicenseForceSelection radiobuttons "I have read and accept the above" "I decline"
-CompletedText "Email trade@franta.com with problems or questions regarding installation."
+CompletedText "Direct installation questions or problems to http://groups.google.com/group/tradelink-users"
 
 ;--------------------------------
 
@@ -73,11 +73,11 @@ SectionEnd
 Section "AnvilServer"
 
 
-  CreateShortCut "$SMPROGRAMS\TradeLink\Anvil+BrokerServer.lnk" "$INSTDIR\AnvilRelease_x32_2_6_8_16\Anvil.exe" "" "$INSTDIR\AnvilRelease_x32_2_6_8_16\Anvil.exe" 0
+  CreateShortCut "$SMPROGRAMS\TradeLink\Anvil+BrokerServer.lnk" "$INSTDIR\AnvilRelease_x32_2_7_0_5\Anvil.exe" "" "$INSTDIR\AnvilRelease_x32_2_7_0_5\Anvil.exe" 0
   ; Put file there
  
   
-  File /r "AnvilRelease_x32_2_6_8_16"
+  File /r "AnvilRelease_x32_2_7_0_5"
 
 
 SectionEnd
@@ -105,14 +105,14 @@ Section "Uninstall"
   ; Remove files and uninstaller
   Delete $INSTDIR\BrokerServer.nsi
   Delete $INSTDIR\uninstall.exe
-  Delete "$INSTDIR\AnvilRelease_x32_2_6_8_16\*.*"
+  Delete "$INSTDIR\AnvilRelease_x32_2_7_0_5\*.*"
   Delete "$INSTDIR\*.*"
   ; Remove shortcuts, if any
   Delete "$SMPROGRAMS\TradeLink\*BrokerServer.lnk"
   
 
   ; Remove directories used
-  RMDir "$INSTDIR\AnvilRelease_x32_2_6_8_16"
+  RMDir "$INSTDIR\AnvilRelease_x32_2_7_0_5"
   RMDir "$INSTDIR"
   
 
