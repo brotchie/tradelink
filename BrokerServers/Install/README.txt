@@ -7,4 +7,3 @@ Supported Brokers Include:
  * InteractiveBrokers
  * Assent (SunGard)
 
-BrokerServer requires one license per user.
