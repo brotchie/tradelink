@@ -22,10 +22,14 @@ namespace TimeSales
             tsgrid.Columns.Add("Time", "Time");
             tsgrid.Columns.Add("Trade", "Trade");
             tsgrid.Columns.Add("TSize", "TSize");
+            tsgrid.Columns.Add("TExch", "TExch");
             tsgrid.Columns.Add("Bid", "Bid");
             tsgrid.Columns.Add("Ask", "Ask");
             tsgrid.Columns.Add("BSize", "BSize");
             tsgrid.Columns.Add("ASize", "ASize");
+            tsgrid.Columns.Add("BExch", "BExch");
+            tsgrid.Columns.Add("AExch", "AExch");
+            SetColumnContext();
             bw.DoWork += new DoWorkEventHandler(bw_DoWork);
             bw.WorkerReportsProgress = true;
             bw.ProgressChanged += new ProgressChangedEventHandler(bw_ProgressChanged);
@@ -33,6 +37,26 @@ namespace TimeSales
             this.Shown +=new EventHandler(toolStripButton1_Click);
             status("Click 'Open' to load time and sales.    " + Util.TLSIdentity());
 
+        }
+
+        void SetColumnContext()
+        {
+            tsgrid.ContextMenuStrip = new ContextMenuStrip();
+            for (int i = 0; i<tsgrid.Columns.Count; i++)
+            {
+                bool grey = !tsgrid.Columns[i].Visible;
+                string col = tsgrid.Columns[i].HeaderText;
+                tsgrid.ContextMenuStrip.Items.Add(col,null,ToggleCol);
+            }
+            
+        }
+
+        void ToggleCol(object sender, EventArgs e)
+        {
+            string col = ((ToolStripItem)sender).Text;
+            if (!tsgrid.Columns.Contains(col)) return;
+            tsgrid.Columns[col].Visible = !tsgrid.Columns[col].Visible;
+            tsgrid.Refresh();
         }
 
         void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -134,12 +158,27 @@ namespace TimeSales
             string ts = "";
             string bs = "";
             string os = "";
-            if (t.trade!=0) trade = t.trade.ToString("N2");
-            if (t.size!=0) ts = t.size.ToString();
-            if (t.bid != 0) bid = t.bid.ToString("N2");
-            if (t.ask != 0) ask = t.ask.ToString("N2");
-            if (t.bs != 0) bs = t.bs.ToString();
-            if (t.os != 0) os = t.os.ToString();
+            string be = "";
+            string oe = "";
+            string ex = "";
+            if (t.isTrade)
+            {
+                trade = t.trade.ToString("N2");
+                ts = t.size.ToString();
+                ex = t.ex;
+            }
+            if (t.hasBid)
+            {
+                bs = t.bs.ToString();
+                be = t.be;
+                bid = t.bid.ToString("N2");
+            }
+            if (t.hasAsk)
+            {
+                ask = t.ask.ToString("N2");
+                oe = t.oe;
+                os = t.os.ToString();
+            }
             if (tsgrid.InvokeRequired)
             {
                 try
@@ -148,7 +187,7 @@ namespace TimeSales
                 }
                 catch (Exception) { }
             }
-            else tsgrid.Rows.Add(time,trade, ts,bid,ask,bs,os); 
+            else tsgrid.Rows.Add(time,trade, ts,ex,bid,ask,bs,os,be,oe); 
         }
 
         private void autoresizebut_CheckedChanged(object sender, EventArgs e)
