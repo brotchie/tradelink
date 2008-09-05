@@ -57,6 +57,8 @@ echo TRIPT
 xcopy /q /y ..\Tript\bin\Release\Tript.exe* .
 echo RESEARCHLIB
 xcopy /q /y ..\ResearchLib\bin\Release\ResearchLib.dll .
+echo RECORD
+xcopy /q /y ..\Record\bin\Release\Record.exe* .
 echo.
 
 
@@ -82,12 +84,12 @@ ren TradeLinkSuite.exe TLS.tmp
 ren signtool.exe signtool.tmp
 echo Removing working releases...
 del VERSION.txt
-del *.exe
 del *.config
 del *.xml
 del EarlyClose.csv
 del *.dll
 del /s /f /q Properties
+del *.exe
 rmdir properties
 ren TLS.tmp TradeLinkSuite-%REVISION%.exe
 ren signtool.tmp signtool.exe
