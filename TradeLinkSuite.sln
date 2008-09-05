@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASP", "ASP\ASP.csproj", "{3
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResearchLib", "ResearchLib\ResearchLib.csproj", "{BBDF2EFE-BFE6-4880-977B-4724C3A67D76}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Record", "Record\Record.csproj", "{B9E0C89A-A460-4C03-A65C-DF8EA0A3B89F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,6 +99,10 @@ Global
 		{BBDF2EFE-BFE6-4880-977B-4724C3A67D76}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BBDF2EFE-BFE6-4880-977B-4724C3A67D76}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BBDF2EFE-BFE6-4880-977B-4724C3A67D76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9E0C89A-A460-4C03-A65C-DF8EA0A3B89F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9E0C89A-A460-4C03-A65C-DF8EA0A3B89F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9E0C89A-A460-4C03-A65C-DF8EA0A3B89F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9E0C89A-A460-4C03-A65C-DF8EA0A3B89F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
