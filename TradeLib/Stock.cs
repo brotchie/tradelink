@@ -48,7 +48,7 @@ namespace TradeLib
         /// <returns></returns>
         public static bool isStock(string sym)
         {
-            Regex sfilt = new Regex("^[A-Z]{1,4}$");
+            Regex sfilt = new Regex("^[A-Z0-9]{1,4}$");
             bool match = sfilt.IsMatch(sym.ToUpper()); 
             return match;
         }
