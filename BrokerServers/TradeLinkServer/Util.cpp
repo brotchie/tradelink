@@ -17,6 +17,8 @@ double unpack(long i) {
 
 
 
+
+
 void TLTimeNow(std::vector<int> & nowtime)
 {
 	time_t now;
@@ -67,6 +69,19 @@ CString gjoin(std::vector<CString>& vec, CString del)
 			s += vec[i] + del;
 	s.TrimRight(del);
 	return s;
+}
+
+void ParseSecurityString(CString input,std::vector<CString> & output)
+{
+	output.clear(); // clear output
+	CString del(",");
+
+	// use pipes for destination deliminter
+	bool haspipe = input.FindOneOf(del) != -1;
+	if (haspipe) // if it has a delimiter parse into symbol and exchange
+		gsplit(input,del,output);
+	else 
+		output.push_back(input); // otherwise just assume it's a symbol
 }
 
 char* cleansvnrev(const char * dirtyrev)

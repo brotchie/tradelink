@@ -12,6 +12,7 @@ void gsplit(CString msg, CString del, std::vector<CString>& rec);
 CString gjoin(std::vector<CString>& vec, CString del);
 void TLTimeNow(std::vector<int> & nowtime);
 char* cleansvnrev(const char * dirtyrev);
+void ParseSecurityString(CString input,std::vector<CString> & output);
 
 enum TLTimeField
 {

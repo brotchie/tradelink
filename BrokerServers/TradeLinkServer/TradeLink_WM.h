@@ -35,6 +35,7 @@ namespace TradeLinkServer
 		vector <time_t>heart; // map last contact to id
 		typedef vector <CString> clientstocklist; // hold a single clients stocks
 		vector < clientstocklist > stocks; // map stocklist to id
+		vector < clientstocklist > futures;
 		DECLARE_MESSAGE_MAP()
 
 	public:
@@ -46,6 +47,7 @@ namespace TradeLinkServer
 		virtual int SendOrder(TLOrder order);
 		virtual int AccountResponse(CString clientname);
 		virtual int RegisterStocks(CString clientname);
+		virtual int RegisterFutures(CString clientname);
 		virtual std::vector<int> GetFeatures();
 		int ClearClient(CString client);
 		int ClearStocks(CString client);
