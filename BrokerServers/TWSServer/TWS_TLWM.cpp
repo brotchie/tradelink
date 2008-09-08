@@ -367,7 +367,10 @@ namespace TradeLinkServer
 			// otherwise, subscribe to this stock and save it to subscribed list of tickers
 			Contract contract;
 			contract.symbol = stocks[cid][i];
-			contract.exchange = "NYSE";
+			if (contract.symbol.GetLength()>3)
+				contract.exchange = "SMART";
+			else 
+				contract.exchange = "NYSE";
 			contract.secType = "STK";
 			this->m_link[this->validlinkids[0]]->reqMktData(stocktickers.size(),contract,"",false);
 			stocktickers.push_back(stocks[cid][i]);

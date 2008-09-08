@@ -81,7 +81,6 @@ namespace TradeLinkServer
 		heart.push_back(now); // save heartbeat at client index
 		clientstocklist my = clientstocklist(0);
 		stocks.push_back(my);
-		futures.push_back(my);
 		D(CString(_T("Client ")+clientname+_T(" connected.")));
 		return OK;
 	}
@@ -122,11 +121,10 @@ namespace TradeLinkServer
 					gsplit(rec[1],CString(","),hisstocks);
 					unsigned int cid = FindClient(client); // parse first part as client name
 					if (cid==-1) return CLIENTNOTREGISTERED; //client not registered
-					futures[cid] = hisstocks; // save the future list
+					stocks[cid] = hisstocks; // save the future list
 					D(CString(_T("Client ")+client+_T(" registered: ")+gjoin(hisstocks,",")));
 					HeartBeat(client);
 					return RegisterFutures(client);
-					
 				}
 
 			case REGISTERCLIENT :

@@ -74,7 +74,7 @@ CString gjoin(std::vector<CString>& vec, CString del)
 void ParseSecurityString(CString input,std::vector<CString> & output)
 {
 	output.clear(); // clear output
-	CString del(",");
+	CString del("|");
 
 	// use pipes for destination deliminter
 	bool haspipe = input.FindOneOf(del) != -1;
