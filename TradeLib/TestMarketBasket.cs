@@ -22,7 +22,7 @@ namespace TestTradeLib
             mb.Remove(i);
             Assert.That(!mb.hasStock);
             mb.Add(new Stock("LVS"));
-            Assert.That(mb.Get(0).Symbol=="LVS");
+            Assert.That(mb.Get(0).Symbol=="LVS",mb[0].ToString());
             mb.Add(new Stock("IBM"));
             Assert.That(mb[1].Symbol=="IBM");
             MarketBasket newbasket = new MarketBasket(new Stock("FDX"));

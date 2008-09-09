@@ -1,6 +1,6 @@
 namespace Quotopia
 {
-    partial class order
+    partial class Ticket
     {
         /// <summary>
         /// Required designer variable.

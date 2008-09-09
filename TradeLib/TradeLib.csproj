@@ -46,7 +46,6 @@
     <Compile Include="Bar.cs" />
     <Compile Include="BarList.cs" />
     <Compile Include="BarMath.cs" />
-    <Compile Include="Basket.cs" />
     <Compile Include="BlackBoxEasy.cs" />
     <Compile Include="Box.cs" />
     <Compile Include="BoxInfo.cs" />
@@ -66,7 +65,6 @@
     <Compile Include="Index.cs" />
     <Compile Include="IndexBasket.cs" />
     <Compile Include="Indicator.cs" />
-    <Compile Include="Instrument.cs" />
     <Compile Include="LimitOrder.cs" />
     <Compile Include="MarketBasket.cs" />
     <Compile Include="MarketOrder.cs" />

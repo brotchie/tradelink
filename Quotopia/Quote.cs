@@ -148,20 +148,25 @@ namespace Quotopia
 
         void rightticket(object sender, EventArgs e)
         {
-            string sym = GetVisibleStock(qg.CurrentRowIndex);
-            if (Index.isIdx(sym)) return;
-            Position me = tl.FastPos(sym);
-            order o = new order(sym, me.Size, me.Side);
-            o.neworder += new QuotopiaOrderDel(o_neworder);
-            spillTick +=new TickDelegate(o.newTick);
-            orderStatus+=new OrderStatusDel(o.orderStatus);
+            Security s = GetVisibleSecurity(qg.CurrentRowIndex);
+            if (s.Type == SecurityType.IDX) return;
+            string sym = s.Symbol;
+            Order o = new Order(sym,-1*tl.PosSize(sym));
+            o.Exchange = s.DestEx;
+            o.Security = s.Type;
+            o.LocalSymbol = sym;
+            Ticket t = new Ticket(o);
+            
+            t.neworder += new QuotopiaOrderDel(t_neworder);
+            spillTick +=new TickDelegate(t.newTick);
+            orderStatus+=new OrderStatusDel(t.orderStatus);
             System.Drawing.Point p = new System.Drawing.Point(MousePosition.X, MousePosition.Y);
             p.Offset(-315, 20);
-            o.SetDesktopLocation(p.X, p.Y);
-            o.Show();
+            t.SetDesktopLocation(p.X, p.Y);
+            t.Show();
         }
 
-        void o_neworder(Order sendOrder)
+        void t_neworder(Order sendOrder)
         {
             int res = tl.SendOrder(sendOrder);
             if (res != 0)
@@ -174,7 +179,7 @@ namespace Quotopia
 
         void rightremove(object sender, EventArgs e)
         {
-            string sym = GetVisibleStock(qg.CurrentRowIndex);
+            string sym = GetVisibleSecurity(qg.CurrentRowIndex).Symbol;
             if (MessageBox.Show("Are you sure you want to remove "+sym+"?","Confirm remove",MessageBoxButtons.YesNo)== DialogResult.Yes)
             {
                 qt.Rows.RemoveAt(qg.CurrentRowIndex);
@@ -188,7 +193,7 @@ namespace Quotopia
             DataGrid.HitTestInfo ht = qg.HitTest(p);
             if (ht.Type != DataGrid.HitTestType.Cell) return;
             if (ht.Row < 0) return;
-            string sym = GetVisibleStock(qg.CurrentRowIndex);
+            string sym = GetVisibleSecurity(qg.CurrentRowIndex).Symbol;
             Chart c = new Chart();
             try
             {
@@ -298,23 +303,17 @@ namespace Quotopia
             status("Added " + sym);
         }
 
-
-
-
-
         void tl_gotIndexTick(Index idx)
         {
             tl_gotTick(idx.ToTick());
-            // archive index (just like ticks)
-            // high/low coloring (just like ticks)
-            // uptick/downtick coloring (just like ticks)
         }
 
 
-        string GetVisibleStock(int row)
+        Security GetVisibleSecurity(int row)
         {
-            return ((row < 0) || (row >= qg.VisibleRowCount))
-                ? "" : qg[row, 0].ToString();
+            if ((row < 0) || (row >= qg.VisibleRowCount)) return new Security();
+            Security s = Security.Parse(qg[row, 0].ToString());
+            return s;
         }
         int[] GetSymbolRows(string sym)
         {
@@ -420,15 +419,6 @@ namespace Quotopia
             BarUpdate(t);
             if (spillTick != null) spillTick(t);
             RefreshRow(t);
-            // boxinfo
-            // trades boxes
-            // spilltick to order tickets
-            // archive
-            // watch ticks
-            // color high/low
-            // color uptick/downtick
-            // write trends
-            // write consolidated order-sizes
         }
 
         TradeLink_Client_WM tl = new TradeLink_Client_WM("quotopia.client",true);

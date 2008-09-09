@@ -7,7 +7,7 @@ namespace TradeLib
     /// <summary>
     /// Holds a collection of Index instances
     /// </summary>
-    public class IndexBasket : Basket
+    public class IndexBasket 
     {
         List<Index> l = new List<Index>();
         public bool hasIndex { get { return l.Count > 0; } }
@@ -17,18 +17,18 @@ namespace TradeLib
                 Add(ib[i]);
         }
         public void Add(Index i) { if (Index.isIdx(i.Name)) l.Add(i); }
-        public override void Add(Instrument item)
+        public void Add(Security item)
         {
             if (item.isValid) l.Add((Index)item);
             
         }
-        public override void Remove(int index)
+        public void Remove(int index)
         {
             l.RemoveAt(index);
         }
         public void Remove(Index i) { l.Remove(i); }
         public Index this[int i] { get { return l[i]; } set { l[i] = value; } }
-        public override int Count { get { return l.Count; } }
+        public int Count { get { return l.Count; } }
         public override string ToString()
         {
             string s = "";

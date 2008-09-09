@@ -46,7 +46,7 @@ namespace TestTradeLib
             const decimal p = 10;
             const int z = 100;
             const Currency c = Currency.USD;
-            const Security t = Security.STK;
+            const SecurityType t = SecurityType.STK;
             Order o = new Order(s, z);
             o.sec = 2;
             o.date = 20080718;

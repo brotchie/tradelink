@@ -8,19 +8,15 @@ namespace TradeLib
     /// Used to hold information specific to a particular equity instrument, eg name date-traded,etc.
     /// </summary>
     [Serializable]
-    public class Stock : Instrument
+    public class Stock : Security
     {
-        public override Security SecurityType
-        {
-            get { return Security.STK;  }
-        }
         public Stock(string s) 
         {
+            _type = SecurityType.STK;
             if (!Stock.isStock(s)) return;
-            symbol = s;
+            _sym = s;
         }
         public Stock(string symbol, int Date) : this(symbol) { date = Date; }
-        private string symbol = null;
         private decimal dh = 0;
         private decimal dl = 10000000000;
         private decimal dop = 0;
@@ -33,12 +29,11 @@ namespace TradeLib
         public decimal DayOpen { get { return dop; } set { dop = value; } }
         public decimal DayClose { get { return tc; } set { tc = value; } }
         public decimal YestClose { get { return yc; } set { yc = value; } }
-        public string Symbol { get { return symbol; }  }
         public override string Name { get { return Symbol; } set { } }
-        public override bool isValid { get { return (symbol != null) && isStock(symbol); } }
+        public override bool isValid { get { return (_sym != null) && isStock(_sym); } }
         public override int GetHashCode()
         {
-            return symbol.GetHashCode() + date;
+            return _sym.GetHashCode() + date;
         }
         /// <summary>
         /// Test if symbol is valid stock name

@@ -56,11 +56,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="order.cs">
+    <Compile Include="Ticket.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="order.Designer.cs">
-      <DependentUpon>order.cs</DependentUpon>
+    <Compile Include="Ticket.Designer.cs">
+      <DependentUpon>Ticket.cs</DependentUpon>
     </Compile>
     <Compile Include="Quote.cs">
       <SubType>Form</SubType>
@@ -71,9 +71,9 @@
     <Compile Include="Settings.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="order.resx">
+    <EmbeddedResource Include="Ticket.resx">
       <SubType>Designer</SubType>
-      <DependentUpon>order.cs</DependentUpon>
+      <DependentUpon>Ticket.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Quote.resx">
       <SubType>Designer</SubType>

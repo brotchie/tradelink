@@ -50,6 +50,7 @@
     <Compile Include="TestMarketBasket.cs" />
     <Compile Include="TestOrder.cs" />
     <Compile Include="TestPosition.cs" />
+    <Compile Include="TestSecurity.cs" />
     <Compile Include="TestStock.cs" />
     <Compile Include="TestTick.cs" />
     <Compile Include="TestTickFileFilter.cs" />

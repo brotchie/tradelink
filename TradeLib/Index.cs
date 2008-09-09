@@ -6,12 +6,8 @@ namespace TradeLib
     /// <summary>
     /// Used for tracking indicies, such as SP500 futures, NASDAQ, OIH, etc
     /// </summary>
-    public class Index : Instrument
+    public class Index : Security
     {
-        public override Security SecurityType
-        {
-            get { return Security.IDX; }
-        }
         /// <summary>
         /// Determines whether the specified symbol is an index.
         /// </summary>
@@ -43,7 +39,7 @@ namespace TradeLib
             date = copythisidx.date;
             time = copythisidx.time;
         }
-        public Index() { }
+        public Index() { _type = SecurityType.IDX; }
         public Index(string symbol) : this(symbol, 0, 0, 0, 1000000, 0,0,0) { }
         public Index(string symbol, decimal tick, decimal o, decimal h, decimal l, decimal c) : this(symbol, tick, o, h, l, c, 0, 0) { }
         public Index(string symbol, decimal tick, decimal o, decimal h, decimal l, decimal c, int date, int time)
@@ -56,6 +52,7 @@ namespace TradeLib
             close = c;
             Date = date;
             Time = time;
+            _type = SecurityType.IDX;
         }
         string name = "";
         int time = 0;

@@ -123,7 +123,7 @@ namespace TradeLib
             o.Exchange = rec[(int)OrderField.Exchange];
             o.LocalSymbol = rec[(int)OrderField.LocalSymbol];
             o.Currency = (Currency)Enum.Parse(typeof(Currency), rec[(int)OrderField.Currency]);
-            o.Security = (Security)Enum.Parse(typeof(Security), rec[(int)OrderField.Security]);
+            o.Security = (SecurityType)Enum.Parse(typeof(SecurityType), rec[(int)OrderField.Security]);
             o.id = Convert.ToUInt32(rec[(int)OrderField.OrderID]);
             o.TIF = rec[(int)OrderField.OrderTIF];
             try

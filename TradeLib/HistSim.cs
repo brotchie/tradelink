@@ -20,7 +20,7 @@ namespace TradeLib
         int _tickcount = 0;
         int _indexcount = 0;
         long _bytestoprocess = 0;
-        List<Instrument> Instruments = new List<Instrument>();
+        List<Security> Instruments = new List<Security>();
         
         // events
         public event TickDelegate GotTick;
@@ -142,14 +142,14 @@ namespace TradeLib
         {  
             // if a tick is in the cache it's because it's too new (in future)
             // so we only need to fetch ticks for uncached symbols
-            foreach (Instrument i in Instruments)
+            foreach (Security i in Instruments)
             {
                 if (cachedsymbols.Contains(i.Name)) continue;
 
                 // if it's not already cached we need the next tick/index:
-                switch (i.SecurityType)
+                switch (i.Type)
                 {
-                    case Security.STK:
+                    case SecurityType.STK:
                         Stock s = (Stock)i;
                         Tick next = s.NextTick;
                         if (next.isValid)
@@ -159,7 +159,7 @@ namespace TradeLib
                             cachedsymbols.Add(i.Name); // update index of cached symbols
                         }
                         break;
-                    case Security.IDX:
+                    case SecurityType.IDX:
                         Index x = (Index)i;
                         Index nexti = x.NextTick;
                         if (nexti.isValid)

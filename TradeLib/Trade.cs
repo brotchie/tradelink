@@ -10,12 +10,12 @@ namespace TradeLib
     {
         public uint id = 0;
         protected Currency cur = Currency.USD;
-        protected Security type = Security.STK;
+        protected SecurityType type = SecurityType.STK;
         protected string ex = "NYSE";
         string _localsymbol = "";
         public string LocalSymbol { get { return _localsymbol; } set { _localsymbol = value; } }
         public Currency Currency { get { return cur; } set { cur = value; } }
-        public Security Security { get { return type; } set { type = value; } }
+        public SecurityType Security { get { return type; } set { type = value; } }
         public string Exchange { get { return ex; } set { ex = value; } }
         public string Account { get { return accountid; } set { accountid = value; } }
         protected string accountid = "";
@@ -166,7 +166,7 @@ namespace TradeLib
             try
             {
                 t.Currency = (Currency)Enum.Parse(typeof(Currency), rec[(int)TradeField.Currency]);
-                t.Security = (Security)Enum.Parse(typeof(Security), rec[(int)TradeField.Security]);
+                t.Security = (SecurityType)Enum.Parse(typeof(SecurityType), rec[(int)TradeField.Security]);
             }
             catch (Exception) { }
             return t;

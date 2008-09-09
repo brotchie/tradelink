@@ -10,20 +10,21 @@ using TradeLib;
 namespace Quotopia
 {
     public delegate void QuotopiaOrderDel(Order sendOrder);
-    public partial class order : Form
+    public partial class Ticket : Form
     {
-
-        public order(string symbol, int initialsize, bool side)
+        Order work = new Order();
+        public Order WorkingOrder { get { return work; } set { work = value; } }
+        public Ticket(Order working)
         {
             InitializeComponent();
-            isize = Math.Abs(initialsize);
-            size = Math.Abs(initialsize);
-            Symbol = symbol;
-            Text = symbol;
+            work = working;
 
-            osize.Text = size.ToString();
-            oprice.Text = "0";
-            if (side) { obuybut.Checked = true; osellbut.Checked = false; }
+            isize = work.UnSignedSize;
+            Text = work.symbol;
+
+            osize.Text = work.ToString();
+            oprice.Text = work.Price.ToString();
+            if (work.Side) { obuybut.Checked = true; osellbut.Checked = false; }
             else { osellbut.Checked = true; obuybut.Checked = false; }
             oprice.MouseWheel += new MouseEventHandler(order_MouseWheel);
             
@@ -37,7 +38,7 @@ namespace Quotopia
                 this.Invoke(new TickDelegate(newTick), new object[] { tick });
             else
             {
-                if ((tick == null) || (tick.sym != sym)) return;
+                if ((tick == null) || (tick.sym != work.symbol)) return;
                 if (touched) return;
 
                 decimal changedval = obuybut.Checked ? (limitbut.Checked ? tick.ask : tick.bid) : (limitbut.Checked ? tick.bid : tick.ask);
@@ -55,7 +56,7 @@ namespace Quotopia
 
         public void orderStatus(string symbol, int error)
         {
-            if (symbol != Symbol) return; // not for us
+            if (symbol != work.symbol) return; // not for us
             sendbut.BackColor = (error == 0) ? sendbut.BackColor = Color.White : Color.Yellow;
             return;
         }
@@ -72,11 +73,8 @@ namespace Quotopia
             touched = true;
         }
 
-        int size = 0;
         int isize = 0;
         bool touched = false;
-        string sym = null;
-        public string Symbol { get { return sym; } set { sym = value; } }
         bool isValid()
         {
             bool castexcep = false;
@@ -88,24 +86,28 @@ namespace Quotopia
             }
             catch (InvalidCastException) { castexcep = true; }
             if (marketbut.Checked) p = 0;
-            return (sym != null) && (s > 0) && !castexcep && ((p > 0) || marketbut.Checked);
+            return (s > 0) && !castexcep && ((p > 0) || marketbut.Checked);
         }
 
         private void limitbut_Click(object sender, EventArgs e)
         {
             if (!isValid()) return;
-            bool side = obuybut.Checked;
-            int size = Convert.ToInt32(osize.Text);
-            Order o;
-            if (marketbut.Checked) o = new Order(sym, side, size, 0, 0, "", 0, 0);
+            work.side = obuybut.Checked;
+            work.size = Math.Abs(Convert.ToInt32(osize.Text));
+            if (marketbut.Checked)
+            {
+                work.price = 0;
+                work.stopp = 0;
+            }
             else
             {
                 bool islimit = limitbut.Checked;
                 decimal limit = islimit ? Convert.ToDecimal(oprice.Value) : 0;
                 decimal stop = !islimit ? Convert.ToDecimal(oprice.Value) : 0;
-                o = new Order(sym, side, size, limit, stop, "", 0, 0);
+                work.price = limit;
+                work.stopp = stop;
             }
-            if (neworder!=null) neworder(o);
+            if (neworder!=null) neworder(work);
         }
 
 
