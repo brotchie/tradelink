@@ -77,8 +77,9 @@ namespace TradeLinkServer
 			double unrealizedPNL, double realizedPNL, const CString &accountName);
 		void updateAccountTime(const CString &timeStamp);
 		void nextValidId( OrderId orderId);
-		void contractDetails( const ContractDetails& contractDetails);
-		void bondContractDetails( const ContractDetails& contractDetails);
+		void contractDetails( int reqId, const ContractDetails& contractDetails);
+		void bondContractDetails( int reqId, const ContractDetails& contractDetails);
+		void contractDetailsEnd( int reqId);
 		void execDetails( OrderId orderId, const Contract& contract, const Execution& execution);
 		void error(const int id, const int errorCode, const CString errorString);
 
@@ -98,6 +99,7 @@ namespace TradeLinkServer
 		void realtimeBar(TickerId reqId, long time, double open, double high, double low, double close,
 		   long volume, double wap, int count);
 		void currentTime(long time);
+		void fundamentalData(TickerId reqId, const CString& data);
 
 	public:
 		EClient* GetOrderSink(CString account);

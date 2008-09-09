@@ -2,6 +2,7 @@
 #include "TLOrder.h"
 #include "TLTrade.h"
 #include "TLTick.h"
+#include "TLSecurity.h"
 #include <vector>
 using namespace std;
 
@@ -35,6 +36,7 @@ namespace TradeLinkServer
 		vector <time_t>heart; // map last contact to id
 		typedef vector <CString> clientstocklist; // hold a single clients stocks
 		vector < clientstocklist > stocks; // map stocklist to id
+		int FindClientFromStock(CString stock);
 		DECLARE_MESSAGE_MAP()
 
 	public:

@@ -84,7 +84,7 @@ SectionEnd
 
 Section "InteractiveBrokers Server"
   File "TWSServer.exe"
-  File "TWSSocketClient.dll"
+  ;File "TWSSocketClient.dll"
   File "TwsServer.Config.txt"
   CreateShortCut "$SMPROGRAMS\TradeLink\TWS+BrokerServer.lnk" "$INSTDIR\TWSServer.exe" "" "$INSTDIR\TWSServer.exe" 0
 SectionEnd

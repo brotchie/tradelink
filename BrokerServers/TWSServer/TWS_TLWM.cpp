@@ -44,11 +44,9 @@ namespace TradeLinkServer
 		file.getline(skip,100);
 		file.getline(data,8);
 		this->FIRSTSOCKET = atoi(data);
-		char sockets[8];
 		file.getline(skip,100);
 		file.getline(data,8);
 		int maxsockets = atoi(data); // get the # of sockets first
-		char sess[8];
 		file.getline(skip,100);
 		file.getline(data,8);
 		sessionid = atoi(data); // get the session id next 
@@ -363,18 +361,21 @@ namespace TradeLinkServer
 		for (size_t i = 0; i<stocks[cid].size(); i++)
 		{
 			// if we already have a subscription to this stock, proceed to next one
-			if (hasTicker(stocks[cid][i])) continue;
+			TLSecurity sec = TLSecurity::Deserialize(stocks[cid][i]);
+			if (hasTicker(sec.sym)) continue;
 			// otherwise, subscribe to this stock and save it to subscribed list of tickers
 			Contract contract;
-			contract.symbol = stocks[cid][i];
-			if (contract.symbol.GetLength()>3)
+			contract.localSymbol = sec.sym;
+			if (sec.hasDest())
+				contract.exchange = sec.dest;
+			else if ((sec.type==STK) && (sec.sym.GetLength()>3))
 				contract.exchange = "SMART";
-			else 
+			else if (sec.type==STK)
 				contract.exchange = "NYSE";
-			contract.secType = "STK";
+			contract.secType = TLSecurity::SecurityTypeName(sec.type);
 			this->m_link[this->validlinkids[0]]->reqMktData(stocktickers.size(),contract,"",false);
-			stocktickers.push_back(stocks[cid][i]);
-			D(CString("Added IB subscription for ")+CString(stocks[cid][i]));
+			stocktickers.push_back(sec.sym);
+			D(CString("Added IB subscription for ")+CString(sec.sym));
 		}
 		return OK;
 
@@ -469,9 +470,9 @@ namespace TradeLinkServer
 		double marketPrice, double marketValue, double averageCost,
 		double unrealizedPNL, double realizedPNL, const CString &accountName) { }
 	void TWS_TLWM::updateAccountTime(const CString &timeStamp) { }
-	void TWS_TLWM::contractDetails( const ContractDetails& contractDetails) { }
-	void TWS_TLWM::bondContractDetails( const ContractDetails& contractDetails) { }
-
+	void TWS_TLWM::contractDetails( int reqId, const ContractDetails& contractDetails) {}
+	void TWS_TLWM::bondContractDetails( int reqId, const ContractDetails& contractDetails) {}
+	void TWS_TLWM::contractDetailsEnd( int reqId) {}
 	void TWS_TLWM::updateMktDepth( TickerId id, int position, int operation, int side, 
 			double price, int size) { }
 	void TWS_TLWM::updateMktDepthL2( TickerId id, int position, CString marketMaker, int operation, 
@@ -487,6 +488,7 @@ namespace TradeLinkServer
 	void TWS_TLWM::realtimeBar(TickerId reqId, long time, double open, double high, double low, double close,
 	   long volume, double wap, int count) { }
 	void TWS_TLWM::currentTime(long time) {}
+	void TWS_TLWM::fundamentalData(TickerId reqId, const CString& data) {}
 }
 
 

@@ -1,5 +1,8 @@
 #pragma once
 
+namespace TradeLinkServer
+{
+
 	class AFX_EXT_CLASS TLSecurity
 	{
 	public:
@@ -10,11 +13,15 @@
 		int date;
 		CString dest;
 		int type;
-		CString DefaultDest();
 		bool isValid();
 		CString Serialize(void);
+		bool hasDest();
 		static TLSecurity Deserialize(CString msg);
+		static LPCTSTR SecurityTypeName(int SecurityTypeID);
+		static int SecurityID(CString SecurityTypeName);
 	};
+
+}
 
 	enum TLSecurityID
     {
@@ -30,12 +37,10 @@
         BND,
     };
 
-	CString SecurityTypeName(int SecurityTypeID);
-	int SecurityID(CString SecurityTypeName);
-
 	enum TLSecurityField
 	{
 		SecSym,
 		SecType,
 		SecDest,
 	};
+

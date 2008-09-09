@@ -33,11 +33,26 @@ namespace TradeLinkServer
 		ON_WM_COPYDATA()
 	END_MESSAGE_MAP()
 
+	int TradeLink_WM::FindClientFromStock(CString stock)
+	{
+		for (size_t i = 0; i<client.size(); i++)
+			for (size_t j = 0; j<stocks[i].size(); j++)
+			{
+				TLSecurity sec = TLSecurity::Deserialize(stocks[i][j]);
+				if (sec.sym.CompareNoCase(stock)==0)
+					return i;
+			}
+		return -1;
+	}
+
 	bool TradeLink_WM::needStock(CString stock)
 	{
 		for (size_t i = 0; i<stocks.size(); i++)
 			for (size_t j = 0; j<stocks[i].size(); j++)
-				if (stocks[i][j]==stock) return true;
+			{
+				TLSecurity sec = TLSecurity::Deserialize(stocks[i][j]);
+				if (sec.sym==stock) return true;
+			}
 		return false;
 	}
 
@@ -250,8 +265,11 @@ namespace TradeLinkServer
 		if (tick.sym=="") return;
 		for (size_t i = 0; i<stocks.size(); i++)
 			for (size_t j = 0; j<stocks[i].size(); j++)
-				if (stocks[i][j].CompareNoCase(tick.sym)==0)
+			{
+				TLSecurity sec = TLSecurity::Deserialize(stocks[i][j]);
+				if (sec.sym==tick.sym)
 					SendMsg(TICKNOTIFY,tick.Serialize(),client[i]);
+			}
 	}
 
 	void TradeLink_WM::SrvCancelNotify(int orderid)
