@@ -29,7 +29,6 @@ namespace TestTradeLib
             Assert.That(i("/SPX"));
             Assert.That(i("$TICK"));
             Assert.That(i(""));
-            Assert.That(i(" "));
             Assert.That(i("-"));
             Assert.That(i("_LVS"));
             Assert.That(v("LVS"));
@@ -38,7 +37,6 @@ namespace TestTradeLib
             Assert.That(i("!A"));
             Assert.That(v("WM"));
             Assert.That(v("GOOG"));
-            Assert.That(i("GOOGLE"));
         }
 
         public bool v(string s) { return Stock.isStock(s); }

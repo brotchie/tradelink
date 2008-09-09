@@ -264,7 +264,7 @@ namespace Quotopia
                 status(preface + newsymbol);
             }
             else if (((e.KeyValue>=(int)Keys.A) && (e.KeyValue<=(int)Keys.Z)) 
-                || ((e.KeyValue>=(int)Keys.D0) && (e.KeyValue<=(int)Keys.D9)) || e.Shift)
+                || ((e.KeyValue>=(int)Keys.D0) && (e.KeyValue<=(int)Keys.D9)) || e.Shift || (e.KeyData== Keys.Space))
             {
                 string val = "";
                 if (e.Shift)
@@ -318,11 +318,16 @@ namespace Quotopia
         }
         int[] GetSymbolRows(string sym)
         {
-            List<int> r = new List<int>();
+            List<int> row = new List<int>();
             for (int i = 0; i < qt.Rows.Count; i++)
-                if (qt.Rows[i]["Symbol"].ToString() == sym)
-                    r.Add(i);
-            return r.ToArray();
+            {
+                string r = qt.Rows[i]["Symbol"].ToString();
+                int s = r.IndexOf(' ');
+                string rsym = (s==-1) ? r : r.Substring(0,s);
+                if (rsym == sym)
+                    row.Add(i);
+            }
+            return row.ToArray();
         }
 
         void RefreshRow(Tick t)
