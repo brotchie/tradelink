@@ -43,16 +43,11 @@ namespace TradeLinkServer
 		int getMlinkId(OrderId id);
 		std::vector<int> validlinkids; // gets the m_links ids that are logged in
 		bool IGNOREERRORS;
-		// following are used because tick updates only include size or price that changed (not both)
-		double trade;
-		double bid;
-		double ask;
-		int ts;
-		int bs;
-		int os;
 		// for storing subscribed symbols and their tickerid
 		bool hasTicker(CString symbol);
 		std::vector<CString> stocktickers;
+		// following used because tick updates only include size or price that changed (not both)
+		std::vector<TLTick> stockticks;
 
 		// these are the IB-api methods we'll override (from EWrapper above)
 		void tickPrice( TickerId ddeId, TickType field, double price, int canAutoExecute);

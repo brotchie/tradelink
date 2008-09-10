@@ -145,6 +145,8 @@ namespace TradeLinkServer
 		Contract* contract(new Contract);
 		contract->symbol = o.symbol;
 		contract->localSymbol = o.localsymbol;
+		if (o.exchange=="")
+			o.exchange = "SMART";
 		contract->exchange = o.exchange;
 		contract->secType = o.security;
 		contract->currency = o.currency;
@@ -375,6 +377,8 @@ namespace TradeLinkServer
 			contract.secType = TLSecurity::SecurityTypeName(sec.type);
 			this->m_link[this->validlinkids[0]]->reqMktData(stocktickers.size(),contract,"",false);
 			stocktickers.push_back(sec.sym);
+			TLTick k; // create blank tick
+			stockticks.push_back(k);
 			D(CString("Added IB subscription for ")+CString(sec.sym));
 		}
 		return OK;
@@ -395,21 +399,21 @@ namespace TradeLinkServer
 			k.sym = stocktickers[tickerId];
 			if (tickType==LAST)
 			{
-				trade = price;
-				k.trade = trade;
-				k.size = ts*100;
+				stockticks[tickerId].trade = price;
+				k.trade = price;
+				k.size = stockticks[tickerId].size;
 			}
 			else if (tickType==BID)
 			{
-				bid = price;
-				k.bid = bid;
-				k.bs = this->bs;
+				stockticks[tickerId].bid = price;
+				k.bid = stockticks[tickerId].bid;
+				k.bs = stockticks[tickerId].bs;
 			}
 			else if (tickType==ASK)
 			{
-				ask = price;
-				k.ask = ask;
-				k.os = this->os;
+				stockticks[tickerId].ask = price;
+				k.ask = stockticks[tickerId].ask;
+				k.os = stockticks[tickerId].os;
 			}
 			else return; // not relevant tick info
 			if (k.isValid() && needStock(k.sym))
@@ -431,21 +435,21 @@ namespace TradeLinkServer
 			k.sym = stocktickers[tickerId];
 			if (tickType==LAST_SIZE)
 			{
-				ts = size;
-				k.trade = trade;
-				k.size = ts*100;
+				stockticks[tickerId].size = size*100;
+				k.trade = stockticks[tickerId].trade;
+				k.size = stockticks[tickerId].size;
 			}
 			else if (tickType==BID_SIZE)
 			{
-				bs = size;
-				k.bid = bid;
-				k.bs = this->bs;
+				stockticks[tickerId].bs = size;
+				k.bid = stockticks[tickerId].bid;
+				k.bs = stockticks[tickerId].bs;
 			}
 			else if (tickType==ASK_SIZE)
 			{
-				os = size;
-				k.ask= ask;
-				k.os = this->os;
+				stockticks[tickerId].os = size;
+				k.ask= stockticks[tickerId].ask;
+				k.os = stockticks[tickerId].os;
 			}
 			else return; // not relevant tick info
 			if (k.isValid() && needStock(k.sym))

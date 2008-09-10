@@ -18,6 +18,12 @@ namespace Quotopia
         {
             InitializeComponent();
             work = working;
+            if (work.Security == SecurityType.FUT)
+            {
+                osize.Increment = 1;
+                osize.Value = 1;
+            }
+
 
             isize = work.UnSignedSize;
             Text = work.symbol;
