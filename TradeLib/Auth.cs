@@ -8,7 +8,7 @@ namespace TradeLib
 {
     public class Auth
     {
-        public Auth(string authUrl) { url = authUrl+"?"; }
+        public Auth(string authUrl) { url = authUrl; }
         string url = "";
         public bool isAuthorized(string key)
         {
@@ -20,7 +20,12 @@ namespace TradeLib
             string rurl = url;
             if (appendrandom)
             {
+                if (!rurl.Contains("?"))
+                    rurl += "?";
                 Random rand = new Random((int)DateTime.Now.Ticks);
+                string last = rurl.Substring(url.Length-1,1);
+                if ((last != "?") || (last != "&"))
+                    rurl += "&";
                 rurl += "r=" + rand.Next().ToString();
             }
             string res = "";
