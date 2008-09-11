@@ -46,6 +46,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\SplitEPF.lnk" "$INSTDIR\SplitEPF.EXE" "" "$INSTDIR\SplitEPF.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\Kadina.lnk" "$INSTDIR\Kadina.EXE" "" "$INSTDIR\Kadina.EXE" 0 
   CreateShortCut "$SMPROGRAMS\TradeLink\Tript.lnk" "$INSTDIR\Tript.EXE" "" "$INSTDIR\Tript.EXE" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink\Record.lnk" "$INSTDIR\Record.EXE" "" "$INSTDIR\Record.EXE" 0  
   
   
   ; Put file there
