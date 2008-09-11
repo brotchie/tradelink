@@ -12,8 +12,6 @@ namespace TradeLib
         {
             get { return Get(index); }
         }
-        public Bar t { get { return Get(BarZero); } }
-        public Bar p { get { return Get(BarZero - 1); } }
         public BarList() : this(BarInterval.FiveMin, "") { }
         string sym = "";
         public BarList(BarInterval PreferredInt) : this(PreferredInt, "") { }
@@ -28,8 +26,8 @@ namespace TradeLib
             sym = stock;
         }
         public bool isValid { get { return Has(1); } }
-        public bool HasBar() { return NumBars() > 0; }
-        public bool Has(int MinimumBars) { return NumBars() >= MinimumBars; }
+        public bool HasBar() { return Count> 0; }
+        public bool Has(int MinimumBars) { return Count >= MinimumBars; }
         /// <summary>
         /// Resets this instance.  Clears all the bars for all time intervals.
         /// </summary>
@@ -47,14 +45,22 @@ namespace TradeLib
         protected List<Bar> hourlist = new List<Bar>();
         protected List<Bar> daylist = new List<Bar>();
         public string Symbol { get { return sym; } }
-
-        public int NumBars() { return DefaultBar.Count; }
-        public Bar RecentBar { get { return this.Get(BarZero); } }
+        public int Count { get { return DefaultBar.Count; } }
+        public int Last { get { return Count -1; } }
         /// <summary>
-        /// Gets the bar zero.  This is the last or most recent bar in the list.
+        /// Returns most recent bar, or an invalid bar if no bars have been received
         /// </summary>
-        public int BarZero { get { return NumBars() - 1; } }
-        public int Last { get { return BarZero; } }
+        public Bar RecentBar 
+        { 
+            get 
+            {
+                try
+                {
+                    return this[Last];
+                }
+                catch (NullReferenceException) { return new Bar(); }
+            } 
+        }
         /// <summary>
         /// Gets a value indicating whether most recently added bar is a [new bar].
         /// </summary>
@@ -120,7 +126,7 @@ namespace TradeLib
                 return NewBar; //don't process ticks for other stocks
             if (!t.isTrade) return NewBar; // don't process quotes
             // if we have no bars, add bar with a tick
-            if (NumBars() == 0)
+            if (Count == 0)
             {
                 minlist.Add(new Bar(BarInterval.Minute));
                 fivelist.Add(new Bar(BarInterval.FiveMin));
@@ -140,7 +146,7 @@ namespace TradeLib
                 foreach (BarInterval inv in Enum.GetValues(typeof(BarInterval)))
                 {
                     Int = inv;
-                    Bar cbar = (Bar)DefaultBar[NumBars() - 1];
+                    Bar cbar = RecentBar;
                     // if tick fits in current bar, then we're done for this interval
                     if (cbar.newTick(t)) continue;
                     else

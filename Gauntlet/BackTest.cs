@@ -186,7 +186,7 @@ namespace WinGauntlet
                     if (tick.trade < bi.Low) bi.Low = tick.trade;
                     bl.AddTick(tick); // save our tick to a bar
 
-                    if (bl.Has(2) && bl.Get(bl.BarZero-1).DayEnd)
+                    if (bl.Has(2) && bl.Get(bl.Last-1).DayEnd)
                     { // we hit a new day in the same file, reset day stuff and set our DayEndTime
                         bl.Reset();
                         bl.AddTick(tick); // put our tick back

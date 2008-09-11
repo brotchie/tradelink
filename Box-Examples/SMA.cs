@@ -23,13 +23,13 @@ namespace box
 		
 		public static decimal BarSMA(BarList bl, BarInterval bi, int barsback)
 		{
-			if (!bl.Has(barsback)) return bl.Get(bl.BarZero).Close;
+			if (!bl.Has(barsback)) return bl.Get(bl.Last).Close;
 			decimal sum = 0;
             for (int i = 0; i < barsback; i++)
             {
                 try
                 {
-                    sum += bl.Get(bl.BarZero - i, bi).Close;
+                    sum += bl.Get(bl.Last - i, bi).Close;
                 } 
                 catch (ArgumentOutOfRangeException) 
                 { 

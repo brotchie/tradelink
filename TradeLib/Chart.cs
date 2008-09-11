@@ -98,9 +98,9 @@ namespace TradeLib
             {
                 highesth = BarMath.HH(bl);
                 lowestl = BarMath.LL(bl);
-                barc = bl.NumBars();
+                barc = bl.Count;
             }
-            if ((bl == null)||(bl.NumBars()==0)) return;
+            if ((bl == null)||(bl.Count==0)) return;
             Text = Title;
             r = ClientRectangle;
             pixperbar = (((decimal)r.Width - (decimal)border - ((decimal)border/3)) / (decimal)barc);

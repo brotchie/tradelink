@@ -22,9 +22,9 @@ namespace box
         {
             if (!bl.Has(MinimumBarsToAvg)) return 0; // if we don't have a bar yet we can't have an avg bar volume
             int sum = 0;
-            for (int i = 0; i < bl.NumBars(); i++)
+            for (int i = 0; i < bl.Count; i++)
                 sum += bl[i].Volume;
-            return sum / (bl.NumBars());
+            return sum / (bl.Count);
         }
         public bool newBar(BarList bl)
         {

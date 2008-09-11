@@ -26,9 +26,9 @@ namespace TradeLib
         /// <returns></returns>
         public static decimal HH(BarList b, int barsback)
         {// gets highest high
-            if (barsback > b.NumBars()) barsback = b.NumBars();
+            if (barsback > b.Count) barsback = b.Count;
             decimal hh = decimal.MinValue;
-            for (int i = b.BarZero; i > (b.NumBars() - barsback); i--) hh = (b.Get(i).High > hh) ? b.Get(i).High : hh;
+            for (int i = b.Last; i > (b.Count - barsback); i--) hh = (b.Get(i).High > hh) ? b.Get(i).High : hh;
             return hh;
         }
         /// <summary>
@@ -36,7 +36,7 @@ namespace TradeLib
         /// </summary>
         /// <param name="b">The b.</param>
         /// <returns></returns>
-        public static decimal HH(BarList b) { return HH(b, b.NumBars()); }
+        public static decimal HH(BarList b) { return HH(b, b.Count); }
         /// <summary>
         /// The lowest low for the barlist, considering so many bars back.
         /// </summary>
@@ -45,9 +45,9 @@ namespace TradeLib
         /// <returns></returns>
         public static decimal LL(BarList b, int barsback)
         { // gets lowest low
-            if (barsback > b.NumBars()) barsback = b.NumBars();
+            if (barsback > b.Count) barsback = b.Count;
             decimal ll = decimal.MaxValue;
-            for (int i = b.BarZero; i > (b.NumBars() - barsback); i--) ll = (b.Get(i).Low < ll) ? b.Get(i).Low : ll;
+            for (int i = b.Last; i > (b.Count - barsback); i--) ll = (b.Get(i).Low < ll) ? b.Get(i).Low : ll;
             return ll;
         }
         /// <summary>
@@ -55,7 +55,7 @@ namespace TradeLib
         /// </summary>
         /// <param name="b">The barlist.</param>
         /// <returns></returns>
-        public static decimal LL(BarList b) { return LL(b, b.NumBars()); }
+        public static decimal LL(BarList b) { return LL(b, b.Count); }
     }
 
 }
