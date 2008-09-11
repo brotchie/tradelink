@@ -486,6 +486,7 @@ namespace TradeLib
         /// <value>The avg price.</value>
         /// 
         private Position _pos = null;
+        [BrowsableAttribute(false)]
         public Position Pos { get { return _pos; } } 
         [CategoryAttribute("TradeLink BoxInfo"), DescriptionAttribute("Average Position Price")]
         public decimal AvgPrice { get { return (_pos!=null) ? _pos.AvgPrice : 0; } }
