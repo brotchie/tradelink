@@ -169,7 +169,6 @@ namespace TestTradeLib
             Assert.That(good == 3);
             // news from the box was received.
             Assert.That(debugs>0);
-
         }
 
         void b_GotDebug(Debug debug)
@@ -302,6 +301,90 @@ namespace TestTradeLib
             }
             Assert.That(p.Size == 100);
 
+        }
+
+        public class FullOrder : Box
+        {
+            public FullOrder() 
+            { 
+                QuickOrder = false; 
+                Name = "full order"; 
+                AllowMultipleOrders = true;
+                Debug = true;
+            }
+            int orders = 0;
+            protected override Order ReadOrder(Tick tick, BarList bl, BoxInfo boxinfo)
+            {
+                Order o = new Order();
+
+                if (orders == 0)
+                {
+                    o = new LimitOrder(s, true, 200, 10);
+                }
+                if (orders==1)
+                    CancelOrders(true);
+                if (o.isValid)
+                    orders++;
+                return o;
+            }
+        }
+
+        Broker b = new Broker();
+        FullOrder fb = new FullOrder();
+
+        [Test]
+        public void FullOrderAndCancel()
+        {
+
+            b.GotOrder += (fb.gotOrderSink);
+            b.GotOrderCancel += new Broker.OrderCancelDelegate(b_GotOrderCancel);
+            fb.CancelOrderSource += new UIntDelegate(fb_CancelOrderSource);
+            fb.Symbol = s;
+            fb.GotDebug += new DebugFullDelegate(f_GotDebug);
+
+            Tick[] timesales = new Tick[] { 
+                Tick.NewTrade(s,d,t+1,0,100,100,x),
+                Tick.NewTrade(s,d,t+2,0,100,100,x),
+                Tick.NewTrade(s,d,t+3,0,100,100,x),
+                Tick.NewTrade(s,d,t+3,0,100,100,x),
+            };
+
+            int i = 0;
+            Tick k = timesales[i++];
+            b.Execute(k);
+            Assert.That(b.GetOrderList().Count == 0);
+            b.sendOrder(fb.Trade(k, new BarList(), new Position(s), new BoxInfo()));
+            Assert.That(b.GetOrderList().Count==1,b.GetOrderList().Count.ToString());
+
+            k = timesales[i++];
+            b.Execute(k);
+            b.sendOrder(fb.Trade(k, new BarList(), new Position(s), new BoxInfo()));
+            Assert.That(b.GetOrderList().Count == 0, b.GetOrderList().Count.ToString());
+
+            k = timesales[i++];
+            b.Execute(k);
+            b.sendOrder(fb.Trade(k, new BarList(), new Position(s), new BoxInfo()));
+            Assert.That(b.GetOrderList().Count == 0, b.GetOrderList().Count.ToString());
+
+
+
+
+
+        }
+
+        void fb_CancelOrderSource(uint number)
+        {
+            b.CancelOrder(number);
+        }
+
+        void b_GotOrderCancel(string sym, bool side, uint id)
+        {
+            fb.gotCancelSink(id);
+        }
+
+        void f_GotDebug(Debug debug)
+        {
+            Console.WriteLine(debug.Msg);
         }
     }
 

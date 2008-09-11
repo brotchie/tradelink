@@ -187,6 +187,35 @@ namespace TradeLib
                 size = -1 * PosSize;
             return size;
         }
+        protected List<uint> buyids = new List<uint>();
+        protected List<uint> sellids = new List<uint>();
+        public void gotOrderSink(Order o)
+        {
+            if (o.symbol != Symbol) return;
+            if (o.side && !buyids.Contains(o.id))
+                buyids.Add(o.id);
+            else if (!o.side && !sellids.Contains(o.id))
+                sellids.Add(o.id);
+        }
+        public void gotCancelSink(uint cancelid)
+        {
+            if (buyids.Contains(cancelid))
+                buyids.Remove(cancelid);
+            if (sellids.Contains(cancelid))
+                sellids.Remove(cancelid);
+        }
+        public event UIntDelegate CancelOrderSource;
+        public void CancelOrders() { CancelOrders(true); CancelOrders(false); }
+        public void CancelOrders(bool side)
+        {
+            if (CancelOrderSource == null) return;
+            if (side)
+                foreach (uint id in buyids.ToArray())
+                    CancelOrderSource(id);
+            else
+                foreach (uint id in sellids.ToArray())
+                    CancelOrderSource(id);
+        }
 
         protected List<string> _iname = new List<string>(0);
         protected List<object> _indicators = new List<object>(0);

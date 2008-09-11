@@ -126,6 +126,14 @@ namespace ASP
             string boxname = (string)Boxes.SelectedItem;
             workingbox = Box.FromDLL(boxname, boxdll);
             workingbox.GotDebug += new DebugFullDelegate(workingbox_GotDebug);
+            workingbox.CancelOrderSource += new UIntDelegate(workingbox_CancelOrderSource);
+            tl.gotOrder+=new OrderDelegate(workingbox.gotOrderSink);
+            tl.gotOrderCancel+=new UIntDelegate(workingbox.gotCancelSink);
+        }
+
+        void workingbox_CancelOrderSource(uint number)
+        {
+            tl.CancelOrder((long)number);
         }
 
         void workingbox_GotDebug(Debug debug)

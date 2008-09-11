@@ -478,10 +478,24 @@ namespace Kadina
             {
                 mybox.Debug = boxdebugs;
                 mybox.GotDebug += new DebugFullDelegate(mybox_GotDebug);
+                mybox.CancelOrderSource += new UIntDelegate(mybox_CancelOrderSource);
+                broker.GotOrder+=new OrderDelegate(mybox.gotOrderSink);
+                broker.GotOrderCancel += new Broker.OrderCancelDelegate(broker_GotOrderCancel);
                 status(boxname + " is current box.");
             }
             else status("Box did not load.");
 
+        }
+
+        void broker_GotOrderCancel(string sym, bool side, uint id)
+        {
+            if (mybox != null)
+                mybox.gotCancelSink(id);
+        }
+
+        void mybox_CancelOrderSource(uint number)
+        {
+            broker.CancelOrder(number);
         }
 
         void mybox_GotDebug(Debug msg)

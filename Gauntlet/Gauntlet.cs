@@ -363,6 +363,20 @@ using System.IO;
             catch (Exception ex) { show("Box failed to load, quitting... (" + ex.Message + (ex.InnerException != null ? ex.InnerException.Message.ToString() : "") + ")"); }
             mybox.IndicatorUpdate += new ObjectArrayDelegate(mybox_IndicatorUpdate);
             mybox.GotDebug += new DebugFullDelegate(mybox_GotDebug);
+            mybox.CancelOrderSource += new UIntDelegate(mybox_CancelOrderSource);
+            bt.mybroker.GotOrder+=new OrderDelegate(mybox.gotOrderSink);
+            bt.mybroker.GotOrderCancel += new Broker.OrderCancelDelegate(mybroker_GotOrderCancel);
+        }
+
+        void mybroker_GotOrderCancel(string sym, bool side, uint id)
+        {
+            if (mybox != null)
+                mybox.gotCancelSink(id);
+        }
+
+        void mybox_CancelOrderSource(uint number)
+        {
+            
         }
 
         void mybox_GotDebug(Debug debug)
