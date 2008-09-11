@@ -19,8 +19,6 @@ namespace TradeLib
         private string name = "Unnamed";
         private string ver = "$Rev: 1036 $";
         private string symbol;
-        private int tDir = 0;
-        private decimal avgprice = 0;
         private int turns = 0;
         private int adjusts = 0;
         private bool DEBUG = false;
@@ -41,7 +39,6 @@ namespace TradeLib
         private bool _multipleorders = false;
         private int _expectedpossize = 0;
         public int DayEndBuff = 2;
-
 
         
         /// <summary>
@@ -81,6 +78,7 @@ namespace TradeLib
             {
                 if (tick.sym != "") symbol = tick.sym;
                 else throw new Exception("No symbol specified");
+                _pos = new Position(tick.sym);
             }
             if (!pos.isValid) throw new Exception("Invalid Position Provided to Box" + pos.ToString());
             if (tick.sym != Symbol) return o;
@@ -96,11 +94,7 @@ namespace TradeLib
                 this.Shutdown("Trade limit reached.");
                 return o;
             }
-            if ((pos.AvgPrice != AvgPrice) || (pos.Size != PosSize))
-            {
-                avgprice = pos.AvgPrice;
-                tDir = pos.Size;
-            }
+            _pos = pos;
 
             if (QuickOrder) // user providing only size adjustment
             {
@@ -490,8 +484,11 @@ namespace TradeLib
         /// Gets the avg price of any current position (zero for no position).
         /// </summary>
         /// <value>The avg price.</value>
+        /// 
+        private Position _pos = null;
+        public Position Pos { get { return _pos; } } 
         [CategoryAttribute("TradeLink BoxInfo"), DescriptionAttribute("Average Position Price")]
-        public decimal AvgPrice { get { return avgprice; } }
+        public decimal AvgPrice { get { return (_pos!=null) ? _pos.AvgPrice : 0; } }
         /// <summary>
         /// Gets or sets the full name of the box, as defined in the source code.
         /// </summary>
@@ -538,7 +535,7 @@ namespace TradeLib
         /// </summary>
         /// <value>The size of the pos.</value>
         [BrowsableAttribute(false)]
-        public int PosSize { get { return tDir; } }
+        public int PosSize { get { return (_pos!=null) ? _pos.Size : 0; } }
         /// <summary>
         /// Gets the position size required to flat any current position (zero if no position).
         /// </summary>
