@@ -86,9 +86,10 @@ using System.IO;
 
         Stock StockFromFileName(string filename)
         {
-            string symbol = System.Text.RegularExpressions.Regex.Match(filename, "([a-z]+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase).Result("$1");
-            Stock s = new Stock(symbol);
-            s.Date = Convert.ToInt32(System.Text.RegularExpressions.Regex.Match(filename, "([0-9]+)").Result("$1"));
+            string ds = System.Text.RegularExpressions.Regex.Match(filename, "([0-9]{8})[.]", System.Text.RegularExpressions.RegexOptions.IgnoreCase).Result("$1");
+            string sym = filename.Replace(ds, "").Replace(".EPF","");
+            Stock s = new Stock(sym);
+            s.Date = Convert.ToInt32(ds);
             return s;
         }
         private void button1_Click(object sender, EventArgs e)
@@ -151,6 +152,8 @@ using System.IO;
         {
             bt = new BackTest();
             bt.BTStatus += new DebugFullDelegate(bt_BTStatus);
+            bt.mybroker.GotOrder += new OrderDelegate(mybox.gotOrderSink);
+            bt.mybroker.GotOrderCancel += new Broker.OrderCancelDelegate(mybroker_GotOrderCancel);
             if (cleartrades.Checked) trades.Rows.Clear();
             if (clearorders.Checked) orders.Rows.Clear();
             if (clearmessages.Checked) messages.Clear();
@@ -364,8 +367,6 @@ using System.IO;
             mybox.IndicatorUpdate += new ObjectArrayDelegate(mybox_IndicatorUpdate);
             mybox.GotDebug += new DebugFullDelegate(mybox_GotDebug);
             mybox.CancelOrderSource += new UIntDelegate(mybox_CancelOrderSource);
-            bt.mybroker.GotOrder+=new OrderDelegate(mybox.gotOrderSink);
-            bt.mybroker.GotOrderCancel += new Broker.OrderCancelDelegate(mybroker_GotOrderCancel);
         }
 
         void mybroker_GotOrderCancel(string sym, bool side, uint id)
@@ -376,6 +377,8 @@ using System.IO;
 
         void mybox_CancelOrderSource(uint number)
         {
+            if ((bt != null) && (bt.mybroker != null))
+                bt.mybroker.CancelOrder(number);
             
         }
 
