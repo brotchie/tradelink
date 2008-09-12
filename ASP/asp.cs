@@ -37,6 +37,8 @@ namespace ASP
         TickArchiver ta = new TickArchiver();
 
 
+
+
        
         void tl_gotTick(Tick t)
         {
@@ -46,10 +48,10 @@ namespace ASP
             if (!barlist.ContainsKey(t.sym)) barlist.Add(t.sym, new BarList(BarInterval.FiveMin, t.sym));
             else barlist[t.sym].newTick(t);
 
-            if (tradeboxlist.ContainsKey(t.sym) && (tradeboxlist[t.sym] != null))
+            if (boxlist.ContainsKey(t.sym) && (boxlist[t.sym] != null))
             {
 
-                Box b = tradeboxlist[t.sym];
+                Box b = boxlist[t.sym];
                 BoxInfo bi = new BoxInfo();
                 Position p = new Position(t.sym);
                 try
@@ -103,18 +105,20 @@ namespace ASP
             of.DefaultExt = ".dll";
             of.Filter = "BoxDLL|*.dll";
             of.Multiselect = false;
-            if(of.ShowDialog() == DialogResult.OK) {
+            if(of.ShowDialog() == DialogResult.OK) 
+            {
                 boxdll = of.FileName;
 
-                List <string> boxlist = Util.GetBoxList(boxdll);
+                List <string> list = Util.GetBoxList(boxdll);
                 Boxes.Items.Clear();
-                foreach (string box in boxlist)
+                foreach (string box in list)
                 {
                     Boxes.Items.Add(box);
                 }
-                }
 
-                tradeboxlist.Clear();
+            }
+
+                boxlist.Clear();
                 boxes.Clear();
         }
 
@@ -154,14 +158,32 @@ namespace ASP
                 status("Please select a box.");
                 return;
             }
+            string shortsym = Security.Parse(sym).Symbol;
+            string boxcrit = "Box on " + sym + " with " + (string)Boxes.SelectedItem;
+            if (boxlist.ContainsKey(shortsym))
+            {
 
-            
+                if (MessageBox.Show("For safety, you're only allowed one box per symbol.  Would you like to replace existing box?", "Confirm box replace", MessageBoxButtons.YesNoCancel) == DialogResult.Yes)
+                {
+                    status("flatting symbol " + shortsym);
+                    tl.SendOrder(new MarketOrder(shortsym, boxlist[shortsym].PosSize * -1));
+                    boxlist[shortsym].Shutdown("user requested shutdown");
+                    string name = boxlist[shortsym].Name;
+                    boxlist.Remove(shortsym);
+                    status("Removed strategy " + name + " from " + shortsym);
+                }
+                else
+                {
+                    status("Box activation canceled because of too many boxes.");
+                    return;
+
+                }
+            }
             mb.Add(new Stock(sym));
             tl.Subscribe(mb);
-            string boxcrit = "Box on " + sym + " with " + (string)Boxes.SelectedItem;
-            workingbox.Symbol = sym;
+            workingbox.Symbol = shortsym;
             boxcriteria.Items.Add(workingbox);
-            tradeboxlist.Add(stock.Text, workingbox);
+            boxlist.Add(shortsym,workingbox);
             boxes.Add(workingbox);
             
 
@@ -171,8 +193,8 @@ namespace ASP
             
         }
 
-        
-        Dictionary<string, Box> tradeboxlist = new Dictionary<string, Box>();
+
+        Dictionary<string, Box> boxlist = new Dictionary<string, Box>();
         Dictionary<string, BarList> barlist = new Dictionary<string, BarList>(); 
         Dictionary<string, Position> poslist = new Dictionary<string, Position>();
         
