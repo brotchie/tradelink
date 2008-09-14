@@ -42,6 +42,7 @@
     <Compile Include="AlwaysEnter.cs" />
     <Compile Include="Blade.cs" />
     <Compile Include="Bollinger.cs" />
+    <Compile Include="AlwaysEnterSingle.cs" />
     <Compile Include="GreyExit.cs" />
     <Compile Include="MAbox.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
