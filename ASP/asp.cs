@@ -209,20 +209,20 @@ namespace ASP
 
         }
 
-        private void status(string status)
+        private void status(string msg)
         {
             if (InvokeRequired)
-                Invoke(new DebugDelegate(status), new object[] { status });
+                Invoke(new DebugDelegate(status), new object[] { msg });
             else 
-                toolStripStatusLabel1.Text = status;
+                toolStripStatusLabel1.Text = msg;
         }
 
-        private void fillstatus(string fillstatus)
+        private void fillstatus(string msg)
         {
             if (InvokeRequired)
-                Invoke(new DebugDelegate(fillstatus), new object[] { fillstatus });
+                Invoke(new DebugDelegate(fillstatus), new object[] { msg});
             else 
-                toolStripStatusLabel2.Text = fillstatus;
+                toolStripStatusLabel2.Text = msg;
         }
 
         private void shutdown_Click(object sender, EventArgs e)
