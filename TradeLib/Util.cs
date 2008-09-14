@@ -22,7 +22,7 @@ namespace TradeLib
             TickFileInfo tfi;
             string fn = System.IO.Path.GetFileNameWithoutExtension(filepath);
             string ext = System.IO.Path.GetExtension(filepath).Replace(".", "");
-            string date = Regex.Match(fn, "[0-9]+$").Value;
+            string date = Regex.Match(fn, "[0-9]{8}$").Value;
             try
             {
                 tfi.type = (TickFileType)Enum.Parse(typeof(TickFileType), ext.ToUpper());
