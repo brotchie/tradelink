@@ -211,12 +211,18 @@ namespace ASP
 
         private void status(string status)
         {
-            toolStripStatusLabel1.Text = status;
+            if (InvokeRequired)
+                Invoke(new DebugDelegate(status), new object[] { status });
+            else 
+                toolStripStatusLabel1.Text = status;
         }
 
         private void fillstatus(string fillstatus)
         {
-            toolStripStatusLabel2.Text = fillstatus;
+            if (InvokeRequired)
+                Invoke(new DebugDelegate(fillstatus), new object[] { fillstatus });
+            else 
+                toolStripStatusLabel2.Text = fillstatus;
         }
 
         private void shutdown_Click(object sender, EventArgs e)
