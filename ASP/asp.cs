@@ -62,6 +62,9 @@ namespace ASP
 
                     
                 Order o = b.Trade(t, barlist[t.sym], p, bi);
+                o.Security = seclist[t.sym].Type;
+                o.Exchange = seclist[t.sym].DestEx;
+                o.LocalSymbol = seclist[t.sym].Name;
                 tl.SendOrder(o);
             }
         }
@@ -158,7 +161,8 @@ namespace ASP
                 status("Please select a box.");
                 return;
             }
-            string shortsym = Security.Parse(sym).Symbol;
+            Security sec = Security.Parse(sym);
+            string shortsym = sec.Symbol;
             string boxcrit = "Box on " + sym + " with " + (string)Boxes.SelectedItem;
             if (boxlist.ContainsKey(shortsym))
             {
@@ -184,6 +188,7 @@ namespace ASP
             workingbox.Symbol = shortsym;
             boxcriteria.Items.Add(workingbox);
             boxlist.Add(shortsym,workingbox);
+            seclist.Add(shortsym, sec);
             boxes.Add(workingbox);
             
 
@@ -192,6 +197,8 @@ namespace ASP
             Boxes.SelectedIndex = -1;
             
         }
+
+        Dictionary<string, Security> seclist = new Dictionary<string, Security>();
 
 
         Dictionary<string, Box> boxlist = new Dictionary<string, Box>();
