@@ -22,7 +22,7 @@ namespace TradeLib
         BarList bl = null;
         public BarList Bars { get { return bl; } set { bl = value; } }
         string sym = "";
-        public string Symbol { get { return sym; } set { sym = value; } }
+        public string Symbol { get { return sym; } set { sym = value; Text = Title; } }
         Graphics g = null;
         string mlabel = "";
         decimal highesth = 0;
