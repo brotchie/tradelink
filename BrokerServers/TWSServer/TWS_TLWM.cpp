@@ -333,7 +333,7 @@ namespace TradeLinkServer
 		trade.localsymbol = contract.localSymbol;
 		trade.xprice = execution.price;
 		trade.xsize = execution.shares;
-		trade.symbol = contract.symbol;
+		trade.symbol = contract.localSymbol;
 		trade.side = execution.side=="BOT";
 
 		// convert date and time
