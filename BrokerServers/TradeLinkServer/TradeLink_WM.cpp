@@ -259,7 +259,7 @@ namespace TradeLinkServer
 			{
 				TLSecurity sec = TLSecurity::Deserialize(stocks[i][j]);
 				if (sec.sym==trade.symbol)
-					SendMsg(TRADENOTIFY,trade.Serialize(),client[i]);
+					SendMsg(EXECUTENOTIFY,trade.Serialize(),client[i]);
 			}
 	}
 
