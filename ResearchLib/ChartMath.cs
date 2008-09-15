@@ -8,7 +8,7 @@ namespace ResearchLib
     public class ChartMath
     {
 
-        public decimal[] Highs(BarList chart)
+        public static decimal[] Highs(BarList chart)
         {
             List<decimal> l = new List<decimal>();
             foreach (Bar b in chart)
@@ -16,7 +16,7 @@ namespace ResearchLib
             return l.ToArray();
         }
 
-        public decimal[] Lows(BarList chart)
+        public static decimal[] Lows(BarList chart)
         {
             List<decimal> l = new List<decimal>();
             foreach (Bar b in chart)
@@ -24,7 +24,7 @@ namespace ResearchLib
             return l.ToArray();
         }
 
-        public decimal[] Opens(BarList chart)
+        public static decimal[] Opens(BarList chart)
         {
             List<decimal> l = new List<decimal>();
             foreach (Bar b in chart)
@@ -32,7 +32,7 @@ namespace ResearchLib
             return l.ToArray();
         }
 
-        public decimal[] Closes(BarList chart)
+        public static decimal[] Closes(BarList chart)
         {
             List<decimal> l = new List<decimal>();
             foreach (Bar b in chart)
@@ -40,7 +40,7 @@ namespace ResearchLib
             return l.ToArray();
         }
 
-        public int [] Volumes(BarList chart)
+        public static int[] Volumes(BarList chart)
         {
             List<int> l = new List<int>();
             foreach (Bar b in chart)
@@ -48,7 +48,7 @@ namespace ResearchLib
             return l.ToArray();
         }
 
-        public decimal[] HLRange(BarList chart)
+        public static decimal[] HLRange(BarList chart)
         {
             List<decimal> l = new List<decimal>();
             foreach (Bar b in chart)
@@ -56,7 +56,7 @@ namespace ResearchLib
             return l.ToArray();
         }
 
-        public decimal[] CORange(BarList chart)
+        public static decimal[] CORange(BarList chart)
         {
             List<decimal> l = new List<decimal>();
             foreach (Bar b in chart)
@@ -64,7 +64,7 @@ namespace ResearchLib
             return l.ToArray();
         }
 
-        public decimal[] TrueRange(BarList chart)
+        public static decimal[] TrueRange(BarList chart)
         {
             List<decimal> l = new List<decimal>();
             for (int i = chart.Last; i > 0; i--)
