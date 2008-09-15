@@ -39,8 +39,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ChartFetch.cs" />
-    <Compile Include="ChartMath.cs" />
     <Compile Include="ParseListed.cs" />
     <Compile Include="Fetch.cs" />
     <Compile Include="FetchBasket.cs">
