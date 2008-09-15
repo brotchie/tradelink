@@ -136,6 +136,7 @@ namespace TradeLinkServer
 		order->action = (o.side) ? "BUY" : "SELL";
 		order->account = o.account;
 		order->tif = o.TIF;
+		order->outsideRth = true;
 		if (o.id!=0) // if ID is provided, keep it
 			order->orderId = o.id;
 		else // otherwise just get the next id
