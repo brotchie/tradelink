@@ -45,6 +45,7 @@ namespace TradeLib
         {
             InitializeComponent();
             bl = b;
+            Symbol = b.Symbol;
             Paint += new PaintEventHandler(Chart_Paint);
             MouseWheel +=new MouseEventHandler(Chart_MouseUp);
             if (allowtype) this.KeyUp += new KeyEventHandler(Chart_KeyUp);
