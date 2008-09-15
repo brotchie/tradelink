@@ -256,8 +256,11 @@ namespace TradeLinkServer
 		if (trade.symbol=="") return;
 		for (size_t i = 0; i<stocks.size(); i++)
 			for (size_t j = 0; j<stocks[i].size(); j++)
-				if (stocks[i][j].CompareNoCase(trade.symbol)==0)
+			{
+				TLSecurity sec = TLSecurity::Deserialize(stocks[i][j]);
+				if (sec.sym==trade.symbol)
 					SendMsg(TRADENOTIFY,trade.Serialize(),client[i]);
+			}
 	}
 
 	void TradeLink_WM::SrvGotTick(TLTick tick)
