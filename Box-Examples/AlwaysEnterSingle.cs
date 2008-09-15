@@ -18,6 +18,8 @@ namespace box
         {
             Name = "AlwaysEnter";
             MinSize = 1;
+            DayStart = 0;
+            DayEnd = 3000;
         }
         protected override bool EnterLong()
         {

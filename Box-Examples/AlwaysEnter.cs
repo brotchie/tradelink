@@ -15,6 +15,8 @@ namespace box
         public AlwaysEnter() : base() 
         {
             Name = "AlwaysEnter";
+            DayStart = 0;
+            DayEnd = 3000;
         }
         protected override bool EnterLong()
         {
