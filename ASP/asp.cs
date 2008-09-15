@@ -132,6 +132,7 @@ namespace ASP
         {
             string boxname = (string)Boxes.SelectedItem;
             workingbox = Box.FromDLL(boxname, boxdll);
+            workingbox.Debug = debugon.Checked;
             workingbox.GotDebug += new DebugFullDelegate(workingbox_GotDebug);
             workingbox.CancelOrderSource += new UIntDelegate(workingbox_CancelOrderSource);
             tl.gotOrder+=new OrderDelegate(workingbox.gotOrderSink);
@@ -186,7 +187,7 @@ namespace ASP
             mb.Add(new Stock(sym));
             tl.Subscribe(mb);
             workingbox.Symbol = shortsym;
-            boxcriteria.Items.Add(workingbox);
+            boxcriteria.Items.Add(workingbox.Name+" ["+shortsym+"]");
             boxlist.Add(shortsym,workingbox);
             seclist.Add(shortsym, sec);
             boxes.Add(workingbox);
@@ -254,6 +255,19 @@ namespace ASP
             }
             else
                 status("select a box to activate");
+        }
+
+        private void debugon_CheckedChanged(object sender, EventArgs e)
+        {
+            foreach (Box b in boxlist.Values)
+                b.Debug = debugon.Checked;
+            status("Reset debugging for all boxes to : " + debugon.Checked.ToString());
+        }
+
+        private void stock_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyData == Keys.Enter)
+                Trade_Click(null, null);
         }                                            
     }
 }

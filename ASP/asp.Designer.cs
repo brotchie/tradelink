@@ -50,10 +50,10 @@ namespace ASP
             // 
             // LoadDLL
             // 
-            this.LoadDLL.Location = new System.Drawing.Point(589, 218);
-            this.LoadDLL.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.LoadDLL.Location = new System.Drawing.Point(602, 273);
+            this.LoadDLL.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.LoadDLL.Name = "LoadDLL";
-            this.LoadDLL.Size = new System.Drawing.Size(100, 28);
+            this.LoadDLL.Size = new System.Drawing.Size(95, 29);
             this.LoadDLL.TabIndex = 0;
             this.LoadDLL.Text = "Box Library";
             this.LoadDLL.UseVisualStyleBackColor = true;
@@ -62,10 +62,10 @@ namespace ASP
             // Boxes
             // 
             this.Boxes.FormattingEnabled = true;
-            this.Boxes.Location = new System.Drawing.Point(403, 7);
-            this.Boxes.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Boxes.Location = new System.Drawing.Point(377, 9);
+            this.Boxes.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Boxes.Name = "Boxes";
-            this.Boxes.Size = new System.Drawing.Size(285, 24);
+            this.Boxes.Size = new System.Drawing.Size(320, 28);
             this.Boxes.TabIndex = 1;
             this.Boxes.Text = "Select a box";
             this.Boxes.SelectedIndexChanged += new System.EventHandler(this.Boxes_SelectedIndexChanged);
@@ -73,19 +73,19 @@ namespace ASP
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(285, 17);
+            this.label1.Location = new System.Drawing.Point(245, 17);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(96, 17);
+            this.label1.Size = new System.Drawing.Size(109, 20);
             this.label1.TabIndex = 2;
             this.label1.Text = "Configure Box";
             // 
             // Trade
             // 
-            this.Trade.Location = new System.Drawing.Point(587, 38);
-            this.Trade.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Trade.Location = new System.Drawing.Point(585, 53);
+            this.Trade.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Trade.Name = "Trade";
-            this.Trade.Size = new System.Drawing.Size(100, 28);
+            this.Trade.Size = new System.Drawing.Size(112, 35);
             this.Trade.TabIndex = 3;
             this.Trade.Text = "Trade";
             this.Trade.UseVisualStyleBackColor = true;
@@ -94,30 +94,32 @@ namespace ASP
             // boxcriteria
             // 
             this.boxcriteria.FormattingEnabled = true;
-            this.boxcriteria.ItemHeight = 16;
-            this.boxcriteria.Location = new System.Drawing.Point(9, 47);
-            this.boxcriteria.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.boxcriteria.HorizontalScrollbar = true;
+            this.boxcriteria.ItemHeight = 20;
+            this.boxcriteria.Location = new System.Drawing.Point(10, 59);
+            this.boxcriteria.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.boxcriteria.Name = "boxcriteria";
-            this.boxcriteria.Size = new System.Drawing.Size(267, 164);
+            this.boxcriteria.Size = new System.Drawing.Size(222, 204);
             this.boxcriteria.TabIndex = 4;
             this.boxcriteria.TabStop = false;
             this.boxcriteria.SelectedIndexChanged += new System.EventHandler(this.boxcriteria_SelectedIndexChanged);
             // 
             // stock
             // 
-            this.stock.Location = new System.Drawing.Point(403, 41);
-            this.stock.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.stock.Location = new System.Drawing.Point(377, 57);
+            this.stock.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.stock.Name = "stock";
-            this.stock.Size = new System.Drawing.Size(175, 22);
+            this.stock.Size = new System.Drawing.Size(196, 26);
             this.stock.TabIndex = 5;
+            this.stock.KeyUp += new System.Windows.Forms.KeyEventHandler(this.stock_KeyUp);
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(285, 44);
+            this.label2.Location = new System.Drawing.Point(245, 63);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(116, 17);
+            this.label2.Size = new System.Drawing.Size(128, 20);
             this.label2.TabIndex = 6;
             this.label2.Text = "Trade on Symbol";
             // 
@@ -126,10 +128,10 @@ namespace ASP
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1,
             this.toolStripStatusLabel2});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 255);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 326);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 19, 0);
-            this.statusStrip1.Size = new System.Drawing.Size(701, 22);
+            this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 21, 0);
+            this.statusStrip1.Size = new System.Drawing.Size(704, 22);
             this.statusStrip1.TabIndex = 8;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -145,10 +147,10 @@ namespace ASP
             // 
             // shutdown
             // 
-            this.shutdown.Location = new System.Drawing.Point(8, 218);
-            this.shutdown.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.shutdown.Location = new System.Drawing.Point(10, 273);
+            this.shutdown.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.shutdown.Name = "shutdown";
-            this.shutdown.Size = new System.Drawing.Size(91, 28);
+            this.shutdown.Size = new System.Drawing.Size(92, 29);
             this.shutdown.TabIndex = 9;
             this.shutdown.TabStop = false;
             this.shutdown.Text = "Shutdown";
@@ -157,10 +159,10 @@ namespace ASP
             // 
             // activate
             // 
-            this.activate.Location = new System.Drawing.Point(107, 218);
-            this.activate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.activate.Location = new System.Drawing.Point(110, 273);
+            this.activate.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.activate.Name = "activate";
-            this.activate.Size = new System.Drawing.Size(100, 28);
+            this.activate.Size = new System.Drawing.Size(96, 29);
             this.activate.TabIndex = 10;
             this.activate.TabStop = false;
             this.activate.Text = "Activate";
@@ -170,21 +172,22 @@ namespace ASP
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(5, 17);
+            this.label3.Location = new System.Drawing.Point(6, 21);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(123, 17);
+            this.label3.Size = new System.Drawing.Size(139, 20);
             this.label3.TabIndex = 11;
             this.label3.Text = "Configured Boxes:";
             // 
             // listBox1
             // 
             this.listBox1.FormattingEnabled = true;
-            this.listBox1.ItemHeight = 16;
-            this.listBox1.Location = new System.Drawing.Point(289, 79);
-            this.listBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.listBox1.HorizontalScrollbar = true;
+            this.listBox1.ItemHeight = 20;
+            this.listBox1.Location = new System.Drawing.Point(249, 99);
+            this.listBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(399, 132);
+            this.listBox1.Size = new System.Drawing.Size(448, 164);
             this.listBox1.TabIndex = 12;
             // 
             // debugon
@@ -193,13 +196,14 @@ namespace ASP
             this.debugon.AutoSize = true;
             this.debugon.Checked = true;
             this.debugon.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.debugon.Location = new System.Drawing.Point(289, 218);
-            this.debugon.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.debugon.Location = new System.Drawing.Point(249, 272);
+            this.debugon.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.debugon.Name = "debugon";
-            this.debugon.Size = new System.Drawing.Size(67, 27);
+            this.debugon.Size = new System.Drawing.Size(75, 30);
             this.debugon.TabIndex = 13;
             this.debugon.Text = "Debugs";
             this.debugon.UseVisualStyleBackColor = true;
+            this.debugon.CheckedChanged += new System.EventHandler(this.debugon_CheckedChanged);
             // 
             // archivetickbox
             // 
@@ -207,18 +211,19 @@ namespace ASP
             this.archivetickbox.AutoSize = true;
             this.archivetickbox.Checked = true;
             this.archivetickbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.archivetickbox.Location = new System.Drawing.Point(363, 218);
+            this.archivetickbox.Location = new System.Drawing.Point(335, 272);
+            this.archivetickbox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.archivetickbox.Name = "archivetickbox";
-            this.archivetickbox.Size = new System.Drawing.Size(87, 27);
+            this.archivetickbox.Size = new System.Drawing.Size(95, 30);
             this.archivetickbox.TabIndex = 14;
             this.archivetickbox.Text = "Save Ticks";
             this.archivetickbox.UseVisualStyleBackColor = true;
             // 
             // ASP
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(701, 277);
+            this.ClientSize = new System.Drawing.Size(704, 348);
             this.Controls.Add(this.archivetickbox);
             this.Controls.Add(this.debugon);
             this.Controls.Add(this.listBox1);
@@ -234,7 +239,7 @@ namespace ASP
             this.Controls.Add(this.Boxes);
             this.Controls.Add(this.LoadDLL);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "ASP";
             this.Text = "ASP";
             this.statusStrip1.ResumeLayout(false);
