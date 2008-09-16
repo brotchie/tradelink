@@ -51,6 +51,7 @@ Section "BrokerServer"
   File "VERSION.txt"
   File "README.txt"
   File "LICENSE.txt"
+  File "TwsSocketClient.dll"
   
   File /oname=$SYSDIR\TradeLinkServer.dll "TradeLinkServer.dll" ; put in in %PATH% to make it easy for programs to find
   
