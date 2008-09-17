@@ -11,12 +11,34 @@ namespace Picker
         {
             Random r = new Random(seed + DateTime.Now.DayOfYear+ DateTime.Now.Hour + DateTime.Now.Minute + DateTime.Now.Second+ DateTime.Now.Millisecond);
             string sym = "";
-            sym += (char)r.Next(65, 91);
-            sym += (char)r.Next(65, 91);
-            sym += (char)r.Next(65, 91);
-            sym += (char)r.Next(65, 91);
-            int len = r.Next(1, 4);
-            return sym.Substring(0,len);
+            int symbolinbaseten = r.Next(1, (int)Math.Pow(26,maxlength));
+            int[] alphacodes = BaseTenConvert(symbolinbaseten, 26);
+            sym = Alphacodes2string(alphacodes);
+            return sym;
+        }
+
+        public static string Alphacodes2string(int[] codes)
+        {
+            string s = "";
+            foreach (int c in codes)
+                s += (char)(c+64);
+            return s;
+        }
+
+        public static int[] BaseTenConvert(int num, int destbase)
+        {
+            List<int> ordinals = new List<int>();
+            if (destbase==0) return ordinals.ToArray();
+            int rem = num % destbase;
+            int ans = (int)num / destbase;
+            while (ans!=0)
+            {
+                ordinals.Add(rem);
+                rem = ans % destbase;
+                ans = (int)ans / destbase;
+            }
+            ordinals.Add(rem);
+            return ordinals.ToArray();
         }
 
         public static string[] GetSymbols(int seed)

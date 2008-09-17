@@ -23,11 +23,12 @@ namespace ResearchLib
 
         public static QuickQuote Fetch(string sym)
         {
+            QuickQuote qq = new QuickQuote();
+            if (sym == "") return qq;
             WebClient wc = new WebClient();
             string res  = wc.DownloadString(baseurl + sym);
             res = res.Replace("\"", "");
             string [] r = res.Split(',');
-            QuickQuote qq = new QuickQuote();
             qq.Symbol = r[(int)q.sym];
             qq.Company = r[(int)q.company];
             try 
