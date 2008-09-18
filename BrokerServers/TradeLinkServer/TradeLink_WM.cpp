@@ -5,6 +5,7 @@
 #include "TradeLink_WM.h"
 #include "TradeLink.h"
 #include "Util.h"
+#include <fstream>
 using namespace std;
 
 
@@ -297,14 +298,33 @@ namespace TradeLinkServer
 					return true;
 		return false;
 	}
+	const char* VERFILE = "c:\\progra~1\\tradelink\\brokerserver\\VERSION.txt";
 	void TradeLink_WM::Start(bool live)
 	{
 		if (!ENABLED)
 		{
+			CString major = "0.1";
+			CString minor("$Rev: 197 $");
+			std::ifstream file;
+			file.open(VERFILE);
+			if (file.is_open())
+			{
+				char data[8];
+				file.getline(data,8);
+				minor = CString(data);
+				file.close();
+			}
+			else
+			{
+				minor.Replace("$Rev: ","");
+				minor.TrimRight(" $");
+			}
 			CString wind(live ? LIVEWINDOW : SIMWINDOW);
 			this->Create(NULL, wind, 0,CRect(0,0,20,20), CWnd::GetDesktopWindow(),NULL);
 			this->ShowWindow(SW_HIDE); // hide our window
-			this->D(CString("Started TL BrokerServer ")+wind);
+			CString msg;
+			msg.Format("Started TL BrokerServer %s [ %s.%s]",wind,major,minor);
+			this->D(msg);
 			ENABLED = true;
 		}
 
