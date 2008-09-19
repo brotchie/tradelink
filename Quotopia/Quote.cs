@@ -35,6 +35,10 @@ namespace Quotopia
             show(Util.TLSIdentity());
             QuoteGridSetup();
             FetchTLServer();
+            statfade.Interval = 10000;
+            statfade.Tick += new EventHandler(statfade_Tick);
+            statfade.Start();
+            
             tl.gotTick += new TickDelegate(tl_gotTick);
             tl.gotFill += new FillDelegate(tl_gotFill);
             tl.gotIndexTick += new IndexDelegate(tl_gotIndexTick);
@@ -43,6 +47,20 @@ namespace Quotopia
             ordergrid.ContextMenuStrip = new ContextMenuStrip();
             ordergrid.ContextMenuStrip.Items.Add("Cancel", null, new EventHandler(cancelorder));
             FormClosing += new FormClosingEventHandler(Quote_FormClosing);
+        }
+
+        void statfade_Tick(object sender, EventArgs e)
+        {
+            if (DateTime.Now.Subtract(laststat).TotalSeconds > 10)
+                statusStrip1.Visible = false;
+        }
+
+        void ToggleCol(object sender, EventArgs e)
+        {
+            string col = ((ToolStripItem)sender).Text;
+            if (!qg.Columns.Contains(col)) return;
+            qg.Columns[col].Visible = !qg.Columns[col].Visible;
+            qg.Refresh();
         }
 
         void tl_gotOrderCancel(uint number)
@@ -98,8 +116,9 @@ namespace Quotopia
             else status("Unable to find any broker instance.  Do you have one running?");
         }
 
-
-        DataGrid qg = new DataGrid();
+        Timer statfade = new Timer();
+        Multimedia.Timer ticker = new Multimedia.Timer();
+        DataGridView qg = new DataGridView();
         DataTable qt = new DataTable();
 
         void QuoteGridSetup()
@@ -116,21 +135,30 @@ namespace Quotopia
             qt.Columns.Add("PosSize");
             qt.Columns.Add("High");
             qt.Columns.Add("Low");
-            qg.CaptionVisible = true;
+            qg.AllowUserToAddRows = false;
+            qg.AllowUserToDeleteRows = false;
+            qg.AllowUserToOrderColumns = true;
+            qg.AllowUserToResizeColumns = true;
+            qg.BackgroundColor = Quotopia.Properties.Settings.Default.marketbgcolor;
             qg.RowHeadersVisible = false;
             qg.ColumnHeadersVisible = true;
             qg.Capture = true;
-            qg.FlatMode = true;
-            qg.ContextMenu = new ContextMenu();
-            qg.ContextMenu.MenuItems.Add("Remove", new EventHandler(rightremove));
-            qg.ContextMenu.MenuItems.Add("Chart", new EventHandler(rightchart));
-            qg.ContextMenu.MenuItems.Add("Ticket", new EventHandler(rightticket));
-            qg.BackColor = Quotopia.Properties.Settings.Default.marketbgcolor;
+            qg.ContextMenuStrip = new ContextMenuStrip();
+            qg.ContextMenuStrip.Items.Add("Remove", null,new EventHandler(rightremove));
+            qg.ContextMenuStrip.Items.Add("Chart", null,new EventHandler(rightchart));
+            qg.ContextMenuStrip.Items.Add("Ticket", null,new EventHandler(rightticket));
+            qg.ContextMenuStrip.Items.Add("Import Basket", null,new EventHandler(importbasketbut_Click));
+            qg.BackgroundColor = Quotopia.Properties.Settings.Default.marketbgcolor;
             qg.ForeColor = Quotopia.Properties.Settings.Default.marketfontcolor;
-            qg.HeaderBackColor = Quotopia.Properties.Settings.Default.colheaderbg;
-            qg.HeaderForeColor = Quotopia.Properties.Settings.Default.colheaderfg;
-            qg.GridLineColor = Quotopia.Properties.Settings.Default.gridcolor;
-            qg.AlternatingBackColor = qg.BackColor;
+            qg.DefaultCellStyle.BackColor = qg.BackgroundColor;
+            qg.DefaultCellStyle.ForeColor = qg.ForeColor;
+            qg.RowHeadersDefaultCellStyle.BackColor = Quotopia.Properties.Settings.Default.colheaderbg;
+            qg.RowHeadersDefaultCellStyle.ForeColor = Quotopia.Properties.Settings.Default.colheaderfg;
+            qg.AlternatingRowsDefaultCellStyle.BackColor = qg.BackgroundColor;
+            qg.AlternatingRowsDefaultCellStyle.ForeColor = qg.ForeColor;
+            qg.GridColor = Quotopia.Properties.Settings.Default.gridcolor;
+            qg.MultiSelect = false;
+            qg.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             qg.ReadOnly = true;
             qg.DataSource = qt;
             qg.Parent = Markets;
@@ -139,6 +167,7 @@ namespace Quotopia
             quoteTab.KeyUp +=new KeyEventHandler(qg_KeyUp);
             this.KeyUp += new KeyEventHandler(qg_KeyUp);
             qg.MouseUp += new MouseEventHandler(qg_MouseUp);
+            SetColumnContext();
         }
 
         void qg_DoubleClick(object sender, EventArgs e)
@@ -146,9 +175,23 @@ namespace Quotopia
             rightticket(null, null);
         }
 
+        int CurrentRow { get { return (qg.SelectedRows.Count>0 ? qg.SelectedRows[0].Index : -1); } }
+
+        void SetColumnContext()
+        {
+
+            ToolStripMenuItem dd = new ToolStripMenuItem("Columns");
+            for (int i = 0; i < qg.Columns.Count; i++)
+            {
+                string col = qg.Columns[i].HeaderText;
+                dd.DropDownItems.Add(col,null,new EventHandler(ToggleCol));
+            }
+            qg.ContextMenuStrip.Items.Add(dd);
+        }
+
         void rightticket(object sender, EventArgs e)
         {
-            Security s = GetVisibleSecurity(qg.CurrentRowIndex);
+            Security s = GetVisibleSecurity(CurrentRow);
             if (s.Type == SecurityType.IDX) return;
             string sym = s.Symbol;
             Order o = new Order(sym,-1*tl.PosSize(sym));
@@ -179,21 +222,17 @@ namespace Quotopia
 
         void rightremove(object sender, EventArgs e)
         {
-            string sym = GetVisibleSecurity(qg.CurrentRowIndex).Symbol;
+            string sym = GetVisibleSecurity(CurrentRow).Symbol;
             if (MessageBox.Show("Are you sure you want to remove "+sym+"?","Confirm remove",MessageBoxButtons.YesNo)== DialogResult.Yes)
             {
-                qt.Rows.RemoveAt(qg.CurrentRowIndex);
+                qt.Rows.RemoveAt(CurrentRow);
             }
         }
 
 
         void rightchart(object sender, EventArgs e)
         {
-            Point p = qg.PointToClient(MousePosition);
-            DataGrid.HitTestInfo ht = qg.HitTest(p);
-            if (ht.Type != DataGrid.HitTestType.Cell) return;
-            if (ht.Row < 0) return;
-            string sym = GetVisibleSecurity(qg.CurrentRowIndex).Symbol;
+            string sym = GetVisibleSecurity(CurrentRow).Symbol;
             Chart c = new Chart();
             try
             {
@@ -208,14 +247,11 @@ namespace Quotopia
             
         void qg_MouseUp(object sender, MouseEventArgs e)
         {
-            if ((e.Clicks == 2) && (qg.CurrentRowIndex >= 0) && (qg.CurrentRowIndex < qg.VisibleRowCount))
+            if ((e.Clicks == 2) && (CurrentRow >= 0) && (CurrentRow < qg.Rows.Count))
             {
                 rightticket(null, null);
             }
-            else if ((e.Clicks == 1) && (qg.CurrentRowIndex >= 0) && (qg.CurrentRowIndex < qg.VisibleRowCount))
-            {
-                qg.Select(qg.CurrentRowIndex);
-            }
+
 
         
         }
@@ -299,7 +335,6 @@ namespace Quotopia
             DataRow r = qt.Rows.Add(sym, "", "", "", "", "", "", "", "", "", "", "");
             if (!bardict.ContainsKey(sym))
                 bardict.Add(sym, new BarList(BarInterval.FiveMin, sym));
-            qg.Select(qg.VisibleRowCount - 1); // selects most recently added symbol
             status("Added " + sym);
         }
 
@@ -311,8 +346,8 @@ namespace Quotopia
 
         Security GetVisibleSecurity(int row)
         {
-            if ((row < 0) || (row >= qg.VisibleRowCount)) return new Security();
-            Security s = Security.Parse(qg[row, 0].ToString());
+            if ((row < 0) || (row >= qg.Rows.Count)) return new Security();
+            Security s = Security.Parse(qt.Rows[row]["Symbol"].ToString());
             return s;
         }
         int[] GetSymbolRows(string sym)
@@ -449,11 +484,23 @@ namespace Quotopia
                 SetTextCallback d = new SetTextCallback(show);
                 this.Invoke(d, new object[] { s });
             }
-            else statusWindow.AppendText(s + Environment.NewLine);
+            else
+            {
+                statusWindow.AppendText(s + Environment.NewLine);
+            }
         }
+
+        DateTime laststat = DateTime.Now;
         public void status(string s)
         {
-            statuslab.Text = s;
+            if (InvokeRequired)
+                Invoke(new DebugDelegate(status), new object[] { s });
+            else
+            {
+                statuslab.Text = s;
+                statusStrip1.Visible = true;
+                laststat = DateTime.Now;
+            }
         }
 
         MarketBasket mb = new MarketBasket();

@@ -28,8 +28,6 @@ namespace Quotopia
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Quote));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -37,13 +35,11 @@ namespace Quotopia
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Quote));
             this.quoteTab = new System.Windows.Forms.TabControl();
             this.Markets = new System.Windows.Forms.TabPage();
-            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.importbasketbut = new System.Windows.Forms.ToolStripButton();
-            this.exportbasketbut = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.statuslab = new System.Windows.Forms.ToolStripLabel();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.statuslab = new System.Windows.Forms.ToolStripStatusLabel();
             this.ordertab = new System.Windows.Forms.TabPage();
             this.ordergrid = new System.Windows.Forms.DataGridView();
             this.oid = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -71,15 +67,6 @@ namespace Quotopia
             this.saveSettingsbut = new System.Windows.Forms.Button();
             this.LogTab = new System.Windows.Forms.TabPage();
             this.statusWindow = new System.Windows.Forms.RichTextBox();
-            this.rightclickrow = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.showchart = new System.Windows.Forms.ToolStripMenuItem();
-            this.flatmenuright = new System.Windows.Forms.ToolStripMenuItem();
-            this.flatthisfull = new System.Windows.Forms.ToolStripMenuItem();
-            this.flatthishalf = new System.Windows.Forms.ToolStripMenuItem();
-            this.flatthisqtr = new System.Windows.Forms.ToolStripMenuItem();
-            this.flatallpositions = new System.Windows.Forms.ToolStripMenuItem();
-            this.columnsdropdown = new System.Windows.Forms.ToolStripMenuItem();
-            this.boxdropdown = new System.Windows.Forms.ToolStripMenuItem();
             this.OrderUserCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.OrderStopCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.OrderPriceCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -89,14 +76,13 @@ namespace Quotopia
             this.OrderDateCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.quoteTab.SuspendLayout();
             this.Markets.SuspendLayout();
-            this.toolStrip1.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.ordertab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ordergrid)).BeginInit();
             this.TradeTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.TradesView)).BeginInit();
             this.Settings.SuspendLayout();
             this.LogTab.SuspendLayout();
-            this.rightclickrow.SuspendLayout();
             this.SuspendLayout();
             // 
             // quoteTab
@@ -114,77 +100,50 @@ namespace Quotopia
             this.quoteTab.Name = "quoteTab";
             this.quoteTab.SelectedIndex = 0;
             this.quoteTab.ShowToolTips = true;
-            this.quoteTab.Size = new System.Drawing.Size(836, 567);
+            this.quoteTab.Size = new System.Drawing.Size(940, 709);
             this.quoteTab.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.quoteTab.TabIndex = 0;
             // 
             // Markets
             // 
             this.Markets.BackColor = System.Drawing.Color.Black;
-            this.Markets.Controls.Add(this.toolStrip1);
+            this.Markets.Controls.Add(this.statusStrip1);
             this.Markets.ForeColor = System.Drawing.Color.White;
             this.Markets.Location = new System.Drawing.Point(4, 4);
-            this.Markets.Margin = new System.Windows.Forms.Padding(4);
+            this.Markets.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Markets.Name = "Markets";
-            this.Markets.Padding = new System.Windows.Forms.Padding(4);
-            this.Markets.Size = new System.Drawing.Size(828, 538);
+            this.Markets.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.Markets.Size = new System.Drawing.Size(932, 676);
             this.Markets.TabIndex = 0;
             this.Markets.Text = "Markets";
             this.Markets.UseVisualStyleBackColor = true;
             // 
-            // toolStrip1
+            // statusStrip1
             // 
-            this.toolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.importbasketbut,
-            this.exportbasketbut,
-            this.toolStripSeparator1,
+            this.statusStrip1.BackColor = System.Drawing.Color.Transparent;
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.statuslab});
-            this.toolStrip1.Location = new System.Drawing.Point(4, 4);
-            this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(820, 25);
-            this.toolStrip1.TabIndex = 0;
-            this.toolStrip1.Text = "toolStrip1";
-            // 
-            // importbasketbut
-            // 
-            this.importbasketbut.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.importbasketbut.ForeColor = System.Drawing.Color.Black;
-            this.importbasketbut.Image = ((System.Drawing.Image)(resources.GetObject("importbasketbut.Image")));
-            this.importbasketbut.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.importbasketbut.Name = "importbasketbut";
-            this.importbasketbut.Size = new System.Drawing.Size(47, 22);
-            this.importbasketbut.Text = "Open";
-            this.importbasketbut.Click += new System.EventHandler(this.importbasketbut_Click);
-            // 
-            // exportbasketbut
-            // 
-            this.exportbasketbut.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.exportbasketbut.ForeColor = System.Drawing.Color.Black;
-            this.exportbasketbut.Image = ((System.Drawing.Image)(resources.GetObject("exportbasketbut.Image")));
-            this.exportbasketbut.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.exportbasketbut.Name = "exportbasketbut";
-            this.exportbasketbut.Size = new System.Drawing.Size(44, 22);
-            this.exportbasketbut.Text = "Save";
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            this.statusStrip1.Location = new System.Drawing.Point(4, 645);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(924, 26);
+            this.statusStrip1.TabIndex = 0;
+            this.statusStrip1.Text = "statusStrip1";
             // 
             // statuslab
             // 
-            this.statuslab.ForeColor = System.Drawing.Color.Black;
+            this.statuslab.BackColor = System.Drawing.Color.Transparent;
+            this.statuslab.ForeColor = System.Drawing.Color.LightGray;
             this.statuslab.Name = "statuslab";
-            this.statuslab.Size = new System.Drawing.Size(227, 22);
-            this.statuslab.Text = "Enter a symbol or open a basket.";
+            this.statuslab.Size = new System.Drawing.Size(195, 21);
+            this.statuslab.Text = "Enter symbols to begin...";
             // 
             // ordertab
             // 
             this.ordertab.Controls.Add(this.ordergrid);
             this.ordertab.Location = new System.Drawing.Point(4, 4);
+            this.ordertab.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.ordertab.Name = "ordertab";
-            this.ordertab.Size = new System.Drawing.Size(828, 538);
+            this.ordertab.Size = new System.Drawing.Size(932, 676);
             this.ordertab.TabIndex = 4;
             this.ordertab.Text = "Orders";
             this.ordertab.UseVisualStyleBackColor = true;
@@ -224,6 +183,7 @@ namespace Quotopia
             this.ordergrid.DefaultCellStyle = dataGridViewCellStyle2;
             this.ordergrid.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ordergrid.Location = new System.Drawing.Point(0, 0);
+            this.ordergrid.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.ordergrid.Name = "ordergrid";
             this.ordergrid.ReadOnly = true;
             dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
@@ -242,7 +202,7 @@ namespace Quotopia
             this.ordergrid.RowTemplate.DefaultCellStyle.ForeColor = System.Drawing.SystemColors.WindowText;
             this.ordergrid.RowTemplate.Height = 24;
             this.ordergrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.ordergrid.Size = new System.Drawing.Size(828, 538);
+            this.ordergrid.Size = new System.Drawing.Size(932, 676);
             this.ordergrid.TabIndex = 0;
             // 
             // oid
@@ -294,10 +254,10 @@ namespace Quotopia
             this.TradeTab.Controls.Add(this.TradesView);
             this.TradeTab.ForeColor = System.Drawing.SystemColors.MenuText;
             this.TradeTab.Location = new System.Drawing.Point(4, 4);
-            this.TradeTab.Margin = new System.Windows.Forms.Padding(4);
+            this.TradeTab.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.TradeTab.Name = "TradeTab";
-            this.TradeTab.Padding = new System.Windows.Forms.Padding(4);
-            this.TradeTab.Size = new System.Drawing.Size(828, 538);
+            this.TradeTab.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.TradeTab.Size = new System.Drawing.Size(932, 676);
             this.TradeTab.TabIndex = 3;
             this.TradeTab.Text = "Trades";
             this.TradeTab.UseVisualStyleBackColor = true;
@@ -333,8 +293,8 @@ namespace Quotopia
             this.TradesView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TradesView.EnableHeadersVisualStyles = false;
             this.TradesView.GridColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.TradesView.Location = new System.Drawing.Point(4, 4);
-            this.TradesView.Margin = new System.Windows.Forms.Padding(4);
+            this.TradesView.Location = new System.Drawing.Point(4, 5);
+            this.TradesView.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.TradesView.Name = "TradesView";
             this.TradesView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
             dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
@@ -349,7 +309,7 @@ namespace Quotopia
             this.TradesView.RowTemplate.Height = 24;
             this.TradesView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.TradesView.ShowEditingIcon = false;
-            this.TradesView.Size = new System.Drawing.Size(820, 530);
+            this.TradesView.Size = new System.Drawing.Size(924, 666);
             this.TradesView.TabIndex = 0;
             // 
             // Date
@@ -419,50 +379,50 @@ namespace Quotopia
             this.Settings.Controls.Add(this.saveSettingsbut);
             this.Settings.ForeColor = System.Drawing.SystemColors.MenuText;
             this.Settings.Location = new System.Drawing.Point(4, 4);
-            this.Settings.Margin = new System.Windows.Forms.Padding(4);
+            this.Settings.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Settings.Name = "Settings";
-            this.Settings.Padding = new System.Windows.Forms.Padding(4);
-            this.Settings.Size = new System.Drawing.Size(828, 538);
+            this.Settings.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.Settings.Size = new System.Drawing.Size(932, 676);
             this.Settings.TabIndex = 1;
             this.Settings.Text = "Settings";
             this.Settings.UseVisualStyleBackColor = true;
             // 
             // aboutbut
             // 
-            this.aboutbut.Location = new System.Drawing.Point(271, 16);
-            this.aboutbut.Margin = new System.Windows.Forms.Padding(4);
+            this.aboutbut.Location = new System.Drawing.Point(305, 20);
+            this.aboutbut.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.aboutbut.Name = "aboutbut";
-            this.aboutbut.Size = new System.Drawing.Size(79, 28);
+            this.aboutbut.Size = new System.Drawing.Size(89, 35);
             this.aboutbut.TabIndex = 21;
             this.aboutbut.Text = "About";
             this.aboutbut.UseVisualStyleBackColor = true;
             // 
             // resetsetbut
             // 
-            this.resetsetbut.Location = new System.Drawing.Point(96, 16);
-            this.resetsetbut.Margin = new System.Windows.Forms.Padding(4);
+            this.resetsetbut.Location = new System.Drawing.Point(108, 20);
+            this.resetsetbut.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.resetsetbut.Name = "resetsetbut";
-            this.resetsetbut.Size = new System.Drawing.Size(79, 28);
+            this.resetsetbut.Size = new System.Drawing.Size(89, 35);
             this.resetsetbut.TabIndex = 6;
             this.resetsetbut.Text = "Discard";
             this.resetsetbut.UseVisualStyleBackColor = true;
             // 
             // restoredefaultsbut
             // 
-            this.restoredefaultsbut.Location = new System.Drawing.Point(183, 16);
-            this.restoredefaultsbut.Margin = new System.Windows.Forms.Padding(4);
+            this.restoredefaultsbut.Location = new System.Drawing.Point(206, 20);
+            this.restoredefaultsbut.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.restoredefaultsbut.Name = "restoredefaultsbut";
-            this.restoredefaultsbut.Size = new System.Drawing.Size(80, 28);
+            this.restoredefaultsbut.Size = new System.Drawing.Size(90, 35);
             this.restoredefaultsbut.TabIndex = 5;
             this.restoredefaultsbut.Text = "Defaults";
             this.restoredefaultsbut.UseVisualStyleBackColor = true;
             // 
             // saveSettingsbut
             // 
-            this.saveSettingsbut.Location = new System.Drawing.Point(8, 16);
-            this.saveSettingsbut.Margin = new System.Windows.Forms.Padding(4);
+            this.saveSettingsbut.Location = new System.Drawing.Point(9, 20);
+            this.saveSettingsbut.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.saveSettingsbut.Name = "saveSettingsbut";
-            this.saveSettingsbut.Size = new System.Drawing.Size(81, 28);
+            this.saveSettingsbut.Size = new System.Drawing.Size(91, 35);
             this.saveSettingsbut.TabIndex = 4;
             this.saveSettingsbut.Text = "Save";
             this.saveSettingsbut.UseVisualStyleBackColor = true;
@@ -472,9 +432,9 @@ namespace Quotopia
             this.LogTab.BackColor = System.Drawing.Color.Transparent;
             this.LogTab.Controls.Add(this.statusWindow);
             this.LogTab.Location = new System.Drawing.Point(4, 4);
-            this.LogTab.Margin = new System.Windows.Forms.Padding(4);
+            this.LogTab.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.LogTab.Name = "LogTab";
-            this.LogTab.Size = new System.Drawing.Size(828, 538);
+            this.LogTab.Size = new System.Drawing.Size(932, 676);
             this.LogTab.TabIndex = 2;
             this.LogTab.Text = "Messages";
             this.LogTab.UseVisualStyleBackColor = true;
@@ -487,82 +447,12 @@ namespace Quotopia
             this.statusWindow.Dock = System.Windows.Forms.DockStyle.Fill;
             this.statusWindow.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.statusWindow.Location = new System.Drawing.Point(0, 0);
-            this.statusWindow.Margin = new System.Windows.Forms.Padding(4);
+            this.statusWindow.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.statusWindow.Name = "statusWindow";
             this.statusWindow.ReadOnly = true;
-            this.statusWindow.Size = new System.Drawing.Size(828, 538);
+            this.statusWindow.Size = new System.Drawing.Size(932, 676);
             this.statusWindow.TabIndex = 0;
             this.statusWindow.Text = "";
-            // 
-            // rightclickrow
-            // 
-            this.rightclickrow.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.showchart,
-            this.flatmenuright,
-            this.columnsdropdown,
-            this.boxdropdown});
-            this.rightclickrow.Name = "rightclickrow";
-            this.rightclickrow.Size = new System.Drawing.Size(132, 92);
-            // 
-            // showchart
-            // 
-            this.showchart.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.showchart.Name = "showchart";
-            this.showchart.Size = new System.Drawing.Size(131, 22);
-            this.showchart.Text = "Chart";
-            this.showchart.ToolTipText = "Chart symbol";
-            // 
-            // flatmenuright
-            // 
-            this.flatmenuright.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.flatmenuright.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.flatthisfull,
-            this.flatthishalf,
-            this.flatthisqtr,
-            this.flatallpositions});
-            this.flatmenuright.Name = "flatmenuright";
-            this.flatmenuright.Size = new System.Drawing.Size(131, 22);
-            this.flatmenuright.Text = "Flat";
-            this.flatmenuright.TextDirection = System.Windows.Forms.ToolStripTextDirection.Horizontal;
-            this.flatmenuright.TextImageRelation = System.Windows.Forms.TextImageRelation.TextBeforeImage;
-            // 
-            // flatthisfull
-            // 
-            this.flatthisfull.Name = "flatthisfull";
-            this.flatthisfull.Size = new System.Drawing.Size(184, 22);
-            this.flatthisfull.Text = "flat THIS 100%";
-            // 
-            // flatthishalf
-            // 
-            this.flatthishalf.Name = "flatthishalf";
-            this.flatthishalf.Size = new System.Drawing.Size(184, 22);
-            this.flatthishalf.Text = "flat THIS 50%";
-            // 
-            // flatthisqtr
-            // 
-            this.flatthisqtr.Name = "flatthisqtr";
-            this.flatthisqtr.Size = new System.Drawing.Size(184, 22);
-            this.flatthisqtr.Text = "flat THIS 25%";
-            // 
-            // flatallpositions
-            // 
-            this.flatallpositions.Name = "flatallpositions";
-            this.flatallpositions.Size = new System.Drawing.Size(184, 22);
-            this.flatallpositions.Text = "flat ALL positions";
-            // 
-            // columnsdropdown
-            // 
-            this.columnsdropdown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.columnsdropdown.Name = "columnsdropdown";
-            this.columnsdropdown.Size = new System.Drawing.Size(131, 22);
-            this.columnsdropdown.Text = "Columns";
-            this.columnsdropdown.ToolTipText = "Toggle displayed fields";
-            // 
-            // boxdropdown
-            // 
-            this.boxdropdown.Name = "boxdropdown";
-            this.boxdropdown.Size = new System.Drawing.Size(131, 22);
-            this.boxdropdown.Text = "Boxes";
             // 
             // OrderUserCol
             // 
@@ -608,31 +498,30 @@ namespace Quotopia
             // 
             // Quote
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.WindowFrame;
-            this.ClientSize = new System.Drawing.Size(836, 567);
+            this.ClientSize = new System.Drawing.Size(940, 709);
             this.Controls.Add(this.quoteTab);
             this.DataBindings.Add(new System.Windows.Forms.Binding("Location", global::Quotopia.Properties.Settings.Default, "location", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.ForeColor = System.Drawing.SystemColors.Window;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Location = global::Quotopia.Properties.Settings.Default.location;
-            this.Margin = new System.Windows.Forms.Padding(4);
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "Quote";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Quotopia";
             this.quoteTab.ResumeLayout(false);
             this.Markets.ResumeLayout(false);
             this.Markets.PerformLayout();
-            this.toolStrip1.ResumeLayout(false);
-            this.toolStrip1.PerformLayout();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ordertab.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.ordergrid)).EndInit();
             this.TradeTab.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.TradesView)).EndInit();
             this.Settings.ResumeLayout(false);
             this.LogTab.ResumeLayout(false);
-            this.rightclickrow.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -653,24 +542,10 @@ namespace Quotopia
         private System.Windows.Forms.DataGridViewTextBoxColumn OrderTimeCol;
         private System.Windows.Forms.DataGridViewTextBoxColumn OrderDateCol;
         private System.Windows.Forms.Button saveSettingsbut;
-        private System.Windows.Forms.ContextMenuStrip rightclickrow;
-        private System.Windows.Forms.ToolStripMenuItem columnsdropdown;
-        private System.Windows.Forms.ToolStripMenuItem showchart;
-        private System.Windows.Forms.ToolStripMenuItem flatmenuright;
-        private System.Windows.Forms.ToolStripMenuItem flatthisfull;
-        private System.Windows.Forms.ToolStripMenuItem flatthishalf;
-        private System.Windows.Forms.ToolStripMenuItem flatthisqtr;
-        private System.Windows.Forms.ToolStripMenuItem flatallpositions;
-        private System.Windows.Forms.ToolStripMenuItem boxdropdown;
         private System.Windows.Forms.Button restoredefaultsbut;
         private System.Windows.Forms.Button resetsetbut;
         private System.Windows.Forms.Button aboutbut;
         private System.Windows.Forms.RichTextBox statusWindow;
-        private System.Windows.Forms.ToolStrip toolStrip1;
-        private System.Windows.Forms.ToolStripLabel statuslab;
-        private System.Windows.Forms.ToolStripButton importbasketbut;
-        private System.Windows.Forms.ToolStripButton exportbasketbut;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.DataGridViewTextBoxColumn Date;
         private System.Windows.Forms.DataGridViewTextBoxColumn Time;
         private System.Windows.Forms.DataGridViewTextBoxColumn Sec;
@@ -689,5 +564,7 @@ namespace Quotopia
         private System.Windows.Forms.DataGridViewTextBoxColumn oprice;
         private System.Windows.Forms.DataGridViewTextBoxColumn ostop;
         private System.Windows.Forms.DataGridViewTextBoxColumn oaccount;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel statuslab;
     }
 }
