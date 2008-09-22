@@ -38,6 +38,11 @@ namespace Quotopia
             statfade.Interval = 10000;
             statfade.Tick += new EventHandler(statfade_Tick);
             statfade.Start();
+            ticker.Resolution = 500;
+            ticker.Period = 100;
+            ticker.Mode = Multimedia.TimerMode.Periodic;
+            ticker.Tick += new EventHandler(ticker_Tick);
+            ticker.Start();
             
             tl.gotTick += new TickDelegate(tl_gotTick);
             tl.gotFill += new FillDelegate(tl_gotFill);
@@ -47,6 +52,18 @@ namespace Quotopia
             ordergrid.ContextMenuStrip = new ContextMenuStrip();
             ordergrid.ContextMenuStrip.Items.Add("Cancel", null, new EventHandler(cancelorder));
             FormClosing += new FormClosingEventHandler(Quote_FormClosing);
+        }
+
+        void ticker_Tick(object sender, EventArgs e)
+        {
+            // update the screen periodically
+            for (int r = 0; r<ticks.Length; r++)
+            {
+                Tick t = ticks[r];
+                if ((t==null) || !t.isValid) continue;
+                if (spillTick != null) spillTick(t);
+                RefreshRow(t);
+            }
         }
 
         void statfade_Tick(object sender, EventArgs e)
@@ -225,7 +242,12 @@ namespace Quotopia
             string sym = GetVisibleSecurity(CurrentRow).Symbol;
             if (MessageBox.Show("Are you sure you want to remove "+sym+"?","Confirm remove",MessageBoxButtons.YesNo)== DialogResult.Yes)
             {
+                //remove the row
                 qt.Rows.RemoveAt(CurrentRow);
+                // clear current index
+                symidx.Clear();
+                // reget index
+                symindex();
             }
         }
 
@@ -327,7 +349,6 @@ namespace Quotopia
         }
 
         Dictionary<string, BarList> bardict = new Dictionary<string, BarList>();
-        void BarUpdate(Tick t) { if (bardict.ContainsKey(t.sym)) bardict[t.sym].AddTick(t); }
 
         void addsymbol(string sym)
         {
@@ -336,13 +357,40 @@ namespace Quotopia
             if (!bardict.ContainsKey(sym))
                 bardict.Add(sym, new BarList(BarInterval.FiveMin, sym));
             status("Added " + sym);
+            symindex();
         }
+
+        
 
         void tl_gotIndexTick(Index idx)
         {
             tl_gotTick(idx.ToTick());
         }
 
+        Dictionary<string, int[]> symidx = new Dictionary<string, int[]>();
+
+        void symindex()
+        {
+            for (int i = 0; i < qt.Rows.Count; i++)
+            {
+                if (qt.Rows[i].RowState == DataRowState.Deleted) continue;
+                Security sec = Security.Parse(qt.Rows[i]["Symbol"].ToString());
+                string sym = sec.Symbol;
+                if (!symidx.ContainsKey(sym)) // if we've not seen this symbol add it's index
+                    symidx.Add(sym, new int[] { i });
+                else
+                {
+                    // otherwise create a new array with an extra spot
+                    int[] newidx = new int[symidx[sym].Length + 1];
+                    // copy the old indicies in
+                    symidx[sym].CopyTo(newidx, 0);
+                    // save this latest index
+                    newidx[symidx[sym].Length] = i;
+                    // replace the old with the new
+                    symidx[sym] = newidx;
+                }
+            }
+        }
 
         Security GetVisibleSecurity(int row)
         {
@@ -352,22 +400,18 @@ namespace Quotopia
         }
         int[] GetSymbolRows(string sym)
         {
-            List<int> row = new List<int>();
-            for (int i = 0; i < qt.Rows.Count; i++)
-            {
-                string r = qt.Rows[i]["Symbol"].ToString();
-                int s = r.IndexOf(' ');
-                string rsym = (s==-1) ? r : r.Substring(0,s);
-                if (rsym == sym)
-                    row.Add(i);
-            }
-            return row.ToArray();
+            int[] res = new int[] { };
+            symidx.TryGetValue(sym,out res);
+            return res;
         }
 
         void RefreshRow(Tick t)
         {
             if (qg.InvokeRequired)
+            {
                 qg.Invoke(new TickDelegate(RefreshRow), new object[] { t });
+
+            }
             else
             {
                 int[] rows = GetSymbolRows(t.sym);
@@ -379,6 +423,8 @@ namespace Quotopia
                     // fetch OHLC from TL
                     // fetch position from TL
                     int r = rows[i];
+                    if (qt.Rows[r].RowState == DataRowState.Deleted) continue;
+                    if ((r < 0) || (r > qt.Rows.Count - 1)) continue;
                     if (t.isTrade)
                     {
                         qt.Rows[r]["Last"] = t.trade.ToString("N2");
@@ -407,7 +453,7 @@ namespace Quotopia
                         qt.Rows[r]["Ask"] = t.ask.ToString("N2");
                         qt.Rows[r]["ASize"] = t.os;
                         string s = qt.Rows[r]["BSize"].ToString();
-                        int bs = (s!="") ? Convert.ToInt32(s) : 0;
+                        int bs = (s != "") ? Convert.ToInt32(s) : 0;
                         qt.Rows[r]["Sizes"] = bs.ToString() + "x" + t.os.ToString();
                     }
                     qt.Rows[r]["High"] = high.ToString("N2");
@@ -448,12 +494,16 @@ namespace Quotopia
                 TradesView.Rows.Add(t.xdate, t.xtime, t.xsec, t.symbol, (t.side ? "BUY" : "SELL"), t.xsize, t.xprice.ToString("N2"), t.comment, t.Account.ToString()); // if we accept trade, add it to list
             }
         }
+        Tick[] ticks = new Tick[100];
 
         void tl_gotTick(Tick t)
         {
-            BarUpdate(t);
-            if (spillTick != null) spillTick(t);
-            RefreshRow(t);
+            int[] rows = GetSymbolRows(t.sym);
+            if ((rows==null)||(rows.Length == 0) ) return;
+            ticks[rows[0]] = t;
+            BarList bl = null;
+            if (bardict.TryGetValue(t.sym, out bl))
+                bardict[t.sym].newTick(t);
         }
 
         TradeLink_Client_WM tl = new TradeLink_Client_WM("quotopia.client",true);
