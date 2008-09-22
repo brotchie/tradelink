@@ -20,6 +20,14 @@ namespace box
 
         [DescriptionAttribute("% of our trade to exit when MA is crossed")]
         public decimal ExitSizePercent { get { return exitpercent; } set { exitpercent = value; } }
+        [DescriptionAttribute("Interval to use in MA calculation")]
+        public BarInterval Interval { get { return _int; } set { _int = value; } }
+        [DescriptionAttribute("Number of bars to use in SMA.")]
+        public int MABars { get { return _bb; } set { _bb = value; } }
+        [DescriptionAttribute("Exit when price crosses above.  Change to false to make exit signal on opposite cross.")]
+        public bool ExitAbove { get { return _above; } set { _above = value; } }
+        [DescriptionAttribute("Set ExitAbove automatically based on current position.")]
+        public bool AutoExitAbove { get { return _autoabove; } set { _autoabove = value; } }
 
 
         public GreyExit()
@@ -36,24 +44,25 @@ namespace box
         // we define these working variables as private 
         // this way they aren't displayed to the user when prompting for parameters
         private decimal exitpercent = 0;
-        private decimal sum = 0;
-        private int ticks = 0;
-        private int secperint = 300;
-        private int starttime = 0;
         private decimal MA = 0;
+        BarInterval _int = BarInterval.FiveMin;
+        bool _above = true; // trigger when crosses above or below
+        bool _autoabove = false; // set above automatically based on position
+        int _bb = 2;
 
         protected override int Read(Tick tick, BarList bl,BoxInfo bi)
         {
             if (tick.isTrade)
             {
-                sum += tick.trade;
-                ticks++;
-                MA = sum/ticks;
+                MA = SMA.BarSMA(bl, _int, _bb);
 
-                if (((tick.time - starttime) % secperint) == 0) starttime = tick.time;
-                if (starttime==0) return 0;
+                if (PosSize == 0) return 0;
 
-                bool pricecross = (((PosSize > 0) && (tick.trade < MA)) || ((PosSize < 0) && (tick.trade > MA)));
+                if (_autoabove)
+                    _above = (PosSize < 0);
+
+                bool pricecross = _above ? (tick.trade > MA) : (tick.trade < MA);
+
                 return  (pricecross) ? Norm2Min(Flat*exitpercent) : 0;
             }
             return 0;
