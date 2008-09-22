@@ -54,6 +54,7 @@ namespace box
         {
             if (tick.isTrade)
             {
+                if (!bl.Has(_bb)) return 0;
                 MA = SMA.BarSMA(bl, _int, _bb);
 
                 if (PosSize == 0) return 0;
