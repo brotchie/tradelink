@@ -76,7 +76,7 @@ namespace TradeLib
 
         public static string TLVersion()
         {
-            const string major = "0.2.";
+            const string major = "0.1.";
             const string backupminor = "$Rev$";
             string build = BuildFromFile(TLProgramDir + @"\VERSION.txt");
             string minor = build == ZEROBUILD ? CleanVer(backupminor) : build;
