@@ -53,5 +53,7 @@ namespace TestTradeLib
             Assert.That(newbars == 8, newbars.ToString());
 
         }
+
+
     }
 }
