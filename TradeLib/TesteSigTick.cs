@@ -24,8 +24,7 @@ namespace TestTradeLib
                 if (i < 3) continue;
                 string line = file[i];
                 e.Load(line);
-                e.sym= "WAG";
-                Console.WriteLine(e.ToString());
+                e.sym = "WAG";
                 if (bl.newTick(e))
                     count++;
             }
