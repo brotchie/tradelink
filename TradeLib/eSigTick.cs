@@ -137,7 +137,7 @@ namespace TradeLib
             StreamReader cf = EPFfile; 
             string symline = cf.ReadLine();
             string dateline = cf.ReadLine();
-            Regex se = new Regex("=[a-z-A-Z]+");
+            Regex se = new Regex("=[a-z-A-Z0-9]+");
             Regex dse = new Regex(@"; Date=([0-9]+)/([0-9]+)/([0-9]+).*$");
             MatchCollection r = se.Matches(symline, 0);
             string t = r[0].Value;
