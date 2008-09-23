@@ -38,6 +38,7 @@ echo REPLAY
 xcopy /q /y ..\Replay\bin\Release\Replay.exe* .
 echo QUOTOPIA
 xcopy /q /y ..\Quotopia\bin\Release\Quotopia.exe* .
+xcopy /q /y ..\Quotopia\bin\Release\Multimedia.dll .
 xcopy /q /i /y ..\Quotopia\bin\Release\Properties .\Properties
 echo GAUNTLET
 xcopy /q /y ..\Gauntlet\bin\Release\Gauntlet.exe* .
