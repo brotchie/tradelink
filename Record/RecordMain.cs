@@ -50,10 +50,11 @@ namespace Record
             if (e.KeyData == Keys.Enter)
             {
                 int size = mb.Count + ib.Count;
-                if (Stock.isStock(symbox.Text))
-                    mb.Add(new Stock(symbox.Text));
-                else if (Index.isIdx(symbox.Text))
+                Security sec = Security.Parse(symbox.Text);
+                if (sec.Type== SecurityType.IDX)
                     ib.Add(new Index(symbox.Text));
+                else
+                    mb.Add(new Stock(symbox.Text));
                 refreshlist(size);
             }
         }
