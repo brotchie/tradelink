@@ -9,6 +9,7 @@ namespace TradeLib
     /// </summary>
     public class BarList : TickIndicator
     {
+        private int _enum = -1;
         public IEnumerator GetEnumerator() { foreach (Bar b in DefaultBar) yield return b; }
         public Bar this[int index]
         {
@@ -28,22 +29,8 @@ namespace TradeLib
             sym = stock;
         }
         public bool isValid { get { return Has(1); } }
-        public bool HasBar() { return Count> 0; }
+        public bool HasBar() { return Count > 0; }
         public bool Has(int MinimumBars) { return Count >= MinimumBars; }
-        public bool Has(int MinimumBars, BarInterval interval)
-        {
-            switch (interval)
-            {
-                case BarInterval.Day: return daylist.Count >= MinimumBars; break;
-                case BarInterval.FifteenMin: return fifteenlist.Count >= MinimumBars; break;
-                case BarInterval.FiveMin: return fivelist.Count >= MinimumBars; break;
-                case BarInterval.Hour: return hourlist.Count >= MinimumBars; break;
-                case BarInterval.Minute: return minlist.Count >= MinimumBars; break;
-            }
-            return false;
-        }
-    
-
         /// <summary>
         /// Resets this instance.  Clears all the bars for all time intervals.
         /// </summary>
@@ -51,6 +38,7 @@ namespace TradeLib
         {
             minlist.Clear();
             fivelist.Clear();
+            thirtylist.Clear();
             fifteenlist.Clear();
             hourlist.Clear();
             daylist.Clear();
@@ -58,24 +46,25 @@ namespace TradeLib
         protected List<Bar> minlist = new List<Bar>();
         protected List<Bar> fivelist = new List<Bar>();
         protected List<Bar> fifteenlist = new List<Bar>();
+        protected List<Bar> thirtylist = new List<Bar>();
         protected List<Bar> hourlist = new List<Bar>();
         protected List<Bar> daylist = new List<Bar>();
         public string Symbol { get { return sym; } }
         public int Count { get { return DefaultBar.Count; } }
-        public int Last { get { return Count -1; } }
+        public int Last { get { return Count - 1; } }
         /// <summary>
         /// Returns most recent bar, or an invalid bar if no bars have been received
         /// </summary>
-        public Bar RecentBar 
-        { 
-            get 
+        public Bar RecentBar
+        {
+            get
             {
                 try
                 {
                     return this[Last];
                 }
                 catch (NullReferenceException) { return new Bar(); }
-            } 
+            }
         }
         /// <summary>
         /// Gets a value indicating whether most recently added bar is a [new bar].
@@ -93,6 +82,7 @@ namespace TradeLib
                     case BarInterval.FiveMin: bars = fivelist; break;
                     case BarInterval.Minute: bars = minlist; break;
                     case BarInterval.FifteenMin: bars = fifteenlist; break;
+                    case BarInterval.ThirtyMin: bars = thirtylist; break;
                     case BarInterval.Hour: bars = hourlist; break;
                     case BarInterval.Day: bars = daylist; break;
                 }
@@ -124,6 +114,7 @@ namespace TradeLib
                 case BarInterval.FiveMin: bars = fivelist; break;
                 case BarInterval.Minute: bars = minlist; break;
                 case BarInterval.FifteenMin: bars = fifteenlist; break;
+                case BarInterval.ThirtyMin: bars = thirtylist; break;
                 case BarInterval.Hour: bars = hourlist; break;
                 case BarInterval.Day: bars = daylist; break;
             }
@@ -136,9 +127,9 @@ namespace TradeLib
         /// <param name="t">The tick to add.</param>
         public bool newTick(Tick t)
         {
-            if ((t.sym != Symbol) && (Symbol==""))
+            if ((t.sym != Symbol) && (Symbol == ""))
                 this.sym = t.sym; // if we have no symbol, take ticks symbol
-            else if ((t.sym!=Symbol) && (Symbol!=""))
+            else if ((t.sym != Symbol) && (Symbol != ""))
                 return NewBar; //don't process ticks for other stocks
             if (!t.isTrade) return NewBar; // don't process quotes
             // if we have no bars, add bar with a tick
@@ -147,11 +138,13 @@ namespace TradeLib
                 minlist.Add(new Bar(BarInterval.Minute));
                 fivelist.Add(new Bar(BarInterval.FiveMin));
                 fifteenlist.Add(new Bar(BarInterval.FifteenMin));
+                thirtylist.Add(new Bar(BarInterval.ThirtyMin));
                 hourlist.Add(new Bar(BarInterval.Hour));
                 daylist.Add(new Bar(BarInterval.Day));
                 minlist[minlist.Count - 1].newTick(t);
                 fivelist[fivelist.Count - 1].newTick(t);
                 fifteenlist[fifteenlist.Count - 1].newTick(t);
+                thirtylist[thirtylist.Count - 1].newTick(t);
                 hourlist[hourlist.Count - 1].newTick(t);
                 daylist[daylist.Count - 1].newTick(t);
             }
@@ -252,7 +245,7 @@ namespace TradeLib
             Stock s = eSigTick.InitEpf(sr);
             BarList b = new BarList(BarInterval.FiveMin, s.Symbol);
             while (!sr.EndOfStream)
-                b.AddTick(eSigTick.FromStream(s.Symbol,sr));
+                b.AddTick(eSigTick.FromStream(s.Symbol, sr));
             return b;
         }
 
@@ -271,7 +264,7 @@ namespace TradeLib
                 b.AddTick(Index.Deserialize(sr.ReadLine()).ToTick());
             return b;
         }
-            
+
     }
 
 }
