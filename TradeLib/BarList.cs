@@ -31,6 +31,19 @@ namespace TradeLib
         public bool isValid { get { return Has(1); } }
         public bool HasBar() { return Count > 0; }
         public bool Has(int MinimumBars) { return Count >= MinimumBars; }
+        public bool Has(int MinimumBars, BarInterval interval)
+        {
+            switch (interval)
+            {
+                case BarInterval.Day: return daylist.Count >= MinimumBars; break;
+                case BarInterval.FifteenMin: return fifteenlist.Count >= MinimumBars; break;
+                case BarInterval.ThirtyMin: return thirtylist.Count >= MinimumBars; break;
+                case BarInterval.FiveMin: return fivelist.Count >= MinimumBars; break;
+                case BarInterval.Hour: return hourlist.Count >= MinimumBars; break;
+                case BarInterval.Minute: return minlist.Count >= MinimumBars; break;
+            }
+            return false;
+        }
         /// <summary>
         /// Resets this instance.  Clears all the bars for all time intervals.
         /// </summary>
