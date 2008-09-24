@@ -139,6 +139,10 @@ namespace TradeLib
         /// <summary>
         /// Hour-long intervals
         /// </summary>
+        ThirtyMin = 30,
+        /// <summary>
+        /// Hour-long intervals
+        /// </summary>
         Hour = 60,
         /// <summary>
         /// Day-long intervals
