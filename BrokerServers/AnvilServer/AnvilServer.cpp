@@ -73,14 +73,13 @@ void WINAPI TerminateAnvilExtension()
     if(frame)
     {
         frame->DestroyWindow();
-//        delete frame;
     }
 
 }
 
 const char* WINAPI GetAnvilExtensionDescription()
 {
-    return "TradeLink AnvilServer";
+    return "Anvil+BrokerServer";
 }
 
 const char* WINAPI GetAnvilExtensionMenu()
@@ -122,6 +121,7 @@ void ShowMainWindow()
     ExtFrame* frame = ExtFrame::GetInstance();
 	Observable* m_account = B_GetCurrentAccount();
 	BOOL isSim = B_IsAccountSimulation(m_account);
+	delete m_account;
 
     if(!frame)
     {
@@ -153,7 +153,7 @@ const char* VERFILE = "c:\\progra~1\\tradelink\\brokerserver\\VERSION.txt";
 
 void WINAPI InitializeAnvilExtension()
 {
-	CString major = "2.2";
+	CString major = "0.1";
 	CString minor("$Rev: 197 $");
 	std::ifstream file;
 	file.open(VERFILE);
