@@ -9,7 +9,6 @@ namespace TradeLib
     /// </summary>
     public class BarList : TickIndicator
     {
-        private int _enum = -1;
         public IEnumerator GetEnumerator() { foreach (Bar b in DefaultBar) yield return b; }
         public Bar this[int index]
         {
