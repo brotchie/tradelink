@@ -6,7 +6,6 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using TradeLib;
-using ResearchLib;
 
 namespace Record
 {
@@ -23,7 +22,6 @@ namespace Record
             InitializeComponent();
             if ((tl.LinkType == TLTypes.LIVEBROKER) || (tl.LinkType == TLTypes.SIMBROKER))
             {
-                tw.Alerted += new StockDelegate(tw_Alerted);
                 tl.gotTick += new TickDelegate(tl_gotTick);
                 tl.gotIndexTick += new IndexDelegate(tl_gotIndexTick);
             }
@@ -39,32 +37,19 @@ namespace Record
             ta.Save(t);
         }
 
-        void tw_Alerted(Stock stock)
-        {
-            if (emailbox.Text != "")
-                Email.Send(emailbox.Text, emailbox.Text, "TickDelay " + stock.Symbol, "No ticks received for " + tw.DefaultWait + " seconds." + stock.ToString());
-        }
 
         private void symbox_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyData == Keys.Enter)
-            {
-                int size = mb.Count + ib.Count;
-                Security sec = Security.Parse(symbox.Text);
-                if (sec.Type== SecurityType.IDX)
-                    ib.Add(new Index(symbox.Text));
-                else
-                    mb.Add(new Stock(symbox.Text));
-                refreshlist(size);
-            }
+                recordbut_Click(null, null);
         }
 
         void refreshlist(int size)
         {
             if (size != (mb.Count + ib.Count))
             {
-                tl.RegIndex(ib);
-                tl.Subscribe(mb);
+                if (ib.Count>0) tl.RegIndex(ib);
+                if (mb.Count>0) tl.Subscribe(mb);
 
                 stockslist.Items.Clear();
                 for (int i = 0; i < mb.Count; i++)
@@ -74,16 +59,17 @@ namespace Record
             }
         }
 
-        private void toolStripButton1_Click(object sender, EventArgs e)
+        private void recordbut_Click(object sender, EventArgs e)
         {
-            if (Clipboard.ContainsText())
-            {
-                string t = Clipboard.GetText();
-                int size = mb.Count + ib.Count;
-                mb.Add(ParseStocks.NYSE(t));
-                mb.Add(ParseStocks.NASDAQ(t));
-                refreshlist(size);
-            }
+            int size = mb.Count + ib.Count;
+            Security sec = Security.Parse(symbox.Text);
+            if (sec.Type == SecurityType.IDX)
+                ib.Add(new Index(symbox.Text));
+            else
+                mb.Add(new Stock(symbox.Text));
+            refreshlist(size);
+
         }
+
     }
 }
