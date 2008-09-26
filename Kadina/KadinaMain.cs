@@ -457,8 +457,8 @@ namespace Kadina
         bool isDesiredExchange(string name)
         {
             foreach (ToolStripMenuItem m in filter.DropDown.Items)
-                if (m.Checked && name.Contains(m.Text)) return true;
-            return false;
+                if (m.Checked && !name.Contains(m.Text)) return false;
+            return true;
         }
 
         void boxlist_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -536,7 +536,7 @@ namespace Kadina
                         recent.DropDownItems.Add(f);
                 for (int i = 0; i < l.Count; i++)
                     boxlist.DropDownItems.Add(l[i]);
-                status("Found " + l.Count + " boxes in DLL.");
+                status("Found " + l.Count + " boxes in DLL.  Please select a box from Boxes Menu.");
                 return true;
             }
             else if (isEPF(f))
