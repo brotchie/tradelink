@@ -33,10 +33,6 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="TradeLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Program Files\TradeLink\TradeLinkSuite\TradeLib.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ParseListed.cs" />
@@ -74,6 +70,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="nasdaq.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TradeLib\TradeLib.csproj">
+      <Project>{A0FE06A2-F31B-49DE-8901-917B5D593E43}</Project>
+      <Name>TradeLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
