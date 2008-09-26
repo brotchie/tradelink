@@ -3,6 +3,7 @@ Name "TradeLinkSuite"
 XPStyle on
 CRCCheck force
 ShowInstDetails show
+SetOverWrite on
 Icon "tradelinkinstaller.ico"
 
 ; The file to write
