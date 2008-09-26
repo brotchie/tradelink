@@ -8,6 +8,7 @@ Icon "favicon.ico"
 
 XPStyle on
 CRCCheck force
+SetOverWrite on
 ShowInstDetails show
 
 ; The file to write
