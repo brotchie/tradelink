@@ -9,6 +9,11 @@
 #include "SendMsg.h"
 using namespace TradeLinkServer;
 
+typedef std::vector <int> filllist;
+std::vector<filllist> accountfills;
+std::vector<CString> accounts;
+std::vector<Order*> ordercache;
+
 Monitor::Monitor()
 {
 	void* iterator = B_CreateAccountIterator();
@@ -22,10 +27,23 @@ Monitor::Monitor()
 	B_DestroyIterator(iterator);
 }
 
+Monitor::~Monitor()
+{
+	void* iterator = B_CreateAccountIterator();
+	B_StartIteration(iterator);
+	Observable* acct;
+	while (acct = B_GetNextAccount(iterator)) // loop through every available account
+	{
+		acct->Remove(this); // add this object to account as an observer
+	}
+	B_DestroyIterator(iterator);
+	accounts.clear();
+	ordercache.clear();
+	accountfills.clear();
+}
 
-typedef std::vector <int> filllist;
-std::vector<filllist> accountfills;
-std::vector<CString> accounts;
+
+
 int AccountId(CString acct) { for (size_t i = 0; i<accounts.size(); i++) if (accounts[i]==acct) return i; return -1; }
 bool hasFillID(CString acct,int id)
 {
@@ -45,7 +63,7 @@ bool hasFillID(CString acct,int id)
 	accountfills[aid] = existing;
 	return false;
 }
-std::vector<Order*> ordercache;
+
 bool hasOrder(unsigned int  TLid)
 {
 	return (TLid>=0) && (TLid<ordercache.size());
@@ -58,12 +76,6 @@ unsigned int AnvilId(unsigned int TLOrderId)
 	return o->GetId();
 }
 
-
-Monitor::~Monitor()
-{
-	ordercache.clear();
-	accountfills.clear();
-}
 
 unsigned int Monitor::cacheOrder(Order* o)
 {

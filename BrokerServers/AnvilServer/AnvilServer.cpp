@@ -121,7 +121,7 @@ void ShowMainWindow()
     ExtFrame* frame = ExtFrame::GetInstance();
 	Observable* m_account = B_GetCurrentAccount();
 	BOOL isSim = B_IsAccountSimulation(m_account);
-	delete m_account;
+
 
     if(!frame)
     {

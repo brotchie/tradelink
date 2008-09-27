@@ -85,11 +85,27 @@ std::vector <TLIdx*> idxs; // saves our indicies with hammer
 
 void TLUnload()
 {
+	for (size_t i = 0; i<subs.size(); i++)
+	{
+		if (subs[i]!=NULL)
+		{
+			subs[i]->Clear();
+			delete subs[i];
+			subs[i] = NULL;
+		}
+	}
+	for (size_t i = 0; i<idxs.size(); i++) 
+	{
+		if (idxs[i]!=NULL)
+		{
+			idxs[i]->Clear();
+			delete idxs[i];
+			idxs[i] = NULL;
+		}
+	}
 	client.clear();
 	heart.clear();
 	stocks.clear();
-	for (size_t i = 0; i<subs.size(); i++) subs[i]->Clear();
-	for (size_t i = 0; i<idxs.size(); i++) idxs[i]->Clear();
 	subs.clear();
 	idxs.clear();
 }
@@ -276,7 +292,14 @@ LRESULT RegStocks(CString m)
 void RemoveSub(CString stock)
 {
 	for (size_t i = 0; i<subs.size(); i++)
-		if (subs[i]->GetSymbol().compare(stock)==0) subs[i]->Clear();
+	{
+		if ((subs[i]!=NULL) && subs[i]->isLoaded() && (subs[i]->GetSymbol().compare(stock)==0))
+		{
+			subs[i]->Clear();
+			delete subs[i];
+			subs[i]= NULL;
+		}
+	}
 }
 
 void RemoveSubs(CString cwind)
@@ -310,6 +333,7 @@ LRESULT ClearClient(CString m)
 
 LRESULT ClearStocks(CString m)
 {
+	RemoveSubs(m);
 	int cid = FindClient(m);
 	if (cid==-1) return 1;
 	stocks[cid] = mystocklist(0);

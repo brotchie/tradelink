@@ -9,7 +9,7 @@
 			Name="Release|Win32"
 			>
 			<DebugSettings
-				Command=""
+				Command="C:\Users\jfranta\Documents\Visual Studio 2005\Projects\AnvilDebug_x32_2_7_0_5\Anvil.exe"
 				WorkingDirectory=""
 				CommandArguments=""
 				Attach="false"
@@ -22,7 +22,7 @@
 				SQLDebugging=""
 				Environment=""
 				EnvironmentMerge="true"
-				DebuggerFlavor=""
+				DebuggerFlavor="0"
 				MPIRunCommand=""
 				MPIRunArguments=""
 				MPIRunWorkingDirectory=""
@@ -65,7 +65,7 @@
 			Name="Debug|Win32"
 			>
 			<DebugSettings
-				Command="C:\Users\jfranta\Documents\Visual Studio 2005\Projects\AnvilDebug_x32_2_6_8_16\Anvil.exe"
+				Command="C:\Users\jfranta\Documents\Visual Studio 2005\Projects\AnvilDebug_x32_2_7_0_5\Anvil.exe"
 				WorkingDirectory=""
 				CommandArguments=""
 				Attach="false"

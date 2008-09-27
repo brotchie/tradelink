@@ -41,8 +41,8 @@ ExtFrame::ExtFrame()
 ExtFrame::~ExtFrame()
 {
 	TLUnload();
+	B_GetAdminObservable()->Remove(monitor);
 	delete monitor;
-	monitor = NULL;
     instance = NULL;
 }
 
@@ -961,7 +961,6 @@ void ExtFrame::OnMultiBook()
 
 BOOL ExtFrame::OnCopyData(CWnd* sWnd, COPYDATASTRUCT* CD) 
 {
-	TRACE0("got COPYDATA");
 	CString gotMsg = (LPCTSTR)(CD->lpData);
 	int gotType = (int)(CD->dwData);
 	return ServiceMsg(gotType,gotMsg);
