@@ -154,7 +154,7 @@ const char* VERFILE = "c:\\progra~1\\tradelink\\brokerserver\\VERSION.txt";
 void WINAPI InitializeAnvilExtension()
 {
 	CString major = "0.1";
-	CString minor("$Rev: 197 $");
+	CString minor("$Rev$");
 	std::ifstream file;
 	file.open(VERFILE);
 	if (file.is_open())
