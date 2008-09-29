@@ -899,7 +899,6 @@ void ExtFrame::MarketSummaryPopulationDone(bool done)
 
 void ExtFrame::Process(const Message* message, Observable* from, const Message* additionalInfo)
 {
-	TLKillDead(600);
 	
     switch(message->GetType())
     {
