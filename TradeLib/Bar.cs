@@ -69,8 +69,14 @@ namespace TradeLib
         }
         public int Bartime { get { return bartime; } }
         public int Bardate { get { return bardate; } }
-        private int BarTime(int time) { return time - (time % (int)this.tunits); }
-        public bool Accept(Tick t) { return newTick(t); }
+        private int BarTime(int time) 
+        {
+            DateTime dt = Util.ToDateTime(time, 0);
+            int bcount = (int)dt.TimeOfDay.TotalMinutes / (int)tunits;
+            int h = (bcount * (int)tunits )/ 60;
+            int m = (dt.Minute / (int)tunits)*(int)tunits;
+            return (h * 100) + m;
+        }
 
         /// <summary>
         /// Accepts the specified tick.

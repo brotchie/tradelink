@@ -10,10 +10,17 @@ namespace TradeLib
     public class BarList : TickIndicator
     {
         public IEnumerator GetEnumerator() { foreach (Bar b in DefaultBar) yield return b; }
+        public Bar this[int index, BarInterval bint]
+        {
+            get { return Get(index, bint); }
+        }
+
+    
         public Bar this[int index]
         {
             get { return Get(index); }
         }
+        public BarList(string symbol) : this(BarInterval.FiveMin, symbol) { }
         public BarList() : this(BarInterval.FiveMin, "") { }
         string sym = "";
         public BarList(BarInterval PreferredInt) : this(PreferredInt, "") { }
@@ -75,7 +82,7 @@ namespace TradeLib
                 {
                     return this[Last];
                 }
-                catch (NullReferenceException) { return new Bar(); }
+                catch (Exception) { return new Bar(); }
             }
         }
         /// <summary>
@@ -130,6 +137,7 @@ namespace TradeLib
                 case BarInterval.Hour: bars = hourlist; break;
                 case BarInterval.Day: bars = daylist; break;
             }
+            if ((i < 0) || (i >= bars.Count)) return new Bar();
             return bars[i];
         }
         public void AddTick(Tick t) { newTick(t); }
@@ -163,23 +171,34 @@ namespace TradeLib
             else
             {
                 // if we have at least a bar, get most current bar
-                BarInterval saveint = Int;
                 foreach (BarInterval inv in Enum.GetValues(typeof(BarInterval)))
                 {
-                    Int = inv;
-                    Bar cbar = RecentBar;
+                    Bar cbar = this[this.Last, inv];
                     // if tick fits in current bar, then we're done for this interval
                     if (cbar.newTick(t)) continue;
-                    else
-                    {
-                        DefaultBar.Add(new Bar(Int)); // otherwise we need another bar in this interval
-                        DefaultBar[DefaultBar.Count - 1].newTick(t);
-                    }
-                }
-                Int = saveint;
+                    else // otherwise we need another bar in this interval
+                        if (AddBar(inv))
+                            this[this.Last,inv].newTick(t);
+               }
             }
             return NewBar;
         }
+
+        bool AddBar(BarInterval bint)
+        {
+            switch (bint)
+            {
+                case BarInterval.Day: daylist.Add(new Bar(BarInterval.Day)); break;
+                case BarInterval.FifteenMin: fifteenlist.Add(new Bar(BarInterval.FifteenMin)); break;
+                case BarInterval.FiveMin: fivelist.Add(new Bar(BarInterval.FiveMin)); break;
+                case BarInterval.Hour: hourlist.Add(new Bar(BarInterval.Hour)); break;
+                case BarInterval.Minute: minlist.Add(new Bar(BarInterval.Minute)); break;
+                case BarInterval.ThirtyMin: thirtylist.Add(new Bar(BarInterval.ThirtyMin)); break;
+                default: return false;
+            }
+            return true;
+        }
+    
 
         public Stock ToStock()
         {
