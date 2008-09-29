@@ -53,7 +53,6 @@ namespace TestTradeLib
         public void test_alert(Stock s)
         {
             alertssent++;
-            Console.WriteLine(s.Symbol + " is overdue.");
         }
     }
 }

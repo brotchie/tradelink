@@ -173,7 +173,6 @@ namespace TestTradeLib
 
         void b_GotDebug(Debug debug)
         {
-            Console.WriteLine(debug.Msg);
             debugs++;
         }
 
@@ -384,7 +383,7 @@ namespace TestTradeLib
 
         void f_GotDebug(Debug debug)
         {
-            Console.WriteLine(debug.Msg);
+            
         }
     }
 

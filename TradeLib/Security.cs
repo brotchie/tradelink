@@ -33,7 +33,6 @@ namespace TradeLib
         public static Security Parse(string msg)
         {
             string[] r = msg.Split(' ');
-            Console.WriteLine(msg);
             Security sec = new Security();
             sec.Symbol = r[0];
             if (r.Length > 2)
