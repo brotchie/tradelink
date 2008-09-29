@@ -48,6 +48,7 @@ namespace TradeLib
         {
             int hour = (int)Math.Floor((decimal)TradeLinkTime / 100);
             int min = TradeLinkTime - (hour*100);
+            if (min > 59) { hour++; min-=60; }
             int year = 1, day = 1, month = 1;
             if (TradeLinkDate != 0)
             {
