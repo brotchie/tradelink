@@ -53,6 +53,34 @@ namespace TestTradeLib
             Assert.That(newbars == 8, newbars.ToString());
 
         }
+        [Test]
+        public void HourTest()
+        {
+            int t = 1915;
+            Tick[] tape = new Tick[] { 
+                Tick.NewTrade(sym,d,t,0,10,100,x), // new on all intervals
+                Tick.NewTrade(sym,d,t+1,0,10,100,x), 
+                Tick.NewTrade(sym,d,t+2,0,10,100,x),
+                Tick.NewTrade(sym,d,t+3,0,10,100,x),
+                Tick.NewTrade(sym,d,t+4,0,15,100,x), 
+                Tick.NewTrade(sym,d,t+5,0,16,100,x), 
+                Tick.NewTrade(sym,d,t+6,0,16,100,x),
+                Tick.NewTrade(sym,d,t+7,0,10,100,x), 
+                Tick.NewTrade(sym,d,t+7,10,10,100,x), 
+                Tick.NewTrade(sym,d,t+100,0,10,100,x), // new on hour interval
+            };
+
+            int newbars = 0;
+            BarList bl = new BarList(BarInterval.Hour, sym);
+            foreach (Tick k in tape)
+            {
+                bl.newTick(k);
+                if (bl.NewBar)
+                    newbars++;
+            }
+
+            Assert.That(newbars == 2, newbars.ToString());
+        }
 
 
     }
