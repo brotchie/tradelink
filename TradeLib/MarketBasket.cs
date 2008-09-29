@@ -20,12 +20,12 @@ namespace TradeLib
             Add(firststock);
         }
         public MarketBasket() { }
-        public Stock this [int index] { get { return stocks[index]; } set { stocks[index] = value; } }
-        List<Stock> stocks = new List<Stock>();
-        public int Count { get { return stocks.Count; } }
-        public bool hasStock { get { return stocks.Count >0; } }
-        public void Add(Security s) { if (s.isValid) stocks.Add((Stock)s); }
-        public void Add(Stock s) { if (s.isValid) stocks.Add(s); }
+        public Security this [int index] { get { return symbols[index]; } set { symbols[index] = value; } }
+        List<Security> symbols = new List<Security>();
+        public int Count { get { return symbols.Count; } }
+        public bool hasStock { get { return symbols.Count >0; } }
+        public void Add(Security s) { if (s.isValid) symbols.Add((Stock)s); }
+        public void Add(Stock s) { if (s.isValid) symbols.Add(s); }
         public void Add(MarketBasket mb)
         {
             for (int i = 0; i < mb.Count; i++)
@@ -34,21 +34,21 @@ namespace TradeLib
         public void Subtract(MarketBasket mb)
         {
             List<int> remove = new List<int>();
-            for (int i = 0; i < stocks.Count; i++)
+            for (int i = 0; i < symbols.Count; i++)
                 for (int j = 0; j < mb.Count; j++)
-                    if (stocks[i].Symbol == mb[j].Symbol)
+                    if (symbols[i].Symbol == mb[j].Symbol)
                         remove.Add(i);
             for (int i = remove.Count - 1; i >= 0; i--)
-                stocks.RemoveAt(remove[i]);
+                symbols.RemoveAt(remove[i]);
         }
-        public void Remove(int i) { stocks.RemoveAt(i); }
-        public void Remove(Stock s) { stocks.Remove(s); }
-        public void Clear() { stocks.Clear(); }
-        public Stock Get(int i) { return (Stock)stocks[i]; }
+        public void Remove(int i) { symbols.RemoveAt(i); }
+        public void Remove(Stock s) { symbols.Remove(s); }
+        public void Clear() { symbols.Clear(); }
+        public Stock Get(int i) { return (Stock)symbols[i]; }
         public override string  ToString()
         {
             List<string> s = new List<string>();
-            for (int i = 0; i < stocks.Count; i++) s.Add(Get(i).Symbol);
+            for (int i = 0; i < symbols.Count; i++) s.Add(Get(i).Symbol);
             return string.Join(",", s.ToArray());
         }
         public static MarketBasket FromString(string serialBasket)
