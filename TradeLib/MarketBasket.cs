@@ -24,7 +24,7 @@ namespace TradeLib
         List<Security> symbols = new List<Security>();
         public int Count { get { return symbols.Count; } }
         public bool hasStock { get { return symbols.Count >0; } }
-        public void Add(Security s) { if (s.isValid) symbols.Add((Stock)s); }
+        public void Add(Security s) { if (s.isValid) symbols.Add(s); }
         public void Add(Stock s) { if (s.isValid) symbols.Add(s); }
         public void Add(MarketBasket mb)
         {
