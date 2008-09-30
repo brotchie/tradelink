@@ -86,5 +86,18 @@ namespace TradeLib
             return wmult * MINSIZE;
         }
 
+        /// <summary>
+        /// Provides an offsetting price from a position.
+        /// Positive offset will be a profit offset, negative offset will be stop.
+        /// </summary>
+        /// <param name="p">Position</param>
+        /// <param name="offset">Offset amount</param>
+        /// <returns>Offset price</returns>
+        public static decimal OffsetPrice(Position p, decimal offset) { return OffsetPrice(p.AvgPrice, p.Side, offset); }
+        public static decimal OffsetPrice(decimal AvgPrice, bool side, decimal offset)
+        {
+            return side ? AvgPrice + offset : AvgPrice - offset;
+        }
+
     }
 }
