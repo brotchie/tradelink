@@ -22,11 +22,13 @@ namespace TradeLib
         public bool isValid { get { return _name != BLANKBOX; } }
         protected Position Pos { get { return _pos; } set { _pos = value; } }
         public virtual void D(string debug) 
-        { 
+        {
+            string Date = _dt != DateTime.MinValue ? _dt.ToString() : "";
             if (SendDebug != null) 
-                SendDebug(TradeLib.Debug.Create("[" + Name + "] " + Symbol + " " + Date + ":" + Time + " " + debug, DebugLevel.Debug)); 
+                SendDebug(Debug.Create("[" + Name + "] " + Symbol + " " + Date + debug, DebugLevel.Debug)); 
         }
 
+        private DateTime _dt = DateTime.MinValue;
         private Position _pos = null;
         private bool _ison = true;
         protected string[] _iname;
