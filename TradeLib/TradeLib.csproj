@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="aBox.cs" />
     <Compile Include="Account.cs" />
     <Compile Include="Auth.cs" />
     <Compile Include="Bar.cs" />
