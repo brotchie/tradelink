@@ -13,12 +13,13 @@ namespace TradeLib
         public MarketBasket(string[] symbolist)
         {
             foreach (string s in symbolist)
-                Add(new Stock(s));
+                Add(new Security(s));
         }
         public MarketBasket(Stock firststock)
         {
             Add(firststock);
         }
+        public MarketBasket(Security firstsecurity) { Add(firstsecurity); }
         public MarketBasket() { }
         public Security this [int index] { get { return symbols[index]; } set { symbols[index] = value; } }
         List<Security> symbols = new List<Security>();
@@ -42,9 +43,9 @@ namespace TradeLib
                 symbols.RemoveAt(remove[i]);
         }
         public void Remove(int i) { symbols.RemoveAt(i); }
-        public void Remove(Stock s) { symbols.Remove(s); }
+        public void Remove(Security s) { symbols.Remove(s); }
         public void Clear() { symbols.Clear(); }
-        public Stock Get(int i) { return (Stock)symbols[i]; }
+        public Security Get(int i) { return symbols[i]; }
         public override string  ToString()
         {
             List<string> s = new List<string>();
@@ -57,8 +58,12 @@ namespace TradeLib
             if ((serialBasket == null) || (serialBasket == "")) return mb;
             string[] r = serialBasket.Split(',');
             for (int i = 0; i < r.Length; i++)
-                if ((r[i]!="") && Stock.isStock(r[i]))
-                    mb.Add(new Stock(r[i]));
+            {
+                if (r[i] == "") continue;
+                Security sec = Security.Parse(r[i]);
+                if (sec.isValid)
+                    mb.Add(sec);
+            }
             return mb;
         }
 
