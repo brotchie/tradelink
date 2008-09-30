@@ -5,7 +5,7 @@ using System.Text;
 namespace TradeLib
 {
     // base template class for issue #32
-    public class aBox
+    public class Response
     {
         public event TickDelegate GotTick;
         public event OrderDelegate GotOrder;
@@ -14,25 +14,18 @@ namespace TradeLib
         public event OrderDelegate SendOrder;
         public event UIntDelegate SendCancel;
         public event DebugFullDelegate SendDebug;
+        public event ObjectArrayDelegate SendIndicators;
 
         public string Name { get { return _name; } }
         public string FullName { get { return _fullname; } set { _fullname = value; } }
         public string Symbol { get { return _sym; } }
         public bool isOn { get { return _ison; } }
         public bool isValid { get { return _name != BLANKBOX; } }
-        protected Position Pos { get { return _pos; } set { _pos = value; } }
-        public virtual void D(string debug) 
-        {
-            string Date = _dt != DateTime.MinValue ? _dt.ToString() : "";
-            if (SendDebug != null) 
-                SendDebug(Debug.Create("[" + Name + "] " + Symbol + " " + Date + debug, DebugLevel.Debug)); 
-        }
-
-        private DateTime _dt = DateTime.MinValue;
-        private Position _pos = null;
-        private bool _ison = true;
+        protected string[] IndicatorNames { get { return _iname; } set { _iname = value; } }
+        protected object[] Indicators { get { return _indicators; } }
         protected string[] _iname;
         protected object[] _indicators;
+
         const string BLANKBOX = "Blank Box Template";
         string _name = BLANKBOX;
         string _fullname = "";
