@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual C# Express 2005
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C# Express 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeLib", "TradeLib\TradeLib.csproj", "{A0FE06A2-F31B-49DE-8901-917B5D593E43}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeSales", "TimeAndSales\TimeSales.csproj", "{5FE9B310-BE7C-4ADE-8D33-DB8646D8FC3C}"
