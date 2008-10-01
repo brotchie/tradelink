@@ -232,7 +232,7 @@ namespace TradeLib
         }
             
 
-        static bool IsBox(Type t) { return (t.BaseType!=null) && ((t.BaseType.IsSubclassOf(typeof(Box))) || t.BaseType.Equals(typeof(Box))); }
+        static bool IsBox(Type t) { return (t.BaseType!=null) && ((t.BaseType.IsSubclassOf(typeof(Response))) || t.BaseType.Equals(typeof(Response))); }
         /// <summary>
         /// Gets teh fully qualified boxnames found in a given file.
         /// </summary>

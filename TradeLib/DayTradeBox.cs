@@ -39,23 +39,24 @@ namespace TradeLib
         public void Indicate(object[] values) { if (SendIndicators != null) SendIndicators(values); }
 
 
-        public DayTradeBox()
-        {
-
-        }
-
         public void GotTick(Tick tick)
         {
-            if ((_date != 0) && (tick.date > _date))
+            if ((_date != 0) && (tick.date != _date))
                 Reset();
-            _bl.newTick(tick);
             Order o = new Order();
             if (Symbol == null)
             {
                 if (tick.sym != "") Symbol = tick.sym;
                 else return;
                 _pos = new Position(tick.sym);
+                try
+                {
+                    if (Util.isEarlyClose(tick.date))
+                        DayEnd = Util.GetEarlyClose(tick.date);
+                }
+                catch (Exception ex) { D("Exception checking for EarlyClose..."+ex.Message); }
             }
+            _bl.newTick(tick);
             if (!_pos.isValid)
             {
                 D("Invalid position provided: " + _pos.ToString());
@@ -296,7 +297,11 @@ namespace TradeLib
         public bool Off { get { return _shut; } }
         [BrowsableAttribute(false)]
         public Position Pos { get { return _pos; } }
-        public BarList BL { get { return _bl; } }
+        [BrowsableAttribute(false)]
+        protected BarList BL { get { return _bl; } }
+        [BrowsableAttribute(false)]
+        public bool isValid { get { return _shut; } }
+
 
 
     }

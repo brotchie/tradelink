@@ -17,11 +17,11 @@ namespace Kadina
         string boxname = "";
         Stock stock;
         Broker broker = new Broker();
-        Box mybox;
+        Response mybox;
         System.IO.StreamReader sr;
         PlayTo pt = PlayTo.TenTrade;
         public event TickDelegate KadTick;
-        BarList bl;
+
         DataTable dt = new DataTable("ticktable");
         DataTable it = new DataTable("itable");
         DataTable ptab = new DataTable("ptable");
@@ -81,8 +81,6 @@ namespace Kadina
             boxdebugs = !boxdebugs;
             if (boxdebugs) status("Box debugging enabled.");
             else status("Box debugging disabled");
-            if (mybox != null)
-                mybox.Debug = boxdebugs;
         }
 
         void rightplay(object sender, EventArgs e)
@@ -216,7 +214,7 @@ namespace Kadina
             {
                 fg.CurrentCell = new System.Windows.Forms.DataGridCell(hti.Row, hti.Column);
                 fg.Select(hti.Row);
-                if (mybox.hasIndicators && (it.Rows.Count > hti.Row)) ig.Select(hti.Row);
+                if (it.Rows.Count > hti.Row) ig.Select(hti.Row);
             }    
         }
 
@@ -228,17 +226,17 @@ namespace Kadina
             {
                 og.CurrentCell = new System.Windows.Forms.DataGridCell(hti.Row, hti.Column);
                 og.Select(hti.Row);
-                if (mybox.hasIndicators && (it.Rows.Count > hti.Row)) ig.Select(hti.Row);
+                if (it.Rows.Count > hti.Row) ig.Select(hti.Row);
             }    
         }
 
 
         void InitIGrid()
         {
-            if ((mybox == null) || !mybox.hasIndicators) 
+            if ((mybox == null) || (mybox.Indicators.Length==0))
                 return;
-            for (int i = 0; i < mybox.IndicatorNames.Length; i++)
-                it.Columns.Add(mybox.IndicatorNames[i]);
+            for (int i = 0; i < mybox.Indicators.Length; i++)
+                it.Columns.Add(mybox.Indicators[i]);
 
             ig.Parent = itab;
             ig.DataSource = it;
@@ -290,7 +288,7 @@ namespace Kadina
             {
                 dg.CurrentCell = new System.Windows.Forms.DataGridCell(hti.Row, hti.Column);
                 dg.Select(hti.Row);
-                if (mybox.hasIndicators && (it.Rows.Count>hti.Row)) ig.Select(hti.Row);
+                if (it.Rows.Count>hti.Row) ig.Select(hti.Row);
             }            
         }
 
@@ -349,16 +347,10 @@ namespace Kadina
 
             nowtime = t.time.ToString() + ":" + t.sec.ToString();
 
-            if (bl == null) 
-                bl = new BarList(BarInterval.FiveMin, t.sym);
-            bl.AddTick(t);
             Order o = new Order();
             Position mypos = broker.GetOpenPosition(t.sym);
             if (mybox != null)
-            {
-                o = mybox.Trade(t, bl, mypos, BoxInfo.FromBarList(bl));
-                mybox_IndicatorUpdate(mybox.Indicators);
-            }
+                mybox.GotTick(t);
 
             if (o.isValid) // mark tick/row if an order happened
                 orows.Add(dt.Rows.Count - 1);
@@ -420,7 +412,7 @@ namespace Kadina
                     itime = tk.time;
                     // send them to the box (before we send the tix)
                     for (int id = 0; id < itix.Count; id++)
-                        mybox.NewIndex(itix[id]);
+                        ;//mybox.NewIndex(itix[id]);
                 }
                 if (KadTick!=null) KadTick(tk);
                 tick++;
@@ -471,16 +463,16 @@ namespace Kadina
         {
             try
             {
-                mybox = Box.FromDLL(name, boxdll);
+                mybox = ResponseLoader.FromDLL(name, boxdll);
             }
             catch (Exception ex) { debug(ex.Message); debug("Error, quitting..."); return; }
             if ((mybox != null) && (mybox.FullName == name))
             {
-                mybox.Debug = boxdebugs;
-                mybox.GotDebug += new DebugFullDelegate(mybox_GotDebug);
-                mybox.CancelOrderSource += new UIntDelegate(mybox_CancelOrderSource);
-                broker.GotOrder+=new OrderDelegate(mybox.gotOrderSink);
+                mybox.SendDebug += new DebugFullDelegate(mybox_GotDebug);
+                mybox.SendCancel += new UIntDelegate(mybox_CancelOrderSource);
+                broker.GotOrder+=new OrderDelegate(mybox.GotOrder);
                 broker.GotOrderCancel += new Broker.OrderCancelDelegate(broker_GotOrderCancel);
+                broker.GotFill+=new FillDelegate(mybox.GotFill);
                 status(boxname + " is current box.");
             }
             else status("Box did not load.");
@@ -490,7 +482,7 @@ namespace Kadina
         void broker_GotOrderCancel(string sym, bool side, uint id)
         {
             if (mybox != null)
-                mybox.gotCancelSink(id);
+                mybox.GotOrderCancel(id);
         }
 
         void mybox_CancelOrderSource(uint number)
@@ -500,6 +492,7 @@ namespace Kadina
 
         void mybox_GotDebug(Debug msg)
         {
+            if (!boxdebugs) return;
             if (msg.Level == DebugLevel.Debug)
                 debug(msg.Msg);
             else if (msg.Level == DebugLevel.Status)
@@ -508,8 +501,11 @@ namespace Kadina
 
         void mybox_IndicatorUpdate(object[] parameters)
         {
-            if ((mybox == null) || !mybox.hasIndicators) return;
-            NewIRow(new object[] { parameters });
+            if (mybox == null) return;
+            if (mybox.Indicators.Length == 0) 
+                debug("No indicators defined on box " + mybox.Name);
+            else 
+                NewIRow(new object[] { parameters });
         }
 
 

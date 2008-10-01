@@ -10,7 +10,7 @@ using System.IO;
 {
     public partial class Gauntlet : Form
     {
-        Box mybox;
+        Response mybox;
         BackTest bt;
         public Gauntlet()
         {
@@ -152,8 +152,9 @@ using System.IO;
         {
             bt = new BackTest();
             bt.BTStatus += new DebugFullDelegate(bt_BTStatus);
-            bt.mybroker.GotOrder += new OrderDelegate(mybox.gotOrderSink);
+            bt.mybroker.GotOrder += new OrderDelegate(mybox.GotOrder);
             bt.mybroker.GotOrderCancel += new Broker.OrderCancelDelegate(mybroker_GotOrderCancel);
+            bt.mybroker.GotFill+=new FillDelegate(mybox.GotFill);
             if (cleartrades.Checked) trades.Rows.Clear();
             if (clearorders.Checked) orders.Rows.Clear();
             if (clearmessages.Checked) messages.Clear();
@@ -211,7 +212,7 @@ using System.IO;
             }
 
             bt.name = DateTime.Now.ToString("yyyMMdd.HHmm");
-            if (mybox != null) { bt.mybox = mybox; bt.mybox.Debug = showdebug.Checked; }
+            if (mybox != null) { bt.mybox = mybox;  }
             else { show("You must select a box to run the gauntlet."); return; } 
             string exfilt = "";
             if ((exchlist.SelectedIndices.Count > 0) && 
@@ -290,7 +291,7 @@ using System.IO;
             if (indicatorscsv.Checked)
             {
                 StreamWriter sw = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Indicators"+unique+".csv",false);
-                sw.WriteLine(string.Join(",",mybox.IndicatorNames));
+                sw.WriteLine(string.Join(",",mybox.Indicators));
                 
                 for (int i = 0; i< Indicators.Count; i++)
                 {
@@ -361,18 +362,26 @@ using System.IO;
         {
             try
             {
-                mybox = Box.FromDLL((string)boxlist.SelectedItem, WinGauntlet.Properties.Settings.Default.boxdll);
+                mybox = ResponseLoader.FromDLL((string)boxlist.SelectedItem, WinGauntlet.Properties.Settings.Default.boxdll);
             }
             catch (Exception ex) { show("Box failed to load, quitting... (" + ex.Message + (ex.InnerException != null ? ex.InnerException.Message.ToString() : "") + ")"); }
-            mybox.IndicatorUpdate += new ObjectArrayDelegate(mybox_IndicatorUpdate);
-            mybox.GotDebug += new DebugFullDelegate(mybox_GotDebug);
-            mybox.CancelOrderSource += new UIntDelegate(mybox_CancelOrderSource);
+            if (!mybox.isValid) { show("Box did not load or loaded in a shutdown state. "+mybox.Name+ " "+mybox.FullName); return; }
+            mybox.SendIndicators += new ObjectArrayDelegate(mybox_IndicatorUpdate);
+            mybox.SendDebug += new DebugFullDelegate(mybox_GotDebug);
+            mybox.SendCancel+= new UIntDelegate(mybox_CancelOrderSource);
+            mybox.SendOrder += new OrderDelegate(mybox_SendOrder);
+        }
+
+        void mybox_SendOrder(Order o)
+        {
+            if ((bt != null) && (bt.mybroker != null))
+                bt.mybroker.sendOrder(o);
         }
 
         void mybroker_GotOrderCancel(string sym, bool side, uint id)
         {
             if (mybox != null)
-                mybox.gotCancelSink(id);
+                mybox.GotOrderCancel(id);
         }
 
         void mybox_CancelOrderSource(uint number)

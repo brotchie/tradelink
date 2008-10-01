@@ -25,7 +25,7 @@ namespace TradeLib
         /// Initializes a new instance of the <see cref="ParamPrompt"/> class.
         /// </summary>
         /// <param name="DisplayParamsOfObject">The Box for which you want the user to specify or alter the properties for.</param>
-		public ParamPrompt(Box DisplayParamsOfObject)
+		public ParamPrompt(Response DisplayParamsOfObject)
 		{
 			//
 			// The InitializeComponent() call is required for Windows Forms designer support.

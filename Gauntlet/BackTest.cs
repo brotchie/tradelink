@@ -26,7 +26,7 @@ namespace WinGauntlet
         public string symbol;
         public bool debug = false;
         private Type myboxtype = null;
-        public Box mybox = null;
+        public Response mybox = null;
         private bool _idx = true;
         public int time;
         public string aname = "c:\\program files\\tradelink\\tradelinksuite\\box.dll";
@@ -42,20 +42,11 @@ namespace WinGauntlet
         public int Interval { get { return bint; } set { bint = value; } }
         public string Include { get { return include; } set { include = value; } }
         public string Exclude { get { return exclude; } set { exclude = value; } }
-        private Hashtable EarlyClose;
-        public void SetDayClose() 
-        {
-            try
-            {
-                if (EarlyClose.Contains(tick.date)) mybox.DayEnd = (int)EarlyClose[tick.date];
-            }
-            catch (Exception ex) { string es = ex.Message; }
-        }
+
         public BackTest() 
         {
             this.name = "GauntletRun";
             this.mybroker = new Broker();
-            EarlyClose = Util.GetCloseTime();
             this.WorkerReportsProgress = true;
             this.WorkerSupportsCancellation = false;
             this.DoWork += new DoWorkEventHandler(BackTest_DoWork);
@@ -172,7 +163,7 @@ namespace WinGauntlet
                         itime = tick.time;
                         // send them to the box (before we send the tix)
                         for (int id = 0; id < itix.Count; id++)
-                            mybox.NewIndex(itix[id]);
+                            ;//mybox.NewIndex(itix[id]);
                     }
 
                     if ((this.exfilter != "") &&
@@ -192,7 +183,6 @@ namespace WinGauntlet
                         bl.AddTick(tick); // put our tick back
 
                         if (mybox!=null) mybox.Reset();
-                        SetDayClose(); // this has to be run after mybox.Reset!!!
                     }
 
 
@@ -201,10 +191,9 @@ namespace WinGauntlet
                     // trade box on this tick, if he generates any orders then send them
                     if (mybox != null)
                     {
-                        mybroker.sendOrder(
-                            mybox.Trade(tick, bl, mybroker.GetOpenPosition(this.symbol), bi));
+                        mybox.GotTick(tick);
                         // quit early if box shuts itself off and no pending orders
-                        if (mybox.Off && (mybroker.GetOrderList().Count == 0)) break;
+                        if (!mybox.isValid && (mybroker.GetOrderList().Count == 0)) break;
                     }
 
 
@@ -250,36 +239,7 @@ namespace WinGauntlet
         }
 
 
-        public bool Box(string boxname)
-        {
-            Assembly a;
-            Type type;
-            object[] args;
-            try
-            {
-                a = Assembly.LoadFrom(aname);
-            }
-            catch (Exception ex) { show(ex.Message+Environment.NewLine); return false; }
-            try
-            {
-                type = a.GetType(boxname,true,true);
-            }
-            catch (Exception ex) { show(ex.Message+Environment.NewLine); return false; }
-            this.myboxtype = type;
-            args = new object[] {};
-            try
-            {
-                mybox = (Box)Activator.CreateInstance(myboxtype,args);
-            }
-            catch (Exception ex) { show(ex.Message+Environment.NewLine); return false; }
-            mybox.FullName = boxname;
-            mybox.Debug = debug;
-            return true;
-        }
-        public void NewBarList(int MinInterval)
-        {
-            bl = new BarList((BarInterval)MinInterval);
-        }
+
 
 
         public void show(string debug)

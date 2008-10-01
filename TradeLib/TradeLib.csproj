@@ -52,7 +52,6 @@
     <Compile Include="Bar.cs" />
     <Compile Include="BarList.cs" />
     <Compile Include="BarMath.cs" />
-    <Compile Include="Box.cs" />
     <Compile Include="BoxInfo.cs" />
     <Compile Include="BoxMath.cs" />
     <Compile Include="Broker.cs" />

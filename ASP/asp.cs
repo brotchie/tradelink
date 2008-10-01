@@ -45,28 +45,9 @@ namespace ASP
 
             if (archivetickbox.Checked)
                 ta.Save(t);
-            if (!barlist.ContainsKey(t.sym)) barlist.Add(t.sym, new BarList(BarInterval.FiveMin, t.sym));
-            else barlist[t.sym].newTick(t);
 
             if (boxlist.ContainsKey(t.sym) && (boxlist[t.sym] != null))
-            {
-
-                Box b = boxlist[t.sym];
-                BoxInfo bi = new BoxInfo();
-                Position p = new Position(t.sym);
-                try
-                {
-                    p = poslist[t.sym];
-                }
-                catch (KeyNotFoundException) { }
-
-                    
-                Order o = b.Trade(t, barlist[t.sym], p, bi);
-                o.Security = seclist[t.sym].Type;
-                o.Exchange = seclist[t.sym].DestEx;
-                o.LocalSymbol = seclist[t.sym].Name;
-                tl.SendOrder(o);
-            }
+                boxlist[t.sym].GotTick(t);
         }
 
         private int count = 0;
@@ -96,9 +77,9 @@ namespace ASP
 
         
         string boxdll;
-        List<Box> boxes = new List<Box>();
+        List<Response> boxes = new List<Response>();
 
-        Box workingbox = new Box();
+        Response workingbox = new InvalidResponse();
 
         // name of dll of box names
 
@@ -121,8 +102,8 @@ namespace ASP
 
             }
 
-                boxlist.Clear();
-                boxes.Clear();
+            boxlist.Clear();
+            boxes.Clear();
         }
 
         TradeLink_Client_WM tl;
@@ -131,12 +112,21 @@ namespace ASP
         private void Boxes_SelectedIndexChanged(object sender, EventArgs e)
         {
             string boxname = (string)Boxes.SelectedItem;
-            workingbox = Box.FromDLL(boxname, boxdll);
-            workingbox.Debug = debugon.Checked;
-            workingbox.GotDebug += new DebugFullDelegate(workingbox_GotDebug);
-            workingbox.CancelOrderSource += new UIntDelegate(workingbox_CancelOrderSource);
-            tl.gotOrder+=new OrderDelegate(workingbox.gotOrderSink);
-            tl.gotOrderCancel+=new UIntDelegate(workingbox.gotCancelSink);
+            workingbox = ResponseLoader.FromDLL(boxname, boxdll);
+            workingbox.SendOrder += new OrderDelegate(workingbox_SendOrder);
+            workingbox.SendDebug+= new DebugFullDelegate(workingbox_GotDebug);
+            workingbox.SendCancel+= new UIntDelegate(workingbox_CancelOrderSource);
+            tl.gotOrder+=new OrderDelegate(workingbox.GotOrder);
+            tl.gotOrderCancel+=new UIntDelegate(workingbox.GotOrderCancel);
+            tl.gotFill += new FillDelegate(workingbox.GotFill);
+        }
+
+        void workingbox_SendOrder(Order o)
+        {
+            o.Security = seclist[o.symbol].Type;
+            o.Exchange = seclist[o.symbol].DestEx;
+            o.LocalSymbol = seclist[o.symbol].Name;
+            tl.SendOrder(o);
         }
 
         void workingbox_CancelOrderSource(uint number)
@@ -146,6 +136,7 @@ namespace ASP
 
         void workingbox_GotDebug(Debug debug)
         {
+            if (!debugon.Checked) return;
             Debug(debug.Msg);
         }
 
@@ -171,8 +162,7 @@ namespace ASP
                 if (MessageBox.Show("For safety, you're only allowed one box per symbol.  Would you like to replace existing box?", "Confirm box replace", MessageBoxButtons.YesNoCancel) == DialogResult.Yes)
                 {
                     status("flatting symbol " + shortsym);
-                    tl.SendOrder(new MarketOrder(shortsym, boxlist[shortsym].PosSize * -1));
-                    boxlist[shortsym].Shutdown("user requested shutdown");
+                    tl.SendOrder(new MarketOrder(shortsym, poslist[shortsym].Size * -1));
                     string name = boxlist[shortsym].Name;
                     boxlist.Remove(shortsym);
                     status("Removed strategy " + name + " from " + shortsym);
@@ -186,7 +176,6 @@ namespace ASP
             }
             mb.Add(new Stock(sym));
             tl.Subscribe(mb);
-            workingbox.Symbol = shortsym;
             boxcriteria.Items.Add(workingbox.Name+" ["+shortsym+"]");
             boxlist.Add(shortsym,workingbox);
             seclist.Add(shortsym, sec);
@@ -202,7 +191,7 @@ namespace ASP
         Dictionary<string, Security> seclist = new Dictionary<string, Security>();
 
 
-        Dictionary<string, Box> boxlist = new Dictionary<string, Box>();
+        Dictionary<string, Response> boxlist = new Dictionary<string, Response>();
         Dictionary<string, BarList> barlist = new Dictionary<string, BarList>(); 
         Dictionary<string, Position> poslist = new Dictionary<string, Position>();
         
@@ -210,10 +199,10 @@ namespace ASP
         private void boxcriteria_SelectedIndexChanged(object sender, EventArgs e)
         {
             int selbox = boxcriteria.SelectedIndex;
-            if (boxes[selbox].Off)
-                status("Box " + boxes[selbox].Name + " (" + boxes[selbox].Symbol + ")" + " is off.");
+            if (!boxes[selbox].isValid)
+                status("Box " + boxes[selbox].Name + " is off.");
             else
-                status("Box " + boxes[selbox].Name + " (" + boxes[selbox].Symbol + ")" + " is on.");
+                status("Box " + boxes[selbox].Name +  " is on.");
 
         }
 
@@ -233,36 +222,7 @@ namespace ASP
                 toolStripStatusLabel2.Text = msg;
         }
 
-        private void shutdown_Click(object sender, EventArgs e)
-        {
-            if (boxcriteria.SelectedIndex >= 0)
-            {
-                int selbox = boxcriteria.SelectedIndex;
-                boxes[selbox].Shutdown("shutdown requested by user.");
-                status("Box " + boxes[selbox].Name + " (" + boxes[selbox].Symbol + ")" + " shutdown.");
-            }
-            else
-                status("select a box to shutdown");
-        }
 
-        private void activate_Click(object sender, EventArgs e)
-        {
-            if (boxcriteria.SelectedIndex >= 0)
-            {
-                int selbox = boxcriteria.SelectedIndex;
-                boxes[selbox].Activate("activate requested by user.");
-                status("Box " + boxes[selbox].Name + " (" + boxes[selbox].Symbol + ")" + " activated.");
-            }
-            else
-                status("select a box to activate");
-        }
-
-        private void debugon_CheckedChanged(object sender, EventArgs e)
-        {
-            foreach (Box b in boxlist.Values)
-                b.Debug = debugon.Checked;
-            status("Reset debugging for all boxes to : " + debugon.Checked.ToString());
-        }
 
         private void stock_KeyUp(object sender, KeyEventArgs e)
         {

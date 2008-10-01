@@ -39,8 +39,6 @@ namespace ASP
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.shutdown = new System.Windows.Forms.Button();
-            this.activate = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.debugon = new System.Windows.Forms.CheckBox();
@@ -145,30 +143,6 @@ namespace ASP
             this.toolStripStatusLabel2.Name = "toolStripStatusLabel2";
             this.toolStripStatusLabel2.Size = new System.Drawing.Size(0, 17);
             // 
-            // shutdown
-            // 
-            this.shutdown.Location = new System.Drawing.Point(10, 273);
-            this.shutdown.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.shutdown.Name = "shutdown";
-            this.shutdown.Size = new System.Drawing.Size(92, 29);
-            this.shutdown.TabIndex = 9;
-            this.shutdown.TabStop = false;
-            this.shutdown.Text = "Shutdown";
-            this.shutdown.UseVisualStyleBackColor = true;
-            this.shutdown.Click += new System.EventHandler(this.shutdown_Click);
-            // 
-            // activate
-            // 
-            this.activate.Location = new System.Drawing.Point(110, 273);
-            this.activate.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.activate.Name = "activate";
-            this.activate.Size = new System.Drawing.Size(96, 29);
-            this.activate.TabIndex = 10;
-            this.activate.TabStop = false;
-            this.activate.Text = "Activate";
-            this.activate.UseVisualStyleBackColor = true;
-            this.activate.Click += new System.EventHandler(this.activate_Click);
-            // 
             // label3
             // 
             this.label3.AutoSize = true;
@@ -203,7 +177,6 @@ namespace ASP
             this.debugon.TabIndex = 13;
             this.debugon.Text = "Debugs";
             this.debugon.UseVisualStyleBackColor = true;
-            this.debugon.CheckedChanged += new System.EventHandler(this.debugon_CheckedChanged);
             // 
             // archivetickbox
             // 
@@ -228,8 +201,6 @@ namespace ASP
             this.Controls.Add(this.debugon);
             this.Controls.Add(this.listBox1);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.activate);
-            this.Controls.Add(this.shutdown);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.stock);
@@ -259,8 +230,6 @@ namespace ASP
         private System.Windows.Forms.TextBox stock;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.Button shutdown;
-        private System.Windows.Forms.Button activate;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel2;

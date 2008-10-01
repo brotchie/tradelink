@@ -302,11 +302,6 @@ namespace TestTradeLib
             fb.GotTick(k);
             b.sendOrder(o);
             Assert.That(b.GetOrderList().Count == 0, b.GetOrderList().Count.ToString());
-
-
-
-
-
         }
 
         void fb_SendOrder(Order order)
