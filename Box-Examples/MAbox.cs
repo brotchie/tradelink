@@ -29,9 +29,7 @@ namespace box
 
             // demo of indicator tracking (used by other tools)
             // we will push the values of these indicators so they can be retrieved elsewhere
-            this.ResetIndicators(2);
-            this.SetIname(imkt, "Mkt");
-            this.SetIname(ibar, "2BarMA");
+            Indicators = new string[] { "Mkt", "2BarMA" };
 		}
         // where to find our entry rules... in this case we're defining entry rules the same for long and short
 		protected override bool EnterLong()	{ return MAenter(); }
@@ -55,7 +53,7 @@ namespace box
 			this.D("market:"+market.ToString("N2")+" MA:"+MA.ToString("N2"));
 
             // expose indicators (optional, if used by other tools)
-            this.Indicators = new object[] { market, MA };
+            Indicate(new object[] {market, MA});
 
             // rules that determine how indicators lead to entry (or not)
 			if (this.Side && (market>MA)) enter = true; // long entry

@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{3443CCF0-9CA3-46BD-A1D8-5455AA178F0F}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -46,11 +46,13 @@
   <ItemGroup>
     <Compile Include="A.cs" />
     <Compile Include="AlwaysEnter.cs" />
+    <Compile Include="BlackBoxEasy.cs" />
     <Compile Include="Blade.cs" />
     <Compile Include="Bollinger.cs" />
     <Compile Include="AlwaysEnterSingle.cs" />
     <Compile Include="GreyExit.cs" />
     <Compile Include="MAbox.cs" />
+    <Compile Include="MarketBox.cs" />
     <Compile Include="OpenCancel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SMA.cs" />
