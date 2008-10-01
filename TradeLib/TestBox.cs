@@ -17,6 +17,7 @@ namespace TestTradeLib
         const string x = "NYS";
         const int d = 20070917;
         const int t = 929;
+        Order o = new Order();
 
         Tick[] timesales = new Tick[] { 
                 Tick.NewTrade(s,d,t,0,10,100,x),
@@ -34,31 +35,39 @@ namespace TestTradeLib
         };
 
         // test the constructor and make sure it never enters a trade
+        int sbcount = 0;
         [Test]
-        public void BlankBox()
+        public void StandardBox()
         {
-            Box b = new Box();
+            DayTradeBox b = new DayTradeBox();
+            b.SendOrder += new OrderDelegate(b_SendOrder);
+
             Assert.That(!b.Off);
-            Assert.That(b.QuickOrder);
-            Assert.That(b.Turns == 0);
-            Assert.That(!b.TradeCaps);
-            Assert.That(!b.Debug);
             Assert.That(b.DayStart == 930);
-            // this box doesn't do anything, so it returns a blank/invalid order
+            Assert.That(sbcount == 0);
+            // default box does not trade
             // for every tick that it trades
             for (int i = 0; i < timesales.Length; i++)
-                Assert.That(!b.Trade(timesales[i], new BarList(), new Position(s), new BoxInfo()).isValid);
-            // no debugs were sent
-            Assert.That(debugs == 0);
-            
+            {
+                b.GotTick(timesales[i]);
+                Assert.That(!o.isValid);
+            }
+            Assert.That(sbcount == timesales.Length, sbcount.ToString());
+           
         }
-        class Always : Box 
+
+        void b_SendOrder(Order order)
+        {
+            sbcount++;
+            o = order;
+        }
+        class Always : DayTradeBox
         {
             public Always() { MinSize = 100; }
-            protected override int  Read(Tick tick, BarList bl, BoxInfo boxinfo)
+            protected override Order ReadOrder(Tick tick, BarList bl)
             {
                 D("entering");
-                return MinSize;
+                return new BuyMarket(Symbol,MinSize);
             }
         }
 
@@ -67,31 +76,26 @@ namespace TestTradeLib
         public void AlwaysEnter()
         {
             Always b = new Always();
-            b.AllowMultipleOrders = true;
+            b.SendOrder+=new OrderDelegate(b_SendOrder);
+            sbcount = 0;
             Assert.That(b.MinSize == 100);
             int good = 0;
             int i = 0;
-            Order o = new Order();
-            o = b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo());
+            b.GotTick(timesales[i++]);
             if (o.isValid)
                 good++;
-            Assert.That(b.Turns == 0);
-            Assert.That(b.Adjusts == 0);
-            o = b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo());
+            o = new Order();
+            b.GotTick(timesales[i++]);
             if (o.isValid)
                 good++;
-            Assert.That(b.Turns == 0);
-            Assert.That(b.Adjusts == 1);
-            o = b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo());
+            o = new Order(); 
+            b.GotTick(timesales[i++]);
             if (o.isValid)
                 good++;
-            Assert.That(b.Turns == 0);
-            Assert.That(b.Adjusts == 2);
-            o = b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo());
+            o = new Order();
+            b.GotTick(timesales[i++]);
             if (o.isValid)
                 good++;
-            Assert.That(b.Turns == 0);
-            Assert.That(b.Adjusts == 3);
             // first trade was pre-market so we only have 3 total;
             Assert.That(good == 3);
             // no debugs were sent
@@ -103,50 +107,55 @@ namespace TestTradeLib
         public void OneOrderAtTime() 
         {
             Always b = new Always();
-            b.AllowMultipleOrders = false; // this is the default, but it's what we're testing
             b.MaxSize = Int32.MaxValue; // lets not restrict our maximum position for this example
             Broker broker = new Broker();
+            broker.GotFill += new FillDelegate(broker_GotFill);
             Tick t;
             Assert.That(b.MinSize == 100);
             int good = 0;
             int i = 0;
-            Order o = new Order();
+            o = new Order();
             t = new Tick(timesales[i++]);
             broker.Execute(t);
-            o = b.Trade(t, new BarList(), broker.GetOpenPosition(s), new BoxInfo());
+            o = new Order();
+            b.GotTick(t);
+            
             broker.sendOrder(o);
             if (o.isValid)
                 good++;
-            Assert.That(b.Turns == 0);
-            Assert.That(b.Adjusts == 0);
+
             t = new Tick(timesales[i++]);
             broker.Execute(t);
-            o = b.Trade(t, new BarList(), broker.GetOpenPosition(s), new BoxInfo());
+            o = new Order();
+            b.GotTick(t); 
             broker.sendOrder(o);
             if (o.isValid)
                 good++;
-            Assert.That(b.Turns == 0);
-            Assert.That(b.Adjusts == 1);
             t = new Tick(timesales[i++]);
             broker.Execute(t);
-            o = b.Trade(t, new BarList(), broker.GetOpenPosition(s), new BoxInfo());
+            o = new Order();
+            b.GotTick(t);
             // lets change this to a limit order, so he doesn't get filled on just any tick
             o.price = 1;
             broker.sendOrder(o);
             if (o.isValid)
                 good++;
-            Assert.That(b.Turns == 0);
-            Assert.That(b.Adjusts == 2);
+
             t = new Tick(timesales[i++]);
             broker.Execute(t);
-            o = b.Trade(t, new BarList(), broker.GetOpenPosition(s), new BoxInfo());
+            o = new Order();
+            b.GotTick(t); 
             broker.sendOrder(o);
             if (o.isValid)
                 good++;
-            Assert.That(b.Turns == 0);
-            Assert.That(b.Adjusts == 2);
+
             // first trade was pre-market 2nd order was never filled so 3rd was ignored... 2 total.
             Assert.That(good == 2);
+        }
+
+        void broker_GotFill(Trade t)
+        {
+            
         }
 
 
@@ -156,16 +165,15 @@ namespace TestTradeLib
         {
             // subscribe to news service that will count everytime a debug is sent
             Always b = new Always(); // send debugs from this box to our news service
-            b.GotDebug += new DebugFullDelegate(b_GotDebug);
-            b.AllowMultipleOrders = true; // lets allow multiple orders for more debugging
-            // this time we want to throw news events for debugging statements
-            b.Debug = true;
+            b.SendDebug += new DebugFullDelegate(b_GotDebug);
             int good = 0;
-            b.D("Starting debug test for NUnit...");
             for (int i = 0; i < timesales.Length; i++)
-                if (b.Trade(timesales[i], new BarList(), new Position(s), new BoxInfo()).isValid)
+            {
+                o = new Order();
+                b.GotTick(timesales[i]);
+                if (o.isValid)                
                     good++;
-            b.D("NUnit testing complete...");
+            }
             Assert.That(good == 3);
             // news from the box was received.
             Assert.That(debugs>0);
@@ -176,83 +184,7 @@ namespace TestTradeLib
             debugs++;
         }
 
-        // Make sure indicies are received
-        public class IndexBox : Box
-        {
-            public IndexBox() : base() { GotIndex += new IndexDelegate(IndexBox_GotIndex); }
-            public int indexticks = 0;
-            public bool athigh = false;
-            void IndexBox_GotIndex(Index idx)
-            {
-                athigh = (idx.Value == idx.High);
-                indexticks++;
-            }
-        }
 
-
-        [Test]
-        public void IndexTest()
-        {
-            IndexBox ibox = new IndexBox();
-            int highs = 0;
-            for (int i = 0; i < futures.Length; i++)
-            {
-                // send futures update
-                ibox.NewIndex(futures[i]);
-                // trade the box
-                ibox.Trade(timesales[i], new BarList(), new Position(s), new BoxInfo());
-                if (ibox.athigh) highs++;
-            }
-            Assert.That(highs == 3);
-            Assert.That(ibox.indexticks == 4);
-        }
-
-        public class LimitsTest : Box
-        {
-            public LimitsTest() { TradeCaps = true; }
-            protected override int Read(Tick tick, BarList bl, BoxInfo boxinfo)
-            {
-                // go short off first trade
-                if (tick.isTrade && (PosSize == 0)) return MinSize;
-                // cover at the next opportunity
-                else if (tick.isTrade && (PosSize != 0))
-                {
-                    Shutdown("All done for today");
-                    return Flat;
-                }
-                return 0;
-            }
-        }
-
-        [Test]
-        public void ThrottlesTest()
-        {
-            LimitsTest b = new LimitsTest();
-            // we're skipping the first trade bc it's pre-market and we're not testing
-            // that in this test
-            int i = 1;
-            Order o;
-            Position p = new Position(s);
-            Assert.That(b.Turns == 0);
-            Assert.That(b.Adjusts == 0);
-            Assert.That(b.TradeCaps);
-            Assert.That(!b.Off);
-            Assert.That(b.PosSize == 0);
-            o = b.Trade(timesales[i++], new BarList(), p, new BoxInfo());
-            Assert.That(o.isValid);
-            // fill our order with next tick and just our position
-            o.Fill(timesales[i]);
-            p.Adjust((Trade)o);
-            Assert.That(b.Adjusts == 1);
-            Assert.That(b.Turns == 0);
-            o = b.Trade(timesales[i++], new BarList(), p, new BoxInfo());
-            Assert.That(o.isValid);
-            Assert.That(b.Adjusts == 2);
-            Assert.That(b.Turns == 1); // should be flat now
-            o = b.Trade(timesales[i++], new BarList(), new Position(s), new BoxInfo());
-            Assert.That(!o.isValid); // no more orders, as
-            Assert.That(b.Off); // we should be shutdown
-        }
 
         [Test]
         public void MaxSizeTest()
@@ -274,7 +206,8 @@ namespace TestTradeLib
                     o = new Order();
                 }
                 Assert.That(p.Size<=b.MaxSize);
-                o = b.Trade(timesales[i], new BarList(), p, new BoxInfo());
+                b.GotPosition(p);
+                b.GotTick(timesales[i]);
             }
             Assert.That(p.Size == 200);
 
@@ -296,23 +229,21 @@ namespace TestTradeLib
                     o = new Order();
                 }
                 Assert.That(p.Size <= b.MaxSize);
-                o = b.Trade(timesales[i], new BarList(), p, new BoxInfo());
+                b.GotPosition(p);
+                b.GotTick(timesales[i]);
             }
             Assert.That(p.Size == 100);
 
         }
 
-        public class FullOrder : Box
+        public class FullOrder : DayTradeBox
         {
             public FullOrder() 
             { 
-                QuickOrder = false; 
                 Name = "full order"; 
-                AllowMultipleOrders = true;
-                Debug = true;
             }
             int orders = 0;
-            protected override Order ReadOrder(Tick tick, BarList bl, BoxInfo boxinfo)
+            protected override Order ReadOrder(Tick tick,BarList bl)
             {
                 Order o = new Order();
 
@@ -335,11 +266,12 @@ namespace TestTradeLib
         public void FullOrderAndCancel()
         {
 
-            b.GotOrder += (fb.gotOrderSink);
+            b.GotOrder += fb.GotOrder;
             b.GotOrderCancel += new Broker.OrderCancelDelegate(b_GotOrderCancel);
-            fb.CancelOrderSource += new UIntDelegate(fb_CancelOrderSource);
+            fb.SendOrder += new OrderDelegate(fb_SendOrder);
+            fb.SendCancel += new UIntDelegate(fb_CancelOrderSource);
             fb.Symbol = s;
-            fb.GotDebug += new DebugFullDelegate(f_GotDebug);
+            fb.SendDebug+= new DebugFullDelegate(f_GotDebug);
 
             Tick[] timesales = new Tick[] { 
                 Tick.NewTrade(s,d,t+1,0,100,100,x),
@@ -352,23 +284,34 @@ namespace TestTradeLib
             Tick k = timesales[i++];
             b.Execute(k);
             Assert.That(b.GetOrderList().Count == 0);
-            b.sendOrder(fb.Trade(k, new BarList(), new Position(s), new BoxInfo()));
+            o = new Order();
+            fb.GotTick(k);
+            b.sendOrder(o);
             Assert.That(b.GetOrderList().Count==1,b.GetOrderList().Count.ToString());
 
             k = timesales[i++];
             b.Execute(k);
-            b.sendOrder(fb.Trade(k, new BarList(), new Position(s), new BoxInfo()));
+            o = new Order();
+            fb.GotTick(k);
+            b.sendOrder(o);
             Assert.That(b.GetOrderList().Count == 0, b.GetOrderList().Count.ToString());
 
             k = timesales[i++];
             b.Execute(k);
-            b.sendOrder(fb.Trade(k, new BarList(), new Position(s), new BoxInfo()));
+            o = new Order();
+            fb.GotTick(k);
+            b.sendOrder(o);
             Assert.That(b.GetOrderList().Count == 0, b.GetOrderList().Count.ToString());
 
 
 
 
 
+        }
+
+        void fb_SendOrder(Order order)
+        {
+            o = order;
         }
 
         void fb_CancelOrderSource(uint number)
@@ -378,7 +321,7 @@ namespace TestTradeLib
 
         void b_GotOrderCancel(string sym, bool side, uint id)
         {
-            fb.gotCancelSink(id);
+            fb.GotOrderCancel(id);
         }
 
         void f_GotDebug(Debug debug)

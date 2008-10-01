@@ -5,18 +5,21 @@ using System.ComponentModel;
 
 namespace TradeLib
 {
-    public class StandardBox : Response
+    public class DayTradeBox : Response
     {
-        public event TickDelegate GotTick;
-        public event FillDelegate GotFill;
+        protected event TickDelegate gotTick;
+        public event FillDelegate gotFill;
+        protected event UIntDelegate gotOrderCancel;
+        protected event OrderDelegate gotOrder;
         public event UIntDelegate SendCancel;
         public event OrderDelegate SendOrder;
         public event DebugFullDelegate SendDebug;
-        public event UIntDelegate GotOrderCancel;
-        public event OrderDelegate GotOrder;
+        public event ObjectArrayDelegate SendIndicators;
 
         BarList _bl = new BarList();
         Position _pos = new Position();
+        string[] _iname;
+        public virtual string[] Indicators { get { return _iname; } set { _iname = value; } }
         public string Symbol = null;
         private int _date = 0;
         private int _time = 0;
@@ -33,18 +36,18 @@ namespace TradeLib
         private int _expectedpossize = 0;
         private List<uint> _buyids = new List<uint>();
         private List<uint> _sellids = new List<uint>();
+        public void Indicate(object[] values) { if (SendIndicators != null) SendIndicators(values); }
 
 
-        public StandardBox()
+        public DayTradeBox()
         {
-            GotTick += new TickDelegate(StandardBox_GotTick);
-            GotFill += new FillDelegate(StandardBox_GotFill);
-            GotOrder += new OrderDelegate(StandardBox_GotOrder);
-            GotOrderCancel += new UIntDelegate(StandardBox_GotOrderCancel);
+
         }
 
-        void StandardBox_GotTick(Tick tick)
+        public void GotTick(Tick tick)
         {
+            if ((_date != 0) && (tick.date > _date))
+                Reset();
             _bl.newTick(tick);
             Order o = new Order();
             if (Symbol == null)
@@ -97,29 +100,65 @@ namespace TradeLib
                 else D("No route for order. Dropped.");
             }
 
+            if (gotTick != null)
+                GotTick(tick);
+
         }
 
-        void StandardBox_GotOrderCancel(uint cancelid)
+        public void GotOrderCancel(uint cancelid)
         {
+            // track current ids
             if (_buyids.Contains(cancelid))
                 _buyids.Remove(cancelid);
             if (_sellids.Contains(cancelid))
                 _sellids.Remove(cancelid);
+
+            // pass through as an event
+            if (gotOrderCancel != null)
+                gotOrderCancel(cancelid);
         }
 
-        void StandardBox_GotFill(Trade t)
+        public void GotFill(Trade t)
         {
+            // track current position
             _pos.Adjust(t);
+
+            // pass through as an event
+            if (gotFill != null)
+                gotFill(t);
         }
 
-        void StandardBox_GotOrder(Order o)
+        public void GotPosition(Position pos)
         {
+            _pos = pos;
+        }
+
+        public void GotOrder(Order o)
+        {
+            // track orders sent from this box
             if (o.symbol != Symbol) return;
             if (o.side && !_buyids.Contains(o.id))
                 _buyids.Add(o.id);
             else if (!o.side && !_sellids.Contains(o.id))
                 _sellids.Add(o.id);
 
+            //pass through as an event
+            if (gotOrder != null)
+                gotOrder(o);
+
+        }
+
+        /// <summary>
+        /// Reset this box instance.  (eg for another box run, a new trading day, etc)
+        /// </summary>
+        public virtual void Reset()
+        {
+            Symbol = null; _shut = false; 
+            DayStart = 930; DayEnd = 1600;
+            _buyids.Clear();
+            _sellids.Clear();
+            _pos = new Position(Symbol);
+            _bl = new BarList();
         }
 
 
@@ -148,7 +187,7 @@ namespace TradeLib
         /// Debugging facility for box.  Send text messages here to get picked up by other programs.
         /// </summary>
         /// <param name="debug">your debugging message</param>
-        void D(string debug) 
+        protected void D(string debug) 
         {
             if (SendDebug != null)
             {
@@ -160,7 +199,7 @@ namespace TradeLib
         /// Status facility for this box.  Send status messages to get picked up by other programs.
         /// </summary>
         /// <param name="status">your status message</param>
-        void S(string status)
+        protected void S(string status)
         {
             if (SendDebug != null)
             {

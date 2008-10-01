@@ -52,7 +52,6 @@
     <Compile Include="Bar.cs" />
     <Compile Include="BarList.cs" />
     <Compile Include="BarMath.cs" />
-    <Compile Include="BlackBoxEasy.cs" />
     <Compile Include="Box.cs" />
     <Compile Include="BoxInfo.cs" />
     <Compile Include="BoxMath.cs" />
@@ -64,6 +63,7 @@
       <DependentUpon>Chart.cs</DependentUpon>
     </Compile>
     <Compile Include="Currency.cs" />
+    <Compile Include="DayTradeBox.cs" />
     <Compile Include="Debug.cs" />
     <Compile Include="Email.cs" />
     <Compile Include="eSigTick.cs" />
@@ -73,7 +73,6 @@
     <Compile Include="Indicator.cs" />
     <Compile Include="LimitOrder.cs" />
     <Compile Include="MarketBasket.cs" />
-    <Compile Include="StandardBox.cs" />
     <Compile Include="MarketOrder.cs" />
     <Compile Include="Order.cs" />
     <Compile Include="ParamPrompt.cs">
