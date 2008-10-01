@@ -9,7 +9,8 @@ namespace TradeLib
     /// </summary>
     public class Position
     {
-        public Position(string stock) { sym = stock; }
+        public Position() : this("") { }
+        public Position(string stock) : this(stock, 0m, 0) { }
         public Position(string stock, decimal p, int s) { sym = stock; price = p; size = s; }
         public Position(Trade t) 
         {
@@ -43,6 +44,7 @@ namespace TradeLib
         public decimal Adjust(Position pos)
         {
             if (this.hasSymbol && (this.Symbol != pos.Symbol)) throw new Exception("Invalid Position: Position MUST have a symbol.");
+            if (!hasSymbol && pos.hasSymbol) sym = pos.Symbol;
             if (!pos.isValid) throw new Exception("Invalid position adjustment, existing:" + this.ToString() + " adjustment:" + pos.ToString());
             if (pos.Flat) return 0; // nothing to do
             decimal pl = BoxMath.ClosePL(this,pos.ToTrade());
@@ -59,11 +61,6 @@ namespace TradeLib
         /// <param name="t">The fill to apply to this position.</param>
         /// <returns></returns>
         public decimal Adjust(Trade t) { return Adjust(new Position(t)); }
-        public static int Norm2Min(int size)
-        {
-            int wmult = (int)Math.Ceiling((decimal)size / 100);
-            return wmult * 100;
-        }
 
         public override string ToString()
         {
