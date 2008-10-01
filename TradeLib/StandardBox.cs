@@ -256,7 +256,8 @@ namespace TradeLib
         [CategoryAttribute("TradeLink BoxInfo"), Description("True if the box is Shutdown.")]
         public bool Off { get { return _shut; } }
         [BrowsableAttribute(false)]
-        public Position Pos { get { return _pos; } } 
+        public Position Pos { get { return _pos; } }
+        public BarList BL { get { return _bl; } }
 
 
     }
