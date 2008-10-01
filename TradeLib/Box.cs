@@ -5,13 +5,12 @@ using System.ComponentModel;
 
 namespace TradeLib
 {
-    public delegate void DebugDelegate(string msg);
-    public delegate void ObjectArrayDelegate(object[] parameters);
+
     /// <summary>
     /// A container for trading strategies or trading rules, and the things necessary to trade and track these rules on a single stock or instrument.
     /// </summary>
     [Serializable]
-    public class Box
+    public class Box 
     {
         public event DebugFullDelegate GotDebug;
         protected event IndexDelegate GotIndex;

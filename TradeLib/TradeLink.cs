@@ -59,6 +59,8 @@ namespace TradeLib
     public delegate void IntDelegate(Int64 number);
     public delegate void UIntDelegate(UInt32 number);
     public delegate void TL2MsgDelegate(TL2 [] messages);
+    public delegate void DebugDelegate(string msg);
+    public delegate void ObjectArrayDelegate(object[] parameters);
 
     /// <summary>
     /// Used to indicate that a TradeLink Broker Connector was not running.
