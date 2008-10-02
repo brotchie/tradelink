@@ -41,9 +41,10 @@ namespace Chartographer
             // 
             this.chartsymbolbox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this.chartsymbolbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chartsymbolbox.Location = new System.Drawing.Point(38, 5);
+            this.chartsymbolbox.Location = new System.Drawing.Point(57, 8);
+            this.chartsymbolbox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.chartsymbolbox.Name = "chartsymbolbox";
-            this.chartsymbolbox.Size = new System.Drawing.Size(58, 22);
+            this.chartsymbolbox.Size = new System.Drawing.Size(85, 30);
             this.chartsymbolbox.TabIndex = 0;
             this.chartsymbolbox.Text = "IBM";
             this.chartsymbolbox.Click += new System.EventHandler(this.chartsymbolbox_Click);
@@ -51,9 +52,10 @@ namespace Chartographer
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(102, 5);
+            this.button1.Location = new System.Drawing.Point(153, 8);
+            this.button1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(34, 22);
+            this.button1.Size = new System.Drawing.Size(51, 34);
             this.button1.TabIndex = 3;
             this.button1.Text = "net";
             this.button1.UseVisualStyleBackColor = true;
@@ -65,9 +67,10 @@ namespace Chartographer
             this.blackbackground.AutoSize = true;
             this.blackbackground.Checked = global::Chartographer.Properties.Settings.Default.blackchartbg;
             this.blackbackground.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::Chartographer.Properties.Settings.Default, "blackchartbg", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.blackbackground.Location = new System.Drawing.Point(3, 34);
+            this.blackbackground.Location = new System.Drawing.Point(4, 52);
+            this.blackbackground.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.blackbackground.Name = "blackbackground";
-            this.blackbackground.Size = new System.Drawing.Size(43, 23);
+            this.blackbackground.Size = new System.Drawing.Size(56, 30);
             this.blackbackground.TabIndex = 5;
             this.blackbackground.Text = "black";
             this.blackbackground.UseVisualStyleBackColor = true;
@@ -79,9 +82,10 @@ namespace Chartographer
             this.stickychartsbox.AutoSize = true;
             this.stickychartsbox.Checked = global::Chartographer.Properties.Settings.Default.stickychartson;
             this.stickychartsbox.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::Chartographer.Properties.Settings.Default, "stickychartson", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.stickychartsbox.Location = new System.Drawing.Point(52, 34);
+            this.stickychartsbox.Location = new System.Drawing.Point(78, 52);
+            this.stickychartsbox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.stickychartsbox.Name = "stickychartsbox";
-            this.stickychartsbox.Size = new System.Drawing.Size(44, 23);
+            this.stickychartsbox.Size = new System.Drawing.Size(58, 30);
             this.stickychartsbox.TabIndex = 4;
             this.stickychartsbox.Text = "sticky";
             this.stickychartsbox.UseVisualStyleBackColor = true;
@@ -93,9 +97,10 @@ namespace Chartographer
             this.maxchartbox.AutoSize = true;
             this.maxchartbox.Checked = global::Chartographer.Properties.Settings.Default.maxcharts;
             this.maxchartbox.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::Chartographer.Properties.Settings.Default, "maxcharts", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.maxchartbox.Location = new System.Drawing.Point(100, 34);
+            this.maxchartbox.Location = new System.Drawing.Point(150, 52);
+            this.maxchartbox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.maxchartbox.Name = "maxchartbox";
-            this.maxchartbox.Size = new System.Drawing.Size(36, 23);
+            this.maxchartbox.Size = new System.Drawing.Size(48, 30);
             this.maxchartbox.TabIndex = 2;
             this.maxchartbox.Text = "max";
             this.maxchartbox.UseVisualStyleBackColor = true;
@@ -103,9 +108,10 @@ namespace Chartographer
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(3, 5);
+            this.button2.Location = new System.Drawing.Point(4, 8);
+            this.button2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(28, 23);
+            this.button2.Size = new System.Drawing.Size(42, 35);
             this.button2.TabIndex = 6;
             this.button2.Text = "file";
             this.button2.UseVisualStyleBackColor = true;
@@ -113,10 +119,10 @@ namespace Chartographer
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.ClientSize = new System.Drawing.Size(139, 60);
+            this.ClientSize = new System.Drawing.Size(240, 92);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.blackbackground);
             this.Controls.Add(this.stickychartsbox);
@@ -124,6 +130,7 @@ namespace Chartographer
             this.Controls.Add(this.maxchartbox);
             this.Controls.Add(this.chartsymbolbox);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "Form1";
