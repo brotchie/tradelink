@@ -18,11 +18,8 @@ namespace TradeLib
 
         BarList _bl = new BarList();
         Position _pos = new Position();
-        string[] _iname;
-        string[] _syms;
-        public virtual string[] Indicators { get { return _iname; } set { _iname = value; } }
-        public string[] Symbols { get { return _syms; } }
-        public string Symbol { get { return _syms.Length==0 ? "": _syms[0]; } }
+        string[] _iname = new string[0];
+        string[] _syms = new string[0];
         private int _date = 0;
         private int _time = 0;
         private int _sec = 0;
@@ -247,57 +244,57 @@ namespace TradeLib
         /// Gets or sets the day start, in 24hour time as an integer (eg 1415 = 2:15PM).
         /// </summary>
         /// <value>The day start.</value>
-        [CategoryAttribute("TradeLink Box"), DescriptionAttribute("Sets inclusive start time for box each day.")]
+        [CategoryAttribute("TL DayTradeInfo"), DescriptionAttribute("Sets inclusive start time for box each day.")]
         public int DayStart { get { return _sday; } set { _sday = value; } }
         /// <summary>
         /// Gets or sets the day end, in 24hour time as an integer (eg 1600 = 4:00PM)
         /// </summary>
         /// <value>The day end.</value>
-        [CategoryAttribute("TradeLink Box"), DescriptionAttribute("Sets inclusive stop time for box each day.")]
+        [CategoryAttribute("TL DayTradeInfo"), DescriptionAttribute("Sets inclusive stop time for box each day.")]
         public int DayEnd { get { if ((_eday % 100) != 0) return _eday - _DayEndBuff; return _eday - 40 - _DayEndBuff; } set { _eday = value; } }
         /// <summary>
         /// Gets the current date.
         /// </summary>
         /// <value>The date.</value>
-        [CategoryAttribute("TradeLink BoxInfo"), DescriptionAttribute("Date")]
+        [BrowsableAttribute(false)]
         public int Date { get { return _date; } }
-        [CategoryAttribute("TradeLink BoxInfo"), DescriptionAttribute("Sec")]
+        [BrowsableAttribute(false)]
         public int Sec { get { return _sec; } }
         /// <summary>
         /// Gets the current time.
         /// </summary>
         /// <value>The time.</value>
-        [CategoryAttribute("TradeLink BoxInfo"), DescriptionAttribute("Time")]
+        [BrowsableAttribute(false)]
         public int Time { get { return _time; } }
         /// <summary>
         /// Gets or sets the size of the maximum position size allowed by this box (maxsize of a single position).
         /// </summary>
         /// <value>The size of the max.</value>
-        [CategoryAttribute("TradeLink Box"), DescriptionAttribute("Maximum size of a single position.")]
+        [CategoryAttribute("TL DayTradeInfo"), DescriptionAttribute("Maximum size of a single position.")]
         public int MaxSize { get { return MAXSIZE; } set { MAXSIZE = value; } }
         /// <summary>
         /// Gets or sets the size of the minimum size of aposition allowed.
         /// </summary>
         /// <value>The size of the min.</value>
-        [CategoryAttribute("TradeLink Box"), DescriptionAttribute("Minimum size of a single position.")]
+        [CategoryAttribute("TL DayTradeInfo"), DescriptionAttribute("Minimum size of a single position.")]
         public int MinSize { get { return MINSIZE; } set { MINSIZE = value; } }
         /// <summary>
         /// Gets or sets the full name of the box, as defined in the source code.
         /// </summary>
         /// <value>The full name.</value>
-        [CategoryAttribute("TradeLink BoxInfo"), DescriptionAttribute("Fully qualified box class name."), ReadOnlyAttribute(true)]
+        [CategoryAttribute("TL DayTradeInfo"), DescriptionAttribute("Fully qualified box class name."), ReadOnlyAttribute(true)]
         public string FullName { get { return _fullname; } set { _fullname = value; } }
         /// <summary>
         /// Gets or sets the name of this box as described by the user.
         /// </summary>
         /// <value>The name.</value>
-        [CategoryAttribute("TradeLink Box"), DescriptionAttribute("Name of this box.")]
+        [CategoryAttribute("TL DayTradeInfo"), DescriptionAttribute("Name of this box.")]
         public string Name { get { return _name; } set { _name = value; } }
         /// <summary>
         /// Gets a value indicating whether this <see cref="Box"/> is shutdown.
         /// </summary>
         /// <value><c>true</c> if off; otherwise, <c>false</c>.</value>
-        [CategoryAttribute("TradeLink BoxInfo"), Description("True if the box is Shutdown.")]
+        [CategoryAttribute("TL DayTradeInfo"), Description("True if the box is Shutdown.")]
         public bool Off { get { return _shut; } }
         [BrowsableAttribute(false)]
         public Position Pos { get { return _pos; } }
@@ -305,6 +302,13 @@ namespace TradeLib
         protected BarList BL { get { return _bl; } }
         [BrowsableAttribute(false)]
         public bool isValid { get { return _shut; } }
+        [BrowsableAttribute(false)]
+        public virtual string[] Indicators { get { return _iname; } set { _iname = value; } }
+        [BrowsableAttribute(false)]
+        public string[] Symbols { get { return _syms; } }
+        [BrowsableAttribute(false)]
+        public string Symbol { get { return _syms.Length == 0 ? "" : _syms[0]; } }
+
 
 
 
