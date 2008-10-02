@@ -33,8 +33,10 @@ namespace TradeLib
         public decimal Price { get { return price; } }
         public decimal AvgPrice { get { return price; } }
         public int Size { get { return size; } }
-        public bool Side { get { return size > 0; } }
-        public bool Flat { get { return size==0; } }
+        public bool isLong { get { return size > 0; } }
+        public bool isFlat { get { return size==0; } }
+        public bool isShort { get { return size < 0; } }
+        public int FlatSize { get { return size * -1; } }
         // returns any closed PL calculated on position basis (not per share)
         /// <summary>
         /// Adjusts the position by applying a new position.
@@ -46,13 +48,13 @@ namespace TradeLib
             if (this.hasSymbol && (this.Symbol != pos.Symbol)) throw new Exception("Invalid Position: Position MUST have a symbol.");
             if (!hasSymbol && pos.hasSymbol) sym = pos.Symbol;
             if (!pos.isValid) throw new Exception("Invalid position adjustment, existing:" + this.ToString() + " adjustment:" + pos.ToString());
-            if (pos.Flat) return 0; // nothing to do
+            if (pos.isFlat) return 0; // nothing to do
             decimal pl = BoxMath.ClosePL(this,pos.ToTrade());
-            if (this.Flat) this.price = pos.price; // if we're leaving flat just copy price
-            else if ((pos.Side && this.Side) || (!pos.Side && !this.Side)) // sides match, adding so adjust price
+            if (this.isFlat) this.price = pos.price; // if we're leaving flat just copy price
+            else if ((pos.isLong && this.isLong) || (!pos.isLong && !this.isLong)) // sides match, adding so adjust price
                 this.price = ((this.price * this.size) + (pos.price * pos.size)) / (pos.size + this.size);
             this.size += pos.size; // adjust the size
-            if (this.Flat) price = 0; // if we're flat after adjusting, size price back to zero
+            if (this.isFlat) price = 0; // if we're flat after adjusting, size price back to zero
             return pl;
         }
         /// <summary>

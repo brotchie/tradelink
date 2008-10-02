@@ -59,9 +59,9 @@ namespace TradeLib
         {
             if (!existing.isValid || !adjust.isValid) 
                 throw new Exception("Invalid position provided. (existing:" + existing.ToString() + " adjustment:" + adjust.ToString());
-            if (existing.Flat) return 0; // nothing to close
-            if (existing.Side == adjust.Side) return 0; // if we're adding, nothing to close
-            return existing.Side ? adjust.Price - existing.Price : existing.Price - adjust.Price;
+            if (existing.isFlat) return 0; // nothing to close
+            if (existing.isLong == adjust.Side) return 0; // if we're adding, nothing to close
+            return existing.isLong ? adjust.Price - existing.Price : existing.Price - adjust.Price;
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace TradeLib
         /// <param name="p">Position</param>
         /// <param name="offset">Offset amount</param>
         /// <returns>Offset price</returns>
-        public static decimal OffsetPrice(Position p, decimal offset) { return OffsetPrice(p.AvgPrice, p.Side, offset); }
+        public static decimal OffsetPrice(Position p, decimal offset) { return OffsetPrice(p.AvgPrice, p.isLong, offset); }
         public static decimal OffsetPrice(decimal AvgPrice, bool side, decimal offset)
         {
             return side ? AvgPrice + offset : AvgPrice - offset;

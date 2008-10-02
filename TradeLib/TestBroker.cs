@@ -147,12 +147,12 @@ namespace TestTradeLib
             Position apos = broker.GetOpenPosition(sym,a);
             Position bpos = broker.GetOpenPosition(sym,b);
             Position cpos = broker.GetOpenPosition(sym, c);
-            Assert.That(apos.Side && (apos.Size == 100));
-            Assert.That(bpos.Side && (bpos.Size == 100));
-            Assert.That(cpos.Flat);
+            Assert.That(apos.isLong && (apos.Size == 100));
+            Assert.That(bpos.isLong && (bpos.Size == 100));
+            Assert.That(cpos.isFlat);
             // make sure that default account doesn't register
             // any trades
-            Assert.That(broker.GetOpenPosition(sym).Flat);
+            Assert.That(broker.GetOpenPosition(sym).isFlat);
         }
     }
 }
