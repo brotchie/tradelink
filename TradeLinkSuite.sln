@@ -19,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chartographer", "Chartograp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestTradeLib", "TradeLib\TestTradeLib.csproj", "{293780F0-4BE5-49F9-8720-CFD5F79EC77D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Box-Examples", "Box-Examples\Box-Examples.csproj", "{3443CCF0-9CA3-46BD-A1D8-5455AA178F0F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoxExamples", "Box-Examples\BoxExamples.csproj", "{3443CCF0-9CA3-46BD-A1D8-5455AA178F0F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tattle", "Tattle\Tattle.csproj", "{0A64C62F-11F1-4F32-99E0-E8F0F76C2594}"
 EndProject
