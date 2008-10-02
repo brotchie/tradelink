@@ -67,7 +67,7 @@ namespace Replay
             // for every-non flat position, calculate the pl and add to the total
             decimal totalopenpl = 0;
             foreach (Position p in posdict.Values)
-                if (!p.Flat)
+                if (!p.isFlat)
                     totalopenpl += BoxMath.OpenPL(last[p.Symbol], p);
             return totalopenpl;
         }
