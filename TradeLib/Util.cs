@@ -232,7 +232,10 @@ namespace TradeLib
         }
             
 
-        static bool IsBox(Type t) { return (t.BaseType!=null) && ((t.BaseType.IsSubclassOf(typeof(Response))) || t.BaseType.Equals(typeof(Response))); }
+        static bool IsResponse(Type t) 
+        {
+            return typeof(Response).IsAssignableFrom(t);
+        }
         /// <summary>
         /// Gets teh fully qualified boxnames found in a given file.
         /// </summary>
@@ -265,7 +268,7 @@ namespace TradeLib
             }
             catch (Exception ex) { boxlist.Add(ex.Message); return boxlist; }
             for (int i = 0; i < t.GetLength(0); i++)
-                if (IsBox(t[i])) boxlist.Add(t[i].FullName);
+                if (IsResponse(t[i])) boxlist.Add(t[i].FullName);
             return boxlist;
         }
 
