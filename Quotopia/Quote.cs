@@ -118,6 +118,7 @@ namespace Quotopia
 
         void Quote_FormClosing(object sender, FormClosingEventArgs e)
         {
+            tl.Unsubscribe();
             tl.Disconnect();
         }
 
@@ -216,7 +217,6 @@ namespace Quotopia
             o.Security = s.Type;
             o.LocalSymbol = sym;
             Ticket t = new Ticket(o);
-            
             t.neworder += new QuotopiaOrderDel(t_neworder);
             spillTick +=new TickDelegate(t.newTick);
             orderStatus+=new OrderStatusDel(t.orderStatus);

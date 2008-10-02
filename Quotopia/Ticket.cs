@@ -33,7 +33,6 @@ namespace Quotopia
             if (work.Side) { obuybut.Checked = true; osellbut.Checked = false; }
             else { osellbut.Checked = true; obuybut.Checked = false; }
             oprice.MouseWheel += new MouseEventHandler(order_MouseWheel);
-            
             osize.MouseWheel += new MouseEventHandler(osize_MouseWheel);
         }
 
@@ -41,7 +40,13 @@ namespace Quotopia
         public void newTick(Tick tick)
         {
             if (this.InvokeRequired)
-                this.Invoke(new TickDelegate(newTick), new object[] { tick });
+            {
+                try
+                {
+                    Invoke(new TickDelegate(newTick), new object[] { tick });
+                }
+                catch (ObjectDisposedException) { return; }
+            }
             else
             {
                 if ((tick == null) || (tick.sym != work.symbol)) return;
