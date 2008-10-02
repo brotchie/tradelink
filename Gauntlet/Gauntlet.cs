@@ -212,8 +212,11 @@ using System.IO;
             }
 
             bt.name = DateTime.Now.ToString("yyyMMdd.HHmm");
-            if (mybox != null) { bt.mybox = mybox;  }
-            else { show("You must select a box to run the gauntlet."); return; } 
+            if (mybox==null)
+            { 
+                show("You must select a box to run the gauntlet."); 
+                return; 
+            } 
             string exfilt = "";
             if ((exchlist.SelectedIndices.Count > 0) && 
                 !exchlist.SelectedItem.ToString().Contains("NoFilter")) 
@@ -224,7 +227,7 @@ using System.IO;
             bt.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bt_RunWorkerCompleted);
             ProgressBar1.Enabled = true;
             queuebut.Enabled = false;
-            bt.RunWorkerAsync(tf);
+            bt.RunWorkerAsync(new BackTestArgs(tf,mybox));
         }
 
         void bt_BTStatus(Debug debug)
@@ -393,10 +396,8 @@ using System.IO;
 
         void mybox_GotDebug(Debug debug)
         {
-            if (debug.Msg.Contains(mybox.Name))
-                show(Environment.NewLine + debug.Msg);
-            else
-                show(debug.Msg);
+            if (!showdebug.Checked) return;
+            show(debug.Msg);
         }
 
         void mybox_IndicatorUpdate(object[] parameters)

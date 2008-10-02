@@ -25,8 +25,6 @@ namespace WinGauntlet
         public string exfilter = "";
         public string symbol;
         public bool debug = false;
-        private Type myboxtype = null;
-        public Response mybox = null;
         private bool _idx = true;
         public int time;
         public string aname = "c:\\program files\\tradelink\\tradelinksuite\\box.dll";
@@ -54,7 +52,8 @@ namespace WinGauntlet
 
         void BackTest_DoWork(object sender, DoWorkEventArgs e)
         {
-            Test((List<FileInfo>)e.Argument);
+            BackTestArgs arg = (BackTestArgs)e.Argument;
+            Test(arg.Files,arg.Box);
         }
         public void TickFile(string filename) 
         {
@@ -126,7 +125,7 @@ namespace WinGauntlet
         }
 
 
-        public int Test(List<FileInfo> tf) 
+        public int Test(List<FileInfo> tf,Response mybox) 
         {
             show("Starting run "+name+" containing "+ tf.Count + " symbols."+Environment.NewLine);
             int totfills = 0;
@@ -199,7 +198,6 @@ namespace WinGauntlet
 
                     if (this.delay != 0)
                     {
-                        System.Threading.Thread.Sleep(this.delay);
                         System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Lowest;
                     }
                     this.ReportProgress((int)((100*line) / totalticks));
@@ -249,5 +247,13 @@ namespace WinGauntlet
         }
 
     }
+
+    public class BackTestArgs
+    {
+        public Response Box = new InvalidResponse();
+        public List<FileInfo> Files = new List<FileInfo>();
+        public BackTestArgs(List<FileInfo> files, Response box) { Box = box; Files = files; }
+    }
+
 
 }

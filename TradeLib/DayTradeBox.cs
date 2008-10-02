@@ -48,7 +48,6 @@ namespace TradeLib
                 string[] newsym = new string[_syms.Length + 1];
                 newsym[_syms.Length] = tick.sym;
                 _syms = newsym;
-                _pos = new Position(tick.sym);
                 try
                 {
                     if (Util.isEarlyClose(tick.date))
@@ -58,12 +57,7 @@ namespace TradeLib
             }
             Order o = new Order();
             _bl.newTick(tick);
-            if (!_pos.isValid)
-            {
-                D("Invalid position provided: " + _pos.ToString());
-                return;
-            }
-            if (tick.sym != Symbol) return;
+
             _time = tick.time;
             _date = tick.date;
             _sec = tick.sec;
@@ -92,18 +86,15 @@ namespace TradeLib
                 _expectedpossize += o.SignedSize;
                 o.time = Time;
                 o.date = Date;
-            }
-
-            if (o.isValid)
-            {
                 D("Sent order: " + o);
                 if (SendOrder != null)
                     SendOrder(o); // send our order
-                else D("No route for order. Dropped.");
+                else 
+                    D("No route for order. Dropped.");
             }
 
             if (gotTick != null)
-                GotTick(tick);
+                gotTick(tick);
 
         }
 
@@ -301,7 +292,7 @@ namespace TradeLib
         [BrowsableAttribute(false)]
         protected BarList BL { get { return _bl; } }
         [BrowsableAttribute(false)]
-        public bool isValid { get { return _shut; } }
+        public bool isValid { get { return !_shut; } }
         [BrowsableAttribute(false)]
         public virtual string[] Indicators { get { return _iname; } set { _iname = value; } }
         [BrowsableAttribute(false)]
