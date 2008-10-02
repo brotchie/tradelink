@@ -97,7 +97,7 @@ namespace ASP
             this.boxcriteria.Location = new System.Drawing.Point(10, 59);
             this.boxcriteria.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.boxcriteria.Name = "boxcriteria";
-            this.boxcriteria.Size = new System.Drawing.Size(222, 204);
+            this.boxcriteria.Size = new System.Drawing.Size(222, 244);
             this.boxcriteria.TabIndex = 4;
             this.boxcriteria.TabStop = false;
             this.boxcriteria.SelectedIndexChanged += new System.EventHandler(this.boxcriteria_SelectedIndexChanged);
@@ -126,7 +126,7 @@ namespace ASP
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1,
             this.toolStripStatusLabel2});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 326);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 362);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 21, 0);
             this.statusStrip1.Size = new System.Drawing.Size(704, 22);
@@ -196,7 +196,7 @@ namespace ASP
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(704, 348);
+            this.ClientSize = new System.Drawing.Size(704, 384);
             this.Controls.Add(this.archivetickbox);
             this.Controls.Add(this.debugon);
             this.Controls.Add(this.listBox1);
