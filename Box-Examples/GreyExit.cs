@@ -33,7 +33,7 @@ namespace BoxExamples
         public GreyExit()
             : base()
         {
-            Name = "GreyBox"+Util.CleanVer("$Rev: 1");
+            Name = "GreyBox";
 
             // here's how we prompt for parameters
             ParamPrompt param = new ParamPrompt(this); // read the parameters

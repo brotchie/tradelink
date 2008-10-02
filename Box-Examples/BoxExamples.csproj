@@ -7,8 +7,8 @@
     <ProjectGuid>{3443CCF0-9CA3-46BD-A1D8-5455AA178F0F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>box</RootNamespace>
-    <AssemblyName>box</AssemblyName>
+    <RootNamespace>BoxExamples</RootNamespace>
+    <AssemblyName>BoxExamples</AssemblyName>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
