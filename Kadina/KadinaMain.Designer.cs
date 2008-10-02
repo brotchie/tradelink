@@ -68,7 +68,7 @@ namespace Kadina
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 5, 1, 34);
             this.statusStrip1.ShowItemToolTips = true;
-            this.statusStrip1.Size = new System.Drawing.Size(79, 222);
+            this.statusStrip1.Size = new System.Drawing.Size(84, 222);
             this.statusStrip1.TabIndex = 1;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -78,7 +78,7 @@ namespace Kadina
             this.recent.Image = ((System.Drawing.Image)(resources.GetObject("recent.Image")));
             this.recent.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.recent.Name = "recent";
-            this.recent.Size = new System.Drawing.Size(74, 25);
+            this.recent.Size = new System.Drawing.Size(79, 29);
             this.recent.Text = "Recent";
             this.recent.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.recent.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.recent_DropDownItemClicked);
@@ -90,7 +90,7 @@ namespace Kadina
             this.boxlist.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.boxlist.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.boxlist.Name = "boxlist";
-            this.boxlist.Size = new System.Drawing.Size(74, 25);
+            this.boxlist.Size = new System.Drawing.Size(79, 29);
             this.boxlist.Text = "Boxes";
             this.boxlist.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -100,7 +100,7 @@ namespace Kadina
             this.playtobut.Image = ((System.Drawing.Image)(resources.GetObject("playtobut.Image")));
             this.playtobut.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.playtobut.Name = "playtobut";
-            this.playtobut.Size = new System.Drawing.Size(74, 25);
+            this.playtobut.Size = new System.Drawing.Size(79, 29);
             this.playtobut.Text = "Play To";
             this.playtobut.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -114,7 +114,7 @@ namespace Kadina
             this.filter.Image = ((System.Drawing.Image)(resources.GetObject("filter.Image")));
             this.filter.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.filter.Name = "filter";
-            this.filter.Size = new System.Drawing.Size(74, 25);
+            this.filter.Size = new System.Drawing.Size(79, 29);
             this.filter.Text = "Filter";
             this.filter.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.filter.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.filter_DropDownItemClicked);
@@ -124,7 +124,7 @@ namespace Kadina
             this.toolStripMenuItem1.CheckOnClick = true;
             this.toolStripMenuItem1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(152, 26);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(123, 30);
             this.toolStripMenuItem1.Text = "NYS";
             // 
             // toolStripMenuItem2
@@ -132,7 +132,7 @@ namespace Kadina
             this.toolStripMenuItem2.CheckOnClick = true;
             this.toolStripMenuItem2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(152, 26);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(123, 30);
             this.toolStripMenuItem2.Text = "PSE";
             // 
             // toolStripMenuItem3
@@ -140,7 +140,7 @@ namespace Kadina
             this.toolStripMenuItem3.CheckOnClick = true;
             this.toolStripMenuItem3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(152, 26);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(123, 30);
             this.toolStripMenuItem3.Text = "NMS";
             // 
             // tabControl1
@@ -154,11 +154,11 @@ namespace Kadina
             this.tabControl1.Controls.Add(this.ordertab);
             this.tabControl1.Controls.Add(this.filltab);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControl1.Location = new System.Drawing.Point(79, 0);
+            this.tabControl1.Location = new System.Drawing.Point(84, 0);
             this.tabControl1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(794, 222);
+            this.tabControl1.Size = new System.Drawing.Size(789, 222);
             this.tabControl1.TabIndex = 2;
             this.tabControl1.DragDrop += new System.Windows.Forms.DragEventHandler(this.kadinamain_DragDrop);
             this.tabControl1.DragEnter += new System.Windows.Forms.DragEventHandler(this.kadinamain_DragEnter);
@@ -171,7 +171,7 @@ namespace Kadina
             this.tabmsg.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tabmsg.Name = "tabmsg";
             this.tabmsg.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.tabmsg.Size = new System.Drawing.Size(786, 186);
+            this.tabmsg.Size = new System.Drawing.Size(781, 186);
             this.tabmsg.TabIndex = 0;
             this.tabmsg.Text = "Messages";
             this.tabmsg.UseVisualStyleBackColor = true;
@@ -180,17 +180,17 @@ namespace Kadina
             // 
             this.statusStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.statuslab});
-            this.statusStrip2.Location = new System.Drawing.Point(4, 155);
+            this.statusStrip2.Location = new System.Drawing.Point(4, 151);
             this.statusStrip2.Name = "statusStrip2";
             this.statusStrip2.Padding = new System.Windows.Forms.Padding(1, 0, 21, 0);
-            this.statusStrip2.Size = new System.Drawing.Size(778, 26);
+            this.statusStrip2.Size = new System.Drawing.Size(773, 30);
             this.statusStrip2.TabIndex = 1;
             this.statusStrip2.Text = "statusStrip2";
             // 
             // statuslab
             // 
             this.statuslab.Name = "statuslab";
-            this.statuslab.Size = new System.Drawing.Size(153, 21);
+            this.statuslab.Size = new System.Drawing.Size(166, 25);
             this.statuslab.Text = "Welcome to Kadina";
             // 
             // msgbox
@@ -200,7 +200,7 @@ namespace Kadina
             this.msgbox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.msgbox.Name = "msgbox";
             this.msgbox.ReadOnly = true;
-            this.msgbox.Size = new System.Drawing.Size(778, 176);
+            this.msgbox.Size = new System.Drawing.Size(773, 176);
             this.msgbox.TabIndex = 0;
             this.msgbox.Text = "";
             // 
@@ -210,7 +210,7 @@ namespace Kadina
             this.ticktab.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.ticktab.Name = "ticktab";
             this.ticktab.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.ticktab.Size = new System.Drawing.Size(784, 186);
+            this.ticktab.Size = new System.Drawing.Size(786, 186);
             this.ticktab.TabIndex = 1;
             this.ticktab.Text = "Ticks";
             this.ticktab.UseVisualStyleBackColor = true;
@@ -220,7 +220,7 @@ namespace Kadina
             this.itab.Location = new System.Drawing.Point(4, 32);
             this.itab.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.itab.Name = "itab";
-            this.itab.Size = new System.Drawing.Size(784, 186);
+            this.itab.Size = new System.Drawing.Size(786, 186);
             this.itab.TabIndex = 2;
             this.itab.Text = "Indicators";
             this.itab.UseVisualStyleBackColor = true;
@@ -230,7 +230,7 @@ namespace Kadina
             this.postab.Location = new System.Drawing.Point(4, 32);
             this.postab.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.postab.Name = "postab";
-            this.postab.Size = new System.Drawing.Size(784, 186);
+            this.postab.Size = new System.Drawing.Size(786, 186);
             this.postab.TabIndex = 3;
             this.postab.Text = "Position";
             this.postab.UseVisualStyleBackColor = true;
@@ -240,7 +240,7 @@ namespace Kadina
             this.ordertab.Location = new System.Drawing.Point(4, 32);
             this.ordertab.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.ordertab.Name = "ordertab";
-            this.ordertab.Size = new System.Drawing.Size(784, 186);
+            this.ordertab.Size = new System.Drawing.Size(786, 186);
             this.ordertab.TabIndex = 4;
             this.ordertab.Text = "Orders";
             this.ordertab.UseVisualStyleBackColor = true;
@@ -250,7 +250,7 @@ namespace Kadina
             this.filltab.Location = new System.Drawing.Point(4, 32);
             this.filltab.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.filltab.Name = "filltab";
-            this.filltab.Size = new System.Drawing.Size(784, 186);
+            this.filltab.Size = new System.Drawing.Size(786, 186);
             this.filltab.TabIndex = 5;
             this.filltab.Text = "Fills";
             this.filltab.UseVisualStyleBackColor = true;

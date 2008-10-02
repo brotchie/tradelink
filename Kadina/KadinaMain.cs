@@ -470,6 +470,7 @@ namespace Kadina
             {
                 mybox.SendDebug += new DebugFullDelegate(mybox_GotDebug);
                 mybox.SendCancel += new UIntDelegate(mybox_CancelOrderSource);
+                mybox.SendOrder += new OrderDelegate(mybox_SendOrder);
                 broker.GotOrder+=new OrderDelegate(mybox.GotOrder);
                 broker.GotOrderCancel += new Broker.OrderCancelDelegate(broker_GotOrderCancel);
                 broker.GotFill+=new FillDelegate(mybox.GotFill);
@@ -477,6 +478,11 @@ namespace Kadina
             }
             else status("Box did not load.");
 
+        }
+
+        void mybox_SendOrder(Order o)
+        {
+            broker.sendOrder(o);
         }
 
         void broker_GotOrderCancel(string sym, bool side, uint id)
