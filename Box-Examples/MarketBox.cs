@@ -34,7 +34,7 @@ namespace TradeLib
 
         private int NoCrossingFlat(int size)
         {
-            if ((!Pos.Flat) &&
+            if ((!Pos.isFlat) &&
                 ((Pos.Size+ size) != 0) &&
                 (((Pos.Size+ size) * Pos.Size) < 0))
                 size = -1 * Pos.Size;

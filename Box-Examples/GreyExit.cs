@@ -13,7 +13,7 @@ namespace box
     /// 
     /// Essentially a smarter stop-loss.
     /// </summary>
-    public class GreyExit : Box
+    public class GreyExit : MarketBox
     {
 
         // here's the exit size we allow the user to choose at startup
@@ -33,8 +33,7 @@ namespace box
         public GreyExit()
             : base()
         {
-            Version = "$Rev: 1";
-            Name = "GreyBox"+CleanVersion;
+            Name = "GreyBox"+Util.CleanVer("$Rev: 1");
 
             // here's how we prompt for parameters
             ParamPrompt param = new ParamPrompt(this); // read the parameters
@@ -50,21 +49,21 @@ namespace box
         bool _autoabove = false; // set above automatically based on position
         int _bb = 2;
 
-        protected override int Read(Tick tick, BarList bl,BoxInfo bi)
+        protected override int Read(Tick tick, BarList bl)
         {
             if (tick.isTrade)
             {
                 if (!bl.Has(_bb)) return 0;
                 MA = SMA.BarSMA(bl, _int, _bb);
 
-                if (PosSize == 0) return 0;
+                if (Pos.isFlat) return 0;
 
                 if (_autoabove)
-                    _above = (PosSize < 0);
+                    _above = (Pos.isShort);
 
                 bool pricecross = _above ? (tick.trade > MA) : (tick.trade < MA);
 
-                return  (pricecross) ? Norm2Min(Flat*exitpercent) : 0;
+                return  (pricecross) ? BoxMath.Norm2Min(Pos.FlatSize*exitpercent,MINSIZE) : 0;
             }
             return 0;
            

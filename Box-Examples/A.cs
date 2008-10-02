@@ -18,12 +18,12 @@ namespace box
     /// If the open and the low are close but the high is far away, sell the open when the market reapproaches it.
     /// If the open and high and close but the low is far away, buy the open when the market reapproaches it.
     /// </summary>
-	public class A : Box 
+	public class A : MarketBox
 	{
         public A() : base() 
         { 
-            Version = "$Rev$"; 
-            Name = "A"+CleanVersion; 
+            const string version = "$Rev$"; 
+            Name = "A"+Util.CleanVer(version); 
         }
         BarList bars;
 
@@ -40,7 +40,7 @@ namespace box
         const decimal s = -.11m; // stop loss
         
         // here are the trading rules that implement our strategy's intention
-        protected override int Read(Tick tick, BarList bl,BoxInfo bi)
+        protected override int Read(Tick tick, BarList bl)
         {
             // indicator setup
             bars = bl;
@@ -53,9 +53,9 @@ namespace box
             if (((o-l)<=a) && ((tick.trade-l)>e)) return MaxSize*-1;
 
             // profit and loss tests
-            decimal PL = BoxMath.OpenPT(tick.trade, AvgPrice, PosSize);
-            if (PL > p) return Flat;
-            if (PL < s) return Flat;
+            decimal PL = BoxMath.OpenPT(tick.trade, Pos.AvgPrice, Pos.Size);
+            if (PL > p) return Pos.FlatSize;
+            if (PL < s) return Pos.FlatSize;
 
             return 0;
         }
