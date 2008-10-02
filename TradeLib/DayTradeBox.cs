@@ -19,8 +19,10 @@ namespace TradeLib
         BarList _bl = new BarList();
         Position _pos = new Position();
         string[] _iname;
+        string[] _syms;
         public virtual string[] Indicators { get { return _iname; } set { _iname = value; } }
-        public string Symbol = null;
+        public string[] Symbols { get { return _syms; } }
+        public string Symbol { get { return _syms.Length==0 ? "": _syms[0]; } }
         private int _date = 0;
         private int _time = 0;
         private int _sec = 0;
@@ -34,20 +36,21 @@ namespace TradeLib
         private bool _shut = false;
         private bool _multipleorders = false;
         private int _expectedpossize = 0;
-        private List<uint> _buyids = new List<uint>();
-        private List<uint> _sellids = new List<uint>();
+        protected List<uint> _buyids = new List<uint>();
+        protected List<uint> _sellids = new List<uint>();
         public void Indicate(object[] values) { if (SendIndicators != null) SendIndicators(values); }
 
 
         public void GotTick(Tick tick)
         {
+            if (tick.sym == "") return;
             if ((_date != 0) && (tick.date != _date))
                 Reset();
-            Order o = new Order();
-            if (Symbol == null)
+            if (!string.Join(",",_syms).Contains(tick.sym))
             {
-                if (tick.sym != "") Symbol = tick.sym;
-                else return;
+                string[] newsym = new string[_syms.Length + 1];
+                newsym[_syms.Length] = tick.sym;
+                _syms = newsym;
                 _pos = new Position(tick.sym);
                 try
                 {
@@ -56,6 +59,7 @@ namespace TradeLib
                 }
                 catch (Exception ex) { D("Exception checking for EarlyClose..."+ex.Message); }
             }
+            Order o = new Order();
             _bl.newTick(tick);
             if (!_pos.isValid)
             {
@@ -154,7 +158,7 @@ namespace TradeLib
         /// </summary>
         public virtual void Reset()
         {
-            Symbol = null; _shut = false; 
+            _syms = new string[0]; _shut = false; 
             DayStart = 930; DayEnd = 1600;
             _buyids.Clear();
             _sellids.Clear();

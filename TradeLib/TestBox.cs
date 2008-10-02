@@ -270,7 +270,6 @@ namespace TestTradeLib
             b.GotOrderCancel += new Broker.OrderCancelDelegate(b_GotOrderCancel);
             fb.SendOrder += new OrderDelegate(fb_SendOrder);
             fb.SendCancel += new UIntDelegate(fb_CancelOrderSource);
-            fb.Symbol = s;
             fb.SendDebug+= new DebugFullDelegate(f_GotDebug);
 
             Tick[] timesales = new Tick[] { 
