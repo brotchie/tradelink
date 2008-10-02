@@ -367,7 +367,7 @@ namespace Kadina
                 // get difference between stats pre and stats post
                 cpl = broker.GetClosedPL(t.sym) - cpl;
                 cpt = broker.GetClosedPT(t.sym) - cpt;
-                ptab.Rows.Add(nowtime, (mypos.Flat ? "FLAT" : (mypos.Side ? "LONG" : "SHORT")), mypos.Size, mypos.AvgPrice, cpl.ToString("C2"),cpt.ToString("N1"));
+                ptab.Rows.Add(nowtime, (mypos.isFlat ? "FLAT" : (mypos.isLong ? "LONG" : "SHORT")), mypos.Size, mypos.AvgPrice, cpl.ToString("C2"),cpt.ToString("N1"));
             }
         }
 
