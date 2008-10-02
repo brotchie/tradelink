@@ -241,12 +241,18 @@ int LastBeat(CString cwind)
 
 bool hasHammerSub(std::string symbol)
 {
-	for (size_t i = 0; i<subs.size(); i++) if (symbol == subs[i]->GetSymbol()) return true;
+	for (size_t i = 0; i<subs.size(); i++) 
+		if ((subs[i]!=NULL) && 
+			(subs[i]->isLoaded()) && 
+			(symbol == subs[i]->GetSymbol()))
+			return true;
 	return false;
 }
 bool hasHammerIdx(CString symbol)
 {
-	for (size_t i = 0; i<idxs.size(); i++) if (symbol == idxs[i]->m_symbol) return true;
+	for (size_t i = 0; i<idxs.size(); i++) 
+		if ((idxs[i]!=NULL) && (symbol == idxs[i]->m_symbol))
+			return true;
 	return false;
 }
 
