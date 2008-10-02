@@ -10,7 +10,7 @@
 using System;
 using TradeLib;
 
-namespace box
+namespace BoxExamples
 {
     /// <summary>
     /// An example of a strategy that buys and sells Asymetries around the open.

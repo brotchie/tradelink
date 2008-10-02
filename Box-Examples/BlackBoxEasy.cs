@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using TradeLib;
 
-namespace TradeLib
+namespace BoxExamples
 {
     /// <summary>
     /// Feature-rich version of Box class.  More structure for trader/user.  Full-concept of a round-turn with explicit entry and exit definition.  Stoploss and profit-taking included.

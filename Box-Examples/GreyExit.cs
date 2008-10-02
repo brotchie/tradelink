@@ -6,7 +6,7 @@ using TradeLib;
 // we need this library to be able to read the parameter comments from our box
 using System.ComponentModel;
 
-namespace box
+namespace BoxExamples
 {
     /// <summary>
     /// Grey box that will monitor existing position and exit you if the market crosses the 5 minute moving average for your position.

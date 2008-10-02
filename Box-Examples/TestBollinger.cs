@@ -5,7 +5,7 @@ using TradeLib;
 using NUnit.Framework;
 
 
-namespace box
+namespace BoxExamples
 {
     [TestFixture]
     public class TestBollinger

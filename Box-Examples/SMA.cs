@@ -10,7 +10,7 @@
 using System;
 using TradeLib;
 
-namespace box
+namespace BoxExamples
 {
 	/// <summary>
 	/// Simple-Moving-Average class used by other boxes

@@ -30,7 +30,7 @@ echo.
 echo ASP
 xcopy /q /y ..\ASP\bin\Release\ASP.exe* .
 echo BOX-EXAMPLES
-xcopy /q /y ..\Box-Examples\bin\Release\box.dll .
+xcopy /q /y ..\Box-Examples\bin\Release\BoxExamples.dll .
 echo TRADELIB
 xcopy /q /y ..\Tradelib\bin\Release\TradeLib.dll .
 xcopy /q /y ..\TradeLib\bin\Release\EarlyClose.csv .

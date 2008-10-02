@@ -1,7 +1,7 @@
 using System;
 using TradeLib;
 
-namespace box
+namespace BoxExamples
 {
     /// <summary>
     /// Enters with only a single share/contract 

@@ -1,7 +1,7 @@
 using System;
 using TradeLib;
 
-namespace box
+namespace BoxExamples
 {
     /// <summary>
     /// This box will always enter long on every tick, unless he's already in a position.

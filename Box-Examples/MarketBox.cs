@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TradeLib;
 
-namespace TradeLib
+namespace BoxExamples
 {
     public class MarketBox : DayTradeBox
     {
