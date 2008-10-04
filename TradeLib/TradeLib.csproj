@@ -82,6 +82,7 @@
     <Compile Include="Response.cs" />
     <Compile Include="ScreenCapture.cs" />
     <Compile Include="Security.cs" />
+    <Compile Include="SparkLine.cs" />
     <Compile Include="Stock.cs" />
     <Compile Include="StopOrder.cs" />
     <Compile Include="Tick.cs" />

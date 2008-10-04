@@ -29,7 +29,12 @@ namespace TradeLib
         {// gets highest high
             if (barsback > b.Count) barsback = b.Count;
             decimal hh = decimal.MinValue;
-            for (int i = b.Last; i > (b.Count - barsback); i--) hh = (b.Get(i).High > hh) ? b.Get(i).High : hh;
+            for (int i = b.Last; i >= (b.Count - barsback); i--)
+            {
+                decimal high = b[i].High;
+                if (high > hh) hh = high;
+            }
+            if (hh == decimal.MinValue) hh = 0;
             return hh;
         }
         /// <summary>
@@ -48,7 +53,12 @@ namespace TradeLib
         { // gets lowest low
             if (barsback > b.Count) barsback = b.Count;
             decimal ll = decimal.MaxValue;
-            for (int i = b.Last; i > (b.Count - barsback); i--) ll = (b.Get(i).Low < ll) ? b.Get(i).Low : ll;
+            for (int i = b.Last; i >= (b.Count - barsback); i--)
+            {
+                decimal low = b[i].Low;
+                if (low < ll) ll = low;
+            }
+            if (ll == decimal.MaxValue) ll = 0;
             return ll;
         }
         /// <summary>
