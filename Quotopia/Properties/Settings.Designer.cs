@@ -25,7 +25,7 @@ namespace Quotopia.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Black")]
+        [global::System.Configuration.DefaultSettingValueAttribute("White")]
         public global::System.Drawing.Color marketbgcolor {
             get {
                 return ((global::System.Drawing.Color)(this["marketbgcolor"]));
@@ -49,7 +49,7 @@ namespace Quotopia.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("White")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Black")]
         public global::System.Drawing.Color marketfontcolor {
             get {
                 return ((global::System.Drawing.Color)(this["marketfontcolor"]));
@@ -115,7 +115,7 @@ namespace Quotopia.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Black")]
+        [global::System.Configuration.DefaultSettingValueAttribute("White")]
         public global::System.Drawing.Color gridcolor {
             get {
                 return ((global::System.Drawing.Color)(this["gridcolor"]));

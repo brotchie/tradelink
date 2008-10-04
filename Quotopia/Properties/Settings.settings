@@ -3,13 +3,13 @@
   <Profiles />
   <Settings>
     <Setting Name="marketbgcolor" Type="System.Drawing.Color" Scope="User">
-      <Value Profile="(Default)">Black</Value>
+      <Value Profile="(Default)">White</Value>
     </Setting>
     <Setting Name="marketfont" Type="System.Drawing.Font" Scope="User">
       <Value Profile="(Default)">Microsoft Sans Serif, 9.75pt</Value>
     </Setting>
     <Setting Name="marketfontcolor" Type="System.Drawing.Color" Scope="User">
-      <Value Profile="(Default)">White</Value>
+      <Value Profile="(Default)">Black</Value>
     </Setting>
     <Setting Name="uptickcolor" Type="System.Drawing.Color" Scope="User">
       <Value Profile="(Default)">LawnGreen</Value>
@@ -30,7 +30,7 @@
 &lt;/ArrayOfString&gt;</Value>
     </Setting>
     <Setting Name="gridcolor" Type="System.Drawing.Color" Scope="User">
-      <Value Profile="(Default)">Black</Value>
+      <Value Profile="(Default)">White</Value>
     </Setting>
     <Setting Name="ticfolderpath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
