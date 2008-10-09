@@ -163,7 +163,7 @@ namespace Quotopia.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("613, 429")]
+        [global::System.Configuration.DefaultSettingValueAttribute("700, 429")]
         public global::System.Drawing.Size wsize {
             get {
                 return ((global::System.Drawing.Size)(this["wsize"]));

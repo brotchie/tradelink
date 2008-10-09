@@ -118,8 +118,12 @@ namespace Quotopia
 
         void Quote_FormClosing(object sender, FormClosingEventArgs e)
         {
-            tl.Unsubscribe();
-            tl.Disconnect();
+            try
+            {
+                tl.Unsubscribe();
+                tl.Disconnect();
+            }
+            catch (TLServerNotFound) { }
         }
 
         void FetchTLServer()
@@ -153,6 +157,9 @@ namespace Quotopia
             qt.Columns.Add("PosSize");
             qt.Columns.Add("High");
             qt.Columns.Add("Low");
+            qt.Columns.Add("Exch");
+            qt.Columns.Add("BidEx");
+            qt.Columns.Add("AskEx");
             qg.AllowUserToAddRows = false;
             qg.AllowUserToDeleteRows = false;
             qg.AllowUserToOrderColumns = true;
@@ -428,6 +435,7 @@ namespace Quotopia
                     if (t.isTrade)
                     {
                         qt.Rows[r]["Last"] = t.trade.ToString("N2");
+                        qt.Rows[r]["Exch"] = t.ex;
                         if (t.size > 0) // make sure TSize is reported
                             qt.Rows[r]["TSize"] = t.size;
                     }
@@ -436,6 +444,8 @@ namespace Quotopia
 
                         qt.Rows[r]["Bid"] = t.bid.ToString("N2");
                         qt.Rows[r]["Ask"] = t.ask.ToString("N2");
+                        qt.Rows[r]["BidEx"] = t.be;
+                        qt.Rows[r]["AskEx"] = t.oe;
                         qt.Rows[r]["BSize"] = t.bs;
                         qt.Rows[r]["ASize"] = t.os;
                         qt.Rows[r]["Sizes"] = t.bs.ToString() + "x" + t.os.ToString();
@@ -443,6 +453,7 @@ namespace Quotopia
                     else if (t.hasBid)
                     {
                         qt.Rows[r]["Bid"] = t.bid.ToString("N2");
+                        qt.Rows[r]["BidEx"] = t.be;
                         qt.Rows[r]["BSize"] = t.bs;
                         string s = qt.Rows[r]["ASize"].ToString();
                         int os = (s != "") ? Convert.ToInt32(s) : 0;
@@ -452,6 +463,7 @@ namespace Quotopia
                     {
                         qt.Rows[r]["Ask"] = t.ask.ToString("N2");
                         qt.Rows[r]["ASize"] = t.os;
+                        qt.Rows[r]["AskEx"] = t.oe;
                         string s = qt.Rows[r]["BSize"].ToString();
                         int bs = (s != "") ? Convert.ToInt32(s) : 0;
                         qt.Rows[r]["Sizes"] = bs.ToString() + "x" + t.os.ToString();

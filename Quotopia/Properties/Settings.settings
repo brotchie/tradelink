@@ -42,7 +42,7 @@
       <Value Profile="(Default)">Maroon</Value>
     </Setting>
     <Setting Name="wsize" Type="System.Drawing.Size" Scope="User">
-      <Value Profile="(Default)">613, 429</Value>
+      <Value Profile="(Default)">700, 429</Value>
     </Setting>
     <Setting Name="highcolorbg" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
