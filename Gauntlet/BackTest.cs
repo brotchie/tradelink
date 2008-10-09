@@ -28,7 +28,6 @@ namespace WinGauntlet
         private bool _idx = true;
         public int time;
         public string aname = "c:\\program files\\tradelink\\tradelinksuite\\box.dll";
-        public BarList bl = new BarList();
         public eSigTick tick = new eSigTick();
         public int bint = 5;
         public bool UseIndex { get { return _idx; } set { _idx = value; } }
@@ -144,11 +143,9 @@ namespace WinGauntlet
 
                 // reset per-symbol statistics
                 if (mybox!=null) mybox.Reset();
-                bl = new BarList((BarInterval)bint, symbol);
                 int fills = 0;
                 tick = new eSigTick(); // reset our tick
                 int itime = 0;
-                BoxInfo bi = new BoxInfo();
                 
 
                 while (this.getTick() && tick.hasTick)
@@ -168,22 +165,6 @@ namespace WinGauntlet
                     if ((this.exfilter != "") &&
                         ((!tick.isTrade && (!tick.be.Contains(exfilter) || !tick.oe.Contains(exfilter))) ||
                          (tick.isTrade && tick.ex.Contains(exfilter)))) continue;
-
-                    if ((bi.Open == 0) && tick.isTrade) 
-                        bi.Open = tick.trade;
-
-                    if (tick.trade > bi.High) bi.High = tick.trade;
-                    if (tick.trade < bi.Low) bi.Low = tick.trade;
-                    bl.AddTick(tick); // save our tick to a bar
-
-                    if (bl.Has(2) && bl.Get(bl.Last-1).DayEnd)
-                    { // we hit a new day in the same file, reset day stuff and set our DayEndTime
-                        bl.Reset();
-                        bl.AddTick(tick); // put our tick back
-
-                        if (mybox!=null) mybox.Reset();
-                    }
-
 
                     // execute any pending orders on this tick
                     if (mybroker.GetOrderList().Count>0) fills += mybroker.Execute(tick); 
