@@ -65,7 +65,7 @@
 			Name="Debug|Win32"
 			>
 			<DebugSettings
-				Command="C:\Users\jfranta\Documents\Visual Studio 2005\Projects\AnvilDebug_x32_2_7_0_5\Anvil.exe"
+				Command="C:\Users\jfranta\Documents\Visual Studio 2008\Projects\AnvilDebug_x32_2_7_0_5\Anvil.exe"
 				WorkingDirectory=""
 				CommandArguments=""
 				Attach="false"

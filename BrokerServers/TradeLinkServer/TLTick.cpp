@@ -33,7 +33,7 @@ namespace TradeLinkServer
 	CString TLTick::Serialize(void)
 	{
 		CString m;
-		m.Format(_T("%s,%i,%i,%i,%f,%i,%s,%f,%f,%i,%i,%s,%f"),sym,date,time,sec,trade,size,ex,bid,ask,bs,os,be,oe);
+		m.Format(_T("%s,%i,%i,%i,%f,%i,%s,%f,%f,%i,%i,%s,%s"),sym,date,time,sec,trade,size,ex,bid,ask,bs,os,be,oe);
 		return m;
 	}
 	TLTick TLTick::Deserialize(CString message)
