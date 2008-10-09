@@ -33,6 +33,7 @@ namespace TradeLib
         public decimal Price { get { return price; } }
         public decimal AvgPrice { get { return price; } }
         public int Size { get { return size; } }
+        public int UnsignedSize { get { return Math.Abs(size); } }
         public bool isLong { get { return size > 0; } }
         public bool isFlat { get { return size==0; } }
         public bool isShort { get { return size < 0; } }
