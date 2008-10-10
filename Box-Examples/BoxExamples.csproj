@@ -40,12 +40,20 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="A.cs" />
     <Compile Include="AlwaysEnter.cs" />
+    <Compile Include="BigTrades.cs" />
+    <Compile Include="BigTradeUI.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BigTradeUI.Designer.cs">
+      <DependentUpon>BigTradeUI.cs</DependentUpon>
+    </Compile>
     <Compile Include="BlackBoxEasy.cs" />
     <Compile Include="Blade.cs" />
     <Compile Include="Bollinger.cs" />
@@ -55,6 +63,7 @@
     <Compile Include="MarketBox.cs" />
     <Compile Include="OpenCancel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResponseTemplate.cs" />
     <Compile Include="SMA.cs" />
     <Compile Include="TestBlade.cs" />
     <Compile Include="TestBollinger.cs" />
@@ -64,6 +73,11 @@
       <Project>{A0FE06A2-F31B-49DE-8901-917B5D593E43}</Project>
       <Name>TradeLib</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="BigTradeUI.resx">
+      <DependentUpon>BigTradeUI.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
