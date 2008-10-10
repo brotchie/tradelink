@@ -260,10 +260,7 @@ using System.IO;
 
         void bt_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            bt = null;
-            string unique = "";
-            if (csvnamesunique.Checked)
-                unique = "."+bt.name;
+            string unique = csvnamesunique.Checked ? "."+bt.name : "";
             if (ordersinwind.Checked)
             {
                 for (int i = 0; i < bt.mybroker.GetOrderList().Count; i++)
@@ -292,23 +289,8 @@ using System.IO;
                     sw.WriteLine(bt.mybroker.GetOrderList()[i].Serialize());
                 sw.Close();
             }
-            if (indicatorscsv.Checked)
-            {
-                StreamWriter sw = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Indicators"+unique+".csv",false);
-                sw.WriteLine(string.Join(",",mybox.Indicators));
-                
-                for (int i = 0; i< Indicators.Count; i++)
-                {
-                    List<string> ivals = new List<string>();
-                    for (int j = 0; j<Indicators[i].Length; j++)
-                        ivals.Add(Indicators[i][j].ToString());
-                    sw.WriteLine(string.Join(",",ivals.ToArray()));
-                }
-                sw.Close();
-                Indicators.Clear();
-            }
-
-
+            indf.Close();
+            bt = null;
             
             ProgressBar1.Enabled = false;
             ProgressBar1.Value = 0;
@@ -401,10 +383,22 @@ using System.IO;
             if (!showdebug.Checked) return;
             show(debug.Msg);
         }
-
+        StreamWriter indf = null;
         void mybox_IndicatorUpdate(object[] parameters)
         {
-            Indicators.Add(parameters);
+            if (indicatorscsv.Checked)
+            {
+                if (indf== null)
+                {
+                    string unique = csvnamesunique.Checked ? "." + bt.name : "";
+                    indf= new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Indicators" + unique + ".csv", false);
+                    indf.WriteLine(string.Join(",", mybox.Indicators));
+                    indf.AutoFlush = true;
+                }
+                string[] ivals = new string[parameters.Length];
+                for (int i = 0; i < parameters.Length; i++) ivals[i] = parameters[i].ToString();
+                indf.WriteLine(string.Join(",", ivals));
+            }
         }
 
         public List<object[]> Indicators = new List<object[]>();
