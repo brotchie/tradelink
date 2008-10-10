@@ -305,6 +305,7 @@ using System.IO;
                     sw.WriteLine(string.Join(",",ivals.ToArray()));
                 }
                 sw.Close();
+                Indicators.Clear();
             }
 
 
