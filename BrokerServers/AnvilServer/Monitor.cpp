@@ -153,7 +153,7 @@ void Monitor::Process(const Message* message, Observable* from, const Message* a
 			CTime ct = CTime::GetCurrentTime();
 			TLOrder o;
 			o.id = index;
-			o.price = order->GetOrderPrice().toDouble();
+			o.price = order->isMarketOrder() ? 0: order->GetOrderPrice().toDouble();
 			o.sec = ct.GetSecond();
 			o.stop = order->GetStopPrice()->toDouble();
 			o.time = (ct.GetHour()*100)+ct.GetMinute();
