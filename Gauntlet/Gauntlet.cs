@@ -260,6 +260,7 @@ using System.IO;
 
         void bt_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            bt = null;
             string unique = "";
             if (csvnamesunique.Checked)
                 unique = "."+bt.name;
