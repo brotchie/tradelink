@@ -266,6 +266,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\TLPosition.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\TLPosition.h"
+				>
+			</File>
+			<File
 				RelativePath=".\TLSecurity.h"
 				>
 			</File>
