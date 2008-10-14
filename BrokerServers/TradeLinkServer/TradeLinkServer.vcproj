@@ -216,6 +216,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\TLPosition.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\TLSecurity.cpp"
 				>
 			</File>
@@ -263,10 +267,6 @@
 			</File>
 			<File
 				RelativePath=".\TLOrder.h"
-				>
-			</File>
-			<File
-				RelativePath=".\TLPosition.cpp"
 				>
 			</File>
 			<File
