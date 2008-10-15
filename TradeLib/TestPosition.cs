@@ -21,7 +21,7 @@ namespace TestTradeLib
             Assert.That(p.AvgPrice == 0);
             Assert.That(p.isFlat);
             Assert.That(p.isValid);
-            Position p2 = new Position(s, 10, 100);
+            Position p2 = new Position(s, 10, 100,0);
             p.Adjust(p2);
             Assert.That(p.Size == 100);
             Assert.That(p.hasSymbol);
@@ -29,11 +29,11 @@ namespace TestTradeLib
             Assert.That(!p.isFlat);
             Assert.That(p.isLong);
             Assert.That(p.isValid);
-            Position p3 = new Position(s, 0, 100);
+            Position p3 = new Position(s, 0, 100,0);
             Assert.That(!p3.isValid);
-            p3 = new Position(s, 10, 0);
+            p3 = new Position(s, 10, 0,0);
             Assert.That(!p3.isValid);
-            p3 = new Position(s, 12, 100);
+            p3 = new Position(s, 12, 100,0);
             p.Adjust(p3);
             Assert.That(p.AvgPrice == 11);
             Assert.That(p.isLong);
@@ -69,6 +69,23 @@ namespace TestTradeLib
             pl = p.Adjust(new Trade(s, 80, 100,dt));
             Assert.That(pl == (84 - 80) * 100);
             Assert.That(p.isFlat);
+        }
+
+        [Test]
+        public void SerializeDeserialize()
+        {
+            const string s = "TST";
+            const decimal x = 10m;
+            const int z = -100;
+            const decimal cpl = 5.05m;
+            Position p = new Position(s, x, z, cpl);
+            string msg = p.Serialize();
+
+            Position c = Position.Deserialize(msg);
+            Assert.That(c.Symbol == s, c.Symbol);
+            Assert.That(c.AvgPrice == x, c.AvgPrice.ToString());
+            Assert.That(c.Size == z, c.Size.ToString());
+            Assert.That(c.ClosedPL == cpl, c.ClosedPL.ToString());
         }
     }
 }

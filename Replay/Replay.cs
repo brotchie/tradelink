@@ -29,7 +29,7 @@ namespace Replay
             tl.gotSrvAcctRequest += new TradeLink_Server_WM.StringDelegate(tl_gotSrvAcctRequest);
             tl.gotSrvAcctClosedPLRequest += new TradeLink_Server_WM.DecimalStringDelegate(tl_gotSrvAcctClosedPLRequest);
             tl.gotSrvAcctOpenPLRequest += new TradeLink_Server_WM.DecimalStringDelegate(tl_gotSrvAcctOpenPLRequest);
-
+            tl.gotSrvPosList += new TradeLink_Server_WM.PositionArrayDelegate(tl_gotSrvPosList);
             h.GotTick += new TickDelegate(h_GotTick);
             h.GotIndex += new IndexDelegate(h_GotIndex);
             h.SimBroker.GotOrder += new OrderDelegate(SimBroker_GotOrder);
@@ -43,6 +43,20 @@ namespace Replay
             // (this is for determining top of book between historical sources and our own orders)
             HISTBOOK.Execute = false; // make sure our special book is never executed by simulator
             HISTBOOK.Notify = false; // don't notify 
+        }
+
+        Position[] tl_gotSrvPosList(string account)
+        {
+            if (h==null) return new Position[0];
+            List<Trade> tlist = h.SimBroker.GetTradeList(new Account(account));
+            List<Position> plist = new List<Position>();
+            List<string> slist = new List<string>();
+            foreach (Trade t in tlist)
+                if (!slist.Contains(t.symbol))
+                    slist.Add(t.symbol);
+            foreach (string sym in slist)
+                plist.Add(h.SimBroker.GetOpenPosition(sym));
+            return plist.ToArray();
         }
 
         decimal tl_gotSrvAcctOpenPLRequest(string s)

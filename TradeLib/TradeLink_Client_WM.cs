@@ -20,6 +20,7 @@ namespace TradeLib
         public event DebugDelegate gotAccounts;
         public event UIntDelegate gotOrderCancel;
         public event TL2MsgDelegate gotSupportedFeatures;
+        public event PositionDelegate gotPosition;
 
         public TradeLink_Client_WM() : this("TradeLinkClient",true) { }
 
@@ -286,8 +287,12 @@ namespace TradeLib
         /// <returns>error code, and list of accounts via the gotAccounts event.</returns>
         /// 
         public int RequestAccounts() { return (int)TLSend(TL2.ACCOUNTREQUEST, Text); }
-
-
+        /// <summary>
+        /// Sends a request for current positions.  gotPosition event will fire for each position record held by the broker.
+        /// </summary>
+        /// <param name="account">account to obtain position list for (required)</param>
+        /// <returns>number of positions to expect</returns>
+        public int RequestPositions(string account) { if (account == "") return 0; return (int)TLSend(TL2.POSITIONREQUEST, Text + "+" + account); }
 
         public Brokers BrokerName 
         { 
@@ -418,6 +423,10 @@ namespace TradeLib
                 case TL2.ORDERNOTIFY:
                     Order o = Order.Deserialize(msg);
                     if (gotOrder != null) gotOrder(o);
+                    break;
+                case TL2.POSITIONRESPONSE:
+                    Position pos = Position.Deserialize(msg);
+                    if (gotPosition != null) gotPosition(pos);
                     break;
 
                 case TL2.ACCOUNTRESPONSE:

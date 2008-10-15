@@ -492,17 +492,18 @@ CString SerializeIntVec(std::vector<int> input)
 	return gjoin(tmp,",");
 }
 
-void PosList(CString req)
+int PosList(CString req)
 {
 	std::vector<CString> r;
 	gsplit(req,CString("+"),r);
-	if (r.size()<2) return;
+	if (r.size()<2) return 0;
 	CString account = req[1];
 	CString client = req[0];
 	Observable* m_account = B_GetAccount(account);
     void* iterator = B_CreatePositionIterator(POSITION_FLAT|POSITION_LONG|POSITION_SHORT, (1 << ST_LAST) - 1,m_account);
     B_StartIteration(iterator);
     const Position* pos;
+	int count = 0;
     while(pos = B_GetNextPosition(iterator))
     {
 		TradeLinkServer::TLPosition p;
@@ -512,8 +513,12 @@ void PosList(CString req)
 		p.Symbol = CString(pos->GetSymbol());
 		CString msg = p.Serialize();
 		SendMsg(POSITIONRESPONSE,msg,client);
+		count++;
     }
     B_DestroyIterator(iterator);
+	m_account = NULL;
+	pos = NULL;
+	return count;
 }
 
 CString GetFeatures()
@@ -534,6 +539,8 @@ CString GetFeatures()
 	f.push_back(POSCLOSEDPL);
 	f.push_back(POSLONGPENDSHARES);
 	f.push_back(POSSHORTPENDSHARES);
+	f.push_back(POSITIONREQUEST);
+	f.push_back(POSITIONRESPONSE);
 	f.push_back(LRPBID);
 	f.push_back(LRPASK);
 	f.push_back(POSTOTSHARES);
@@ -585,6 +592,7 @@ LPARAM ServiceMsg(const int t,CString m) {
 	if (t==CLEARCLIENT) return (LRESULT)ClearClient(m);
 	if (t==CLEARSTOCKS) return (LRESULT)ClearStocks(m);
 	if (t==REGISTERINDEX) return (LRESULT)RegIndex(m);
+	if (t==POSITIONREQUEST) return (LRESULT)PosList(m);
 	if (t==ACCOUNTOPENPL)
 	{
 		if (m.GetLength()>0)

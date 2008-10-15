@@ -10,6 +10,7 @@ namespace TradeLib
         public delegate decimal DecimalStringDelegate(string s);
         public delegate int IntStringDelegate(string s);
         public delegate string StringDelegate();
+        public delegate Position[] PositionArrayDelegate(string account);
         public event DecimalStringDelegate gotSrvAcctOpenPLRequest;
         public event DecimalStringDelegate gotSrvAcctClosedPLRequest;
         public event StringDelegate gotSrvAcctRequest;
@@ -19,6 +20,7 @@ namespace TradeLib
         public event DecimalStringDelegate DayLowRequest;
         public event OrderDelegate gotSrvFillRequest;
         public event UIntDelegate OrderCancelRequest;
+        public event PositionArrayDelegate gotSrvPosList;
 
         public TradeLink_Server_WM() : this(TLTypes.HISTORICALBROKER) { }
         public TradeLink_Server_WM(string servername) : base()
@@ -214,6 +216,16 @@ namespace TradeLib
                 case TL2.ACCOUNTREQUEST:
                     if (gotSrvAcctRequest == null) break;
                     WMUtil.SendMsg(gotSrvAcctRequest(), TL2.ACCOUNTRESPONSE, Handle, msg);
+                    break;
+                case TL2.POSITIONREQUEST:
+                    if (gotSrvPosList == null) break;
+                    string [] pm = msg.Split('+');
+                    if (pm.Length<2) break;
+                    string client = pm[0];
+                    string acct = pm[1];
+                    Position[] list = gotSrvPosList(acct);
+                    foreach (Position pos in list)
+                        WMUtil.SendMsg(pos.Serialize(), TL2.POSITIONRESPONSE, Handle, client);
                     break;
                 case TL2.ORDERCANCELREQUEST:
                     if (OrderCancelRequest != null)

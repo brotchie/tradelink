@@ -10,34 +10,37 @@ namespace TradeLib
     public class Position
     {
         public Position() : this("") { }
-        public Position(string stock) : this(stock, 0m, 0) { }
-        public Position(string stock, decimal p, int s) { sym = stock; price = p; size = s; }
+        public Position(string symbol) : this(symbol, 0m, 0,0) { }
+        public Position(string symbol, decimal price, int size) : this(symbol, price, size, 0) { }
+        public Position(string symbol, decimal price, int size, decimal closedpl) { _sym = symbol; _price = price; _size = size; _closedpl = closedpl; }
         public Position(Trade t) 
         {
             if (!t.isValid) throw new Exception("Can't construct a position object from invalid trade.");
-            sym = t.symbol; price = t.xprice; size = t.xsize; date = t.xdate; time = t.time; sec = t.xsec;
-            if (size>0) size *= t.side ? 1 : -1;
+            _sym = t.symbol; _price = t.xprice; _size = t.xsize; _date = t.xdate; _time = t.time; _sec = t.xsec;
+            if (_size>0) _size *= t.side ? 1 : -1;
         }
-        private string sym = "";
-        private int size = 0;
-        private decimal price = 0;
-        private int date = 0;
-        private int time = 0;
-        private int sec = 0;
+        private string _sym = "";
+        private int _size = 0;
+        private decimal _price = 0;
+        private int _date = 0;
+        private int _time = 0;
+        private int _sec = 0;
+        private decimal _closedpl = 0;
         public bool isValid
         {
             get { return hasSymbol && (((AvgPrice == 0) && (Size == 0)) || ((AvgPrice != 0) && (Size != 0))); }
         }
-        public bool hasSymbol { get { return sym != ""; } }
-        public string Symbol { get { return sym; } }
-        public decimal Price { get { return price; } }
-        public decimal AvgPrice { get { return price; } }
-        public int Size { get { return size; } }
-        public int UnsignedSize { get { return Math.Abs(size); } }
-        public bool isLong { get { return size > 0; } }
-        public bool isFlat { get { return size==0; } }
-        public bool isShort { get { return size < 0; } }
-        public int FlatSize { get { return size * -1; } }
+        public decimal ClosedPL { get { return _closedpl; } }
+        public bool hasSymbol { get { return _sym != ""; } }
+        public string Symbol { get { return _sym; } }
+        public decimal Price { get { return _price; } }
+        public decimal AvgPrice { get { return _price; } }
+        public int Size { get { return _size; } }
+        public int UnsignedSize { get { return Math.Abs(_size); } }
+        public bool isLong { get { return _size > 0; } }
+        public bool isFlat { get { return _size==0; } }
+        public bool isShort { get { return _size < 0; } }
+        public int FlatSize { get { return _size * -1; } }
         // returns any closed PL calculated on position basis (not per share)
         /// <summary>
         /// Adjusts the position by applying a new position.
@@ -47,15 +50,16 @@ namespace TradeLib
         public decimal Adjust(Position pos)
         {
             if (this.hasSymbol && (this.Symbol != pos.Symbol)) throw new Exception("Invalid Position: Position MUST have a symbol.");
-            if (!hasSymbol && pos.hasSymbol) sym = pos.Symbol;
+            if (!hasSymbol && pos.hasSymbol) _sym = pos.Symbol;
             if (!pos.isValid) throw new Exception("Invalid position adjustment, existing:" + this.ToString() + " adjustment:" + pos.ToString());
             if (pos.isFlat) return 0; // nothing to do
             decimal pl = BoxMath.ClosePL(this,pos.ToTrade());
-            if (this.isFlat) this.price = pos.price; // if we're leaving flat just copy price
+            if (this.isFlat) this._price = pos._price; // if we're leaving flat just copy price
             else if ((pos.isLong && this.isLong) || (!pos.isLong && !this.isLong)) // sides match, adding so adjust price
-                this.price = ((this.price * this.size) + (pos.price * pos.size)) / (pos.size + this.size);
-            this.size += pos.size; // adjust the size
-            if (this.isFlat) price = 0; // if we're flat after adjusting, size price back to zero
+                this._price = ((this._price * this._size) + (pos._price * pos._size)) / (pos._size + this._size);
+            this._size += pos._size; // adjust the size
+            if (this.isFlat) _price = 0; // if we're flat after adjusting, size price back to zero
+            _closedpl += pl; // update running closed pl
             return pl;
         }
         /// <summary>
@@ -71,8 +75,34 @@ namespace TradeLib
         }
         public Trade ToTrade()
         {
-            DateTime dt = (date*time!=0) ? Util.ToDateTime(date, time, sec) : DateTime.Now;
+            DateTime dt = (_date*_time!=0) ? Util.ToDateTime(_date, _time, _sec) : DateTime.Now;
             return new Trade(Symbol, AvgPrice, Size,dt );
+        }
+
+        public static Position Deserialize(string msg)
+        {
+            
+            string[] r = msg.Split(',');
+            string sym = r[(int)pf.symbol];
+            decimal price = Convert.ToDecimal(r[(int)pf.price]);
+            decimal cpl = Convert.ToDecimal(r[(int)pf.closedpl]);
+            int size = Convert.ToInt32(r[(int)pf.size]);
+            Position p = new Position(sym,price,size,cpl);
+            return p;
+        }
+
+        public string Serialize()
+        {
+            string[] r = new string[] { Symbol, AvgPrice.ToString("N2"), Size.ToString(), ClosedPL.ToString("N2") };
+            return string.Join(",", r);
+        }
+
+        enum pf
+        {
+            symbol,
+            price,
+            size,
+            closedpl,
         }
     }
 }
