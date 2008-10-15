@@ -1,6 +1,5 @@
 
-#include "ObserverApi.h"
-#include "BusinessApi.h"
+
 
 LPARAM ServiceMsg(const int gotType,CString gotMsg);
 void TLUnload();
@@ -9,6 +8,7 @@ void Subscribers(CString stock,std::vector <CString> &subscriberids);
 void TLKillDead(int deathInseconds);
 void gsplit(CString msg, CString del, std::vector<CString>& rec);
 
+/*
 
 enum TL2 {
 	OK = 0,
@@ -115,5 +115,5 @@ protected:
     MarketIndex* m_index;
 };
 
-
+*/
 

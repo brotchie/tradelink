@@ -14,6 +14,7 @@
 #include "SingleBookDlg.h"
 #include "MultiBookDlg.h"
 #include "TradeLink.h"
+#include "TLAnvil.h"
 #include "Monitor.h"
 
 #include "ObserverApi.h"

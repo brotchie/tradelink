@@ -787,37 +787,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\TLAnvil.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\TLAnvil.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TLIndex.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\TLIndex.h"
+				>
+			</File>
+			<File
 				RelativePath=".\TLStock.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\TLStock.h"
-				>
-			</File>
-			<File
-				RelativePath=".\TradeLink.cpp"
-				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						ExceptionHandling="1"
-						UsePrecompiledHeader="2"
-						CompileAsManaged="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\TradeLink.h"
 				>
 			</File>
 		</Filter>

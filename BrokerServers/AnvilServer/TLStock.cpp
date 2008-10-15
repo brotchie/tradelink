@@ -3,6 +3,7 @@
 #include "TLStock.h"
 #include "Messages.h"
 #include "SendMsg.h"
+#include "TLAnvil.h"
 #include "TradeLink.h"
 #include "TradeLinkServer.h"
 #include "AnvilUtil.h"

@@ -5,6 +5,7 @@
 #include "Messages.h"
 #include "TradeLinkServer.h"
 #include "TradeLink.h"
+#include "TLAnvil.h"
 #include "AnvilUtil.h"
 #include "SendMsg.h"
 using namespace TradeLinkServer;

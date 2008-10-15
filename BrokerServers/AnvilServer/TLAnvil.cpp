@@ -8,47 +8,12 @@
 #include "TLStock.h"
 #include "SendMsg.h"
 #include "TLOrder.h"
+#include "TLPosition.h"
 #include "AnvilUtil.h"
 #include "Monitor.h"
+#include "TLIndex.h"
+#include "TLAnvil.h"
 
-
-// TLIdx message handlers
-
-void TLIdx::Load(CString symbol)
-{
-    if(symbol.GetLength() != 0)
-    {
-        MarketIndex* index = B_FindIndex(symbol);
-        if(m_index != index)
-        {
-            if(m_index)
-            {
-                m_index->Remove(this);
-            }
-            m_index = index;
-            if(m_index)
-            {
-				m_symbol = m_index->GetSymbol();
-				m_index->Add(this);
-                FillInfo();
-            }
-		}
-	}
-	else m_symbol = "";
-}
-
-
-TLIdx::TLIdx(CString symbol)
-{
-	m_index = NULL;
-	m_symbol = "";
-	Load(symbol);
-
-}
-
-void TLIdx::OnChangeIndexSymbol() 
-{
-}
 
 
 
@@ -525,6 +490,30 @@ CString SerializeIntVec(std::vector<int> input)
 	}
 	// join vector and return serialized structure
 	return gjoin(tmp,",");
+}
+
+void PosList(CString req)
+{
+	std::vector<CString> r;
+	gsplit(req,CString("+"),r);
+	if (r.size()<2) return;
+	CString account = req[1];
+	CString client = req[0];
+	Observable* m_account = B_GetAccount(account);
+    void* iterator = B_CreatePositionIterator(POSITION_FLAT|POSITION_LONG|POSITION_SHORT, (1 << ST_LAST) - 1,m_account);
+    B_StartIteration(iterator);
+    const Position* pos;
+    while(pos = B_GetNextPosition(iterator))
+    {
+		TradeLinkServer::TLPosition p;
+		p.AvgPrice = pos->GetAverageExecPrice().GetMoneyValueForServer()/1024;
+		p.ClosedPL = pos->GetClosedPnl().GetMoneyValueForServer()/1024;
+		p.Size = pos->GetSize();
+		p.Symbol = CString(pos->GetSymbol());
+		CString msg = p.Serialize();
+		SendMsg(POSITIONRESPONSE,msg,client);
+    }
+    B_DestroyIterator(iterator);
 }
 
 CString GetFeatures()
