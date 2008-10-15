@@ -19,13 +19,13 @@ namespace TradeLib
             _sym = t.symbol; _price = t.xprice; _size = t.xsize; _date = t.xdate; _time = t.time; _sec = t.xsec;
             if (_size>0) _size *= t.side ? 1 : -1;
         }
-        private string _sym = "";
-        private int _size = 0;
-        private decimal _price = 0;
-        private int _date = 0;
-        private int _time = 0;
-        private int _sec = 0;
-        private decimal _closedpl = 0;
+        protected string _sym = "";
+        protected int _size = 0;
+        protected decimal _price = 0;
+        protected int _date = 0;
+        protected int _time = 0;
+        protected int _sec = 0;
+        protected decimal _closedpl = 0;
         public bool isValid
         {
             get { return hasSymbol && (((AvgPrice == 0) && (Size == 0)) || ((AvgPrice != 0) && (Size != 0))); }

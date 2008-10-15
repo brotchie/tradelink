@@ -495,10 +495,10 @@ CString SerializeIntVec(std::vector<int> input)
 int PosList(CString req)
 {
 	std::vector<CString> r;
-	gsplit(req,CString("+"),r);
+	gsplit(req,"+",r);
 	if (r.size()<2) return 0;
-	CString account = req[1];
-	CString client = req[0];
+	CString account = r[1];
+	CString client = r[0];
 	Observable* m_account = B_GetAccount(account);
     void* iterator = B_CreatePositionIterator(POSITION_FLAT|POSITION_LONG|POSITION_SHORT, (1 << ST_LAST) - 1,m_account);
     B_StartIteration(iterator);
