@@ -132,7 +132,7 @@ namespace TradeLib
         public bool CancelOrder(Account a, uint orderid)
         {
             if (!MasterOrders.ContainsKey(a)) return false;
-            for (int i = 0; i < MasterOrders[a].Count; i++) // and every order
+            for (int i = MasterOrders[a].Count-1; i>=0; i--) // and every order
                 if (MasterOrders[a][i].id == orderid) // if we have order with requested id
                 {
                     if ((GotOrderCancel != null) && a.Notify)
@@ -191,6 +191,7 @@ namespace TradeLib
                 // if account has requested no executions, skip it
                 if (!a.Execute) continue;
                 // go through each order in the account
+                List<int> remove = new List<int>();
                 for (int i = 0; i < MasterOrders[a].Count; i++)
                 { 
                     Order o = MasterOrders[a][i];
@@ -202,7 +203,7 @@ namespace TradeLib
                         (o.side && (mysize <= availablesize) && (tick.trade >= o.stopp) && (o.price == 0)) || // buy stop
                         (!o.side && (mysize <= availablesize) && (tick.trade <= o.stopp) && (o.price == 0))) // sell stop
                     { // sort filled trades by symbol
-                        MasterOrders[a].RemoveAt(i);
+                        remove.Add(i);
                         if (!MasterTrades.ContainsKey(a.ID)) MasterTrades.Add(a.ID, new List<Trade>());
                         o.Fill(tick); // fill our trade
                         availablesize -= mysize; // don't let other trades fill on same tick
@@ -212,6 +213,9 @@ namespace TradeLib
                         filledorders++; // count the trade
                     }
                 }
+                // remove the filled orders
+                for (int i = remove.Count - 1; i >= 0; i--)
+                    MasterOrders[a].RemoveAt(remove[i]);
             }
             return filledorders;
         }

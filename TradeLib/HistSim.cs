@@ -178,21 +178,25 @@ namespace TradeLib
         bool FlushIndexCache(DateTime time)
         {
             bool didsomething = false;
+            List<int> remove = new List<int>();
             for (int i = 0; i < indexcache.Count; i++)
                 if (time >= Util.ToDateTime(indexcache[i].Date, indexcache[i].Time, 0)) // indicies don't have seconds
                 {
                     if (GotIndex != null)
                         GotIndex(indexcache[i]); // send cached item as event
                     cachedsymbols.Remove(indexcache[i].Name); // update symbol cache
-                    indexcache.RemoveAt(i);// remove item from cache
+                    remove.Add(i);// remove item from cache
                     didsomething = true;
                 }
+            for (int i = remove.Count - 1; i >= 0; i--) // process removals
+                indexcache.RemoveAt(remove[i]);
             return didsomething;
         }
 
         bool FlushTickCache(DateTime time)
         {
             bool didsomething = false;
+            List<int> remove = new List<int>();
             for (int i = 0; i < tickcache.Count; i++)
                 if (time >= Util.ToDateTime(tickcache[i].date, tickcache[i].time, tickcache[i].sec))
                 {
@@ -201,9 +205,11 @@ namespace TradeLib
                     if (GotTick != null)
                         GotTick(tickcache[i]); // send cached tick as event
                     cachedsymbols.Remove(tickcache[i].sym); // update symbol cache
-                    tickcache.RemoveAt(i); // remove item from cache
+                    remove.Add(i);// remove item from cache
                     didsomething = true;
                 }
+            for (int i = remove.Count - 1; i >= 0; i--) // process removals
+                tickcache.RemoveAt(remove[i]);
             return didsomething;
         }
 
