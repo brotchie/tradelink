@@ -12,7 +12,7 @@ namespace TradeLib
         public Position() : this("") { }
         public Position(string symbol) : this(symbol, 0m, 0,0) { }
         public Position(string symbol, decimal price, int size) : this(symbol, price, size, 0) { }
-        public Position(string symbol, decimal price, int size, decimal closedpl) { _sym = symbol; _price = price; _size = size; _closedpl = closedpl; }
+        public Position(string symbol, decimal price, int size, decimal closedpl) { _sym = symbol; if (size == 0) price = 0; _price = price; _size = size; _closedpl = closedpl; }
         public Position(Trade t) 
         {
             if (!t.isValid) throw new Exception("Can't construct a position object from invalid trade.");
