@@ -289,7 +289,8 @@ using System.IO;
                     sw.WriteLine(bt.mybroker.GetOrderList()[i].Serialize());
                 sw.Close();
             }
-            indf.Close();
+            if (indf!=null)
+                indf.Close();
             bt = null;
             
             ProgressBar1.Enabled = false;
