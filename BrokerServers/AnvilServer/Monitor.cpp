@@ -10,8 +10,6 @@
 #include "SendMsg.h"
 using namespace TradeLinkServer;
 
-typedef std::vector <int> filllist;
-std::vector<filllist> accountfills;
 std::vector<CString> accounts;
 std::vector<Order*> ordercache;
 
@@ -40,30 +38,12 @@ Monitor::~Monitor()
 	B_DestroyIterator(iterator);
 	accounts.clear();
 	ordercache.clear();
-	accountfills.clear();
 }
 
 
 
 int AccountId(CString acct) { for (size_t i = 0; i<accounts.size(); i++) if (accounts[i]==acct) return i; return -1; }
-bool hasFillID(CString acct,int id)
-{
-	int aid = AccountId(acct);
-	if (aid==-1)
-	{
-		accounts.push_back(acct);
-		filllist f;
-		f.push_back(id);
-		accountfills.push_back(f);
-		return false;
-	}
-	filllist existing = accountfills[aid];
-	for (size_t i= 0; i<existing.size(); i++)
-		if (existing[i]==id) return true;
-	existing.push_back(id);
-	accountfills[aid] = existing;
-	return false;
-}
+
 
 bool hasOrder(unsigned int  TLid)
 {
@@ -105,7 +85,7 @@ void Monitor::Process(const Message* message, Observable* from, const Message* a
 
 			unsigned int thisid = order->GetId();
 			CString ac = CString(B_GetAccountName(position->GetAccount()));
-			if (!hasFillID(ac,thisid)) // don't send same notification twice
+
 			{
 				// build the serialized trade object
 				CTime ct(msg->x_Time);
