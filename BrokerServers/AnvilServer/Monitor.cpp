@@ -83,7 +83,7 @@ void Monitor::Process(const Message* message, Observable* from, const Message* a
             const Execution* exec = info->m_execution;
 			if ((order==NULL) || (position==NULL) || (exec==NULL)) return; // don't process null orders
 
-			unsigned int thisid = order->GetId();
+			unsigned int thisid = this->cacheOrder(order);
 			CString ac = CString(B_GetAccountName(position->GetAccount()));
 
 			{
