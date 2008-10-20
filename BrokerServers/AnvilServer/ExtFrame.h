@@ -13,14 +13,8 @@
 
 class Money;
 class MoneySize;
-class BaseDlg;
-/*
-class MarketMakerDlg;
-class LoadDlg;
-class SendOrderDlg;
-class CancelOrderDlg;
-class IndexDlg;
-*/
+//class BaseDlg;
+
 /////////////////////////////////////////////////////////////////////////////
 // ExtFrame frame
 
@@ -37,48 +31,16 @@ public:
 public:
 //    const std::string& GetVersion() const{return m_version;}
     static ExtFrame* GetInstance(){return instance;}
+	/*
     static void FormatDollarsAndCents(CString& dest, int dollars, int cents);
     static void FormatMoney(CString& dest, const Money& money);
     static void FormatMoneySize(CString& dest, const MoneySize& money);
     static void FormatTimeToken(unsigned int i, std::string& str);
     static void FormatTif(unsigned int tif, std::string& text);
+	*/
 //    static CString ExtFrame::FormatPrice(const Money& price)
 // Operations
 public:
-/*
-    MarketMakerDlg* CreateMMDlg();
-    LoadDlg* CreateLoadDlg();
-    IndexDlg* CreateIndexDlg();
-    SendOrderDlg* CreateSendOrderDlg();
-    CancelOrderDlg* CreateCancelOrderDlg();
-
-    void ClearMMDialogs();
-    void DestroyMMDlg(MarketMakerDlg*);
-
-    void ClearLoadDialogs();
-    void DestroyLoadDlg(LoadDlg*);
-
-    void ClearIndexDialogs();
-    void DestroyIndexDlg(IndexDlg*);
-
-    void ClearSendOrderDialogs();
-    void DestroySendOrderDlg(SendOrderDlg*);
-
-    void ClearCancelOrderDialogs();
-    void DestroyCancelOrderDlg(CancelOrderDlg*);
-*/
-    BaseDlg* CreateDlg(unsigned int id);
-    void ClearDialogs();
-    void DestroyDlg(BaseDlg*);
-
-    static unsigned int SetDollarsAndCents(CSpinButtonCtrl& spinDollars, CEdit& editDollars,
-        CSpinButtonCtrl& spinCents, CEdit& editCents,
-        unsigned int val, unsigned int maxDollars = 99);
-    static void SpinChanged(CSpinButtonCtrl& spin, CEdit& edit);
-    static void IncrementSpin(CSpinButtonCtrl& spin, CEdit& edit, unsigned int val);
-    static void AdjustEdit(CSpinButtonCtrl& spin, CEdit& edit, bool two);
-    static void ScrollEnd(CEdit& edit);
-    static void SetSpinValue(CSpinButtonCtrl& spin, CEdit& edit, int val, bool two);
 
 // Overrides
 	// ClassWizard generated virtual function overrides
@@ -113,27 +75,9 @@ protected:
 	afx_msg BOOL OnCopyData(CWnd* sWnd,COPYDATASTRUCT* pCD);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
-	void RegChannels();
+
     virtual void Process(const Message* message, Observable* from, const Message* additionalInfo);
     void MarketSummaryPopulationDone(bool done);
-/*
-    typedef std::set<MarketMakerDlg*> MmDlgSet;
-    MmDlgSet m_mmDlgSet;
-
-    typedef std::set<LoadDlg*> LoadDlgSet;
-    LoadDlgSet m_loadDlgSet;
-
-    typedef std::set<SendOrderDlg*> SendOrderDlgSet;
-    SendOrderDlgSet m_sendOrderDlgSet;
-
-    typedef std::set<IndexDlg*> IndexDlgSet;
-    IndexDlgSet m_indexDlgSet;
-
-    typedef std::set<CancelOrderDlg*> CancelOrderDlgSet;
-    CancelOrderDlgSet m_cancelOrderDlgSet;
-*/
-    typedef std::set<BaseDlg*> DlgSet;
-    DlgSet m_dlgSet;
 
     static ExtFrame* instance;
 

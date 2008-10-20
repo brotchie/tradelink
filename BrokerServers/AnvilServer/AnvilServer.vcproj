@@ -515,22 +515,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\BaseDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\BaseDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CancelOrderDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CancelOrderDlg.h"
-				>
-			</File>
-			<File
 				RelativePath="ExtFrame.cpp"
 				>
 				<FileConfiguration
@@ -591,101 +575,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\IndexDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\IndexDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ListBoxFocus.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ListBoxFocus.h"
-				>
-			</File>
-			<File
-				RelativePath=".\LoadDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\LoadDlg.h"
-				>
-			</File>
-			<File
-				RelativePath="MarketMakerDlg.cpp"
-				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="0"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-						BasicRuntimeChecks="3"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="MarketMakerDlg.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Monitor.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\Monitor.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MultiBookDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\MultiBookDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PosOrdersExecsDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PosOrdersExecsDlg.h"
 				>
 			</File>
 			<File
@@ -698,38 +592,6 @@
 			</File>
 			<File
 				RelativePath=".\SendMsg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SendOrderBaseDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SendOrderBaseDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SendOrderDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SendOrderDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SendStopOrderDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SendStopOrderDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SingleBookDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SingleBookDlg.h"
 				>
 			</File>
 			<File

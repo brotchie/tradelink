@@ -68,7 +68,6 @@ void BaseDlg::Fill(BaseDlg::QuoteControls& quoteControls, void* iterator)
     {
         str = be->GetMmid();
         str += "  ";
-//        ExtFrame::FormatDollarsAndCents(str, be->GetPriceWhole(), be->GetPriceThousandsFraction());
         ExtFrame::FormatMoney(str, *be);
         str += "       ";
 		_itoa_s(be->GetSize(), num, sizeof(num), 10);

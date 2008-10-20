@@ -1,8 +1,6 @@
 
 #include "stdafx.h"
-#include "Resource.h"
 #include "TradeLink.h"
-#include "SendOrderDlg.h"
 #include "ExtFrame.h"
 #include "time.h"
 #include "TLStock.h"
@@ -75,65 +73,9 @@ void TLUnload()
 	idxs.clear();
 }
 
-void TLIdx::FillInfo()
-{
-	
-    CString tick = m_index->GetSymbol();
-	tick.AppendChar(',');
-	time_t now;
-	CTime ct(time(&now));
-	int xd = (ct.GetYear()*10000)+(ct.GetMonth()*100)+ct.GetDay();
-	int xt = (ct.GetHour()*100)+ct.GetMinute();
-	CString xdate;
-	xdate.Format(_T("%i,"),xd);
-	CString xtime;
-	xtime.Format(_T ("%i,"),xt);
-	tick.Append(xdate);
-	tick.Append(xtime);
-	CString str;
-	ExtFrame::FormatMoney(str, m_index->GetValue());
-	tick.Append(str);
-    str = "";
-    ExtFrame::FormatMoney(str, m_index->GetOpenValue());
-	tick.AppendChar(',');
-	tick.Append(str);
-    str = "";
-    ExtFrame::FormatMoney(str, m_index->GetHigh());
-	tick.AppendChar(',');
-	tick.Append(str);
-    str = "";
-    ExtFrame::FormatMoney(str, m_index->GetLow());
-	tick.AppendChar(',');
-	tick.Append(str);
-    str = "";
-    ExtFrame::FormatMoney(str, m_index->GetCloseValue());
-	tick.AppendChar(',');
-	tick.Append(str);
-	tick.AppendChar(',');
-
-	for (size_t i = 0; i<client.size(); i++)
-		SendMsg(TICKNOTIFY,tick,client[i]); // send update to every client
-}
 
 
-void TLIdx::Process(const Message* message, Observable* from, const Message* additionalInfo)
-{
-    switch(message->GetType())
-    {
-        case M_NW2_INDEX_DETAILS:
-        FillInfo();
-        break;
-    }
-}
 
-void TLIdx::OnDynamicUpdate() 
-{
-    if(m_index)
-    {
-            FillInfo();
-            m_index->Add(this);
-    }
-}
 
 
 

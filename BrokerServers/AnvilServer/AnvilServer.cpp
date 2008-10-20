@@ -5,10 +5,8 @@
 #include "Resource.h"
 #include "BusinessApi.h"
 #include <afxdllx.h>
-#include "SendOrderBaseDlg.h"
 #include "ExtFrame.h"
 #include <fstream>
-#include "PosOrdersExecsDlg.h"
 
 
 #ifdef _DEBUG
@@ -85,34 +83,8 @@ const char* WINAPI GetAnvilExtensionDescription()
 const char* WINAPI GetAnvilExtensionMenu()
 {
     static char menu[30];
-    const char* ms = "Show Window";
-    const char* mh = "Hide Window";
+	return menu;
 
-    char* cursor = menu;
-	unsigned int len = sizeof(menu);
-	unsigned int le;
-
-	strcpy_s(cursor, len, ms);
-	le = (unsigned int)strlen(cursor) + 1;
-	if(len <= le)
-	{
-		*menu = '\0';
-		return menu;
-	}
-	len -= le;
-    cursor += le;
-
-    strcpy_s(cursor, len, mh);
-	le = (unsigned int)strlen(cursor) + 1;
-	if(len <= le)
-	{
-		*menu = '\0';
-		return menu;
-	}
-	len -= le;
-    cursor += le;
-    *cursor = '\0';
-    return menu;
 }
 
 
@@ -131,20 +103,9 @@ void ShowMainWindow()
         frame = new ExtFrame();
 
         CRect rect(200, 200, 600, 400);
-	// create and load the frame with its resources
-//	pFrame->Create(NULL, "", WS_THICKFRAME|WS_POPUP|WS_CLIPCHILDREN|WS_SYSMENU|WS_MINIMIZEBOX|WS_CAPTION, CRect(0, 0, 200, 100));
         CWnd* parent = AfxGetMainWnd();
-//HINSTANCE resource = AfxGetResourceHandle();
-//AfxSetResourceHandle(module_instance);
 	    frame->Create(NULL, windname, WS_OVERLAPPEDWINDOW, rect, parent, MAKEINTRESOURCE(IDR_MAINFRAME));//, WS_VISIBLE|WS_POPUP|WS_CLIPCHILDREN|WS_THICKFRAME|WS_SYSMENU|WS_MINIMIZEBOX, rect);
-//        frame->ShowWindow(SW_SHOW);
-        //frame->ShowWindowAndChildren(SW_SHOW);
-    }
-    else
-    {
-//        frame->ShowWindow(SW_SHOW);
-        frame->ShowWindowAndChildren(SW_SHOW);
-        frame->SetForegroundWindow();
+
     }
 }
 

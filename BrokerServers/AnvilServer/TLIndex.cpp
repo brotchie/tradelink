@@ -1,5 +1,11 @@
 #include "stdafx.h"
+#include "TradeLink.h"
 #include "TLIndex.h"
+#include "TLAnvil.h"
+#include "SendMsg.h"
+#include "MessageIds.h"
+
+
 
 // TLIdx message handlers
 
@@ -35,7 +41,50 @@ TLIdx::TLIdx(CString symbol)
 
 }
 
+void TLIdx::OnDynamicUpdate() 
+{
+    if(m_index)
+    {
+            FillInfo();
+            m_index->Add(this);
+    }
+}
+
 void TLIdx::OnChangeIndexSymbol() 
 {
+}
+
+void TLIdx::FillInfo()
+{
+
+	time_t now;
+	CTime ct(time(&now));
+	int xd = (ct.GetYear()*10000)+(ct.GetMonth()*100)+ct.GetDay();
+	int xt = (ct.GetHour()*100)+ct.GetMinute();
+	double val = m_index->GetValue().toDouble();
+	double open = m_index->GetOpenValue().toDouble();
+	double high = m_index->GetHigh().toDouble();
+	double low = m_index->GetLow().toDouble();
+	double close = m_index->GetCloseValue().toDouble();
+	CString sym = m_index->GetSymbol();
+	CString str;
+	// sym,date, time, value, open, high, low, close
+	str.Format("%s,%i,%i,%f,%f,%f,%f,%f",sym,xd,xt,val,open,high,low,close);
+
+	std::vector<CString> client;
+	AllClients(client);
+	for (size_t i = 0; i<client.size(); i++)
+		SendMsg(TICKNOTIFY,str,client[i]); // send update to every client
+}
+
+
+void TLIdx::Process(const Message* message, Observable* from, const Message* additionalInfo)
+{
+    switch(message->GetType())
+    {
+        case M_NW2_INDEX_DETAILS:
+        FillInfo();
+        break;
+    }
 }
 
