@@ -9,24 +9,43 @@ namespace TradeLib
     [Serializable]
     public class MarketBasket 
     {
+        /// <summary>
+        /// Create a basket of securities
+        /// </summary>
+        /// <param name="onesymbol">first symbol</param>
         public MarketBasket(string onesymbol) : this(new string[] { onesymbol }) { }
+        /// <summary>
+        /// Create a basket of securities
+        /// </summary>
+        /// <param name="symbolist">symbols</param>
         public MarketBasket(string[] symbolist)
         {
             foreach (string s in symbolist)
                 Add(new Security(s));
         }
-        public MarketBasket(Stock firststock)
+        /// <summary>
+        /// Create a basket of securities
+        /// </summary>
+        /// <param name="firstsec">security</param>
+        public MarketBasket(Security firstsec)
         {
-            Add(firststock);
+            Add(firstsec);
         }
-        public MarketBasket(Security firstsecurity) { Add(firstsecurity); }
+        /// <summary>
+        /// Create a basket of securities
+        /// </summary>
+        /// <param name="securities"></param>
+        public MarketBasket(Security[] securities)
+        {
+            foreach (Security s in securities)
+                Add(s);
+        }
         public MarketBasket() { }
         public Security this [int index] { get { return symbols[index]; } set { symbols[index] = value; } }
         List<Security> symbols = new List<Security>();
         public int Count { get { return symbols.Count; } }
         public bool hasStock { get { return symbols.Count >0; } }
         public void Add(Security s) { if (s.isValid) symbols.Add(s); }
-        public void Add(Stock s) { if (s.isValid) symbols.Add(s); }
         public void Add(MarketBasket mb)
         {
             for (int i = 0; i < mb.Count; i++)

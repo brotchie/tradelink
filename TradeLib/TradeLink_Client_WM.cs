@@ -380,16 +380,16 @@ namespace TradeLib
                     {
                         try
                         {
-                            if (t.trade > chighs[t.sym]) chighs[t.sym] = t.trade;
-                            if (t.trade < clows[t.sym]) clows[t.sym] = t.trade;
+                            if (t.trade > chighs[t.symbol]) chighs[t.symbol] = t.trade;
+                            if (t.trade < clows[t.symbol]) clows[t.symbol] = t.trade;
                         }
                         catch (KeyNotFoundException)
                         {
-                            decimal high = DayHigh(t.sym);
-                            decimal low = DayLow(t.sym);
-                            chighs.Add(t.sym, high);
+                            decimal high = DayHigh(t.symbol);
+                            decimal low = DayLow(t.symbol);
+                            chighs.Add(t.symbol, high);
                             if (low == 0) low = 640000;
-                            clows.Add(t.sym, low);
+                            clows.Add(t.symbol, low);
                         }
                     }
                     if (gotTick != null) gotTick(t);

@@ -295,7 +295,7 @@ namespace Quotopia
                 Security sec = Security.Parse(newsymbol);
                 if (sec.isValid)
                 {
-                    mb.Add(new Stock(newsymbol));
+                    mb.Add(sec);
                     addsymbol(newsymbol);
                     newsymbol = "";
                     tl.Subscribe(mb);
@@ -408,9 +408,9 @@ namespace Quotopia
             }
             else
             {
-                int[] rows = GetSymbolRows(t.sym);
-                decimal high = tl.DayHigh(t.sym);
-                decimal low = tl.DayLow(t.sym);
+                int[] rows = GetSymbolRows(t.symbol);
+                decimal high = tl.DayHigh(t.symbol);
+                decimal low = tl.DayLow(t.symbol);
                 for (int i = 0; i < rows.Length; i++)
                 {
                     // last,size,bid/ask,sizes
@@ -497,12 +497,12 @@ namespace Quotopia
 
         void tl_gotTick(Tick t)
         {
-            int[] rows = GetSymbolRows(t.sym);
+            int[] rows = GetSymbolRows(t.symbol);
             if ((rows==null)||(rows.Length == 0) ) return;
             ticks[rows[0]] = t;
             BarList bl = null;
-            if (bardict.TryGetValue(t.sym, out bl))
-                bardict[t.sym].newTick(t);
+            if (bardict.TryGetValue(t.symbol, out bl))
+                bardict[t.symbol].newTick(t);
         }
 
         TradeLink_Client_WM tl = new TradeLink_Client_WM("quotopia.client",true);

@@ -160,7 +160,7 @@ namespace WinGauntlet
                 tick.factor = factorsize;
                 good = tick.Load(line);
             }
-            tick.sym = symbol;
+            tick.symbol = symbol;
             return good;
         }
 

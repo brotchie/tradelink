@@ -56,7 +56,7 @@ namespace TestTradeLib
             Assert.That(ticks == 0, ticks.ToString());
 
             // have to subscribe to a stock to get notified on fills for said stock
-            c.Subscribe(new MarketBasket(new Stock("TST")));
+            c.Subscribe(new MarketBasket(new Security("TST")));
 
             //send a tick from the server
             Tick t = Tick.NewTrade("TST", 10, 100);
@@ -92,7 +92,7 @@ namespace TestTradeLib
             Assert.That(fills == 0, fills.ToString());
 
             // have to subscribe to a stock to get notified on fills for said stock
-            c.Subscribe(new MarketBasket(new Stock("TST")));
+            c.Subscribe(new MarketBasket(new Security("TST")));
 
             // prepare and send an execution from client to server
             Trade t = new Trade("TST", 100, 300, DateTime.Now);

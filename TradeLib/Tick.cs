@@ -9,7 +9,7 @@ namespace TradeLib
     [Serializable]
     public class Tick
     {
-        public string sym = "";
+        public string symbol = "";
         public int factor = 100;
         public int time;
         public int date;
@@ -30,7 +30,7 @@ namespace TradeLib
         public bool isQuote { get { return (!isTrade && (hasBid || hasAsk)); } }
         public bool isTrade { get { return (trade != 0) && (size != 0); } }
         public bool hasTick { get { return (this.isTrade || hasBid || hasAsk); } }
-        public bool isValid { get { return (sym != "") && hasTick; } }
+        public bool isValid { get { return (symbol != "") && hasTick; } }
         public bool atHigh(decimal high) { return (isTrade && (trade>=high)); }
         public bool atLow(decimal low) { return (isTrade && (trade <= low)); }
         public int BidSize { get { return bs * 100; } set { bs = (int)(value / 100); } }
@@ -38,10 +38,10 @@ namespace TradeLib
         public int TradeSize { get { return ts*100; } set { size = (int)(value / 100); } }
         public int ts { get { return size / 100; } } // normalized to bs/os
         public Tick() { }
-        public Tick(string symbol) { this.sym = symbol; }
+        public Tick(string symbol) { this.symbol = symbol; }
         public Tick(Tick c)
         {
-            if (c.sym!="") sym = c.sym;
+            if (c.symbol!="") symbol = c.symbol;
             time = c.time;
             date = c.date;
             sec = c.sec;
@@ -60,12 +60,12 @@ namespace TradeLib
             // this is to handle tick updates that only provide bid/ask changes (like anvil)
 
             // a = old tick, b = new tick or tick update
-            if (b.sym != a.sym) return; // don't combine different symbols
+            if (b.symbol != a.symbol) return; // don't combine different symbols
             if (b.time < a.time) return; // don't process old updates
             time = b.time;
             date = b.date;
             sec = b.sec;
-            sym = b.sym;
+            symbol = b.symbol;
 
             if (b.isTrade)
             {
@@ -124,15 +124,15 @@ namespace TradeLib
         public override string ToString()
         {
             if (!this.hasTick) return "";
-            if (this.isTrade) return sym+" "+this.size + "@" + this.trade + " " + this.ex;
-            else return sym+" "+this.bid + "x" + this.ask + " (" + this.bs + "x" + this.os + ") " + this.be + "," + this.oe;
+            if (this.isTrade) return symbol+" "+this.size + "@" + this.trade + " " + this.ex;
+            else return symbol+" "+this.bid + "x" + this.ask + " (" + this.bs + "x" + this.os + ") " + this.be + "," + this.oe;
         }
 
         public string Serialize()
         {
             Tick t = this;
             const char d = ',';
-            string s = t.sym + d + t.date + d + t.time + d + t.sec + d + t.trade + d + t.size + d + t.ex + d + t.bid + d + t.ask + d + t.bs + d + t.os + d + t.be + d + t.oe + d;
+            string s = t.symbol + d + t.date + d + t.time + d + t.sec + d + t.trade + d + t.size + d + t.ex + d + t.bid + d + t.ask + d + t.bs + d + t.os + d + t.be + d + t.oe + d;
             return s;
         }
 
@@ -140,7 +140,7 @@ namespace TradeLib
         {
             string [] r = msg.Split(',');
             Tick t = new Tick();
-            t.sym = r[(int)TickField.symbol];
+            t.symbol = r[(int)TickField.symbol];
             t.trade = Convert.ToDecimal(r[(int)TickField.trade]);
             t.size = Convert.ToInt32(r[(int)TickField.tsize]);
             t.bid = Convert.ToDecimal(r[(int)TickField.bid]);

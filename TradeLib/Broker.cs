@@ -195,7 +195,7 @@ namespace TradeLib
                 for (int i = 0; i < MasterOrders[a].Count; i++)
                 { 
                     Order o = MasterOrders[a][i];
-                    if (tick.sym != o.symbol) continue; //make sure tick is for the right stock
+                    if (tick.symbol != o.symbol) continue; //make sure tick is for the right stock
                     int mysize = (int)Math.Abs(o.size);
                     if (((mysize <= availablesize) && (o.price == 0) && (o.stopp == 0)) || //market order
                         (o.side && (mysize <= availablesize) && (tick.trade <= o.price) && (o.stopp == 0)) || // buy limit

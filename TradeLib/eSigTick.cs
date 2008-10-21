@@ -28,7 +28,7 @@ namespace TradeLib
         {
             eSigTick e = new eSigTick();
             e.Load(sr.ReadLine());
-            e.sym = symbol;
+            e.symbol = symbol;
             return e;
         }
         public static eSigTick FromStream(System.IO.StreamReader sr)
@@ -107,24 +107,24 @@ namespace TradeLib
         /// <summary>
         /// Create an epf file header.
         /// </summary>
-        /// <param name="stock">The stock.</param>
-        /// <param name="date">The date.</param>
+        /// <param name="stock">The securities symbol</param>
+        /// <param name="date">The date</param>
         /// <returns></returns>
-        public static string EPFheader(string stock, int date)
+        public static string EPFheader(string symbol, int date)
         {
             string s = "";
-            s += "; Symbol=" + stock + Environment.NewLine;
+            s += "; Symbol=" + symbol + Environment.NewLine;
             s += "; Date=" + date.ToString() + Environment.NewLine;
             return s;
         }
         /// <summary>
-        /// Create an epf file header.
+        /// Create an epf file header
         /// </summary>
-        /// <param name="s">The stock.</param>
+        /// <param name="sec">The security</param>
         /// <returns></returns>
-        public static string EPFheader(Stock s)
+        public static string EPFheader(Security sec)
         {
-        	return EPFheader(s.Symbol,s.Date);
+        	return EPFheader(sec.Symbol,sec.Date);
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace TradeLib
         /// </summary>
         /// <param name="EPFfile">The EP ffile.</param>
         /// <returns></returns>
-        public static Stock InitEpf(StreamReader EPFfile) 
+        public static Security InitEpf(StreamReader EPFfile) 
         {
             StreamReader cf = EPFfile; 
             string symline = cf.ReadLine();
@@ -142,7 +142,7 @@ namespace TradeLib
             MatchCollection r = se.Matches(symline, 0);
             string t = r[0].Value;
             string symbol = t.Substring(1, t.Length - 1);
-            Stock s = new Stock(symbol.ToUpper());
+            Security s = Security.Parse(symbol.ToUpper());
             string date = dateline.Contains("/") ? dse.Replace(dateline, "20$3$1$2") : Regex.Match(dateline, "[0-9]+").ToString();
             s.Date = Convert.ToInt32(date);
             return s;

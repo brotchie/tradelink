@@ -11,7 +11,7 @@ namespace ResearchLib
             MarketBasket mb = new MarketBasket();
             MatchCollection mc = Regex.Matches(ParseStocks, @"\b[A-Z]{1,3}\b");
             for (int i = 0; i < mc.Count; i++)
-                mb.Add(new Stock(mc[i].Value.ToUpper()));
+                mb.Add(new Security(mc[i].Value.ToUpper()));
             return mb;
         }
 
@@ -21,7 +21,7 @@ namespace ResearchLib
             string regexp = @"\b[A-Z]{4}\b";
             MatchCollection mc = Regex.Matches(ParseStocks, regexp);
             for (int i = 0; i < mc.Count; i++)
-                mb.Add(new Stock(mc[i].Value.ToUpper()));
+                mb.Add(new Security(mc[i].Value.ToUpper()));
             return mb;
         }
 
@@ -35,7 +35,7 @@ namespace ResearchLib
                 string chunk = mc[i].Value;
                 chunk = chunk.Replace("</a>", "");
                 chunk = chunk.TrimStart('>');
-                mb.Add(new Stock(chunk.ToUpper()));
+                mb.Add(new Security(chunk.ToUpper()));
             }
             return mb;
         }
@@ -50,7 +50,7 @@ namespace ResearchLib
                 string chunk = mc[i].Value;
                 chunk = chunk.Replace("</a>", "");
                 chunk = chunk.TrimStart('>');
-                mb.Add(new Stock(chunk.ToUpper()));
+                mb.Add(new Security(chunk.ToUpper()));
             }
             return mb;
         }

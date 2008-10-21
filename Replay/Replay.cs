@@ -277,36 +277,36 @@ namespace Replay
             if (t.isTrade)
             {
                 decimal price = 0;
-                if (last.TryGetValue(t.sym, out price))
-                    last[t.sym] = t.trade;
-                else last.Add(t.sym, t.trade);
-                if (highs.TryGetValue(t.sym, out price))
+                if (last.TryGetValue(t.symbol, out price))
+                    last[t.symbol] = t.trade;
+                else last.Add(t.symbol, t.trade);
+                if (highs.TryGetValue(t.symbol, out price))
                 {
                     if (t.trade > price)
-                        highs[t.sym] = t.trade;
+                        highs[t.symbol] = t.trade;
                 }
-                else highs.Add(t.sym, t.trade);
-                if (lows.TryGetValue(t.sym, out price))
+                else highs.Add(t.symbol, t.trade);
+                if (lows.TryGetValue(t.symbol, out price))
                 {
                     if (t.trade < price)
-                        lows[t.sym] = t.trade;
+                        lows[t.symbol] = t.trade;
                 }
-                else lows.Add(t.sym, t.trade);
+                else lows.Add(t.symbol, t.trade);
                 tl.newTick(t); // notify of the trade
             }
             else
             {   // it's a quote so we need to update the book
 
                 // first though get the BBO from hist book to detect improvements
-                Order oldbid = h.SimBroker.BestBid(t.sym);
-                Order oldask = h.SimBroker.BestOffer(t.sym);
+                Order oldbid = h.SimBroker.BestBid(t.symbol);
+                Order oldask = h.SimBroker.BestOffer(t.symbol);
 
                 // then update the historical book
                 PlaceHistoricalOrder(t);
 
                 // fetch the new book
-                Order newbid = h.SimBroker.BestBid(t.sym);
-                Order newask = h.SimBroker.BestOffer(t.sym);
+                Order newbid = h.SimBroker.BestBid(t.symbol);
+                Order newask = h.SimBroker.BestOffer(t.symbol);
 
                 // reset accounts so equality comparisons work properly in next step
                 oldbid.Account = "";
@@ -357,9 +357,9 @@ namespace Replay
             if (t.hasAsk)
             {
                 // if we already have a book for this side we can get rid of it
-                foreach (uint oid in hasHistBook(t.sym, false))
+                foreach (uint oid in hasHistBook(t.symbol, false))
                     h.SimBroker.CancelOrder(oid); 
-                Order o = new SellLimit(t.sym, t.AskSize, t.ask);
+                Order o = new SellLimit(t.symbol, t.AskSize, t.ask);
                 o.date = t.date;
                 o.time = t.time;
                 o.sec = t.sec;
@@ -369,9 +369,9 @@ namespace Replay
             if (t.hasBid)
             {
                 // if we already have a book for this side we can get rid of it
-                foreach (uint oid in hasHistBook(t.sym, true))
+                foreach (uint oid in hasHistBook(t.symbol, true))
                     h.SimBroker.CancelOrder(oid);
-                Order o = new BuyLimit(t.sym, t.BidSize, t.bid);
+                Order o = new BuyLimit(t.symbol, t.BidSize, t.bid);
                 o.date = t.date;
                 o.time = t.time;
                 o.sec = t.sec; 

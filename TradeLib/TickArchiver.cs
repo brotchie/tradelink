@@ -33,33 +33,33 @@ namespace TradeLib
 
         bool SaveTick(Tick t)
         {
-            if ((t.sym==null) || (t.sym=="")) return false;
-            if (filedict.ContainsKey(t.sym))
+            if ((t.symbol==null) || (t.symbol=="")) return false;
+            if (filedict.ContainsKey(t.symbol))
             {
                 try 
                 {
-                   filedict[t.sym].WriteLine(eSigTick.ToEPF(t));
+                   filedict[t.symbol].WriteLine(eSigTick.ToEPF(t));
                 }
                 catch (IOException) { return false; }
             }
             else
             {
-                string fn = _path + @"/" + t.sym + t.date + ".EPF";
+                string fn = _path + @"/" + t.symbol + t.date + ".EPF";
                 bool hasheader = false;
                 try 
                 {
                     if (File.Exists(fn))
                     {
                         StreamReader sr = new StreamReader(fn);
-                        Stock s = eSigTick.InitEpf(sr);
+                        Security s = eSigTick.InitEpf(sr);
                         if (s.isValid)
                             hasheader = true;
                         sr.Close();
                     }
-                    filedict.Add(t.sym, new StreamWriter(fn, true));
+                    filedict.Add(t.symbol, new StreamWriter(fn, true));
                     if (!hasheader)
-                        filedict[t.sym].Write(eSigTick.EPFheader(t.sym, t.date));
-                    filedict[t.sym].WriteLine(eSigTick.ToEPF(t));
+                        filedict[t.symbol].Write(eSigTick.EPFheader(t.symbol, t.date));
+                    filedict[t.symbol].WriteLine(eSigTick.ToEPF(t));
                 }
                 catch (IOException) { return false; }
                 catch (Exception) { return false; }

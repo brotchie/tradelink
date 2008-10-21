@@ -147,9 +147,9 @@ namespace TradeLib
         /// <param name="t">The tick to add.</param>
         public bool newTick(Tick t)
         {
-            if ((t.sym != Symbol) && (Symbol == ""))
-                this.sym = t.sym; // if we have no symbol, take ticks symbol
-            else if ((t.sym != Symbol) && (Symbol != ""))
+            if ((t.symbol != Symbol) && (Symbol == ""))
+                this.sym = t.symbol; // if we have no symbol, take ticks symbol
+            else if ((t.symbol != Symbol) && (Symbol != ""))
                 return NewBar; //don't process ticks for other stocks
             if (!t.isTrade) return NewBar; // don't process quotes
             // if we have no bars, add bar with a tick
@@ -200,14 +200,11 @@ namespace TradeLib
         }
     
 
-        public Stock ToStock()
+        public Security ToSecurity()
         {
             if (!HasBar()) throw new Exception("Can't generate a stock instance from an empty barlist!");
-            Stock s = new Stock(Symbol, this.RecentBar.Bardate);
-            s.DayHigh = BarMath.HH(this);
-            s.DayLow = BarMath.LL(this);
-            s.DayOpen = this[0].Open;
-            s.DayClose = this.RecentBar.Close;
+            Security s = new Security(Symbol);
+            s.Date = RecentBar.Bardate;
             return s;
         }
 
@@ -269,11 +266,11 @@ namespace TradeLib
         /// Build a barlist using an EPF file as the source
         /// </summary>
         /// <param name="filename">The filename.</param>
-        /// <returns></returns>
+        /// <returns>barlist</returns>
         public static BarList FromEPF(string filename)
         {
             System.IO.StreamReader sr = new System.IO.StreamReader(filename);
-            Stock s = eSigTick.InitEpf(sr);
+            Security s = eSigTick.InitEpf(sr);
             BarList b = new BarList(BarInterval.FiveMin, s.Symbol);
             while (!sr.EndOfStream)
                 b.AddTick(eSigTick.FromStream(s.Symbol, sr));

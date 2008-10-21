@@ -74,7 +74,7 @@ namespace TradeLib
             {
                 if (!tick.isValid) return; // need a valid tick
                 for (int i = 0; i < client.Count; i++) // send tick to each client that has subscribed to tick's stock
-                    if ((client[i] != null) && (stocks[i].Contains(tick.sym)))
+                    if ((client[i] != null) && (stocks[i].Contains(tick.symbol)))
                         WMUtil.SendMsg(tick.Serialize(), TL2.TICKNOTIFY, Handle, client[i]);
             }
         }

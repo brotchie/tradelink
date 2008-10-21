@@ -55,7 +55,7 @@ namespace Record
             int size = mb.Count;
             Security sec = Security.Parse(symbox.Text);
             if (sec.isValid)
-                mb.Add(new Stock(symbox.Text));
+                mb.Add(sec);
             refreshlist(size);
 
         }

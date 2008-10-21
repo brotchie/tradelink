@@ -11,14 +11,12 @@ namespace TradeLib
         string _folder;
         TickFileFilter _filter = new TickFileFilter();
         Broker _broker = new Broker();
-        string[] _indexfiles;
         string[] _tickfiles;
         bool _inited = false;
         DateTime _nextticktime = DateTime.MinValue;
         DateTime _nextindextime = DateTime.MinValue;
         int _executions = 0;
         int _tickcount = 0;
-        int _indexcount = 0;
         long _bytestoprocess = 0;
         List<Security> Instruments = new List<Security>();
         
@@ -28,25 +26,71 @@ namespace TradeLib
         
         // user-facing interfaces
         public TickFileFilter FileFilter { get { return _filter; } set { _filter = value; D("Restarting simulator with " + _filter.ToString()); Reset(); Initialize(); } }
+        /// <summary>
+        /// Total ticks available for processing, based on provided filter or tick files.
+        /// </summary>
         public int ApproxTotalTicks { get { return (int)Math.Floor((double)_bytestoprocess/39); } }
+        /// <summary>
+        /// Ticks processed in this simulation run.
+        /// </summary>
         public int TickCount { get { return _tickcount; } }
-        public int CountedTicks { get { return _tickcount + _indexcount; } }
+        public int CountedTicks { get { return _tickcount; } }
+        /// <summary>
+        /// Fills executed during this simulation run.
+        /// </summary>
         public int SimBrokerFillCount { get { return _executions; } }
+        /// <summary>
+        /// Gets next tick in the simulation
+        /// </summary>
         public DateTime NextTickTime { get { return _nextticktime; } }
-        public Broker SimBroker { get { return _broker; } set { _broker = value; } }
+        /// <summary>
+        /// Gets broker used in the simulation
+        /// </summary>
+        public Broker SimBroker { get { return _broker; }  }
+        
+        /// <summary>
+        /// Create a historical simulator using default tick folder and null filter
+        /// </summary>
         public HistSim() : this(Util.TLTickDir, null) { }
+        /// <summary>
+        /// Create a historical simulator
+        /// </summary>
+        /// <param name="tff"></param>
         public HistSim(TickFileFilter tff) : this(Util.TLTickDir, tff) { }
+        /// <summary>
+        /// Create a historical simulator
+        /// </summary>
+        /// <param name="TickFolder">tick folder to use</param>
+        /// <param name="tff">filter to determine what tick files from folder to use</param>
         public HistSim(string TickFolder, TickFileFilter tff)
         {
             _folder = TickFolder;
             if (tff != null)
                 _filter = tff;
         }
+        /// <summary>
+        /// Create a historical simulator
+        /// </summary>
+        /// <param name="filename">Single file to use</param>
+        public HistSim(string filename)
+        {
+            _tickfiles = new string[] { filename };
+        }
+        /// <summary>
+        /// Create a historical simulator
+        /// </summary>
+        /// <param name="filenames">list of tick files to use</param>
+        public HistSim(string[] filenames)
+        {
+            _tickfiles = filenames;
+        }
         private void D(string message)
         {
             if (GotDebug!=null) GotDebug(message);
         }
-
+        /// <summary>
+        /// Reset the simulation
+        /// </summary>
         public void Reset()
         {
 
@@ -58,25 +102,29 @@ namespace TradeLib
             _broker.Reset();
             _executions = 0;
             _tickcount = 0;
-            _indexcount = 0;
             _bytestoprocess = 0;
             _nextticktime = ENDSIM;
         }
 
         const string tickext = "*.EPF";
-
+        /// <summary>
+        /// Reinitialize the cache
+        /// </summary>
         public void Initialize()
         {
             if (_inited) return; // only init once
-            // get our listings of historical files (idx and epf)
-            string[] files = Directory.GetFiles(_folder,tickext);
-            _tickfiles = _filter.Allows(files);
+            if (_tickfiles.Length == 0)
+            {
+                // get our listings of historical files (idx and epf)
+                string[] files = Directory.GetFiles(_folder, tickext);
+                _tickfiles = _filter.Allows(files);
+            }
             D("got tickfiles: "+string.Join(",",_tickfiles));
 
             // now we have our list, initialize instruments from files
             foreach (string file in _tickfiles)
             {
-                Instruments.Add(Stock.FromFile(file));
+                Instruments.Add(Security.FromFile(file));
             }
 
             D("Initialized " + (_tickfiles.Length ) + " instruments.");
@@ -86,7 +134,7 @@ namespace TradeLib
             // get total bytes represented by files
             
             DirectoryInfo di = new DirectoryInfo(_folder);
-            FileInfo[] fi = di.GetFiles("*.*", SearchOption.AllDirectories);
+            FileInfo[] fi = di.GetFiles("*.epf", SearchOption.AllDirectories);
             foreach (FileInfo thisfi in fi)
             {
                 foreach (string file in _tickfiles)
@@ -96,7 +144,10 @@ namespace TradeLib
             D("Approximately " + ApproxTotalTicks + " ticks to process...");
             _inited = true;
         }
-
+        /// <summary>
+        /// Run simulation to specific time
+        /// </summary>
+        /// <param name="time">Simulation will run until this time (use HistSim.ENDSIM for last time)</param>
         public void PlayTo(DateTime time)
         {
             if (!_inited)
@@ -129,7 +180,7 @@ namespace TradeLib
                 switch (i.Type)
                 {
                     case SecurityType.STK:
-                        Stock s = (Stock)i;
+                        Security s = (Security)i;
                         Tick next = s.NextTick;
                         if (next.isValid)
                         {
@@ -154,7 +205,7 @@ namespace TradeLib
                         _executions += SimBroker.Execute(tickcache[i]); // use tick to execute any pending orders
                     if (GotTick != null)
                         GotTick(tickcache[i]); // send cached tick as event
-                    cachedsymbols.Remove(tickcache[i].sym); // update symbol cache
+                    cachedsymbols.Remove(tickcache[i].symbol); // update symbol cache
                     remove.Add(i);// remove item from cache
                     didsomething = true;
                 }

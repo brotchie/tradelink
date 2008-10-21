@@ -19,7 +19,8 @@ namespace TradeLib
         public string Exchange { get { return ex; } set { ex = value; } }
         public string Account { get { return accountid; } set { accountid = value; } }
         protected string accountid = "";
-        public string symbol = null;
+        public string Symbol { get { return symbol; } }
+        public string symbol = "";
         public bool side = true;
         public int size = 0;
         public decimal price = 0;

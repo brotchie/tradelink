@@ -49,7 +49,7 @@ namespace Quotopia
             }
             else
             {
-                if ((tick == null) || (tick.sym != work.symbol)) return;
+                if ((tick == null) || (tick.symbol != work.symbol)) return;
                 if (touched) return;
 
                 decimal changedval = obuybut.Checked ? (limitbut.Checked ? tick.ask : tick.bid) : (limitbut.Checked ? tick.bid : tick.ask);

@@ -40,13 +40,13 @@ namespace TradeLib
 
         public void GotTick(Tick tick)
         {
-            if (tick.sym == "") return;
+            if (tick.symbol == "") return;
             if ((_date != 0) && (tick.date != _date))
                 Reset();
-            if (!string.Join(",",_syms).Contains(tick.sym))
+            if (!string.Join(",",_syms).Contains(tick.symbol))
             {
                 string[] newsym = new string[_syms.Length + 1];
-                newsym[_syms.Length] = tick.sym;
+                newsym[_syms.Length] = tick.symbol;
                 _syms = newsym;
                 try
                 {

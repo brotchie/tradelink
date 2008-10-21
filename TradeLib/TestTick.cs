@@ -17,7 +17,7 @@ namespace TestTradeLib
         {
             Tick t = new Tick();
             Assert.That(!t.isValid);
-            t.sym = "IBM";
+            t.symbol = "IBM";
             t.size = 100;
             t.trade = 1;
             Assert.That(t.isValid);
@@ -51,7 +51,7 @@ namespace TestTradeLib
             Assert.That(t.ask==p, t.ask.ToString());
             Assert.That(t.AskSize == z, t.AskSize.ToString());
             Assert.That(t.os == (int)(z / 100), t.os.ToString());
-            Assert.That(t.sym == s);
+            Assert.That(t.symbol == s);
 
             // produce bid tick
             t = Tick.NewBid(s, p, z);
@@ -59,7 +59,7 @@ namespace TestTradeLib
             Assert.That(t.bid== p, t.bid.ToString());
             Assert.That(t.BidSize == z, t.BidSize.ToString());
             Assert.That(t.bs == (int)(z / 100), t.bs.ToString()); 
-            Assert.That(t.sym == s);
+            Assert.That(t.symbol == s);
 
             // produce a trade tick
             t = Tick.NewTrade(s, p, z);
@@ -67,7 +67,7 @@ namespace TestTradeLib
             Assert.That(t.trade == p, t.trade.ToString());
             Assert.That(t.TradeSize == z, t.TradeSize.ToString());
             Assert.That(t.ts == (int)(z / 100), t.ts.ToString());
-            Assert.That(t.sym == s);
+            Assert.That(t.symbol == s);
 
 
 

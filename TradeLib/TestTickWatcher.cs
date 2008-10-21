@@ -17,7 +17,7 @@ namespace TestTradeLib
         {
             // create a new tick watcher
             TickWatcher tw = new TickWatcher();
-            tw.Alerted += new StockDelegate(test_alert);
+            tw.Alerted += new SecurityDelegate(test_alert);
             const string sym = "TST";
             const int y = 2008;
             const int m = 1;
@@ -50,7 +50,7 @@ namespace TestTradeLib
 
             Assert.That(alertssent == 2); // here's our alert check
         }
-        public void test_alert(Stock s)
+        public void test_alert(Security s)
         {
             alertssent++;
         }

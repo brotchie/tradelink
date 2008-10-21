@@ -16,16 +16,16 @@ namespace TestTradeLib
         {
             MarketBasket mb = new MarketBasket();
             Assert.That(mb != null);
-            Stock i = new Stock("IBM");
+            Security i = new Security("IBM");
             mb = new MarketBasket(i);
             Assert.That(mb.hasStock);
             mb.Remove(i);
             Assert.That(!mb.hasStock);
-            mb.Add(new Stock("LVS"));
+            mb.Add(new Security("LVS"));
             Assert.That(mb.Get(0).Symbol=="LVS",mb[0].ToString());
-            mb.Add(new Stock("IBM"));
+            mb.Add(new Security("IBM"));
             Assert.That(mb[1].Symbol=="IBM");
-            MarketBasket newbasket = new MarketBasket(new Stock("FDX"));
+            MarketBasket newbasket = new MarketBasket(new Security("FDX"));
             newbasket.Add(mb);
             mb.Clear();
             Assert.That(mb.Count==0);
@@ -47,7 +47,7 @@ namespace TestTradeLib
         public void Serialization()
         {
             MarketBasket mb = new MarketBasket();
-            mb.Add(new Stock("IBM"));
+            mb.Add(new Security("IBM"));
             MarketBasket compare = MarketBasket.FromString(mb.ToString());
             Assert.That(compare.Count == 1);
             mb.Clear();

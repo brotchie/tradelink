@@ -18,7 +18,7 @@ namespace TradeLib
     /// </summary>
     public partial class Chart : Form
     {
-        public event StockDelegate FetchStock;
+        public event SecurityDelegate FetchStock;
         BarList bl = null;
         public BarList Bars { get { return bl; } set { bl = value; } }
         string sym = "";
@@ -77,7 +77,7 @@ namespace TradeLib
             {
                 string stock = newstock.ToString();
                 newstock = "";
-                if (FetchStock != null) FetchStock(new Stock(stock));
+                if (FetchStock != null) FetchStock(new Security(stock));
                 Refresh();
             }
 

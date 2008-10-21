@@ -69,7 +69,7 @@ using System.IO;
             catch (Exception ex) { show("exception loading stocks: " + ex.ToString()); return; }
             for (int i = 0; i < fi.Length; i++)
             {
-                Stock s = StockFromFileName(fi[i].Name);
+                Security s = StockFromFileName(fi[i].Name);
                 DateTime d = Util.ToDateTime(s.Date);
                 if (!stocklist.Items.Contains(s.Symbol))
                     stocklist.Items.Add(s.Symbol);
@@ -84,11 +84,11 @@ using System.IO;
 
         
 
-        Stock StockFromFileName(string filename)
+        Security StockFromFileName(string filename)
         {
             string ds = System.Text.RegularExpressions.Regex.Match(filename, "([0-9]{8})[.]", System.Text.RegularExpressions.RegexOptions.IgnoreCase).Result("$1");
             string sym = filename.Replace(ds, "").Replace(".EPF","");
-            Stock s = new Stock(sym);
+            Security s = new Security(sym);
             s.Date = Convert.ToInt32(ds);
             return s;
         }

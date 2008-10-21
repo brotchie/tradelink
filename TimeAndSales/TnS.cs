@@ -103,7 +103,7 @@ namespace TimeSales
         void LoadEPF(string file)
         {
             StreamReader sr = new StreamReader(file);
-            Stock s = eSigTick.InitEpf(sr);
+            Security s = eSigTick.InitEpf(sr);
             total = 0;
             symbol = s.Symbol;
             date = s.Date;

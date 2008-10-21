@@ -64,7 +64,7 @@ namespace ASP
                 ta.Save(t);
 
             int[] idxs = new int[0];
-            symidx.TryGetValue(t.sym, out idxs);
+            symidx.TryGetValue(t.symbol, out idxs);
             foreach (int idx in idxs)
                 boxlist[idx].GotTick(t);
         }
@@ -173,7 +173,7 @@ namespace ASP
                     status("Please select a box.");
                     return;
                 }
-                mb.Add(new Stock(sym));
+                mb.Add(sec);
                 valid.Add(sym);
                 if (!seclist.ContainsKey(sec.Symbol))
                 {

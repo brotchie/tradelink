@@ -27,9 +27,9 @@ namespace TradeLib
         // server to clients
         public void newTick(Tick t)
         {
-            if (t.sym == "") return; // can't process symbol-less ticks
+            if (t.symbol == "") return; // can't process symbol-less ticks
             for (int i = 0; i < client.Count; i++) // send tick to each client that has subscribed to tick's stock
-                if ((client[i] != null) && (stocks[i].Contains(t.sym)))
+                if ((client[i] != null) && (stocks[i].Contains(t.symbol)))
                     TLSend(client[i], new LinkMessage(TL2.TICKNOTIFY, t));
         }
         public void newFill(Trade t)

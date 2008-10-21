@@ -41,8 +41,8 @@ namespace BoxExamples
             // we want to see if this trade is one of the top 10 biggest
 
             // get symbol from first tick if we haven't gotten one yet
-            if (sym == "") sym = tick.sym;
-            else if (tick.sym != sym) return;
+            if (sym == "") sym = tick.symbol;
+            else if (tick.symbol != sym) return;
 
             // ignore it if it's not a trade
             if (!tick.isTrade) return;

@@ -52,10 +52,10 @@ namespace TradeLib
     public delegate void MessageDelegate(TL2 msgid, string source);
     public delegate void TickDelegate(Tick t);
     public delegate void FillDelegate(Trade t);
-    public delegate void StockDelegate(Stock stock);
     public delegate void OrderDelegate(Order o);
     public delegate void IntDelegate(Int64 number);
     public delegate void UIntDelegate(UInt32 number);
+    public delegate void SecurityDelegate(Security sec);
     public delegate void TL2MsgDelegate(TL2 [] messages);
     public delegate void DebugDelegate(string msg);
     public delegate void ObjectArrayDelegate(object[] parameters);
