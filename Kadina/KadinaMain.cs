@@ -33,16 +33,13 @@ namespace Kadina
         BackgroundWorker bw = new BackgroundWorker();
         HistSim h = new HistSim();
 
-        bool boxdebugs = Kadina.Properties.Settings.Default.boxdebugs;
+       
 
         public kadinamain()
         {
             InitializeComponent();
             boxlist.DropDownItemClicked += new ToolStripItemClickedEventHandler(boxlist_DropDownItemClicked);
             playtobut.DropDownItemClicked += new ToolStripItemClickedEventHandler(playtobut_DropDownItemClicked);
-            h.SimBroker.GotOrder += new OrderDelegate(broker_GotOrder);
-            h.SimBroker.GotFill += new FillDelegate(broker_GotFill);
-            h.GotTick += new TickDelegate(kadinamain_KadTick);
             InitPlayTo();
             InitTickGrid();
             InitPGrid();
@@ -55,6 +52,35 @@ namespace Kadina
             bw.WorkerSupportsCancellation = true;
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(PlayComplete);
             status(Util.TLSIdentity());
+            debug("Drag and drop tick files and DLL containing boxes to test, or select from Recent menu.");
+            debug("Then select a box from Boxes list, and a PlayTo time.");
+            debug("Finally right click and click play to play to that time.");
+        }
+
+        void h_GotTick(Tick t)
+        {
+            // get time for display
+            nowtime = t.time.ToString() + ":" + t.sec.ToString();
+            
+            // don't display ticks for unmatched exchanges
+            if (t.isTrade && !isDesiredExchange(t.ex)) return;
+            else if (t.hasBid && !isDesiredExchange(t.be)) return;
+            else if (t.hasAsk && !isDesiredExchange(t.oe)) return;
+
+            // add tick to grid
+            NewTRow(new object[] { nowtime, t.symbol,t.trade, t.size, t.bid, t.ask, t.bs, t.os });
+        }
+
+        void Play(object sender, DoWorkEventArgs e)
+        {
+            PlayTo type = (PlayTo)e.Argument;
+            if (e.Cancel) return;
+            int t = (int)type;
+            DateTime start = h.NextTickTime;
+            int maxmin = (t > 127) && (t < 450) ? t - 127 : 0;
+            DateTime stop = start.AddMinutes(maxmin);
+            if (time != 0) stop = Util.ToDateTime(time, 0);
+            h.PlayTo(stop);
         }
 
 
@@ -62,7 +88,6 @@ namespace Kadina
         void kadinamain_FormClosing(object sender, FormClosingEventArgs e)
         {
             saverecent();
-            Kadina.Properties.Settings.Default.boxdebugs = boxdebugs;
             Kadina.Properties.Settings.Default.Save();
         }
 
@@ -71,46 +96,19 @@ namespace Kadina
             ContextMenu = new ContextMenu();
             ContextMenu.MenuItems.Add("Play", new EventHandler(rightplay));
             ContextMenu.MenuItems.Add("Reset", new EventHandler(rightreset));
-            ContextMenu.MenuItems.Add("Debugs", new EventHandler(rightdebugs));
         }
-        void rightdebugs(object sender, EventArgs e)
-        {
-            boxdebugs = !boxdebugs;
-            if (boxdebugs) status("Box debugging enabled.");
-            else status("Box debugging disabled");
-        }
+
 
         void rightplay(object sender, EventArgs e)
         {
-            if (h == null) { status("You must select a tickfile to play."); return; }
+            if (epffiles.Count==0) { status("You must select a tickfile to play."); return; }
+            if (mybox == null) { status("You must drop a box dll AND select a specific box from the Boxes menu."); return; }
             if (!igridinit) InitIGrid();
             bw.RunWorkerAsync(pt);
             ContextMenu.MenuItems.Add("Cancel", new EventHandler(rightcancel));
             status("Playing...");
         }
         void rightcancel(object sender, EventArgs e) { bw.CancelAsync(); }
-
-        void PlayComplete(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (e.Error!=null)
-            {
-                debug(e.Error.Message);
-                status("Terminated because of an Exception.  See messages.");
-            }
-            else if (e.Cancelled) status("Canceled play.");
-            else status("Reached next " + pt.ToString() + " at time "+KadTime);
-            if (ContextMenu.MenuItems.Count > 3) // remove cancel option
-                ContextMenu.MenuItems.RemoveAt(ContextMenu.MenuItems.Count - 1); 
-        }
-
-        string KadTime
-        {
-            get
-            {
-                if (dt.Rows.Count > 0) return dt.Rows[dt.Rows.Count - 1]["Time"].ToString();
-                return "(none)";
-            }
-        }
 
         void rightreset(object sender, EventArgs e)
         {
@@ -149,6 +147,7 @@ namespace Kadina
         void InitPGrid()
         {
             ptab.Columns.Add("Time");
+            ptab.Columns.Add("Symbol");
             ptab.Columns.Add("Side");
             ptab.Columns.Add("Size");
             ptab.Columns.Add("AvgPrice");
@@ -171,6 +170,7 @@ namespace Kadina
         void InitOFGrids()
         {
             ot.Columns.Add("Time");
+            ot.Columns.Add("Symbol");
             ot.Columns.Add("Side");
             ot.Columns.Add("Size");
             ot.Columns.Add("Price");
@@ -186,6 +186,7 @@ namespace Kadina
             og.Dock = DockStyle.Fill;
             og.Show();
             ft.Columns.Add("xTime");
+            ft.Columns.Add("Symbol");
             ft.Columns.Add("xSide");
             ft.Columns.Add("xSize");
             ft.Columns.Add("xPrice");
@@ -251,13 +252,13 @@ namespace Kadina
         void InitTickGrid()
         {
             dt.Columns.Add("Time", "".GetType());
+            dt.Columns.Add("Sym");
             dt.Columns.Add("Trade", new Decimal().GetType());
             dt.Columns.Add("TSize", new Int32().GetType());
             dt.Columns.Add("Bid", new Decimal().GetType());
             dt.Columns.Add("Ask", new Decimal().GetType());
             dt.Columns.Add("BSize", new Int32().GetType());
             dt.Columns.Add("ASize", new Int32().GetType());
-            dt.Columns.Add("Flags", "".GetType());
             dg.TableStyles.Clear();
             dg.TableStyles.Add(new DataGridTableStyle());
             dg.TableStyles[0].GridColumnStyles.Clear();
@@ -327,6 +328,7 @@ namespace Kadina
             decimal cpt = 0;
             if (!poslist.TryGetValue(t.symbol, out mypos))
             {
+                mypos = new Position(t);
                 poslist.Add(t.symbol, mypos);
             }
             else
@@ -336,58 +338,33 @@ namespace Kadina
                 poslist[t.symbol] = mypos;
             }
 
-            ptab.Rows.Add(nowtime, (mypos.isFlat ? "FLAT" : (mypos.isLong ? "LONG" : "SHORT")), mypos.Size, mypos.AvgPrice, cpl.ToString("C2"), cpt.ToString("N1"));
-            ft.Rows.Add(t.xtime.ToString() + "." + t.xsec.ToString(), (t.Side ? "BUY" : "SELL"),t.xsize, t.xprice);
+            ptab.Rows.Add(nowtime, mypos.Symbol,(mypos.isFlat ? "FLAT" : (mypos.isLong ? "LONG" : "SHORT")), mypos.Size, mypos.AvgPrice, cpl.ToString("C2"), cpt.ToString("N1"));
+            ft.Rows.Add(t.xtime.ToString() + "." + t.xsec.ToString(), t.symbol,(t.Side ? "BUY" : "SELL"),t.xsize, t.xprice);
         }
 
         void broker_GotOrder(Order o)
         {
-            ot.Rows.Add(o.time, (o.side ? "BUY" : "SELL"), o.size, o.price);
+            ot.Rows.Add(o.time, o.symbol,(o.side ? "BUY" : "SELL"), o.size, o.price);
         }
         string nowtime = "0";
 
-        void kadinamain_KadTick(Tick t)
-        {
-            if ((t.symbol == "") || (t.symbol!=sec.Symbol)) return;
-            if (t.isTrade && !isDesiredExchange(t.ex)) return;
-            else if (t.hasBid && !isDesiredExchange(t.be)) return;
-            else if (t.hasAsk && !isDesiredExchange(t.oe)) return;
 
-
-            nowtime = t.time.ToString() + ":" + t.sec.ToString();
-
-            Order o = new Order();
-            Position mypos = h.SimBroker.GetOpenPosition(t.symbol);
-            if (mybox != null)
-                mybox.GotTick(t);
-            
-            // tick grid
-            NewTRow(new object[] { nowtime, t.trade, t.size, t.bid, t.ask, t.bs, t.os});
-        }
 
         void NewTRow(object[] values)
         {
             if (dg.InvokeRequired)
-                Invoke(new ObjectArrayDelegate(NewTRow), new object[] { values });
+            {
+                try
+                {
+                    Invoke(new ObjectArrayDelegate(NewTRow), new object[] { values });
+                }
+                catch (ObjectDisposedException) { }
+            }
             else
                 dt.Rows.Add(values);
         }
 
 
-        List<int> xrows = new List<int>();
-        List<int> orows = new List<int>();
-
-        void Play(object sender, DoWorkEventArgs e)
-        {
-            PlayTo type = (PlayTo)e.Argument;
-            if (e.Cancel) return;
-            int t = (int)type;
-            DateTime start = h.NextTickTime;
-            int maxmin = (t > 127) && (t < 450) ? t - 127 : 0;
-            DateTime stop = start.AddMinutes(maxmin);
-            if (time != 0) stop = Util.ToDateTime(time, 0);
-            h.PlayTo(stop);
-        }
 
         int time = 0;
         void playtobut_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -433,9 +410,9 @@ namespace Kadina
                 mybox.SendDebug += new DebugFullDelegate(mybox_GotDebug);
                 mybox.SendCancel += new UIntDelegate(mybox_CancelOrderSource);
                 mybox.SendOrder += new OrderDelegate(mybox_SendOrder);
-                h.SimBroker.GotOrder+=new OrderDelegate(mybox.GotOrder);
-                h.SimBroker.GotOrderCancel += new Broker.OrderCancelDelegate(broker_GotOrderCancel);
-                h.SimBroker.GotFill+=new FillDelegate(mybox.GotFill);
+                h.SimBroker.GotOrder += new OrderDelegate(mybox.GotOrder);
+                h.SimBroker.GotFill += new FillDelegate(mybox.GotFill);
+                h.GotTick += new TickDelegate(mybox.GotTick);
                 status(boxname + " is current box.");
             }
             else status("Box did not load.");
@@ -460,7 +437,6 @@ namespace Kadina
 
         void mybox_GotDebug(Debug msg)
         {
-            if (!boxdebugs) return;
             if (msg.Level == DebugLevel.Debug)
                 debug(msg.Msg);
             else if (msg.Level == DebugLevel.Status)
@@ -486,7 +462,14 @@ namespace Kadina
         }
 
 
-
+        List<string> epffiles = new List<string>();
+        string[] PrettyEPF()
+        {
+            string[] list = new string[epffiles.Count];
+            for (int i = 0; i < epffiles.Count; i++)
+                list[i] = Util.ParseFile(epffiles[i]).symbol;
+            return list;
+        }
          private bool loadfile(string path)
          {
              string f = path;
@@ -506,13 +489,19 @@ namespace Kadina
             else if (isEPF(f))
             {
 
-                h = new HistSim(f);
-                h.Initialize();
                 sec = Security.FromFile(f);
                 if (System.IO.File.Exists(f))
-                    if (!isRecent(f))
+                    if (!isRecent(f) && sec.isValid)
                         recent.DropDownItems.Add(f);
-                status("Loaded "+sec.Symbol+" for "+Util.ToDateTime(sec.Date));
+                epffiles.Add(f);
+                h = new HistSim(epffiles.ToArray());
+                h.SimBroker.GotOrder += new OrderDelegate(broker_GotOrder);
+                h.SimBroker.GotFill += new FillDelegate(broker_GotFill);
+                h.GotTick += new TickDelegate(h_GotTick);
+                h.SimBroker.GotOrderCancel += new Broker.OrderCancelDelegate(broker_GotOrderCancel);
+
+
+                status("Loaded "+sec.Symbol+" for "+Util.ToDateTime(sec.Date)+" ["+string.Join(",",PrettyEPF())+"]");
                 return true;
             }
 
@@ -535,7 +524,13 @@ namespace Kadina
         void debug(string msg)
         {
             if (msgbox.InvokeRequired)
-                Invoke(new DebugDelegate(debug), new object[] { msg });
+            {
+                try
+                {
+                    Invoke(new DebugDelegate(debug), new object[] { msg });
+                }
+                catch (ObjectDisposedException) { }
+            }
             else
             {
                 msgbox.AppendText(msg + Environment.NewLine);
@@ -553,6 +548,27 @@ namespace Kadina
 
         bool isEPF(string path) { return path.Contains("EPF")||path.Contains("epf"); }
         bool isBOX(string path) { return path.Contains("DLL")||path.Contains("dll"); }
+
+        void PlayComplete(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Error != null)
+            {
+                debug(e.Error.Message);
+                status("Terminated because of an Exception.  See messages.");
+            }
+            else if (e.Cancelled) status("Canceled play.");
+            else status("Reached next " + pt.ToString() + " at time " + KadTime);
+            if (ContextMenu.MenuItems.Count > 3) // remove cancel option
+                ContextMenu.MenuItems.RemoveAt(ContextMenu.MenuItems.Count - 1);
+        }
+
+        string KadTime
+        {
+            get
+            {
+                return nowtime!="" ? nowtime : "(none)";
+            }
+        }
 
         private void recent_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
