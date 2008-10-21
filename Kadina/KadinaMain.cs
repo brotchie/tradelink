@@ -12,15 +12,12 @@ namespace Kadina
 {
     public partial class kadinamain : Form
     {
+        Security sec = null;
         string tickfile = "";
         string boxdll = "";
         string boxname = "";
-        Stock stock;
-        Broker broker = new Broker();
         Response mybox;
-        System.IO.StreamReader sr;
-        PlayTo pt = PlayTo.TenTrade;
-        public event TickDelegate KadTick;
+        PlayTo pt = PlayTo.OneMin;
 
         DataTable dt = new DataTable("ticktable");
         DataTable it = new DataTable("itable");
@@ -34,7 +31,7 @@ namespace Kadina
         DataGrid fg = new DataGrid();
         List<string> exfilter = new List<string>();
         BackgroundWorker bw = new BackgroundWorker();
-
+        HistSim h = new HistSim();
 
         bool boxdebugs = Kadina.Properties.Settings.Default.boxdebugs;
 
@@ -43,9 +40,9 @@ namespace Kadina
             InitializeComponent();
             boxlist.DropDownItemClicked += new ToolStripItemClickedEventHandler(boxlist_DropDownItemClicked);
             playtobut.DropDownItemClicked += new ToolStripItemClickedEventHandler(playtobut_DropDownItemClicked);
-            broker.GotOrder += new OrderDelegate(broker_GotOrder);
-            broker.GotFill += new FillDelegate(broker_GotFill);
-            KadTick += new TickDelegate(kadinamain_KadTick);
+            h.SimBroker.GotOrder += new OrderDelegate(broker_GotOrder);
+            h.SimBroker.GotFill += new FillDelegate(broker_GotFill);
+            h.GotTick += new TickDelegate(kadinamain_KadTick);
             InitPlayTo();
             InitTickGrid();
             InitPGrid();
@@ -85,7 +82,7 @@ namespace Kadina
 
         void rightplay(object sender, EventArgs e)
         {
-            if (sr == null) { status("You must select a tickfile to play."); return; }
+            if (h == null) { status("You must select a tickfile to play."); return; }
             if (!igridinit) InitIGrid();
             bw.RunWorkerAsync(pt);
             ContextMenu.MenuItems.Add("Cancel", new EventHandler(rightcancel));
@@ -118,10 +115,9 @@ namespace Kadina
         void rightreset(object sender, EventArgs e)
         {
             igridinit = false;
-            if (sr!=null) sr.Close();
+            if (h!=null) h.Reset();
             msgbox.Clear();
             dt.Clear();
-            broker.Reset();
             ptab.Clear();
             ot.Clear();
             ft.Clear();
@@ -131,7 +127,7 @@ namespace Kadina
             loadfile(boxdll);
             loadboxname(boxname);
             if (mybox!=null) mybox.Reset();
-            status("Reset box " + mybox.Name + " for stock " + stock.Symbol);
+            status("Reset box " + mybox.Name + " for stock " + sec.Symbol);
         }
 
         bool igridinit = false;
@@ -323,9 +319,24 @@ namespace Kadina
             for (int i = 0; i < list.Length; i++)
                 playtobut.DropDownItems.Add(list[i]);
         }
-
+        Dictionary<string, Position> poslist = new Dictionary<string, Position>();
         void broker_GotFill(Trade t)
         {
+            Position mypos = new Position(t);
+            decimal cpl = 0;
+            decimal cpt = 0;
+            if (!poslist.TryGetValue(t.symbol, out mypos))
+            {
+                poslist.Add(t.symbol, mypos);
+            }
+            else
+            {
+                cpt = BoxMath.ClosePT(mypos, t);
+                cpl = mypos.Adjust(t);
+                poslist[t.symbol] = mypos;
+            }
+
+            ptab.Rows.Add(nowtime, (mypos.isFlat ? "FLAT" : (mypos.isLong ? "LONG" : "SHORT")), mypos.Size, mypos.AvgPrice, cpl.ToString("C2"), cpt.ToString("N1"));
             ft.Rows.Add(t.xtime.ToString() + "." + t.xsec.ToString(), (t.Side ? "BUY" : "SELL"),t.xsize, t.xprice);
         }
 
@@ -337,38 +348,21 @@ namespace Kadina
 
         void kadinamain_KadTick(Tick t)
         {
-            if ((t.sym == "") || (t.sym!=stock.Symbol)) return;
-            // get stats prior to execution
-            decimal cpl = broker.GetClosedPL(t.sym);
-            decimal cpt = broker.GetClosedPT(t.sym);
-            int x = broker.Execute(t);
-            if (x != 0) // mark tick/row if an execution happened
-                xrows.Add(dt.Rows.Count - 1);
+            if ((t.symbol == "") || (t.symbol!=sec.Symbol)) return;
+            if (t.isTrade && !isDesiredExchange(t.ex)) return;
+            else if (t.hasBid && !isDesiredExchange(t.be)) return;
+            else if (t.hasAsk && !isDesiredExchange(t.oe)) return;
+
 
             nowtime = t.time.ToString() + ":" + t.sec.ToString();
 
             Order o = new Order();
-            Position mypos = broker.GetOpenPosition(t.sym);
+            Position mypos = h.SimBroker.GetOpenPosition(t.symbol);
             if (mybox != null)
                 mybox.GotTick(t);
-
-            if (o.isValid) // mark tick/row if an order happened
-                orows.Add(dt.Rows.Count - 1);
-            broker.sendOrder(o);
-            string flags = "";
-            flags += o.isValid ? "O" : "";
-            flags += x > 0 ? "X" : "";
             
             // tick grid
-            NewTRow(new object[] { nowtime, t.trade, t.size, t.bid, t.ask, t.bs, t.os, flags });
-            // position grid
-            if (x != 0)
-            {
-                // get difference between stats pre and stats post
-                cpl = broker.GetClosedPL(t.sym) - cpl;
-                cpt = broker.GetClosedPT(t.sym) - cpt;
-                ptab.Rows.Add(nowtime, (mypos.isFlat ? "FLAT" : (mypos.isLong ? "LONG" : "SHORT")), mypos.Size, mypos.AvgPrice, cpl.ToString("C2"),cpt.ToString("N1"));
-            }
+            NewTRow(new object[] { nowtime, t.trade, t.size, t.bid, t.ask, t.bs, t.os});
         }
 
         void NewTRow(object[] values)
@@ -387,35 +381,12 @@ namespace Kadina
         {
             PlayTo type = (PlayTo)e.Argument;
             if (e.Cancel) return;
-            // set our counter limits (0 = not used)
             int t = (int)type;
-            int maxtick = (t>=0) && (t<32)? t: 0;
-            int maxquote = (t > 31) && (t < 64) ? t - 31 : 0;
-            int maxtrade = (t > 63) && (t < 128) ? t - 63 : 0;
+            DateTime start = h.NextTickTime;
             int maxmin = (t > 127) && (t < 450) ? t - 127 : 0;
-            int quote = 0, tick = 0, trade = 0;
-            DateTime start = DateTime.Now;
-            bool needtoset = true;
-            int itime = 0;
-            while (!sr.EndOfStream)
-            {
-                if (e.Cancel) break;
-                Tick tk = eSigTick.FromStream(stock.Symbol,sr);
-                if (tk.isTrade && !isDesiredExchange(tk.ex)) continue;
-                else if (tk.hasBid && !isDesiredExchange(tk.be)) continue;
-                else if (tk.hasAsk && !isDesiredExchange(tk.oe)) continue;
-                if (needtoset) { start = Util.ToDateTime(tk.time, tk.sec); needtoset = false; }
-                if (KadTick!=null) KadTick(tk);
-                tick++;
-                if (tk.isTrade) trade++;
-                if (tk.isQuote) quote++;
-                if ((type == PlayTo.Time) && (time != 0) && (tk.time == time)) break;
-                TimeSpan since = new TimeSpan(Util.ToDateTime(tk.time, tk.sec).Ticks - start.Ticks);
-                if ((maxmin!=0) && ((int)since.TotalMinutes>=maxmin)) break;
-                if ((maxtick != 0) && (tick >= maxtick)) break;
-                if ((maxtrade != 0) && (trade >= maxtrade)) break;
-                if ((maxquote != 0) && (quote >= maxquote)) break;
-            }
+            DateTime stop = start.AddMinutes(maxmin);
+            if (time != 0) stop = Util.ToDateTime(time, 0);
+            h.PlayTo(stop);
         }
 
         int time = 0;
@@ -462,9 +433,9 @@ namespace Kadina
                 mybox.SendDebug += new DebugFullDelegate(mybox_GotDebug);
                 mybox.SendCancel += new UIntDelegate(mybox_CancelOrderSource);
                 mybox.SendOrder += new OrderDelegate(mybox_SendOrder);
-                broker.GotOrder+=new OrderDelegate(mybox.GotOrder);
-                broker.GotOrderCancel += new Broker.OrderCancelDelegate(broker_GotOrderCancel);
-                broker.GotFill+=new FillDelegate(mybox.GotFill);
+                h.SimBroker.GotOrder+=new OrderDelegate(mybox.GotOrder);
+                h.SimBroker.GotOrderCancel += new Broker.OrderCancelDelegate(broker_GotOrderCancel);
+                h.SimBroker.GotFill+=new FillDelegate(mybox.GotFill);
                 status(boxname + " is current box.");
             }
             else status("Box did not load.");
@@ -473,7 +444,7 @@ namespace Kadina
 
         void mybox_SendOrder(Order o)
         {
-            broker.sendOrder(o);
+            h.SimBroker.sendOrder(o);
         }
 
         void broker_GotOrderCancel(string sym, bool side, uint id)
@@ -484,7 +455,7 @@ namespace Kadina
 
         void mybox_CancelOrderSource(uint number)
         {
-            broker.CancelOrder(number);
+            h.SimBroker.CancelOrder(number);
         }
 
         void mybox_GotDebug(Debug msg)
@@ -534,13 +505,14 @@ namespace Kadina
             }
             else if (isEPF(f))
             {
-                tickfile = f;
-                sr = new System.IO.StreamReader(f);
-                stock = eSigTick.InitEpf(sr);
+
+                h = new HistSim(f);
+                h.Initialize();
+                sec = Security.FromFile(f);
                 if (System.IO.File.Exists(f))
                     if (!isRecent(f))
                         recent.DropDownItems.Add(f);
-                status("Loaded "+stock.Symbol+" for "+Util.ToDateTime(stock.Date));
+                status("Loaded "+sec.Symbol+" for "+Util.ToDateTime(sec.Date));
                 return true;
             }
 
@@ -631,35 +603,6 @@ namespace Kadina
                 exfilter.Add(m.Text);
             else exfilter.Remove(m.Text);
         }
-
-        /* COMMENTING OUT TO USE AS REFERENCE FOR HISTSIM INTEGRATION
-        void LoadIndexFiles(int date)
-        {
-            idxstream.Clear();
-            Dictionary<string, StreamReader> idxfile = new Dictionary<string, StreamReader>();
-            DirectoryInfo di = new DirectoryInfo(Util.TLTickDir);
-            FileInfo[] files = di.GetFiles("*" + date + "*.idx");
-            for (int i = 0; i < files.Length; i++)
-                if (!idxfile.ContainsKey(files[i].FullName))
-                    idxfile.Add(files[i].FullName, new StreamReader(files[i].FullName));
-                else idxfile[files[i].FullName] = new StreamReader(files[i].FullName);
-            debug("Preparing " + idxfile.Count + " indicies: ");
-            string sym = "";
-            foreach (string stock in idxfile.Keys)
-            {
-                if (!idxstream.ContainsKey(stock))
-                    idxstream.Add(stock, new List<Index>());
-                while (!idxfile[stock].EndOfStream)
-                { // read every index into memory
-                    string line = idxfile[stock].ReadLine();
-                    Index fi = Index.Deserialize(line);
-                    idxstream[stock].Add(fi);
-                    if (!sym.Contains(fi.Name)) sym += fi.Name;
-                }
-            }
-            debug(sym);
-        }
-        */
     }
 
     enum PlayTo
@@ -671,12 +614,6 @@ namespace Kadina
         End = Int32.MaxValue,
         Pause = Int32.MaxValue-1,
         Time = Int32.MaxValue-2,
-        Tick = 0,
-        TenTick = 9,
-        Quote = 32,
-        TenQuote =41,
-        Trade = 64,
-        TenTrade = 73,
         OneMin = 128,
         FiveMin = 131,
         FifteenMin = 141,
