@@ -8,10 +8,10 @@ namespace TradeLib
     public class HistSim 
     {
         // working variables
-        string _folder;
+        string _folder = Util.TLTickDir;
         TickFileFilter _filter = new TickFileFilter();
         Broker _broker = new Broker();
-        string[] _tickfiles;
+        string[] _tickfiles = new string[0];
         bool _inited = false;
         DateTime _nextticktime = DateTime.MinValue;
         DateTime _nextindextime = DateTime.MinValue;
@@ -95,7 +95,7 @@ namespace TradeLib
         {
 
             _inited = false;
-            _tickfiles = null;
+            _tickfiles = new string[0];
             Instruments.Clear();
             cachedsymbols.Clear();
             tickcache.Clear();
