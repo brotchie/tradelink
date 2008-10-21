@@ -33,8 +33,6 @@ namespace TradeLib
         public bool isValid { get { return (sym != "") && hasTick; } }
         public bool atHigh(decimal high) { return (isTrade && (trade>=high)); }
         public bool atLow(decimal low) { return (isTrade && (trade <= low)); }
-        public bool atHigh(BoxInfo bi) { return (isTrade && (trade >= bi.High)); }
-        public bool atLow(BoxInfo bi) { return (isTrade && (trade <= bi.Low)); }
         public int BidSize { get { return bs * 100; } set { bs = (int)(value / 100); } }
         public int AskSize { get { return os * 100; } set { os = (int)(value / 100); } }
         public int TradeSize { get { return ts*100; } set { size = (int)(value / 100); } }

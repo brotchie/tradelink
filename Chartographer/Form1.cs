@@ -144,11 +144,11 @@ namespace Chartographer
             od.CheckFileExists = true;
             od.CheckPathExists = true;
             od.DefaultExt = "*.EPF";
-            od.Filter = "TickFiles|*.EPF;*.IDX";
+            od.Filter = "TickFiles|*.EPF";
             od.InitialDirectory = "c:\\program files\\tradelink\\tickdata\\";
             od.Multiselect = false;
             od.ShowDialog();
-            BarList bl = od.FileName.Contains(".EPF") ? BarList.FromEPF(od.FileName) : BarList.FromIDX(od.FileName);
+            BarList bl = BarList.FromEPF(od.FileName);
             Chart c = new Chart(bl, false);
             c.Symbol = bl.Symbol;
             try

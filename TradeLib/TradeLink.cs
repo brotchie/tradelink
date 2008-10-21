@@ -11,7 +11,6 @@ namespace TradeLib
     public interface TradeLinkClient
     {
         int SendOrder(Order order);
-        void RegIndex(IndexBasket ib);
         void GoLive();
         void GoSim();
         void Disconnect();
@@ -53,7 +52,6 @@ namespace TradeLib
     public delegate void MessageDelegate(TL2 msgid, string source);
     public delegate void TickDelegate(Tick t);
     public delegate void FillDelegate(Trade t);
-    public delegate void IndexDelegate(Index idx);
     public delegate void StockDelegate(Stock stock);
     public delegate void OrderDelegate(Order o);
     public delegate void IntDelegate(Int64 number);

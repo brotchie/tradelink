@@ -46,18 +46,6 @@ namespace TradeLib
             }
         }
 
-        public void newIndexTick(Index itick)
-        {
-            if (this.InvokeRequired)
-                this.Invoke(new IndexDelegate(newIndexTick), new object[] { itick });
-            else
-            {
-                if (!itick.isValid) return;
-                for (int i = 0; i < index.Count; i++)
-                    if ((client[i] != null) && (index[i].Contains(itick.Name)))
-                        WMUtil.SendMsg(itick.Serialize(), TL2.TICKNOTIFY, Handle, client[i]);
-            }
-        }
 
         delegate void tlneworderdelegate(Order o, bool allclients);
         public void newOrder(Order o) { newOrder(o, false); }

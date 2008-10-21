@@ -40,7 +40,7 @@ namespace Replay
                 if (prevtime!=DateTime.MinValue) // if it's not first time doing this
                     System.Threading.Thread.CurrentThread.Join(delay); // wait realistic time
                 prevtime = new DateTime(h.NextTickTime.Ticks); // save last time mark
-                double progress = 100.0 * ((h.TickCount + h.IndexCount) / (double)h.ApproxTotalTicks);
+                double progress = 100.0 * (h.TickCount / (double)h.ApproxTotalTicks);
                 ReportProgress((int)progress); // report progress
                 h.PlayTo(h.NextTickTime); // this will throw tick/idx events and get next time mark
             }

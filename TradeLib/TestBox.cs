@@ -27,12 +27,7 @@ namespace TestTradeLib
             };
         const string f = "/SPX";
         const decimal fnom = 1300;
-        Index[] futures = new Index[] { 
-            new Index(f,fnom,fnom,fnom,fnom,fnom),
-            new Index(f,fnom+2,fnom,fnom+2,fnom,fnom+2),
-            new Index(f,fnom+3,fnom,fnom+3,fnom,fnom+3),
-            new Index(f,fnom+2.5m,fnom,fnom+3,fnom,fnom+2.5m),
-        };
+
 
         // test the constructor and make sure it never enters a trade
         int sbcount = 0;

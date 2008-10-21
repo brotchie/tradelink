@@ -196,10 +196,6 @@ namespace TradeLib
             throw new Exception("The method or operation is not implemented.");
         }
 
-        public void RegIndex(IndexBasket ib)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
         public void GoLive()
         {
             throw new Exception("The method or operation is not implemented.");

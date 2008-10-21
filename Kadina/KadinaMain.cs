@@ -405,15 +405,6 @@ namespace Kadina
                 else if (tk.hasBid && !isDesiredExchange(tk.be)) continue;
                 else if (tk.hasAsk && !isDesiredExchange(tk.oe)) continue;
                 if (needtoset) { start = Util.ToDateTime(tk.time, tk.sec); needtoset = false; }
-                if ((mybox!=null) && ((itime == 0) || (itime != tk.time)))
-                {
-                    // load all the indicies for this time
-                    List<Index> itix = FetchIdx(tk.time);
-                    itime = tk.time;
-                    // send them to the box (before we send the tix)
-                    for (int id = 0; id < itix.Count; id++)
-                        ;//mybox.NewIndex(itix[id]);
-                }
                 if (KadTick!=null) KadTick(tk);
                 tick++;
                 if (tk.isTrade) trade++;
@@ -550,7 +541,6 @@ namespace Kadina
                     if (!isRecent(f))
                         recent.DropDownItems.Add(f);
                 status("Loaded "+stock.Symbol+" for "+Util.ToDateTime(stock.Date));
-                LoadIndexFiles(stock.Date);
                 return true;
             }
 
@@ -642,6 +632,7 @@ namespace Kadina
             else exfilter.Remove(m.Text);
         }
 
+        /* COMMENTING OUT TO USE AS REFERENCE FOR HISTSIM INTEGRATION
         void LoadIndexFiles(int date)
         {
             idxstream.Clear();
@@ -668,23 +659,7 @@ namespace Kadina
             }
             debug(sym);
         }
-
-
-        Dictionary<string, List<Index>> idxstream = new Dictionary<string, List<Index>>();
-
-        List<Index> FetchIdx(int time)
-        {
-            List<Index> res = new List<Index>();
-            foreach (string file in idxstream.Keys)
-            {
-                for (int i = 0; i < idxstream[file].Count; i++)
-                    if (idxstream[file][i].Time == time)
-                        res.Add(idxstream[file][i]);
-            }
-            return res;
-        }
-
-
+        */
     }
 
     enum PlayTo

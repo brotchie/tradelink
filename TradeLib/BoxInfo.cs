@@ -6,7 +6,7 @@ namespace TradeLib
     /// <summary>
     /// Common information requested or needed by boxes.
     /// </summary>
-    public class BoxInfo
+    public class BoxInfo2
     {
         decimal _high = decimal.MinValue;
         decimal _low = decimal.MaxValue;
@@ -52,20 +52,6 @@ namespace TradeLib
             if (Open == 0) Open = v;
             if (v > High) High = v;
             if (v < Low) Low = v;
-        }
-        /// <summary>
-        /// Create a box-info instance from an existing BarList
-        /// </summary>
-        /// <param name="bl">The barlist.</param>
-        /// <returns>a BoxInfo</returns>
-        public static BoxInfo FromBarList(BarList bl)
-        {
-            BoxInfo bi = new BoxInfo();
-            if (!bl.HasBar()) return bi;
-            bi.High = BarMath.HH(bl);
-            bi.Low = BarMath.LL(bl);
-            bi.Open = bl[0].Open;
-            return bi;
         }
     }
 }

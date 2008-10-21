@@ -80,49 +80,7 @@ namespace WinGauntlet
             return ticks;
         }
 
-        void LoadIndexFiles(int date)
-        {
-            idxstream.Clear();
-            Dictionary<string, StreamReader> idxfile = new Dictionary<string, StreamReader>();
-            DirectoryInfo di = new DirectoryInfo(PATH);
-            FileInfo[] files = di.GetFiles("*"+date+"*.idx");
-            for (int i = 0; i < files.Length; i++)
-                if (!idxfile.ContainsKey(files[i].FullName))
-                    idxfile.Add(files[i].FullName, new StreamReader(files[i].FullName));
-                else idxfile[files[i].FullName] = new StreamReader(files[i].FullName);
-            show(Environment.NewLine);
-            show("Preparing "+idxfile.Count+ " indicies: ");
-            foreach (string stock in idxfile.Keys)
-            {
-                if (!idxstream.ContainsKey(stock))
-                    idxstream.Add(stock, new List<Index>());
-                string sym = "";
-                while (!idxfile[stock].EndOfStream)
-                { // read every index into memory
-                    string line = idxfile[stock].ReadLine();
-                    Index fi = Index.Deserialize(line);
-                    idxstream[stock].Add(fi);
-                    sym = fi.Name;
-                }
-                show(sym+" ");
-            }
-        }
-
         
-        Dictionary<string, List<Index>> idxstream = new Dictionary<string, List<Index>>();
-
-        List<Index> FetchIdx(int time)
-        {
-            List<Index> res = new List<Index>();
-            foreach (string file in idxstream.Keys)
-            {
-                for (int i = 0; i < idxstream[file].Count; i++)
-                    if (idxstream[file][i].Time == time)
-                        res.Add(idxstream[file][i]);
-            }
-            return res;
-        }
-
 
         public int Test(List<FileInfo> tf,Response mybox) 
         {
@@ -135,7 +93,6 @@ namespace WinGauntlet
                 FileInfo f = tf[i-1];
                 Match m = Regex.Match(f.Name, "([0-9]+)", RegexOptions.IgnoreCase);
                 int date = Convert.ToInt32(m.Result("$1"));
-                LoadIndexFiles(date);
                 TickFile(f.Name); // set current file
                 if (f.Length == 0) continue; // ignore if tick file is empty
                 show(Environment.NewLine);
@@ -145,22 +102,12 @@ namespace WinGauntlet
                 if (mybox!=null) mybox.Reset();
                 int fills = 0;
                 tick = new eSigTick(); // reset our tick
-                int itime = 0;
                 
 
                 while (this.getTick() && tick.hasTick)
                 { // process the ticks
                     line++;
                     if ((line % 5000) == 0) show(".");
-                    if (((itime==0) || (itime!=tick.time)))
-                    {
-                        // load all the indicies for this time
-                        List<Index> itix = FetchIdx(tick.time);
-                        itime = tick.time;
-                        // send them to the box (before we send the tix)
-                        for (int id = 0; id < itix.Count; id++)
-                            ;//mybox.NewIndex(itix[id]);
-                    }
 
                     if ((this.exfilter != "") &&
                         ((!tick.isTrade && (!tick.be.Contains(exfilter) || !tick.oe.Contains(exfilter))) ||

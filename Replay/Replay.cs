@@ -31,7 +31,6 @@ namespace Replay
             tl.gotSrvAcctOpenPLRequest += new TradeLink_Server_WM.DecimalStringDelegate(tl_gotSrvAcctOpenPLRequest);
             tl.gotSrvPosList += new TradeLink_Server_WM.PositionArrayDelegate(tl_gotSrvPosList);
             h.GotTick += new TickDelegate(h_GotTick);
-            h.GotIndex += new IndexDelegate(h_GotIndex);
             h.SimBroker.GotOrder += new OrderDelegate(SimBroker_GotOrder);
             h.SimBroker.GotFill += new FillDelegate(SimBroker_GotFill);
             h.SimBroker.GotOrderCancel += new Broker.OrderCancelDelegate(SimBroker_GotOrderCancel);
@@ -268,11 +267,6 @@ namespace Replay
         void SimBroker_GotOrder(Order o)
         {
             tl.newOrder(o,true);
-        }
-
-        void h_GotIndex(Index idx)
-        {
-            tl.newIndexTick(idx);
         }
 
         Dictionary<string, decimal> highs = new Dictionary<string, decimal>();

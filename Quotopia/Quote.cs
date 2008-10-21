@@ -46,7 +46,6 @@ namespace Quotopia
             
             tl.gotTick += new TickDelegate(tl_gotTick);
             tl.gotFill += new FillDelegate(tl_gotFill);
-            tl.gotIndexTick += new IndexDelegate(tl_gotIndexTick);
             tl.gotOrder += new OrderDelegate(tl_gotOrder);
             tl.gotOrderCancel += new UIntDelegate(tl_gotOrderCancel);
             ordergrid.ContextMenuStrip = new ContextMenuStrip();
@@ -293,23 +292,17 @@ namespace Quotopia
                 preface = "Adding index: ";
             if (e.KeyCode == Keys.Enter)
             {
-                if (Stock.isStock(newsymbol))
+                Security sec = Security.Parse(newsymbol);
+                if (sec.isValid)
                 {
                     mb.Add(new Stock(newsymbol));
                     addsymbol(newsymbol);
                     newsymbol = "";
                     tl.Subscribe(mb);
                 }
-                else if (Index.isIdx(newsymbol))
-                {
-                    ib.Add(new Index(newsymbol));
-                    addsymbol(newsymbol);
-                    newsymbol = "";
-                    tl.RegIndex(ib);
-                }
                 else
                 {
-                    status("Invalid stock or index.");
+                    status("Invalid Security "+newsymbol);
                     newsymbol = "";
                 }
             }
@@ -368,12 +361,6 @@ namespace Quotopia
         }
 
         
-
-        void tl_gotIndexTick(Index idx)
-        {
-            tl_gotTick(idx.ToTick());
-        }
-
         Dictionary<string, int[]> symidx = new Dictionary<string, int[]>();
 
         void symindex()
@@ -566,7 +553,6 @@ namespace Quotopia
         }
 
         MarketBasket mb = new MarketBasket();
-        IndexBasket ib = new IndexBasket();
 
 
         private void importbasketbut_Click(object sender, EventArgs e)
@@ -590,10 +576,9 @@ namespace Quotopia
                     for (int i = 0; i < r.Length; i++)
                     {
                         bool add = true;
-                        if (Stock.isStock(r[i]))
-                            mb.Add(new Stock(r[i]));
-                        else if (Index.isIdx(r[i]))
-                            ib.Add(new Index(r[i]));
+                        Security sec = Security.Parse(r[i]);
+                        if (sec.isValid)
+                            mb.Add(sec);
                         else { add = false; skipped++; }
                         if (add) addsymbol(r[i]);
                     }
@@ -601,7 +586,6 @@ namespace Quotopia
                 }
             }
             tl.Subscribe(mb);
-            tl.RegIndex(ib);
         }
 
     }

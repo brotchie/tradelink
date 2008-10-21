@@ -68,28 +68,7 @@ namespace TradeLib
             return true;
         }
 
-        bool SaveIndex(Index i)
-        {
-            if ((i == null) || (i.Name == null) || (i.Name == "") || !Index.isIdx(i.Name)) return false;
-            if (!filedict.ContainsKey(i.Name))
-            {
-                try
-                {
-                    string fn = _path + @"/" + i.Name + i.Date + ".IDX";
-                    filedict.Add(i.Name, new StreamWriter(fn, true));
-                }
-                catch (Exception) { return false; }
-            }
-            try
-            {
-                filedict[i.Name].WriteLine(i.Serialize());
-            }
-            catch (Exception) { return false; }
-            filedict[i.Name].Flush();
-            return true;
-        }
 
-        public bool Save(Index i) { return SaveIndex(i); }
         public bool Save(Tick t) { return SaveTick(t); }
 
     }

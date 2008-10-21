@@ -280,22 +280,6 @@ namespace TradeLib
             return b;
         }
 
-        /// <summary>
-        /// Build a barlist using an IDX (index) file as a source.
-        /// </summary>
-        /// <param name="filename">The filename.</param>
-        /// <returns></returns>
-        public static BarList FromIDX(string filename)
-        {
-            System.IO.StreamReader sr = new System.IO.StreamReader(filename);
-            Index i = Index.Deserialize(sr.ReadLine());
-            BarList b = new BarList(BarInterval.FiveMin, i.Name);
-            b.AddTick(i.ToTick());
-            while (!sr.EndOfStream)
-                b.AddTick(Index.Deserialize(sr.ReadLine()).ToTick());
-            return b;
-        }
-
     }
 
 }

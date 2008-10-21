@@ -15,7 +15,6 @@ namespace TradeLib
         /// </summary>
         public event TickDelegate gotTick;
         public event FillDelegate gotFill;
-        public event IndexDelegate gotIndexTick;
         public event OrderDelegate gotOrder;
         public event DebugDelegate gotAccounts;
         public event UIntDelegate gotOrderCancel;
@@ -336,11 +335,6 @@ namespace TradeLib
             TLSend(TL2.REGISTERSTOCK, Text + "+" + mb.ToString());
         }
 
-        public void RegIndex(IndexBasket ib)
-        {
-            TLSend(TL2.REGISTERINDEX, Text + "+" + ib.ToString());
-        }
-
         public void Unsubscribe()
         {
             TLSend(TL2.CLEARSTOCKS, Text);
@@ -381,13 +375,6 @@ namespace TradeLib
                     if (gotOrderCancel != null) gotOrderCancel(Convert.ToUInt32(msg));
                     break;
                 case TL2.TICKNOTIFY:
-                    if (Index.isIdx(r[(int)TickField.symbol]))
-                    {
-                        // we got an index update
-                        Index i = Index.Deserialize(msg);
-                        if (gotIndexTick != null) gotIndexTick(i);
-                        break;
-                    }
                     Tick t = Tick.Deserialize(msg);
                     if (t.isTrade)
                     {

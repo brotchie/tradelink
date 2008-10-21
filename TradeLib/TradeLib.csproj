@@ -67,8 +67,6 @@
     <Compile Include="Email.cs" />
     <Compile Include="eSigTick.cs" />
     <Compile Include="HistSim.cs" />
-    <Compile Include="Index.cs" />
-    <Compile Include="IndexBasket.cs" />
     <Compile Include="Indicator.cs" />
     <Compile Include="LimitOrder.cs" />
     <Compile Include="MarketBasket.cs" />
