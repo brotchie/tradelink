@@ -47,6 +47,7 @@ namespace BoxExamples
             if (!string.Join(",",_syms).Contains(tick.symbol))
             {
                 string[] newsym = new string[_syms.Length + 1];
+                _syms.CopyTo(newsym, 0);
                 newsym[_syms.Length] = tick.symbol;
                 _syms = newsym;
                 try
