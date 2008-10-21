@@ -62,7 +62,6 @@
       <DependentUpon>Chart.cs</DependentUpon>
     </Compile>
     <Compile Include="Currency.cs" />
-    <Compile Include="DayTradeBox.cs" />
     <Compile Include="Debug.cs" />
     <Compile Include="Email.cs" />
     <Compile Include="eSigTick.cs" />
