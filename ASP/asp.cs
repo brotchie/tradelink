@@ -23,8 +23,25 @@ namespace ASP
             archivetickbox.Checked = tl.LinkType != TLTypes.HISTORICALBROKER;
             tl.gotTick += new TickDelegate(tl_gotTick);
             tl.gotFill += new FillDelegate(tl_gotFill);
+            tl.gotOrder += new OrderDelegate(tl_gotOrder);
+            tl.gotOrderCancel += new UIntDelegate(tl_gotOrderCancel);
             this.FormClosing += new FormClosingEventHandler(ASP_FormClosing);
             status(Util.TLSIdentity());
+        }
+
+        void tl_gotOrderCancel(uint number)
+        {
+            foreach (string sym in symidx.Keys)
+                foreach (int idx in symidx[sym])
+                    boxlist[idx].GotOrderCancel(number);
+        }
+
+        void tl_gotOrder(Order o)
+        {
+            int[] idxs = new int[0];
+            symidx.TryGetValue(o.symbol, out idxs);
+            foreach (int idx in idxs)
+                boxlist[idx].GotOrder(o);
         }
 
         void ASP_FormClosing(object sender, FormClosingEventArgs e)
@@ -46,8 +63,10 @@ namespace ASP
             if (archivetickbox.Checked)
                 ta.Save(t);
 
-            if (boxlist.ContainsKey(t.sym) && (boxlist[t.sym] != null))
-                boxlist[t.sym].GotTick(t);
+            int[] idxs = new int[0];
+            symidx.TryGetValue(t.sym, out idxs);
+            foreach (int idx in idxs)
+                boxlist[idx].GotTick(t);
         }
 
         private int count = 0;
@@ -58,9 +77,10 @@ namespace ASP
                 Debug(t.ToString());
 
             count++;
-            if (!poslist.ContainsKey(t.symbol)) poslist.Add(t.symbol, new Position(t.symbol));
-            poslist[t.symbol].Adjust(t);
-            fillstatus("Fills: " + count);
+            int[] idxs = new int[0];
+            symidx.TryGetValue(t.symbol, out idxs);
+            foreach (int idx in idxs)
+                boxlist[idx].GotFill(t);
         }
 
 
@@ -77,7 +97,6 @@ namespace ASP
 
         
         string boxdll;
-        List<Response> boxes = new List<Response>();
 
         Response workingbox = new InvalidResponse();
 
@@ -103,7 +122,6 @@ namespace ASP
             }
 
             boxlist.Clear();
-            boxes.Clear();
         }
 
         TradeLink_Client_WM tl;
@@ -116,9 +134,6 @@ namespace ASP
             workingbox.SendOrder += new OrderDelegate(workingbox_SendOrder);
             workingbox.SendDebug+= new DebugFullDelegate(workingbox_GotDebug);
             workingbox.SendCancel+= new UIntDelegate(workingbox_CancelOrderSource);
-            tl.gotOrder+=new OrderDelegate(workingbox.GotOrder);
-            tl.gotOrderCancel+=new UIntDelegate(workingbox.GotOrderCancel);
-            tl.gotFill += new FillDelegate(workingbox.GotFill);
         }
 
         void workingbox_SendOrder(Order o)
@@ -142,46 +157,49 @@ namespace ASP
 
         private void Trade_Click(object sender, EventArgs e)
         {
-            string sym = stock.Text.ToUpper();
-            if (!Stock.isStock(sym))
+            string[] syms = stock.Text.Split(',');
+            List<string> valid = new List<string>();
+            foreach (string symt in syms)
             {
-                status("Please input a stock symbol.");
-                return;
-            }
-            if (Boxes.SelectedIndex == -1)
-            {
-                status("Please select a box.");
-                return;
-            }
-            Security sec = Security.Parse(sym);
-            string shortsym = sec.Symbol;
-            string boxcrit = "Box on " + sym + " with " + (string)Boxes.SelectedItem;
-            if (boxlist.ContainsKey(shortsym))
-            {
-
-                if (MessageBox.Show("For safety, you're only allowed one box per symbol.  Would you like to replace existing box?", "Confirm box replace", MessageBoxButtons.YesNoCancel) == DialogResult.Yes)
+                string sym = symt.ToUpper();
+                Security sec = Security.Parse(sym);
+                if (!sec.isValid)
                 {
-                    status("flatting symbol " + shortsym);
-                    tl.SendOrder(new MarketOrder(shortsym, poslist[shortsym].Size * -1));
-                    string name = boxlist[shortsym].Name;
-                    boxlist.Remove(shortsym);
-                    status("Removed strategy " + name + " from " + shortsym);
-                }
-                else
-                {
-                    status("Box activation canceled because of too many boxes.");
+                    status("Security invalid: " + sec.ToString());
                     return;
-
                 }
-            }
-            mb.Add(new Stock(sym));
-            tl.Subscribe(mb);
-            boxcriteria.Items.Add(workingbox.Name+" ["+shortsym+"]");
-            boxlist.Add(shortsym,workingbox);
-            seclist.Add(shortsym, sec);
-            boxes.Add(workingbox);
-            
+                if (Boxes.SelectedIndex == -1)
+                {
+                    status("Please select a box.");
+                    return;
+                }
+                mb.Add(new Stock(sym));
+                valid.Add(sym);
+                if (!seclist.ContainsKey(sec.Symbol))
+                {
+                    lock (seclist) // potentially used by other threads, so we lock it
+                    {
+                        seclist.Add(sec.Symbol, sec);
+                    }
+                }
 
+            }
+            lock (boxlist) // potentially used by other threads
+            {
+                boxlist.Add(workingbox);
+            }
+            int idx = boxlist.Count -1;
+            tl.Subscribe(mb);
+            boxcriteria.Items.Add(workingbox.Name+" ["+string.Join(",",valid.ToArray())+"]");
+            foreach (string sym in valid)
+                if (symidx.ContainsKey(sym))
+                {
+                    // add this boxes' index to subscriptions for this symbol
+                    int len = symidx[sym].Length;
+                    int[] a = new int[len + 1];
+                    a[len] = idx;
+                }
+                else symidx.Add(sym, new int[] { idx });
             stock.Text = "";
             status("");
             Boxes.SelectedIndex = -1;
@@ -189,20 +207,18 @@ namespace ASP
         }
 
         Dictionary<string, Security> seclist = new Dictionary<string, Security>();
-
-
-        Dictionary<string, Response> boxlist = new Dictionary<string, Response>();
-        Dictionary<string, BarList> barlist = new Dictionary<string, BarList>(); 
-        Dictionary<string, Position> poslist = new Dictionary<string, Position>();
+        Dictionary<string, int[]> symidx = new Dictionary<string, int[]>();
+        List<Response> boxlist = new List<Response>();
+        
         
 
         private void boxcriteria_SelectedIndexChanged(object sender, EventArgs e)
         {
             int selbox = boxcriteria.SelectedIndex;
-            if (!boxes[selbox].isValid)
-                status("Box " + boxes[selbox].Name + " is off.");
+            if (!boxlist[selbox].isValid)
+                status("Box " + boxlist[selbox].Name + " is off.");
             else
-                status("Box " + boxes[selbox].Name +  " is on.");
+                status("Box " + boxlist[selbox].Name +  " is on.");
 
         }
 
