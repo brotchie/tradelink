@@ -53,7 +53,7 @@
     <Compile Include="TestAccount.cs" />
     <Compile Include="TestBar.cs" />
     <Compile Include="TestBarList.cs" />
-    <Compile Include="TestBox.cs" />
+    <Compile Include="TestResponse.cs" />
     <Compile Include="TestBoxMath.cs" />
     <Compile Include="TestBroker.cs" />
     <Compile Include="TesteSigTick.cs" />

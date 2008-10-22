@@ -7,9 +7,9 @@ using NUnit.Framework;
 namespace TestTradeLib
 {
     [TestFixture]
-    public class TestBox
+    public class TestResponse
     {
-        public TestBox()
+        public TestResponse()
         {
         }
         int debugs = 0;
@@ -32,7 +32,7 @@ namespace TestTradeLib
         // test the constructor and make sure it never enters a trade
         int sbcount = 0;
         [Test]
-        public void StandardBox()
+        public void StandardResponse()
         {
             Never b = new Never();
             b.SendOrder += new OrderDelegate(b_SendOrder);
