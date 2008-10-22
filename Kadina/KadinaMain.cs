@@ -76,6 +76,7 @@ namespace Kadina
             PlayTo type = (PlayTo)e.Argument;
             if (e.Cancel) return;
             int t = (int)type;
+            h.Initialize();
             DateTime start = h.NextTickTime;
             int maxmin = (t > 127) && (t < 450) ? t - 127 : 0;
             DateTime stop = start.AddMinutes(maxmin);
@@ -104,6 +105,7 @@ namespace Kadina
             if (epffiles.Count==0) { status("You must select a tickfile to play."); return; }
             if (mybox == null) { status("You must drop a box dll AND select a specific box from the Boxes menu."); return; }
             if (!igridinit) InitIGrid();
+            if (bw.IsBusy) { status("Play is already running..."); return; }
             bw.RunWorkerAsync(pt);
             ContextMenu.MenuItems.Add("Cancel", new EventHandler(rightcancel));
             status("Playing...");
@@ -410,6 +412,7 @@ namespace Kadina
                 mybox.SendDebug += new DebugFullDelegate(mybox_GotDebug);
                 mybox.SendCancel += new UIntDelegate(mybox_CancelOrderSource);
                 mybox.SendOrder += new OrderDelegate(mybox_SendOrder);
+                mybox.SendIndicators += new ObjectArrayDelegate(mybox_SendIndicators);
                 h.SimBroker.GotOrder += new OrderDelegate(mybox.GotOrder);
                 h.SimBroker.GotFill += new FillDelegate(mybox.GotFill);
                 h.GotTick += new TickDelegate(mybox.GotTick);
@@ -417,6 +420,15 @@ namespace Kadina
             }
             else status("Box did not load.");
 
+        }
+
+        void mybox_SendIndicators(object[] parameters)
+        {
+            if (mybox == null) return;
+            if (mybox.Indicators.Length == 0)
+                debug("No indicators defined on box " + mybox.Name);
+            else
+                NewIRow(new object[] { parameters });
         }
 
         void mybox_SendOrder(Order o)
@@ -443,14 +455,6 @@ namespace Kadina
                 status(msg.Msg);
         }
 
-        void mybox_IndicatorUpdate(object[] parameters)
-        {
-            if (mybox == null) return;
-            if (mybox.Indicators.Length == 0) 
-                debug("No indicators defined on box " + mybox.Name);
-            else 
-                NewIRow(new object[] { parameters });
-        }
 
 
         private void kadinamain_DragDrop(object sender, DragEventArgs e)
