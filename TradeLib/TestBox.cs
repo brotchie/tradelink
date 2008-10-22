@@ -34,11 +34,10 @@ namespace TestTradeLib
         [Test]
         public void StandardBox()
         {
-            DayTradeBox b = new DayTradeBox();
+            Never b = new Never();
             b.SendOrder += new OrderDelegate(b_SendOrder);
 
-            Assert.That(!b.Off);
-            Assert.That(b.DayStart == 930);
+            Assert.That(!b.isValid);
             Assert.That(sbcount == 0);
             // default box does not trade
             // for every tick that it trades
@@ -56,13 +55,47 @@ namespace TestTradeLib
             sbcount++;
             o = order;
         }
-        class Always : DayTradeBox
+        public class Always : Response
         {
-            public Always() { MinSize = 100; }
-            protected override Order ReadOrder(Tick tick, BarList bl)
+            public int MinSize = 100;
+            public int MaxSize = 100;
+            public Always() {  }
+            public virtual void GotTick(Tick tick)
             {
-                D("entering");
-                return new BuyMarket(Symbol,MinSize);
+                SendDebug(Debug.Create("entering"));
+                SendOrder(new BuyMarket(tick.symbol, MinSize));
+            }
+
+            public virtual void GotOrder(Order order) {}
+            public void GotFill(Trade fill) {}
+            public void GotOrderCancel(uint cancelid) { }
+            public void Reset() { }
+
+            public void GotPosition(Position p) { }
+
+            string[] _inds = new string[0];
+            string _name = "";
+            string _full = "";
+
+            public bool isValid { get { return true; } }
+
+            public string[] Indicators { get { return _inds; } set { _inds = value; } }
+
+            public string Name { get { return _name; } set { _name = value; } }
+
+            public string FullName { get { return _full; } set { _full = value; } }
+
+            public event DebugFullDelegate SendDebug;
+            public event OrderDelegate SendOrder;
+            public event UIntDelegate SendCancel;
+            public event ObjectArrayDelegate SendIndicators;
+        }
+
+        public class Never : Always
+        {
+            public override void GotTick(Tick tick)
+            {
+                
             }
         }
 
@@ -231,92 +264,7 @@ namespace TestTradeLib
 
         }
 
-        public class FullOrder : DayTradeBox
-        {
-            public FullOrder() 
-            { 
-                Name = "full order"; 
-            }
-            int orders = 0;
-            protected override Order ReadOrder(Tick tick,BarList bl)
-            {
-                Order o = new Order();
 
-                if (orders == 0)
-                {
-                    o = new LimitOrder(s, true, 200, 10);
-                }
-                if (orders==1)
-                    CancelOrders(true);
-                if (o.isValid)
-                    orders++;
-                return o;
-            }
-        }
-
-        Broker b = new Broker();
-        FullOrder fb = new FullOrder();
-
-        [Test]
-        public void FullOrderAndCancel()
-        {
-
-            b.GotOrder += fb.GotOrder;
-            b.GotOrderCancel += new Broker.OrderCancelDelegate(b_GotOrderCancel);
-            fb.SendOrder += new OrderDelegate(fb_SendOrder);
-            fb.SendCancel += new UIntDelegate(fb_CancelOrderSource);
-            fb.SendDebug+= new DebugFullDelegate(f_GotDebug);
-
-            Tick[] timesales = new Tick[] { 
-                Tick.NewTrade(s,d,t+1,0,100,100,x),
-                Tick.NewTrade(s,d,t+2,0,100,100,x),
-                Tick.NewTrade(s,d,t+3,0,100,100,x),
-                Tick.NewTrade(s,d,t+3,0,100,100,x),
-            };
-
-            int i = 0;
-            Tick k = timesales[i++];
-            b.Execute(k);
-            Assert.That(b.GetOrderList().Count == 0);
-            o = new Order();
-            fb.GotTick(k);
-            b.sendOrder(o);
-            Assert.That(b.GetOrderList().Count==1,b.GetOrderList().Count.ToString());
-
-            k = timesales[i++];
-            b.Execute(k);
-            o = new Order();
-            fb.GotTick(k);
-            b.sendOrder(o);
-            Assert.That(b.GetOrderList().Count == 0, b.GetOrderList().Count.ToString());
-
-            k = timesales[i++];
-            b.Execute(k);
-            o = new Order();
-            fb.GotTick(k);
-            b.sendOrder(o);
-            Assert.That(b.GetOrderList().Count == 0, b.GetOrderList().Count.ToString());
-        }
-
-        void fb_SendOrder(Order order)
-        {
-            o = order;
-        }
-
-        void fb_CancelOrderSource(uint number)
-        {
-            b.CancelOrder(number);
-        }
-
-        void b_GotOrderCancel(string sym, bool side, uint id)
-        {
-            fb.GotOrderCancel(id);
-        }
-
-        void f_GotDebug(Debug debug)
-        {
-            
-        }
     }
 
 }
