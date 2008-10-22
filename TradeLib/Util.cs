@@ -12,9 +12,12 @@ namespace TradeLib
     /// </summary>
     public class Util
     {
-        public static string TLBaseDir { get { return @"c:\program files\tradelink\"; } }
-        public static string TLProgramDir { get { return TLBaseDir + "TradeLinkSuite\\"; } }
-        public static string TLTickDir { get { return TLBaseDir + "TickData\\"; } }
+        public static string TLBaseDir 
+        { get { return Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)+@"\tradelink\"; } }
+        public static string TLProgramDir 
+        { get { return TLBaseDir + "TradeLinkSuite\\"; } }
+        public static string TLTickDir 
+        { get { return TLBaseDir + "TickData\\"; } }
 
 
         public static TickFileInfo ParseFile(string filepath)
@@ -78,7 +81,7 @@ namespace TradeLib
         public static string TLVersion()
         {
             const string major = "0.1.";
-            const string backupminor = "$Rev$";
+            const string backupminor = "0";
             string build = BuildFromFile(TLProgramDir + @"\VERSION.txt");
             string minor = build == ZEROBUILD ? CleanVer(backupminor) : build;
             return major + minor;
