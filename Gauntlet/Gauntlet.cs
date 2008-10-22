@@ -404,6 +404,18 @@ using System.IO;
 
         public List<object[]> Indicators = new List<object[]>();
 
+        private void spreadliston_CheckedChanged(object sender, EventArgs e)
+        {
+            spreadallon.Checked = !spreadliston.Checked;
+            spreadlist.Visible = spreadliston.Checked;
+        }
+
+        private void spreadallon_CheckedChanged(object sender, EventArgs e)
+        {
+            spreadallon.Checked = !spreadliston.Checked;
+            spreadlist.Visible = spreadliston.Checked;
+        }
+
 
 
 

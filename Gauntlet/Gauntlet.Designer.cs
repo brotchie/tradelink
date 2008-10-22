@@ -50,6 +50,9 @@ namespace WinGauntlet
             this.boxlist = new System.Windows.Forms.ListBox();
             this.stocklist = new System.Windows.Forms.ListBox();
             this.optionpage = new System.Windows.Forms.TabPage();
+            this.spreadlist = new System.Windows.Forms.TextBox();
+            this.spreadliston = new System.Windows.Forms.CheckBox();
+            this.spreadallon = new System.Windows.Forms.CheckBox();
             this.csvnamesunique = new System.Windows.Forms.CheckBox();
             this.indicatorscsv = new System.Windows.Forms.CheckBox();
             this.tradesincsv = new System.Windows.Forms.CheckBox();
@@ -303,6 +306,9 @@ namespace WinGauntlet
             // 
             // optionpage
             // 
+            this.optionpage.Controls.Add(this.spreadlist);
+            this.optionpage.Controls.Add(this.spreadliston);
+            this.optionpage.Controls.Add(this.spreadallon);
             this.optionpage.Controls.Add(this.csvnamesunique);
             this.optionpage.Controls.Add(this.indicatorscsv);
             this.optionpage.Controls.Add(this.tradesincsv);
@@ -333,13 +339,45 @@ namespace WinGauntlet
             this.optionpage.Text = "Options";
             this.optionpage.UseVisualStyleBackColor = true;
             // 
+            // spreadlist
+            // 
+            this.spreadlist.Location = new System.Drawing.Point(468, 124);
+            this.spreadlist.Name = "spreadlist";
+            this.spreadlist.Size = new System.Drawing.Size(100, 26);
+            this.spreadlist.TabIndex = 30;
+            this.spreadlist.Visible = false;
+            // 
+            // spreadliston
+            // 
+            this.spreadliston.AutoSize = true;
+            this.spreadliston.Location = new System.Drawing.Point(245, 126);
+            this.spreadliston.Name = "spreadliston";
+            this.spreadliston.Size = new System.Drawing.Size(228, 24);
+            this.spreadliston.TabIndex = 29;
+            this.spreadliston.Text = "Spread only these symbols :";
+            this.spreadliston.UseVisualStyleBackColor = true;
+            this.spreadliston.Visible = false;
+            this.spreadliston.CheckedChanged += new System.EventHandler(this.spreadliston_CheckedChanged);
+            // 
+            // spreadallon
+            // 
+            this.spreadallon.AutoSize = true;
+            this.spreadallon.Location = new System.Drawing.Point(8, 127);
+            this.spreadallon.Name = "spreadallon";
+            this.spreadallon.Size = new System.Drawing.Size(204, 24);
+            this.spreadallon.TabIndex = 28;
+            this.spreadallon.Text = "Spread trade all symbols";
+            this.spreadallon.UseVisualStyleBackColor = true;
+            this.spreadallon.Visible = false;
+            this.spreadallon.CheckedChanged += new System.EventHandler(this.spreadallon_CheckedChanged);
+            // 
             // csvnamesunique
             // 
             this.csvnamesunique.AutoSize = true;
             this.csvnamesunique.Checked = global::WinGauntlet.Properties.Settings.Default.csvnamesunique;
             this.csvnamesunique.CheckState = System.Windows.Forms.CheckState.Checked;
             this.csvnamesunique.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "csvnamesunique", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.csvnamesunique.Location = new System.Drawing.Point(307, 335);
+            this.csvnamesunique.Location = new System.Drawing.Point(245, 335);
             this.csvnamesunique.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.csvnamesunique.Name = "csvnamesunique";
             this.csvnamesunique.Size = new System.Drawing.Size(191, 24);
@@ -352,7 +390,7 @@ namespace WinGauntlet
             this.indicatorscsv.AutoSize = true;
             this.indicatorscsv.Checked = global::WinGauntlet.Properties.Settings.Default.indicatorsincsv;
             this.indicatorscsv.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "indicatorsincsv", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.indicatorscsv.Location = new System.Drawing.Point(307, 300);
+            this.indicatorscsv.Location = new System.Drawing.Point(244, 300);
             this.indicatorscsv.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.indicatorscsv.Name = "indicatorscsv";
             this.indicatorscsv.Size = new System.Drawing.Size(154, 24);
@@ -366,7 +404,7 @@ namespace WinGauntlet
             this.tradesincsv.Checked = global::WinGauntlet.Properties.Settings.Default.tradesincsv;
             this.tradesincsv.CheckState = System.Windows.Forms.CheckState.Checked;
             this.tradesincsv.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "tradesincsv", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.tradesincsv.Location = new System.Drawing.Point(307, 265);
+            this.tradesincsv.Location = new System.Drawing.Point(244, 265);
             this.tradesincsv.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tradesincsv.Name = "tradesincsv";
             this.tradesincsv.Size = new System.Drawing.Size(133, 24);
@@ -380,7 +418,7 @@ namespace WinGauntlet
             this.tradesinwind.Checked = global::WinGauntlet.Properties.Settings.Default.tradesinwind;
             this.tradesinwind.CheckState = System.Windows.Forms.CheckState.Checked;
             this.tradesinwind.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "tradesinwind", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.tradesinwind.Location = new System.Drawing.Point(307, 229);
+            this.tradesinwind.Location = new System.Drawing.Point(244, 229);
             this.tradesinwind.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tradesinwind.Name = "tradesinwind";
             this.tradesinwind.Size = new System.Drawing.Size(162, 24);
@@ -393,7 +431,7 @@ namespace WinGauntlet
             this.ordersincsv.AutoSize = true;
             this.ordersincsv.Checked = global::WinGauntlet.Properties.Settings.Default.ordersincsv;
             this.ordersincsv.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "ordersincsv", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.ordersincsv.Location = new System.Drawing.Point(307, 195);
+            this.ordersincsv.Location = new System.Drawing.Point(245, 195);
             this.ordersincsv.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.ordersincsv.Name = "ordersincsv";
             this.ordersincsv.Size = new System.Drawing.Size(132, 24);
@@ -407,7 +445,7 @@ namespace WinGauntlet
             this.ordersinwind.Checked = global::WinGauntlet.Properties.Settings.Default.ordersinwind;
             this.ordersinwind.CheckState = System.Windows.Forms.CheckState.Checked;
             this.ordersinwind.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "ordersinwind", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.ordersinwind.Location = new System.Drawing.Point(307, 159);
+            this.ordersinwind.Location = new System.Drawing.Point(245, 161);
             this.ordersinwind.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.ordersinwind.Name = "ordersinwind";
             this.ordersinwind.Size = new System.Drawing.Size(161, 24);
@@ -522,7 +560,7 @@ namespace WinGauntlet
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(303, 61);
+            this.label4.Location = new System.Drawing.Point(507, 233);
             this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(119, 20);
@@ -538,17 +576,17 @@ namespace WinGauntlet
             "NYS",
             "NMS",
             "PSE"});
-            this.exchlist.Location = new System.Drawing.Point(432, 61);
+            this.exchlist.Location = new System.Drawing.Point(511, 265);
             this.exchlist.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.exchlist.MultiColumn = true;
             this.exchlist.Name = "exchlist";
-            this.exchlist.Size = new System.Drawing.Size(138, 84);
+            this.exchlist.Size = new System.Drawing.Size(127, 84);
             this.exchlist.TabIndex = 8;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(51, 94);
+            this.label2.Location = new System.Drawing.Point(269, 62);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(119, 20);
@@ -557,7 +595,7 @@ namespace WinGauntlet
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(12, 91);
+            this.button2.Location = new System.Drawing.Point(231, 56);
             this.button2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(30, 26);
@@ -757,6 +795,9 @@ namespace WinGauntlet
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.CheckBox indicatorscsv;
         private System.Windows.Forms.CheckBox csvnamesunique;
+        private System.Windows.Forms.CheckBox spreadallon;
+        private System.Windows.Forms.CheckBox spreadliston;
+        private System.Windows.Forms.TextBox spreadlist;
     }
 }
 
