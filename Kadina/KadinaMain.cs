@@ -237,6 +237,7 @@ namespace Kadina
             for (int i = 0; i < mybox.Indicators.Length; i++)
                 it.Columns.Add(mybox.Indicators[i]);
 
+            msgbox.Clear(); // clear the message box on first box run
             ig.Parent = itab;
             ig.DataSource = it;
             ig.RowHeadersVisible = false;
@@ -449,10 +450,7 @@ namespace Kadina
 
         void mybox_GotDebug(Debug msg)
         {
-            if (msg.Level == DebugLevel.Debug)
-                debug(msg.Msg);
-            else if (msg.Level == DebugLevel.Status)
-                status(msg.Msg);
+            debug(nowtime+":"+mybox.Name+" "+msg.Msg);
         }
 
 
