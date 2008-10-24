@@ -25,8 +25,6 @@ namespace TestTradeLib
                 Tick.NewTrade(s,d,t+2,0,10,100,x),
                 Tick.NewTrade(s,d,t+3,0,10,100,x),
             };
-        const string f = "/SPX";
-        const decimal fnom = 1300;
 
 
         // test the constructor and make sure it never enters a trade
@@ -36,17 +34,17 @@ namespace TestTradeLib
         {
             Never b = new Never();
             b.SendOrder += new OrderDelegate(b_SendOrder);
-
-            Assert.That(!b.isValid);
+            sbcount = 0;
+            Assert.That(b.isValid);
             Assert.That(sbcount == 0);
             // default box does not trade
             // for every tick that it trades
             for (int i = 0; i < timesales.Length; i++)
             {
                 b.GotTick(timesales[i]);
-                Assert.That(!o.isValid);
+                Assert.That(o.isValid);
             }
-            Assert.That(sbcount == timesales.Length, sbcount.ToString());
+            Assert.AreEqual(0, sbcount);
            
         }
 
@@ -104,8 +102,10 @@ namespace TestTradeLib
         public void AlwaysEnter()
         {
             Always b = new Always();
+            b.SendDebug += new DebugFullDelegate(b_SendDebug);
             b.SendOrder+=new OrderDelegate(b_SendOrder);
             sbcount = 0;
+            debugs = 0;
             Assert.That(b.MinSize == 100);
             int good = 0;
             int i = 0;
@@ -124,62 +124,16 @@ namespace TestTradeLib
             b.GotTick(timesales[i++]);
             if (o.isValid)
                 good++;
-            // first trade was pre-market so we only have 3 total;
-            Assert.That(good == 3);
-            // no debugs were sent
-            Assert.That(debugs == 0);
+
+            Assert.AreEqual(4, good);
+            Assert.AreEqual(4, debugs);
         }
 
-        [Test]
-        // make sure this box only generates orders when last one has been filled
-        public void OneOrderAtTime() 
+        void b_SendDebug(Debug debug)
         {
-            Always b = new Always();
-            b.MaxSize = Int32.MaxValue; // lets not restrict our maximum position for this example
-            Broker broker = new Broker();
-            broker.GotFill += new FillDelegate(broker_GotFill);
-            Tick t;
-            Assert.That(b.MinSize == 100);
-            int good = 0;
-            int i = 0;
-            o = new Order();
-            t = new Tick(timesales[i++]);
-            broker.Execute(t);
-            o = new Order();
-            b.GotTick(t);
-            
-            broker.sendOrder(o);
-            if (o.isValid)
-                good++;
-
-            t = new Tick(timesales[i++]);
-            broker.Execute(t);
-            o = new Order();
-            b.GotTick(t); 
-            broker.sendOrder(o);
-            if (o.isValid)
-                good++;
-            t = new Tick(timesales[i++]);
-            broker.Execute(t);
-            o = new Order();
-            b.GotTick(t);
-            // lets change this to a limit order, so he doesn't get filled on just any tick
-            o.price = 1;
-            broker.sendOrder(o);
-            if (o.isValid)
-                good++;
-
-            t = new Tick(timesales[i++]);
-            broker.Execute(t);
-            o = new Order();
-            b.GotTick(t); 
-            broker.sendOrder(o);
-            if (o.isValid)
-                good++;
-
-            // first trade was pre-market 2nd order was never filled so 3rd was ignored... 2 total.
-            Assert.That(good == 2);
+            debugs++;
         }
+
 
         void broker_GotFill(Trade t)
         {
@@ -193,8 +147,10 @@ namespace TestTradeLib
         {
             // subscribe to news service that will count everytime a debug is sent
             Always b = new Always(); // send debugs from this box to our news service
-            b.SendDebug += new DebugFullDelegate(b_GotDebug);
+            b.SendDebug += new DebugFullDelegate(b_SendDebug);
+            b.SendOrder+=new OrderDelegate(b_SendOrder);
             int good = 0;
+            debugs = 0;
             for (int i = 0; i < timesales.Length; i++)
             {
                 o = new Order();
@@ -202,67 +158,13 @@ namespace TestTradeLib
                 if (o.isValid)                
                     good++;
             }
-            Assert.That(good == 3);
+            Assert.AreEqual(4, good);
             // news from the box was received.
             Assert.That(debugs>0);
         }
 
-        void b_GotDebug(Debug debug)
-        {
-            debugs++;
-        }
 
 
-
-        [Test]
-        public void MaxSizeTest()
-        {
-            Always b = new Always();
-            b.MinSize = 100;
-            b.MaxSize = 200;
-            Position p = new Position(s);
-            Order o = new Order();
-            Assert.That(b.MinSize==100);
-            Assert.That(b.MaxSize==200);
-            for (int i = 0; i < timesales.Length; i++)
-            {
-                Tick t = new Tick(timesales[i]);
-                if (o.isValid && t.isTrade)
-                {
-                    o.Fill(t);
-                    p.Adjust((Trade)o);
-                    o = new Order();
-                }
-                Assert.That(p.Size<=b.MaxSize);
-                b.GotPosition(p);
-                b.GotTick(timesales[i]);
-            }
-            Assert.That(p.Size == 200);
-
-            // Now we'll set maxsize to 100
-            b = new Always();
-            b.MinSize = 100;
-            b.MaxSize = 100;
-            p = new Position(s);
-            o = new Order();
-            Assert.That(b.MinSize == 100);
-            Assert.That(b.MaxSize == 100);
-            for (int i = 0; i < timesales.Length; i++)
-            {
-                Tick t = new Tick(timesales[i]);
-                if (o.isValid && t.isTrade)
-                {
-                    o.Fill(t);
-                    p.Adjust((Trade)o);
-                    o = new Order();
-                }
-                Assert.That(p.Size <= b.MaxSize);
-                b.GotPosition(p);
-                b.GotTick(timesales[i]);
-            }
-            Assert.That(p.Size == 100);
-
-        }
 
 
     }
