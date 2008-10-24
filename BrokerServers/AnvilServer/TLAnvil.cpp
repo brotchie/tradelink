@@ -279,7 +279,8 @@ int Sendorder(CString msg)
 	const Money stopm = Money((int)(o.stop*1024));
 	unsigned int mytif = TIFId(o.TIF);
 
-	if (!Stock->isLoaded()) return UNKNOWNSYM;
+	if ((Stock==NULL) || (!Stock->isLoaded()))
+		return UNKNOWNSYM;
 	
 	// send the order (next line is from SendOrderDlg.cpp)
 	unsigned int error = B_SendOrder(Stock,
