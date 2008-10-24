@@ -31,8 +31,6 @@ namespace TestTradeLib
             Assert.That(p.isValid);
             Position p3 = new Position(s, 0, 100,0);
             Assert.That(!p3.isValid);
-            p3 = new Position(s, 10, 0,0);
-            Assert.That(!p3.isValid);
             p3 = new Position(s, 12, 100,0);
             p.Adjust(p3);
             Assert.That(p.AvgPrice == 11);
