@@ -21,7 +21,7 @@ namespace SterServer
         public SterMain()
         {
             InitializeComponent();
-            stiEvents.OnSTIOrderConfirm += new _ISTIEventsEvents_OnSTIOrderConfirmEventHandler(stiEvents_OnSTIOrderConfirm);
+            stiEvents.OnSTITradeUpdateMsg += new _ISTIEventsEvents_OnSTITradeUpdateMsgEventHandler(stiEvents_OnSTITradeUpdateMsg);
             stiEvents.OnSTITradeUpdate += new _ISTIEventsEvents_OnSTITradeUpdateEventHandler(stiEvents_OnSTITradeUpdate);
             stiPos.OnSTIPositionUpdate += new _ISTIPositionEvents_OnSTIPositionUpdateEventHandler(stiPos_OnSTIPositionUpdate);
             stiQuote.OnSTIQuoteUpdate += new _ISTIQuoteEvents_OnSTIQuoteUpdateEventHandler(stiQuote_OnSTIQuoteUpdate);
@@ -29,6 +29,25 @@ namespace SterServer
             tl.gotSrvPosList += new TradeLink_Server_WM.PositionArrayDelegate(tl_gotSrvPosList);
             
             debug(PROGRAM + Util.TLSIdentity());
+        }
+
+        void stiEvents_OnSTITradeUpdateMsg(STITradeUpdateMsg c)
+        {
+            Order o = new Order();
+            o.Account = c.Account;
+            o.id = Convert.ToUInt32(c.ClOrderID);
+            o.symbol = c.Symbol;
+            o.TIF = c.Tif;
+            o.price = (decimal)c.LmtPrice;
+            o.stopp = (decimal)c.StpPrice;
+            o.size = c.Quantity;
+            o.Exchange = c.Destination;
+            o.side = c.Side.Contains("B");
+            DateTime now = DateTime.Parse(c.UpdateTime);
+            o.date = Util.ToTLDate(now);
+            o.time = Util.ToTLTime(now);
+            o.sec = now.Second;
+            tl.newOrder(o);
         }
 
         void stiEvents_OnSTITradeUpdate(ref structSTITradeUpdate t)
@@ -91,10 +110,6 @@ namespace SterServer
             debug("got position");
         }
 
-        void stiEvents_OnSTIOrderConfirm(ref structSTIOrderConfirm structOrderConfirm)
-        {
-            debug("got order confirm");
-        }
 
         void debug(string msg)
         {
