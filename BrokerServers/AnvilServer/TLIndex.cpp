@@ -4,6 +4,7 @@
 #include "TLAnvil.h"
 #include "SendMsg.h"
 #include "MessageIds.h"
+#include "TLTick.h"
 
 
 
@@ -66,15 +67,16 @@ void TLIdx::FillInfo()
 	double high = m_index->GetHigh().toDouble();
 	double low = m_index->GetLow().toDouble();
 	double close = m_index->GetCloseValue().toDouble();
-	CString sym = m_index->GetSymbol();
-	CString str;
-	// sym,date, time, value, open, high, low, close
-	str.Format("%s,%i,%i,%f,%f,%f,%f,%f",sym,xd,xt,val,open,high,low,close);
+
+	TradeLinkServer::TLTick k;
+	k.sym = m_index->GetSymbol();
+	k.trade = val;
+	k.size = -1;
 
 	std::vector<CString> client;
 	AllClients(client);
 	for (size_t i = 0; i<client.size(); i++)
-		SendMsg(TICKNOTIFY,str,client[i]); // send update to every client
+		SendMsg(TICKNOTIFY,k.Serialize(),client[i]); // send update to every client
 }
 
 

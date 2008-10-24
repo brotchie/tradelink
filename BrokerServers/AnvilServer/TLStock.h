@@ -1,16 +1,16 @@
-#ifndef STOCKHPP
-#define STOCKHPP
-
+#pragma once
 #include "ObserverApi.h"
 #include "BusinessApi.h"
 #include "ExtFrame.h"
+
 
 unsigned int TIFId(CString name);
 
 class ListBoxStock;
 
-class TLStock : public Observer//we derive this object from Obsererver to be able to get info about dynamic changes of the stock
-                            //every Observer must have function virtual void Process(const Message* message, Observable* from, const Message* additionalInfo); which will be called when a stock update is received from the server.
+class TLStock : public Observer
+	//we derive this object from Obsererver to be able to get info about dynamic changes of the stock
+    //every Observer must have function virtual void Process(const Message* message, Observable* from, const Message* additionalInfo); which will be called when a stock update is received from the server.
 {
 public:
     TLStock(const char* symbol, bool load = false);
@@ -131,4 +131,3 @@ protected:
     MoneySize m_nysPrint;
 };
 
-#endif

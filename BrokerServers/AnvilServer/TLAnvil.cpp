@@ -41,8 +41,9 @@ std::vector <CString>client;
 std::vector <time_t>heart;
 typedef std::vector <CString> mystocklist;
 std::vector < mystocklist > stocks;
-std::vector <TLStock*> subs; // this saves our subscriptions with the hammer server
-std::vector <TLIdx*> idxs; // saves our indicies with hammer
+std::vector <Observer*> subs; // this saves our subscriptions with the hammer server
+std::vector <CString> subsym;
+
 
 
 
@@ -57,20 +58,10 @@ void TLUnload()
 			subs[i] = NULL;
 		}
 	}
-	for (size_t i = 0; i<idxs.size(); i++) 
-	{
-		if (idxs[i]!=NULL)
-		{
-			idxs[i]->Clear();
-			delete idxs[i];
-			idxs[i] = NULL;
-		}
-	}
 	client.clear();
 	heart.clear();
 	stocks.clear();
 	subs.clear();
-	idxs.clear();
 }
 
 
@@ -146,41 +137,28 @@ int LastBeat(CString cwind)
 	return (int)dif;
 }
 
-bool hasHammerSub(std::string symbol)
+
+size_t SubIdx(CString symbol)
 {
-	for (size_t i = 0; i<subs.size(); i++) 
-		if ((subs[i]!=NULL) && 
-			(subs[i]->isLoaded()) && 
-			(symbol == subs[i]->GetSymbol()))
-			return true;
-	return false;
-}
-bool hasHammerIdx(CString symbol)
-{
-	for (size_t i = 0; i<idxs.size(); i++) 
-		if ((idxs[i]!=NULL) && (symbol == idxs[i]->m_symbol))
-			return true;
-	return false;
+	for (size_t i = 0; i<subsym.size(); i++) 
+		if (subsym[i]==symbol)
+			return i;
+	return -1;
 }
 
-LRESULT RegIndex(CString m)
+bool hasHammerSub(CString symbol)
 {
-	std::vector <CString> rec;
-	gsplit(m,"+",rec); // split message body into client id and stock list
-	unsigned int cid = FindClient(rec[0]);
-	if (cid==-1) return 1; //client not registered
-	mystocklist my; // initialize stocklist array to proper length
-	gsplit(rec[1],",",my); // populate array from the message
-	for (size_t i = 0; i<my.size();i++) // subscribe to stocks
-	{
-		CString idx = my[i];
-		if (hasHammerIdx(idx)) continue; // if already subscribed, go to next index
-		TLIdx * newidx = new TLIdx(idx);
-		idxs.push_back(newidx);
-	}
-	return 0;
+	return SubIdx(symbol)!=-1;
 }
 
+
+bool isIndex(CString sym)
+{
+	int slashi = sym.FindOneOf("/");
+	int doli = sym.FindOneOf("$");
+	int poundi = sym.FindOneOf("#");
+	return (slashi!=-1)||(doli!=-1)||(poundi!=-1);
+}
 
 LRESULT RegStocks(CString m)
 { 
@@ -192,10 +170,18 @@ LRESULT RegStocks(CString m)
 	gsplit(rec[1],",",my); // populate array from the message
 	for (size_t i = 0; i<my.size();i++) // subscribe to stocks
 	{
-		if (hasHammerSub((std::string)my[i])) continue; // if we've already subscribed once, skip to next stock
-		TLStock* stk = new TLStock(my[i]); // create new stock instance
-		stk->Load();
-		subs.push_back(stk);
+		if (hasHammerSub(my[i])) continue; // if we've already subscribed once, skip to next stock
+		Observer* sec;
+		if (isIndex(my[i]))
+			sec = new TLIdx(my[i]);
+		else
+		{
+			TLStock *stk = new TLStock(my[i]); // create new stock instance
+			stk->Load();
+			sec = stk;
+		}
+		subs.push_back(sec);
+		subsym.push_back(my[i]);
 	}
 	stocks[cid] = my; // index the array by the client's id
 	HeartBeat(rec[0]); // update the heartbeat
@@ -204,12 +190,14 @@ LRESULT RegStocks(CString m)
 
 void RemoveSub(CString stock)
 {
-	for (size_t i = 0; i<subs.size(); i++)
+	if (hasHammerSub(stock))
 	{
-		if ((subs[i]!=NULL) && subs[i]->isLoaded() && (subs[i]->GetSymbol().compare(stock)==0))
+		size_t i = SubIdx(stock);
+		if (subs[i]!=NULL)
 		{
 			subs[i]->Clear();
 			delete subs[i];
+			subsym[i] = "";
 			subs[i]= NULL;
 		}
 	}
@@ -533,7 +521,6 @@ LPARAM ServiceMsg(const int t,CString m) {
 	if (t==REGISTERSTOCK) return (LRESULT)RegStocks(m);
 	if (t==CLEARCLIENT) return (LRESULT)ClearClient(m);
 	if (t==CLEARSTOCKS) return (LRESULT)ClearStocks(m);
-	if (t==REGISTERINDEX) return (LRESULT)RegIndex(m);
 	if (t==POSITIONREQUEST) return (LRESULT)PosList(m);
 	if (t==ACCOUNTOPENPL)
 	{
