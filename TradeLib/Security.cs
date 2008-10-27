@@ -28,7 +28,8 @@ namespace TradeLib
         public override string ToString()
         {
             string[] r = { _sym, _type.ToString(), _destex };
-            return string.Join(" ", r);
+            if (_type!= SecurityType.STK) return string.Join(" ", r);
+            return _sym;
         }
         public string Serialize()
         {

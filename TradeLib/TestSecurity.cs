@@ -23,10 +23,14 @@ namespace TestTradeLib
             Assert.That(!t.hasDest, t.DestEx);
             Assert.That(t.Type == nyse.Type, t.Type.ToString());
 
-            Security crude = Security.Parse("CLV8 GLOBEX FUT");
+            Security crude = Security.Parse("CLV8 FUT GLOBEX");
             Assert.That(crude.Symbol == "CLV8", crude.Symbol);
             Assert.That(crude.hasDest, crude.DestEx);
             Assert.That(crude.Type == SecurityType.FUT, crude.Type.ToString());
+            Assert.AreEqual("CLV8 FUT GLOBEX", crude.FullName);
+            Security goog = Security.Parse("GOOG");
+            Assert.AreEqual("GOOG", goog.FullName);
+
 
             
         }
