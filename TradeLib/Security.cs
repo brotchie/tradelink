@@ -27,6 +27,11 @@ namespace TradeLib
         public string FullName { get { return ToString(); } }
         public override string ToString()
         {
+            string[] r = { _sym, _type.ToString(), _destex };
+            return string.Join(" ", r);
+        }
+        public string Serialize()
+        {
             int t = (int)_type;
             string[] r = { _sym, t.ToString(), _destex };
             return string.Join(" ", r);
