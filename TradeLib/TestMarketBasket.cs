@@ -54,6 +54,12 @@ namespace TestTradeLib
             compare = MarketBasket.FromString(mb.ToString());
             Assert.That(compare.Count==0);
 
+            mb.Clear();
+            Security longform = Security.Parse("CLZ8 FUT NYMEX");
+            mb.Add(longform);
+            compare = MarketBasket.FromString(mb.ToString());
+            Assert.AreEqual(longform.ToString(),compare[0].ToString());
+
 
 
         }

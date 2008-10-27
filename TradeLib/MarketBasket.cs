@@ -68,7 +68,7 @@ namespace TradeLib
         public override string  ToString()
         {
             List<string> s = new List<string>();
-            for (int i = 0; i < symbols.Count; i++) s.Add(Get(i).Symbol);
+            for (int i = 0; i < symbols.Count; i++) s.Add(Get(i).ToString());
             return string.Join(",", s.ToArray());
         }
         public static MarketBasket FromString(string serialBasket)
