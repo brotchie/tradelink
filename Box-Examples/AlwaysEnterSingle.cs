@@ -18,6 +18,7 @@ namespace BoxExamples
         {
             Name = "AlwaysEnter";
             MinSize = 1;
+            EntrySize = 1;
             DayStart = 0;
             DayEnd = 3000;
         }
