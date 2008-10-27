@@ -39,7 +39,8 @@ namespace ASP
         void tl_gotOrder(Order o)
         {
             int[] idxs = new int[0];
-            symidx.TryGetValue(o.symbol, out idxs);
+            if (!symidx.TryGetValue(o.symbol, out idxs))
+                return;
             foreach (int idx in idxs)
                 boxlist[idx].GotOrder(o);
         }
@@ -64,7 +65,8 @@ namespace ASP
                 ta.Save(t);
 
             int[] idxs = new int[0];
-            symidx.TryGetValue(t.symbol, out idxs);
+            if (!symidx.TryGetValue(t.symbol, out idxs))
+                return;
             foreach (int idx in idxs)
                 boxlist[idx].GotTick(t);
         }
@@ -78,7 +80,8 @@ namespace ASP
 
             count++;
             int[] idxs = new int[0];
-            symidx.TryGetValue(t.symbol, out idxs);
+            if (!symidx.TryGetValue(t.symbol, out idxs))
+                return;
             foreach (int idx in idxs)
                 boxlist[idx].GotFill(t);
         }
@@ -174,7 +177,7 @@ namespace ASP
                     return;
                 }
                 mb.Add(sec);
-                valid.Add(sym);
+                valid.Add(sec.Symbol);
                 if (!seclist.ContainsKey(sec.Symbol))
                 {
                     lock (seclist) // potentially used by other threads, so we lock it
