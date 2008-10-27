@@ -46,8 +46,6 @@ echo TIME and SALES
 xcopy /q /y ..\TimeAndSales\bin\Release\TimeSales.exe* .
 echo SPLITEPF
 xcopy /q /y ..\SplitEPF\bin\Release\SplitEPF.exe .
-echo EPF2IDX
-xcopy /q /y ..\EPF2IDX\bin\Release\EPF2IDX.exe .
 echo CHARTOGRAPHER
 xcopy /q /y ..\Chartographer\bin\Release\Chartographer.exe* .
 echo TATTLE
