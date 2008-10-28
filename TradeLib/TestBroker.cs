@@ -131,24 +131,30 @@ namespace TestTradeLib
         public void MultiAccount()
         {
             const string sym = "TST";
-            Order o = new BuyMarket(sym,100);
+
             const string me = "tester";
             const string other = "anotherguy";
             Account a = new Account(me);
             Account b = new Account(other);
             Account c = new Account("sleeper");
+            Order oa = new BuyMarket(sym,100);
+            Order ob = new BuyMarket(sym, 100);
+            oa.Account = me;
+            ob.Account = other;
             // send order to account for jfranta
-            Assert.That(broker.sendOrder(o, a)>0);
-            Assert.That(broker.sendOrder(o, b)>0);
+            Assert.That(broker.sendOrder(oa)>0);
+            Assert.That(broker.sendOrder(ob)>0);
             Tick t = new Tick(sym);
             t.trade = 100m;
             t.size = 200;
-            Assert.That(broker.Execute(t)==2);
+            Assert.AreEqual(2,broker.Execute(t));
             Position apos = broker.GetOpenPosition(sym,a);
             Position bpos = broker.GetOpenPosition(sym,b);
             Position cpos = broker.GetOpenPosition(sym, c);
-            Assert.That(apos.isLong && (apos.Size == 100));
-            Assert.That(bpos.isLong && (bpos.Size == 100));
+            Assert.That(apos.isLong);
+            Assert.AreEqual(100,apos.Size);
+            Assert.That(bpos.isLong);
+            Assert.AreEqual(100,bpos.Size);
             Assert.That(cpos.isFlat);
             // make sure that default account doesn't register
             // any trades

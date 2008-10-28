@@ -95,13 +95,7 @@ namespace TradeLib
             this.xtime = this.time;
             this.xdate = this.date;
         }
-        public void Fill(Tick t)
-        {
-            this.xprice = t.trade;
-            this.xsize = this.size;
-            this.xtime = t.time;
-            this.xdate = t.date;
-        }
+
         public void Fill(decimal xp, int xs, int xt)
         {
             this.xprice = xp;

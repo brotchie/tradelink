@@ -93,6 +93,27 @@ namespace TradeLib
         }
 
         /// <summary>
+        /// Fills this order with a tick
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public void Fill(Tick t)
+        {
+            if (!t.isTrade) return;
+            if ((isLimit && Side && (t.trade <= price)) // buy limit
+                || (isLimit && !Side && (t.trade>=price))// sell limit
+                || (isStop && Side && (t.trade>=stopp)) // buy stop
+                || (isStop && !Side && (t.trade<=stopp)) // sell stop
+                || isMarket)
+            {
+                this.xprice = t.trade;
+                this.xsize = t.TradeSize >= size ? size : t.TradeSize;
+                this.xtime = t.time;
+                this.xdate = t.date;
+            } 
+        }
+
+        /// <summary>
         /// Serialize order as a string
         /// </summary>
         /// <returns></returns>
