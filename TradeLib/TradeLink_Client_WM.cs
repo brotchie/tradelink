@@ -21,16 +21,17 @@ namespace TradeLib
         public event TL2MsgDelegate gotSupportedFeatures;
         public event PositionDelegate gotPosition;
 
-        public TradeLink_Client_WM() : this("TradeLinkClient",true) { }
+        public TradeLink_Client_WM() : this("TradeLinkClient",true,true) { }
+        public TradeLink_Client_WM(string clientname, bool showwarningonmissing) : this(clientname, showwarningonmissing, true) { }
 
-        public TradeLink_Client_WM(string clientname, bool showarmingonmissingserver)
+        public TradeLink_Client_WM(string clientname, bool showarmingonmissingserver, bool handleexceptions)
             : base()
         {
             this.Text = WMUtil.GetUniqueWindow(clientname);
             this.WindowState = FormWindowState.Minimized;
             this.ShowInTaskbar = false;
             this.Hide();
-            this.Mode(this.TLFound(), false, showarmingonmissingserver);
+            this.Mode(this.TLFound(), handleexceptions, showarmingonmissingserver);
         }
 
         string _servername = WMUtil.SIMWINDOW;
