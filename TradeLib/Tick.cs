@@ -20,9 +20,9 @@ namespace TradeLib
         public decimal ask;
         public int bs;
         public int os;
-        public string be;
-        public string oe;
-        public string ex;
+        public string be = "";
+        public string oe = "";
+        public string ex = "";
         public bool IndexTick { get { return size < 0; } }
         public bool hasBid { get { return (bid != 0) && (bs != 0); } }
         public bool hasAsk { get { return (ask != 0) && (os != 0); } }
