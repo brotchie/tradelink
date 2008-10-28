@@ -68,7 +68,7 @@ namespace Kadina
             else if (t.hasAsk && !isDesiredExchange(t.oe)) return;
 
             // add tick to grid
-            NewTRow(new object[] { nowtime, t.symbol,t.trade, t.size, t.bid, t.ask, t.bs, t.os });
+            NewTRow(new object[] { nowtime, t.symbol,t.trade, t.size, t.bid, t.ask, t.bs, t.os, t.ex,t.be,t.oe });
         }
 
         void Play(object sender, DoWorkEventArgs e)
@@ -262,6 +262,9 @@ namespace Kadina
             dt.Columns.Add("Ask", new Decimal().GetType());
             dt.Columns.Add("BSize", new Int32().GetType());
             dt.Columns.Add("ASize", new Int32().GetType());
+            dt.Columns.Add("TExch");
+            dt.Columns.Add("BidExch");
+            dt.Columns.Add("AskExch");
             dg.TableStyles.Clear();
             dg.TableStyles.Add(new DataGridTableStyle());
             dg.TableStyles[0].GridColumnStyles.Clear();
@@ -560,7 +563,7 @@ namespace Kadina
             }
             else if (e.Cancelled) status("Canceled play.");
             else status("Reached next " + pt.ToString() + " at time " + KadTime);
-            if (ContextMenu.MenuItems.Count > 3) // remove cancel option
+            if (ContextMenu.MenuItems.Count > 2) // remove cancel option
                 ContextMenu.MenuItems.RemoveAt(ContextMenu.MenuItems.Count - 1);
         }
 
