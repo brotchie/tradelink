@@ -44,11 +44,14 @@ namespace TradeLib
         public Chart(BarList b,bool allowtype)
         {
             InitializeComponent();
-            bl = b;
-            Symbol = b.Symbol;
             Paint += new PaintEventHandler(Chart_Paint);
             MouseWheel +=new MouseEventHandler(Chart_MouseUp);
             if (allowtype) this.KeyUp += new KeyEventHandler(Chart_KeyUp);
+            if (b != null)
+            {
+                bl = b;
+                Symbol = b.Symbol;
+            }
         }
 
         /// <summary>
@@ -105,7 +108,8 @@ namespace TradeLib
             Text = Title;
             r = ClientRectangle;
             pixperbar = (((decimal)r.Width - (decimal)border - ((decimal)border/3)) / (decimal)barc);
-            pixperdollar = (((decimal)r.Height - (decimal)border * 2) / (highesth - lowestl));
+            decimal range = (highesth - lowestl);
+            pixperdollar = range == 0 ? 0 : (((decimal)r.Height - (decimal)border * 2) / range);
             Pen p = new Pen(Color.Black);
             g = e.Graphics;
             Form f = (Form)sender;
@@ -126,36 +130,40 @@ namespace TradeLib
             {
                 Color bcolor = (bl.Get(i).Close > bl.Get(i).Open) ? Color.Green : Color.Red;
                 p = new Pen(bcolor);
-                // draw high/low bar
-                g.DrawLine(p, getX(i), getY(bl.Get(i).Low), getX(i), getY(bl.Get(i).High));
-                // draw open bar
-                g.DrawLine(p, getX(i), getY(bl.Get(i).Open), getX(i) - (int)(pixperbar / 3), getY(bl.Get(i).Open));
-                // draw close bar
-                g.DrawLine(p, getX(i), getY(bl.Get(i).Close), getX(i) + (int)(pixperbar / 3), getY(bl.Get(i).Close));
-                // draw time labels (time @30min and date@noon)
+                try
+                {
+                    // draw high/low bar
+                    g.DrawLine(p, getX(i), getY(bl.Get(i).Low), getX(i), getY(bl.Get(i).High));
+                    // draw open bar
+                    g.DrawLine(p, getX(i), getY(bl.Get(i).Open), getX(i) - (int)(pixperbar / 3), getY(bl.Get(i).Open));
+                    // draw close bar
+                    g.DrawLine(p, getX(i), getY(bl.Get(i).Close), getX(i) + (int)(pixperbar / 3), getY(bl.Get(i).Close));
+                    // draw time labels (time @30min and date@noon)
 
-                if (bl.Int != BarInterval.Day)
-                {
-                    if ((i % 6) == 0) g.DrawString(bl.Get(i).Bartime.ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (f.Font.GetHeight() * 3));
-                    if (bl.Get(i).Bartime == 1200) g.DrawString(bl.Get(i).Bardate.ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (float)(f.Font.GetHeight() * 1.5));
-                }
-                else
-                {
-                    int[] date = BarMath.Date(bl.Get(i).Bardate);
-                    int[] lastbardate = date;
-                    if ((i-1)>0) lastbardate = BarMath.Date(bl.Get(i-1).Bardate);
-                    if ((getX(lastlabelcoord) + minxlabelwidth) <= getX(i))
+                    if (bl.Int != BarInterval.Day)
                     {
-                        lastlabelcoord = i;
-                        g.DrawString(date[2].ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (f.Font.GetHeight() * 3));
+                        if ((i % 6) == 0) g.DrawString(bl.Get(i).Bartime.ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (f.Font.GetHeight() * 3));
+                        if (bl.Get(i).Bartime == 1200) g.DrawString(bl.Get(i).Bardate.ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (float)(f.Font.GetHeight() * 1.5));
                     }
-                    if ((i == 0) || (lastbardate[1] != date[1]))
+                    else
                     {
-                        string ds = date[1].ToString();
-                        if ((i==0)||(lastbardate[0]!=date[0])) ds += '/'+date[0].ToString();
-                        g.DrawString(ds, f.Font, new SolidBrush(fgcol), getX(i), r.Height - (float)(f.Font.GetHeight() * 1.5));
+                        int[] date = BarMath.Date(bl.Get(i).Bardate);
+                        int[] lastbardate = date;
+                        if ((i - 1) > 0) lastbardate = BarMath.Date(bl.Get(i - 1).Bardate);
+                        if ((getX(lastlabelcoord) + minxlabelwidth) <= getX(i))
+                        {
+                            lastlabelcoord = i;
+                            g.DrawString(date[2].ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (f.Font.GetHeight() * 3));
+                        }
+                        if ((i == 0) || (lastbardate[1] != date[1]))
+                        {
+                            string ds = date[1].ToString();
+                            if ((i == 0) || (lastbardate[0] != date[0])) ds += '/' + date[0].ToString();
+                            g.DrawString(ds, f.Font, new SolidBrush(fgcol), getX(i), r.Height - (float)(f.Font.GetHeight() * 1.5));
+                        }
                     }
                 }
+                catch (OverflowException) { }
             }
 
             // DRAW YLABELS
