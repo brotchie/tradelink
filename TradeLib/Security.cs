@@ -96,8 +96,12 @@ namespace TradeLib
             get
             {
                 if (!hasHistorical) return new Tick();
-                Tick t = (Tick)eSigTick.FromStream(Symbol, _histfile);
-                if (!t.isValid) _histfile.Close();
+                Tick t = new Tick();
+                do
+                {
+                    t = (Tick)eSigTick.FromStream(Symbol, _histfile);
+                } while ((!t.isValid) && hasHistorical);
+                if (!t.isValid) { _histfile.Close(); _histfile = null; }
                 return t;
             }
         }
