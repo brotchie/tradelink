@@ -45,7 +45,6 @@ namespace TradeLinkServer
 		bool IGNOREERRORS;
 		// for storing subscribed symbols and their tickerid
 		bool hasTicker(CString symbol);
-		std::vector<CString> stocktickers;
 		// following used because tick updates only include size or price that changed (not both)
 		std::vector<TLTick> stockticks;
 

@@ -370,18 +370,18 @@ namespace Quotopia
                 if (qt.Rows[i].RowState == DataRowState.Deleted) continue;
                 Security sec = Security.Parse(qt.Rows[i]["Symbol"].ToString());
                 string sym = sec.Symbol;
-                if (!symidx.ContainsKey(sym)) // if we've not seen this symbol add it's index
-                    symidx.Add(sym, new int[] { i });
+                if (!symidx.ContainsKey(sec.FullName)) // if we've not seen this symbol add it's index
+                    symidx.Add(sec.FullName, new int[] { i });
                 else
                 {
                     // otherwise create a new array with an extra spot
-                    int[] newidx = new int[symidx[sym].Length + 1];
+                    int[] newidx = new int[symidx[sec.FullName].Length + 1];
                     // copy the old indicies in
-                    symidx[sym].CopyTo(newidx, 0);
+                    symidx[sec.FullName].CopyTo(newidx, 0);
                     // save this latest index
-                    newidx[symidx[sym].Length] = i;
+                    newidx[symidx[sec.FullName].Length] = i;
                     // replace the old with the new
-                    symidx[sym] = newidx;
+                    symidx[sec.FullName] = newidx;
                 }
             }
         }

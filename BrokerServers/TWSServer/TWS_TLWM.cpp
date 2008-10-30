@@ -21,7 +21,7 @@ namespace TradeLinkServer
 	TWS_TLWM::~TWS_TLWM(void)
 	{
 		// cancel subscriptions
-		for (size_t i = 0; i<stocktickers.size(); i++)
+		for (size_t i = 0; i<stockticks.size(); i++)
 			this->m_link[this->validlinkids[0]]->cancelMktData((TickerId)i);
 		// disconnect from IB and unallocate memory
 		for (size_t i = 0; i<m_link.size(); i++)
@@ -351,8 +351,8 @@ namespace TradeLinkServer
 
 	bool TWS_TLWM::hasTicker(CString symbol)
 	{
-		for (size_t i = 0; i<stocktickers.size(); i++)
-			if (stocktickers[i]==symbol) return true;
+		for (size_t i = 0; i<stockticks.size(); i++)
+			if (stockticks[i].sym==symbol) return true;
 		return false;
 	}
 
@@ -376,9 +376,9 @@ namespace TradeLinkServer
 			else if (sec.type==STK)
 				contract.exchange = "NYSE";
 			contract.secType = TLSecurity::SecurityTypeName(sec.type);
-			this->m_link[this->validlinkids[0]]->reqMktData(stocktickers.size(),contract,"",false);
-			stocktickers.push_back(sec.sym);
+			this->m_link[this->validlinkids[0]]->reqMktData(stockticks.size(),contract,"",false);
 			TLTick k; // create blank tick
+			k.sym = stocks[cid][i]; // store long symbol
 			stockticks.push_back(k);
 			D(CString("Added IB subscription for ")+CString(sec.sym));
 		}
@@ -388,7 +388,7 @@ namespace TradeLinkServer
 
 	void TWS_TLWM::tickPrice( TickerId tickerId, TickType tickType, double price, int canAutoExecute) 
 	{ 
-		if ((tickerId>-1)&&(tickerId<stocktickers.size()) && needStock(stocktickers[tickerId]))
+		if ((tickerId>=0)&&(tickerId<stockticks.size()) && needStock(stockticks[tickerId].sym))
 		{
 			time_t now;
 			time(&now);
@@ -397,7 +397,7 @@ namespace TradeLinkServer
 			k.date = (ct.GetYear()*10000) + (ct.GetMonth()*100) + ct.GetDay();
 			k.time = (ct.GetHour()*100)+ct.GetMinute();
 			k.sec = ct.GetSecond();
-			k.sym = stocktickers[tickerId];
+			k.sym = stockticks[tickerId].sym;
 			if (tickType==LAST)
 			{
 				stockticks[tickerId].trade = price;
@@ -424,7 +424,7 @@ namespace TradeLinkServer
 	}
 	void TWS_TLWM::tickSize( TickerId tickerId, TickType tickType, int size) 
 	{ 
-		if ((tickerId>-1)&&(tickerId<stocktickers.size()) && needStock(stocktickers[tickerId]))
+		if ((tickerId>=0)&&(tickerId<stockticks.size()) && needStock(stockticks[tickerId].sym))
 		{
 			time_t now;
 			time(&now);
@@ -433,10 +433,12 @@ namespace TradeLinkServer
 			k.date = (ct.GetYear()*10000) + (ct.GetMonth()*100) + ct.GetDay();
 			k.time = (ct.GetHour()*100)+ct.GetMinute();
 			k.sec = ct.GetSecond();
-			k.sym = stocktickers[tickerId];
+			k.sym = stockticks[tickerId].sym;
+			TLSecurity sec = TLSecurity::Deserialize(k.sym);
+			bool hundrednorm = sec.type== STK;
 			if (tickType==LAST_SIZE)
 			{
-				stockticks[tickerId].size = size*100;
+				stockticks[tickerId].size = hundrednorm ? size*100 : size;
 				k.trade = stockticks[tickerId].trade;
 				k.size = stockticks[tickerId].size;
 			}

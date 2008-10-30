@@ -39,8 +39,7 @@ namespace TradeLinkServer
 		for (size_t i = 0; i<client.size(); i++)
 			for (size_t j = 0; j<stocks[i].size(); j++)
 			{
-				TLSecurity sec = TLSecurity::Deserialize(stocks[i][j]);
-				if (sec.sym.CompareNoCase(stock)==0)
+				if (stocks[i][j].CompareNoCase(stock)==0)
 					return i;
 			}
 		return -1;
@@ -51,8 +50,7 @@ namespace TradeLinkServer
 		for (size_t i = 0; i<stocks.size(); i++)
 			for (size_t j = 0; j<stocks[i].size(); j++)
 			{
-				TLSecurity sec = TLSecurity::Deserialize(stocks[i][j]);
-				if (sec.sym==stock) return true;
+				if (stocks[i][j]==stock) return true;
 			}
 		return false;
 	}
@@ -258,8 +256,7 @@ namespace TradeLinkServer
 		for (size_t i = 0; i<stocks.size(); i++)
 			for (size_t j = 0; j<stocks[i].size(); j++)
 			{
-				TLSecurity sec = TLSecurity::Deserialize(stocks[i][j]);
-				if (sec.sym==trade.symbol)
+				if (stocks[i][j]==trade.symbol)
 					SendMsg(EXECUTENOTIFY,trade.Serialize(),client[i]);
 			}
 	}
@@ -270,8 +267,7 @@ namespace TradeLinkServer
 		for (size_t i = 0; i<stocks.size(); i++)
 			for (size_t j = 0; j<stocks[i].size(); j++)
 			{
-				TLSecurity sec = TLSecurity::Deserialize(stocks[i][j]);
-				if (sec.sym==tick.sym)
+				if (stocks[i][j]==tick.sym)
 					SendMsg(TICKNOTIFY,tick.Serialize(),client[i]);
 			}
 	}
