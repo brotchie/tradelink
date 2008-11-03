@@ -97,9 +97,9 @@ namespace TradeLib
         /// </summary>
         /// <param name="t"></param>
         /// <returns></returns>
-        public void Fill(Tick t)
+        public bool Fill(Tick t)
         {
-            if (!t.isTrade) return;
+            if (!t.isTrade) return false;
             if ((isLimit && Side && (t.trade <= price)) // buy limit
                 || (isLimit && !Side && (t.trade>=price))// sell limit
                 || (isStop && Side && (t.trade>=stopp)) // buy stop
@@ -110,7 +110,9 @@ namespace TradeLib
                 this.xsize = t.TradeSize >= size ? size : t.TradeSize;
                 this.xtime = t.time;
                 this.xdate = t.date;
-            } 
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
