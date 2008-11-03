@@ -35,6 +35,53 @@ namespace TestTradeLib
         }
 
         [Test]
+        public void Fill()
+        {
+            const string s = "TST";
+            // market should fill on trade but not on quote
+            Order o = new BuyMarket(s, 100);
+            Assert.That(o.Fill(Tick.NewTrade(s, 9, 100)));
+            Assert.That(!o.Fill(Tick.NewBid(s, 8, 100)));
+
+            // buy limit
+
+            // limit should fill if order price is inside market
+            o = new BuyLimit(s, 100, 10m);
+            Assert.That(o.Fill(Tick.NewTrade(s, 9, 100)));
+            // shouldn't fill outside market
+            o = new BuyLimit(s, 100, 10m);
+            Assert.That(!o.Fill(Tick.NewTrade(s, 11, 100)));
+
+            // sell limit
+
+            // limit should fill if order price is inside market
+            o = new SellLimit(s, 100, 10m);
+            Assert.That(o.Fill(Tick.NewTrade(s, 11, 100)));
+            // shouldn't fill outside market
+            o = new SellLimit(s, 100, 10m);
+            Assert.That(!o.Fill(Tick.NewTrade(s, 9, 100)));
+
+            // buy stop
+
+            o = new BuyStop(s, 100, 10m);
+            Assert.That(o.Fill(Tick.NewTrade(s, 11, 100)));
+            // shouldn't fill outside market
+            o = new BuyStop(s, 100, 10m);
+            Assert.That(!o.Fill(Tick.NewTrade(s, 9, 100)));
+
+            // sell stop
+
+            o = new SellStop(s, 100, 10m);
+            Assert.That(o.Fill(Tick.NewTrade(s, 9, 100)));
+            // shouldn't fill outside market
+            o = new SellStop(s, 100, 10m);
+            Assert.That(!o.Fill(Tick.NewTrade(s, 11, 100)));
+
+
+
+        }
+
+        [Test]
         public void SerializationAndDeserialization()
         {
             // create an order
