@@ -92,7 +92,10 @@ namespace ASP
             if (listBox1.InvokeRequired)
                 listBox1.Invoke(new DebugDelegate(Debug), new object[] { message });
             else
+            {
                 listBox1.Items.Add(message);
+                listBox1.SelectedIndex = listBox1.Items.Count - 1;
+            }
         }
 
 
