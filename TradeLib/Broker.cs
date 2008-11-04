@@ -196,19 +196,15 @@ namespace TradeLib
                 { 
                     Order o = MasterOrders[a][i];
                     if (tick.symbol != o.symbol) continue; //make sure tick is for the right stock
-                    int mysize = (int)Math.Abs(o.size);
-                    if (((mysize <= availablesize) && (o.price == 0) && (o.stopp == 0)) || //market order
-                        (o.side && (mysize <= availablesize) && (tick.trade <= o.price) && (o.stopp == 0)) || // buy limit
-                        (!o.side && (mysize <= availablesize) && (tick.trade >= o.price) && (o.stopp == 0)) || //sell limit
-                        (o.side && (mysize <= availablesize) && (tick.trade >= o.stopp) && (o.price == 0)) || // buy stop
-                        (!o.side && (mysize <= availablesize) && (tick.trade <= o.stopp) && (o.price == 0))) // sell stop
-                    { // sort filled trades by symbol
+                    bool filled = o.Fill(tick); // fill our trade
+                    if (filled)
+                    {
+                        int mysize = (int)Math.Abs(o.size);
+                        tick.size -= mysize;
                         remove.Add(i);
                         if (!MasterTrades.ContainsKey(a.ID)) MasterTrades.Add(a.ID, new List<Trade>());
-                        o.Fill(tick); // fill our trade
-                        availablesize -= mysize; // don't let other trades fill on same tick
                         MasterTrades[a.ID].Add((Trade)o); // record trade
-                        if ((GotFill != null) && a.Notify) 
+                        if ((GotFill != null) && a.Notify)
                             GotFill((Trade)o); // notify subscribers after recording trade
                         filledorders++; // count the trade
                     }
@@ -299,6 +295,12 @@ namespace TradeLib
             }
             return pl;
         }
+
+        FillMode _fm = FillMode.HistBook;
+        /// <summary>
+        /// Gets or sets the fill mode this broker uses when executing orders
+        /// </summary>
+        public FillMode FillMode { get { return _fm; } set { _fm = value; } }
 
         /// <summary>
         /// Gets the closed PL for a particular symbol on the default account.
@@ -407,4 +409,9 @@ namespace TradeLib
         Echo,
     }
 
+    public enum FillMode
+    {
+        HistBook = 0,
+        OwnBook,
+    }
 }

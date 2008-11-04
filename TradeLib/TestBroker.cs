@@ -37,6 +37,27 @@ namespace TestTradeLib
             Assert.That(fills == 1);
             // no warnings since first warning
             Assert.That(warn == 1);
+
+            // test that a limit order is not filled outside the market
+            o = new BuyLimit(s, 100, 9);
+            broker.sendOrder(o);
+            Assert.AreEqual(0, broker.Execute(Tick.NewTrade(s, 10, 100)));
+            Assert.That(fills == 1); // redudant but for counting
+
+            // test that limit order is filled inside the market
+            Assert.AreEqual(1, broker.Execute(Tick.NewTrade(s, 8, 100)));
+            Assert.That(fills == 2);
+
+            // test that a market order is filled when opposite book exists
+            o = new BuyMarket(s, 100);
+            broker.sendOrder(o);
+            Assert.That(fills == 2);
+
+            // test that a market order is not filled when no book exists
+            // on opposite side
+            
+
+            
         }
         void broker_GotWarning(string msg)
         {
