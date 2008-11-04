@@ -308,7 +308,7 @@ namespace TradeLib
             return pl;
         }
 
-        FillMode _fm = FillMode.HistBook;
+        FillMode _fm = FillMode.OwnBook;
         /// <summary>
         /// Gets or sets the fill mode this broker uses when executing orders
         /// </summary>
@@ -423,7 +423,7 @@ namespace TradeLib
 
     public enum FillMode
     {
-        HistBook = 0,
-        OwnBook,
+        OwnBook = 0,
+        HistBookOnly = 1,
     }
 }
