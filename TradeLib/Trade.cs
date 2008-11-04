@@ -58,7 +58,7 @@ namespace TradeLib
             xtime = copytrade.xtime;
             xdate = copytrade.xdate;
         }
-        public decimal Price { get { return xprice; } }
+        public virtual decimal Price { get { return xprice; } }
         public virtual bool isValid { get { return (xsize != 0) && (xprice != 0) && (xtime != 0) && (xdate != 0) && (symbol != null) && (symbol!=""); } }
         /// <summary>
         /// true if this is a real Trade, otherwise it's still an order.

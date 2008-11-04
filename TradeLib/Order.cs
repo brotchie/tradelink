@@ -18,6 +18,13 @@ namespace TradeLib
         public bool isStop { get { return (stopp != 0); } }
         public int SignedSize { get { return Math.Abs(size) * (side ? 1 : -1); } }
         public int UnSignedSize { get { return Math.Abs(size); } }
+        public override decimal Price
+        {
+            get
+            {
+                return isStop ? stopp : price; 
+            }
+        }
         public Order(Order copythis)
         {
             this.symbol = copythis.symbol;
@@ -107,9 +114,32 @@ namespace TradeLib
                 || isMarket)
             {
                 this.xprice = t.trade;
-                this.xsize = t.TradeSize >= size ? size : t.TradeSize;
+                this.xsize = t.TradeSize >= UnSignedSize ? size : t.TradeSize;
                 this.xtime = t.time;
                 this.xdate = t.date;
+                return true;
+            }
+            return false;
+        }
+        /// <summary>
+        /// Try to fill incoming order against this order.  If orders match.
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns>order can be cast to valid Trade and function returns true.  Otherwise, false</returns>
+        public bool Fill(Order o)
+        {
+            if (Side==o.side) return false;
+            if (!o.isValid) return false;
+            if ((isLimit && Side && (o.Price<=Price)) // buy limit cross
+                || (isLimit && !Side && (o.Price>=Price))// sell limit cross
+                || (isStop && Side && (o.Price>=stopp)) // buy stop
+                || (isStop && !Side && (o.price<=stopp)) // sell stop
+                || isMarket)
+            {
+                this.xprice = o.isLimit ? o.Price : o.stopp;
+                this.xsize = o.UnSignedSize >= UnSignedSize? UnSignedSize : o.UnSignedSize;
+                this.xtime = o.time;
+                this.xdate = o.date;
                 return true;
             }
             return false;

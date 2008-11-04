@@ -48,13 +48,23 @@ namespace TestTradeLib
             Assert.AreEqual(1, broker.Execute(Tick.NewTrade(s, 8, 100)));
             Assert.That(fills == 2);
 
+            Order x = new Order();
             // test that a market order is filled when opposite book exists
-            o = new BuyMarket(s, 100);
+            o = new SellLimit(s, 100, 11);
+            x = new BuyMarket(s, 100);
+            broker.FillMode = FillMode.OwnBook;
             broker.sendOrder(o);
-            Assert.That(fills == 2);
+            broker.sendOrder(x);
+            Assert.AreEqual(3, fills); 
 
             // test that a market order is not filled when no book exists
             // on opposite side
+
+            // clear existing orders
+            broker.CancelOrders();
+            o = new SellMarket(s, 100);
+            broker.sendOrder(o);
+            Assert.AreEqual(3, fills);
             
 
             

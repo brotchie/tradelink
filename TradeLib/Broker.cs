@@ -115,6 +115,18 @@ namespace TradeLib
         protected void AddOrder(Order o,Account a) 
         {
             if (!a.isValid) throw new Exception("Invalid account provided"); // account must be good
+            if (FillMode== FillMode.OwnBook)
+            {
+                Order match = BestBidOrOffer(o.Symbol, !o.Side);
+                bool filled = o.Fill(match);
+                int avail = o.UnSignedSize;
+                if (filled && (GotFill != null))
+                    GotFill((Trade)o);
+                if (filled)
+                    o.size = (avail - Math.Abs(o.xsize)) * (o.Side ? 1 : -1);
+                if (Math.Abs(o.xsize) == avail) return;
+               
+            }
             if (!MasterOrders.ContainsKey(a))  // see if we have a book for this account
                 MasterOrders.Add(a,new List<Order>()); // if not, create one
             o.Account = a.ID; // make sure order knows his account
@@ -162,7 +174,7 @@ namespace TradeLib
         /// <returns>order id if order was accepted, zero otherwise</returns>
         public uint sendOrder(Order o,Account a)
         {
-            if ((!o.isValid) || (!a.isValid))
+            if (!o.isValid || !a.isValid)
             {
                 if (GotWarning != null)
                     GotWarning(!o.isValid ? "Invalid order: " + o.ToString() : "Invalid Account" + a.ToString());

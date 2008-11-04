@@ -77,7 +77,30 @@ namespace TestTradeLib
             o = new SellStop(s, 100, 10m);
             Assert.That(!o.Fill(Tick.NewTrade(s, 11, 100)));
 
+            // always fail filling an invalid tick
+            o = new BuyMarket(s, 100);
+            Assert.IsFalse(o.Fill(Tick.NewTrade(s, 0, 0)));
 
+            // always fail filling invalid order
+            o = new BuyLimit(s, 100, 10);
+            Order x = new Order();
+            Assert.IsFalse(o.Fill(x));
+
+            // always fail filling an order that doesn't cross market
+            x = new BuyMarket(s, 100);
+            Assert.IsFalse(o.Fill(x));
+
+            // suceed on crossing market
+            x = new SellMarket(s,100);
+            Assert.IsTrue(o.Fill(x));
+
+            // fail on match outside of market
+            x = new SellLimit(s, 100, 11);
+            Assert.IsFalse(o.Fill(x));
+
+            // succeed on limit cross
+            x = new SellLimit(s, 100, 10);
+            Assert.IsTrue(o.Fill(x));
 
         }
 
