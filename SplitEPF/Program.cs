@@ -7,9 +7,10 @@ namespace SplitEPF
     {
         static void Main(string[] args)
         {
-//            Console.ForegroundColor = ConsoleColor.Black;
-            //Console.BackgroundColor = ConsoleColor.White;
-            const string PATH = "C:\\Documents and Settings\\josh.franta\\My Documents\\Notes\\Archive\\TickFiles\\";
+            Console.WriteLine("We recommend you store your tick files that need spliting in a seperate directory.");
+            Console.WriteLine("Then run split EPF on this isolated directory.");
+            Console.WriteLine("Enter a path to scan for EPF files to split: ");
+            string PATH = Console.ReadLine();
             string p = "";
             if (args.Length>0) p = args[1];
             else p = PATH;
