@@ -25,21 +25,7 @@ TLStock::TLStock(const char* symbol, bool load):
     m_stockHandle(NULL),
     m_level1(NULL),
     m_level2(NULL),
-    m_prints(NULL),
-    m_owningListBox(NULL),
-//        m_loaded(false),
-    m_index(0xFFFFFFFF),
-    m_bidIterator(NULL),
-    m_askIterator(NULL),
-    m_stockCalcsLevelsBid(NULL),
-    m_stockCalcsLevelsAsk(NULL),
-    m_stockCalcsPricesBid(NULL),
-    m_stockCalcsPricesAsk(NULL),
-    m_levelBidIterator(NULL),
-    m_levelAskIterator(NULL),
-    m_priceBidIterator(NULL),
-    m_priceAskIterator(NULL),
-    m_position(NULL)
+    m_prints(NULL)
 {
     if(load)
     {
@@ -47,76 +33,8 @@ TLStock::TLStock(const char* symbol, bool load):
     }
 }
 
-void TLStock::SetPosition(Position* pos)
-{
-    if(m_position != pos)
-    {
-        if(m_position)
-        {
-            m_position->Remove(this);
-        }
-        m_position = pos;
-        if(m_position)
-        {
-            m_position->Add(this);
-        }
-    }
-}
-
 void TLStock::Clear()
 {
-    if(m_bidIterator)
-    {
-        B_DestroyIterator(m_bidIterator);
-        m_bidIterator = NULL;
-    }
-    if(m_askIterator)
-    {
-        B_DestroyIterator(m_askIterator);
-        m_askIterator = NULL;
-    }
-
-    if(m_levelBidIterator)
-    {
-        B_DestroyIterator(m_levelBidIterator);
-        m_levelBidIterator = NULL;
-    }
-    if(m_levelAskIterator)
-    {
-        B_DestroyIterator(m_levelAskIterator);
-        m_levelAskIterator = NULL;
-    }
-    if(m_priceBidIterator)
-    {
-        B_DestroyIterator(m_priceBidIterator);
-        m_priceBidIterator = NULL;
-    }
-    if(m_priceAskIterator)
-    {
-        B_DestroyIterator(m_priceAskIterator);
-        m_priceAskIterator = NULL;
-    }
-
-    if(m_stockCalcsLevelsBid)
-    {
-        B_DestroyStockCalc(m_stockCalcsLevelsBid);
-        m_stockCalcsLevelsBid = NULL;
-    }
-    if(m_stockCalcsLevelsAsk)
-    {
-        B_DestroyStockCalc(m_stockCalcsLevelsAsk);
-        m_stockCalcsLevelsAsk = NULL;
-    }
-    if(m_stockCalcsPricesBid)
-    {
-        B_DestroyStockCalc(m_stockCalcsPricesBid);
-        m_stockCalcsPricesBid = NULL;
-    }
-    if(m_stockCalcsPricesAsk)
-    {
-        B_DestroyStockCalc(m_stockCalcsPricesAsk);
-        m_stockCalcsPricesAsk = NULL;
-    }
     if(m_level1)
     {
         m_level1->Remove(this);
@@ -151,139 +69,14 @@ void TLStock::Load()
 		m_prints = B_GetPrints(m_stockHandle);
 		m_account = B_GetCurrentAccount();
 
-	//Add 'this' as an Observer to a bunch of Observables.
+		//Add 'this' as an Observer to a bunch of Observables.
 		m_level1->Add(this);
 		m_prints->Add(this);
 	    m_level2->Add(this);
 		m_account->Add(this);
-
-		bool ecnsOnly = false;
-		bool twoDecPlaces = false;
-
-
-		unsigned int bookQuotesIntegrated[MAX_BOOKS];
-		for(unsigned int i = 0; i < MAX_BOOKS; i++)
-		{
-			if(i == NYSE_BOOK)
-			{
-				bookQuotesIntegrated[i] = 0;
-			}
-			else
-			{
-				bookQuotesIntegrated[i] = 0xFFFFFFFF;
-			}
-		}
-
-		twoDecPlaces = true;
 	}
-	else
-	{
-		//m_owningListBox->IncrementInvalidCount();
-	}
+
 }
-
-void TLStock::SetUseMmBooks(bool use)
-{
-    if(m_stockHandle != NULL)
-    {
-        if(m_stockCalcsPricesBid)
-        {
-			B_SetStockCalcMmBookLines(m_stockCalcsPricesBid, use ? 0xFFFFFFFF : 0);
-        }
-        if(m_stockCalcsPricesAsk)
-        {
-            B_SetStockCalcMmBookLines(m_stockCalcsPricesAsk, use ? 0xFFFFFFFF : 0);
-        }
-        if(m_stockCalcsLevelsBid)
-        {
-            B_SetStockCalcMmBookLines(m_stockCalcsLevelsBid, use ? 0xFFFFFFFF : 0);
-        }
-        if(m_stockCalcsLevelsAsk)
-        {
-            B_SetStockCalcMmBookLines(m_stockCalcsLevelsAsk, use ? 0xFFFFFFFF : 0);
-        }
-    }
-}
-
-void TLStock::SetEcnsOnlyBeforeAfterMarket(bool ecnsOnly)
-{
-    if(m_stockHandle != NULL)
-    {
-        if(m_stockCalcsPricesBid)
-        {
-            B_SetStockCalcEcnsOnlyBeforeAfterMarket(m_stockCalcsPricesBid, ecnsOnly);
-        }
-        if(m_stockCalcsPricesAsk)
-        {
-            B_SetStockCalcEcnsOnlyBeforeAfterMarket(m_stockCalcsPricesAsk, ecnsOnly);
-        }
-        if(m_stockCalcsLevelsBid)
-        {
-            B_SetStockCalcEcnsOnlyBeforeAfterMarket(m_stockCalcsLevelsBid, ecnsOnly);
-        }
-        if(m_stockCalcsLevelsAsk)
-        {
-            B_SetStockCalcEcnsOnlyBeforeAfterMarket(m_stockCalcsLevelsAsk, ecnsOnly);
-        }
-    }
-}
-
-void TLStock::SetEcnsOnlyDuringMarket(bool ecnsOnly)
-{
-    if(m_stockHandle != NULL)
-    {
-        if(m_stockCalcsPricesBid)
-        {
-            B_SetStockCalcEcnsOnlyDuringMarket(m_stockCalcsPricesBid, ecnsOnly);
-        }
-        if(m_stockCalcsPricesAsk)
-        {
-            B_SetStockCalcEcnsOnlyDuringMarket(m_stockCalcsPricesAsk, ecnsOnly);
-        }
-        if(m_stockCalcsLevelsBid)
-        {
-            B_SetStockCalcEcnsOnlyDuringMarket(m_stockCalcsLevelsBid, ecnsOnly);
-        }
-        if(m_stockCalcsLevelsAsk)
-        {
-            B_SetStockCalcEcnsOnlyDuringMarket(m_stockCalcsLevelsAsk, ecnsOnly);
-        }
-    }
-}
-
-void TLStock::SetMonitorThroughLimit(const Money& throughLimit)
-{
-    if(m_stockHandle != NULL)
-    {
-        if(m_stockCalcsPricesBid)
-        {
-            B_SetStockCalcThroughLimit(m_stockCalcsPricesBid, throughLimit);
-        }
-        if(m_stockCalcsPricesAsk)
-        {
-            B_SetStockCalcThroughLimit(m_stockCalcsPricesAsk, throughLimit);
-        }
-    }
-}
-
-void TLStock::SetMonitorLevelLimit(unsigned int levelLimit)
-{
-    if(m_stockHandle != NULL)
-    {
-        if(m_stockCalcsLevelsBid)
-        {
-            B_SetStockCalcLevelLimit(m_stockCalcsLevelsBid, levelLimit);
-        }
-        if(m_stockCalcsLevelsAsk)
-        {
-            B_SetStockCalcLevelLimit(m_stockCalcsLevelsAsk, levelLimit);
-        }
-    }
-}
-
-
-
-
 
 
 void TLStock::Process(const Message* message, Observable* from, const Message* additionalInfo)
