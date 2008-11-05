@@ -255,6 +255,7 @@ namespace TradeLib
         public void Reset()
         {
             CancelOrders();
+            acctlist.Clear();
             MasterOrders.Clear();
             MasterTrades.Clear();
             AddAccount(DEFAULT);
