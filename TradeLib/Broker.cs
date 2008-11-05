@@ -37,7 +37,7 @@ namespace TradeLib
 
         }
         public const string DEFAULTBOOK = "DEFAULT";
-        protected Account DEFAULT = new Account(DEFAULTBOOK,"Defacto account when account not provided");
+        protected Account DEFAULT = new Account(DEFAULTBOOK, "Defacto account when account not provided");
         protected Dictionary<Account, List<Order>> MasterOrders = new Dictionary<Account, List<Order>>();
         protected Dictionary<string, List<Trade>> MasterTrades = new Dictionary<string, List<Trade>>();
         protected List<Order> Orders { get { return MasterOrders[DEFAULT]; } set { MasterOrders[DEFAULT] = value; } }
@@ -111,22 +111,40 @@ namespace TradeLib
             return add;
         }
 
-
         protected void AddOrder(Order o,Account a) 
         {
             if (!a.isValid) throw new Exception("Invalid account provided"); // account must be good
-            if (FillMode== FillMode.OwnBook)
+            if ((FillMode== FillMode.OwnBook) && a.Execute)
             {
+                // get best bid or offer from opposite side,
+                // see if we can match against this BBO and cross locally
                 Order match = BestBidOrOffer(o.Symbol, !o.Side);
-                bool filled = o.Fill(match);
-                int avail = o.UnSignedSize;
-                if (filled && (GotFill != null))
-                    GotFill((Trade)o);
-                if (filled)
-                    o.size = (avail - Math.Abs(o.xsize)) * (o.Side ? 1 : -1);
-                if (Math.Abs(o.xsize) == avail) return;
-               
+
+                // first we need to make sure the book we're matching to allows executions
+                Account ma = new Account();
+                if (acctlist.TryGetValue(match.Account,out ma) && ma.Execute) 
+                {
+                    // if it's allowed, try to match it
+                    bool filled = o.Fill(match);
+                    int avail = o.UnSignedSize;
+                    // if it matched 
+                    if (filled)
+                    {
+                        // record trade
+                        MasterTrades[a.ID].Add((Trade)o); 
+                        // notify the trade occured
+                        if (GotFill != null) 
+                            GotFill((Trade)o);
+
+                        // update the order's size (in case it was a partial fill)
+                        o.size = (avail - Math.Abs(o.xsize)) * (o.Side ? 1 : -1);
+
+                        // if it was a full fill, no need to add order to the book
+                        if (Math.Abs(o.xsize) == avail) return;
+                    }
+                }
             }
+            // add any remaining order to book as new liquidity route
             if (!MasterOrders.ContainsKey(a))  // see if we have a book for this account
                 MasterOrders.Add(a,new List<Order>()); // if not, create one
             o.Account = a.ID; // make sure order knows his account
@@ -163,7 +181,10 @@ namespace TradeLib
         { 
             if (o.Account=="")
                 return sendOrder(o, DEFAULT);
-            return sendOrder(o, new Account(o.Account));
+            Account a = new Account();
+            if (!acctlist.TryGetValue(o.Account,out a))
+                AddAccount(new Account(o.Account));
+            return sendOrder(o, acctlist[o.Account]);
 
         }
         /// <summary>
@@ -236,8 +257,16 @@ namespace TradeLib
             CancelOrders();
             MasterOrders.Clear();
             MasterTrades.Clear();
-            MasterOrders.Add(DEFAULT, new List<Order>());
-            MasterTrades.Add(DEFAULT.ID, new List<Trade>());
+            AddAccount(DEFAULT);
+        }
+        protected Dictionary<string, Account> acctlist = new Dictionary<string, Account>();
+        protected void AddAccount(Account a)
+        {
+            Account t = null;
+            if (acctlist.TryGetValue(a.ID, out t)) return; // already had it
+            MasterOrders.Add(a, new List<Order>());
+            MasterTrades.Add(a.ID, new List<Trade>());
+            acctlist.Add(a.ID, a);
         }
         public void CancelOrders() 
         {
