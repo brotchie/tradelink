@@ -11,11 +11,8 @@ using namespace TradeLinkServer;
 
 
 #ifdef _DEBUG
-//#include "Shiny.h"
+#include "Shiny.h"
 #endif
-
-//const unsigned int TLStock::m_maxLevels = 4;
-//const Money TLStock::m_maxThrough = Money(0, 40);
 
 #pragma warning (disable:4355)
 
@@ -56,6 +53,9 @@ void TLStock::Clear()
 TLStock::~TLStock()
 {
     Clear();
+	PROFILER_UPDATE(); // update all profiles
+
+	PROFILER_OUTPUT_TREE_STRING();									
 }
 
 
@@ -81,6 +81,7 @@ void TLStock::Load()
 
 void TLStock::Process(const Message* message, Observable* from, const Message* additionalInfo)
 {
+	PROFILE_FUNC();
     switch(message->GetType())
     {
         case M_LEVEL2_QUOTE:
