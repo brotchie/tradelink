@@ -175,11 +175,17 @@ namespace TradeLib
         public void GoTest() { Disconnect(); himh = WMUtil.HisHandle(WMUtil.TESTWINDOW); LinkType = TLTypes.TESTBROKER; Register(); }
         IntPtr himh = IntPtr.Zero;
         protected long TLSend(TL2 type) { return TLSend(type, ""); }
+        delegate long TLSendDelegate(TL2 type, string msg);
         protected long TLSend(TL2 type, string m)
         {
-            if (himh == IntPtr.Zero) throw new TLServerNotFound();
-            long res = WMUtil.SendMsg(m, himh, Handle, (int)type);
-            return res;
+            if (InvokeRequired)
+                return (long)Invoke(new TLSendDelegate(TLSend), new object[] { type, m });
+            else
+            {
+                if (himh == IntPtr.Zero) throw new TLServerNotFound();
+                long res = WMUtil.SendMsg(m, himh, Handle, (int)type);
+                return res;
+            }
         }
         /// <summary>
         /// Sends the order.
