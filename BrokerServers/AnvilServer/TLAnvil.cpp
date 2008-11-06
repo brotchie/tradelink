@@ -438,8 +438,8 @@ int PosList(CString req)
     while(pos = B_GetNextPosition(iterator))
     {
 		TradeLinkServer::TLPosition p;
-		p.AvgPrice = pos->GetAverageExecPrice().GetMoneyValueForServer()/1024;
-		p.ClosedPL = pos->GetClosedPnl().GetMoneyValueForServer()/1024;
+		p.AvgPrice = pos->GetAverageExecPrice().GetMoneyValueForServer()/(double)1024;
+		p.ClosedPL = pos->GetClosedPnl().GetMoneyValueForServer()/(double)1024;
 		p.Size = pos->GetSize();
 		p.Symbol = CString(pos->GetSymbol());
 		CString msg = p.Serialize();
