@@ -216,6 +216,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\TLMarketBasket.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\TLOrder.cpp"
 				>
 			</File>
@@ -271,6 +275,10 @@
 			</File>
 			<File
 				RelativePath=".\TLClient_WM.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TLMarketBasket.h"
 				>
 			</File>
 			<File
