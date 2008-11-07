@@ -201,9 +201,10 @@ namespace TradeLib
                     GotWarning(!o.isValid ? "Invalid order: " + o.ToString() : "Invalid Account" + a.ToString());
                 return 0;
             }
-            AddOrder(o, a);
-            if ((GotOrder != null) && a.Notify) 
+            if ((GotOrder != null) && a.Notify)
                 GotOrder(o);
+            AddOrder(o, a);
+
             return o.id;
         }
 
