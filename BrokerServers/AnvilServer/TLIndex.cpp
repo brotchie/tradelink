@@ -68,7 +68,7 @@ void TLIdx::FillInfo()
 	double low = m_index->GetLow().toDouble();
 	double close = m_index->GetCloseValue().toDouble();
 
-	TradeLinkServer::TLTick k;
+	TradeLibFast::TLTick k;
 	k.sym = m_index->GetSymbol();
 	k.trade = val;
 	k.size = -1;

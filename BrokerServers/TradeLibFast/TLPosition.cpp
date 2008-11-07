@@ -2,7 +2,7 @@
 #include "TLPosition.h"
 #include "Util.h"
 
-namespace TradeLinkServer
+namespace TradeLibFast
 {
 
 	TLPosition::TLPosition() 

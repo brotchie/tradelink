@@ -1,7 +1,7 @@
 #pragma once
 #include "TLOrder.h"
 
-namespace TradeLinkServer 
+namespace TradeLibFast 
 {
 	class AFX_EXT_CLASS TLTrade : public TLOrder
 	{

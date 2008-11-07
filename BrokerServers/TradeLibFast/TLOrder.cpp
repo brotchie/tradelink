@@ -2,7 +2,7 @@
 #include "TLOrder.h"
 #include "Util.h"
 
-namespace TradeLinkServer
+namespace TradeLibFast
 {
 
 	TLOrder::TLOrder(void)

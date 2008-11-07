@@ -2,7 +2,7 @@
 #include "TLTrade.h"
 #include "Util.h"
 
-namespace TradeLinkServer
+namespace TradeLibFast
 {
 	TLTrade::TLTrade(void)
 	{

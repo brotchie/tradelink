@@ -5,7 +5,7 @@
 #include <fstream>
 #include "IBUtil.h"
 
-namespace TradeLinkServer
+namespace TradeLibFast
 {
 	const char* CONFIGFILE = "TwsServer.Config.txt";
 	const char* LINE = "-----------------------------------------------------";
@@ -212,7 +212,7 @@ namespace TradeLinkServer
 				gsplit(accts[i],",",all); // otherwise save em all
 		}
 		CString s = gjoin(all,","); // join em back together
-		SendMsg(ACCOUNTRESPONSE,s,clientname); // send the whole list
+		TLSend(ACCOUNTRESPONSE,s,clientname); // send the whole list
 		return OK;
 	}
 
@@ -280,7 +280,7 @@ namespace TradeLinkServer
 								const Order& order, const OrderState& orderState)
 	{
 
-			TradeLinkServer::TLOrder o;
+			TradeLibFast::TLOrder o;
 			o.id = orderId;
 			o.side = (order.action=="BUY");
 			o.size = abs(order.totalQuantity) * ((o.side) ? 1 : -1);

@@ -54,7 +54,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\TradeLinkServer"
+				AdditionalIncludeDirectories="..\TradeLibFast"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_AFXEXT"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -83,7 +83,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Business.lib Observer.lib Version.lib TradeLinkServer.lib"
+				AdditionalDependencies="Business.lib Observer.lib Version.lib TradeLibFast.lib"
 				OutputFile="$(OutDir)\$(ProjectName).dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -255,7 +255,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\Shiny\include;..\TradeLinkServer"
+				AdditionalIncludeDirectories="..\Shiny\include;..\TradeLibFast"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_AFXEXT"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="3"
@@ -284,7 +284,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Business.lib Observer.lib Version.lib TradeLinkServer.lib Shiny.lib"
+				AdditionalDependencies="Business.lib Observer.lib Version.lib TradeLibFast.lib Shiny.lib"
 				OutputFile="$(OutDir)\$(ProjectName).dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"

@@ -3,12 +3,12 @@
 #include "Monitor.h"
 #include "BusinessApi.h"
 #include "Messages.h"
-#include "TradeLinkServer.h"
+#include "TradeLibFast.h"
 #include "TradeLink.h"
 #include "TLAnvil.h"
 #include "AnvilUtil.h"
 #include "SendMsg.h"
-using namespace TradeLinkServer;
+using namespace TradeLibFast;
 
 std::vector<CString> accounts;
 std::vector<Order*> ordercache;
@@ -91,7 +91,7 @@ void Monitor::Process(const Message* message, Observable* from, const Message* a
 				CTime ct(msg->x_Time);
 				int xd = (ct.GetYear()*10000)+(ct.GetMonth()*100)+ct.GetDay();
 				int xt = (ct.GetHour()*100)+ct.GetMinute();
-				TradeLinkServer::TLTrade fill;
+				TradeLibFast::TLTrade fill;
 				fill.id = thisid;
 				fill.xsec = ct.GetSecond();
 				fill.xtime = xt;

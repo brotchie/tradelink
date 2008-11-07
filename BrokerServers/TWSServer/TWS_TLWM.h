@@ -8,7 +8,7 @@
 #include "Contract.h"
 #include "TradeLink_WM.h"
 
-namespace TradeLinkServer
+namespace TradeLibFast
 {
 
 	class TWS_TLWM :

@@ -261,7 +261,7 @@ int Sendorder(CString msg)
 {
 	if (msg=="") return GOTNULLORDER;
 
-	TradeLinkServer::TLOrder o = TradeLinkServer::TLOrder::Deserialize(msg);
+	TradeLibFast::TLOrder o = TradeLibFast::TLOrder::Deserialize(msg);
 	const StockBase* Stock = B_GetStockHandle(o.symbol);
 
 	Observable* m_account;
@@ -437,7 +437,7 @@ int PosList(CString req)
 	int count = 0;
     while(pos = B_GetNextPosition(iterator))
     {
-		TradeLinkServer::TLPosition p;
+		TradeLibFast::TLPosition p;
 		p.AvgPrice = pos->GetAverageExecPrice().GetMoneyValueForServer()/(double)1024;
 		p.ClosedPL = pos->GetClosedPnl().GetMoneyValueForServer()/(double)1024;
 		p.Size = pos->GetSize();

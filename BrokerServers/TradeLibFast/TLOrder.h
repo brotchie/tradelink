@@ -1,6 +1,6 @@
 #pragma once
 
-namespace TradeLinkServer 
+namespace TradeLibFast 
 {
 	class AFX_EXT_CLASS TLOrder 
 	{

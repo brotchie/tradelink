@@ -10,7 +10,7 @@
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
-using namespace TradeLinkServer;
+using namespace TradeLibFast;
 
 // CTWSServerDlg dialog
 

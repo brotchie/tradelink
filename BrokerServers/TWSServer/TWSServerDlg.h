@@ -34,7 +34,7 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 	CEdit m_status;
-	TradeLinkServer::TWS_TLWM* tl;
+	TradeLibFast::TWS_TLWM* tl;
 public:
 	void cstat(CString msg);
 	void status(LPCTSTR msg);

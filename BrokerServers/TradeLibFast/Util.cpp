@@ -28,22 +28,7 @@ void TLTimeNow(std::vector<int> & nowtime)
 	nowtime.push_back(sec);
 }
 
-int SendMsg(int type,LPCTSTR msg,CString windname) {
-	LRESULT result = 999;
-	HWND hdlAnVig = FindWindowA(NULL,(LPCSTR)(LPCTSTR)windname);
-	
-	if (hdlAnVig) {
-		COPYDATASTRUCT CD;  // windows-provided structure for this purpose
-		CD.dwData=type;		// stores type of message
-		int len = 0;
-		len = (int)strlen((char*)msg);
 
-		CD.cbData = len+1;
-		CD.lpData = (void*)msg;	//here's the data we're sending
-		result = SendMessageA(hdlAnVig,WM_COPYDATA,0,(LPARAM)&CD);
-	} 
-	return (int)result;
-}
 
 void gsplit(CString msg, CString del, std::vector<CString>& rec)
 {

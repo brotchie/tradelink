@@ -5,13 +5,13 @@
 #include "SendMsg.h"
 #include "TLAnvil.h"
 #include "TradeLink.h"
-#include "TradeLinkServer.h"
+#include "TradeLibFast.h"
 #include "AnvilUtil.h"
-using namespace TradeLinkServer;
+using namespace TradeLibFast;
 
 
 #ifdef _DEBUG
-#include "Shiny.h"
+
 #endif
 
 #pragma warning (disable:4355)
@@ -53,9 +53,7 @@ void TLStock::Clear()
 TLStock::~TLStock()
 {
     Clear();
-	PROFILER_UPDATE(); // update all profiles
-
-	PROFILER_OUTPUT_TREE_STRING();									
+						
 }
 
 
@@ -81,7 +79,7 @@ void TLStock::Load()
 
 void TLStock::Process(const Message* message, Observable* from, const Message* additionalInfo)
 {
-	PROFILE_FUNC();
+
     switch(message->GetType())
     {
         case M_LEVEL2_QUOTE:
@@ -101,7 +99,7 @@ void TLStock::Process(const Message* message, Observable* from, const Message* a
 				int date = (ct.GetYear()*10000) + (ct.GetMonth()*100) + ct.GetDay();
 				int time = (ct.GetHour()*100)+ct.GetMinute();
 				int sec = ct.GetSecond();
-				TradeLinkServer::TLTick tick;
+				TradeLibFast::TLTick tick;
 				tick.sym = msg->m_Symbol;
 				tick.date = date;
 				tick.time = time;

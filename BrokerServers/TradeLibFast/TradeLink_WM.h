@@ -6,7 +6,7 @@
 #include <vector>
 using namespace std;
 
-namespace TradeLinkServer
+namespace TradeLibFast
 {
 
 
@@ -37,6 +37,7 @@ namespace TradeLinkServer
 		typedef vector <CString> clientstocklist; // hold a single clients stocks
 		vector < clientstocklist > stocks; // map stocklist to id
 		int FindClientFromStock(CString stock);
+		int TLSend(int type,LPCTSTR msg,CString windname);
 		DECLARE_MESSAGE_MAP()
 
 	public:

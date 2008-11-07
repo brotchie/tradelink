@@ -47,7 +47,7 @@ BEGIN
     "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
     "LANGUAGE 9, 1\r\n"
     "#pragma code_page(1252)\r\n"
-    "#include ""res\\TradeLinkServer.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""res\\TradeLibFast.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
     "#include ""afxres.rc""     // Standard components\r\n"
     "#endif\r\n"
     "\0"
@@ -81,9 +81,9 @@ BEGIN
             VALUE "CompanyName", "TODO: <Company name>"
             VALUE "FileDescription", "TODO: <File description>"
             VALUE "FileVersion", "1.0.0.1"
-            VALUE "InternalName", "TradeLinkServer.dll"
+            VALUE "InternalName", "TradeLibFast.dll"
             VALUE "LegalCopyright", "TODO: (c) <Company name>.  All rights reserved."
-            VALUE "OriginalFilename", "TradeLinkServer.dll"
+            VALUE "OriginalFilename", "TradeLibFast.dll"
             VALUE "ProductName", "TODO: <Product name>"
             VALUE "ProductVersion", "1.0.0.1"
         END
@@ -112,7 +112,7 @@ END
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 LANGUAGE 9, 1
 #pragma code_page(1252)
-#include "res\TradeLinkServer.rc2"  // non-Microsoft Visual C++ edited resources
+#include "res\TradeLibFast.rc2"  // non-Microsoft Visual C++ edited resources
 #include "afxres.rc"     // Standard components
 #endif
 

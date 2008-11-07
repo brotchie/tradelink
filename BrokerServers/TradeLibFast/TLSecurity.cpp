@@ -2,7 +2,7 @@
 #include "TLSecurity.h"
 #include "Util.h"
 
-namespace TradeLinkServer
+namespace TradeLibFast
 {
 
 	TLSecurity::TLSecurity()

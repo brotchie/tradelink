@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="TradeLinkServer"
+	Name="TradeLibFast"
 	ProjectGUID="{70D6F9FC-3067-4527-8858-D931623554CF}"
 	RootNamespace="TradeLinkServer"
 	Keyword="MFCDLLProj"
@@ -286,15 +286,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\TradeLibFast.h"
+				>
+			</File>
+			<File
 				RelativePath=".\TradeLink.h"
 				>
 			</File>
 			<File
 				RelativePath=".\TradeLink_WM.h"
-				>
-			</File>
-			<File
-				RelativePath=".\TradeLinkServer.h"
 				>
 			</File>
 			<File
@@ -308,18 +308,14 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\TradeLinkServer.rc"
+				RelativePath=".\res\TradeLibFast.rc2"
 				>
 			</File>
 			<File
-				RelativePath=".\res\TradeLinkServer.rc2"
+				RelativePath=".\TradeLinkServer.rc"
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath=".\ReadMe.txt"
-			>
-		</File>
 	</Files>
 	<Globals>
 		<Global

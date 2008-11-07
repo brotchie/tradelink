@@ -9,7 +9,7 @@
 using namespace std;
 
 
-namespace TradeLinkServer
+namespace TradeLibFast
 {
 
 
@@ -171,7 +171,7 @@ namespace TradeLinkServer
 					stub.push_back(CLEARSTOCKS);
 					stub.push_back(CLEARCLIENT);
 					// send entire feature set back to client
-					SendMsg(FEATURERESPONSE,SerializeIntVec(stub),msg);
+					TLSend(FEATURERESPONSE,SerializeIntVec(stub),msg);
 					return OK;
 				}
 
@@ -234,7 +234,7 @@ namespace TradeLinkServer
 		if (order.symbol=="") return;
 		for (size_t i = 0; i<client.size(); i++)
 			if (client[i]!="")
-				SendMsg(ORDERNOTIFY,order.Serialize(),client[i]);
+				TLSend(ORDERNOTIFY,order.Serialize(),client[i]);
 	}
 
 	void TradeLink_WM::D(const CString & message)
@@ -257,7 +257,7 @@ namespace TradeLinkServer
 			for (size_t j = 0; j<stocks[i].size(); j++)
 			{
 				if (stocks[i][j]==trade.symbol)
-					SendMsg(EXECUTENOTIFY,trade.Serialize(),client[i]);
+					TLSend(EXECUTENOTIFY,trade.Serialize(),client[i]);
 			}
 	}
 
@@ -268,7 +268,7 @@ namespace TradeLinkServer
 			for (size_t j = 0; j<stocks[i].size(); j++)
 			{
 				if (stocks[i][j]==tick.sym)
-					SendMsg(TICKNOTIFY,tick.Serialize(),client[i]);
+					TLSend(TICKNOTIFY,tick.Serialize(),client[i]);
 			}
 	}
 
@@ -278,7 +278,7 @@ namespace TradeLinkServer
 		id.Format(_T("%i"),orderid);
 		for (size_t i = 0; i<client.size(); i++)
 			if (client[i]!="")
-				SendMsg(ORDERCANCELRESPONSE,id,client[i]);
+				TLSend(ORDERCANCELRESPONSE,id,client[i]);
 	}
 
 	void TradeLink_WM::SrvCancelRequest(long order)
@@ -323,12 +323,31 @@ namespace TradeLinkServer
 			this->D(msg);
 			ENABLED = true;
 		}
-
-
 	}
 
 
+	int TradeLink_WM::TLSend(int type,LPCTSTR msg,CString windname) 
+	{
+		LRESULT result = 999;
+		HWND dest = FindWindowA(NULL,(LPCSTR)(LPCTSTR)windname)->GetSafeHwnd();
+		
+		if (dest) 
+		{
+			COPYDATASTRUCT CD;  // windows-provided structure for this purpose
+			CD.dwData=type;		// stores type of message
+			int len = 0;
+			len = (int)strlen((char*)msg);
+
+			CD.cbData = len+1;
+			CD.lpData = (void*)msg;	//here's the data we're sending
+			result = ::SendMessageA(dest,WM_COPYDATA,0,(LPARAM)&CD);
+		} 
+		return (int)result;
+	}
 }
+
+
+
 
 
 

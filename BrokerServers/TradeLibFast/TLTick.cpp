@@ -2,7 +2,7 @@
 #include "TLTick.h"
 #include "Util.h"
 
-namespace TradeLinkServer
+namespace TradeLibFast
 {
 	TLTick::TLTick(void)
 	{

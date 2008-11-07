@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\TradeLinkServer;Shared"
+				AdditionalIncludeDirectories="..\TradeLibFast;Shared"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -68,7 +68,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\$(ConfigurationName)\TradeLinkServer.lib"
+				AdditionalDependencies="TradeLibFast.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;..\$(ConfigurationName)&quot;"
 				GenerateDebugInformation="true"
@@ -131,7 +131,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="..\TradeLinkServer;Shared"
+				AdditionalIncludeDirectories="..\TradeLibFast;Shared"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG"
 				MinimalRebuild="false"
 				RuntimeLibrary="2"
@@ -154,9 +154,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\release\TradeLinkServer.lib"
+				AdditionalDependencies="TradeLibFast.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\release"
+				AdditionalLibraryDirectories="&quot;..\$(Configurationname)&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -236,7 +236,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\TradeLinkServer\Util.cpp"
+				RelativePath="..\TradeLibFast\Util.cpp"
 				>
 			</File>
 		</Filter>

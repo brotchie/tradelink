@@ -1,10 +1,10 @@
-// TradeLinkServer.cpp : Defines the initialization routines for the DLL.
+// TradeLibFast.cpp : Defines the initialization routines for the DLL.
 //
 
 #include "stdafx.h"
 #include <afxdllx.h>
 #ifdef _MANAGED
-#error Please read instructions in TradeLinkServer.cpp to compile with /clr
+#error Please read instructions in TradeLibFast.cpp to compile with /clr
 // If you want to add /clr to your project you must do the following:
 //	1. Remove the above include for afxdllx.h
 //	2. Add a .cpp file to your project that does not have /clr thrown and has
@@ -18,7 +18,7 @@
 #endif
 
 
-static AFX_EXTENSION_MODULE TradeLinkServerDLL = { NULL, NULL };
+static AFX_EXTENSION_MODULE TradeLibFastDLL = { NULL, NULL };
 
 #ifdef _MANAGED
 #pragma managed(push, off)
@@ -32,10 +32,10 @@ DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 
 	if (dwReason == DLL_PROCESS_ATTACH)
 	{
-		TRACE0("TradeLinkServer.DLL Initializing!\n");
+		TRACE0("TradeLibFast.DLL Initializing!\n");
 		
 		// Extension DLL one-time initialization
-		if (!AfxInitExtensionModule(TradeLinkServerDLL, hInstance))
+		if (!AfxInitExtensionModule(TradeLibFastDLL, hInstance))
 			return 0;
 
 		// Insert this DLL into the resource chain
@@ -50,15 +50,15 @@ DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 		//  Regular DLL's resource chain, and serious problems will
 		//  result.
 
-		new CDynLinkLibrary(TradeLinkServerDLL);
+		new CDynLinkLibrary(TradeLibFastDLL);
 
 	}
 	else if (dwReason == DLL_PROCESS_DETACH)
 	{
-		TRACE0("TradeLinkServer.DLL Terminating!\n");
+		TRACE0("TradeLibFast.DLL Terminating!\n");
 
 		// Terminate the library before destructors are called
-		AfxTermExtensionModule(TradeLinkServerDLL);
+		AfxTermExtensionModule(TradeLibFastDLL);
 	}
 	return 1;   // ok
 }
