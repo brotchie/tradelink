@@ -15,7 +15,7 @@ echo.
 echo IBSERVER
 xcopy /q /y ..\Release\TWSServer.exe .
 xcopy /q /y ..\Release\TWSServer.Config.txt .
-xcopy /q /y ..\Release\TradeLinkServer.dll
+xcopy /q /y ..\Release\TradeLibFast.dll
 echo.
 
 if not exist "c:\progra~1\nsis\makensis.exe" (
