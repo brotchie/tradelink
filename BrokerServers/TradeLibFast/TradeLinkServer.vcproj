@@ -232,6 +232,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\TLServer_WM.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\TLTick.cpp"
 				>
 			</File>
@@ -245,10 +249,6 @@
 			</File>
 			<File
 				RelativePath=".\TradeLibFast.def"
-				>
-			</File>
-			<File
-				RelativePath=".\TradeLinkServer_WM.cpp"
 				>
 			</File>
 			<File
@@ -294,6 +294,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\TLServer_WM.h"
+				>
+			</File>
+			<File
 				RelativePath=".\TLTick.h"
 				>
 			</File>
@@ -307,10 +311,6 @@
 			</File>
 			<File
 				RelativePath=".\TradeLink.h"
-				>
-			</File>
-			<File
-				RelativePath=".\TradeLinkServer_WM.h"
 				>
 			</File>
 			<File

@@ -6,13 +6,13 @@
 #include <vector>
 #include "orderstate.h"
 #include "Contract.h"
-#include "TradeLinkServer_WM.h"
+#include "TLServer_WM.h"
 
 namespace TradeLibFast
 {
 
 	class TWS_TLWM :
-		public TradeLinkServer_WM ,
+		public TLServer_WM ,
 		public EWrapper
 	{
 	public:

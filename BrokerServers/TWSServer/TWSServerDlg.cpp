@@ -51,7 +51,7 @@ BOOL CTWSServerDlg::OnInitDialog()
 
 	cstat("Starting tradelink broker server...");
 	tl = new TWS_TLWM();
-	__hook(&TradeLinkServer_WM::GotDebug,tl,&CTWSServerDlg::status);
+	__hook(&TLServer_WM::GotDebug,tl,&CTWSServerDlg::status);
 	tl->Start();
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -59,7 +59,7 @@ BOOL CTWSServerDlg::OnInitDialog()
 
 CTWSServerDlg::~CTWSServerDlg()
 {
-	__unhook(&TradeLinkServer_WM::GotDebug,tl,&CTWSServerDlg::status);
+	__unhook(&TLServer_WM::GotDebug,tl,&CTWSServerDlg::status);
 	delete tl;
 }
 
