@@ -212,6 +212,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\TLClient_WM.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\TLOrder.cpp"
 				>
 			</File>
@@ -263,6 +267,10 @@
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TLClient_WM.h"
 				>
 			</File>
 			<File
