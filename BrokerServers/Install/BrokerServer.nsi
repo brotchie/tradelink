@@ -49,13 +49,16 @@ Section "BrokerServer"
   SetOutPath $INSTDIR
   CreateDirectory "$SMPROGRAMS\TradeLink"
   
+  ; files included in install
   File "VERSION.txt"
   File "README.txt"
   File "LICENSE.txt"
   File "TwsSocketClient.dll"
   
-  File /oname=$SYSDIR\TradeLinkServer.dll "TradeLinkServer.dll" ; put in in %PATH% to make it easy for programs to find
+  ; put in in %PATH% to make it easy for programs to find
+  File /oname=$SYSDIR\TradeLibFast.dll "TradeLibFast.dll" 
   
+  ; shortcut to uninstaller
   CreateShortCut "$SMPROGRAMS\TradeLink\Uninstall BrokerServer.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
   
   ; Write the installation path into the registry
@@ -102,7 +105,7 @@ Section "Uninstall"
   ; Remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\NSIS_TLBrokerServer"
   DeleteRegKey HKLM SOFTWARE\NSIS_TLBrokerServer
-  Delete $SYSDIR\TradeLinkServer.dll
+  Delete $SYSDIR\TradeLibFast.dll
 
   ; Remove files and uninstaller
   Delete $INSTDIR\BrokerServer.nsi
