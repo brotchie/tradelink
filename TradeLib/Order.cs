@@ -12,7 +12,14 @@ namespace TradeLib
         public Order(bool side) : base() { this.side = side; } 
         public string TIF = "DAY";
         public int sec = 0;
-        public override bool isValid { get { return (symbol != null) && (size != 0); } }
+        public override bool isValid 
+        { 
+            get 
+            { 
+                if (isFilled) return base.isValid;
+                return (symbol != null) && (size != 0); 
+            } 
+        }
         public bool isMarket { get { return (price == 0) && (stopp == 0); } }
         public bool isLimit { get { return (price != 0); } }
         public bool isStop { get { return (stopp != 0); } }

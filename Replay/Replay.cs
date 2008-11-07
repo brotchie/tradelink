@@ -217,8 +217,10 @@ namespace Replay
             {
                 if (o.time * o.date == 0)
                 {
-                    o.time = Util.ToTLTime(h.NextTickTime);
-                    o.date = Util.ToTLDate(h.NextTickTime);
+                    DateTime time = h.NextTickTime == HistSim.STARTSIM ? 
+                        DateTime.Now : h.NextTickTime;
+                    o.time = Util.ToTLTime(time);
+                    o.date = Util.ToTLDate(time);
                 }
                 // before we send the order, get top of book for same side
                 Order oldbbo = h.SimBroker.BestBidOrOffer(o.symbol,o.Side);

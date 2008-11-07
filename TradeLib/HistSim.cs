@@ -13,8 +13,7 @@ namespace TradeLib
         Broker _broker = new Broker();
         string[] _tickfiles = new string[0];
         bool _inited = false;
-        DateTime _nextticktime = DateTime.MinValue;
-        DateTime _nextindextime = DateTime.MinValue;
+        DateTime _nextticktime = STARTSIM;
         int _executions = 0;
         int _tickcount = 0;
         long _bytestoprocess = 0;
@@ -215,7 +214,7 @@ namespace TradeLib
         }
 
         public static DateTime ENDSIM = DateTime.MaxValue;
-
+        public static DateTime STARTSIM = DateTime.MinValue;
 
         void updatenextticktime()
         {
