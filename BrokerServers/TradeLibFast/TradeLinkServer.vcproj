@@ -67,7 +67,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkIncremental="2"
-				ModuleDefinitionFile=".\TradeLinkServer.def"
+				ModuleDefinitionFile=".\TradeLibFast.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -150,7 +150,7 @@
 				Name="VCLinkerTool"
 				ShowProgress="0"
 				LinkIncremental="1"
-				ModuleDefinitionFile=".\TradeLinkServer.def"
+				ModuleDefinitionFile=".\TradeLibServer.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -232,15 +232,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\TradeLink_WM.cpp"
+				RelativePath=".\TradeLibFast.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\TradeLinkServer.cpp"
+				RelativePath=".\TradeLibFast.def"
 				>
 			</File>
 			<File
-				RelativePath=".\TradeLinkServer.def"
+				RelativePath=".\TradeLinkServer_WM.cpp"
 				>
 			</File>
 			<File
@@ -294,7 +294,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\TradeLink_WM.h"
+				RelativePath=".\TradeLinkServer_WM.h"
 				>
 			</File>
 			<File

@@ -6,7 +6,7 @@
 #include <vector>
 #include "orderstate.h"
 #include "Contract.h"
-#include "TradeLink_WM.h"
+#include "TradeLinkServer_WM.h"
 
 namespace TradeLibFast
 {

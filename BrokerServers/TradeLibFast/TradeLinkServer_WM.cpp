@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "TradeLink_WM.h"
+#include "TradeLinkServer_WM.h"
 #include "TradeLink.h"
 #include "Util.h"
 #include <fstream>
