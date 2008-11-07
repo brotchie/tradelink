@@ -12,7 +12,7 @@ namespace TradeLibFast
 {
 
 	class TWS_TLWM :
-		public TradeLink_WM ,
+		public TradeLinkServer_WM ,
 		public EWrapper
 	{
 	public:

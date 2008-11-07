@@ -1,4 +1,4 @@
-// TradeLink_WM.cpp : implementation file
+// TradeLinkServer_WM.cpp : implementation file
 //
 
 #include "stdafx.h"
@@ -13,28 +13,28 @@ namespace TradeLibFast
 {
 
 
-	// TradeLink_WM
+	// TradeLinkServer_WM
 
-	IMPLEMENT_DYNAMIC(TradeLink_WM, CWnd)
+	IMPLEMENT_DYNAMIC(TradeLinkServer_WM, CWnd)
 
-	TradeLink_WM::TradeLink_WM(void)
+	TradeLinkServer_WM::TradeLinkServer_WM(void)
 	{
 		TLDEBUG = true;
 		ENABLED = false;
 		debugbuffer = CString("");
 	}
 
-	TradeLink_WM::~TradeLink_WM()
+	TradeLinkServer_WM::~TradeLinkServer_WM()
 	{
 		delete debugbuffer;
 	}
 
 
-	BEGIN_MESSAGE_MAP(TradeLink_WM, CWnd)
+	BEGIN_MESSAGE_MAP(TradeLinkServer_WM, CWnd)
 		ON_WM_COPYDATA()
 	END_MESSAGE_MAP()
 
-	int TradeLink_WM::FindClientFromStock(CString stock)
+	int TradeLinkServer_WM::FindClientFromStock(CString stock)
 	{
 		for (size_t i = 0; i<client.size(); i++)
 			for (size_t j = 0; j<stocks[i].size(); j++)
@@ -45,7 +45,7 @@ namespace TradeLibFast
 		return -1;
 	}
 
-	bool TradeLink_WM::needStock(CString stock)
+	bool TradeLinkServer_WM::needStock(CString stock)
 	{
 		for (size_t i = 0; i<stocks.size(); i++)
 			for (size_t j = 0; j<stocks[i].size(); j++)
@@ -55,7 +55,7 @@ namespace TradeLibFast
 		return false;
 	}
 
-	int TradeLink_WM::FindClient(CString cwind)
+	int TradeLinkServer_WM::FindClient(CString cwind)
 	{
 		size_t len = client.size();
 		for (size_t i = 0; i<len; i++) if (client[i]==cwind) return (int)i;
@@ -75,10 +75,10 @@ namespace TradeLibFast
 		return gjoin(tmp,",");
 	}
 
-	// TradeLink_WM message handlers
+	// TradeLinkServer_WM message handlers
 
 
-	BOOL TradeLink_WM::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
+	BOOL TradeLinkServer_WM::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct)
 	{
 		CString msg = (LPCTSTR)(pCopyDataStruct->lpData);
 		int type = (int)pCopyDataStruct->dwData;
@@ -86,7 +86,7 @@ namespace TradeLibFast
 	}
 
 
-	int TradeLink_WM::RegisterClient(CString  clientname)
+	int TradeLinkServer_WM::RegisterClient(CString  clientname)
 	{
 		if (FindClient(clientname)!=-1) return OK;
 		client.push_back(clientname);
@@ -99,7 +99,7 @@ namespace TradeLibFast
 		return OK;
 	}
 
-	int TradeLink_WM::ServiceMessage(int MessageType, CString msg)
+	int TradeLinkServer_WM::ServiceMessage(int MessageType, CString msg)
 	{
 			switch (MessageType)
 			{
@@ -179,7 +179,7 @@ namespace TradeLibFast
 			return UNKNOWNMSG;
 	}
 
-	int TradeLink_WM::HeartBeat(CString clientname)
+	int TradeLinkServer_WM::HeartBeat(CString clientname)
 	{
 			int cid = FindClient(clientname);
 			if (cid==-1) return -1;
@@ -191,26 +191,26 @@ namespace TradeLibFast
 			return (int)dif;
 	}
 
-	int TradeLink_WM::RegisterStocks(CString clientname) { return OK; }
-	int TradeLink_WM::RegisterFutures(CString clientname) { return OK; }
-	std::vector<int> TradeLink_WM::GetFeatures() { std::vector<int> blank; return blank; } 
+	int TradeLinkServer_WM::RegisterStocks(CString clientname) { return OK; }
+	int TradeLinkServer_WM::RegisterFutures(CString clientname) { return OK; }
+	std::vector<int> TradeLinkServer_WM::GetFeatures() { std::vector<int> blank; return blank; } 
 
-	int TradeLink_WM::AccountResponse(CString clientname)
+	int TradeLinkServer_WM::AccountResponse(CString clientname)
 	{
 		return FEATURE_NOT_IMPLEMENTED;
 	}
 
-	int TradeLink_WM::BrokerName(void)
+	int TradeLinkServer_WM::BrokerName(void)
 	{
 		return UnknownBroker;
 	}
 
-	int TradeLink_WM::SendOrder(TLOrder order)
+	int TradeLinkServer_WM::SendOrder(TLOrder order)
 	{
 		return FEATURE_NOT_IMPLEMENTED;
 	}
 
-	int TradeLink_WM::ClearClient(CString clientname)
+	int TradeLinkServer_WM::ClearClient(CString clientname)
 	{
 		int cid = FindClient(clientname);
 		if (cid==-1) return CLIENTNOTREGISTERED;
@@ -220,7 +220,7 @@ namespace TradeLibFast
 		D(CString(_T("Client ")+clientname+_T(" disconnected.")));
 		return OK;
 	}
-	int TradeLink_WM::ClearStocks(CString clientname)
+	int TradeLinkServer_WM::ClearStocks(CString clientname)
 	{
 		int cid = FindClient(clientname);
 		if (cid==-1) return CLIENTNOTREGISTERED;
@@ -229,7 +229,7 @@ namespace TradeLibFast
 		D(CString(_T("Cleared stocks for ")+clientname));
 		return OK;
 	}
-	void TradeLink_WM::SrvGotOrder(TLOrder order)
+	void TradeLinkServer_WM::SrvGotOrder(TLOrder order)
 	{
 		if (order.symbol=="") return;
 		for (size_t i = 0; i<client.size(); i++)
@@ -237,7 +237,7 @@ namespace TradeLibFast
 				TLSend(ORDERNOTIFY,order.Serialize(),client[i]);
 	}
 
-	void TradeLink_WM::D(const CString & message)
+	void TradeLinkServer_WM::D(const CString & message)
 	{
 
 		if (this->TLDEBUG)
@@ -250,7 +250,7 @@ namespace TradeLibFast
 		}
 	}
 
-	void TradeLink_WM::SrvGotFill(TLTrade trade)
+	void TradeLinkServer_WM::SrvGotFill(TLTrade trade)
 	{
 		if (trade.symbol=="") return;
 		for (size_t i = 0; i<stocks.size(); i++)
@@ -261,7 +261,7 @@ namespace TradeLibFast
 			}
 	}
 
-	void TradeLink_WM::SrvGotTick(TLTick tick)
+	void TradeLinkServer_WM::SrvGotTick(TLTick tick)
 	{
 		if (tick.sym=="") return;
 		for (size_t i = 0; i<stocks.size(); i++)
@@ -272,7 +272,7 @@ namespace TradeLibFast
 			}
 	}
 
-	void TradeLink_WM::SrvCancelNotify(int orderid)
+	void TradeLinkServer_WM::SrvCancelNotify(int orderid)
 	{
 		CString id;
 		id.Format(_T("%i"),orderid);
@@ -281,12 +281,12 @@ namespace TradeLibFast
 				TLSend(ORDERCANCELRESPONSE,id,client[i]);
 	}
 
-	void TradeLink_WM::SrvCancelRequest(long order)
+	void TradeLinkServer_WM::SrvCancelRequest(long order)
 	{
 		return;
 	}
 
-	bool TradeLink_WM::HaveSubscriber(CString stock)
+	bool TradeLinkServer_WM::HaveSubscriber(CString stock)
 	{
 		for (size_t i = 0; i<stocks.size(); i++) // go through each client
 			for (size_t j = 0; j<stocks[i].size(); j++) // and each stock
@@ -295,7 +295,7 @@ namespace TradeLibFast
 		return false;
 	}
 	const char* VERFILE = "c:\\progra~1\\tradelink\\brokerserver\\VERSION.txt";
-	void TradeLink_WM::Start(bool live)
+	void TradeLinkServer_WM::Start(bool live)
 	{
 		if (!ENABLED)
 		{
@@ -326,7 +326,7 @@ namespace TradeLibFast
 	}
 
 
-	int TradeLink_WM::TLSend(int type,LPCTSTR msg,CString windname) 
+	int TradeLinkServer_WM::TLSend(int type,LPCTSTR msg,CString windname) 
 	{
 		LRESULT result = 999;
 		HWND dest = FindWindowA(NULL,(LPCSTR)(LPCTSTR)windname)->GetSafeHwnd();

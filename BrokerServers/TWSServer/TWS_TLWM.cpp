@@ -34,7 +34,7 @@ namespace TradeLibFast
 
 	void TWS_TLWM::Start(void)
 	{
-		TradeLink_WM::Start();
+		TradeLinkServer_WM::Start();
 
 		std::ifstream file;
 		file.open(CONFIGFILE);
@@ -358,7 +358,7 @@ namespace TradeLibFast
 
 	int TWS_TLWM::RegisterStocks(CString clientname)
 	{
-		TradeLink_WM::RegisterStocks(clientname);
+		TradeLinkServer_WM::RegisterStocks(clientname);
 		int cid = this->FindClient(clientname);  // get client id so we can find his stocks
 		// loop through every stock for this client
 		for (size_t i = 0; i<stocks[cid].size(); i++)

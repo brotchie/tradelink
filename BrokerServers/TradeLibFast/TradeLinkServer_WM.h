@@ -13,16 +13,16 @@ namespace TradeLibFast
 	const CString LIVEWINDOW = _T("TL-BROKER-LIVE");
 	const CString SIMWINDOW = _T("TL-BROKER-SIMU");
 
-	// TradeLink_WM
+	// TradeLinkServer_WM
 
 	[event_source(native)]
-	class AFX_EXT_CLASS  TradeLink_WM : public CWnd
+	class AFX_EXT_CLASS  TradeLinkServer_WM : public CWnd
 	{
-		DECLARE_DYNAMIC(TradeLink_WM)
+		DECLARE_DYNAMIC(TradeLinkServer_WM)
 
 	public:
-		TradeLink_WM(void);
-		~TradeLink_WM(void);
+		TradeLinkServer_WM(void);
+		~TradeLinkServer_WM(void);
 		bool TLDEBUG;
 		bool ENABLED;
 		__event void GotDebug(LPCTSTR msg);
@@ -54,7 +54,7 @@ namespace TradeLibFast
 		int ClearClient(CString client);
 		int ClearStocks(CString client);
 
-		void TradeLink_WM::D(const CString & message);
+		void TradeLinkServer_WM::D(const CString & message);
 		void SrvGotOrder(TLOrder order);
 		void SrvGotFill(TLTrade trade);
 		void SrvGotTick(TLTick tick);
