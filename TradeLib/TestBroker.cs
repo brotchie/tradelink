@@ -170,6 +170,11 @@ namespace TestTradeLib
             Account c = new Account("sleeper");
             Order oa = new BuyMarket(sym,100);
             Order ob = new BuyMarket(sym, 100);
+            oa.time = Util.ToTLTime(DateTime.Now);
+            oa.date = Util.ToTLDate(DateTime.Now);
+            ob.time = Util.ToTLTime(DateTime.Now);
+            ob.date = Util.ToTLDate(DateTime.Now);
+
             oa.Account = me;
             ob.Account = other;
             // send order to account for jfranta
@@ -178,6 +183,8 @@ namespace TestTradeLib
             Tick t = new Tick(sym);
             t.trade = 100m;
             t.size = 200;
+            t.date = Util.ToTLDate(DateTime.Now);
+            t.time = Util.ToTLTime(DateTime.Now);
             Assert.AreEqual(2,broker.Execute(t));
             Position apos = broker.GetOpenPosition(sym,a);
             Position bpos = broker.GetOpenPosition(sym,b);
