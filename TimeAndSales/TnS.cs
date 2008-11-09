@@ -125,7 +125,7 @@ namespace TimeSales
         void bw_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             status(headline+"(loading " + e.ProgressPercentage + "%)");
-            toolStripProgressBar1.Value = e.ProgressPercentage;
+            toolStripProgressBar1.Value = e.ProgressPercentage > 100 ? 100 : e.ProgressPercentage;
             
         }
 
