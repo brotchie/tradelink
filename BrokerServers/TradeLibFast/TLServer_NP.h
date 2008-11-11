@@ -1,6 +1,7 @@
 #pragma once
 #include "TradeLibFast.h"
 #include <vector>
+#include <map>
 using namespace std;
 
 namespace TradeLibFast
@@ -17,9 +18,8 @@ namespace TradeLibFast
 		void newTick(TLTick k);
 
 	protected:
-		int newSecurity(TLSecurity sec);
-		int symidx(CString symbol);
-		vector<TLSecurity> _secs;
+
+		map<CString,int> _pidx;
 		vector<HANDLE> _pipes;
 
 	};
