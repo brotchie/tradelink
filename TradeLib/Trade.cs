@@ -100,6 +100,7 @@ namespace TradeLib
         {
             this.xprice = xp;
             this.xsize = xs;
+            xdate = date;
             this.xtime = xt;
         }
         public void Fill(decimal xprice, int xsize, int xtime, int xdate, int xsec)
