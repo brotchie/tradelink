@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections;
 
 namespace TradeLib
 {
@@ -85,6 +86,7 @@ namespace TradeLib
             }
             return mb;
         }
+        public IEnumerator GetEnumerator() { foreach (Security s in symbols) yield return s; }
 
     }
 }

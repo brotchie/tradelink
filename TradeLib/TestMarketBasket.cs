@@ -63,5 +63,17 @@ namespace TestTradeLib
 
 
         }
+
+        [Test]
+        public void Enumeration()
+        {
+            MarketBasket mb = new MarketBasket(new string[] { "IBM", "MHS", "LVS", "GM" });
+            string[] l = new string[4];
+            int i = 0;
+            foreach (Security s in mb)
+                l[i++] = s.Symbol;
+            Assert.AreEqual(4, i);
+
+        }
     }
 }
