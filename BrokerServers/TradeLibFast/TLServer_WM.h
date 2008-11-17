@@ -23,6 +23,7 @@ namespace TradeLibFast
 		bool ENABLED;
 		__event void GotDebug(LPCTSTR msg);
 		CString debugbuffer;
+		static int TLSend(int type,LPCTSTR msg,CString windname);
 
 	protected:
 		bool needStock(CString stock);
@@ -33,7 +34,7 @@ namespace TradeLibFast
 		typedef vector <CString> clientstocklist; // hold a single clients stocks
 		vector < clientstocklist > stocks; // map stocklist to id
 		unsigned int FindClientFromStock(CString stock);
-		int TLSend(int type,LPCTSTR msg,CString windname);
+		
 		DECLARE_MESSAGE_MAP()
 
 	public:
