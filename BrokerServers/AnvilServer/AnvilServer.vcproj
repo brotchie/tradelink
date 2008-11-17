@@ -515,6 +515,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\AVL_TLWM.cpp"
+				>
+			</File>
+			<File
 				RelativePath="ExtFrame.cpp"
 				>
 				<FileConfiguration
@@ -697,6 +701,10 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\AVL_TLWM.h"
+			>
+		</File>
 	</Files>
 	<Globals>
 		<Global

@@ -1,12 +1,7 @@
 #include "stdAfx.h"
-#include "ObserverApi.h"
-#include "BusinessApi.h"
 #include "AVL_TLWM.h"
 
-#include "AVLStock.h"
-#include "AnvilUtil.h"
-
-namespace TradeLinkServer
+namespace TradeLibFast
 {
 
 	AVL_TLWM::AVL_TLWM(void)
@@ -24,7 +19,7 @@ namespace TradeLinkServer
 
 	int AVL_TLWM::RegisterStocks(CString clientname)
 	{
-		int cid = FindClient(clientname);
+/*		int cid = FindClient(clientname);
 		vector<CString> my = this->stocks[cid]; // get this clients stocks
 		for (size_t i = 0; i<my.size();i++) // subscribe to stocks
 		{
@@ -33,6 +28,7 @@ namespace TradeLinkServer
 			stk->Load();
 			this->stocksubs.push_back(stk);
 		}
+		*/
 		return OK;
 	}
 

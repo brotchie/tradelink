@@ -32,7 +32,7 @@ namespace TradeLibFast
 		vector <time_t>heart; // map last contact to id
 		typedef vector <CString> clientstocklist; // hold a single clients stocks
 		vector < clientstocklist > stocks; // map stocklist to id
-		int FindClientFromStock(CString stock);
+		unsigned int FindClientFromStock(CString stock);
 		int TLSend(int type,LPCTSTR msg,CString windname);
 		DECLARE_MESSAGE_MAP()
 

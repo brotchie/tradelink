@@ -25,7 +25,7 @@ namespace TradeLibFast
 
 		// build pipe path
 		CString pipename;
-		pipename.Format(_T("\\.\pipe\%s%i"),k.sym,k.date);
+		pipename.Format(_T("\\.\\pipe\\%s%i"),k.sym,k.date);
 
 		// check to see if we have a handle already
 		map<CString,int>::iterator pi = _pidx.find(pipename);

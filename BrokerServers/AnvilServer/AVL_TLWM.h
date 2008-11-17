@@ -1,20 +1,19 @@
 #pragma once
-#include "TradeLink.h"
-#include "TradeLink_WM.h"
-#include "AVLStock.h"
-#include "AVLIdx.h"
+#include "TradeLibFast.h"
+#include "TLStock.h"
+#include "TLIndex.h"
 using namespace std;
 
-namespace TradeLinkServer
+namespace TradeLibFast
 {
 	class AVL_TLWM :
-		public TradeLink_WM
+		public TLServer_WM
 	{
 	public:
 		AVL_TLWM(void);
 		~AVL_TLWM(void);
 	protected:
-		vector <AVLStock*> stocksubs;
+		vector <TLStock*> stocksubs;
 		bool hasHammerSub(CString stock);
 		int RegisterStocks(CString clientname);
 		int BrokerName(void);

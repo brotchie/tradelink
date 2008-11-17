@@ -22,9 +22,9 @@ namespace TradeLibFast
 		return m;
 	}
 
-	int TLMarketBasket::Count()
+	unsigned int TLMarketBasket::Count()
 	{
-		return _secs.size();
+		return (unsigned int)_secs.size();
 	}
 
 	TLMarketBasket TLMarketBasket::Deserialize(CString msg)

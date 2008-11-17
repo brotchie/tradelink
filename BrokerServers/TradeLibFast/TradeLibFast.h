@@ -6,3 +6,5 @@
 #include "TLPosition.h"
 #include "TLSecurity.h"
 #include "TLMarketBasket.h"
+#include "TLServer_WM.h"
+#include "TLServer_NP.h"

@@ -34,10 +34,10 @@ namespace TradeLibFast
 		ON_WM_COPYDATA()
 	END_MESSAGE_MAP()
 
-	int TLServer_WM::FindClientFromStock(CString stock)
+	unsigned int TLServer_WM::FindClientFromStock(CString stock)
 	{
-		for (size_t i = 0; i<client.size(); i++)
-			for (size_t j = 0; j<stocks[i].size(); j++)
+		for (unsigned int i = 0; i<client.size(); i++)
+			for (unsigned int j = 0; j<stocks[i].size(); j++)
 			{
 				if (stocks[i][j].CompareNoCase(stock)==0)
 					return i;

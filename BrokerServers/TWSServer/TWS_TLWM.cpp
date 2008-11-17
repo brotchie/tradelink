@@ -361,7 +361,7 @@ namespace TradeLibFast
 		TLServer_WM::RegisterStocks(clientname);
 		int cid = this->FindClient(clientname);  // get client id so we can find his stocks
 		// loop through every stock for this client
-		for (size_t i = 0; i<stocks[cid].size(); i++)
+		for (unsigned int i = 0; i<stocks[cid].size(); i++)
 		{
 			// if we already have a subscription to this stock, proceed to next one
 			TLSecurity sec = TLSecurity::Deserialize(stocks[cid][i]);
@@ -376,7 +376,7 @@ namespace TradeLibFast
 			else if (sec.type==STK)
 				contract.exchange = "NYSE";
 			contract.secType = TLSecurity::SecurityTypeName(sec.type);
-			this->m_link[this->validlinkids[0]]->reqMktData(stockticks.size(),contract,"",false);
+			this->m_link[this->validlinkids[0]]->reqMktData((TickerId)stockticks.size(),contract,"",false);
 			TLTick k; // create blank tick
 			k.sym = stocks[cid][i]; // store long symbol
 			stockticks.push_back(k);
@@ -388,7 +388,7 @@ namespace TradeLibFast
 
 	void TWS_TLWM::tickPrice( TickerId tickerId, TickType tickType, double price, int canAutoExecute) 
 	{ 
-		if ((tickerId>=0)&&(tickerId<stockticks.size()) && needStock(stockticks[tickerId].sym))
+		if ((tickerId>=0)&&(tickerId<(TickerId)stockticks.size()) && needStock(stockticks[tickerId].sym))
 		{
 			time_t now;
 			time(&now);
@@ -424,7 +424,7 @@ namespace TradeLibFast
 	}
 	void TWS_TLWM::tickSize( TickerId tickerId, TickType tickType, int size) 
 	{ 
-		if ((tickerId>=0)&&(tickerId<stockticks.size()) && needStock(stockticks[tickerId].sym))
+		if ((tickerId>=0)&&(tickerId<(TickerId)stockticks.size()) && needStock(stockticks[tickerId].sym))
 		{
 			time_t now;
 			time(&now);

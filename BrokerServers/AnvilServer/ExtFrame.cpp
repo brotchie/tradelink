@@ -82,11 +82,6 @@ void ExtFrame::OnSysCommand(UINT nID, LPARAM lParam)
 void ExtFrame::Process(const Message* message, Observable* from, const Message* additionalInfo)
 {
 	
-    switch(message->GetType())
-    {
-        break;
-    }
-
 }
 
 
