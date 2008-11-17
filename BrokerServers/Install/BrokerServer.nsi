@@ -21,9 +21,6 @@ InstallDir $PROGRAMFILES\TradeLink\BrokerServer\
 ; overwrite the old one automatically)
 InstallDirRegKey HKLM "Software\NSIS_TLBrokerServer" "Install_Dir"
 
-
-
-
 ;--------------------------------
 
 ; Pages
@@ -54,17 +51,16 @@ Section "BrokerServer"
   File "README.txt"
   File "LICENSE.txt"
   File "TwsSocketClient.dll"
-  
-  ; put in in %PATH% to make it easy for programs to find
-  File /oname=$SYSDIR\TradeLibFast.dll "TradeLibFast.dll" 
-  
-  ; shortcut to uninstaller
-  CreateShortCut "$SMPROGRAMS\TradeLink\Uninstall BrokerServer.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
+  File TradeLibFast.dll 
+  ; write path for TradeLibFast.dll
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\App Paths\TradeLibFast.dll" "Path" "$INSTDIR\"
   
   ; Write the installation path into the registry
   WriteRegStr HKLM Software\NSIS_TLBrokerServer "Install_Dir" "$INSTDIR"
-  
-  
+
+
+  ; shortcut to uninstaller
+  CreateShortCut "$SMPROGRAMS\TradeLink\Uninstall BrokerServer.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
   ; Write the uninstall keys for Windows
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\NSIS_TLBrokerServer" "DisplayName" "TradeLinkAnvilServer"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\NSIS_TLBrokerServer" "UninstallString" '"$INSTDIR\uninstall.exe"'
@@ -105,10 +101,9 @@ Section "Uninstall"
   ; Remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\NSIS_TLBrokerServer"
   DeleteRegKey HKLM SOFTWARE\NSIS_TLBrokerServer
-  Delete $SYSDIR\TradeLibFast.dll
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\App Paths\TradeLibFast.dll"
 
   ; Remove files and uninstaller
-  Delete $INSTDIR\BrokerServer.nsi
   Delete $INSTDIR\uninstall.exe
   Delete "$INSTDIR\AnvilRelease_x32_2_7_0_5\*.*"
   Delete "$INSTDIR\*.*"
