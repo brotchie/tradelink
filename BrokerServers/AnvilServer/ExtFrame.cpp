@@ -27,19 +27,7 @@ ExtFrame::ExtFrame()
 	monitor = new Monitor();
 	B_GetAdminObservable()->Add(monitor);
     B_GetAdminObservable()->Add(this);
-    m_marketSummaryPopulationDone = B_IsMarketSummaryPopulationDone();
 
-	/*
-
-	//use window properties as channels,
-	//rather than using window names, untested.
-		CString caption;
-	GetWindowTextA(caption);
-	HWND h = (HWND)FindWindowA(NULL,caption);
-	if (h)
-	{
-		SetProp(h,"TradeLink",(HANDLE)h);
-	}*/
 }
 
 ExtFrame::~ExtFrame()
