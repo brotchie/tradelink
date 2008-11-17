@@ -1,7 +1,6 @@
 #pragma once
 #include "ObserverApi.h"
 #include "BusinessApi.h"
-#include "ExtFrame.h"
 
 
 unsigned int TIFId(CString name);

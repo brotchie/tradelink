@@ -4,9 +4,6 @@
 #include "stdafx.h"
 #include "Resource.h"
 #include "ExtFrame.h"
-#include "TradeLink.h"
-#include "TLAnvil.h"
-#include "Monitor.h"
 
 #include "ObserverApi.h"
 #include "BusinessApi.h"
@@ -24,17 +21,17 @@ ExtFrame* ExtFrame::instance = NULL;
 ExtFrame::ExtFrame()
 {
     instance = this;
-	monitor = new Monitor();
-	B_GetAdminObservable()->Add(monitor);
+	tl = new AVL_TLWM();
+	B_GetAdminObservable()->Add(tl);
     B_GetAdminObservable()->Add(this);
 
 }
 
 ExtFrame::~ExtFrame()
 {
-	TLUnload();
-	B_GetAdminObservable()->Remove(monitor);
-	delete monitor;
+	//TLUnload();
+	B_GetAdminObservable()->Remove(tl);
+	delete tl;
     instance = NULL;
 }
 
@@ -84,12 +81,3 @@ void ExtFrame::Process(const Message* message, Observable* from, const Message* 
 	
 }
 
-
-
-BOOL ExtFrame::OnCopyData(CWnd* sWnd, COPYDATASTRUCT* CD) 
-{
-	CString gotMsg = (LPCTSTR)(CD->lpData);
-	int gotType = (int)(CD->dwData);
-	return ServiceMsg(gotType,gotMsg);
-
-}

@@ -9,8 +9,9 @@
 
 #include "Messages.h"
 #include "ObserverApi.h"
-#include "Monitor.h"
 #include "TradeLibFast.h"
+#include "AVL_TLWM.h"
+using namespace TradeLibFast;
 
 class ExtFrame : public CFrameWnd, public Observer
 {
@@ -19,7 +20,7 @@ public:
 	ExtFrame();           // protected constructor used by dynamic creation
 	virtual ~ExtFrame();
     void ShowWindowAndChildren(int show);
-	Monitor* monitor;
+	AVL_TLWM* tl;
 public:
     static ExtFrame* GetInstance(){return instance;}
 public:
@@ -36,7 +37,6 @@ protected:
 	//{{AFX_MSG(ExtFrame)
 	afx_msg void OnDestroy();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
-	afx_msg BOOL OnCopyData(CWnd* sWnd,COPYDATASTRUCT* pCD);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 

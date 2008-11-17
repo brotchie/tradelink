@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #include "TradeLink.h"
 #include "TLIndex.h"
-#include "TLAnvil.h"
-#include "SendMsg.h"
+#include "AVL_TLWM.h"
 #include "MessageIds.h"
 #include "TLTick.h"
 

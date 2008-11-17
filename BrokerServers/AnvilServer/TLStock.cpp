@@ -2,8 +2,7 @@
 
 #include "TLStock.h"
 #include "Messages.h"
-#include "SendMsg.h"
-#include "TLAnvil.h"
+#include "AVL_TLWM.h"
 #include "TradeLink.h"
 #include "TradeLibFast.h"
 #include "AnvilUtil.h"

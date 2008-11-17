@@ -583,23 +583,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\Monitor.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Monitor.h"
-				>
-			</File>
-			<File
 				RelativePath="Resource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SendMsg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SendMsg.h"
 				>
 			</File>
 			<File
@@ -654,14 +638,6 @@
 			</File>
 			<File
 				RelativePath="StdAfx.h"
-				>
-			</File>
-			<File
-				RelativePath=".\TLAnvil.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\TLAnvil.h"
 				>
 			</File>
 			<File
