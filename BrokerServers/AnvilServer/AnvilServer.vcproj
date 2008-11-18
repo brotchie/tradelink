@@ -656,6 +656,10 @@
 				RelativePath=".\TLStock.h"
 				>
 			</File>
+			<File
+				RelativePath="..\TradeLibFast\Util.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="AnvilApi"
@@ -681,6 +685,10 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath="..\TradeLibFast\Util.h"
+			>
+		</File>
 	</Files>
 	<Globals>
 		<Global

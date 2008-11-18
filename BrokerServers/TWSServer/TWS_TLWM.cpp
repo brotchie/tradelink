@@ -317,7 +317,7 @@ namespace TradeLibFast
 		// for some reason IB sends order cancels as an error rather than
 		// as an order update message
 		if (errorCode==202) 
-			this->SrvCancelNotify(id); // cancels
+			this->SrvGotCancel(id); // cancels
 		else if (IGNOREERRORS) return; // ignore errors during init
 		else D(errorString); // print other errors
 	}

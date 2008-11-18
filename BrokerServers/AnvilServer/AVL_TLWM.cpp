@@ -1,19 +1,13 @@
 #include "stdAfx.h"
 #include "AVL_TLWM.h"
+#include "Util.h"
 #include "Messages.h"
 
-	std::vector <CString>client;
-	std::vector <time_t>heart;
-	typedef std::vector <CString> mystocklist;
-	std::vector < mystocklist > stocks;
-	std::vector <Observer*> subs; // this saves our subscriptions with the hammer server
-	std::vector <CString> subsym;
 
 namespace TradeLibFast
 {
 	// private structures
-	std::vector<CString> accounts;
-	std::vector<Order*> ordercache;
+	
 	
 
 
@@ -34,6 +28,7 @@ namespace TradeLibFast
 
 	AVL_TLWM::~AVL_TLWM(void)
 	{
+		// account monitoring stuff
 		void* iterator = B_CreateAccountIterator();
 		B_StartIteration(iterator);
 		Observable* acct;
@@ -44,6 +39,19 @@ namespace TradeLibFast
 		B_DestroyIterator(iterator);
 		accounts.clear();
 		ordercache.clear();
+
+
+		// stock stuff
+		for (size_t i = 0; i<subs.size(); i++)
+		{
+			if (subs[i]!=NULL)
+			{
+				subs[i]->Clear();
+				delete subs[i];
+				subs[i] = NULL;
+			}
+		}
+		subs.clear();
 	}
 
 	int AVL_TLWM::BrokerName(void)
@@ -51,55 +59,48 @@ namespace TradeLibFast
 		return Assent;
 	}
 
-	int AVL_TLWM::RegisterStocks(CString clientname)
-	{
-/*		int cid = FindClient(clientname);
-		vector<CString> my = this->stocks[cid]; // get this clients stocks
-		for (size_t i = 0; i<my.size();i++) // subscribe to stocks
-		{
-			if (hasHammerSub(my[i])) continue; // if we've already subscribed once, skip to next stock
-			AVLStock* stk = new AVLStock(my[i],this); // create new stock instance
-			stk->Load();
-			this->stocksubs.push_back(stk);
-		}
-		*/
-		return OK;
-	}
 
 	bool AVL_TLWM::hasHammerSub(CString symbol)
 	{
-		for (size_t i = 0; i<stocksubs.size(); i++) 
-			if (symbol.CompareNoCase(stocksubs[i]->GetSymbol().c_str())==0) 
+		for (uint i = 0; i<subsym.size(); i++) 
+			if (symbol==subsym[i]) 
 				return true;
 		return false;
 	}
 
-	int AVL_TLWM::SendOrder(TLOrder order)
+	int AVL_TLWM::SendOrder(TLOrder o) 
 	{
+		const StockBase* Stock = B_GetStockHandle(o.symbol);
+
 		Observable* m_account;
-		m_account = B_GetCurrentAccount();
+		if (o.account=="")
+			m_account = B_GetCurrentAccount();
+		else 
+			m_account = B_GetAccount(o.account.GetBuffer());
 		
-		const StockBase* Stock = B_GetStockHandle(order.symbol);
+
 
 		//convert the arguments
 		Order* orderSent;
-		char side = order.side ? 'B' : 'S';
+		char side = (o.side) ? 'B' : 'S';
+		const Money pricem = Money((int)(o.price*1024));
+		const Money stopm = Money((int)(o.stop*1024));
+		unsigned int mytif = TIFId(o.TIF);
 
-		const Money pricem = Money((int)(order.price*1024));
-		const Money stopm = Money((int)(order.stop*1024));
-		unsigned int tif = TIF_DAY;
-
+		if ((Stock==NULL) || (!Stock->isLoaded()))
+			return UNKNOWNSYM;
+		
 		// send the order (next line is from SendOrderDlg.cpp)
 		unsigned int error = B_SendOrder(Stock,
 				side,
-				order.exchange,
-				order.size,
+				o.exchange,
+				o.size,
 				OVM_VISIBLE, //visability mode
-				order.size, //visable size
+				o.size, //visable size
 				pricem,//const Money& price,0 for Market
 				&stopm,//const Money* stopPrice,
 				NULL,//const Money* discrtetionaryPrice,
-				tif,
+				mytif,
 				false,//bool proactive,
 				true,//bool principalOrAgency, //principal - true, agency - false
 				SUMO_ALG_UNKNOWN,//char superMontageAlgorithm,
@@ -110,19 +111,12 @@ namespace TradeLibFast
 				m_account,
 				0,
 				false,
-				101, order.comment);	
-
-		// cleanup all the stuff we created
-		Stock = NULL;
-		orderSent = NULL;
-		m_account = NULL;
+				101, o.comment);	
 		return error;
 	}
 
-	int AccountId(CString acct) { for (size_t i = 0; i<accounts.size(); i++) if (accounts[i]==acct) return i; return -1; }
 
-
-	bool hasOrder(unsigned int  TLid)
+	bool AVL_TLWM::hasOrder(unsigned int  TLid)
 	{
 		return (TLid>=0) && (TLid<ordercache.size());
 	}
@@ -173,11 +167,8 @@ namespace TradeLibFast
 				fill.xsize= msg->x_NumberOfShares;
 				fill.exchange = CString(ExchangeName((long)msg->x_executionId));
 				fill.account = CString(B_GetAccountName(position->GetAccount()));
+				SrvGotFill(fill);
 
-				std::vector <CString> subname;
-				AllClients(subname);
-				for (size_t i = 0; i< subname.size(); i++) 
-					TLSend(EXECUTENOTIFY,fill.Serialize(),subname[i]);
 			} // has additional info end
 			break;
 			case M_POOL_ASSIGN_ORDER_ID://Original order sent has a unigue generated id. The server sends this message to notify you that the order was assigned a new id different from the original. Both ids are part of this notification structure. This message can come 1 or 2 times.
@@ -213,10 +204,7 @@ namespace TradeLibFast
 				o.TIF = TIFName(order->GetTimeInForce());
 				o.account = CString(B_GetAccountName(order->GetAccount()));
 				o.symbol = CString(order->GetSymbol());
-				std::vector <CString> subname;
-				AllClients(subname);
-				for (size_t i = 0; i< subname.size(); i++) 
-					TLSend(ORDERNOTIFY,o.Serialize(),subname[i]);
+				SrvGotOrder(o);
 				break;
 			} // has addt info / caseend
 			case M_REQ_CANCEL_ORDER:
@@ -225,12 +213,7 @@ namespace TradeLibFast
 				Order* order = info->m_order;
 				unsigned int anvilid = order->GetId();
 				unsigned int id = cacheOrder(order);
-				CString msg;
-				msg.Format("%u",id);
-				std::vector<CString> clients;
-				AllClients(clients);
-				for (size_t i = 0; i<clients.size(); i++)
-					TLSend(ORDERCANCELRESPONSE,msg,clients[i]);
+				SrvGotCancel(id);
 				break;
 
 			}
@@ -238,119 +221,109 @@ namespace TradeLibFast
 		} // switchend
 	}
 
-		unsigned int AnvilId(unsigned int TLOrderId)
+	int AVL_TLWM::AnvilId(unsigned int TLOrderId)
 	{
 		if (!hasOrder(TLOrderId)) return -1;
 		Order* o = ordercache[TLOrderId];
 		return o->GetId();
 	}
 
-
-
-}
-
-
-
-	void TLUnload()
+	std::vector<int> AVL_TLWM::GetFeatures()
 	{
-		for (size_t i = 0; i<subs.size(); i++)
+		std::vector<int> f;
+		f.push_back(BROKERNAME);
+		f.push_back(ACCOUNTREQUEST);
+		f.push_back(ACCOUNTRESPONSE);
+		f.push_back(HEARTBEAT);
+		f.push_back(NDAYHIGH);
+		f.push_back(NDAYLOW);
+		f.push_back(OPENPRICE);
+		f.push_back(CLOSEPRICE);
+		f.push_back(YESTCLOSE);
+		f.push_back(SENDORDER);
+		f.push_back(AVGPRICE);
+		f.push_back(POSOPENPL);
+		f.push_back(POSCLOSEDPL);
+		f.push_back(POSLONGPENDSHARES);
+		f.push_back(POSSHORTPENDSHARES);
+		f.push_back(POSITIONREQUEST);
+		f.push_back(POSITIONRESPONSE);
+		f.push_back(LRPBID);
+		f.push_back(LRPASK);
+		f.push_back(POSTOTSHARES);
+		f.push_back(LASTTRADE);
+		f.push_back(LASTSIZE);
+		f.push_back(REGISTERCLIENT);
+		f.push_back(REGISTERSTOCK);
+		f.push_back(CLEARCLIENT);
+		f.push_back(CLEARSTOCKS);
+		f.push_back(REGISTERINDEX);
+		f.push_back(ACCOUNTOPENPL);
+		f.push_back(ACCOUNTCLOSEDPL);
+		f.push_back(ORDERCANCELREQUEST);
+		f.push_back(ORDERCANCELRESPONSE);
+		f.push_back(FEATUREREQUEST);
+		f.push_back(FEATURERESPONSE);
+		f.push_back(ISSIMULATION);
+		f.push_back(TICKNOTIFY);
+		f.push_back(TRADENOTIFY);
+		f.push_back(ORDERNOTIFY);
+		return f;
+	}
+
+	int AVL_TLWM::AccountResponse(CString client)
+	{
+		void* iterator = B_CreateAccountIterator();
+		B_StartIteration(iterator);
+		Observable* a;
+		std::vector<CString> accts;
+		while (a = B_GetNextAccount(iterator)) // loop through every available account
 		{
-			if (subs[i]!=NULL)
-			{
-				subs[i]->Clear();
-				delete subs[i];
-				subs[i] = NULL;
-			}
+			PTCHAR username = (PTCHAR)B_GetAccountName(a);
+			CString un(username);
+			accts.push_back(un);
 		}
-		client.clear();
-		heart.clear();
-		stocks.clear();
-		subs.clear();
+		B_DestroyIterator(iterator);
+		CString msg = ::gjoin(accts,CString(","));
+		TLSend(ACCOUNTRESPONSE,msg,client);
+		return OK;
 	}
 
-	void AllClients(std::vector <CString> &clients)
+	int AVL_TLWM::PositionResponse(CString account, CString client)
 	{
-		size_t count = client.size();
-		for (size_t i = 0; i<count; i++)
-			clients.push_back(client[i]);
-	}
-
-	void Subscribers(CString stock, std::vector <CString> &subscriberids)
-	{
-		size_t maxclient = stocks.size();
-		for (size_t i = 0; i<maxclient; i++)
+		Observable* m_account = B_GetAccount(account);
+		void* iterator = B_CreatePositionIterator(POSITION_FLAT|POSITION_LONG|POSITION_SHORT, (1 << ST_LAST) - 1,m_account);
+		B_StartIteration(iterator);
+		const Position* pos;
+		int count = 0;
+		while(pos = B_GetNextPosition(iterator))
 		{
-			size_t maxstocks = stocks[i].size(); //numstocks for this client
-			for (size_t j=0; j<maxstocks; j++) 
-				if (stock.CompareNoCase(stocks[i][j])==0) // our stock matches the current stock of this client
-				{
-					subscriberids.push_back(client[i]); // so we save this client
-					break; // no need to process more stocks for this client
-				}
+			TradeLibFast::TLPosition p;
+			p.AvgPrice = pos->GetAverageExecPrice().GetMoneyValueForServer()/(double)1024;
+			p.ClosedPL = pos->GetClosedPnl().GetMoneyValueForServer()/(double)1024;
+			p.Size = pos->GetSize();
+			p.Symbol = CString(pos->GetSymbol());
+			CString msg = p.Serialize();
+			TLSend(POSITIONRESPONSE,msg,client);
+			count++;
 		}
+		B_DestroyIterator(iterator);
+		m_account = NULL;
+		pos = NULL;
+		return count;
 	}
 
-
-
-	int FindClient(CString cwind)
-	{
-		size_t len = client.size();
-		for (size_t i = 0; i<len; i++) if (client[i]==cwind) return i;
-		return -1;
-	}
-
-	LRESULT RegClient(CString m) 
-	{
-		if (FindClient(m)!=-1) return 1;
-		client.push_back(m);
-		time_t now;
-		time(&now);
-		heart.push_back(now); // save heartbeat at client index
-		mystocklist my = mystocklist(0);
-		stocks.push_back(my);
-		return 0;
-	}
-
-	LRESULT HeartBeat(CString cwind)
-	{
-		int cid = FindClient(cwind);
-		if (cid==-1) return -1;
-		time_t now;
-		time(&now);
-		time_t then = heart[cid];
-		double dif = difftime(now,then);
-		heart[cid] = now;
-		return (LRESULT)dif;
-	}
-
-	int LastBeat(CString cwind)
-	{
-		int cid = FindClient(cwind);
-		if (cid==-1) return 6400000;
-		time_t now,then;
-		time(&now);
-		then = heart[cid];
-		double dif = difftime(now,then);
-		if (then==0) dif = 0;
-		return (int)dif;
-	}
-
-
-	size_t SubIdx(CString symbol)
+	int AVL_TLWM::SubIdx(CString symbol)
 	{
 		for (size_t i = 0; i<subsym.size(); i++) 
 			if (subsym[i]==symbol)
-				return i;
+				return (int)i;
 		return -1;
 	}
 
-	bool hasHammerSub(CString symbol)
-	{
-		return SubIdx(symbol)!=-1;
-	}
 
 
-	bool isIndex(CString sym)
+	bool AVL_TLWM::isIndex(CString sym)
 	{
 		int slashi = sym.FindOneOf("/");
 		int doli = sym.FindOneOf("$");
@@ -358,35 +331,7 @@ namespace TradeLibFast
 		return (slashi!=-1)||(doli!=-1)||(poundi!=-1);
 	}
 
-	LRESULT RegStocks(CString m)
-	{ 
-		std::vector <CString> rec;
-		gsplit(m,"+",rec); // split message body into client id and stock list
-		unsigned int cid = FindClient(rec[0]);
-		if (cid==-1) return 1; //client not registered
-		mystocklist my; // initialize stocklist array to proper length
-		gsplit(rec[1],",",my); // populate array from the message
-		for (size_t i = 0; i<my.size();i++) // subscribe to stocks
-		{
-			if (hasHammerSub(my[i])) continue; // if we've already subscribed once, skip to next stock
-			Observer* sec;
-			if (isIndex(my[i]))
-				sec = new TLIdx(my[i]);
-			else
-			{
-				TLStock *stk = new TLStock(my[i]); // create new stock instance
-				stk->Load();
-				sec = stk;
-			}
-			subs.push_back(sec);
-			subsym.push_back(my[i]);
-		}
-		stocks[cid] = my; // index the array by the client's id
-		HeartBeat(rec[0]); // update the heartbeat
-		return 0;
-	}
-
-	void RemoveSub(CString stock)
+	void AVL_TLWM::RemoveSub(CString stock)
 	{
 		if (hasHammerSub(stock))
 		{
@@ -401,109 +346,61 @@ namespace TradeLibFast
 		}
 	}
 
-	void RemoveSubs(CString cwind)
+	void AVL_TLWM::RemoveUnused()
 	{
-		int cid = FindClient(cwind);
-		if (cid==-1) return;
-		size_t maxstocks = stocks[cid].size();
-		for (size_t i =0; i<maxstocks; i++)
+		for (uint i = 0; i<stocks.size(); i++)
+			for (uint j = 0; j<stocks[i].size(); j++)
+				if (!needStock(stocks[i][j]))
+					RemoveSub(stocks[i][j]);
+
+	}
+
+	int AVL_TLWM::RegisterStocks(CString clientname)
+	{ 
+		TLServer_WM::RegisterStocks(clientname);
+		unsigned int cid = FindClient(clientname);
+		if (cid==-1) return CLIENTNOTREGISTERED; //client not registered
+		clientstocklist my = stocks[cid]; // get stocks
+		for (size_t i = 0; i<my.size();i++) // subscribe to stocks
 		{
-			std::vector <CString> ALLSUBS;
-			::Subscribers(stocks[cid][i],ALLSUBS);
-			if ((ALLSUBS.size()==1) // if we only have one subscriber
-				&& (ALLSUBS[0].Compare(cwind)==0)) // and it's the one we requested
-				RemoveSub(stocks[cid][i]);  // remove it
-			// otherwise leave it
-		}
-
-	}
-
-
-	LRESULT ClearClient(CString m) 
-	{
-		RemoveSubs(m); // remove any subscriptions this stock has that aren't used by others
-		int cid = FindClient(m);
-		if (cid==-1) return 1;
-		client[cid] = "";
-		stocks[cid] = mystocklist(0);
-		heart[cid] = NULL;
-		return 0;
-	}
-
-	LRESULT ClearStocks(CString m)
-	{
-		RemoveSubs(m);
-		int cid = FindClient(m);
-		if (cid==-1) return 1;
-		stocks[cid] = mystocklist(0);
-		HeartBeat(m);
-		return 0;
-	}
-
-
-
-	void TLKillDead(int deathInseconds)
-	{
-		for (size_t i = 0; i<client.size(); i++) 
-		{
-			int lastbeat = LastBeat(client[i]);
-			if ((client[i]!="") && (lastbeat>deathInseconds))
+			if (hasHammerSub(my[i])) continue; // if we've already subscribed once, skip to next stock
+			Observer* sec;
+			if (isIndex(my[i]))
+				sec = new TLIdx(my[i],this);
+			else
 			{
-				RemoveSubs(client[i]);
-				ClearClient(client[i]);
+				TLStock *stk = new TLStock(my[i],this); // create new stock instance
+				sec = stk;
 			}
+			subs.push_back(sec);
+			subsym.push_back(my[i]);
 		}
+		stocks[cid] = my; // index the array by the client's id
+		HeartBeat(clientname); // update the heartbeat
+		return 0;
 	}
 
-	int Sendorder(CString msg) 
+	int AVL_TLWM::ClearClient(CString client) 
 	{
-		if (msg=="") return GOTNULLORDER;
-
-		TradeLibFast::TLOrder o = TradeLibFast::TLOrder::Deserialize(msg);
-		const StockBase* Stock = B_GetStockHandle(o.symbol);
-
-		Observable* m_account;
-		if (o.account=="")
-			m_account = B_GetCurrentAccount();
-		else 
-			m_account = B_GetAccount(o.account.GetBuffer());
-		
-
-
-		//convert the arguments
-		Order* orderSent;
-		char side = (o.side) ? 'B' : 'S';
-		const Money pricem = Money((int)(o.price*1024));
-		const Money stopm = Money((int)(o.stop*1024));
-		unsigned int mytif = TIFId(o.TIF);
-
-		if ((Stock==NULL) || (!Stock->isLoaded()))
-			return UNKNOWNSYM;
-		
-		// send the order (next line is from SendOrderDlg.cpp)
-		unsigned int error = B_SendOrder(Stock,
-				side,
-				o.exchange,
-				o.size,
-				OVM_VISIBLE, //visability mode
-				o.size, //visable size
-				pricem,//const Money& price,0 for Market
-				&stopm,//const Money* stopPrice,
-				NULL,//const Money* discrtetionaryPrice,
-				mytif,
-				false,//bool proactive,
-				true,//bool principalOrAgency, //principal - true, agency - false
-				SUMO_ALG_UNKNOWN,//char superMontageAlgorithm,
-				OS_RESIZE,
-				//false,//bool delayShortTillUptick,
-				DE_DEFAULT, //destination exchange
-				&orderSent,
-				m_account,
-				0,
-				false,
-				101, o.comment);	
-		return error;
+		// call base clear
+		TLServer_WM::ClearClient(client);
+		// remove any subscriptions this stock has that aren't used by others
+		RemoveUnused(); 
+		return OK;
 	}
+
+	int AVL_TLWM::ClearStocks(CString client)
+	{
+		// remove record of stocks
+		TLServer_WM::ClearStocks(client);
+		// remove anvil subs
+		RemoveUnused();
+		return OK;
+	}
+
+}
+
+/*
 
 	long GetPosF(CString msg, int funct) 
 	{
@@ -590,108 +487,8 @@ namespace TradeLibFast
 		return price;
 	}
 
-	LRESULT gotAccountRequest(CString client)
-	{
-		void* iterator = B_CreateAccountIterator();
-		B_StartIteration(iterator);
-		Observable* a;
-		std::vector<CString> accts;
-		while (a = B_GetNextAccount(iterator)) // loop through every available account
-		{
-			PTCHAR username = (PTCHAR)B_GetAccountName(a);
-			CString un(username);
-			accts.push_back(un);
-		}
-		B_DestroyIterator(iterator);
-		CString msg = gjoin(accts,",");
-		TradeLibFast::TLServer_WM::TLSend(ACCOUNTRESPONSE,msg,client);
-		return OK;
-	}
 
-	CString SerializeIntVec(std::vector<int> input)
-	{
-		std::vector<CString> tmp;
-		for (size_t i = 0; i<input.size(); i++)
-		{
-			CString t; // setup tmp string
-			t.Format("%i",input[i]); // convert integer into tmp string
-			tmp.push_back(t); // push converted string onto vector
-		}
-		// join vector and return serialized structure
-		return gjoin(tmp,",");
-	}
 
-	int PosList(CString req)
-	{
-		std::vector<CString> r;
-		gsplit(req,"+",r);
-		if (r.size()<2) return 0;
-		CString account = r[1];
-		CString client = r[0];
-		Observable* m_account = B_GetAccount(account);
-		void* iterator = B_CreatePositionIterator(POSITION_FLAT|POSITION_LONG|POSITION_SHORT, (1 << ST_LAST) - 1,m_account);
-		B_StartIteration(iterator);
-		const Position* pos;
-		int count = 0;
-		while(pos = B_GetNextPosition(iterator))
-		{
-			TradeLibFast::TLPosition p;
-			p.AvgPrice = pos->GetAverageExecPrice().GetMoneyValueForServer()/(double)1024;
-			p.ClosedPL = pos->GetClosedPnl().GetMoneyValueForServer()/(double)1024;
-			p.Size = pos->GetSize();
-			p.Symbol = CString(pos->GetSymbol());
-			CString msg = p.Serialize();
-			TradeLibFast::TLServer_WM::TLSend(POSITIONRESPONSE,msg,client);
-			count++;
-		}
-		B_DestroyIterator(iterator);
-		m_account = NULL;
-		pos = NULL;
-		return count;
-	}
-
-	CString GetFeatures()
-	{
-		std::vector<int> f;
-		f.push_back(BROKERNAME);
-		f.push_back(ACCOUNTREQUEST);
-		f.push_back(ACCOUNTRESPONSE);
-		f.push_back(HEARTBEAT);
-		f.push_back(NDAYHIGH);
-		f.push_back(NDAYLOW);
-		f.push_back(OPENPRICE);
-		f.push_back(CLOSEPRICE);
-		f.push_back(YESTCLOSE);
-		f.push_back(SENDORDER);
-		f.push_back(AVGPRICE);
-		f.push_back(POSOPENPL);
-		f.push_back(POSCLOSEDPL);
-		f.push_back(POSLONGPENDSHARES);
-		f.push_back(POSSHORTPENDSHARES);
-		f.push_back(POSITIONREQUEST);
-		f.push_back(POSITIONRESPONSE);
-		f.push_back(LRPBID);
-		f.push_back(LRPASK);
-		f.push_back(POSTOTSHARES);
-		f.push_back(LASTTRADE);
-		f.push_back(LASTSIZE);
-		f.push_back(REGISTERCLIENT);
-		f.push_back(REGISTERSTOCK);
-		f.push_back(CLEARCLIENT);
-		f.push_back(CLEARSTOCKS);
-		f.push_back(REGISTERINDEX);
-		f.push_back(ACCOUNTOPENPL);
-		f.push_back(ACCOUNTCLOSEDPL);
-		f.push_back(ORDERCANCELREQUEST);
-		f.push_back(ORDERCANCELRESPONSE);
-		f.push_back(FEATUREREQUEST);
-		f.push_back(FEATURERESPONSE);
-		f.push_back(ISSIMULATION);
-		f.push_back(TICKNOTIFY);
-		f.push_back(TRADENOTIFY);
-		f.push_back(ORDERNOTIFY);
-		return SerializeIntVec(f);
-	}
 
 	LPARAM ServiceMsg(const int t,CString m) {
 		
@@ -771,3 +568,4 @@ namespace TradeLibFast
 
 		return UNKNOWNMSG;
 	}
+	*/

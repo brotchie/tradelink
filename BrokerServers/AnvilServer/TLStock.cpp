@@ -16,13 +16,14 @@ using namespace TradeLibFast;
 #pragma warning (disable:4355)
 
 
-TLStock::TLStock(const char* symbol, bool load):
+TLStock::TLStock(const char* symbol, TradeLibFast::TLServer_WM* tlinst, bool load):
     m_symbol(symbol),
     m_stockHandle(NULL),
     m_level1(NULL),
     m_level2(NULL),
     m_prints(NULL)
 {
+	tl = tlinst;
     if(load)
     {
         Load();
@@ -47,6 +48,7 @@ void TLStock::Clear()
         m_prints = NULL;
     }
     m_stockHandle = NULL;
+	tl = NULL;
 }
 
 TLStock::~TLStock()
@@ -110,13 +112,7 @@ void TLStock::Process(const Message* message, Observable* from, const Message* a
 				tick.os = msg->m_AskSize;
 				tick.be = info->m_mmid;
 				tick.oe = info->m_mmid;
-				std::vector <CString> subname;
-				// get TL subscribers to this stock
-				Subscribers(msg->m_Symbol,subname);
-
-				// send each subscriber a copy of the trade object
-				for (size_t i = 0; i< subname.size(); i++) 
-					SendMsg(TICKNOTIFY,tick.Serialize(),subname[i]);
+				tl->SrvGotTick(tick);
 		}
 
         break;
@@ -145,11 +141,7 @@ void TLStock::Process(const Message* message, Observable* from, const Message* a
 			tick.time = time;
 			tick.date = date;
 			tick.sec = ct.GetSecond();
-			std::vector <CString> subname;
-			Subscribers(msg->m_Symbol,subname);
-			// send each subscriber a copy of the trade object
-			for (size_t i = 0; i< subname.size(); i++) 
-				SendMsg(TICKNOTIFY,tick.Serialize(),subname[i]);
+			tl->SrvGotTick(tick);
         }
         break;
 

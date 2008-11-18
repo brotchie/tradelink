@@ -33,11 +33,12 @@ void TLIdx::Load(CString symbol)
 }
 
 
-TLIdx::TLIdx(CString symbol)
+TLIdx::TLIdx(CString symbol,TradeLibFast::TLServer_WM* tlinst)
 {
 	m_index = NULL;
 	m_symbol = "";
 	Load(symbol);
+	tl = tlinst;
 
 }
 
@@ -71,11 +72,7 @@ void TLIdx::FillInfo()
 	k.sym = m_index->GetSymbol();
 	k.trade = val;
 	k.size = -1;
-
-	std::vector<CString> client;
-	AllClients(client);
-	for (size_t i = 0; i<client.size(); i++)
-		SendMsg(TICKNOTIFY,k.Serialize(),client[i]); // send update to every client
+	tl->SrvGotTick(k);
 }
 
 

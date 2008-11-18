@@ -104,7 +104,7 @@ namespace TradeLibFast
 			switch (MessageType)
 			{
 			case ORDERCANCELREQUEST :
-				SrvCancelRequest((long)atoi(msg.GetBuffer()));
+				CancelRequest((long)atoi(msg.GetBuffer()));
 				return OK;
 			case ACCOUNTREQUEST :
 				return AccountResponse(msg);
@@ -125,20 +125,6 @@ namespace TradeLibFast
 				D(CString(_T("Client ")+client+_T(" registered: ")+gjoin(hisstocks,",")));
 				HeartBeat(client);
 				return RegisterStocks(client);
-				}
-			case REGISTERFUTURE :
-				{
-					vector<CString> rec;
-					gsplit(msg,CString("+"),rec);
-					CString client = rec[0];
-					vector<CString> hisstocks;
-					gsplit(rec[1],CString(","),hisstocks);
-					unsigned int cid = FindClient(client); // parse first part as client name
-					if (cid==-1) return CLIENTNOTREGISTERED; //client not registered
-					stocks[cid] = hisstocks; // save the future list
-					D(CString(_T("Client ")+client+_T(" registered: ")+gjoin(hisstocks,",")));
-					HeartBeat(client);
-					return RegisterFutures(client);
 				}
 
 			case REGISTERCLIENT :
@@ -192,10 +178,14 @@ namespace TradeLibFast
 	}
 
 	int TLServer_WM::RegisterStocks(CString clientname) { return OK; }
-	int TLServer_WM::RegisterFutures(CString clientname) { return OK; }
 	std::vector<int> TLServer_WM::GetFeatures() { std::vector<int> blank; return blank; } 
 
 	int TLServer_WM::AccountResponse(CString clientname)
+	{
+		return FEATURE_NOT_IMPLEMENTED;
+	}
+
+	int TLServer_WM::PositionResponse(CString account, CString clientname)
 	{
 		return FEATURE_NOT_IMPLEMENTED;
 	}
@@ -272,7 +262,7 @@ namespace TradeLibFast
 			}
 	}
 
-	void TLServer_WM::SrvCancelNotify(int orderid)
+	void TLServer_WM::SrvGotCancel(int orderid)
 	{
 		CString id;
 		id.Format(_T("%i"),orderid);
@@ -281,7 +271,7 @@ namespace TradeLibFast
 				TLSend(ORDERCANCELRESPONSE,id,client[i]);
 	}
 
-	void TLServer_WM::SrvCancelRequest(long order)
+	void TLServer_WM::CancelRequest(long order)
 	{
 		return;
 	}

@@ -1,19 +1,21 @@
 #pragma once
 #include "ObserverApi.h"
 #include "BusinessApi.h"
+#include "TradeLibFast.h"
 
 
 class TLIdx : public Observer
 {
 // Construction
 public:
-	TLIdx(CString symbol);   // standard constructor
+	TLIdx(CString symbol,TradeLibFast::TLServer_WM* tl);   // standard constructor
 	CString m_symbol;
 	CString m_StaticSymbol;
 	protected:
 
 // Implementation
 protected:
+	TradeLibFast::TLServer_WM* tl;
 
 	afx_msg void OnChangeIndexSymbol();
 	afx_msg void OnDynamicUpdate();

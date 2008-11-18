@@ -1,6 +1,7 @@
 #pragma once
 #include "ObserverApi.h"
 #include "BusinessApi.h"
+#include "TradeLibFast.h"
 
 
 unsigned int TIFId(CString name);
@@ -10,7 +11,7 @@ class TLStock : public Observer
     //every Observer must have function virtual void Process(const Message* message, Observable* from, const Message* additionalInfo); which will be called when a stock update is received from the server.
 {
 public:
-    TLStock(const char* symbol, bool load = false);
+	TLStock(const char* symbol, TradeLibFast::TLServer_WM* tl, bool load = true);
 
     virtual ~TLStock();
 
@@ -19,6 +20,7 @@ public:
     const StockBase* GetStockHandle() const{return m_stockHandle;}
     bool isLoaded() const{return m_stockHandle != NULL && B_IsStockLoaded(m_stockHandle);}
     const std::string& GetSymbol() const{return m_symbol;}
+	TradeLibFast::TLServer_WM* tl;
 
     Observable* GetLevel1(){return m_level1;}
     Observable* GetLevel2(){return m_level2;}

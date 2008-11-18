@@ -24,6 +24,10 @@ namespace TradeLibFast
 		__event void GotDebug(LPCTSTR msg);
 		CString debugbuffer;
 		static int TLSend(int type,LPCTSTR msg,CString windname);
+		void SrvGotOrder(TLOrder order);
+		void SrvGotFill(TLTrade trade);
+		void SrvGotTick(TLTick tick);
+		void SrvGotCancel(int orderid);
 
 	protected:
 		bool needStock(CString stock);
@@ -45,20 +49,19 @@ namespace TradeLibFast
 		virtual int BrokerName(void);
 		virtual int SendOrder(TLOrder order);
 		virtual int AccountResponse(CString clientname);
+		virtual int PositionResponse(CString account, CString clientname);
 		virtual int RegisterStocks(CString clientname);
-		virtual int RegisterFutures(CString clientname);
 		virtual std::vector<int> GetFeatures();
-		int ClearClient(CString client);
-		int ClearStocks(CString client);
+		virtual int ClearClient(CString client);
+		virtual int ClearStocks(CString client);
+		virtual void CancelRequest(long order);
+		virtual void Start(bool live = true);
 
 		void TLServer_WM::D(const CString & message);
-		void SrvGotOrder(TLOrder order);
-		void SrvGotFill(TLTrade trade);
-		void SrvGotTick(TLTick tick);
+
+
 		bool HaveSubscriber(CString stock);
-		void SrvCancelNotify(int orderid);
-		virtual void SrvCancelRequest(long order);
-		virtual void Start(bool live = true);
+		
 	};
 
 

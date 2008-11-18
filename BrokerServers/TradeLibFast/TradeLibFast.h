@@ -1,4 +1,5 @@
 #pragma once
+typedef unsigned int uint;
 #include "TradeLink.h"
 #include "TLTrade.h"
 #include "TLOrder.h"
