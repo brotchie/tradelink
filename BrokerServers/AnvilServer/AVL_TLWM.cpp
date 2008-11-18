@@ -6,15 +6,17 @@
 
 namespace TradeLibFast
 {
-	// private structures
 	
 	
+	AVL_TLWM* AVL_TLWM::instance = NULL;	
 
 
 
 
 	AVL_TLWM::AVL_TLWM(void)
 	{
+		instance = this;
+
 		void* iterator = B_CreateAccountIterator();
 		B_StartIteration(iterator);
 		Observable* acct;
@@ -41,7 +43,7 @@ namespace TradeLibFast
 		ordercache.clear();
 
 
-		// stock stuff
+		// stock stuff, close down hammer subscriptions
 		for (size_t i = 0; i<subs.size(); i++)
 		{
 			if (subs[i]!=NULL)
@@ -52,6 +54,10 @@ namespace TradeLibFast
 			}
 		}
 		subs.clear();
+		subsym.clear();
+
+		// if we stored a pointer to ourself, remove it for safety
+		instance = NULL;
 	}
 
 	int AVL_TLWM::BrokerName(void)
@@ -67,10 +73,22 @@ namespace TradeLibFast
 				return true;
 		return false;
 	}
+	const StockBase* AVL_TLWM::preload(CString symbol)
+	{
+		for (uint i = 0; i<subs.size(); i++)
+		{
+			if (!isIndex(subsym[i]) && (subs[i]!=NULL) && (subsym[i]==symbol))
+			{
+				TLStock* s = (TLStock*)subs[i];
+				return s->GetStockHandle();
+			}
+		}
+		return B_GetStockHandle(symbol);
+	}
 
 	int AVL_TLWM::SendOrder(TLOrder o) 
 	{
-		const StockBase* Stock = B_GetStockHandle(o.symbol);
+		const StockBase* Stock = preload(o.symbol);
 
 		Observable* m_account;
 		if (o.account=="")

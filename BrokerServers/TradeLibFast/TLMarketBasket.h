@@ -16,12 +16,9 @@ namespace TradeLibFast
 		unsigned int Count();
 		TLSecurity operator[](unsigned int index) { return _secs[index]; }
 		void Add(TLSecurity sec) { _secs.push_back(sec); }
-		void Add(CString symbol) { _secs.push_back(TLSecurity::Deserialize(symbol)); }
-		void Add(TLMarketBasket basket)
-		{
-			for (unsigned int i = 0; i<basket.Count(); i++)
-				Add(basket[i]);
-		}
+		void Add(CString symbol);
+		void Add(TLMarketBasket basket);
+
 
 	protected:
 		vector<TLSecurity> _secs;

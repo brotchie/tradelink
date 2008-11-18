@@ -2,11 +2,13 @@
 //
 
 #include "stdafx.h"
-#include "Resource.h"
+//#include "Resource.h"
 #include "BusinessApi.h"
 #include <afxdllx.h>
-#include "ExtFrame.h"
+#include "AVL_TLWM.h"
 #include <fstream>
+#include "Messages.h"
+using namespace TradeLibFast;
 
 
 #ifdef _DEBUG
@@ -67,7 +69,7 @@ extern "C" {
 
 void WINAPI TerminateAnvilExtension()
 {
-    ExtFrame* frame = ExtFrame::GetInstance();
+    AVL_TLWM* frame = AVL_TLWM::GetInstance();
     if(frame)
     {
         frame->DestroyWindow();
@@ -90,23 +92,12 @@ const char* WINAPI GetAnvilExtensionMenu()
 
 void ShowMainWindow()
 {
-    ExtFrame* frame = ExtFrame::GetInstance();
+    AVL_TLWM* frame = AVL_TLWM::GetInstance();
 	Observable* m_account = B_GetCurrentAccount();
 	BOOL isSim = B_IsAccountSimulation(m_account);
-
-
-    if(!frame)
-    {
-		LPCTSTR windname = "TL-BROKER-SIMU";
-		if (!isSim) windname = "TL-BROKER-LIVE";
-
-        frame = new ExtFrame();
-
-        CRect rect(200, 200, 600, 400);
-        CWnd* parent = AfxGetMainWnd();
-	    frame->Create(NULL, windname, WS_OVERLAPPEDWINDOW, rect, parent, MAKEINTRESOURCE(IDR_MAINFRAME));//, WS_VISIBLE|WS_POPUP|WS_CLIPCHILDREN|WS_THICKFRAME|WS_SYSMENU|WS_MINIMIZEBOX, rect);
-
-    }
+	if (!frame)
+		frame = new AVL_TLWM();
+	frame->Start(!isSim);
 }
 
 std::string version;
@@ -147,7 +138,7 @@ bool WINAPI DoAnvilExtensionCommand(unsigned int id)
 
         case 1:
         {
-            ExtFrame* frame = ExtFrame::GetInstance();
+            AVL_TLWM* frame = AVL_TLWM::GetInstance();
             if(frame)
             {
                 frame->SendMessage(WM_SYSCOMMAND, SC_CLOSE, 0);

@@ -13,6 +13,18 @@ namespace TradeLibFast
 	{
 	}
 
+	
+	void TLMarketBasket::Add(CString symbol) 
+	{ 
+		TLSecurity sec = TLSecurity::Deserialize(symbol);
+		_secs.push_back(sec); 
+	}
+	void TLMarketBasket::Add(TLMarketBasket basket)
+	{
+		for (unsigned int i = 0; i<basket.Count(); i++)
+			Add(basket[i]);
+	}
+
 	CString TLMarketBasket::Serialize()
 	{
 		std::vector<CString> r;

@@ -3,6 +3,7 @@
 #include "TLStock.h"
 #include "TLIndex.h"
 #include "AnvilUtil.h"
+#include "BusinessApi.h"
 #include <vector>
 using namespace std;
 
@@ -19,11 +20,15 @@ namespace TradeLibFast
 		int AccountResponse(CString clientname);
 		int PositionResponse(CString account,CString clientname);
 		int RegisterStocks(CString clientname);
+		static AVL_TLWM* GetInstance() { return instance; };
+		
 
 	protected:
+		static AVL_TLWM* instance;
 		vector <Observer*> subs;
 		vector<CString> subsym;
 		vector<Order*> ordercache;
+		const StockBase* preload(CString symbol);
 
 		int BrokerName(void);
 		int SendOrder(TLOrder order);

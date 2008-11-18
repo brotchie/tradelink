@@ -43,7 +43,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../TestDLL"
+				AdditionalIncludeDirectories="../TradeLibFast"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_AFXEXT"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -67,10 +67,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="../debug/TestDLL.lib"
+				AdditionalDependencies="TradeLibFast.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="../debug/"
-				ModuleDefinitionFile=".\test.def"
+				AdditionalLibraryDirectories="&quot;..\$(Configurationname)&quot;"
+				ModuleDefinitionFile="$(ProjectName).def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -98,6 +98,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="auto-run unit tests"
+				CommandLine="$(ProjectDir)\runtests.cmd $(OutDir) &quot;$(OutDir)\$(ProjectName).dll&quot;"
 			/>
 		</Configuration>
 		<Configuration

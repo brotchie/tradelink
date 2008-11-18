@@ -66,7 +66,7 @@
 			>
 			<DebugSettings
 				Command="C:\Users\jfranta\Documents\Visual Studio 2008\Projects\AnvilDebug_x32_2_7_0_5\Anvil.exe"
-				WorkingDirectory=""
+				WorkingDirectory="..\$(OutDir)"
 				CommandArguments=""
 				Attach="false"
 				DebuggerType="3"
