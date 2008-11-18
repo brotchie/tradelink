@@ -183,6 +183,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="auto-run unit tests"
+				CommandLine="$(ProjectDir)\runtests.cmd $(OutDir) &quot;$(OutDir)\$(ProjectName).dll&quot;"
 			/>
 		</Configuration>
 	</Configurations>
