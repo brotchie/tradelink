@@ -2,7 +2,6 @@
 //
 
 #include "stdafx.h"
-//#include "Resource.h"
 #include "BusinessApi.h"
 #include <afxdllx.h>
 #include "AVL_TLWM.h"
@@ -74,7 +73,8 @@ void WINAPI TerminateAnvilExtension()
     {
         frame->DestroyWindow();
     }
-
+	delete frame;
+	frame = NULL;
 }
 
 const char* WINAPI GetAnvilExtensionDescription()
@@ -106,7 +106,7 @@ const char* VERFILE = "c:\\progra~1\\tradelink\\brokerserver\\VERSION.txt";
 void WINAPI InitializeAnvilExtension()
 {
 	CString major = "0.1";
-	CString minor("$Rev$");
+	CString minor("?");
 	std::ifstream file;
 	file.open(VERFILE);
 	if (file.is_open())
@@ -115,11 +115,6 @@ void WINAPI InitializeAnvilExtension()
 		file.getline(data,8);
 		minor = CString(data);
 		file.close();
-	}
-	else
-	{
-		minor.Replace("$Rev: ","");
-		minor.TrimRight(" $");
 	}
 	CString ver;
 	ver.Format("%s.%s",major,minor);

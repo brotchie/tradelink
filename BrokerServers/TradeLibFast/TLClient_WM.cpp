@@ -28,7 +28,7 @@ namespace TradeLibFast
 				gotOrder(o);
 			}
 			break;
-		case TRADENOTIFY :
+		case EXECUTENOTIFY :
 			{
 				TLTrade f = TLTrade::Deserialize(msg);
 				gotFill(f);

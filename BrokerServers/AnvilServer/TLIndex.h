@@ -9,6 +9,7 @@ class TLIdx : public Observer
 // Construction
 public:
 	TLIdx(CString symbol,TradeLibFast::TLServer_WM* tl);   // standard constructor
+	~TLIdx();
 	CString m_symbol;
 	CString m_StaticSymbol;
 	protected:

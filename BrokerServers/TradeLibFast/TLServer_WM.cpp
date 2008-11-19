@@ -26,7 +26,7 @@ namespace TradeLibFast
 
 	TLServer_WM::~TLServer_WM()
 	{
-		delete debugbuffer;
+		debugbuffer = "";
 	}
 
 
@@ -118,15 +118,26 @@ namespace TradeLibFast
 				gsplit(msg,CString("+"),rec);
 				CString client = rec[0];
 				vector<CString> hisstocks;
+				// make sure client sent a basket, otherwise clear the basket
+				if (rec.size()!=2) return ClearStocks(client);
+				// get the basket
 				gsplit(rec[1],CString(","),hisstocks);
-				unsigned int cid = FindClient(client); // parse first part as client name
+				// make sure we have the client
+				unsigned int cid = FindClient(client); 
 				if (cid==-1) return CLIENTNOTREGISTERED; //client not registered
-				stocks[cid] = hisstocks; // save the stocklist
+				// save the basket
+				stocks[cid] = hisstocks; 
 				D(CString(_T("Client ")+client+_T(" registered: ")+gjoin(hisstocks,",")));
 				HeartBeat(client);
 				return RegisterStocks(client);
 				}
-
+			case POSITIONREQUEST :
+				{
+				vector<CString> r;
+				gsplit(msg,CString("+"),r);
+				if (r.size()!=2) return BAD_PARAMETERS;
+				return PositionResponse(r[1],r[0]);
+				}
 			case REGISTERCLIENT :
 				return RegisterClient(msg);
 			case HEARTBEAT :
@@ -135,18 +146,6 @@ namespace TradeLibFast
 				return BrokerName();
 			case SENDORDER :
 				return SendOrder(TLOrder::Deserialize(msg));
-			case OPENPRICE :
-				return OK;
-			case GETSIZE :
-				return OK;
-			case CLOSEPRICE :
-				return OK;
-			case YESTCLOSE :
-				return OK;
-			case NDAYHIGH :
-				return OK;
-			case NDAYLOW :
-				return OK;
 			case FEATUREREQUEST:
 				{
 					// get features supported by child class
@@ -254,8 +253,8 @@ namespace TradeLibFast
 	void TLServer_WM::SrvGotTick(TLTick tick)
 	{
 		if (tick.sym=="") return;
-		for (size_t i = 0; i<stocks.size(); i++)
-			for (size_t j = 0; j<stocks[i].size(); j++)
+		for (uint i = 0; i<stocks.size(); i++)
+			for (uint j = 0; j<stocks[i].size(); j++)
 			{
 				if (stocks[i][j]==tick.sym)
 					TLSend(TICKNOTIFY,tick.Serialize(),client[i]);

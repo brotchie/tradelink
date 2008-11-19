@@ -25,7 +25,6 @@ void TLIdx::Load(CString symbol)
             {
 				m_symbol = m_index->GetSymbol();
 				m_index->Add(this);
-                FillInfo();
             }
 		}
 	}
@@ -40,6 +39,12 @@ TLIdx::TLIdx(CString symbol,TradeLibFast::TLServer_WM* tlinst)
 	Load(symbol);
 	tl = tlinst;
 
+}
+TLIdx::~TLIdx()
+{
+	m_index = NULL;
+	m_symbol = "";
+	tl = NULL;
 }
 
 void TLIdx::OnDynamicUpdate() 

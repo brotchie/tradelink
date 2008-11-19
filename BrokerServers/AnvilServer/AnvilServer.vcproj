@@ -543,66 +543,6 @@
 			>
 		</File>
 		<File
-			RelativePath="ExtFrame.cpp"
-			>
-			<FileConfiguration
-				Name="Release|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					Optimization="2"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions=""
-					ExceptionHandling="1"
-					RuntimeLibrary="2"
-					CompileAsManaged="0"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|x64"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					Optimization="2"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions=""
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					Optimization="0"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions=""
-					BasicRuntimeChecks="0"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug|x64"
-				>
-				<Tool
-					Name="VCCLCompilerTool"
-					Optimization="0"
-					AdditionalIncludeDirectories=""
-					PreprocessorDefinitions=""
-					BasicRuntimeChecks="3"
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath="ExtFrame.h"
-			>
-			<FileConfiguration
-				Name="Release|Win32"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-				/>
-			</FileConfiguration>
-		</File>
-		<File
 			RelativePath="Resource.h"
 			>
 		</File>

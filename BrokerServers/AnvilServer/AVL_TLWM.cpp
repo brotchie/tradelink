@@ -253,38 +253,17 @@ namespace TradeLibFast
 		f.push_back(ACCOUNTREQUEST);
 		f.push_back(ACCOUNTRESPONSE);
 		f.push_back(HEARTBEAT);
-		f.push_back(NDAYHIGH);
-		f.push_back(NDAYLOW);
-		f.push_back(OPENPRICE);
-		f.push_back(CLOSEPRICE);
-		f.push_back(YESTCLOSE);
 		f.push_back(SENDORDER);
-		f.push_back(AVGPRICE);
-		f.push_back(POSOPENPL);
-		f.push_back(POSCLOSEDPL);
-		f.push_back(POSLONGPENDSHARES);
-		f.push_back(POSSHORTPENDSHARES);
-		f.push_back(POSITIONREQUEST);
-		f.push_back(POSITIONRESPONSE);
-		f.push_back(LRPBID);
-		f.push_back(LRPASK);
-		f.push_back(POSTOTSHARES);
-		f.push_back(LASTTRADE);
-		f.push_back(LASTSIZE);
 		f.push_back(REGISTERCLIENT);
 		f.push_back(REGISTERSTOCK);
 		f.push_back(CLEARCLIENT);
 		f.push_back(CLEARSTOCKS);
-		f.push_back(REGISTERINDEX);
-		f.push_back(ACCOUNTOPENPL);
-		f.push_back(ACCOUNTCLOSEDPL);
 		f.push_back(ORDERCANCELREQUEST);
 		f.push_back(ORDERCANCELRESPONSE);
 		f.push_back(FEATUREREQUEST);
 		f.push_back(FEATURERESPONSE);
-		f.push_back(ISSIMULATION);
 		f.push_back(TICKNOTIFY);
-		f.push_back(TRADENOTIFY);
+		f.push_back(EXECUTENOTIFY);
 		f.push_back(ORDERNOTIFY);
 		return f;
 	}
@@ -309,6 +288,7 @@ namespace TradeLibFast
 
 	int AVL_TLWM::PositionResponse(CString account, CString client)
 	{
+		if (account=="") return BAD_PARAMETERS;
 		Observable* m_account = B_GetAccount(account);
 		void* iterator = B_CreatePositionIterator(POSITION_FLAT|POSITION_LONG|POSITION_SHORT, (1 << ST_LAST) - 1,m_account);
 		B_StartIteration(iterator);

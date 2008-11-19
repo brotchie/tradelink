@@ -108,13 +108,14 @@ namespace TradeLibFast
 		std::vector<int> f;
 		f.push_back(SENDORDER);
 		f.push_back(BROKERNAME);
+		f.push_back(REGISTERCLIENT);
 		f.push_back(REGISTERSTOCK);
 		f.push_back(ACCOUNTREQUEST);
 		f.push_back(ACCOUNTRESPONSE);
 		f.push_back(ORDERCANCELREQUEST);
 		f.push_back(ORDERCANCELRESPONSE);
 		f.push_back(ORDERNOTIFY);
-		f.push_back(TRADENOTIFY);
+		f.push_back(EXECUTENOTIFY);
 		f.push_back(TICKNOTIFY);
 		return f;
 	}
