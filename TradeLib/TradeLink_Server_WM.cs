@@ -193,14 +193,6 @@ namespace TradeLib
             long result = (long)TL2.OK;
             switch (tlm.type)
             {
-                case TL2.ACCOUNTOPENPL:
-                    if (gotSrvAcctOpenPLRequest == null) break;
-                    result = WMUtil.pack(gotSrvAcctOpenPLRequest(msg));
-                    break;
-                case TL2.ACCOUNTCLOSEDPL:
-                    if (gotSrvAcctClosedPLRequest == null) break;
-                    result = WMUtil.pack(gotSrvAcctClosedPLRequest(msg));
-                    break;
                 case TL2.ACCOUNTREQUEST:
                     if (gotSrvAcctRequest == null) break;
                     WMUtil.SendMsg(gotSrvAcctRequest(), TL2.ACCOUNTRESPONSE, Handle, msg);
@@ -219,22 +211,6 @@ namespace TradeLib
                     if (OrderCancelRequest != null)
                         OrderCancelRequest(Convert.ToUInt32(msg));
                     break;
-                case TL2.GETSIZE:
-                    if (PositionSizeRequest != null)
-                        result = PositionSizeRequest(msg);
-                    break;
-                case TL2.AVGPRICE:
-                    if (PositionPriceRequest != null)
-                        result = WMUtil.pack(PositionPriceRequest(msg));
-                    break;
-                case TL2.NDAYHIGH:
-                    if (DayHighRequest!=null)
-                        result = WMUtil.pack(DayHighRequest(msg));
-                    break;
-                case TL2.NDAYLOW:
-                    if (DayLowRequest!=null)
-                        result = WMUtil.pack(DayLowRequest(msg));
-                    break;
                 case TL2.SENDORDER:
                     SrvDoExecute(msg);
                     break;
@@ -244,10 +220,6 @@ namespace TradeLib
                 case TL2.REGISTERSTOCK:
                     string[] m2 = msg.Split('+');
                     SrvRegStocks(m2[0], m2[1]);
-                    break;
-                case TL2.REGISTERINDEX:
-                    string[] ib = msg.Split('+');
-                    SrvRegIndex(ib[0], ib[1]);
                     break;
                 case TL2.CLEARCLIENT:
                     SrvClearClient(msg);
@@ -283,33 +255,22 @@ namespace TradeLib
         {
             List<TL2> f = new List<TL2>();
 
-            f.Add(TL2.ACCOUNTCLOSEDPL);
-            f.Add(TL2.ACCOUNTOPENPL);
             f.Add(TL2.ACCOUNTREQUEST);
             f.Add(TL2.ACCOUNTRESPONSE);
-            f.Add(TL2.AVGPRICE);
             f.Add(TL2.BROKERNAME);
             f.Add(TL2.CLEARCLIENT);
             f.Add(TL2.CLEARSTOCKS);
             f.Add(TL2.EXECUTENOTIFY);
             f.Add(TL2.FEATUREREQUEST);
             f.Add(TL2.FEATURERESPONSE);
-            f.Add(TL2.GETSIZE);
             f.Add(TL2.HEARTBEAT);
-            f.Add(TL2.NDAYHIGH);
-            f.Add(TL2.NDAYLOW);
-            f.Add(TL2.OPENPRICE);
             f.Add(TL2.ORDERCANCELREQUEST);
             f.Add(TL2.ORDERCANCELRESPONSE);
             f.Add(TL2.ORDERNOTIFY);
-            f.Add(TL2.POSCLOSEDPL);
-            f.Add(TL2.POSOPENPL);
             f.Add(TL2.REGISTERCLIENT);
-            f.Add(TL2.REGISTERINDEX);
             f.Add(TL2.REGISTERSTOCK);
             f.Add(TL2.SENDORDER);
             f.Add(TL2.TICKNOTIFY);
-            f.Add(TL2.TRADENOTIFY);
             return f.ToArray();
         }
 

@@ -35,7 +35,7 @@ namespace Quotopia
             show(Util.TLSIdentity());
             QuoteGridSetup();
             FetchTLServer();
-            statfade.Interval = 10000;
+            statfade.Interval = 5000;
             statfade.Tick += new EventHandler(statfade_Tick);
             statfade.Start();
             ticker.Resolution = 500;
@@ -48,10 +48,43 @@ namespace Quotopia
             tl.gotFill += new FillDelegate(tl_gotFill);
             tl.gotOrder += new OrderDelegate(tl_gotOrder);
             tl.gotOrderCancel += new UIntDelegate(tl_gotOrderCancel);
+            tl.gotPosition += new PositionDelegate(tl_gotPosition);
+            tl.gotAccounts += new DebugDelegate(tl_gotAccounts);
             ordergrid.ContextMenuStrip = new ContextMenuStrip();
             ordergrid.ContextMenuStrip.Items.Add("Cancel", null, new EventHandler(cancelorder));
             FormClosing += new FormClosingEventHandler(Quote_FormClosing);
+            tl.RequestAccounts();
+
         }
+
+        string[] accts;
+
+        void tl_gotAccounts(string msg)
+        {
+            accts = msg.Split(',');
+            
+        }
+
+        void tl_gotPosition(Position pos)
+        {
+            Position p = null;
+            if (posdict.TryGetValue(pos.Symbol, out p))
+                posdict[pos.Symbol] = pos;
+            else
+                posdict.Add(pos.Symbol, pos);
+            int[] rows = new int[0];
+            if (symidx.TryGetValue(pos.Symbol, out rows))
+            {
+                foreach (int r in rows)
+                {
+                    qt.Rows[r]["AvgPrice"] = pos.AvgPrice.ToString("N2");
+                    qt.Rows[r]["PosSize"] = pos.Size.ToString();
+                }
+
+            }
+        }
+
+        Dictionary<string, Position> posdict = new Dictionary<string, Position>();
 
         void ticker_Tick(object sender, EventArgs e)
         {
@@ -218,7 +251,7 @@ namespace Quotopia
             Security s = GetVisibleSecurity(CurrentRow);
             if (s.Type == SecurityType.IDX) return;
             string sym = s.Symbol;
-            Order o = new Order(sym,-1*tl.PosSize(sym));
+            Order o = new Order(sym,0);
             o.Exchange = s.DestEx;
             o.Security = s.Type;
             o.LocalSymbol = sym;
@@ -358,6 +391,7 @@ namespace Quotopia
                 bardict.Add(sym, new BarList(BarInterval.FiveMin, sym));
             status("Added " + sym);
             symindex();
+            tl.RequestPositions(accts[0]);
         }
 
         
@@ -409,8 +443,8 @@ namespace Quotopia
             else
             {
                 int[] rows = GetSymbolRows(t.symbol);
-                decimal high = tl.DayHigh(t.symbol);
-                decimal low = tl.DayLow(t.symbol);
+                decimal high = tl.FastHigh(t.symbol);
+                decimal low = tl.FastLow(t.symbol);
                 for (int i = 0; i < rows.Length; i++)
                 {
                     // last,size,bid/ask,sizes
@@ -483,13 +517,21 @@ namespace Quotopia
                         ordergrid["osize", oidx].Value = Math.Abs(signedosize - signedtsize) * osign;
                 }
                 int[] rows = GetSymbolRows(t.symbol);
-                int size = tl.PosSize(t.symbol);
-                decimal price = tl.AvgPrice(t.symbol);
-                for (int i = 0; i < rows.Length; i++)
+                Position p = null;
+                if (posdict.TryGetValue(t.symbol, out p))
                 {
-                    qt.Rows[rows[i]]["PosSize"] = size.ToString();
-                    qt.Rows[rows[i]]["AvgPrice"] = price.ToString("N2");
+                    p.Adjust(t);
+                    int size = p.Size;
+                    decimal price = p.AvgPrice;
+                    for (int i = 0; i < rows.Length; i++)
+                    {
+                        qt.Rows[rows[i]]["PosSize"] = size.ToString();
+                        qt.Rows[rows[i]]["AvgPrice"] = price.ToString("N2");
+                    }
+                    posdict[t.symbol] = p;
                 }
+                else 
+                    posdict.Add(t.symbol, new Position(t));
                 TradesView.Rows.Add(t.xdate, t.xtime, t.xsec, t.symbol, (t.side ? "BUY" : "SELL"), t.xsize, t.xprice.ToString("N2"), t.comment, t.Account.ToString()); // if we accept trade, add it to list
             }
         }

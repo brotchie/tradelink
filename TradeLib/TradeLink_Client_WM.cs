@@ -211,7 +211,6 @@ namespace TradeLib
         /// </summary>
         /// <param name="sym">The symbol.</param>
         /// <returns></returns>
-        public decimal DayHigh(string sym) { return WMUtil.unpack(TLSend(TL2.NDAYHIGH, sym)); }
         public decimal FastHigh(string sym)
         {
             try
@@ -220,9 +219,7 @@ namespace TradeLib
             }
             catch (KeyNotFoundException)
             {
-                decimal high = DayHigh(sym);
-                if (high != 0) chighs[sym] = high;
-                return high;
+                return 0;
             }
         }
         /// <summary>
@@ -230,7 +227,6 @@ namespace TradeLib
         /// </summary>
         /// <param name="sym">The symbol</param>
         /// <returns></returns>
-        public decimal DayLow(string sym) { return WMUtil.unpack(TLSend(TL2.NDAYLOW, sym)); }
         public decimal FastLow(string sym)
         {
             try
@@ -239,48 +235,10 @@ namespace TradeLib
             }
             catch (KeyNotFoundException)
             {
-                decimal low = DayLow(sym);
-                if (low != 0) clows[sym] = low;
-                return low;
+                return 0;
             }
         }
 
-        public decimal AccountOpenPL() { return WMUtil.unpack(TLSend(TL2.ACCOUNTOPENPL, "")); }
-        public decimal AccountOpenPL(string acct) { return ((acct=="") || (acct==null)) ? 0 : WMUtil.unpack(TLSend(TL2.ACCOUNTOPENPL, acct)); }
-        public decimal AccountClosedPL() { return WMUtil.unpack(TLSend(TL2.ACCOUNTCLOSEDPL, "")); }
-        public decimal AccountClosedPL(string acct) { return ((acct == "") || (acct == null)) ? 0 : WMUtil.unpack(TLSend(TL2.ACCOUNTCLOSEDPL, acct)); }
-        /// <summary>
-        /// Today's closing price (zero if still open)
-        /// </summary>
-        /// <param name="sym">The symbol</param>
-        /// <returns></returns>
-        public decimal DayClose(string sym) { return WMUtil.unpack(TLSend(TL2.CLOSEPRICE, sym)); }
-        /// <summary>
-        /// yesterday's closing price (day)
-        /// </summary>
-        /// <param name="sym">the symbol</param>
-        /// <returns></returns>
-        public decimal YestClose(string sym) { return WMUtil.unpack(TLSend(TL2.YESTCLOSE, sym)); }
-        /// <summary>
-        /// Gets opening price for this day
-        /// </summary>
-        /// <param name="sym">The symbol</param>
-        /// <returns>decimal</returns>
-        public decimal DayOpen(string sym) { return WMUtil.unpack(TLSend(TL2.OPENPRICE, sym)); }
-        public int PosSize(string sym, string account) { return ((account == "") || (account == null)) ? 0 : (int)TLSend(TL2.GETSIZE, sym + "," + account); }
-        /// <summary>
-        /// Gets position size
-        /// </summary>
-        /// <param name="sym">The symbol</param>
-        /// <returns>signed integer representing position size in shares</returns>
-        public int PosSize(string sym) { return (int)TLSend(TL2.GETSIZE, sym); }
-        public decimal AvgPrice(string sym, string account) { return ((account == "") || (account == null)) ? 0 : WMUtil.unpack(TLSend(TL2.AVGPRICE, sym + "," + account)); }
-        /// <summary>
-        /// Returns average price for a position
-        /// </summary>
-        /// <param name="sym">The symbol</param>
-        /// <returns>decimal representing average price</returns>
-        public decimal AvgPrice(string sym) { return WMUtil.unpack(TLSend(TL2.AVGPRICE, sym)); }
         /// <summary>
         /// Request an order be canceled
         /// </summary>
@@ -307,20 +265,6 @@ namespace TradeLib
                 long res = TLSend(TL2.BROKERNAME);
                 return (Brokers)res;
             } 
-        }
-
-        public Position FastPos(string sym)
-        {
-            try
-            {
-                return cpos[sym];
-            }
-            catch (KeyNotFoundException)
-            {
-                Position p = new Position(sym, AvgPrice(sym), PosSize(sym));
-                cpos.Add(sym, p);
-                return p;
-            }
         }
 
         public void Disconnect()
@@ -392,11 +336,8 @@ namespace TradeLib
                         }
                         catch (KeyNotFoundException)
                         {
-                            decimal high = DayHigh(t.symbol);
-                            decimal low = DayLow(t.symbol);
-                            chighs.Add(t.symbol, high);
-                            if (low == 0) low = 640000;
-                            clows.Add(t.symbol, low);
+                            chighs.Add(t.symbol, 0);
+                            clows.Add(t.symbol, decimal.MaxValue);
                         }
                     }
                     if (gotTick != null) gotTick(t);
@@ -404,14 +345,6 @@ namespace TradeLib
                 case TL2.EXECUTENOTIFY:
                     // date,time,symbol,side,size,price,comment
                     Trade tr = Trade.Deserialize(msg);
-                    try
-                    {
-                        cpos[tr.symbol] = new Position(tr.symbol, AvgPrice(tr.symbol), PosSize(tr.symbol));
-                    }
-                    catch (KeyNotFoundException)
-                    {
-                        cpos.Add(tr.symbol, new Position(tr.symbol, AvgPrice(tr.symbol), PosSize(tr.symbol)));
-                    }
                     if (gotFill != null) gotFill(tr);
                     break;
                 case TL2.ORDERNOTIFY:
