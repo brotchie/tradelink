@@ -18,6 +18,7 @@ namespace TradeLibFast
 		void Add(CString symbol);
 		void Add(TLMarketBasket basket);
 		void Add(char* symbol);
+		void Add(char* arry[]);
 
 	protected:
 		vector<TLSecurity> _secs;
