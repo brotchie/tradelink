@@ -14,7 +14,6 @@ namespace TradeLibFast
 	[event_source(native)]
 	class AFX_EXT_CLASS  TLServer_WM : public CWnd
 	{
-		DECLARE_DYNAMIC(TLServer_WM)
 
 	public:
 		TLServer_WM(void);

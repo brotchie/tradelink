@@ -12,11 +12,6 @@ using namespace std;
 namespace TradeLibFast
 {
 
-
-	// TLServer_WM
-
-	IMPLEMENT_DYNAMIC(TLServer_WM, CWnd)
-
 	TLServer_WM::TLServer_WM(void)
 	{
 		TLDEBUG = true;
