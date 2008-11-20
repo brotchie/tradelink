@@ -4,10 +4,6 @@
 
 namespace TradeLibFast
 {
-	// TLClient_WM
-
-	IMPLEMENT_DYNAMIC(TLClient_WM, CWnd)
-
 	BEGIN_MESSAGE_MAP(TLClient_WM, CWnd)
 		ON_WM_COPYDATA()
 	END_MESSAGE_MAP()
@@ -50,11 +46,11 @@ namespace TradeLibFast
 	}
 
 
-	TLClient_WM::TLClient_WM(CString clientname)
+	TLClient_WM::TLClient_WM(char* clientname)
 	{
 		// make sure window has a unique name
 		int i = -1;
-		CString name(clientname);
+		CString name = clientname;
 		while (true)
 		{
 			HWND dest = FindWindowA(NULL,(LPCSTR)(LPCTSTR)name)->GetSafeHwnd();

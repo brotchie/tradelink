@@ -1,22 +1,20 @@
 #pragma once
 #include "TradeLibFast.h"
 
-
 namespace TradeLibFast
 {
 	class AFX_EXT_CLASS  TLClient_WM : public CWnd
 	{
-		DECLARE_DYNAMIC(TLClient_WM)
 
 	public:
-		TLClient_WM(CString client = CString("tlclient"));
+		TLClient_WM(char* client = "tlclient");
 		~TLClient_WM(void);
-		void Register();
 		void Subscribe(TLMarketBasket mb);
 		int TLFound(int mask);
 		void Mode(int mode);
 		void Unsubscribe();
 		void Disconnect();
+		void Register();
 		int SendOrder(TLOrder o);
 		afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct);
 
