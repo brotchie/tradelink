@@ -269,14 +269,6 @@
 			>
 		</File>
 		<File
-			RelativePath=".\TLServer_NP.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\TLServer_NP.h"
-			>
-		</File>
-		<File
 			RelativePath=".\TLServer_WM.cpp"
 			>
 		</File>
