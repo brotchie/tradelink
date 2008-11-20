@@ -7,11 +7,10 @@ using namespace TradeLibFast;
 static void __stdcall Create()
 {
 	// some stocks
-	char* secs[4] = { "LVS", "WAG","GM","MHS" };
+	char* secs[] = { "LVS", "WAG","GM","MHS" };
 	// initial basket with our stocks
 	TLMarketBasket mb;
-	for (uint i = 0; i<sizeof(secs)/sizeof(secs[0]); i++)
-		mb.Add(secs[i]);
+	mb.Add(secs);
 	// test to make sure our basket got them all
 	bool match = true;
 	for (uint i = 0; i<mb.Count(); i++)
