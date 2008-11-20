@@ -9,7 +9,7 @@ namespace TradeLibFast
 		DECLARE_DYNAMIC(TLClient_WM)
 
 	public:
-		TLClient_WM(CString client);
+		TLClient_WM(CString client = CString("tlclient"));
 		~TLClient_WM(void);
 		void Register();
 		void Subscribe(TLMarketBasket mb);

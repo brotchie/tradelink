@@ -12,6 +12,7 @@
         LIVEBROKER = 4,
         HISTORICALBROKER = 8,
         TESTBROKER = 16,
+		ANYSERVER = 255,
 	};
 
 	enum TL2 {

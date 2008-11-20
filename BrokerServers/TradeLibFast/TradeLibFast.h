@@ -9,4 +9,5 @@ typedef unsigned int uint;
 #include "TLMarketBasket.h"
 #include "TLServer_WM.h"
 #include "TLServer_NP.h"
+#include "TLClient_WM.h"
 #include "Util.h"

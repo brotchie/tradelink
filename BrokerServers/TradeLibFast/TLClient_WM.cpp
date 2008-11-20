@@ -50,7 +50,7 @@ namespace TradeLibFast
 	}
 
 
-	TLClient_WM::TLClient_WM(CString clientname="tlclient")
+	TLClient_WM::TLClient_WM(CString clientname)
 	{
 		// make sure window has a unique name
 		int i = -1;
@@ -64,6 +64,7 @@ namespace TradeLibFast
 		_me = name;
 		this->Create(NULL, name, 0,CRect(0,0,20,20), CWnd::GetDesktopWindow(),NULL);
 		this->ShowWindow(SW_HIDE); // hide our window
+		Mode(TLFound(ANYSERVER));
 	}
 
 	TLClient_WM::~TLClient_WM()
