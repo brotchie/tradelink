@@ -19,7 +19,7 @@
 
 
 
-static AFX_EXTENSION_MODULE testDLL = { NULL, NULL };
+static AFX_EXTENSION_MODULE TestTradeLibFast = { NULL, NULL };
 
 #ifdef _MANAGED
 #pragma managed(push, off)
@@ -34,10 +34,10 @@ DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 
 	if (dwReason == DLL_PROCESS_ATTACH)
 	{
-		TRACE0("test.DLL Initializing!\n");
+		TRACE0("TestTradeLibFast.DLL Initializing!\n");
 		
 		// Extension DLL one-time initialization
-		if (!AfxInitExtensionModule(testDLL, hInstance))
+		if (!AfxInitExtensionModule(TestTradeLibFast, hInstance))
 			return 0;
 
 		// Insert this DLL into the resource chain
@@ -52,15 +52,15 @@ DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 		//  Regular DLL's resource chain, and serious problems will
 		//  result.
 
-		new CDynLinkLibrary(testDLL);
+		new CDynLinkLibrary(TestTradeLibFast);
 
 	}
 	else if (dwReason == DLL_PROCESS_DETACH)
 	{
-		TRACE0("test.DLL Terminating!\n");
+		TRACE0("TestTradeLibFast.DLL Terminating!\n");
 
 		// Terminate the library before destructors are called
-		AfxTermExtensionModule(testDLL);
+		AfxTermExtensionModule(TestTradeLibFast);
 	}
 	return 1;   // ok
 }

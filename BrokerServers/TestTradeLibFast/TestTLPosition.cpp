@@ -6,15 +6,40 @@ using namespace TradeLibFast;
 
 static void __stdcall Basics()
 {
-	int a = 1;
-	int b = 1;
-	CFIX_ASSERT( a + b == 2 );
-	TLPosition p;
-	p.ClosedPL = 5;
-	CFIX_ASSERT(p.ClosedPL+a == 6);
+	const CString sym = "LVS";
+	const double x = 10;
+	const int s = 200;
+	TLPosition p(sym,x,s);
+	CFIX_ASSERT(p.ClosedPL== 0);
+	CFIX_ASSERT(p.Symbol==sym);
+	CFIX_ASSERT(p.Size==s);
+	CFIX_ASSERT(p.AvgPrice==x);
+
 	
 }
 
-CFIX_BEGIN_FIXTURE( MyMinimalisticFixture )
+static void __stdcall SerializeDeserialize()
+{
+	const CString sym = "LVS";
+	const double x = 10;
+	const int s = 200;
+	TLPosition p(sym,x,s);
+	CFIX_ASSERT(p.ClosedPL== 0);
+	CFIX_ASSERT(p.Symbol==sym);
+	CFIX_ASSERT(p.Size==s);
+	CFIX_ASSERT(p.AvgPrice==x);
+	// flatten it
+	CString msg = p.Serialize();
+	// unflatten it
+	TLPosition p2 = TLPosition::Deserialize(msg);
+	// check the results
+	CFIX_ASSERT(p2.ClosedPL== 0);
+	CFIX_ASSERT(p2.Symbol==sym);
+	CFIX_ASSERT(p2.Size==s);
+	CFIX_ASSERT(p2.AvgPrice==x);
+}
+
+CFIX_BEGIN_FIXTURE( TestTLPosition )
 	CFIX_FIXTURE_ENTRY( Basics )
+	CFIX_FIXTURE_ENTRY( SerializeDeserialize )
 CFIX_END_FIXTURE()
