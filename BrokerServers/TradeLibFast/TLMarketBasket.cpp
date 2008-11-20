@@ -19,6 +19,11 @@ namespace TradeLibFast
 		TLSecurity sec = TLSecurity::Deserialize(symbol);
 		_secs.push_back(sec); 
 	}
+	void TLMarketBasket::Add(char* symbol)
+	{
+		CString csym = symbol;
+		Add(csym);
+	}
 	void TLMarketBasket::Add(TLMarketBasket basket)
 	{
 		for (unsigned int i = 0; i<basket.Count(); i++)

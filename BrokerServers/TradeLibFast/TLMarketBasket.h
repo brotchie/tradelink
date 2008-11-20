@@ -5,9 +5,8 @@ using namespace std;
 
 namespace TradeLibFast
 {
-	class AFX_EXT_CLASS  TLMarketBasket
+	class AFX_EXT_CLASS TLMarketBasket
 	{
-
 	public:
 		TLMarketBasket(void);
 		~TLMarketBasket(void);
@@ -18,7 +17,7 @@ namespace TradeLibFast
 		void Add(TLSecurity sec) { _secs.push_back(sec); }
 		void Add(CString symbol);
 		void Add(TLMarketBasket basket);
-
+		void Add(char* symbol);
 
 	protected:
 		vector<TLSecurity> _secs;
