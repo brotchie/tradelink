@@ -213,11 +213,19 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath=".\Shared\EClientSocket.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\IBUtil.cpp"
 			>
 		</File>
 		<File
 			RelativePath=".\IBUtil.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Shared\MySocket.cpp"
 			>
 		</File>
 		<File
