@@ -15,7 +15,7 @@ namespace TradeLibFast
 
 	void TLMarketBasket::Add(char* arry[])
 	{
-		for (uint i = 0; i< sizeof(arry)/sizeof(arry[0]); i++)
+		for (unsigned int i = 0; i< sizeof(arry)/sizeof(arry[0]); i++)
 			Add(arry[i]);
 	}
 	

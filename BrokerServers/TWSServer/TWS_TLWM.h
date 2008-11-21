@@ -7,15 +7,13 @@
 #include "orderstate.h"
 #include "Contract.h"
 #include "TLServer_WM.h"
-#include "TLServer_NP.h"
 
 namespace TradeLibFast
 {
 
 	class TWS_TLWM :
 		public TLServer_WM ,
-		public EWrapper, 
-		public TLServer_NP
+		public EWrapper
 	{
 	public:
 		TWS_TLWM(void);

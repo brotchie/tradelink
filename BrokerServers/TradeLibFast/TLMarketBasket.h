@@ -1,7 +1,6 @@
 #pragma once
-#include "TradeLibFast.h"
+#include "TLSecurity.h"
 #include <vector>
-using namespace std;
 
 namespace TradeLibFast
 {
@@ -21,6 +20,6 @@ namespace TradeLibFast
 		void Add(char* arry[]);
 
 	protected:
-		vector<TLSecurity> _secs;
+		std::vector<TLSecurity> _secs;
 	};
 }
