@@ -22,6 +22,11 @@ namespace TestTradeLib
             Assert.That(p.isFlat);
             Assert.That(p.isValid);
             Position p2 = new Position(s, 10, 100,0);
+            Position p2copy = new Position(p2);
+            Assert.AreEqual(p2.AvgPrice, p2copy.AvgPrice);
+            Assert.AreEqual(p2.Size, p2copy.Size);
+            Assert.AreEqual(p2.ClosedPL, p2copy.ClosedPL);
+            Assert.AreEqual(p2.Symbol, p2copy.Symbol);
             p.Adjust(p2);
             Assert.That(p.Size == 100);
             Assert.That(p.hasSymbol);

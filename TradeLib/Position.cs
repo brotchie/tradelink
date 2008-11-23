@@ -10,6 +10,7 @@ namespace TradeLib
     public class Position
     {
         public Position() : this("") { }
+        public Position(Position p) : this(p.Symbol, p.AvgPrice, p.Size, p.ClosedPL) { }
         public Position(string symbol) : this(symbol, 0m, 0,0) { }
         public Position(string symbol, decimal price, int size) : this(symbol, price, size, 0) { }
         public Position(string symbol, decimal price, int size, decimal closedpl) { _sym = symbol; if (size == 0) price = 0; _price = price; _size = size; _closedpl = closedpl; }
