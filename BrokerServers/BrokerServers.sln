@@ -14,6 +14,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TradeLibFast", "TradeLibFast\TradeLinkServer.vcproj", "{70D6F9FC-3067-4527-8858-D931623554CF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestTradeLibFast", "TestTradeLibFast\TestTradeLibFast.vcproj", "{F5CAC916-B631-4800-8DEA-11848473AA7C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{70D6F9FC-3067-4527-8858-D931623554CF} = {70D6F9FC-3067-4527-8858-D931623554CF}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +53,7 @@ Global
 		{F5CAC916-B631-4800-8DEA-11848473AA7C}.Debug|Win32.ActiveCfg = Debug|Win32
 		{F5CAC916-B631-4800-8DEA-11848473AA7C}.Debug|Win32.Build.0 = Debug|Win32
 		{F5CAC916-B631-4800-8DEA-11848473AA7C}.Debug|x64.ActiveCfg = Debug|Win32
+		{F5CAC916-B631-4800-8DEA-11848473AA7C}.Debug|x64.Build.0 = Debug|Win32
 		{F5CAC916-B631-4800-8DEA-11848473AA7C}.Release|Win32.ActiveCfg = Release|Win32
 		{F5CAC916-B631-4800-8DEA-11848473AA7C}.Release|Win32.Build.0 = Release|Win32
 		{F5CAC916-B631-4800-8DEA-11848473AA7C}.Release|x64.ActiveCfg = Release|Win32
