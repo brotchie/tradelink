@@ -65,6 +65,8 @@ namespace TradeLibFast
 
 	TLClient_WM::~TLClient_WM()
 	{
+		Unsubscribe();
+		Disconnect();
 	}
 
 	bool found(CString wind)
@@ -96,6 +98,7 @@ namespace TradeLibFast
 			_him = ::TESTWINDOW;
 		else 
 			_him = "TL-NOTFOUND";
+		Register();
 	}
 
 	void TLClient_WM::Register()
@@ -105,7 +108,9 @@ namespace TradeLibFast
 
 	void TLClient_WM::Subscribe(TLMarketBasket mb)
 	{
-		CString m = mb.Serialize();
+		CString basket = mb.Serialize();
+		CString m;
+		m.Format("%s+%s",_me,basket);
 		TLSend(REGISTERSTOCK,m,_him);
 	}
 

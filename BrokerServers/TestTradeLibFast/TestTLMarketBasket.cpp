@@ -7,15 +7,18 @@ using namespace TradeLibFast;
 static void __stdcall Create()
 {
 	// some stocks
-	char* secs[] = { "LVS", "WAG","GM","MHS" };
+	char* list[] = { "LVS", "WAG","GM","MHS" };
+	const uint count = 4;
+	vector<CString> secs(list,list+count);
 	// initial basket with our stocks
 	TLMarketBasket mb;
 	mb.Add(secs);
 	// test to make sure our basket got them all
 	bool match = true;
-	for (uint i = 0; i<mb.Count(); i++)
+	for (uint i = 0; i<count; i++)
 	{
-		match &= mb[i].sym == secs[i];
+		match = mb[i].sym.CompareNoCase(list[i])==0;
+		if (!match) break;
 	}
 	CFIX_ASSERT(match);
 }

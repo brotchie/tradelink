@@ -1,6 +1,7 @@
 #pragma once
 #include "TLSecurity.h"
 #include <vector>
+using namespace std;
 
 namespace TradeLibFast
 {
@@ -17,7 +18,7 @@ namespace TradeLibFast
 		void Add(CString symbol);
 		void Add(TLMarketBasket basket);
 		void Add(char* symbol);
-		void Add(char* arry[]);
+		void Add(vector<CString> seclist);
 
 	protected:
 		std::vector<TLSecurity> _secs;

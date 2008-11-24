@@ -13,10 +13,10 @@ namespace TradeLibFast
 	{
 	}
 
-	void TLMarketBasket::Add(char* arry[])
+	void TLMarketBasket::Add(vector<CString> seclist)
 	{
-		for (unsigned int i = 0; i< sizeof(arry)/sizeof(arry[0]); i++)
-			Add(arry[i]);
+		for (unsigned int i = 0; i< seclist.size(); i++)
+			Add(seclist[i]);
 	}
 	
 	void TLMarketBasket::Add(CString symbol) 

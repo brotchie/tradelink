@@ -76,7 +76,8 @@ namespace TradeLibFast
 		rec.push_back(this->sym);
 		rec.push_back(SecurityTypeName(this->type));
 		rec.push_back(this->dest);
-		return gjoin(rec," ");
+		if (type!=STK) return gjoin(rec," ");
+		return sym;
 	}
 
 // we're using the same security names as IB since they're so complete
