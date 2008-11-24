@@ -38,7 +38,7 @@ namespace TradeLib
 
         public const string SIMWINDOW = "TL-BROKER-SIMU";
         public const string LIVEWINDOW = "TL-BROKER-LIVE";
-        public const string REPLAYWINDOW = "TL-BROKER-RPLY";
+        public const string REPLAYWINDOW = "TL-BROKER-HIST";
         public const string TESTWINDOW = "TL-BROKER-TEST";
 
         //SendMessage
