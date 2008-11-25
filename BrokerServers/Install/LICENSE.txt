@@ -12,7 +12,7 @@ prior to using software, and I will not hold creators of
 software responsible for damages of any kind that result from 
 using this software.
 
-I agree to use this software ONLY for legal and legitamate purposes, 
+I agree to use this software ONLY for legal and legitimate purposes, 
 in accordance with SEC/CFTC/NASD or any other applicable securities 
 body or relevant legal entity or code.  I agree that if I am 
 found in violation of any laws, the creators of this software 
