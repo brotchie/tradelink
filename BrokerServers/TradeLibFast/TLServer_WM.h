@@ -45,6 +45,7 @@ namespace TradeLibFast
 		int RegisterClient(CString  clientname);
 		int ServiceMessage(int MessageType, CString msg);
 		int HeartBeat(CString clientname);
+		virtual int UnknownMessage(int MessageType, CString msg);
 		virtual int BrokerName(void);
 		virtual int SendOrder(TLOrder order);
 		virtual int AccountResponse(CString clientname);

@@ -156,7 +156,12 @@ namespace TradeLibFast
 				}
 
 			}
-			return UNKNOWNMSG;
+			return UnknownMessage(MessageType,msg);
+	}
+
+	int TLServer_WM::UnknownMessage(int MessageType, CString msg)
+	{
+		return UNKNOWNMSG;
 	}
 
 	int TLServer_WM::HeartBeat(CString clientname)
