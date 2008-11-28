@@ -32,6 +32,7 @@ namespace TradeLibFast
 
 		int BrokerName(void);
 		int SendOrder(TLOrder order);
+		int UnknownMessage(int MessageType,CString msg);
 
 		// account monitoring stuff
 		vector<Observable*> accounts;

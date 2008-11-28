@@ -65,6 +65,21 @@ namespace TradeLibFast
 		return Assent;
 	}
 
+	int AVL_TLWM::UnknownMessage(int MessageType,CString msg)
+	{
+		switch (MessageType)
+		{
+		case ISSHORTABLE :
+			{
+				const StockBase* s = B_GetStockHandle(msg);
+				if (s->isShortable()) return 1;
+				return 0;
+			}
+			break;
+		}
+		return UNKNOWNMSG;
+	}
+
 
 	bool AVL_TLWM::hasHammerSub(CString symbol)
 	{
@@ -249,6 +264,7 @@ namespace TradeLibFast
 	std::vector<int> AVL_TLWM::GetFeatures()
 	{
 		std::vector<int> f;
+		f.push_back(ISSHORTABLE);
 		f.push_back(BROKERNAME);
 		f.push_back(ACCOUNTREQUEST);
 		f.push_back(ACCOUNTRESPONSE);
@@ -400,62 +416,6 @@ namespace TradeLibFast
 
 /*
 
-	long GetPosF(CString msg, int funct) 
-	{
-		CString m(msg);
-		Position* mypos;
-		if (m.Find(",",0)==-1)
-		{
-
-			const char* symbol = (LPCTSTR)msg;
-			Observable* m_account = B_GetCurrentAccount();
-			mypos = B_FindPosition(symbol,m_account);
-		} 
-		else
-		{
-			std::vector<CString> parse;
-			gsplit(m,",",parse);
-			Observable* m_account = B_GetAccount(parse[1].GetBuffer());
-			mypos = B_FindPosition(parse[0].GetBuffer(),m_account);
-		}
-		Money& p = Money(0,0);
-		long price = 0;
-		if (mypos) {
-			if (funct==AVGPRICE) p = mypos->GetAveragePrice();
-			else if (funct==POSOPENPL) p = mypos->GetOpenPnl();
-			else if (funct==POSCLOSEDPL) p = mypos->GetClosedPnl();
-			price = MoneyToPacked(p);
-		}
-		return price;
-	}
-
-	int GetPosI(CString msg, int funct) {
-		CString m(msg);
-		Position* mypos;
-		if (m.Find(",",0)==-1)
-		{
-
-			const char* symbol = (LPCTSTR)msg;
-			Observable* m_account = B_GetCurrentAccount();
-			mypos = B_FindPosition(symbol,m_account);
-		} 
-		else
-		{
-			std::vector<CString> parse;
-			gsplit(m,",",parse);
-			Observable* m_account = B_GetAccount(parse[1].GetBuffer());
-			mypos = B_FindPosition(parse[0].GetBuffer(),m_account);
-		}
-		int s = 0;
-		if (mypos) {
-			if (funct==POSLONGPENDSHARES) s = mypos->GetSharesPendingLong();
-			else if (funct==POSSHORTPENDSHARES) s = mypos->GetSharesPendingShort();
-			else if (funct==POSTOTSHARES) s = (int)mypos->GetSharesClosed();
-			else if (funct==GETSIZE) s = (int)mypos->GetSize();
-		}
-		return s;
-	}
-
 	int GetStockI(CString msg, int funct) {
 		const char* symbol = (LPCTSTR)msg;
 		const StockBase* Stock = B_GetStockHandle(symbol);
@@ -486,84 +446,4 @@ namespace TradeLibFast
 	}
 
 
-
-
-	LPARAM ServiceMsg(const int t,CString m) {
-		
-		// we need an Observer (SendOrderDlg) for stocks that aren't loaded
-		if (t==BROKERNAME) return (LRESULT)Assent;
-		if (t==ACCOUNTREQUEST) return gotAccountRequest(m);
-		if (t==HEARTBEAT) return (LRESULT)HeartBeat(m);
-		if (t==NDAYHIGH) return (LRESULT)GetStockF(m,NDAYHIGH);
-		if (t==NDAYLOW) return (LRESULT)GetStockF(m,NDAYLOW);
-		if (t==OPENPRICE) return (LRESULT)GetStockF(m,OPENPRICE);
-		if (t==CLOSEPRICE) return (LRESULT)GetStockF(m,CLOSEPRICE);
-		if (t==YESTCLOSE) return (LRESULT)GetStockF(m,YESTCLOSE);
-		if (t==SENDORDER) return Sendorder(m);
-		if (t==AVGPRICE) return (LRESULT)GetPosF(m,AVGPRICE);
-		if (t==POSOPENPL) return (LRESULT)GetPosF(m,POSOPENPL);
-		if (t==POSCLOSEDPL) return (LRESULT)GetPosF(m,POSCLOSEDPL);
-		if (t==POSLONGPENDSHARES) return GetPosI(m,POSLONGPENDSHARES);
-		if (t==POSSHORTPENDSHARES) return GetPosI(m,POSSHORTPENDSHARES);
-		if (t==LRPBID) return (LRESULT)GetStockF(m,LRPBID);
-		if (t==LRPASK)	return (LRESULT)GetStockF(m,LRPASK);
-		if (t==POSTOTSHARES) return (LRESULT)GetPosI(m,POSTOTSHARES);
-		if (t==LASTTRADE) return (LRESULT)GetStockF(m,LASTTRADE);
-		if (t==LASTSIZE) return (LRESULT)GetStockI(m,LASTSIZE);
-		if (t==GETSIZE) return (LRESULT)GetPosI(m,GETSIZE);
-		if (t==REGISTERCLIENT) return(LRESULT)RegClient(m);
-		if (t==REGISTERSTOCK) return (LRESULT)RegStocks(m);
-		if (t==CLEARCLIENT) return (LRESULT)ClearClient(m);
-		if (t==CLEARSTOCKS) return (LRESULT)ClearStocks(m);
-		if (t==POSITIONREQUEST) return (LRESULT)PosList(m);
-		if (t==ACCOUNTOPENPL)
-		{
-			if (m.GetLength()>0)
-				return MoneyToPacked(B_GetAccountOpenPnl(B_GetAccount((LPCTSTR)m)));
-			else 
-				return MoneyToPacked(B_GetAccountOpenPnl(B_GetCurrentAccount()));
-		}
-		if (t==ACCOUNTCLOSEDPL)
-		{
-			if (m.GetLength()>0)
-				return MoneyToPacked(B_GetAccountClosedPnl(B_GetAccount((LPCTSTR)m)));
-			else 
-				return MoneyToPacked(B_GetAccountClosedPnl(B_GetCurrentAccount()));
-
-		}
-		if (t==ORDERCANCELREQUEST) 
-		{
-			unsigned int TLorderId = strtoul(m.GetBuffer(),NULL,10); //get tradelink's order id
-			unsigned int orderId = AnvilId(TLorderId); // get current anvil id from tradelink id
-			void* iterator = B_CreateAccountIterator();
-			B_StartIteration(iterator);
-			Observable* acct;
-			// loop through every available account, cancel any matching orders
-			while (acct = B_GetNextAccount(iterator)) 
-			{
-				Order* order = B_FindOrder(orderId,acct);
-				if(order)
-				{
-					order->Cancel();
-
-				}
-			}
-			B_DestroyIterator(iterator);
-			return OK;
-		}
-		if (t==FEATUREREQUEST)
-		{
-			SendMsg(FEATURERESPONSE,GetFeatures(),m);
-			return OK;
-		}
-
-		
-		if (t==ISSIMULATION) {
-			Observable* m_account = B_GetCurrentAccount();
-			BOOL isSim = B_IsAccountSimulation(m_account);
-			return (LRESULT)isSim;
-		}
-
-		return UNKNOWNMSG;
-	}
-	*/
+*/
