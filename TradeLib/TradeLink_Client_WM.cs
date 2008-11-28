@@ -174,9 +174,9 @@ namespace TradeLib
         /// </summary>
         public void GoTest() { Disconnect(); himh = WMUtil.HisHandle(WMUtil.TESTWINDOW); LinkType = TLTypes.TESTBROKER; Register(); }
         IntPtr himh = IntPtr.Zero;
-        protected long TLSend(TL2 type) { return TLSend(type, ""); }
+        public long TLSend(TL2 type) { return TLSend(type, ""); }
         delegate long TLSendDelegate(TL2 type, string msg);
-        protected long TLSend(TL2 type, string m)
+        public long TLSend(TL2 type, string m)
         {
             if (InvokeRequired)
                 return (long)Invoke(new TLSendDelegate(TLSend), new object[] { type, m });
