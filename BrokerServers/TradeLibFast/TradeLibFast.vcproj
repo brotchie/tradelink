@@ -104,7 +104,7 @@
 			ConfigurationType="2"
 			UseOfMFC="2"
 			CharacterSet="2"
-			WholeProgramOptimization="0"
+			WholeProgramOptimization="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -128,6 +128,7 @@
 				Optimization="0"
 				WholeProgramOptimization="false"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_AFXEXT"
+				MinimalRebuild="false"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
@@ -192,11 +193,7 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\res\TradeLibFast.rc2"
-				>
-			</File>
-			<File
-				RelativePath=".\TradeLinkServer.rc"
+				RelativePath=".\TradeLibFast.rc"
 				>
 			</File>
 		</Filter>

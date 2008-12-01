@@ -17,7 +17,6 @@ namespace TradeLibFast
 		void Add(TLSecurity sec) { _secs.push_back(sec); }
 		void Add(CString symbol);
 		void Add(TLMarketBasket basket);
-		void Add(char* symbol);
 		void Add(vector<CString> seclist);
 
 	protected:
