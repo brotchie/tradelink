@@ -26,6 +26,9 @@ namespace TradeLibFast
 
 		bool isValid(void);
 		bool isFilled(void) { return false; }
+		bool isLimit(void) { return (price!=0); }
+		bool isMarket(void) { return (price==0) && (stop==0); }
+		bool isStop(void) { return (stop!=0); }
 
 
 		CString Serialize(void);

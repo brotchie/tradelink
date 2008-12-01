@@ -26,11 +26,11 @@ static void __stdcall Create()
 static void __stdcall SerializeDeserialize()
 {
 	// some stocks
-	char* secs[4] = { "LVS", "WAG","GM","MHS" };
+	char* list[] = { "LVS", "WAG","GM","MHS" };
+	vector<CString> secs(list,list+4);
 	// initial basket with our stocks
 	TLMarketBasket mb;
-	for (uint i = 0; i<sizeof(secs)/sizeof(secs[0]); i++)
-		mb.Add(secs[i]);
+	mb.Add(secs);
 	// serialize it
 	CString msg = mb.Serialize();
 	// undo it

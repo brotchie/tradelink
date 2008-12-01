@@ -120,6 +120,11 @@ namespace TradeLibFast
 		return f;
 	}
 
+	int TWS_TLWM::UnknownMessage(int MessageType, CString msg)
+	{
+		return UNKNOWNMSG;
+	}
+
 
 
 	int TWS_TLWM::SendOrder(TLOrder o)

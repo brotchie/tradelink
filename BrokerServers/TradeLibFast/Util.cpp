@@ -38,6 +38,8 @@ void gsplit(CString msg, CString del, std::vector<CString>& rec)
 		CString r = msg.Left(pos);
 		rec.push_back(r);
 		msg = msg.Right(msg.GetLength()-(pos+1));
+		if ((pos==0) && (msg.GetLength()==0))
+			rec.push_back("");
 	}
 	if (msg.GetLength()>0)
 		rec.push_back(msg);

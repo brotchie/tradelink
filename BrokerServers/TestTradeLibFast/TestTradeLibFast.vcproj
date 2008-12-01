@@ -109,7 +109,7 @@
 			ConfigurationType="2"
 			UseOfMFC="2"
 			CharacterSet="2"
-			WholeProgramOptimization="1"
+			WholeProgramOptimization="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -240,11 +240,23 @@
 			>
 		</File>
 		<File
+			RelativePath=".\TestTLOrder.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\TestTLPosition.cpp"
 			>
 		</File>
 		<File
 			RelativePath=".\TestTLSecurity.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\TestTLTick.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\TestTLTrade.cpp"
 			>
 		</File>
 		<File

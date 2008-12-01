@@ -26,6 +26,7 @@ namespace TradeLibFast
 		int AccountResponse(CString clientname);
 		int RegisterStocks(CString clientname);
 		std::vector<int> GetFeatures();
+		int UnknownMessage(int MessageType, CString msg);
 		void Start(void);
 
 
