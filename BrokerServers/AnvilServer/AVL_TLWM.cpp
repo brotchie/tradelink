@@ -118,13 +118,20 @@ namespace TradeLibFast
 		char side = (o.side) ? 'B' : 'S';
 		const Money pricem = Money((int)(o.price*1024));
 		const Money stopm = Money((int)(o.stop*1024));
+		const Money trailm = Money((int)(o.trail*1024));
 		unsigned int mytif = TIFId(o.TIF);
 
 		if ((Stock==NULL) || (!Stock->isLoaded()))
 			return UNKNOWNSYM;
-		
+
+		uint error = 0;
+
+		// anvil has seperate call for trailing stop orders
+		if (!o.isTrail())
+		{
+
 		// send the order (next line is from SendOrderDlg.cpp)
-		unsigned int error = B_SendOrder(Stock,
+		error = B_SendOrder(Stock,
 				side,
 				o.exchange,
 				o.size,
@@ -145,6 +152,41 @@ namespace TradeLibFast
 				0,
 				false,
 				101, o.comment);	
+		}
+		else 
+		{
+			Observable* stopOrder = B_SendSmartStopOrder(Stock,
+				side,
+				o.size,
+				&pricem,//const Money* priceOffset,//NULL for Stop Market
+				trailm,//trail by this amount
+				true, // price to decimal places
+				true,//bool ecnsOnlyBeforeAfterMarket,
+				false,//bool mmsBasedForNyse,
+				TIF_DAY,//unsigned int stopTimeInForce,
+				0,//unsigned int timeInForceAfterStopReached,
+				"ISLD", //post quote dest
+				NULL,//const char* redirection,
+				false,//bool proactive,
+				true,//bool principalOrAgency, //principal - true, agency - false
+				SUMO_ALG_UNKNOWN,//char superMontageAlgorithm,
+				OS_RESIZE,
+				DE_DEFAULT,//unsigned int destinationExchange,
+				TT_PRICE,//StopTriggerType triggerType,
+				false,
+				0,
+				o.comment,
+				NULL,//const char* regionalProactiveDestination,
+				STPT_ALL,
+				Money(0, 200),
+				false,
+				&orderSent,
+				m_account);
+			if(!stopOrder)
+			{
+				error = SO_INCORRECT_PRICE;
+			}
+		}
 		return error;
 	}
 

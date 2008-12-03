@@ -12,6 +12,7 @@ namespace TradeLib
         public Order(bool side) : base() { this.side = side; } 
         public string TIF = "DAY";
         public int sec = 0;
+        public decimal trail = 0;
         public override bool isValid 
         { 
             get 
@@ -23,6 +24,7 @@ namespace TradeLib
         public bool isMarket { get { return (price == 0) && (stopp == 0); } }
         public bool isLimit { get { return (price != 0); } }
         public bool isStop { get { return (stopp != 0); } }
+        public bool isTrail { get { return trail != 0; } }
         public int SignedSize { get { return Math.Abs(size) * (side ? 1 : -1); } }
         public int UnSignedSize { get { return Math.Abs(size); } }
         public override decimal Price
@@ -159,7 +161,7 @@ namespace TradeLib
         public override string Serialize()
         {
             if (isFilled) return base.Serialize();
-            string [] r = new string[] { symbol,(side ? "true" : "false"),UnSignedSize.ToString(),price.ToString(),stopp.ToString(),comment,ex,accountid,this.Security.ToString(),this.Currency.ToString(),LocalSymbol,id.ToString(),TIF,date.ToString(),time.ToString(),sec.ToString()};
+            string [] r = new string[] { symbol,(side ? "true" : "false"),UnSignedSize.ToString(),price.ToString(),stopp.ToString(),comment,ex,accountid,this.Security.ToString(),this.Currency.ToString(),LocalSymbol,id.ToString(),TIF,date.ToString(),time.ToString(),sec.ToString(),trail.ToString()};
             return string.Join(",", r);
         }
         /// <summary>
@@ -185,6 +187,7 @@ namespace TradeLib
             o.Security = (SecurityType)Enum.Parse(typeof(SecurityType), rec[(int)OrderField.Security]);
             o.id = Convert.ToUInt32(rec[(int)OrderField.OrderID]);
             o.TIF = rec[(int)OrderField.OrderTIF];
+            o.trail = Convert.ToDecimal(rec[(int)OrderField.Trail]);
             try
             {
                 o.date = Convert.ToInt32(rec[(int)OrderField.oDate]);
@@ -241,6 +244,7 @@ namespace TradeLib
         oDate,
         oTime,
         oSec,
+        Trail,
     }
 
 }

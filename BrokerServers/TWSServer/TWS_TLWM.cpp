@@ -135,14 +135,15 @@ namespace TradeLibFast
 
 		// create broker-specific objects here
 		Order* order(new Order);
-		order->auxPrice = o.stop;
+		order->auxPrice = o.isTrail() ? o.trail : o.stop;
 		order->lmtPrice = o.price;
-		order->orderType = (o.stop!=0) ? "STP" : (o.price!=0 ? "LMT" : "MKT");
+		order->orderType = (o.isStop()) ? "STP" : (o.isLimit() ? "LMT" : (o.isTrail() ? "TRAIL" : "MKT"));
 		order->totalQuantity = (long)o.size;
 		order->action = (o.side) ? "BUY" : "SELL";
 		order->account = o.account;
 		order->tif = o.TIF;
 		order->outsideRth = true;
+
 		if (o.id!=0) // if ID is provided, keep it
 			order->orderId = o.id;
 		else // otherwise just get the next id

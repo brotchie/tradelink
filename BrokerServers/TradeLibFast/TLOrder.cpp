@@ -11,6 +11,7 @@ namespace TradeLibFast
 		TIF = "DAY";
 		size = 0;
 		price = 0;
+		trail = 0;
 		stop = 0;
 		comment = "";
 		date = 0;
@@ -32,8 +33,8 @@ namespace TradeLibFast
 	{
 		CString sde = (this->side) ? CString("True") : CString("False");
 		CString m;
-		// sym,side,size,price,stop,user,exch,acct,sect,curr,lsym,id
-		m.Format(_T("%s,%s,%i,%f,%f,%s,%s,%s,%s,%s,%s,%u,%s,%i,%i,%i"),symbol,sde,size,price,stop,comment,exchange,account,security,currency,localsymbol,id,TIF,date,time,sec);
+		// sym,side,size,price,stop,user,exch,acct,sect,curr,lsym,id,TIF,date,time,sec,trail
+		m.Format(_T("%s,%s,%i,%f,%f,%s,%s,%s,%s,%s,%s,%u,%s,%i,%i,%i,%f"),symbol,sde,size,price,stop,comment,exchange,account,security,currency,localsymbol,id,TIF,date,time,sec,trail);
 		return m;
 	}
 
@@ -56,6 +57,7 @@ namespace TradeLibFast
 		o.side = (sde.CompareNoCase(_T("True"))==0);
 		o.size = _tstoi(r[oSIZE].GetBuffer());
 		o.stop = _tstof(r[oSTOP].GetBuffer());
+		o.trail = _tstof(r[oTRAIL].GetBuffer());
 		o.symbol = r[oSYM];
 		o.localsymbol = r[oLSYM];
 		o.id = _tstoi(r[oID].GetBuffer());

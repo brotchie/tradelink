@@ -11,6 +11,7 @@ namespace TradeLibFast
 		int size;
 		double price;
 		double stop;
+		double trail;
 		bool side;
 		CString symbol;
 		int date;
@@ -29,6 +30,7 @@ namespace TradeLibFast
 		bool isLimit(void) { return (price!=0); }
 		bool isMarket(void) { return (price==0) && (stop==0); }
 		bool isStop(void) { return (stop!=0); }
+		bool isTrail() { return trail!=0; }
 
 
 		CString Serialize(void);
@@ -54,6 +56,7 @@ namespace TradeLibFast
 		oDate,
 		oTime,
 		oSec,
+		oTRAIL,
 	};
 
 
