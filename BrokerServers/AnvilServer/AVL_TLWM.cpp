@@ -48,7 +48,6 @@ namespace TradeLibFast
 		{
 			if (subs[i]!=NULL)
 			{
-				subs[i]->Clear();
 				delete subs[i];
 				subs[i] = NULL;
 			}

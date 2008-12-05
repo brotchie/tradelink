@@ -53,8 +53,7 @@ void TLStock::Clear()
 
 TLStock::~TLStock()
 {
-    Clear();
-						
+	Clear();					
 }
 
 
