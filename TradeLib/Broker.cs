@@ -208,6 +208,8 @@ namespace TradeLib
             return o.id;
         }
 
+        List<string> hasopened = new List<string>();
+
         /// <summary>
         /// Executes any open orders allowed by the specified tick.
         /// </summary>
@@ -230,7 +232,24 @@ namespace TradeLib
                 { 
                     Order o = MasterOrders[a][i];
                     if (tick.symbol != o.symbol) continue; //make sure tick is for the right stock
-                    bool filled = o.Fill(tick); // fill our trade
+                    bool filled = false;
+                    if (o.TIF == "OPG")
+                    {
+                        // if it's already opened, we missed our shot
+                        if (hasopened.Contains(o.symbol)) continue;
+                        // otherwise make sure it's really the opening
+                        if (((o.symbol.Length < 4) && (tick.ex.Contains("NYS"))) ||
+                            (o.symbol.Length > 3))
+                        {
+                            // it's the opening tick, so fill it as an opg
+                            filled = o.Fill(tick, true);
+                            // mark this symbol as already being open
+                            hasopened.Add(tick.symbol);
+                        }
+
+                    } 
+                    else // otherwise fill order normally
+                        filled = o.Fill(tick); // fill our trade
                     if (filled)
                     {
                         int mysize = (int)Math.Abs(o.size);

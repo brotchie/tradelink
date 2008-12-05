@@ -113,9 +113,11 @@ namespace TradeLib
         /// </summary>
         /// <param name="t"></param>
         /// <returns></returns>
-        public bool Fill(Tick t)
+        public bool Fill(Tick t) { return Fill(t, false); }
+        public bool Fill(Tick t, bool fillOPG)
         {
             if (!t.isTrade) return false;
+            if (!fillOPG && TIF=="OPG") return false;
             if ((isLimit && Side && (t.trade <= price)) // buy limit
                 || (isLimit && !Side && (t.trade>=price))// sell limit
                 || (isStop && Side && (t.trade>=stopp)) // buy stop

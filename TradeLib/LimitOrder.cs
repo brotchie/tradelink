@@ -17,6 +17,7 @@ namespace TradeLib
         public BuyLimit(string sym, int size, decimal price, string comment) : base (sym,true,size,price,0,comment,0,0) { }
         public BuyLimit(string sym, int size, decimal price) : base (sym,true,size,price,0,"",0,0) { }
     }
+
     /// <summary>
     /// Create sell-limit orders.
     /// </summary>
@@ -25,5 +26,28 @@ namespace TradeLib
         public SellLimit(string sym, int size, decimal price, string comment) : base (sym,false,size,price,0,comment,0,0) { }
         public SellLimit(string sym, int size, decimal price) : base (sym,false,size,price,0,"",0,0) { }
     }
+
+    /// <summary>
+    /// Create a buy OPG order
+    /// </summary>
+    public class BuyOPG : Order
+    {
+        public BuyOPG(string sym, int size, decimal price, string comment) : base(sym,true,size,price,0,comment,0,0) { TIF = "OPG"; }
+        public BuyOPG(string sym, int size,decimal price) : this(sym,size,price,"") {}
+    }
+
+    public class SellOPG : Order
+    {
+        public SellOPG(string sym, int size, decimal price, string comment) : base(sym, false, size, price, 0, comment, 0, 0) { TIF = "OPG"; }
+        public SellOPG(string sym, int size, decimal price) : this(sym, size, price, "") { }
+    }
+
+    public class OPGOrder : Order
+    {
+        public OPGOrder(string sym, bool side, int size, decimal price, string comment) : base(sym, side, size, price, 0, comment, 0, 0) { TIF = "OPG"; }
+        public OPGOrder(string sym, bool side, int size, decimal price) : this(sym, side, size, price, "") { }
+    }
+
+
 
 }

@@ -198,5 +198,43 @@ namespace TestTradeLib
             // any trades
             Assert.That(broker.GetOpenPosition(sym).isFlat);
         }
+
+        [Test]
+        public void OPGs()
+        {
+            Broker broker = new Broker();
+            const string s = "TST";
+            // build and send an OPG order
+            Order opg = new BuyOPG(s, 200, 10);
+            broker.sendOrder(opg);
+
+            // build a tick on another exchange
+            Tick it = Tick.NewTrade(s, 9, 100);
+            it.ex = "ISLD";
+
+            // fill order (should fail)
+            int c = broker.Execute(it);
+            Assert.AreEqual(0, c);
+
+            // build opening price for desired exchange
+            Tick nt = Tick.NewTrade(s, 9, 10000);
+            nt.ex = "NYS";
+            // fill order (should work)
+
+            c = broker.Execute(nt);
+
+            Assert.AreEqual(1, c);
+
+            // add another OPG, make sure it's not filled with another tick
+
+            Tick next = Tick.NewTrade(s, 9, 2000);
+            next.ex = "NYS";
+
+            Order late = new BuyOPG(s, 200, 10);
+            broker.sendOrder(late);
+            c = broker.Execute(next);
+            Assert.AreEqual(0, c);
+
+        }
     }
 }
