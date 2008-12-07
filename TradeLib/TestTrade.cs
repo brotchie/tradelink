@@ -26,6 +26,16 @@ namespace TestTradeLib
             Trade t = new Trade("TST",10,100,DateTime.Now);
             Assert.That(t.isValid,t.ToString());
             Assert.That(t.isFilled,t.ToString());
+
+            //midnight check
+            t.xdate = 20081205;
+            t.xtime = 0;
+            t.xsec = 0;
+            Assert.That(t.isValid);
+            t.xtime = 0;
+            t.xsec = 0;
+            t.xdate = 0;
+            Assert.That(!t.isValid);
         }
 
         [Test]
