@@ -76,12 +76,57 @@ void TLStock::Load()
 
 }
 
+void TLStock::FillQuotes()
+{
+	if(m_stockHandle)
+	{
+			const BookEntry* be;
+			TLTick k;
+			k.sym = CString(m_symbol.c_str());
+			B_StartIteration(m_bidIterator);
+			be = B_GetNextBookEntry(m_bidIterator);
+			k.bid = be->GetMoneyValueForServer()/1024;
+			k.bs = be->GetSize();
+			k.be = be->GetMmid();
+			B_StartIteration(m_askIterator);
+			be = B_GetNextBookEntry(m_askIterator);
+			k.ask = be->GetMoneyValueForServer()/1024;
+			k.os = be->GetSize();
+			k.oe = be->GetMmid();
+			tl->SrvGotTick(k);
+	}
+}
+
 
 void TLStock::Process(const Message* message, Observable* from, const Message* additionalInfo)
 {
 
     switch(message->GetType())
     {
+		case M_RESP_REFRESH_SYMBOL:
+		case M_ITCH_1_00_NewVisibleOrder:
+		case M_ITCH_1_00_VisibleOrderExecution:
+		case M_ITCH_1_00_CanceledOrder:
+		case M_BOOK_NEW_ORDER:
+		case M_BOOK_MODIFY_ORDER:
+		case M_BOOK_DELETE_ORDER:
+		case M_ITCH_1_00_NewVisibleAttributedOrder:
+		case M_ITCH_1_00_VisibleAttributedOrderExecution:
+		case M_ITCH_1_00_ATTRIBUTED_CanceledOrder:
+		case M_BOOK_NYSE_OPEN_BOOK:
+		case M_FLUSH_ALL:
+        case M_FLUSH_ALL_OPEN_BOOKS:
+        case M_FLUSH_BOOK_FOR_STOCK:
+		case M_FLUSH_ATTRIBUTED_BOOK:
+		case M_FLUSH_ATTRIBUTED_BOOK_FOR_STOCK:
+		case M_NW2_INSIDE_QUOTE:
+		{
+			FillQuotes();
+
+		}
+
+		break;
+		case M_NW2_MM_QUOTE:
         case M_LEVEL2_QUOTE:
 //This message comes from m_level2, when a level 2 quote is added, removed or modified.
 //You can cast message to MsgLevel2Quote*
@@ -119,6 +164,7 @@ void TLStock::Process(const Message* message, Observable* from, const Message* a
 
 
         case M_LAST_TRADE_SHORT:
+	case M_TAL_LAST_TRADE:
 //This message comes from m_level1 and m_prints (in this order), when there is a new trade reported
 //You can cast message to MsgLastTradeShort*
 //MsgLastTradeShort* msg = (MsgLastTradeShort*)message;

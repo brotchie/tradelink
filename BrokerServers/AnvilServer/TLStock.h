@@ -22,19 +22,26 @@ public:
     const std::string& GetSymbol() const{return m_symbol;}
 	TradeLibFast::TLServer_WM* tl;
 
+
+	void Clear();
+protected:
+	void FillQuotes();
+    virtual void Process(const Message* message, Observable* from, const Message* additionalInfo);
+	
     Observable* GetLevel1(){return m_level1;}
     Observable* GetLevel2(){return m_level2;}
     Observable* GetPrints(){return m_prints;}
 
-	void Clear();
-protected:
-    virtual void Process(const Message* message, Observable* from, const Message* additionalInfo);
     std::string m_symbol;
     const StockBase* m_stockHandle;
     Observable* m_level1;
     Observable* m_level2;
     Observable* m_prints;
 	Observable* m_account;
+
+	void* m_bidIterator;
+    void* m_askIterator;
+    void* m_printsIterator;
 
 
 };
