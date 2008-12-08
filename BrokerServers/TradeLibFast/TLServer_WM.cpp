@@ -245,7 +245,8 @@ namespace TradeLibFast
 		for (size_t i = 0; i<stocks.size(); i++)
 			for (size_t j = 0; j<stocks[i].size(); j++)
 			{
-				if (stocks[i][j]==trade.symbol)
+				TLSecurity s = TLSecurity::Deserialize(stocks[i][j]);
+				if (s.sym==trade.symbol)
 					TLSend(EXECUTENOTIFY,trade.Serialize(),client[i]);
 			}
 	}

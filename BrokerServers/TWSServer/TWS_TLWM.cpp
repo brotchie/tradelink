@@ -342,6 +342,7 @@ namespace TradeLibFast
 		trade.xsize = execution.shares;
 		trade.symbol = contract.localSymbol;
 		trade.side = execution.side=="BOT";
+		trade.security = contract.secType;
 
 		// convert date and time
 		std::vector<CString> r;

@@ -30,8 +30,8 @@ namespace TradeLibFast
 	{
 		CString m;
 		CString sde = this->side ? _T("True") : _T("False");
-		// date,time,sec,symbol,side,size,price,comment,acc,sect,currency,localsymbol
-		m.Format(_T("%i,%i,%i,%s,%s,%i,%f,%s,%s,%s,%s,%s,%u"),xdate,xtime,xsec,symbol,sde,xsize,xprice,comment,account,security,currency,localsymbol,id);
+		// date,time,sec,symbol,side,size,price,comment,acc,sect,currency,localsymbol,exchange
+		m.Format(_T("%i,%i,%i,%s,%s,%i,%f,%s,%s,%s,%s,%s,%u,%s"),xdate,xtime,xsec,symbol,sde,xsize,xprice,comment,account,security,currency,localsymbol,id,exchange);
 		return m;
 	}
 
@@ -53,6 +53,7 @@ namespace TradeLibFast
 		t.security = r[tSecurity];
 		t.currency = r[tCurrency];
 		t.id = _tstoi(r[tID]);
+		t.exchange = r[tExch];
 		return t;
 	}
 }

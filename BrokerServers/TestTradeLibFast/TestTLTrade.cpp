@@ -34,6 +34,7 @@ static void __stdcall SerializeDeserialize()
 	o.xprice = 0;
 	o.xsize = -100;
 	o.side = false;
+	o.exchange = "NYMEX";
 	// flatten it
 	CString m = o.Serialize();
 
@@ -46,6 +47,7 @@ static void __stdcall SerializeDeserialize()
 	CFIX_ASSERT(o.xdate==d.xdate);
 	CFIX_ASSERT(o.xtime==d.xtime);
 	CFIX_ASSERT(o.xsec==d.xsec);
+	CFIX_ASSERT(o.exchange==d.exchange);
 
 }
 

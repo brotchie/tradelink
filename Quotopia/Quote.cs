@@ -430,6 +430,7 @@ namespace Quotopia
         {
             int[] res = new int[] { };
             symidx.TryGetValue(sym,out res);
+            if (res == null) return new int[0];
             return res;
         }
 
@@ -442,7 +443,7 @@ namespace Quotopia
             }
             else
             {
-                int[] rows = GetSymbolRows(t.symbol);
+                int[] rows = GetSymbolRows(t.Sec.FullName);
                 decimal high = tl.FastHigh(t.symbol);
                 decimal low = tl.FastLow(t.symbol);
                 for (int i = 0; i < rows.Length; i++)
@@ -516,22 +517,23 @@ namespace Quotopia
                     else // otherwise remove portion that was filled and leave rest on order
                         ordergrid["osize", oidx].Value = Math.Abs(signedosize - signedtsize) * osign;
                 }
-                int[] rows = GetSymbolRows(t.symbol);
+                
+                int[] rows = GetSymbolRows(t.Sec.FullName);
                 Position p = null;
                 if (posdict.TryGetValue(t.symbol, out p))
                 {
                     p.Adjust(t);
-                    int size = p.Size;
-                    decimal price = p.AvgPrice;
-                    for (int i = 0; i < rows.Length; i++)
-                    {
-                        qt.Rows[rows[i]]["PosSize"] = size.ToString();
-                        qt.Rows[rows[i]]["AvgPrice"] = price.ToString("N2");
-                    }
                     posdict[t.symbol] = p;
                 }
                 else 
                     posdict.Add(t.symbol, new Position(t));
+                int size = posdict[t.symbol].Size;
+                decimal price = posdict[t.symbol].AvgPrice;
+                for (int i = 0; i < rows.Length; i++)
+                {
+                    qt.Rows[rows[i]]["PosSize"] = size.ToString();
+                    qt.Rows[rows[i]]["AvgPrice"] = price.ToString("N2");
+                }
                 TradesView.Rows.Add(t.xdate, t.xtime, t.xsec, t.symbol, (t.side ? "BUY" : "SELL"), t.xsize, t.xprice.ToString("N2"), t.comment, t.Account.ToString()); // if we accept trade, add it to list
             }
         }
@@ -539,7 +541,7 @@ namespace Quotopia
 
         void tl_gotTick(Tick t)
         {
-            int[] rows = GetSymbolRows(t.symbol);
+            int[] rows = GetSymbolRows(t.Sec.FullName);
             if ((rows==null)||(rows.Length == 0) ) return;
             ticks[rows[0]] = t;
             BarList bl = null;

@@ -49,6 +49,7 @@ namespace TestTradeLib
             Trade t = new Trade(sym, price, size, date);
             uint magicid = 555;
             t.id = magicid;
+            t.Exchange = "NYMEX";
             // serialize it for transmission
             string msg = t.Serialize();
             // deserialize it
@@ -69,6 +70,7 @@ namespace TestTradeLib
             Assert.That(newtrade.xtime != 0);
             Assert.That(newtrade.xsize == size);
             Assert.That(newtrade.id == magicid);
+            Assert.AreEqual(newtrade.Exchange = t.Exchange);
         }
 
     }

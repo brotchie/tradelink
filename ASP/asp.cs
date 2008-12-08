@@ -27,6 +27,7 @@ namespace ASP
             tl.gotOrderCancel += new UIntDelegate(tl_gotOrderCancel);
             this.FormClosing += new FormClosingEventHandler(ASP_FormClosing);
             status(Util.TLSIdentity());
+            LoadBoxDLL(Properties.Settings.Default.boxdll);
         }
 
         void tl_gotOrderCancel(uint number)
@@ -39,7 +40,7 @@ namespace ASP
         void tl_gotOrder(Order o)
         {
             int[] idxs = new int[0];
-            if (!symidx.TryGetValue(o.symbol, out idxs))
+            if (!symidx.TryGetValue(o.Sec.FullName, out idxs))
                 return;
             foreach (int idx in idxs)
                 boxlist[idx].GotOrder(o);
@@ -47,6 +48,7 @@ namespace ASP
 
         void ASP_FormClosing(object sender, FormClosingEventArgs e)
         {
+            Properties.Settings.Default.Save();
             if (tl != null)
                 tl.Disconnect();
             ta.CloseArchive();
@@ -65,7 +67,7 @@ namespace ASP
                 ta.Save(t);
 
             int[] idxs = new int[0];
-            if (!symidx.TryGetValue(t.symbol, out idxs))
+            if (!symidx.TryGetValue(t.Sec.FullName, out idxs))
                 return;
             foreach (int idx in idxs)
                 boxlist[idx].GotTick(t);
@@ -80,7 +82,7 @@ namespace ASP
 
             count++;
             int[] idxs = new int[0];
-            if (!symidx.TryGetValue(t.symbol, out idxs))
+            if (!symidx.TryGetValue(t.Sec.FullName, out idxs))
                 return;
             foreach (int idx in idxs)
                 boxlist[idx].GotFill(t);
@@ -100,13 +102,27 @@ namespace ASP
 
 
         MarketBasket mb = new MarketBasket();
-
-        
-        string boxdll;
-
         Response workingbox = new InvalidResponse();
 
         // name of dll of box names
+
+        void LoadBoxDLL(string filename)
+        {
+            if (!System.IO.File.Exists(filename))
+            {
+                status("file does not exist: " + filename);
+                return;
+            }
+
+            Properties.Settings.Default.boxdll = filename;
+
+            List<string> list = Util.GetBoxList(filename);
+            Boxes.Items.Clear();
+            foreach (string box in list)
+            {
+                Boxes.Items.Add(box);
+            }
+        }
 
         private void LoadDLL_Click(object sender, EventArgs e)
         {
@@ -116,14 +132,7 @@ namespace ASP
             of.Multiselect = false;
             if(of.ShowDialog() == DialogResult.OK) 
             {
-                boxdll = of.FileName;
-
-                List <string> list = Util.GetBoxList(boxdll);
-                Boxes.Items.Clear();
-                foreach (string box in list)
-                {
-                    Boxes.Items.Add(box);
-                }
+                LoadBoxDLL(of.FileName);
 
             }
 
@@ -136,7 +145,7 @@ namespace ASP
         private void Boxes_SelectedIndexChanged(object sender, EventArgs e)
         {
             string boxname = (string)Boxes.SelectedItem;
-            workingbox = ResponseLoader.FromDLL(boxname, boxdll);
+            workingbox = ResponseLoader.FromDLL(boxname, Properties.Settings.Default.boxdll);
             workingbox.SendOrder += new OrderDelegate(workingbox_SendOrder);
             workingbox.SendDebug+= new DebugFullDelegate(workingbox_GotDebug);
             workingbox.SendCancel+= new UIntDelegate(workingbox_CancelOrderSource);
@@ -146,7 +155,7 @@ namespace ASP
         {
             o.Security = seclist[o.symbol].Type;
             o.Exchange = seclist[o.symbol].DestEx;
-            o.LocalSymbol = seclist[o.symbol].Name;
+            o.LocalSymbol = o.symbol;
             tl.SendOrder(o);
         }
 
@@ -185,7 +194,7 @@ namespace ASP
                 {
                     lock (seclist) // potentially used by other threads, so we lock it
                     {
-                        seclist.Add(sec.Symbol, sec);
+                        seclist.Add(sec.Symbol,sec);
                     }
                 }
 
@@ -197,22 +206,22 @@ namespace ASP
             int idx = boxlist.Count -1;
             tl.Subscribe(mb);
             boxcriteria.Items.Add(workingbox.Name+" ["+string.Join(",",valid.ToArray())+"]");
-            foreach (string sym in valid)
-                if (symidx.ContainsKey(sym))
+            foreach (Security sec in seclist.Values)
+                if (symidx.ContainsKey(sec.FullName))
                 {
                     // add this boxes' index to subscriptions for this symbol
-                    int len = symidx[sym].Length;
+                    int len = symidx[sec.FullName].Length;
                     int[] a = new int[len + 1];
                     a[len] = idx;
                 }
-                else symidx.Add(sym, new int[] { idx });
+                else symidx.Add(sec.FullName, new int[] { idx });
             stock.Text = "";
             status("");
             Boxes.SelectedIndex = -1;
             
         }
 
-        Dictionary<string, Security> seclist = new Dictionary<string, Security>();
+        Dictionary<string,Security> seclist = new Dictionary<string,Security>();
         Dictionary<string, int[]> symidx = new Dictionary<string, int[]>();
         List<Response> boxlist = new List<Response>();
         

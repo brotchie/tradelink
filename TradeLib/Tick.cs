@@ -10,6 +10,7 @@ namespace TradeLib
     public class Tick
     {
         public string symbol = "";
+        public Security Sec = new Security();
         public int factor = 100;
         public int time;
         public int date;
@@ -132,7 +133,8 @@ namespace TradeLib
         {
             Tick t = this;
             const char d = ',';
-            string s = t.symbol + d + t.date + d + t.time + d + t.sec + d + t.trade + d + t.size + d + t.ex + d + t.bid + d + t.ask + d + t.bs + d + t.os + d + t.be + d + t.oe + d;
+            string secname = t.Sec.isValid ? t.Sec.FullName : t.symbol;
+            string s = secname + d + t.date + d + t.time + d + t.sec + d + t.trade + d + t.size + d + t.ex + d + t.bid + d + t.ask + d + t.bs + d + t.os + d + t.be + d + t.oe + d;
             return s;
         }
 
@@ -140,7 +142,8 @@ namespace TradeLib
         {
             string [] r = msg.Split(',');
             Tick t = new Tick();
-            t.symbol = r[(int)TickField.symbol];
+            t.Sec = Security.Parse(r[(int)TickField.symbol]);
+            t.symbol = t.Sec.Symbol;
             t.trade = Convert.ToDecimal(r[(int)TickField.trade]);
             t.size = Convert.ToInt32(r[(int)TickField.tsize]);
             t.bid = Convert.ToDecimal(r[(int)TickField.bid]);

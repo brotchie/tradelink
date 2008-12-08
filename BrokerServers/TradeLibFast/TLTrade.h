@@ -36,5 +36,6 @@ namespace TradeLibFast
         tCurrency,
         tLocalSymbol,
 		tID,
+		tExch,
     };
 }

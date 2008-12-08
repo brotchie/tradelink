@@ -22,5 +22,17 @@ namespace ASP.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string boxdll {
+            get {
+                return ((string)(this["boxdll"]));
+            }
+            set {
+                this["boxdll"] = value;
+            }
+        }
     }
 }
