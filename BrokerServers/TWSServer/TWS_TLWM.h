@@ -40,6 +40,7 @@ namespace TradeLibFast
 		void InitSockets(int maxsockets, int clientid); // discover mlinks
 		int m_nextsocket; // next socket to search for mlink
 		OrderId getNextOrderId(CString account);
+		void IncOrderId(CString account);
 		bool hasAccount(CString account);
 		int getMlinkId(OrderId id);
 		std::vector<int> validlinkids; // gets the m_links ids that are logged in

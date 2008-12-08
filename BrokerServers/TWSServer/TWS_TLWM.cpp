@@ -242,8 +242,8 @@ namespace TradeLibFast
 	{
 		for (size_t i = 0; i<accts.size(); i++)
 			if (accts[i].Find(account)!=-1)
-				return m_nextorderids[i]++;
-		return m_nextorderids[0]++; // default is first one
+				return m_nextorderids[i];
+		return m_nextorderids[0]; // default is first one
 	}
 
 	int TWS_TLWM::getMlinkId(OrderId id)
@@ -286,7 +286,10 @@ namespace TradeLibFast
 	void TWS_TLWM::openOrder( OrderId orderId, const Contract& contract,
 								const Order& order, const OrderState& orderState)
 	{
+			// count order
+			IncOrderId(order.account);
 
+			// prepare client order and notify client
 			TradeLibFast::TLOrder o;
 			o.id = orderId;
 			o.side = (order.action=="BUY");
@@ -306,6 +309,18 @@ namespace TradeLibFast
 			o.time = nowtime[TLtime];
 			o.sec = nowtime[TLsec];
 			this->SrvGotOrder(o);
+
+	}
+
+	void TWS_TLWM::IncOrderId(CString account)
+	{
+		for (size_t i = 0; i<accts.size(); i++)
+			if (accts[i].Find(account)!=-1)
+			{
+				m_nextorderids[i]++;
+				return;
+			}
+		m_nextorderids[0]++;
 	}
 
 	void TWS_TLWM::SrvCancelRequest(OrderId orderid)
