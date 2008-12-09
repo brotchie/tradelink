@@ -70,7 +70,7 @@ namespace TestTradeLib
             Assert.That(newtrade.xtime != 0);
             Assert.That(newtrade.xsize == size);
             Assert.That(newtrade.id == magicid);
-            Assert.AreEqual(newtrade.Exchange = t.Exchange);
+            Assert.AreEqual(newtrade.Exchange,t.Exchange);
         }
 
     }

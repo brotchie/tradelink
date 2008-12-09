@@ -7,9 +7,8 @@ using System.Text;
 using System.Windows.Forms;
 using TradeLib;
 
-namespace Quotopia
+namespace TradeLib
 {
-    public delegate void QuotopiaOrderDel(Order sendOrder);
     public partial class Ticket : Form
     {
         Order work = new Order();
@@ -36,7 +35,6 @@ namespace Quotopia
             osize.MouseWheel += new MouseEventHandler(osize_MouseWheel);
         }
 
-        delegate void SetTickCallBack(Tick t);
         public void newTick(Tick tick)
         {
             if (this.InvokeRequired)
@@ -57,8 +55,7 @@ namespace Quotopia
                 {
                     if (this.oprice.InvokeRequired)
                     {
-                        SetTickCallBack d = new SetTickCallBack(newTick);
-                        this.Invoke(d, new object[] { tick });
+                        this.Invoke(new TickDelegate(newTick), new object[] { tick });
                     }
                     else oprice.Value = (decimal)changedval;
                 }
@@ -77,7 +74,7 @@ namespace Quotopia
             if (e.Button == MouseButtons.Middle) osize.Value = isize; 
         }
 
-        public event QuotopiaOrderDel neworder;
+        public event OrderDelegate SendOrder;
 
         void order_MouseWheel(object sender, MouseEventArgs e)
         {
@@ -118,7 +115,7 @@ namespace Quotopia
                 work.price = limit;
                 work.stopp = stop;
             }
-            if (neworder!=null) neworder(work);
+            if (SendOrder!=null) SendOrder(work);
         }
 
 

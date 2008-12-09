@@ -1,4 +1,4 @@
-namespace Quotopia
+namespace TradeLib
 {
     partial class Ticket
     {
