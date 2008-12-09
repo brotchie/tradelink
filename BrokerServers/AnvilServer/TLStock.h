@@ -25,7 +25,8 @@ public:
 
 	void Clear();
 protected:
-	void FillQuotes();
+	void TradeNotify();
+	void QuoteNotify();
     virtual void Process(const Message* message, Observable* from, const Message* additionalInfo);
 	
     Observable* GetLevel1(){return m_level1;}
@@ -39,9 +40,10 @@ protected:
     Observable* m_prints;
 	Observable* m_account;
 
-	void* m_bidIterator;
-    void* m_askIterator;
-    void* m_printsIterator;
+	void* bidi;
+	void* aski;
+	void* pnti;
+	uint booki[MAX_BOOKS];
 
 
 };

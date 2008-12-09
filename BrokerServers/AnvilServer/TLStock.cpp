@@ -21,17 +21,40 @@ TLStock::TLStock(const char* symbol, TradeLibFast::TLServer_WM* tlinst, bool loa
     m_stockHandle(NULL),
     m_level1(NULL),
     m_level2(NULL),
-    m_prints(NULL)
+    m_prints(NULL),
+	bidi(NULL),
+	aski(NULL),
+	pnti(B_CreatePrintsAndBookExecutionsIterator(NULL, (1 << PS_LAST) - 1, 0, false, NULL, true))
 {
 	tl = tlinst;
     if(load)
     {
         Load();
     }
+	for(unsigned int i = 0; i < MAX_BOOKS; i++)
+    {
+        booki[i] = 1;//number of book lines integrated in Level2
+    }
 }
 
 void TLStock::Clear()
 {
+	if (bidi)
+	{
+		B_DestroyIterator(bidi);
+		bidi = NULL;
+	}
+	if (aski)
+	{
+		B_DestroyIterator(aski);
+		aski = NULL;
+	}
+	if (pnti)
+	{
+		B_TransactionIteratorSetStock(pnti, NULL, this);
+		B_DestroyIterator(pnti);
+		pnti= NULL;
+	}
     if(m_level1)
     {
         m_level1->Remove(this);
@@ -72,27 +95,68 @@ void TLStock::Load()
 		m_prints->Add(this);
 	    m_level2->Add(this);
 		m_account->Add(this);
+		// setup book iterators which are used to get top of book and t&s when updates come in
+		bidi = B_CreateLevel2AndBookIterator(m_stockHandle, true, false,false, booki, 1, this);
+		aski = B_CreateLevel2AndBookIterator(m_stockHandle, false, false,false, booki, 1, this);
+		B_TransactionIteratorSetStock(pnti, m_stockHandle, this);
+		if (m_stockHandle->isLoaded())
+		{
+			TradeNotify();
+			QuoteNotify();
+		}
 	}
 
 }
 
-void TLStock::FillQuotes()
+void TLStock::QuoteNotify()
 {
-	if(m_stockHandle)
+	if (m_stockHandle)
 	{
-			const BookEntry* be;
+			time_t now;
+			time(&now);
+			CTime ct(now);
 			TLTick k;
+			k.date = (ct.GetYear()*10000) + (ct.GetMonth()*100) + ct.GetDay();
+			k.time = (ct.GetHour()*100)+ct.GetMinute();
+			k.sec = ct.GetSecond();
 			k.sym = CString(m_symbol.c_str());
-			B_StartIteration(m_bidIterator);
-			be = B_GetNextBookEntry(m_bidIterator);
-			k.bid = be->GetMoneyValueForServer()/1024;
-			k.bs = be->GetSize();
+			// get bid
+			B_StartIteration(bidi);
+			const BookEntry* be = B_GetNextBookEntry(bidi);
+			k.bid = be->toDouble();
+			k.bs = be->GetSize()/m_stockHandle->GetRoundLot();
 			k.be = be->GetMmid();
-			B_StartIteration(m_askIterator);
-			be = B_GetNextBookEntry(m_askIterator);
-			k.ask = be->GetMoneyValueForServer()/1024;
-			k.os = be->GetSize();
-			k.oe = be->GetMmid();
+			// get ask
+			B_StartIteration(aski);
+			const BookEntry* ae = B_GetNextBookEntry(aski);
+			k.ask = ae->toDouble();
+			k.os = ae->GetSize()/m_stockHandle->GetRoundLot();
+			k.oe = ae->GetMmid();
+			// send tick
+			tl->SrvGotTick(k);
+	}
+
+}
+void TLStock::TradeNotify()
+{
+	if (m_stockHandle)
+	{
+			time_t now;
+			time(&now);
+			CTime ct(now);
+			TLTick k;
+			k.date = (ct.GetYear()*10000) + (ct.GetMonth()*100) + ct.GetDay();
+			k.time = (ct.GetHour()*100)+ct.GetMinute();
+			k.sec = ct.GetSecond();
+			k.sym = CString(m_symbol.c_str());
+			// get trade
+			B_StartIteration(pnti);
+			const Transaction* t = B_GetNextPrintsEntry(pnti);
+			k.trade = t->toDouble();
+			k.size = t->GetSize();
+			k.ex = t->GetMmid();
+
+			// send tick
 			tl->SrvGotTick(k);
 	}
 }
@@ -120,76 +184,17 @@ void TLStock::Process(const Message* message, Observable* from, const Message* a
 		case M_FLUSH_ATTRIBUTED_BOOK:
 		case M_FLUSH_ATTRIBUTED_BOOK_FOR_STOCK:
 		case M_NW2_INSIDE_QUOTE:
-		{
-			FillQuotes();
-
-		}
-
-		break;
 		case M_NW2_MM_QUOTE:
         case M_LEVEL2_QUOTE:
-//This message comes from m_level2, when a level 2 quote is added, removed or modified.
-//You can cast message to MsgLevel2Quote*
-//MsgLevel2Quote* msg = (MsgLevel2Quote*)message;
-//See Messages.h
-
-        if(additionalInfo != NULL && additionalInfo->GetType() == M_AI_LEVEL2_QUOTE)
-        {
-
-				AIMsgMMLevel2Quote* info = (AIMsgMMLevel2Quote*)additionalInfo;
-				MsgLevel2Quote* msg = (MsgLevel2Quote*)message;
-				time_t now;
-				time(&now);
-				CTime ct(now);
-				int date = (ct.GetYear()*10000) + (ct.GetMonth()*100) + ct.GetDay();
-				int time = (ct.GetHour()*100)+ct.GetMinute();
-				int sec = ct.GetSecond();
-				TradeLibFast::TLTick tick;
-				tick.sym = msg->m_Symbol;
-				tick.date = date;
-				tick.time = time;
-				tick.sec = sec;
-				tick.bid = (double)msg->m_BidPrice/1024;
-				tick.ask = (double)msg->m_AskPrice/1024;
-				tick.ex = info->m_mmid;
-				tick.bs = msg->m_BidSize;
-				tick.os = msg->m_AskSize;
-				tick.be = info->m_mmid;
-				tick.oe = info->m_mmid;
-				tl->SrvGotTick(tick);
-		}
-
-        break;
-
-
-
+			if (from==m_prints)
+				TradeNotify();
+			if ((from==m_level2) || (from==m_level1))
+				QuoteNotify();
+			break;
         case M_LAST_TRADE_SHORT:
-	case M_TAL_LAST_TRADE:
-//This message comes from m_level1 and m_prints (in this order), when there is a new trade reported
-//You can cast message to MsgLastTradeShort*
-//MsgLastTradeShort* msg = (MsgLastTradeShort*)message;
-//See Messages.h
-        if(from == m_prints)
-        {
-			// send ticks with isTrade set
-            MsgLastTradeShort* msg = (MsgLastTradeShort*)message;
-			TLTick tick;
-			tick.ex = CString(ExchangeName(msg->m_ExecutionExchange));
-			tick.trade = (double)msg->m_price/1024;
-			tick.sym = CString(msg->m_Symbol);
-			tick.size = msg->m_LastTradeVolume;
-			time_t now;
-			time(&now);
-			CTime ct(now);
-			int date = (ct.GetYear()*10000) + (ct.GetMonth()*100) + ct.GetDay();
-			int time = (ct.GetHour()*100)+ct.GetMinute();
-			tick.time = time;
-			tick.date = date;
-			tick.sec = ct.GetSecond();
-			tl->SrvGotTick(tick);
-        }
-        break;
-
+		case M_TAL_LAST_TRADE:
+			TradeNotify();
+			break;
 
     }
 }
