@@ -77,6 +77,9 @@ void TLIdx::FillInfo()
 	k.sym = m_index->GetSymbol();
 	k.trade = val;
 	k.size = -1;
+	k.sec = ct.GetSecond();
+	k.date = xd;
+	k.time = xt;
 	tl->SrvGotTick(k);
 }
 
