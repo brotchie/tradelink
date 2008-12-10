@@ -70,6 +70,7 @@ using System.IO;
             for (int i = 0; i < fi.Length; i++)
             {
                 Security s = StockFromFileName(fi[i].Name);
+                if (!s.isValid) continue;
                 DateTime d = Util.ToDateTime(s.Date);
                 if (!stocklist.Items.Contains(s.Symbol))
                     stocklist.Items.Add(s.Symbol);
@@ -86,11 +87,17 @@ using System.IO;
 
         Security StockFromFileName(string filename)
         {
-            string ds = System.Text.RegularExpressions.Regex.Match(filename, "([0-9]{8})[.]", System.Text.RegularExpressions.RegexOptions.IgnoreCase).Result("$1");
-            string sym = filename.Replace(ds, "").Replace(".EPF","");
-            Security s = new Security(sym);
-            s.Date = Convert.ToInt32(ds);
-            return s;
+            try
+            {
+                string ds = System.Text.RegularExpressions.Regex.Match(filename, "([0-9]{8})[.]", System.Text.RegularExpressions.RegexOptions.IgnoreCase).Result("$1");
+                string sym = filename.Replace(ds, "").Replace(".EPF", "");
+                Security s = new Security(sym);
+                s.Date = Convert.ToInt32(ds);
+                return s;
+            }
+            catch (Exception) { }
+            return new Security();
+            
         }
         private void button1_Click(object sender, EventArgs e)
         {
