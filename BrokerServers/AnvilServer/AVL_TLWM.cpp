@@ -172,7 +172,7 @@ namespace TradeLibFast
 				OS_RESIZE,
 				DE_DEFAULT,//unsigned int destinationExchange,
 				TT_PRICE,//StopTriggerType triggerType,
-				false,
+				true,
 				0,
 				o.comment,
 				NULL,//const char* regionalProactiveDestination,
