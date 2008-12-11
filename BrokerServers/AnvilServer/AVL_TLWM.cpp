@@ -325,6 +325,26 @@ namespace TradeLibFast
 		return f;
 	}
 
+	void AVL_TLWM::CancelRequest(long order)
+	{
+		// get current anvil id from tradelink id
+        unsigned int orderId = AnvilId(order); 
+        void* iterator = B_CreateAccountIterator();
+        B_StartIteration(iterator);
+        Observable* acct;
+        // loop through every available account, cancel any matching orders
+        while (acct = B_GetNextAccount(iterator))
+        {
+                Order* order = B_FindOrder(orderId,acct);
+                if(order)
+                {
+                        order->Cancel();
+
+                }
+        }
+        B_DestroyIterator(iterator);
+	}
+
 	int AVL_TLWM::AccountResponse(CString client)
 	{
 		void* iterator = B_CreateAccountIterator();
