@@ -218,13 +218,7 @@ namespace TradeLibFast
 		D(CString(_T("Cleared stocks for ")+clientname));
 		return OK;
 	}
-	void TLServer_WM::SrvGotOrder(TLOrder order)
-	{
-		if (order.symbol=="") return;
-		for (size_t i = 0; i<client.size(); i++)
-			if (client[i]!="")
-				TLSend(ORDERNOTIFY,order.Serialize(),client[i]);
-	}
+
 
 	void TLServer_WM::D(const CString & message)
 	{
@@ -239,16 +233,20 @@ namespace TradeLibFast
 		}
 	}
 
+	void TLServer_WM::SrvGotOrder(TLOrder order)
+	{
+		if (order.symbol=="") return;
+		for (size_t i = 0; i<client.size(); i++)
+			if (client[i]!="")
+				TLSend(ORDERNOTIFY,order.Serialize(),client[i]);
+	}
+
 	void TLServer_WM::SrvGotFill(TLTrade trade)
 	{
-		if (trade.symbol=="") return;
-		for (size_t i = 0; i<stocks.size(); i++)
-			for (size_t j = 0; j<stocks[i].size(); j++)
-			{
-				TLSecurity s = TLSecurity::Deserialize(stocks[i][j]);
-				if (s.sym==trade.symbol)
-					TLSend(EXECUTENOTIFY,trade.Serialize(),client[i]);
-			}
+		if (!trade.isValid()) return;
+		for (size_t i = 0; i<client.size(); i++)
+			if (client[i]!="")
+				TLSend(EXECUTENOTIFY,trade.Serialize(),client[i]);
 	}
 
 	void TLServer_WM::SrvGotTick(TLTick tick)
