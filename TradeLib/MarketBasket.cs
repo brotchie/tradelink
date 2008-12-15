@@ -44,6 +44,8 @@ namespace TradeLib
         public MarketBasket() { }
         public Security this [int index] { get { return symbols[index]; } set { symbols[index] = value; } }
         List<Security> symbols = new List<Security>();
+        string _name = "";
+        public string Name { get { return _name; } set { _name = value; } }
         public int Count { get { return symbols.Count; } }
         public bool hasStock { get { return symbols.Count >0; } }
         public void Add(Security s) { if (s.isValid) symbols.Add(s); }
