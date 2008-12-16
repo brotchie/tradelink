@@ -255,7 +255,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\Shiny\include;..\TradeLibFast"
+				AdditionalIncludeDirectories="..\TradeLibFast"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_AFXEXT"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="3"
@@ -284,11 +284,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Business.lib Observer.lib Version.lib TradeLibFast.lib Shiny.lib"
+				AdditionalDependencies="Business.lib Observer.lib Version.lib TradeLibFast.lib"
 				OutputFile="$(OutDir)\$(ProjectName).dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="&quot;..\$(Configurationname)&quot;;&quot;$(OutDir)&quot;;..\Shiny"
+				AdditionalLibraryDirectories="&quot;..\$(Configurationname)&quot;;&quot;$(OutDir)&quot;;"
 				ModuleDefinitionFile="$(ProjectName).def"
 				GenerateDebugInformation="true"
 				AssemblyDebug="1"
