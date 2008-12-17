@@ -332,14 +332,17 @@ namespace TradeLibFast
         void* iterator = B_CreateAccountIterator();
         B_StartIteration(iterator);
         Observable* acct;
+
+		bool continue_search_flag = true ;
         // loop through every available account, cancel any matching orders
-        while (acct = B_GetNextAccount(iterator))
+		// stop when order is found
+        while ((acct = B_GetNextAccount(iterator)) && (continue_search_flag == true ))
         {
                 Order* order = B_FindOrder(orderId,acct);
                 if(order)
                 {
                         order->Cancel();
-
+						continue_search_flag = false ;
                 }
         }
         B_DestroyIterator(iterator);
