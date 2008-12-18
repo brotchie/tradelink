@@ -39,7 +39,7 @@ DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 		// Extension DLL one-time initialization
 		if (!AfxInitExtensionModule(TestTradeLibFast, hInstance))
 			return 0;
-
+		
 		// Insert this DLL into the resource chain
 		// NOTE: If this Extension DLL is being implicitly linked to by
 		//  an MFC Regular DLL (such as an ActiveX Control)
