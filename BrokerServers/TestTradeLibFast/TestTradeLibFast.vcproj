@@ -256,6 +256,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\TestTLWM.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\TestTradeLibFast.cpp"
 			>
 		</File>
