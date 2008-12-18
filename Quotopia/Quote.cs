@@ -391,7 +391,7 @@ namespace Quotopia
                 bardict.Add(sym, new BarList(BarInterval.FiveMin, sym));
             status("Added " + sym);
             symindex();
-            tl.RequestPositions(accts[0]);
+            tl.RequestPositions(accts!=null ? accts[0] : "");
         }
 
         
