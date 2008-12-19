@@ -150,6 +150,8 @@ namespace Quotopia
 
         void Quote_FormClosing(object sender, FormClosingEventArgs e)
         {
+            Properties.Settings.Default.Save();
+
             try
             {
                 tl.Unsubscribe();
@@ -269,6 +271,8 @@ namespace Quotopia
         {
             if (accountname.Text != "") 
                 sendOrder.Account = accountname.Text;
+            if (exchdest.Text != "")
+                sendOrder.Exchange = exchdest.Text;
             int res = tl.SendOrder(sendOrder);
             if (res != 0)
             {
@@ -633,6 +637,23 @@ namespace Quotopia
             }
             tl.Subscribe(mb);
         }
+
+        private void saveSettingsbut_Click(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.Save();
+        }
+
+        private void resetsetbut_Click(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.Reload();
+        }
+
+        private void restoredefaultsbut_Click(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.Reset();
+            
+        }
+
 
     }
 

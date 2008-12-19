@@ -61,9 +61,10 @@ namespace Quotopia
             this.Comment = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColAccount = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Settings = new System.Windows.Forms.TabPage();
+            this.label2 = new System.Windows.Forms.Label();
+            this.exchdest = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.accountname = new System.Windows.Forms.TextBox();
-            this.aboutbut = new System.Windows.Forms.Button();
             this.resetsetbut = new System.Windows.Forms.Button();
             this.restoredefaultsbut = new System.Windows.Forms.Button();
             this.saveSettingsbut = new System.Windows.Forms.Button();
@@ -375,9 +376,10 @@ namespace Quotopia
             // Settings
             // 
             this.Settings.BackColor = System.Drawing.Color.Transparent;
+            this.Settings.Controls.Add(this.label2);
+            this.Settings.Controls.Add(this.exchdest);
             this.Settings.Controls.Add(this.label1);
             this.Settings.Controls.Add(this.accountname);
-            this.Settings.Controls.Add(this.aboutbut);
             this.Settings.Controls.Add(this.resetsetbut);
             this.Settings.Controls.Add(this.restoredefaultsbut);
             this.Settings.Controls.Add(this.saveSettingsbut);
@@ -391,6 +393,25 @@ namespace Quotopia
             this.Settings.Text = "Settings";
             this.Settings.UseVisualStyleBackColor = true;
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(9, 156);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(84, 20);
+            this.label2.TabIndex = 25;
+            this.label2.Text = "Exchange:";
+            // 
+            // exchdest
+            // 
+            this.exchdest.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Quotopia.Properties.Settings.Default, "exchangedest", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.exchdest.Location = new System.Drawing.Point(99, 150);
+            this.exchdest.Name = "exchdest";
+            this.exchdest.Size = new System.Drawing.Size(176, 26);
+            this.exchdest.TabIndex = 24;
+            this.exchdest.Text = global::Quotopia.Properties.Settings.Default.exchangedest;
+            this.exchdest.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -403,22 +424,12 @@ namespace Quotopia
             // accountname
             // 
             this.accountname.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Quotopia.Properties.Settings.Default, "accountname", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.accountname.Location = new System.Drawing.Point(87, 118);
+            this.accountname.Location = new System.Drawing.Point(99, 118);
             this.accountname.Name = "accountname";
             this.accountname.Size = new System.Drawing.Size(176, 26);
             this.accountname.TabIndex = 22;
             this.accountname.Text = global::Quotopia.Properties.Settings.Default.accountname;
             this.accountname.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            // 
-            // aboutbut
-            // 
-            this.aboutbut.Location = new System.Drawing.Point(305, 20);
-            this.aboutbut.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.aboutbut.Name = "aboutbut";
-            this.aboutbut.Size = new System.Drawing.Size(89, 35);
-            this.aboutbut.TabIndex = 21;
-            this.aboutbut.Text = "About";
-            this.aboutbut.UseVisualStyleBackColor = true;
             // 
             // resetsetbut
             // 
@@ -429,6 +440,7 @@ namespace Quotopia
             this.resetsetbut.TabIndex = 6;
             this.resetsetbut.Text = "Discard";
             this.resetsetbut.UseVisualStyleBackColor = true;
+            this.resetsetbut.Click += new System.EventHandler(this.resetsetbut_Click);
             // 
             // restoredefaultsbut
             // 
@@ -439,6 +451,7 @@ namespace Quotopia
             this.restoredefaultsbut.TabIndex = 5;
             this.restoredefaultsbut.Text = "Defaults";
             this.restoredefaultsbut.UseVisualStyleBackColor = true;
+            this.restoredefaultsbut.Click += new System.EventHandler(this.restoredefaultsbut_Click);
             // 
             // saveSettingsbut
             // 
@@ -449,6 +462,7 @@ namespace Quotopia
             this.saveSettingsbut.TabIndex = 4;
             this.saveSettingsbut.Text = "Save";
             this.saveSettingsbut.UseVisualStyleBackColor = true;
+            this.saveSettingsbut.Click += new System.EventHandler(this.saveSettingsbut_Click);
             // 
             // LogTab
             // 
@@ -568,7 +582,6 @@ namespace Quotopia
         private System.Windows.Forms.Button saveSettingsbut;
         private System.Windows.Forms.Button restoredefaultsbut;
         private System.Windows.Forms.Button resetsetbut;
-        private System.Windows.Forms.Button aboutbut;
         private System.Windows.Forms.RichTextBox statusWindow;
         private System.Windows.Forms.DataGridViewTextBoxColumn Date;
         private System.Windows.Forms.DataGridViewTextBoxColumn Time;
@@ -592,5 +605,7 @@ namespace Quotopia
         private System.Windows.Forms.ToolStripStatusLabel statuslab;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox accountname;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox exchdest;
     }
 }

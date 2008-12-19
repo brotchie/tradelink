@@ -55,6 +55,8 @@ namespace SterServer
                 STIOrder order = new STIOrder();
                 if (or == oq.Length) or = 0;
                 Order o = oq[or++];
+                order.Destination = o.Exchange;
+                order.Side = o.side ? "B" : "S";
                 order.Symbol = o.symbol;
                 order.Quantity = o.UnSignedSize;
                 order.Account = o.Account != "" ? o.Account : acct;
@@ -65,7 +67,8 @@ namespace SterServer
                 int err = order.SubmitOrder();
                 if (err < 0)
                     debug("Error sending order: " + Util.PrettyError(Brokers.Echo, err) + o.ToString());
-
+                if (err == -1)
+                    debug("Make sure you have set the account in sending program.");
             }
 
             // quotes
@@ -151,7 +154,7 @@ namespace SterServer
         string acct = "";
         void stiPos_OnSTIPositionUpdate(ref structSTIPositionUpdate structPositionUpdate)
         {
-            debug("got position");
+            debug("got position "+structPositionUpdate.ToString());
         }
 
 

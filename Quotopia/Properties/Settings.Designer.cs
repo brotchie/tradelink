@@ -363,5 +363,17 @@ namespace Quotopia.Properties {
                 this["accountname"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string exchangedest {
+            get {
+                return ((string)(this["exchangedest"]));
+            }
+            set {
+                this["exchangedest"] = value;
+            }
+        }
     }
 }
