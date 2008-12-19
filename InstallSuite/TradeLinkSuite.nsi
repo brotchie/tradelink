@@ -56,6 +56,7 @@ Section "TradeLinkSuite"
   File "Kadina.exe.config"
   File "Replay.exe"
   File "SterServer.exe"
+  File Interop.SterlingLib.dll
   File "BoxExamples.dll"
   File "Quotopia.exe"
   File "Quotopia.exe.config"

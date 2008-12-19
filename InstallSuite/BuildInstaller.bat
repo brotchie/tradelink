@@ -38,6 +38,7 @@ echo REPLAY
 xcopy /q /y ..\Replay\bin\Release\Replay.exe* .
 echo STERSERVER
 xcopy /q /y ..\SterServer\bin\Release\SterServer.exe* .
+xcopy /q /y ..\SterServer\bin\Release\Interop.SterlingLib.dll .
 echo QUOTOPIA
 xcopy /q /y ..\Quotopia\bin\Release\Quotopia.exe* .
 xcopy /q /y ..\Quotopia\bin\Release\Multimedia.dll .
