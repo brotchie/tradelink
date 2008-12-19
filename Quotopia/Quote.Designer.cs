@@ -61,6 +61,8 @@ namespace Quotopia
             this.Comment = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColAccount = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Settings = new System.Windows.Forms.TabPage();
+            this.label1 = new System.Windows.Forms.Label();
+            this.accountname = new System.Windows.Forms.TextBox();
             this.aboutbut = new System.Windows.Forms.Button();
             this.resetsetbut = new System.Windows.Forms.Button();
             this.restoredefaultsbut = new System.Windows.Forms.Button();
@@ -123,9 +125,9 @@ namespace Quotopia
             this.statusStrip1.BackColor = System.Drawing.Color.Transparent;
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.statuslab});
-            this.statusStrip1.Location = new System.Drawing.Point(4, 645);
+            this.statusStrip1.Location = new System.Drawing.Point(4, 641);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(924, 26);
+            this.statusStrip1.Size = new System.Drawing.Size(924, 30);
             this.statusStrip1.TabIndex = 0;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -134,7 +136,7 @@ namespace Quotopia
             this.statuslab.BackColor = System.Drawing.Color.Transparent;
             this.statuslab.ForeColor = System.Drawing.Color.LightGray;
             this.statuslab.Name = "statuslab";
-            this.statuslab.Size = new System.Drawing.Size(195, 21);
+            this.statuslab.Size = new System.Drawing.Size(208, 25);
             this.statuslab.Text = "Enter symbols to begin...";
             // 
             // ordertab
@@ -373,6 +375,8 @@ namespace Quotopia
             // Settings
             // 
             this.Settings.BackColor = System.Drawing.Color.Transparent;
+            this.Settings.Controls.Add(this.label1);
+            this.Settings.Controls.Add(this.accountname);
             this.Settings.Controls.Add(this.aboutbut);
             this.Settings.Controls.Add(this.resetsetbut);
             this.Settings.Controls.Add(this.restoredefaultsbut);
@@ -386,6 +390,25 @@ namespace Quotopia
             this.Settings.TabIndex = 1;
             this.Settings.Text = "Settings";
             this.Settings.UseVisualStyleBackColor = true;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(9, 121);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(72, 20);
+            this.label1.TabIndex = 23;
+            this.label1.Text = "Account:";
+            // 
+            // accountname
+            // 
+            this.accountname.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Quotopia.Properties.Settings.Default, "accountname", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.accountname.Location = new System.Drawing.Point(87, 118);
+            this.accountname.Name = "accountname";
+            this.accountname.Size = new System.Drawing.Size(176, 26);
+            this.accountname.TabIndex = 22;
+            this.accountname.Text = global::Quotopia.Properties.Settings.Default.accountname;
+            this.accountname.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // aboutbut
             // 
@@ -521,6 +544,7 @@ namespace Quotopia
             this.TradeTab.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.TradesView)).EndInit();
             this.Settings.ResumeLayout(false);
+            this.Settings.PerformLayout();
             this.LogTab.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -566,5 +590,7 @@ namespace Quotopia
         private System.Windows.Forms.DataGridViewTextBoxColumn oaccount;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel statuslab;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox accountname;
     }
 }

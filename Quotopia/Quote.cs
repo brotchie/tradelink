@@ -267,6 +267,8 @@ namespace Quotopia
 
         void t_neworder(Order sendOrder)
         {
+            if (accountname.Text != "") 
+                sendOrder.Account = accountname.Text;
             int res = tl.SendOrder(sendOrder);
             if (res != 0)
             {

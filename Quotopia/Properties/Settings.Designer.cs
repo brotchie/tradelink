@@ -351,5 +351,17 @@ namespace Quotopia.Properties {
                 this["boxdebug"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string accountname {
+            get {
+                return ((string)(this["accountname"]));
+            }
+            set {
+                this["accountname"] = value;
+            }
+        }
     }
 }
