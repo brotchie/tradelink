@@ -31,6 +31,7 @@ namespace SterServer
             stiEvents.OnSTITradeUpdate += new _ISTIEventsEvents_OnSTITradeUpdateEventHandler(stiEvents_OnSTITradeUpdate);
             stiPos.OnSTIPositionUpdate += new _ISTIPositionEvents_OnSTIPositionUpdateEventHandler(stiPos_OnSTIPositionUpdate);
             stiQuote.OnSTIQuoteUpdate += new _ISTIQuoteEvents_OnSTIQuoteUpdateEventHandler(stiQuote_OnSTIQuoteUpdate);
+            
             tl.gotSrvFillRequest += new OrderDelegate(tl_gotSrvFillRequest);
             tl.gotSrvPosList += new TradeLink_Server_WM.PositionArrayDelegate(tl_gotSrvPosList);
             tl.RegisterStocks += new DebugDelegate(tl_RegisterStocks);
@@ -59,11 +60,12 @@ namespace SterServer
                 order.Side = o.side ? "B" : "S";
                 order.Symbol = o.symbol;
                 order.Quantity = o.UnSignedSize;
-                order.Account = o.Account != "" ? o.Account : acct;
+                order.Account = o.Account;
                 order.Destination = o.Exchange;
                 order.Tif = o.TIF;
                 order.PriceType = o.isMarket ? STIPriceTypes.ptSTIMkt : (o.isLimit ? STIPriceTypes.ptSTILmt : STIPriceTypes.ptSTISvrStp);
-                order.ClOrderID = o.id.ToString();
+                if (o.id!=0)
+                    order.ClOrderID = o.id.ToString();
                 int err = order.SubmitOrder();
                 if (err < 0)
                     debug("Error sending order: " + Util.PrettyError(Brokers.Echo, err) + o.ToString());
