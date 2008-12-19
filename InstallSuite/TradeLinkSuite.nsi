@@ -47,6 +47,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\Kadina.lnk" "$INSTDIR\Kadina.EXE" "" "$INSTDIR\Kadina.EXE" 0 
   CreateShortCut "$SMPROGRAMS\TradeLink\Tript.lnk" "$INSTDIR\Tript.EXE" "" "$INSTDIR\Tript.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\Record.lnk" "$INSTDIR\Record.EXE" "" "$INSTDIR\Record.EXE" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink\Sterling+BrokerServer.lnk" "$INSTDIR\SterServer.EXE" "" "$INSTDIR\SterServer.EXE" 0  
   
   
   ; Put file there
@@ -54,6 +55,7 @@ Section "TradeLinkSuite"
   File "Kadina.exe"
   File "Kadina.exe.config"
   File "Replay.exe"
+  File "SterServer.exe"
   File "BoxExamples.dll"
   File "Quotopia.exe"
   File "Quotopia.exe.config"
@@ -108,8 +110,9 @@ Section "Uninstall"
   Delete "$SMPROGRAMS\TradeLink\Quotopia.lnk"
   Delete "$SMPROGRAMS\TradeLink\Time and Sales.lnk"
   Delete "$SMPROGRAMS\TradeLink\Replay.lnk"
+  Delete "$SMPROGRAMS\TradeLink\Record.lnk"
+  Delete "$SMPROGRAMS\TradeLink\Sterling+BrokerServer.lnk"
   Delete "$SMPROGRAMS\TradeLink\Gauntlet.lnk"
-  Delete "$SMPROGRAMS\TradeLink\Epf-To-Idx.lnk"
   Delete "$SMPROGRAMS\TradeLink\SplitEPF.lnk"
   Delete "$SMPROGRAMS\TradeLink\Tattle.lnk"
   Delete "$SMPROGRAMS\TradeLink\Tript.lnk"

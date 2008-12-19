@@ -15,6 +15,7 @@ namespace SterServer
         STIOrderMaint stiOrder = new STIOrderMaint();
         STIPosition stiPos = new STIPosition();
         STIQuote stiQuote = new STIQuote();
+        STIBook stiBook = new STIBook();
         TradeLink_Server_WM tl = new TradeLink_Server_WM(TLTypes.LIVEBROKER);
         const string PROGRAM = "SterServer ";
         Timer tt = new Timer();
@@ -27,16 +28,43 @@ namespace SterServer
             tt.Enabled = true;
             tt.Tick += new EventHandler(tt_Tick);
             tt.Start();
-            stiEvents.OnSTITradeUpdateMsg += new _ISTIEventsEvents_OnSTITradeUpdateMsgEventHandler(stiEvents_OnSTITradeUpdateMsg);
+
+            stiEvents.SetOrderEventsAsStructs(true);
+
+            stiEvents.OnSTIOrderUpdate += new _ISTIEventsEvents_OnSTIOrderUpdateEventHandler(stiEvents_OnSTIOrderUpdate);
             stiEvents.OnSTITradeUpdate += new _ISTIEventsEvents_OnSTITradeUpdateEventHandler(stiEvents_OnSTITradeUpdate);
             stiPos.OnSTIPositionUpdate += new _ISTIPositionEvents_OnSTIPositionUpdateEventHandler(stiPos_OnSTIPositionUpdate);
             stiQuote.OnSTIQuoteUpdate += new _ISTIQuoteEvents_OnSTIQuoteUpdateEventHandler(stiQuote_OnSTIQuoteUpdate);
-            
+            stiQuote.OnSTIQuoteSnap += new _ISTIQuoteEvents_OnSTIQuoteSnapEventHandler(stiQuote_OnSTIQuoteSnap);
+
             tl.gotSrvFillRequest += new OrderDelegate(tl_gotSrvFillRequest);
             tl.gotSrvPosList += new TradeLink_Server_WM.PositionArrayDelegate(tl_gotSrvPosList);
             tl.RegisterStocks += new DebugDelegate(tl_RegisterStocks);
+            tl.OrderCancelRequest += new UIntDelegate(tl_OrderCancelRequest);
+
             debug(PROGRAM + Util.TLSIdentity());
+            FormClosing += new FormClosingEventHandler(SterMain_FormClosing);
         }
+
+
+        void SterMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            stiQuote.DeRegisterAllQuotes();
+        }
+
+
+
+        void stiEvents_OnSTIOrderUpdateMsg(STIOrderUpdateMsg oSTIOrderUpdateMsg)
+        {
+            throw new NotImplementedException();
+        }
+
+        void stiEvents_OnSTIOrderConfirmMsg(STIOrderConfirmMsg oSTIOrderConfirmMsg)
+        {
+            throw new NotImplementedException();
+        }
+
+
 
         void tl_RegisterStocks(string msg)
         {
@@ -48,6 +76,7 @@ namespace SterServer
         string symquotes = "";
 
         uint or = 0;
+        Dictionary<uint, string> idacct = new Dictionary<uint, string>();
         void tt_Tick(object sender, EventArgs e)
         {
             // orders
@@ -64,9 +93,11 @@ namespace SterServer
                 order.Destination = o.Exchange;
                 order.Tif = o.TIF;
                 order.PriceType = o.isMarket ? STIPriceTypes.ptSTIMkt : (o.isLimit ? STIPriceTypes.ptSTILmt : STIPriceTypes.ptSTISvrStp);
-                if (o.id!=0)
-                    order.ClOrderID = o.id.ToString();
+                order.ClOrderID = o.id.ToString();
                 int err = order.SubmitOrder();
+                string tmp = "";
+                if ((err==0) && (!idacct.TryGetValue(o.id, out tmp)))
+                    idacct.Add(o.id,order.Account);
                 if (err < 0)
                     debug("Error sending order: " + Util.PrettyError(Brokers.Echo, err) + o.ToString());
                 if (err == -1)
@@ -76,51 +107,72 @@ namespace SterServer
             // quotes
             if (qc > qr)
             {
-                stiQuote.DeRegisterAllQuotes();
                 foreach (string sym in symquotes.Split(','))
-                {
-                    string ex = sym.Length > 3 ? "NSDQ" : "NYSE";
-                    stiQuote.RegisterQuote(sym, ex);
-                }
+                    stiQuote.RegisterQuote(sym, "*");
                 qr = qc;
             }
 
+            // cancels
+            if (ic > ir)
+            {
+                if (ir == idq.Length) ir = 0;
+                uint number = idq[ir++];
+                string acct = "";
+                if (idacct.TryGetValue(number, out acct))
+                {
+                    stiOrder.CancelOrder(acct, 0, number.ToString(), DateTime.Now.Ticks.ToString() + acct);
+                    tl.newOrderCancel(number);
+                }
+                else
+                    debug("No record of id: " + number.ToString());
+            }
+
+
             
         }
-
-        void stiEvents_OnSTITradeUpdateMsg(STITradeUpdateMsg c)
+        uint[] idq = new uint[MAXRECORD];
+        uint ic = 0;
+        uint ir = 0;
+        void tl_OrderCancelRequest(uint number)
         {
-            Order o = new Order();
-            o.Account = c.Account;
-            o.id = Convert.ToUInt32(c.ClOrderID);
-            o.symbol = c.Symbol;
-            o.TIF = c.Tif;
-            o.price = (decimal)c.LmtPrice;
-            o.stopp = (decimal)c.StpPrice;
-            o.size = c.Quantity;
-            o.Exchange = c.Destination;
-            o.side = c.Side.Contains("B");
-            DateTime now = DateTime.Parse(c.UpdateTime);
-            o.date = Util.ToTLDate(now);
-            o.time = Util.ToTLTime(now);
-            o.sec = now.Second;
-            tl.newOrder(o);
+            if (ic == idq.Length) ic = 0;
+            idq[ic++] = number;
         }
+
+
 
         void stiEvents_OnSTITradeUpdate(ref structSTITradeUpdate t)
         {
             Trade f = new Trade();
+            f.symbol = t.bstrSymbol;
             f.Account = t.bstrAccount;
-            f.id = Convert.ToUInt16(t.bstrClOrderId);
-            f.Currency = (Currency)Enum.Parse(typeof(Currency), t.bstrCurrency);
+            f.id = Convert.ToUInt32(t.bstrClOrderId);
             f.xprice = (decimal)t.fExecPrice;
             f.xsize = t.nQuantity;
-            DateTime now = DateTime.Parse(t.bstrUpdateTime);
-            f.xdate = Util.ToTLDate(now);
-            f.xtime = Util.ToTLTime(now);
-            f.xsec = now.Second;
+            long now = Convert.ToInt64(t.bstrUpdateTime);
+            f.xsec = (int)(now % 100);
+            long rem = (now - f.xsec) / 100;
+            f.xtime = (int)(rem % 10000);
+            f.xdate = (int)((rem - f.xtime) / 10000);
             tl.newFill(f);
         }
+
+        void stiEvents_OnSTIOrderUpdate(ref structSTIOrderUpdate structOrderUpdate)
+        {
+            Order o = new Order();
+            o.symbol = structOrderUpdate.bstrSymbol;
+            o.id = Convert.ToUInt32(structOrderUpdate.bstrClOrderId);
+            o.size = structOrderUpdate.nQuantity;
+            o.side = o.size > 0;
+            o.price = (decimal)structOrderUpdate.fLmtPrice;
+            o.stopp = (decimal)structOrderUpdate.fStpPrice;
+            o.TIF = structOrderUpdate.bstrTif;
+            o.Account = structOrderUpdate.bstrAccount;
+            o.Exchange = structOrderUpdate.bstrDestination;
+            tl.newOrder(o);
+
+        }
+
 
         Position[] tl_gotSrvPosList(string account)
         {
@@ -133,23 +185,51 @@ namespace SterServer
             Tick k = new Tick(q.bstrSymbol);
             k.bid = (decimal)q.fBidPrice;
             k.ask = (decimal)q.fAskPrice;
-            k.bs = q.nBidSize;
-            k.os = q.nAskSize;
-            k.be = q.bstrBidExch;
-            k.oe = q.bstrAskExch;
-            DateTime now = DateTime.Parse(q.bstrUpdateTime);
-            k.date = Util.ToTLDate(now);
-            k.time = Util.ToTLTime(now);
-            k.sec = now.Second;
+            k.bs = q.nBidSize / 100;
+            k.os = q.nAskSize / 100;
+            if (q.bstrExch!="*")
+                k.ex = q.bstrExch;
+            if (q.bstrBidExch != "*")
+                k.be = q.bstrBidExch;
+            if (q.bstrAskExch != "*")
+                k.oe = q.bstrAskExch;
+            int now = Convert.ToInt32(q.bstrUpdateTime);
+            k.date = Util.ToTLDate(DateTime.Now);
+            k.sec = now % 100;
+            k.time = (now - k.sec) / 100;
             k.trade = (decimal)q.fLastPrice;
             k.size = q.nLastSize;
             tl.newTick(k);
         }
+
+        void stiQuote_OnSTIQuoteSnap(ref structSTIQuoteSnap q)
+        {
+            Tick k = new Tick(q.bstrSymbol);
+            k.bid = (decimal)q.fBidPrice;
+            k.ask = (decimal)q.fAskPrice;
+            k.bs = q.nBidSize/100;
+            k.os = q.nAskSize/100;
+            if (q.bstrExch != "*")
+                k.ex = q.bstrExch;
+            if (q.bstrBidExch != "*")
+                k.be = q.bstrBidExch;
+            if (q.bstrAskExch != "*")
+                k.oe = q.bstrAskExch;
+            int now = Convert.ToInt32(q.bstrUpdateTime);
+            k.date = Util.ToTLDate(DateTime.Now);
+            k.sec = now % 100;
+            k.time = (now - k.sec) / 100;
+            k.trade = (decimal)q.fLastPrice;
+            k.size = q.nLastSize;
+            tl.newTick(k);
+        }
+
         const int MAXRECORD = 5000;
         Order[] oq = new Order[MAXRECORD];
         uint oc = 0;
         void tl_gotSrvFillRequest(Order o)
         {
+            if (o.id ==0 ) o.id = (uint)(DateTime.Now.Ticks + acct.GetHashCode());
             oq[oc++] = o;
         }
 

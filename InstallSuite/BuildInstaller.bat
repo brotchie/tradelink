@@ -36,6 +36,8 @@ xcopy /q /y ..\Tradelib\bin\Release\TradeLib.dll .
 xcopy /q /y ..\TradeLib\bin\Release\EarlyClose.csv .
 echo REPLAY
 xcopy /q /y ..\Replay\bin\Release\Replay.exe* .
+echo STERSERVER
+xcopy /q /y ..\SterServer\bin\Release\SterServer.exe* .
 echo QUOTOPIA
 xcopy /q /y ..\Quotopia\bin\Release\Quotopia.exe* .
 xcopy /q /y ..\Quotopia\bin\Release\Multimedia.dll .
