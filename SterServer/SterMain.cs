@@ -17,18 +17,70 @@ namespace SterServer
         STIQuote stiQuote = new STIQuote();
         TradeLink_Server_WM tl = new TradeLink_Server_WM(TLTypes.LIVEBROKER);
         const string PROGRAM = "SterServer ";
+        Timer tt = new Timer();
+
 
         public SterMain()
         {
             InitializeComponent();
+            tt.Interval = 1000;
+            tt.Enabled = true;
+            tt.Tick += new EventHandler(tt_Tick);
+            tt.Start();
             stiEvents.OnSTITradeUpdateMsg += new _ISTIEventsEvents_OnSTITradeUpdateMsgEventHandler(stiEvents_OnSTITradeUpdateMsg);
             stiEvents.OnSTITradeUpdate += new _ISTIEventsEvents_OnSTITradeUpdateEventHandler(stiEvents_OnSTITradeUpdate);
             stiPos.OnSTIPositionUpdate += new _ISTIPositionEvents_OnSTIPositionUpdateEventHandler(stiPos_OnSTIPositionUpdate);
             stiQuote.OnSTIQuoteUpdate += new _ISTIQuoteEvents_OnSTIQuoteUpdateEventHandler(stiQuote_OnSTIQuoteUpdate);
             tl.gotSrvFillRequest += new OrderDelegate(tl_gotSrvFillRequest);
             tl.gotSrvPosList += new TradeLink_Server_WM.PositionArrayDelegate(tl_gotSrvPosList);
-            
+            tl.RegisterStocks += new DebugDelegate(tl_RegisterStocks);
             debug(PROGRAM + Util.TLSIdentity());
+        }
+
+        void tl_RegisterStocks(string msg)
+        {
+            symquotes = msg;
+            qc++;
+        }
+        int qc = 0;
+        int qr = 0;
+        string symquotes = "";
+
+        uint or = 0;
+        void tt_Tick(object sender, EventArgs e)
+        {
+            // orders
+            while (or < oc)
+            {
+                STIOrder order = new STIOrder();
+                if (or == oq.Length) or = 0;
+                Order o = oq[or++];
+                order.Symbol = o.symbol;
+                order.Quantity = o.UnSignedSize;
+                order.Account = o.Account != "" ? o.Account : acct;
+                order.Destination = o.Exchange;
+                order.Tif = o.TIF;
+                order.PriceType = o.isMarket ? STIPriceTypes.ptSTIMkt : (o.isLimit ? STIPriceTypes.ptSTILmt : STIPriceTypes.ptSTISvrStp);
+                order.ClOrderID = o.id.ToString();
+                int err = order.SubmitOrder();
+                if (err < 0)
+                    debug("Error sending order: " + Util.PrettyError(Brokers.Echo, err) + o.ToString());
+
+            }
+
+            // quotes
+            if (qc > qr)
+            {
+                stiQuote.DeRegisterAllQuotes();
+                foreach (string sym in symquotes.Split(','))
+                {
+                    string ex = sym.Length > 3 ? "NSDQ" : "NYSE";
+                    stiQuote.RegisterQuote(sym, ex);
+                }
+                qr = qc;
+            }
+
+            
         }
 
         void stiEvents_OnSTITradeUpdateMsg(STITradeUpdateMsg c)
@@ -88,23 +140,15 @@ namespace SterServer
             k.size = q.nLastSize;
             tl.newTick(k);
         }
-
+        const int MAXRECORD = 5000;
+        Order[] oq = new Order[MAXRECORD];
+        uint oc = 0;
         void tl_gotSrvFillRequest(Order o)
         {
-            STIOrder order = new STIOrder();
-            order.Symbol = o.symbol;
-            order.Quantity = o.UnSignedSize;
-            order.Account = o.Account;
-            order.Destination = o.Exchange;
-            order.Tif = o.TIF;
-            order.PriceType = o.isMarket ? STIPriceTypes.ptSTIMkt : (o.isLimit ? STIPriceTypes.ptSTILmt : STIPriceTypes.ptSTISvrStp);
-            order.ClOrderID = o.id.ToString();
-            int err = order.SubmitOrder();
-            if (err < 0)
-                debug("Error sending order: " + Util.PrettyError(Brokers.Echo, err) + o.ToString());
-
+            oq[oc++] = o;
         }
 
+        string acct = "";
         void stiPos_OnSTIPositionUpdate(ref structSTIPositionUpdate structPositionUpdate)
         {
             debug("got position");

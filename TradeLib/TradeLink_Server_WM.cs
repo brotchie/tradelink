@@ -131,12 +131,14 @@ namespace TradeLib
             index.Add("");
             SrvBeatHeart(cname);
         }
+        public event DebugDelegate RegisterStocks;
         void SrvRegStocks(string cname, string stklist)
         {
             int cid = client.IndexOf(cname);
             if (cid == -1) return;
             stocks[cid] = stklist;
             SrvBeatHeart(cname);
+            if (RegisterStocks != null) RegisterStocks(stklist);
         }
 
         void SrvClearStocks(string cname)
