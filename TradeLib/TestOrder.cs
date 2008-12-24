@@ -102,6 +102,10 @@ namespace TestTradeLib
             x = new SellLimit(s, 100, 10);
             Assert.IsTrue(o.Fill(x));
 
+            // make sure we can stop cross
+            o = new SellStop(s, 100, 10);
+            Assert.IsTrue(o.Fill(new BuyMarket(s,100)));
+
         }
 
         [Test]

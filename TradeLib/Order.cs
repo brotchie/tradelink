@@ -148,10 +148,11 @@ namespace TradeLib
                 || isMarket)
             {
                 this.xprice = o.isLimit ? o.Price : o.stopp;
+                if (xprice==0) xprice = isLimit ? Price : stopp;
                 this.xsize = o.UnSignedSize >= UnSignedSize? UnSignedSize : o.UnSignedSize;
                 this.xtime = o.time;
                 this.xdate = o.date;
-                return true;
+                return isFilled;
             }
             return false;
         }
