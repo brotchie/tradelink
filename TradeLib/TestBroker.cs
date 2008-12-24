@@ -13,7 +13,7 @@ namespace TestTradeLib
 
         }
         Broker broker = new Broker();
-        int fills = 0,orders = 0, warn=0;
+        int fills = 0, orders = 0;
         const string s = "TST";
 
         [Test]
@@ -22,11 +22,9 @@ namespace TestTradeLib
             Broker broker = new Broker();
             broker.GotFill += new FillDelegate(broker_GotFill);
             broker.GotOrder += new OrderDelegate(broker_GotOrder);
-            broker.GotWarning += new DebugDelegate(broker_GotWarning);
             Order o = new Order();
             uint failsoninvalid= broker.sendOrder(o);
-            Assert.That(failsoninvalid==0);
-            Assert.That(warn == 1);
+            Assert.AreNotEqual((int)TL2.OK,failsoninvalid);
             Assert.That(orders == 0);
             Assert.That(fills == 0);
             o = new BuyMarket(s, 100);
@@ -35,8 +33,6 @@ namespace TestTradeLib
             Assert.That(fills == 0);
             Assert.That(broker.Execute(Tick.NewTrade(s,10,200)) == 1);
             Assert.That(fills == 1);
-            // no warnings since first warning
-            Assert.That(warn == 1);
 
             // test that a limit order is not filled outside the market
             o = new BuyLimit(s, 100, 9);
@@ -52,7 +48,8 @@ namespace TestTradeLib
             // test that a market order is filled when opposite book exists
             o = new SellLimit(s, 100, 11);
             x = new BuyMarket(s, 100);
-            broker.FillMode = FillMode.OwnBook;
+            const string t2 = "trader2";
+            x.Account = t2;
             broker.sendOrder(o);
             broker.sendOrder(x);
             Assert.AreEqual(3, fills); 
@@ -63,16 +60,14 @@ namespace TestTradeLib
             // clear existing orders
             broker.CancelOrders();
             o = new SellMarket(s, 100);
+            o.Account = t2;
             broker.sendOrder(o);
             Assert.AreEqual(3, fills);
             
 
             
         }
-        void broker_GotWarning(string msg)
-        {
-            warn++;
-        }
+
 
         void broker_GotOrder(Order o)
         {

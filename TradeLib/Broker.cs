@@ -27,10 +27,7 @@ namespace TradeLib
         /// Occurs when [got fill].
         /// </summary>
         public event FillDelegate GotFill;
-        /// <summary>
-        /// Occurs when [got warning].  This will happen if an invalid order is received.
-        /// </summary>
-        public event DebugDelegate GotWarning;
+
         public Broker() 
         {
             Reset();
@@ -178,9 +175,13 @@ namespace TradeLib
         /// <param name="o">The order to be send.</param>
         /// <returns>true if the order was accepted.</returns>
         public uint sendOrder(Order o) 
-        { 
-            if (o.Account=="")
+        {
+            if (!o.isValid) return (uint)TL2.BAD_PARAMETERS;
+            if (o.Account == "") // make sure book is clearly stamped
+            {
+                o.Account = DEFAULT.ID;
                 return sendOrder(o, DEFAULT);
+            }
             Account a = new Account();
             if (!acctlist.TryGetValue(o.Account,out a))
                 AddAccount(new Account(o.Account));
@@ -195,12 +196,6 @@ namespace TradeLib
         /// <returns>order id if order was accepted, zero otherwise</returns>
         public uint sendOrder(Order o,Account a)
         {
-            if (!o.isValid || !a.isValid)
-            {
-                if (GotWarning != null)
-                    GotWarning(!o.isValid ? "Invalid order: " + o.ToString() : "Invalid Account" + a.ToString());
-                return 0;
-            }
             if ((GotOrder != null) && a.Notify)
                 GotOrder(o);
             AddOrder(o, a);
