@@ -139,8 +139,12 @@ namespace TradeLib
         /// <returns>order can be cast to valid Trade and function returns true.  Otherwise, false</returns>
         public bool Fill(Order o)
         {
+            // sides must match
             if (Side==o.side) return false;
-            if (!o.isValid) return false;
+            // orders must be valid
+            if (!o.isValid || !this.isValid) return false;
+            // acounts must be different
+            if (o.Account == Account) return false;
             if ((isLimit && Side && (o.Price<=Price)) // buy limit cross
                 || (isLimit && !Side && (o.Price>=Price))// sell limit cross
                 || (isStop && Side && (o.Price>=stopp)) // buy stop

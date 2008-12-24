@@ -90,21 +90,34 @@ namespace TestTradeLib
             x = new BuyMarket(s, 100);
             Assert.IsFalse(o.Fill(x));
 
+            const string t2 = "trader2";
             // suceed on crossing market
             x = new SellMarket(s,100);
+            x.Account = t2;
             Assert.IsTrue(o.Fill(x));
+
+            // fail when accounts are the same
+            x = new SellMarket(s, 100);
+            x.Account = o.Account;
+            Assert.IsFalse(o.Fill(x));
+
 
             // fail on match outside of market
             x = new SellLimit(s, 100, 11);
+            x.Account = t2;
             Assert.IsFalse(o.Fill(x));
 
             // succeed on limit cross
+            o = new BuyLimit(s, 100, 10);
             x = new SellLimit(s, 100, 10);
+            x.Account = t2;
             Assert.IsTrue(o.Fill(x));
 
             // make sure we can stop cross
             o = new SellStop(s, 100, 10);
-            Assert.IsTrue(o.Fill(new BuyMarket(s,100)));
+            x = new BuyMarket(s, 100);
+            x.Account = t2;
+            Assert.IsTrue(o.Fill(x));
 
         }
 
