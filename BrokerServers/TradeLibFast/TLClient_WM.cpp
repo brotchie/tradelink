@@ -45,6 +45,13 @@ namespace TradeLibFast
 		return TLSend(SENDORDER,o.Serialize(),_him);
 	}
 
+	void TLClient_WM::CancelOrder(long id)
+	{
+		CString ids;
+		ids.Format("%i",id);
+		TLSend(ORDERCANCELREQUEST,ids,_him);
+	}
+
 
 	TLClient_WM::TLClient_WM(char* clientname)
 	{

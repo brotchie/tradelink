@@ -3,6 +3,9 @@
 
 #include "stdafx.h"
 #include <afxdllx.h>
+#include <string>
+#include "TradeLibFast.h"
+using namespace TradeLibFast;
 #ifdef _MANAGED
 #error Please read instructions in TradeLibFast.cpp to compile with /clr
 // If you want to add /clr to your project you must do the following:
@@ -62,6 +65,33 @@ DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 	}
 	return 1;   // ok
 }
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+	int SendOrder(std::string sym, bool side, int size, double price, double stop, int id)
+	{
+		TLClient_WM tl;
+		TLOrder o;
+		o.symbol = CString(sym.c_str());
+		o.side = side;
+		o.size = abs(size);
+		o.price = price;
+		o.stop = stop;
+		o.id = id;
+		int error = tl.SendOrder(o);
+		return error;
+	}
+	void SendCancel(int orderid)
+	{
+		TLClient_WM tl;
+		tl.CancelOrder(orderid);
+	}
+
+#ifdef __cplusplus
+} //extern "C"
+#endif
 
 #ifdef _MANAGED
 #pragma managed(pop)

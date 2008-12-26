@@ -4,3 +4,5 @@ LIBRARY      "TradeLibFast"
 
 EXPORTS
     ; Explicit exports can go here
+    SendOrder	@1
+    SendCancel	@2
