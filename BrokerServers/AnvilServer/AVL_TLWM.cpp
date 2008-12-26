@@ -105,6 +105,11 @@ namespace TradeLibFast
 		const StockBase* Stock = preload(o.symbol);
 
 		Observable* m_account;
+		// if order id is set and not-unique, reject order
+		if ((o.id!=0) && (!IdIsUnique(o.id)))
+			return DUPLICATE_ORDERID;
+
+		// get account for this order
 		if (o.account=="")
 			m_account = B_GetCurrentAccount();
 		else 
@@ -186,22 +191,41 @@ namespace TradeLibFast
 				error = SO_INCORRECT_PRICE;
 			}
 		}
+		if (error==0)
+			saveOrder(orderSent,o.id); // save order if it was accepted
 		return error;
 	}
 
 
-	bool AVL_TLWM::hasOrder(unsigned int  TLid)
+	bool AVL_TLWM::IdIsUnique(uint id)
 	{
-		return (TLid>=0) && (TLid<ordercache.size());
+		for (uint i = 0; i<orderids.size(); i++)
+			if (orderids[i]==id) 
+				return false;
+		return true;
+	}
+	uint AVL_TLWM::fetchOrderId(Order* order)
+	{
+		for (uint i = 0; i<ordercache.size(); i++)
+			if (ordercache[i]==order) 
+				return orderids[i];
+		return 0;
 	}
 
-	int AVL_TLWM::cacheOrder(Order* o)
+	bool AVL_TLWM::saveOrder(Order* o,uint id)
 	{
+		if (id==0) // if id is zero, we auto-assign the id
+		{
+			vector<int> now;
+			id = GetTickCount();
+		}
 		for (unsigned int i = 0; i<ordercache.size(); i++)
 			if (ordercache[i]==o) 
-				return i; // found order so we return it's index
-		ordercache.push_back(o);
-		return ordercache.size()-1; // didn't find order so we added it and returned index
+				return false; // already had this order, fail
+		if (!IdIsUnique(id)) return false; // if id has already been used, fail
+		ordercache.push_back(o); // save the order
+		orderids.push_back(id); // save the id
+		return true; // didn't find order so we added it and returned index
 	}
 
 	void AVL_TLWM::Process(const Message* message, Observable* from, const Message* additionalInfo)
@@ -222,7 +246,7 @@ namespace TradeLibFast
 				const Execution* exec = info->m_execution;
 				if ((order==NULL) || (position==NULL) || (exec==NULL)) return; // don't process null orders
 
-				unsigned int thisid = this->cacheOrder(order);
+				unsigned int thisid = this->fetchOrderId(order);
 				CString ac = CString(B_GetAccountName(position->GetAccount()));
 
 				// build the serialized trade object
@@ -259,7 +283,7 @@ namespace TradeLibFast
 				if (order->isDead()) return; // don't notify on dead orders
 
 				unsigned int max = ordercache.size();
-				unsigned int index = cacheOrder(order);
+				unsigned int index = fetchOrderId(order);
 				if (index!=max) // if index isn't at the end, we've already notified for order
 					return;
 
@@ -286,7 +310,7 @@ namespace TradeLibFast
 				AIMsgOrder* info = (AIMsgOrder*)additionalInfo;
 				Order* order = info->m_order;
 				unsigned int anvilid = order->GetId();
-				unsigned int id = cacheOrder(order);
+				unsigned int id = fetchOrderId(order);
 				SrvGotCancel(id);
 				break;
 
@@ -297,9 +321,10 @@ namespace TradeLibFast
 
 	int AVL_TLWM::AnvilId(unsigned int TLOrderId)
 	{
-		if (!hasOrder(TLOrderId)) return -1;
-		Order* o = ordercache[TLOrderId];
-		return o->GetId();
+		for (uint i = 0; i<orderids.size(); i++)
+			if (orderids[i]==TLOrderId)
+				return ordercache[i]->GetId();
+		return -1;
 	}
 
 	std::vector<int> AVL_TLWM::GetFeatures()

@@ -125,7 +125,31 @@ namespace TradeLibFast
 		return UNKNOWNMSG;
 	}
 
+	uint TWS_TLWM::TL2IBID(uint tlid)
+	{
+		for (uint i = 0; i<tlorders.size(); i++)
+			if (tlorders[i]==tlid)
+				return iborders[i];
+		return 0;
+	}
+	uint TWS_TLWM::IB2TLID(uint ibid)
+	{
+		for (uint i = 0 ; i<iborders.size(); i++)
+			if (iborders[i]==ibid)
+				return tlorders[i];
+		return 0;
+	}
 
+	uint TWS_TLWM::newOrder(uint tlid,CString acct)
+	{
+		if (tlid==0) tlid = GetTickCount(); // if no id, auto-assign one
+		uint ibid = TL2IBID(tlid);
+		if (ibid!=0) return ibid; // id already exists
+		ibid = getNextOrderId(acct);
+		tlorders.push_back(tlid);
+		iborders.push_back(ibid);
+		return ibid;
+	}
 
 	int TWS_TLWM::SendOrder(TLOrder o)
 	{
@@ -143,11 +167,7 @@ namespace TradeLibFast
 		order->account = o.account;
 		order->tif = o.TIF;
 		order->outsideRth = true;
-
-		if (o.id!=0) // if ID is provided, keep it
-			order->orderId = o.id;
-		else // otherwise just get the next id
-			order->orderId = getNextOrderId(o.account);
+		order->orderId = newOrder(o.id,o.account);
 		order->transmit = true;
 
 		Contract* contract(new Contract);
@@ -291,7 +311,7 @@ namespace TradeLibFast
 
 			// prepare client order and notify client
 			TradeLibFast::TLOrder o;
-			o.id = orderId;
+			o.id = IB2TLID(orderId);
 			o.side = (order.action=="BUY");
 			o.size = abs(order.totalQuantity) * ((o.side) ? 1 : -1);
 			o.symbol = contract.symbol;
@@ -323,11 +343,12 @@ namespace TradeLibFast
 		m_nextorderids[0]++;
 	}
 
-	void TWS_TLWM::SrvCancelRequest(OrderId orderid)
+	void TWS_TLWM::CancelRequest(OrderId orderid)
 	{
 		// gets mlink associated with order
-		int mlink = getMlinkId(orderid); 
-		m_link[this->validlinkids[mlink]]->cancelOrder(orderid);
+		int mlink = getMlinkId(orderid);
+		uint ibid = TL2IBID((uint)orderid);
+		m_link[this->validlinkids[mlink]]->cancelOrder(ibid);
 	}
 
 	void TWS_TLWM::winError( const CString &str, int lastError)
@@ -339,7 +360,7 @@ namespace TradeLibFast
 		// for some reason IB sends order cancels as an error rather than
 		// as an order update message
 		if (errorCode==202) 
-			this->SrvGotCancel(id); // cancels
+			this->SrvGotCancel(IB2TLID(id)); // cancels
 		else if (IGNOREERRORS) return; // ignore errors during init
 		else D(errorString); // print other errors
 	}
@@ -351,7 +372,7 @@ namespace TradeLibFast
 		trade.currency = contract.currency;
 		trade.account = execution.acctNumber;
 		trade.exchange = contract.exchange;
-		trade.id = orderId;
+		trade.id = IB2TLID(orderId);
 		trade.localsymbol = contract.localSymbol;
 		trade.xprice = execution.price;
 		trade.xsize = execution.shares;

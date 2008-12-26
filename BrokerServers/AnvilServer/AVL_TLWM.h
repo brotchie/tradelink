@@ -37,9 +37,12 @@ namespace TradeLibFast
 
 		// account monitoring stuff
 		vector<Observable*> accounts;
-		int cacheOrder(Order* o);
-		bool hasOrder(unsigned int  TLid);
+		vector<uint> orderids;
+		uint fetchOrderId(Order * order);
+		bool IdIsUnique(uint id);
+		bool saveOrder(Order* o,uint id);
 		int AnvilId(unsigned int TLOrderId);
+
 		virtual void Process(const Message* message, Observable* from, const Message* additionalInfo);
 
 		void RemoveUnused();

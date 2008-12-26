@@ -112,6 +112,7 @@ namespace TradeLib
 		UNKNOWNSYM,
 		TL_CONNECTOR_MISSING,
 		BAD_PARAMETERS,
+        DUPLICATE_ORDERID,
     }
 
 
