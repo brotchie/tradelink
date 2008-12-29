@@ -70,9 +70,10 @@ namespace TradeLibFast
 		{
 		case ISSHORTABLE :
 			{
-				const StockBase* s = B_GetStockHandle(msg);
-				if (s->isShortable()) return 1;
-				return 0;
+				const StockBase* s = preload(msg);
+				if (!s->isLoaded()) return -1;
+				bool shortable = (s->GetStockAttributes() & STOCKATTR_UPC11830) == 0;
+				return shortable ? 1 : 0;
 			}
 			break;
 		}
