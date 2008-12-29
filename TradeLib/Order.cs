@@ -125,7 +125,7 @@ namespace TradeLib
                 || isMarket)
             {
                 this.xprice = t.trade;
-                this.xsize = t.TradeSize >= UnSignedSize ? size : t.TradeSize;
+                this.xsize = t.size >= UnSignedSize ? size : t.size;
                 this.xtime = t.time;
                 this.xdate = t.date;
                 return true;
