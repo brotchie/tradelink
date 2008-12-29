@@ -29,7 +29,7 @@ namespace TradeLib
         public bool hasAsk { get { return (ask != 0) && (os != 0); } }
         public bool FullQuote { get { return hasBid && hasAsk; } }
         public bool isQuote { get { return (!isTrade && (hasBid || hasAsk)); } }
-        public bool isTrade { get { return (trade != 0) && (size != 0); } }
+        public bool isTrade { get { return (trade != 0) && (size> 0); } }
         public bool hasTick { get { return (this.isTrade || hasBid || hasAsk); } }
         public bool isValid { get { return (symbol != "") && hasTick; } }
         public bool atHigh(decimal high) { return (isTrade && (trade>=high)); }
