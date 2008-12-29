@@ -214,8 +214,6 @@ namespace TradeLib
         {
             if (GotTick != null) GotTick(tick);
             if (!tick.isTrade) return 0;
-            int availablesize = (int)Math.Abs(tick.size);
-            int max = this.Orders.Count;
             int filledorders = 0;
             foreach (Account a in MasterOrders.Keys)
             { // go through each account
@@ -247,9 +245,8 @@ namespace TradeLib
                         filled = o.Fill(tick); // fill our trade
                     if (filled)
                     {
-                        int mysize = (int)Math.Abs(o.size);
-                        tick.size -= mysize;
                         remove.Add(i);
+                        tick.size -= o.UnSignedSize;
                         if (!MasterTrades.ContainsKey(a.ID)) MasterTrades.Add(a.ID, new List<Trade>());
                         MasterTrades[a.ID].Add((Trade)o); // record trade
                         if ((GotFill != null) && a.Notify)
