@@ -350,7 +350,7 @@ namespace Kadina
 
         void broker_GotOrder(Order o)
         {
-            ot.Rows.Add(o.time, o.symbol,(o.side ? "BUY" : "SELL"), o.size, o.price);
+            ot.Rows.Add(o.time, o.symbol,(o.side ? "BUY" : "SELL"), o.size, o.isStop? o.stopp : (o.isTrail ? o.trail : o.price));
         }
         string nowtime = "0";
 
