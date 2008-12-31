@@ -77,9 +77,6 @@ namespace ASP
 
         void tl_gotFill(Trade t)
         {
-            if(debugon.Checked)
-                Debug(t.ToString());
-
             count++;
             int[] idxs = new int[0];
             if (!symidx.TryGetValue(t.Sec.FullName, out idxs))
