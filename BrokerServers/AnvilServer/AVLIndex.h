@@ -4,12 +4,12 @@
 #include "TradeLibFast.h"
 
 
-class TLIdx : public Observer
+class AVLIndex : public Observer
 {
 // Construction
 public:
-	TLIdx(CString symbol,TradeLibFast::TLServer_WM* tl);   // standard constructor
-	~TLIdx();
+	AVLIndex(CString symbol,TradeLibFast::TLServer_WM* tl);   // standard constructor
+	~AVLIndex();
 	CString m_symbol;
 	CString m_StaticSymbol;
 	protected:

@@ -6,19 +6,19 @@
 
 unsigned int TIFId(CString name);
 
-class TLStock : public Observer
+class AVLStock : public Observer
 	//we derive this object from Obsererver to be able to get info about dynamic changes of the stock
     //every Observer must have function virtual void Process(const Message* message, Observable* from, const Message* additionalInfo); which will be called when a stock update is received from the server.
 {
 public:
-	TLStock(const char* symbol, TradeLibFast::TLServer_WM* tl, bool load = true);
+	AVLStock(const char* symbol, TradeLibFast::TLServer_WM* tl, bool load = true);
 
-    virtual ~TLStock();
+    virtual ~AVLStock();
 
 
     void Load();
     const StockBase* GetStockHandle() const{return m_stockHandle;}
-    bool isLoaded() const{return m_stockHandle != NULL && B_IsStockLoaded(m_stockHandle);}
+    bool isLoaded() const{return m_stockHandle != NULL && (m_stockHandle->GetSymbol()==m_symbol) && m_stockHandle->isLoaded();}
     const std::string& GetSymbol() const{return m_symbol;}
 	TradeLibFast::TLServer_WM* tl;
 

@@ -71,7 +71,7 @@ namespace TradeLibFast
 		case ISSHORTABLE :
 			{
 				const StockBase* s = preload(msg);
-				if (!s->isLoaded()) return -1;
+				if ((s==NULL)|| !s->isLoaded()) return -1;
 				bool shortable = (s->GetStockAttributes() & STOCKATTR_UPC11830) == 0;
 				return shortable ? 1 : 0;
 			}
@@ -94,7 +94,9 @@ namespace TradeLibFast
 		{
 			if (!isIndex(subsym[i]) && (subs[i]!=NULL) && (subsym[i]==symbol))
 			{
-				TLStock* s = (TLStock*)subs[i];
+				AVLStock* s = (AVLStock*)subs[i];
+				CString ts = CString(s->GetSymbol().c_str());
+				if ((s==NULL) || !s->isLoaded() || (symbol!=ts)) break;
 				return s->GetStockHandle();
 			}
 		}
@@ -470,10 +472,10 @@ namespace TradeLibFast
 			if (hasHammerSub(my[i])) continue; // if we've already subscribed once, skip to next stock
 			Observer* sec;
 			if (isIndex(my[i]))
-				sec = new TLIdx(my[i],this);
+				sec = new AVLIndex(my[i],this);
 			else
 			{
-				TLStock *stk = new TLStock(my[i],this); // create new stock instance
+				AVLStock *stk = new AVLStock(my[i],this); // create new stock instance
 				sec = stk;
 			}
 			subs.push_back(sec);

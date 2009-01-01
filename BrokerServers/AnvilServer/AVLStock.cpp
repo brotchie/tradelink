@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "TLStock.h"
+#include "AVLStock.h"
 #include "Messages.h"
 #include "AVL_TLWM.h"
 #include "TradeLink.h"
@@ -16,7 +16,7 @@ using namespace TradeLibFast;
 #pragma warning (disable:4355)
 
 
-TLStock::TLStock(const char* symbol, TradeLibFast::TLServer_WM* tlinst, bool load):
+AVLStock::AVLStock(const char* symbol, TradeLibFast::TLServer_WM* tlinst, bool load):
     m_symbol(symbol),
     m_stockHandle(NULL),
     m_level1(NULL),
@@ -37,7 +37,7 @@ TLStock::TLStock(const char* symbol, TradeLibFast::TLServer_WM* tlinst, bool loa
     }
 }
 
-void TLStock::Clear()
+void AVLStock::Clear()
 {
 	if (bidi)
 	{
@@ -74,13 +74,13 @@ void TLStock::Clear()
 	tl = NULL;
 }
 
-TLStock::~TLStock()
+AVLStock::~AVLStock()
 {
 	Clear();					
 }
 
 
-void TLStock::Load()
+void AVLStock::Load()
 {
     m_stockHandle = B_GetStockHandle(m_symbol.c_str());//This will load the stock from the Hammer server. The stock will not be available immediately for monitoring and trading, only after Hammer server sends all the info about the stock.
 	if(m_stockHandle)
@@ -108,7 +108,7 @@ void TLStock::Load()
 
 }
 
-void TLStock::QuoteNotify()
+void AVLStock::QuoteNotify()
 {
 	if (m_stockHandle)
 	{
@@ -137,7 +137,7 @@ void TLStock::QuoteNotify()
 	}
 
 }
-void TLStock::TradeNotify()
+void AVLStock::TradeNotify()
 {
 	if (m_stockHandle)
 	{
@@ -162,7 +162,7 @@ void TLStock::TradeNotify()
 }
 
 
-void TLStock::Process(const Message* message, Observable* from, const Message* additionalInfo)
+void AVLStock::Process(const Message* message, Observable* from, const Message* additionalInfo)
 {
 
     switch(message->GetType())

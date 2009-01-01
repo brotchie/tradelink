@@ -543,6 +543,22 @@
 			>
 		</File>
 		<File
+			RelativePath=".\AVLIndex.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\AVLIndex.h"
+			>
+		</File>
+		<File
+			RelativePath=".\AVLStock.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\AVLStock.h"
+			>
+		</File>
+		<File
 			RelativePath="Resource.h"
 			>
 		</File>
@@ -598,22 +614,6 @@
 		</File>
 		<File
 			RelativePath="StdAfx.h"
-			>
-		</File>
-		<File
-			RelativePath=".\TLIndex.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\TLIndex.h"
-			>
-		</File>
-		<File
-			RelativePath=".\TLStock.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\TLStock.h"
 			>
 		</File>
 		<File

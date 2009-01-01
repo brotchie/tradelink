@@ -1,15 +1,15 @@
 #include "stdafx.h"
 #include "TradeLink.h"
-#include "TLIndex.h"
+#include "AVLIndex.h"
 #include "AVL_TLWM.h"
 #include "MessageIds.h"
 #include "TLTick.h"
 
 
 
-// TLIdx message handlers
+// AVLIndex message handlers
 
-void TLIdx::Load(CString symbol)
+void AVLIndex::Load(CString symbol)
 {
     if(symbol.GetLength() != 0)
     {
@@ -32,7 +32,7 @@ void TLIdx::Load(CString symbol)
 }
 
 
-TLIdx::TLIdx(CString symbol,TradeLibFast::TLServer_WM* tlinst)
+AVLIndex::AVLIndex(CString symbol,TradeLibFast::TLServer_WM* tlinst)
 {
 	m_index = NULL;
 	m_symbol = "";
@@ -40,14 +40,14 @@ TLIdx::TLIdx(CString symbol,TradeLibFast::TLServer_WM* tlinst)
 	tl = tlinst;
 
 }
-TLIdx::~TLIdx()
+AVLIndex::~AVLIndex()
 {
 	m_index = NULL;
 	m_symbol = "";
 	tl = NULL;
 }
 
-void TLIdx::OnDynamicUpdate() 
+void AVLIndex::OnDynamicUpdate() 
 {
     if(m_index)
     {
@@ -56,11 +56,11 @@ void TLIdx::OnDynamicUpdate()
     }
 }
 
-void TLIdx::OnChangeIndexSymbol() 
+void AVLIndex::OnChangeIndexSymbol() 
 {
 }
 
-void TLIdx::FillInfo()
+void AVLIndex::FillInfo()
 {
 
 	time_t now;
@@ -84,7 +84,7 @@ void TLIdx::FillInfo()
 }
 
 
-void TLIdx::Process(const Message* message, Observable* from, const Message* additionalInfo)
+void AVLIndex::Process(const Message* message, Observable* from, const Message* additionalInfo)
 {
     switch(message->GetType())
     {
