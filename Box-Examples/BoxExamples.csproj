@@ -59,6 +59,7 @@
     <Compile Include="Bollinger.cs" />
     <Compile Include="AlwaysEnterSingle.cs" />
     <Compile Include="DayTradeBox.cs" />
+    <Compile Include="EmptyResponseTemplate.cs" />
     <Compile Include="GreyExit.cs" />
     <Compile Include="MAbox.cs" />
     <Compile Include="MarketBox.cs" />
