@@ -27,10 +27,13 @@ namespace TradeLibFast
 		void SrvGotFill(TLTrade trade);
 		void SrvGotTick(TLTick tick);
 		void SrvGotCancel(int orderid);
+		CString Version();
 
 	protected:
 		bool needStock(CString stock);
 		int FindClient(CString clientname);
+		double MajorVer;
+		int MinorVer;
 
 		vector <CString>client; // map client ids to name
 		vector <time_t>heart; // map last contact to id

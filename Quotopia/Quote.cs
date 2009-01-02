@@ -555,7 +555,7 @@ namespace Quotopia
                 bardict[t.symbol].newTick(t);
         }
 
-        TradeLink_Client_WM tl = new TradeLink_Client_WM("quotopia.client",true);
+        TLClient_WM tl = new TLClient_WM("quotopia.client",true);
         ~Quote() { QuotopiaClose(); }
         void QuotopiaClose()
         {

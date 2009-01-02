@@ -18,7 +18,7 @@ namespace ASP
         public ASP()
         {
             InitializeComponent();
-            tl = new TradeLink_Client_WM("ASPclient", true);
+            tl = new TLClient_WM("ASPclient", true);
             // don't save ticks from replay since they're already saved
             archivetickbox.Checked = tl.LinkType != TLTypes.HISTORICALBROKER;
             tl.gotTick += new TickDelegate(tl_gotTick);
@@ -136,7 +136,7 @@ namespace ASP
             boxlist.Clear();
         }
 
-        TradeLink_Client_WM tl;
+        TLClient_WM tl;
 
 
         private void Boxes_SelectedIndexChanged(object sender, EventArgs e)

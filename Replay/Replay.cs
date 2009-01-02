@@ -12,7 +12,7 @@ namespace Replay
 {
     public partial class Replay : Form
     {
-        TradeLink_Server_WM tl = new TradeLink_Server_WM(TLTypes.HISTORICALBROKER);
+        TLServer_WM tl = new TLServer_WM(TLTypes.HISTORICALBROKER);
         Playback _playback = null;
         HistSim h = new HistSim();
         string tickfolder = Util.TLTickDir;
@@ -21,15 +21,15 @@ namespace Replay
         {
             InitializeComponent();
             tl.gotSrvFillRequest += new OrderDelegate(tl_gotSrvFillRequest);
-            tl.PositionPriceRequest += new TradeLink_Server_WM.DecimalStringDelegate(tl_PositionPriceRequest);
-            tl.PositionSizeRequest += new TradeLink_Server_WM.IntStringDelegate(tl_PositionSizeRequest);
-            tl.DayHighRequest += new TradeLink_Server_WM.DecimalStringDelegate(tl_DayHighRequest);
-            tl.DayLowRequest += new TradeLink_Server_WM.DecimalStringDelegate(tl_DayLowRequest);
+            tl.PositionPriceRequest += new TLServer_WM.DecimalStringDelegate(tl_PositionPriceRequest);
+            tl.PositionSizeRequest += new TLServer_WM.IntStringDelegate(tl_PositionSizeRequest);
+            tl.DayHighRequest += new TLServer_WM.DecimalStringDelegate(tl_DayHighRequest);
+            tl.DayLowRequest += new TLServer_WM.DecimalStringDelegate(tl_DayLowRequest);
             tl.OrderCancelRequest += new UIntDelegate(tl_OrderCancelRequest);
-            tl.gotSrvAcctRequest += new TradeLink_Server_WM.StringDelegate(tl_gotSrvAcctRequest);
-            tl.gotSrvAcctClosedPLRequest += new TradeLink_Server_WM.DecimalStringDelegate(tl_gotSrvAcctClosedPLRequest);
-            tl.gotSrvAcctOpenPLRequest += new TradeLink_Server_WM.DecimalStringDelegate(tl_gotSrvAcctOpenPLRequest);
-            tl.gotSrvPosList += new TradeLink_Server_WM.PositionArrayDelegate(tl_gotSrvPosList);
+            tl.gotSrvAcctRequest += new TLServer_WM.StringDelegate(tl_gotSrvAcctRequest);
+            tl.gotSrvAcctClosedPLRequest += new TLServer_WM.DecimalStringDelegate(tl_gotSrvAcctClosedPLRequest);
+            tl.gotSrvAcctOpenPLRequest += new TLServer_WM.DecimalStringDelegate(tl_gotSrvAcctOpenPLRequest);
+            tl.gotSrvPosList += new TLServer_WM.PositionArrayDelegate(tl_gotSrvPosList);
             h.GotTick += new TickDelegate(h_GotTick);
             h.SimBroker.GotOrder += new OrderDelegate(SimBroker_GotOrder);
             h.SimBroker.GotFill += new FillDelegate(SimBroker_GotFill);

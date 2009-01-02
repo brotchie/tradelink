@@ -93,10 +93,10 @@
     <Compile Include="TickWatcher.cs" />
     <Compile Include="Trade.cs" />
     <Compile Include="TradeLink.cs" />
-    <Compile Include="TradeLink_Client_WM.cs">
+    <Compile Include="TLClient_WM.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="TradeLink_Server_WM.cs">
+    <Compile Include="TLServer_WM.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Tript.cs" />

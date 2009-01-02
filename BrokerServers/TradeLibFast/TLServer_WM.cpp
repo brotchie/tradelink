@@ -12,16 +12,36 @@ using namespace std;
 namespace TradeLibFast
 {
 
+	const char* VERFILE = "c:\\progra~1\\tradelink\\brokerserver\\VERSION.txt";
 	TLServer_WM::TLServer_WM(void)
 	{
+		MajorVer = 0.1;
+		MinorVer = 0;
 		TLDEBUG = true;
 		ENABLED = false;
 		debugbuffer = CString("");
+		std::ifstream file;
+		file.open(VERFILE);
+		if (file.is_open())
+		{
+			char data[8];
+			file.getline(data,8);
+			MinorVer = atoi(data);
+			file.close();
+		}
+
 	}
 
 	TLServer_WM::~TLServer_WM()
 	{
 		debugbuffer = "";
+	}
+
+	CString TLServer_WM::Version()
+	{
+		CString ver;
+		ver.Format("%.1f.%i",MajorVer,MinorVer);
+		return ver;
 	}
 
 
@@ -96,8 +116,8 @@ namespace TradeLibFast
 
 	int TLServer_WM::ServiceMessage(int MessageType, CString msg)
 	{
-			switch (MessageType)
-			{
+		switch (MessageType)
+		{
 			case ORDERCANCELREQUEST :
 				CancelRequest((long)atoi(msg.GetBuffer()));
 				return OK;
@@ -150,13 +170,16 @@ namespace TradeLibFast
 					stub.push_back(HEARTBEAT);
 					stub.push_back(CLEARSTOCKS);
 					stub.push_back(CLEARCLIENT);
+					stub.push_back(VERSION);
 					// send entire feature set back to client
 					TLSend(FEATURERESPONSE,SerializeIntVec(stub),msg);
 					return OK;
 				}
+			case VERSION :
+					return MinorVer;
+		}
 
-			}
-			return UnknownMessage(MessageType,msg);
+		return UnknownMessage(MessageType,msg);
 	}
 
 	int TLServer_WM::UnknownMessage(int MessageType, CString msg)
@@ -282,32 +305,15 @@ namespace TradeLibFast
 					return true;
 		return false;
 	}
-	const char* VERFILE = "c:\\progra~1\\tradelink\\brokerserver\\VERSION.txt";
 	void TLServer_WM::Start(bool live)
 	{
 		if (!ENABLED)
 		{
-			CString major = "0.1";
-			CString minor("$Rev: 197 $");
-			std::ifstream file;
-			file.open(VERFILE);
-			if (file.is_open())
-			{
-				char data[8];
-				file.getline(data,8);
-				minor = CString(data);
-				file.close();
-			}
-			else
-			{
-				minor.Replace("$Rev: ","");
-				minor.TrimRight(" $");
-			}
 			CString wind(live ? LIVEWINDOW : SIMWINDOW);
 			this->Create(NULL, wind, 0,CRect(0,0,20,20), CWnd::GetDesktopWindow(),NULL);
 			this->ShowWindow(SW_HIDE); // hide our window
 			CString msg;
-			msg.Format("Started TL BrokerServer %s [ %s.%s]",wind,major,minor);
+			msg.Format("Started TL BrokerServer %s [ %.1f.%i]",wind,MajorVer,MinorVer);
 			this->D(msg);
 			ENABLED = true;
 		}

@@ -89,6 +89,8 @@ const char* WINAPI GetAnvilExtensionMenu()
 
 }
 
+std::string version;
+
 
 void ShowMainWindow()
 {
@@ -96,31 +98,17 @@ void ShowMainWindow()
 	Observable* m_account = B_GetCurrentAccount();
 	BOOL isSim = B_IsAccountSimulation(m_account);
 	if (!frame)
+	{
 		frame = new AVL_TLWM();
+		version += frame->Version();
+	}
 	frame->Start(!isSim);
 }
 
-std::string version;
-const char* VERFILE = "c:\\progra~1\\tradelink\\brokerserver\\VERSION.txt";
 
 void WINAPI InitializeAnvilExtension()
 {
-	CString major = "0.1";
-	CString minor("?");
-	std::ifstream file;
-	file.open(VERFILE);
-	if (file.is_open())
-	{
-		char data[8];
-		file.getline(data,8);
-		minor = CString(data);
-		file.close();
-	}
-	CString ver;
-	ver.Format("%s.%s",major,minor);
-	version += ver;
     ShowMainWindow();
-
 }
 
 bool WINAPI DoAnvilExtensionCommand(unsigned int id)

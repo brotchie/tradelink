@@ -62,29 +62,28 @@ namespace TradeLib
             return new DateTime(year, month, day, hour, min, TradeLinkSec);
         }
         public const string ZEROBUILD = "0";
-        public static string BuildFromFile(string filepath)
+        public static int BuildFromFile(string filepath)
         {
-            string build = ZEROBUILD;
+            string builds = "";
+            int build = 0;
             if (File.Exists(filepath))
             {
                 try
                 {
                     StreamReader sr = new StreamReader(filepath);
-                    build = sr.ReadToEnd();
+                    builds = sr.ReadToEnd();
                     sr.Close();
+                    build = Convert.ToInt32(builds);
                 }
                 catch (Exception) { }
             }
             return build;
         }
-
         public static string TLVersion()
         {
             const string major = "0.1.";
-            const string backupminor = "0";
-            string build = BuildFromFile(TLProgramDir + @"\VERSION.txt");
-            string minor = build == ZEROBUILD ? CleanVer(backupminor) : build;
-            return major + minor;
+            string build = BuildFromFile(TLProgramDir + @"\VERSION.txt").ToString();
+            return major + build;
         }
         public static string TLSIdentity()
         {

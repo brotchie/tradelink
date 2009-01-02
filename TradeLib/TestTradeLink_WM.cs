@@ -11,8 +11,8 @@ namespace TestTradeLib
     public class TestTradeLink_WM
     {
         // each side of our "link"
-        TradeLink_Client_WM c;
-        TradeLink_Server_WM s;
+        TLClient_WM c;
+        TLServer_WM s;
 
         // counters used to test link events are working
         int ticks;
@@ -22,8 +22,8 @@ namespace TestTradeLib
 
         public TestTradeLink_WM() 
         {
-            s = new TradeLink_Server_WM();
-            c = new TradeLink_Client_WM("testtradelink",false);
+            s = new TLServer_WM();
+            c = new TLClient_WM("testtradelink",false);
 
             // register server events (so server can process orders)
             s.gotSrvFillRequest += new OrderDelegate(tl_gotSrvFillRequest);

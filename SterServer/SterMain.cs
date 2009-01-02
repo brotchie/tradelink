@@ -16,7 +16,7 @@ namespace SterServer
         STIPosition stiPos = new STIPosition();
         STIQuote stiQuote = new STIQuote();
         STIBook stiBook = new STIBook();
-        TradeLink_Server_WM tl = new TradeLink_Server_WM(TLTypes.LIVEBROKER);
+        TLServer_WM tl = new TLServer_WM(TLTypes.LIVEBROKER);
         const string PROGRAM = "SterServer ";
         Timer tt = new Timer();
 
@@ -38,7 +38,7 @@ namespace SterServer
             stiQuote.OnSTIQuoteSnap += new _ISTIQuoteEvents_OnSTIQuoteSnapEventHandler(stiQuote_OnSTIQuoteSnap);
 
             tl.gotSrvFillRequest += new OrderDelegate(tl_gotSrvFillRequest);
-            tl.gotSrvPosList += new TradeLink_Server_WM.PositionArrayDelegate(tl_gotSrvPosList);
+            tl.gotSrvPosList += new TLServer_WM.PositionArrayDelegate(tl_gotSrvPosList);
             tl.RegisterStocks += new DebugDelegate(tl_RegisterStocks);
             tl.OrderCancelRequest += new UIntDelegate(tl_OrderCancelRequest);
 

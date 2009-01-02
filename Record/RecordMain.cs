@@ -13,7 +13,7 @@ namespace Record
     {
         TickArchiver ta = new TickArchiver();
         TickWatcher tw = new TickWatcher();
-        TradeLink_Client_WM tl = new TradeLink_Client_WM();
+        TLClient_WM tl = new TLClient_WM();
         MarketBasket mb = new MarketBasket();
 
         public RecordMain()
