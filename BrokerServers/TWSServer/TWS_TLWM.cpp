@@ -172,7 +172,7 @@ namespace TradeLibFast
 
 		Contract* contract(new Contract);
 		contract->symbol = o.symbol;
-		contract->localSymbol = o.localsymbol;
+		contract->localSymbol = o.localsymbol!="" ? o.localsymbol : o.symbol;
 		if (o.exchange=="")
 			o.exchange = "SMART";
 		contract->exchange = o.exchange;
@@ -262,8 +262,8 @@ namespace TradeLibFast
 	{
 		for (size_t i = 0; i<accts.size(); i++)
 			if (accts[i].Find(account)!=-1)
-				return m_nextorderids[i];
-		return m_nextorderids[0]; // default is first one
+				return m_nextorderids[i]++;
+		return m_nextorderids[0]++; // default is first one
 	}
 
 	int TWS_TLWM::getMlinkId(OrderId id)
