@@ -123,12 +123,14 @@ void AVLStock::QuoteNotify()
 			// get bid
 			B_StartIteration(bidi);
 			const BookEntry* be = B_GetNextBookEntry(bidi);
+			if (be==NULL) return;
 			k.bid = be->toDouble();
 			k.bs = be->GetSize()/m_stockHandle->GetRoundLot();
 			k.be = be->GetMmid();
 			// get ask
 			B_StartIteration(aski);
 			const BookEntry* ae = B_GetNextBookEntry(aski);
+			if (ae==NULL) return;
 			k.ask = ae->toDouble();
 			k.os = ae->GetSize()/m_stockHandle->GetRoundLot();
 			k.oe = ae->GetMmid();
@@ -152,6 +154,7 @@ void AVLStock::TradeNotify()
 			// get trade
 			B_StartIteration(pnti);
 			const Transaction* t = B_GetNextPrintsEntry(pnti);
+			if (t==NULL) return;
 			k.trade = t->toDouble();
 			k.size = t->GetSize();
 			k.ex = t->GetMmid();
