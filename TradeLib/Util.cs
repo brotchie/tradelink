@@ -23,16 +23,20 @@ namespace TradeLib
         public static TickFileInfo ParseFile(string filepath)
         {
             TickFileInfo tfi;
-            string fn = System.IO.Path.GetFileNameWithoutExtension(filepath);
-            string ext = System.IO.Path.GetExtension(filepath).Replace(".", "");
-            string date = Regex.Match(fn, "[0-9]{8}$").Value;
+            tfi.type = TickFileType.Invalid;
+            tfi.date = DateTime.MinValue;
+            tfi.symbol = "";
+
             try
             {
+                string fn = System.IO.Path.GetFileNameWithoutExtension(filepath);
+                string ext = System.IO.Path.GetExtension(filepath).Replace(".", "");
+                string date = Regex.Match(fn, "[0-9]{8}$").Value;
                 tfi.type = (TickFileType)Enum.Parse(typeof(TickFileType), ext.ToUpper());
+                tfi.date = ToDateTime(Convert.ToInt32(date));
+                tfi.symbol = Regex.Match(fn, "^[A-Z]+").Value;
             }
             catch (Exception) { tfi.type = TickFileType.Invalid; }
-            tfi.date = ToDateTime(Convert.ToInt32(date));
-            tfi.symbol = Regex.Match(fn, "^[A-Z]+").Value;
             return tfi;
         }
         public static DateTime ToDateTime(int TradeLinkDate)
