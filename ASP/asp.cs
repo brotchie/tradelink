@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using TradeLib;
+using System.IO;
 
 
 
@@ -15,9 +16,12 @@ namespace ASP
 {
     public partial class ASP : Form
     {
+        StreamWriter sw = new StreamWriter("ASPDebug." + Util.ToTLDate(DateTime.Now) + ".txt", true);
         public ASP()
         {
             InitializeComponent();
+            if (sw != null)
+                sw.AutoFlush = true;
             tl = new TLClient_WM("ASPclient", true);
             // don't save ticks from replay since they're already saved
             archivetickbox.Checked = tl.LinkType != TLTypes.HISTORICALBROKER;
@@ -48,6 +52,11 @@ namespace ASP
 
         void ASP_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if (sw != null)
+            {
+                sw.Close();
+                sw = null;
+            }
             Properties.Settings.Default.Save();
             if (tl != null)
                 tl.Disconnect();
@@ -164,6 +173,8 @@ namespace ASP
         void workingbox_GotDebug(Debug debug)
         {
             if (!debugon.Checked) return;
+            if (sw != null)
+                sw.WriteLine(debug.Msg);
             Debug(debug.Msg);
         }
 
