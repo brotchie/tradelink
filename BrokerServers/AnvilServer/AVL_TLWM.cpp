@@ -245,12 +245,11 @@ namespace TradeLibFast
 				//You can access objects' fields, but it is not recommended to change them (The fields are protected and you should not play any tricks to modify the fields. It will cause unpredictable results)
 				AIMsgExecution* info = (AIMsgExecution*)additionalInfo;
 				Order* order = info->m_order;
-				const Position* position = info->m_position;
 				const Execution* exec = info->m_execution;
-				if ((order==NULL) || (position==NULL) || (exec==NULL)) return; // don't process null orders
+				if ((order==NULL) || (exec==NULL)) return; // don't process null orders
 
 				unsigned int thisid = this->fetchOrderId(order);
-				CString ac = CString(B_GetAccountName(position->GetAccount()));
+				CString ac = CString(B_GetAccountName(order->GetAccount()));
 
 				// build the serialized trade object
 				CTime ct(msg->x_Time);
@@ -267,7 +266,7 @@ namespace TradeLibFast
 				fill.xprice = (double)msg->x_ExecutionPrice/1024;
 				fill.xsize= msg->x_NumberOfShares;
 				fill.exchange = CString(ExchangeName((long)msg->x_executionId));
-				fill.account = CString(B_GetAccountName(position->GetAccount()));
+				fill.account = CString(B_GetAccountName(order->GetAccount()));
 				SrvGotFill(fill);
 
 			} // has additional info end
@@ -279,17 +278,13 @@ namespace TradeLibFast
 
 				AIMsgOrder* info = (AIMsgOrder*)additionalInfo;
 				Order* order = info->m_order;
-				const Position* position = info->m_position;
 
-				if ((order==NULL) || (position==NULL) || (info==NULL)) return; // don't process null orders
+				if ((order==NULL) || (info==NULL)) return; // don't process null orders
 
 				if (order->isDead()) return; // don't notify on dead orders
 
 				unsigned int max = ordercache.size();
 				unsigned int index = fetchOrderId(order);
-				if (index!=max) // if index isn't at the end, we've already notified for order
-					return;
-
 
 				CTime ct = CTime::GetCurrentTime();
 				TLOrder o;
