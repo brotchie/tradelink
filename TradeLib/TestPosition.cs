@@ -16,11 +16,11 @@ namespace TestTradeLib
         public void Basics()
         {
             Position p = new Position(s);
-            Assert.That(p.Size == 0);
-            Assert.That(p.hasSymbol);
-            Assert.That(p.AvgPrice == 0);
-            Assert.That(p.isFlat);
-            Assert.That(p.isValid);
+            Assert.AreEqual(0,p.Size);
+            Assert.That(p.hasSymbol,"hassymbol");
+            Assert.AreEqual(0,p.AvgPrice);
+            Assert.That(p.isFlat,"isflat");
+            Assert.That(p.isValid,"isvalid");
             Position p2 = new Position(s, 10, 100,0);
             Position p2copy = new Position(p2);
             Assert.AreEqual(p2.AvgPrice, p2copy.AvgPrice);
@@ -29,11 +29,11 @@ namespace TestTradeLib
             Assert.AreEqual(p2.Symbol, p2copy.Symbol);
             p.Adjust(p2);
             Assert.That(p.Size == 100);
-            Assert.That(p.hasSymbol);
+            Assert.IsTrue(p.hasSymbol, "hassymbol");
             Assert.That(p.AvgPrice == 10);
-            Assert.That(!p.isFlat);
-            Assert.That(p.isLong);
-            Assert.That(p.isValid);
+            Assert.IsFalse(p.isFlat);
+            Assert.IsTrue(p.isLong);
+            Assert.IsTrue(p.isValid);
             Position p3 = new Position(s, 0, 100,0);
             Assert.That(!p3.isValid);
             p3 = new Position(s, 12, 100,0);
@@ -55,6 +55,26 @@ namespace TestTradeLib
         }
 
         [Test]
+        public void FlipSideInOneTrade()
+        {
+            // this is illegal on the exchanges, but supported by certain
+            // retail brokers so we're going to allow tradelink to support it
+            // BE CAREFUL WITH THIS FEATURE.  make sure you won't be fined for doing this, before you do it.
+            string s = "IBM";
+            // long position
+            Position p = new Position(s, 100m,200);
+            // sell more than we've got to change sides
+            Trade flip = new Trade(s, 99, -400);
+            decimal cpl = p.Adjust(flip);
+            // make sure we captured close of trade
+            Assert.AreEqual(-200, cpl); 
+            // make sure we captured new side and price
+            Assert.AreEqual(-200, p.Size);
+            Assert.AreEqual(99, p.AvgPrice);
+
+        }
+
+        [Test]
         public void UsingTrades()
         {
             // long
@@ -63,7 +83,7 @@ namespace TestTradeLib
             Assert.That(p.Size == 100);
             decimal pl = p.Adjust(new Trade(s, 84, -100,dt));
             Assert.That(p.isFlat);
-            Assert.That(pl == (84 - 80) * 100);
+            Assert.AreEqual((84 - 80) * 100,pl);
             // short
             pl = 0;
             p = new Position(new Trade(s, 84, -100,dt));

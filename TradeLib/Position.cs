@@ -54,11 +54,13 @@ namespace TradeLib
             if (!hasSymbol && pos.hasSymbol) _sym = pos.Symbol;
             if (!pos.isValid) throw new Exception("Invalid position adjustment, existing:" + this.ToString() + " adjustment:" + pos.ToString());
             if (pos.isFlat) return 0; // nothing to do
+            bool oldside = isLong;
             decimal pl = BoxMath.ClosePL(this,pos.ToTrade());
             if (this.isFlat) this._price = pos._price; // if we're leaving flat just copy price
             else if ((pos.isLong && this.isLong) || (!pos.isLong && !this.isLong)) // sides match, adding so adjust price
                 this._price = ((this._price * this._size) + (pos._price * pos._size)) / (pos._size + this._size);
             this._size += pos._size; // adjust the size
+            if (oldside != isLong) _price = pos.AvgPrice; // this is for when broker allows flipping sides in one trade
             if (this.isFlat) _price = 0; // if we're flat after adjusting, size price back to zero
             _closedpl += pl; // update running closed pl
             return pl;
@@ -66,7 +68,7 @@ namespace TradeLib
         /// <summary>
         /// Adjusts the position by applying a new trade or fill.
         /// </summary>
-        /// <param name="t">The fill to apply to this position.</param>
+        /// <param name="t">The new fill you want this position to reflect.</param>
         /// <returns></returns>
         public decimal Adjust(Trade t) { return Adjust(new Position(t)); }
 

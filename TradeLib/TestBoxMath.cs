@@ -30,23 +30,23 @@ namespace TestTradeLib
         public void OpenPL()
         {
             decimal pl = .98m;
-            Assert.That(BoxMath.OpenPT(last, entry, Long) == pl);
-            Assert.That(BoxMath.OpenPT(last, entry, Short) == -pl);
-            Assert.That(BoxMath.OpenPT(last, entry, lsize) == pl);
-            Assert.That(BoxMath.OpenPT(last, entry, ssize) == -pl);
-            Assert.That(BoxMath.OpenPT(last, lp) == pl);
-            Assert.That(BoxMath.OpenPT(last, sp) == -pl);
-            Assert.That(BoxMath.OpenPL(last, lp) == lp.Size* pl);
-            Assert.That(BoxMath.OpenPL(last, sp) == sp.Size*pl);
+            Assert.AreEqual(pl,BoxMath.OpenPT(last, entry, Long));
+            Assert.AreEqual(-pl,BoxMath.OpenPT(last, entry, Short));
+            Assert.AreEqual(pl, BoxMath.OpenPT(last, entry, lsize));
+            Assert.AreEqual(-pl,BoxMath.OpenPT(last, entry, ssize));
+            Assert.AreEqual(pl, BoxMath.OpenPT(last, lp));
+            Assert.AreEqual(-pl,BoxMath.OpenPT(last, sp));
+            Assert.AreEqual(lp.Size * pl,BoxMath.OpenPL(last, lp) );
+            Assert.AreEqual(sp.Size * pl,BoxMath.OpenPL(last, sp) );
         }
         [Test]
         public void ClosePL()
         {
             decimal pl = .98m;
-            Assert.That(BoxMath.ClosePT(lp, lc) == pl);
-            Assert.That(BoxMath.ClosePT(sp, sc) == -pl);
-            Assert.That(BoxMath.ClosePL(lp, lc) == pl*(lsize/2)); // matches closing size
-            Assert.That(BoxMath.ClosePL(sp, sc) == pl*ssize);
+            Assert.AreEqual(pl,BoxMath.ClosePT(lp, lc));
+            Assert.AreEqual(-pl,BoxMath.ClosePT(sp, sc));
+            Assert.AreEqual(pl*(lsize/2),BoxMath.ClosePL(lp, lc)); // matches closing size
+            Assert.AreEqual((entry-last)*-ssize, BoxMath.ClosePL(sp, sc));
         }
     }
 }

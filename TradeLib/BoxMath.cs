@@ -72,7 +72,8 @@ namespace TradeLib
         /// <returns></returns>
         public static decimal ClosePL(Position existing, Trade adjust)
         {
-            return ClosePT(existing, adjust) * Math.Abs(adjust.Size);
+            int closedsize = Math.Abs(adjust.Size + existing.Size);
+            return ClosePT(existing, adjust) * (closedsize==0 ? Math.Abs(adjust.Size) : closedsize);
         }
 
         /// <summary>
