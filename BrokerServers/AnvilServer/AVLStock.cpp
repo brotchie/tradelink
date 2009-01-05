@@ -39,38 +39,41 @@ AVLStock::AVLStock(const char* symbol, TradeLibFast::TLServer_WM* tlinst, bool l
 
 void AVLStock::Clear()
 {
-	if (bidi)
+	if (isLoaded())
 	{
-		B_DestroyIterator(bidi);
-		bidi = NULL;
+		if (bidi)
+		{
+			B_DestroyIterator(bidi);
+			bidi = NULL;
+		}
+		if (aski)
+		{
+			B_DestroyIterator(aski);
+			aski = NULL;
+		}
+		if (pnti)
+		{
+			B_TransactionIteratorSetStock(pnti, NULL, this);
+			B_DestroyIterator(pnti);
+			pnti= NULL;
+		}
+		if(m_level1)
+		{
+			m_level1->Remove(this);
+			m_level1 = NULL;
+		}
+		if(m_level2)
+		{
+			m_level2->Remove(this);
+			m_level2 = NULL;
+		}
+		if(m_prints)
+		{
+			m_prints->Remove(this);
+			m_prints = NULL;
+		}
+		m_stockHandle = NULL;
 	}
-	if (aski)
-	{
-		B_DestroyIterator(aski);
-		aski = NULL;
-	}
-	if (pnti)
-	{
-		B_TransactionIteratorSetStock(pnti, NULL, this);
-		B_DestroyIterator(pnti);
-		pnti= NULL;
-	}
-    if(m_level1)
-    {
-        m_level1->Remove(this);
-        m_level1 = NULL;
-    }
-    if(m_level2)
-    {
-        m_level2->Remove(this);
-        m_level2 = NULL;
-    }
-    if(m_prints)
-    {
-        m_prints->Remove(this);
-        m_prints = NULL;
-    }
-    m_stockHandle = NULL;
 	tl = NULL;
 }
 
