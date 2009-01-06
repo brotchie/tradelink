@@ -47,10 +47,10 @@ namespace TradeLib
             // 
             this.sendbut.BackColor = System.Drawing.SystemColors.Window;
             this.sendbut.FlatAppearance.BorderSize = 0;
-            this.sendbut.Location = new System.Drawing.Point(145, 4);
+            this.sendbut.Location = new System.Drawing.Point(97, 3);
             this.sendbut.Margin = new System.Windows.Forms.Padding(0);
             this.sendbut.Name = "sendbut";
-            this.sendbut.Size = new System.Drawing.Size(72, 28);
+            this.sendbut.Size = new System.Drawing.Size(47, 19);
             this.sendbut.TabIndex = 0;
             this.sendbut.Text = "Send";
             this.sendbut.UseVisualStyleBackColor = false;
@@ -60,10 +60,10 @@ namespace TradeLib
             // 
             this.obuybut.AutoSize = true;
             this.obuybut.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.obuybut.Location = new System.Drawing.Point(0, 11);
+            this.obuybut.Location = new System.Drawing.Point(0, 7);
             this.obuybut.Margin = new System.Windows.Forms.Padding(0);
             this.obuybut.Name = "obuybut";
-            this.obuybut.Size = new System.Drawing.Size(59, 24);
+            this.obuybut.Size = new System.Drawing.Size(43, 17);
             this.obuybut.TabIndex = 4;
             this.obuybut.Text = "Buy";
             this.obuybut.UseVisualStyleBackColor = true;
@@ -73,10 +73,10 @@ namespace TradeLib
             // 
             this.osellbut.AutoSize = true;
             this.osellbut.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.osellbut.Location = new System.Drawing.Point(71, 11);
+            this.osellbut.Location = new System.Drawing.Point(44, 4);
             this.osellbut.Margin = new System.Windows.Forms.Padding(0);
             this.osellbut.Name = "osellbut";
-            this.osellbut.Size = new System.Drawing.Size(58, 24);
+            this.osellbut.Size = new System.Drawing.Size(42, 17);
             this.osellbut.TabIndex = 5;
             this.osellbut.Text = "Sell";
             this.osellbut.UseVisualStyleBackColor = true;
@@ -85,10 +85,10 @@ namespace TradeLib
             // pricelabel
             // 
             this.pricelabel.AutoSize = true;
-            this.pricelabel.Location = new System.Drawing.Point(5, 63);
+            this.pricelabel.Location = new System.Drawing.Point(3, 41);
             this.pricelabel.Margin = new System.Windows.Forms.Padding(0);
             this.pricelabel.Name = "pricelabel";
-            this.pricelabel.Size = new System.Drawing.Size(48, 20);
+            this.pricelabel.Size = new System.Drawing.Size(31, 13);
             this.pricelabel.TabIndex = 6;
             this.pricelabel.Text = "Price";
             this.pricelabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -98,11 +98,11 @@ namespace TradeLib
             this.limitbut.AutoSize = true;
             this.limitbut.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.limitbut.Checked = true;
-            this.limitbut.Location = new System.Drawing.Point(4, 34);
+            this.limitbut.Location = new System.Drawing.Point(2, 22);
             this.limitbut.Margin = new System.Windows.Forms.Padding(0);
             this.limitbut.Name = "limitbut";
             this.limitbut.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.limitbut.Size = new System.Drawing.Size(59, 24);
+            this.limitbut.Size = new System.Drawing.Size(42, 17);
             this.limitbut.TabIndex = 10;
             this.limitbut.TabStop = true;
             this.limitbut.Text = "Lmt";
@@ -112,10 +112,10 @@ namespace TradeLib
             // 
             this.stopbut.AutoSize = true;
             this.stopbut.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.stopbut.Location = new System.Drawing.Point(75, 34);
+            this.stopbut.Location = new System.Drawing.Point(45, 22);
             this.stopbut.Margin = new System.Windows.Forms.Padding(0);
             this.stopbut.Name = "stopbut";
-            this.stopbut.Size = new System.Drawing.Size(55, 24);
+            this.stopbut.Size = new System.Drawing.Size(41, 17);
             this.stopbut.TabIndex = 11;
             this.stopbut.Text = "Stp";
             this.stopbut.UseVisualStyleBackColor = true;
@@ -123,23 +123,24 @@ namespace TradeLib
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.obuybut);
-            this.groupBox1.Controls.Add(this.osellbut);
             this.groupBox1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.groupBox1.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.groupBox1.Location = new System.Drawing.Point(4, -5);
+            this.groupBox1.Location = new System.Drawing.Point(2, -3);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(2);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(134, 37);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(2);
+            this.groupBox1.Size = new System.Drawing.Size(42, 24);
             this.groupBox1.TabIndex = 12;
             this.groupBox1.TabStop = false;
             // 
             // marketbut
             // 
             this.marketbut.AutoSize = true;
-            this.marketbut.Location = new System.Drawing.Point(145, 34);
+            this.marketbut.Location = new System.Drawing.Point(87, 22);
             this.marketbut.Margin = new System.Windows.Forms.Padding(0);
             this.marketbut.Name = "marketbut";
             this.marketbut.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.marketbut.Size = new System.Drawing.Size(57, 24);
+            this.marketbut.Size = new System.Drawing.Size(43, 17);
             this.marketbut.TabIndex = 15;
             this.marketbut.TabStop = true;
             this.marketbut.Text = "Mkt";
@@ -153,7 +154,7 @@ namespace TradeLib
             0,
             0,
             131072});
-            this.oprice.Location = new System.Drawing.Point(53, 61);
+            this.oprice.Location = new System.Drawing.Point(34, 41);
             this.oprice.Margin = new System.Windows.Forms.Padding(0);
             this.oprice.Maximum = new decimal(new int[] {
             1215752192,
@@ -161,7 +162,7 @@ namespace TradeLib
             0,
             0});
             this.oprice.Name = "oprice";
-            this.oprice.Size = new System.Drawing.Size(80, 26);
+            this.oprice.Size = new System.Drawing.Size(67, 20);
             this.oprice.TabIndex = 16;
             this.oprice.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.oprice.KeyUp += new System.Windows.Forms.KeyEventHandler(this.oprice_KeyUp);
@@ -174,7 +175,7 @@ namespace TradeLib
             0,
             0,
             0});
-            this.osize.Location = new System.Drawing.Point(145, 61);
+            this.osize.Location = new System.Drawing.Point(101, 41);
             this.osize.Margin = new System.Windows.Forms.Padding(0);
             this.osize.Maximum = new decimal(new int[] {
             1410065408,
@@ -182,7 +183,7 @@ namespace TradeLib
             0,
             0});
             this.osize.Name = "osize";
-            this.osize.Size = new System.Drawing.Size(72, 26);
+            this.osize.Size = new System.Drawing.Size(43, 20);
             this.osize.TabIndex = 17;
             this.osize.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.osize.Value = new decimal(new int[] {
@@ -195,11 +196,12 @@ namespace TradeLib
             // Ticket
             // 
             this.AllowDrop = true;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.ClientSize = new System.Drawing.Size(226, 96);
+            this.ClientSize = new System.Drawing.Size(144, 62);
+            this.Controls.Add(this.osellbut);
             this.Controls.Add(this.osize);
             this.Controls.Add(this.oprice);
             this.Controls.Add(this.marketbut);
@@ -210,7 +212,7 @@ namespace TradeLib
             this.Controls.Add(this.sendbut);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.Margin = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "Ticket";
