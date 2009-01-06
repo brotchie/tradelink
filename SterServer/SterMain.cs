@@ -86,6 +86,8 @@ namespace SterServer
                 STIOrder order = new STIOrder();
                 if (or == oq.Length) or = 0;
                 Order o = oq[or++];
+                order.LmtPrice = (double)o.price;
+                order.StpPrice = (double)o.stopp;
                 order.Destination = o.Exchange;
                 order.Side = o.side ? "B" : "S";
                 order.Symbol = o.symbol;
