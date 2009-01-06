@@ -184,6 +184,7 @@ namespace TradeLib
                 WMUtil.SendMsg(orderid_being_cancled.ToString(), TL2.ORDERCANCELRESPONSE, Handle, c);
         }
 
+        public Brokers BrokerName = Brokers.TradeLinkSimulation;
 
         protected override void WndProc(ref Message m)
         {
@@ -236,7 +237,7 @@ namespace TradeLib
                     SrvBeatHeart(msg);
                     break;
                 case TL2.BROKERNAME :
-                    result = (long)Brokers.TradeLinkSimulation;
+                    result = (long)BrokerName;
                     break;
                 case TL2.FEATUREREQUEST:
                     TL2[] f = GetFeatures();

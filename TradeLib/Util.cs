@@ -299,7 +299,7 @@ namespace TradeLib
                     // broker-specific messages
                     if (broker == Brokers.Assent)
                         return Enum.GetName(typeof(AnvilSendOrderError), errorcode);
-                    if (broker == Brokers.Echo)
+                    if (broker == Brokers.Sterling)
                         return Enum.GetName(typeof(SterlingSubmitOrderError), errorcode);
                     break;
             }

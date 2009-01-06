@@ -461,6 +461,7 @@ namespace TradeLib
         Genesis,
         Bright,
         Echo,
+        Sterling,
     }
 
     public enum FillMode

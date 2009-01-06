@@ -37,6 +37,7 @@ namespace SterServer
             stiQuote.OnSTIQuoteUpdate += new _ISTIQuoteEvents_OnSTIQuoteUpdateEventHandler(stiQuote_OnSTIQuoteUpdate);
             stiQuote.OnSTIQuoteSnap += new _ISTIQuoteEvents_OnSTIQuoteSnapEventHandler(stiQuote_OnSTIQuoteSnap);
 
+            tl.BrokerName = Brokers.Sterling;
             tl.gotSrvFillRequest += new OrderDelegate(tl_gotSrvFillRequest);
             tl.gotSrvPosList += new TLServer_WM.PositionArrayDelegate(tl_gotSrvPosList);
             tl.RegisterStocks += new DebugDelegate(tl_RegisterStocks);
@@ -99,7 +100,7 @@ namespace SterServer
                 if ((err==0) && (!idacct.TryGetValue(o.id, out tmp)))
                     idacct.Add(o.id,order.Account);
                 if (err < 0)
-                    debug("Error sending order: " + Util.PrettyError(Brokers.Echo, err) + o.ToString());
+                    debug("Error sending order: " + Util.PrettyError(tl.BrokerName, err) + o.ToString());
                 if (err == -1)
                     debug("Make sure you have set the account in sending program.");
             }
