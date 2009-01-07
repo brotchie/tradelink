@@ -239,7 +239,7 @@ namespace SterServer
         string acct = "";
         void stiPos_OnSTIPositionUpdate(ref structSTIPositionUpdate structPositionUpdate)
         {
-            debug("got position "+structPositionUpdate.ToString());
+            
         }
 
 
