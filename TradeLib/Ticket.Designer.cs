@@ -37,8 +37,10 @@ namespace TradeLib
             this.marketbut = new System.Windows.Forms.RadioButton();
             this.oprice = new System.Windows.Forms.NumericUpDown();
             this.osize = new System.Windows.Forms.NumericUpDown();
+            this.panel1 = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.oprice)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.osize)).BeginInit();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // sendbut
@@ -58,7 +60,7 @@ namespace TradeLib
             // 
             this.obuybut.AutoSize = true;
             this.obuybut.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.obuybut.Location = new System.Drawing.Point(9, 4);
+            this.obuybut.Location = new System.Drawing.Point(0, 0);
             this.obuybut.Margin = new System.Windows.Forms.Padding(0);
             this.obuybut.Name = "obuybut";
             this.obuybut.Size = new System.Drawing.Size(59, 24);
@@ -70,8 +72,9 @@ namespace TradeLib
             // osellbut
             // 
             this.osellbut.AutoSize = true;
+            this.osellbut.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.osellbut.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.osellbut.Location = new System.Drawing.Point(68, 4);
+            this.osellbut.Location = new System.Drawing.Point(63, 0);
             this.osellbut.Margin = new System.Windows.Forms.Padding(0);
             this.osellbut.Name = "osellbut";
             this.osellbut.Size = new System.Drawing.Size(58, 24);
@@ -96,7 +99,7 @@ namespace TradeLib
             this.limitbut.AutoSize = true;
             this.limitbut.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.limitbut.Checked = true;
-            this.limitbut.Location = new System.Drawing.Point(9, 28);
+            this.limitbut.Location = new System.Drawing.Point(-2, 28);
             this.limitbut.Margin = new System.Windows.Forms.Padding(0);
             this.limitbut.Name = "limitbut";
             this.limitbut.RightToLeft = System.Windows.Forms.RightToLeft.No;
@@ -110,7 +113,7 @@ namespace TradeLib
             // 
             this.stopbut.AutoSize = true;
             this.stopbut.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.stopbut.Location = new System.Drawing.Point(71, 28);
+            this.stopbut.Location = new System.Drawing.Point(64, 28);
             this.stopbut.Margin = new System.Windows.Forms.Padding(0);
             this.stopbut.Name = "stopbut";
             this.stopbut.Size = new System.Drawing.Size(55, 24);
@@ -178,6 +181,16 @@ namespace TradeLib
             0});
             this.osize.MouseUp += new System.Windows.Forms.MouseEventHandler(this.osize_MouseWheel);
             // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.obuybut);
+            this.panel1.Controls.Add(this.osellbut);
+            this.panel1.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.panel1.Location = new System.Drawing.Point(-2, 4);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(128, 24);
+            this.panel1.TabIndex = 18;
+            // 
             // Ticket
             // 
             this.AllowDrop = true;
@@ -186,8 +199,7 @@ namespace TradeLib
             this.AutoSize = true;
             this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(216, 88);
-            this.Controls.Add(this.obuybut);
-            this.Controls.Add(this.osellbut);
+            this.Controls.Add(this.panel1);
             this.Controls.Add(this.osize);
             this.Controls.Add(this.oprice);
             this.Controls.Add(this.marketbut);
@@ -210,6 +222,8 @@ namespace TradeLib
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.order_MouseWheel);
             ((System.ComponentModel.ISupportInitialize)(this.oprice)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.osize)).EndInit();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -226,5 +240,6 @@ namespace TradeLib
         private System.Windows.Forms.RadioButton marketbut;
         private System.Windows.Forms.NumericUpDown oprice;
         private System.Windows.Forms.NumericUpDown osize;
+        private System.Windows.Forms.Panel panel1;
     }
 }

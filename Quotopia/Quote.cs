@@ -53,7 +53,8 @@ namespace Quotopia
             ordergrid.ContextMenuStrip = new ContextMenuStrip();
             ordergrid.ContextMenuStrip.Items.Add("Cancel", null, new EventHandler(cancelorder));
             FormClosing += new FormClosingEventHandler(Quote_FormClosing);
-            tl.RequestAccounts();
+            if (tl.LinkType!= TLTypes.NONE)
+                tl.RequestAccounts();
 
         }
 
