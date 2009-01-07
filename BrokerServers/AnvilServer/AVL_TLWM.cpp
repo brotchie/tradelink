@@ -283,12 +283,15 @@ namespace TradeLibFast
 
 				if (order->isDead()) return; // don't notify on dead orders
 
-				unsigned int max = ordercache.size();
-				unsigned int index = fetchOrderId(order);
+				// try to save this order
+				bool isnew = saveOrder(order,0);
+				// if it fails, we already have it so get the id
+				// if it succeeds, we should be able to get the id anyways
+				uint id = fetchOrderId(order);
 
 				CTime ct = CTime::GetCurrentTime();
 				TLOrder o;
-				o.id = index;
+				o.id = id;
 				o.price = order->isMarketOrder() ? 0: order->GetOrderPrice().toDouble();
 				o.sec = ct.GetSecond();
 				o.stop = order->GetStopPrice()->toDouble();
