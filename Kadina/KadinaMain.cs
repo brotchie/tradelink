@@ -66,9 +66,9 @@ namespace Kadina
             if (t.isTrade && !isDesiredExchange(t.ex)) return;
             else if (t.hasBid && !isDesiredExchange(t.be)) return;
             else if (t.hasAsk && !isDesiredExchange(t.oe)) return;
-
+            
             // add tick to grid
-            NewTRow(new object[] { nowtime, t.symbol,t.trade, t.size, t.bid, t.ask, t.bs, t.os, t.ex,t.be,t.oe });
+            NewTRow(new object[] { nowtime, t.symbol,(t.trade!=0 ? t.trade.ToString("N2") : ""), t.size != 0 ? t.size.ToString() : "", t.bid!=0 ? t.bid.ToString("N2") : "", t.ask!=0 ? t.ask.ToString("N2") : "", t.bs!=0 ? t.bs.ToString() : "", t.os!=0 ? t.os.ToString() : "", t.ex,t.be,t.oe });
         }
 
         void Play(object sender, DoWorkEventArgs e)
@@ -256,12 +256,12 @@ namespace Kadina
         {
             dt.Columns.Add("Time", "".GetType());
             dt.Columns.Add("Sym");
-            dt.Columns.Add("Trade", new Decimal().GetType());
-            dt.Columns.Add("TSize", new Int32().GetType());
-            dt.Columns.Add("Bid", new Decimal().GetType());
-            dt.Columns.Add("Ask", new Decimal().GetType());
-            dt.Columns.Add("BSize", new Int32().GetType());
-            dt.Columns.Add("ASize", new Int32().GetType());
+            dt.Columns.Add("Trade");
+            dt.Columns.Add("TSize");
+            dt.Columns.Add("Bid");
+            dt.Columns.Add("Ask");
+            dt.Columns.Add("BSize");
+            dt.Columns.Add("ASize");
             dt.Columns.Add("TExch");
             dt.Columns.Add("BidExch");
             dt.Columns.Add("AskExch");
@@ -344,8 +344,8 @@ namespace Kadina
                 poslist[t.symbol] = mypos;
             }
 
-            ptab.Rows.Add(nowtime, mypos.Symbol,(mypos.isFlat ? "FLAT" : (mypos.isLong ? "LONG" : "SHORT")), mypos.Size, mypos.AvgPrice, cpl.ToString("C2"), cpt.ToString("N1"));
-            ft.Rows.Add(t.xtime.ToString() + "." + t.xsec.ToString(), t.symbol,(t.Side ? "BUY" : "SELL"),t.xsize, t.xprice);
+            ptab.Rows.Add(nowtime, mypos.Symbol,(mypos.isFlat ? "FLAT" : (mypos.isLong ? "LONG" : "SHORT")), mypos.Size, mypos.AvgPrice.ToString("N2"), cpl.ToString("C2"), cpt.ToString("N1"));
+            ft.Rows.Add(t.xtime.ToString() + "." + t.xsec.ToString(), t.symbol,(t.Side ? "BUY" : "SELL"),t.xsize, t.xprice.ToString("N2"));
         }
 
         void broker_GotOrder(Order o)
