@@ -1,13 +1,40 @@
 using System;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ResearchLib
 {
 
-    class SymbolList 
+    public class SymbolList 
     {
-        public static string NYSE() { return ResearchLib.Properties.ResearchLib.nyse; }
-        public static string NASDAQ() { return ResearchLib.Properties.ResearchLib.nasdaq; }
+        public const int SYM = 0;
+        public const int CUSIP = 1;
+        public const int DESC = 2;
+        public const int INDUSTRY = 3;
+        public const int INDDUSTRYCODE = 4;
+        public static string [] NYSE() 
+        {
+            // format:
+            // Symbol|CUSIP|Company|Industry|IndCode|
+            string[] master = ResearchLib.Properties.ResearchLib.nyse.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            IEnumerable<string> query = from line in master let x = line.Split('|') select x[SYM];
+            return query.ToArray();
+        }
+        public static string[] NASDAQ() 
+        {
+            string[] master = ResearchLib.Properties.ResearchLib.nasdaq.Split(Environment.NewLine.ToCharArray());
+            return master;
+        }
+        public static string[] ALL() 
+        {
+            string[] a = NYSE();
+            string[] b = NASDAQ();
+            string[] c = new string[a.Length + b.Length];
+            a.CopyTo(c, 0);
+            b.CopyTo(c, a.Length);
+            return c;
+        }
     }
     public class NYSE 
     {
