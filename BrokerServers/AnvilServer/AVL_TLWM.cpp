@@ -456,6 +456,7 @@ namespace TradeLibFast
 			for (uint j = 0; j<stocks[i].size(); j++)
 				if (!needStock(stocks[i][j]))
 					RemoveSub(stocks[i][j]);
+		B_UnsubscribeUnusedStocks();
 
 	}
 
