@@ -248,11 +248,13 @@ namespace TradeLibFast
 
 		if (this->TLDEBUG)
 		{
-			const CString NEWLINE = "\r\n";
-			CString line(message);
-			line.Append(NEWLINE);
+			const CString NEWLINE = "\n";
+			CString line;
+			vector<int> now;
+			TLTimeNow(now);
+			line.Format("%i:%i %s%s",now[1],now[2],message,NEWLINE);
 			debugbuffer.Append(line);
-			__raise this->GotDebug(message);
+			__raise this->GotDebug(line);
 		}
 	}
 

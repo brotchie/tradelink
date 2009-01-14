@@ -8,7 +8,7 @@
 namespace TradeLibFast
 {
 	const char* CONFIGFILE = "TwsServer.Config.txt";
-	const char* LINE = "-----------------------------------------------------";
+	const char* LINE = "-------------------------------";
 
 	TWS_TLWM::TWS_TLWM(void)
 	{
@@ -62,7 +62,7 @@ namespace TradeLibFast
 		D(CString(LINE));
 		InitSockets(maxsockets,sessionid);
 		D(CString(LINE));
-		msg.Format("Found %i of %i TWS instances.",this->validlinkids.size(),maxsockets);
+		msg.Format("Found %i of %i.",this->validlinkids.size(),maxsockets);
 		D(msg);
 		D(CString("For more instances, change value in: ")+CONFIGFILE);
 		msg.Format("Found accounts: %s",gjoin(accts,","));
