@@ -55,6 +55,7 @@ namespace Quotopia
             FormClosing += new FormClosingEventHandler(Quote_FormClosing);
             if (tl.LinkType!= TLTypes.NONE)
                 tl.RequestAccounts();
+            Util.ExistsNewVersions(tl);
 
         }
 

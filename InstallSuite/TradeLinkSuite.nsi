@@ -47,11 +47,13 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\Kadina.lnk" "$INSTDIR\Kadina.EXE" "" "$INSTDIR\Kadina.EXE" 0 
   CreateShortCut "$SMPROGRAMS\TradeLink\Tript.lnk" "$INSTDIR\Tript.EXE" "" "$INSTDIR\Tript.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\Record.lnk" "$INSTDIR\Record.EXE" "" "$INSTDIR\Record.EXE" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink\Update TradeLink.lnk" "$INSTDIR\Update.EXE" "" "$INSTDIR\Update.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\Sterling+BrokerServer.lnk" "$INSTDIR\SterServer.EXE" "" "$INSTDIR\SterServer.EXE" 0  
   
   
   ; Put file there
   File "VERSION.txt"
+  File "Update.exe"  
   File "Kadina.exe"
   File "Kadina.exe.config"
   File "Replay.exe"
@@ -112,6 +114,7 @@ Section "Uninstall"
   Delete "$SMPROGRAMS\TradeLink\Time and Sales.lnk"
   Delete "$SMPROGRAMS\TradeLink\Replay.lnk"
   Delete "$SMPROGRAMS\TradeLink\Record.lnk"
+  Delete "$SMPROGRAMS\TradeLink\Update TradeLink.lnk"
   Delete "$SMPROGRAMS\TradeLink\Sterling+BrokerServer.lnk"
   Delete "$SMPROGRAMS\TradeLink\Gauntlet.lnk"
   Delete "$SMPROGRAMS\TradeLink\SplitEPF.lnk"
@@ -133,7 +136,7 @@ Function .onInit
   ; plugins dir should be automatically removed after installer runs
   InitPluginsDir
   File /oname=$PLUGINSDIR\splash.bmp "tradelinklogo.bmp"
-  splash::show 2000 $PLUGINSDIR\splash
+  splash::show 1000 $PLUGINSDIR\splash
 
   Pop $0 ; $0 has '1' if the user closed the splash screen early,
          ; '0' if everything closed normally, and '-1' if some error occurred.

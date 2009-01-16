@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.IO;
 using System.Reflection;
+using System.Net;
 
 namespace TradeLib
 {
@@ -39,18 +40,35 @@ namespace TradeLib
             catch (Exception) { tfi.type = TickFileType.Invalid; }
             return tfi;
         }
+        /// <summary>
+        /// Converts TradeLink date to DateTime (eg 20070926 to "DateTime.Mon = 9, DateTime.Day = 26, DateTime.ShortDate = Sept 29, 2007"
+        /// </summary>
+        /// <param name="TradeLinkDate"></param>
+        /// <returns></returns>
         public static DateTime ToDateTime(int TradeLinkDate)
         {
             if (TradeLinkDate < 10000) throw new Exception("Not a date, or invalid date provided");
             return ToDateTime(TradeLinkDate, 0, 0);
         }
-
+        /// <summary>
+        /// Converts TradeLink Time and seconds format to DateTime.  If not using seconds, put a zero.
+        /// </summary>
+        /// <param name="TradeLinkTime"></param>
+        /// <param name="TradeLinkSec"></param>
+        /// <returns></returns>
         public static DateTime ToDateTime(int TradeLinkTime, int TradeLinkSec)
         {
             return ToDateTime(0, TradeLinkTime, TradeLinkSec);
         }
 
-
+        /// <summary>
+        /// Converts TradeLink Date and Time format to a DateTime. 
+        /// eg DateTime ticktime = ToDateTime(tick.date,tick.time,tick.sec);
+        /// </summary>
+        /// <param name="TradeLinkDate"></param>
+        /// <param name="TradeLinkTime"></param>
+        /// <param name="TradeLinkSec"></param>
+        /// <returns></returns>
         public static DateTime ToDateTime(int TradeLinkDate, int TradeLinkTime, int TradeLinkSec)
         {
             int hour = (int)Math.Floor((decimal)TradeLinkTime / 100);
@@ -66,6 +84,12 @@ namespace TradeLib
             return new DateTime(year, month, day, hour, min, TradeLinkSec);
         }
         public const string ZEROBUILD = "0";
+        /// <summary>
+        /// Gets a number representing the build of an installation.
+        /// Build is usually stored in VERSION.TXT and full path is presented via filepath.
+        /// </summary>
+        /// <param name="filepath"></param>
+        /// <returns></returns>
         public static int BuildFromFile(string filepath)
         {
             string builds = "";
@@ -83,25 +107,47 @@ namespace TradeLib
             }
             return build;
         }
+        /// <summary>
+        /// Gets string representing the version of this suite.
+        /// </summary>
+        /// <returns></returns>
         public static string TLVersion()
         {
             const string major = "0.1.";
             string build = BuildFromFile(TLProgramDir + @"\VERSION.txt").ToString();
             return major + build;
         }
+        /// <summary>
+        /// Gets a string representing the identity of this suite.
+        /// </summary>
+        /// <returns></returns>
         public static string TLSIdentity()
         {
             return "TradeLinkSuite-" + TLVersion();
         }
-
+        /// <summary>
+        /// Converts a DateTime to TradeLink Date (eg July 11, 2006 = 20060711)
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <returns></returns>
         public static int ToTLDate(DateTime dt)
         {
             return (dt.Year * 10000) + (dt.Month * 100) + dt.Day;
         }
+        /// <summary>
+        /// Converts a DateTime.Ticks values to TLDate (eg 8million milliseconds since 1970 ~= 19960101 (new years 1996)
+        /// </summary>
+        /// <param name="DateTimeTicks"></param>
+        /// <returns></returns>
         public static int ToTLDate(long DateTimeTicks)
         {
             return ToTLDate(new DateTime(DateTimeTicks));
         }
+        /// <summary>
+        /// Converts a DateTime to TradeLink time (eg 4pm = 1600)
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <returns></returns>
         public static int ToTLTime(DateTime dt)
         {
             return (dt.Hour * 100) + dt.Minute;
@@ -149,13 +195,23 @@ namespace TradeLib
             return matched;
         }
 
-        public static string CleanVer(string ver)
+        /// <summary>
+        /// Obtains a version out of a string that contains version + other information.
+        /// </summary>
+        /// <param name="ver">string containing version</param>
+        /// <returns>version number</returns>
+        public static int CleanVer(string ver)
         {
             Regex re = new Regex("[0-9]+");
             Match m = re.Match(ver);
-            if (m.Success) return m.Value;
-            else return "0";
+            if (m.Success) return Convert.ToInt32(m.Value);
+            return 0;
         }
+        /// <summary>
+        /// Provide date in TLDate format, returns whether market (NYSE) closes early on this day.
+        /// </summary>
+        /// <param name="today"></param>
+        /// <returns></returns>
 		public static bool isEarlyClose(int today) 
         {
             try
@@ -164,6 +220,11 @@ namespace TradeLib
             }
             catch (Exception) { return false; }
         }
+        /// <summary>
+        /// Gets early close time for a given date.   Returns zero if not an early close.
+        /// </summary>
+        /// <param name="today"></param>
+        /// <returns></returns>
         public static int GetEarlyClose(int today)
         {
             try
@@ -172,7 +233,7 @@ namespace TradeLib
             }
             catch (Exception) { return 0; }
         }
-        public static Hashtable GetCloseTime()
+        static Hashtable GetCloseTime()
         {
             StreamReader f = new StreamReader("EarlyClose.csv");
             string[] r = new string[2];
@@ -186,6 +247,12 @@ namespace TradeLib
             f.Close();
             return h; 
         }
+        /// <summary>
+        /// Converts list of trades to a delimited file readable by excel, R, matlab, google spreadsheets, etc.
+        /// </summary>
+        /// <param name="stocktrades"></param>
+        /// <param name="delimiter"></param>
+        /// <param name="filepath"></param>
         public static void FillsToText(List<Trade> stocktrades,char delimiter,string filepath)
         { // works on a queue of Trade objects
             StreamWriter sw = new StreamWriter(filepath, false);
@@ -195,8 +262,18 @@ namespace TradeLib
             sw.Close();
         }
 
+        /// <summary>
+        /// Converts a list of trades to an array of comma-delimited string data also containing closedPL, suitable for output to file for reading by excel, R, matlab, etc.
+        /// </summary>
+        /// <param name="tradelist"></param>
+        /// <returns></returns>
         public static string[] TradesToClosedPL(List<Trade> tradelist) { return TradesToClosedPL(tradelist, ','); }
-
+        /// <summary>
+        /// Converts a list of trades to an array of delimited string data also containing closedPL, suitable for output to file for reading by excel, R, matlab, etc.
+        /// </summary>
+        /// <param name="tradelist"></param>
+        /// <param name="delimiter"></param>
+        /// <returns></returns>
         public static string[] TradesToClosedPL(List<Trade> tradelist, char delimiter)
         {
             List<string> rowoutput = new List<string>();
@@ -225,7 +302,12 @@ namespace TradeLib
             return rowoutput.ToArray();
 
         }
-
+        /// <summary>
+        /// Converts a list of trades to delimited text file containing closedPL, suitable for reading by excel, R, matlab, etc.
+        /// </summary>
+        /// <param name="tradelist"></param>
+        /// <param name="delimiter"></param>
+        /// <param name="filepath"></param>
         public static void ClosedPLToText(List<Trade> tradelist, char delimiter, string filepath)
         {
             StreamWriter sw = new StreamWriter(filepath, false);
@@ -305,6 +387,69 @@ namespace TradeLib
             }
             return "Unknown error: " + errorcode.ToString();
         }
+        public const string BROKERSERVER = "BrokerServer";
+        public const string TRADELINKSUITE = "TradeLinkSuite";
+        /// <summary>
+        /// Gets latest version number of an application located on tradelink project site.
+        /// </summary>
+        /// <param name="Application">Util.BROKERSERVER|Util.TRADELINKSUITE</param>
+        /// <returns></returns>
+        public static int LatestVersion(string Application)
+        {
+            var wc = new WebClient();
+            int ver = 0;
+            const string URL= "http://franta.com/projects/tradelink/ver.cgi?a=";
+            try
+            {
+                string res = wc.DownloadString(URL + Application);
+                ver = Convert.ToInt32(res);
+            }
+            catch (Exception) { return ver; }
+            return ver;
+        }
+        /// <summary>
+        /// Returns true if a newer version of suite exists on website
+        /// </summary>
+        /// <returns></returns>
+        public static bool ExistsNewTLS()
+        {
+            int latest = LatestVersion(Util.TRADELINKSUITE);
+            int build = BuildFromFile(TLProgramDir + @"\VERSION.txt");
+            return latest > build;
+        }
+        /// <summary>
+        /// Returns true if a newer version of brokerserver exists.
+        /// </summary>
+        /// <param name="tl"></param>
+        /// <returns></returns>
+        public static bool ExistsNewBS(TLClient_WM tl)
+        {
+            if (tl.LinkType == TLTypes.NONE) return false;
+            int latest = 0;
+            if (tl.LinkType== TLTypes.HISTORICALBROKER)
+                latest = LatestVersion(Util.TRADELINKSUITE);
+            else 
+             latest = LatestVersion(Util.BROKERSERVER);
+            int thisver = tl.ServerVersion;
+            return latest > thisver;
+        }
+        /// <summary>
+        /// Check for new versions of suite and brokerserver, option to display a dialog box to user if there are
+        /// </summary>
+        /// <param name="tl"></param>
+        /// <returns></returns>
+        public static bool ExistsNewVersions(TLClient_WM tl) { return ExistsNewVersions(tl, true); }
+        public static bool ExistsNewVersions(TLClient_WM tl, bool displayalert)
+        {
+            bool t = ExistsNewTLS();
+            bool b = ExistsNewBS(tl);
+            List<string> p = new List<string>();
+            if (t) p.Add(Util.TRADELINKSUITE);
+            if (b) p.Add(Util.BROKERSERVER);
+            if ((t || b) && displayalert)
+                System.Windows.Forms.MessageBox.Show("There are new versions available for: " + string.Join(",", p.ToArray()) + Environment.NewLine + "Download using TradeLink Update tool, or from http://tradelink.googlecode.com", "New versions of software available.");
+            return t || b;
+        }
         
     }
 
@@ -364,6 +509,7 @@ namespace TradeLib
         SO_INCORRECT_SIDE,
         SO_NO_BULLETS_FOR_CHEAP_STOCK,
         SO_NO_SHORTSELL_FOR_CHEAP_STOCK,
+        SO_NO_SHORTSELL_FOR_HARD_TO_BORROW_STOCK,
         SO_NO_ONOPENORDER_FOR_NASDAQ_STOCK,
         SO_NO_ONCLOSEORDER_FOR_NASDAQ_STOCK,
         SO_NO_ONCLOSEORDER_AGAINST_IMBALANCE_AFTER_1540,
@@ -404,8 +550,16 @@ namespace TradeLib
 
         SO_HIT_OWN_ORDERS,
 
-        //    SO_SHORT_SELL_VIOLATION,
+
         SO_POTENTIAL_OVERSELL,
+
+        SO_BLOCK_ERRONEOUS_TRADE,
+        SO_WARN_ERRONEOUS_TRADE,
+        SO_ALLOW_ERRONEOUS_TRADE,
+
+        SO_SDOT_ROUTING_BLOCK,
+        SO_SDOT_NEWPOS_BLOCK,
+        SO_ARCA_NEWPOS_BLOCK,
     }
     public enum TickFileType
     {

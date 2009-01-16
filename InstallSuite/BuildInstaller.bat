@@ -61,6 +61,8 @@ echo RESEARCHLIB
 xcopy /q /y ..\ResearchLib\bin\Release\ResearchLib.dll .
 echo RECORD
 xcopy /q /y ..\Record\bin\Release\Record.exe* .
+echo UPDATE
+xcopy /q /y ..\Update\bin\Release\Update.exe* .
 echo.
 
 

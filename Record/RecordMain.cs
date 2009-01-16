@@ -23,6 +23,7 @@ namespace Record
             {
                 tl.gotTick += new TickDelegate(tl_gotTick);
             }
+            Util.ExistsNewVersions(tl);
         }
 
 

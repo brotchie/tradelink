@@ -31,6 +31,7 @@ namespace ASP
             tl.gotOrderCancel += new UIntDelegate(tl_gotOrderCancel);
             this.FormClosing += new FormClosingEventHandler(ASP_FormClosing);
             status(Util.TLSIdentity());
+            Util.ExistsNewVersions(tl);
             LoadBoxDLL(Properties.Settings.Default.boxdll);
         }
 

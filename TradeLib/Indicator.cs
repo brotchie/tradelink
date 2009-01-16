@@ -13,4 +13,13 @@ namespace TradeLib
     {
         bool newBar(BarList bl);
     }
+
+    public interface BarInterface
+    {
+        decimal High { get; }
+        decimal Low { get; }
+        decimal Open { get; }
+        decimal Close { get; }
+        int Volume { get; }
+    }
 }

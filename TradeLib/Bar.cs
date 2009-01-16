@@ -9,7 +9,7 @@ namespace TradeLib
     /// <summary>
     /// A single bar of price data, which represents OHLC and volume for an interval of time.
     /// </summary>
-    public class Bar : TickIndicator
+    public class Bar : TickIndicator, BarInterface
     {
         private decimal h = decimal.MinValue;
         private decimal l = decimal.MaxValue;
