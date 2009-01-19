@@ -16,9 +16,20 @@ namespace Update
         [DllImport("user32.dll")]
         static extern bool ShowWindow(IntPtr HWND, int CMDSHOW);
         const int SW_MINIMIZE = 6;
+        const string LOGFILE = "UpdateLog.txt";
+        static StreamWriter logf = null;
 
         static void Main(string[] args)
         {
+            if (File.Exists(LOGFILE))
+            {
+                FileInfo fi = new FileInfo(LOGFILE);
+                if (fi.Length > 128000)
+                    File.Delete(LOGFILE);
+            }
+            logf = new StreamWriter(LOGFILE, true);
+            logf.AutoFlush = true;
+            log("Update Started.");
             // minimize this window
             IntPtr curh = Process.GetCurrentProcess().MainWindowHandle;
             ShowWindow(curh, SW_MINIMIZE);
@@ -39,7 +50,7 @@ namespace Update
             const string URL = "http://tradelink.googlecode.com/files/";
             string bs = Util.BROKERSERVER+"-"+Util.LatestVersion(Util.BROKERSERVER).ToString()+".exe";
             string tls = Util.TRADELINKSUITE + "-" + Util.LatestVersion(Util.TRADELINKSUITE).ToString() + ".exe";
-            // remove existing
+            log("removing existing installers");
             try
             {
                 if (File.Exists(tls))
@@ -48,18 +59,18 @@ namespace Update
                 if (File.Exists(bs))
                     File.Delete(bs);
             }
-            catch (Exception ex) { Console.WriteLine("unable to remove files: " + ex.Message + Environment.NewLine + "any key to continue..."); Console.ReadLine(); }
+            catch (Exception ex) { log("unable to remove files: " + ex.Message); }
 
 
-            // get files
+            log("downloading latest versions...");
             try
             {
                 wc.DownloadFile(URL + bs, bs);
                 wc.DownloadFile(URL + tls, tls);
             }
-            catch (Exception ex) { Console.WriteLine("error: " + ex.Message); Console.WriteLine("any key to continue...");  Console.ReadLine(); return; }
+            catch (Exception ex) { log("error: " + ex.Message); return; }
 
-            // uninstall existing versions
+            log("uninstalling existing versions");
             string ubs = path + Util.BROKERSERVER + "\\uninstall.exe";
             string utls = path + Util.TRADELINKSUITE + "\\uninstall.exe";
             if (File.Exists(ubs))
@@ -67,14 +78,23 @@ namespace Update
             if (File.Exists(tls))
                 Process.Start(utls,"/S");
 
-            // install downloaded versions
+            log("installing downloaded versions");
             if (File.Exists(bs))
-                Process.Start(bs,"/S");
+            {
+                log("installing " + bs);
+                Process.Start(bs, "/S");
+            }
+            else
+                log("installer was missing: " + bs);
             if (File.Exists(tls))
-                Process.Start(tls,"/S");
-
-            // remove downloaded version and restore working directory
+            {
+                log("installing " + tls);
+                Process.Start(tls, "/S");
+            }
+            else
+                log("installer was missing: " + tls);
             System.Threading.Thread.Sleep(3000);
+            log("remove downloaded versions and restore working directory");
             try
             {
                 if (File.Exists(tls))
@@ -83,8 +103,17 @@ namespace Update
                 if (File.Exists(bs))
                     File.Delete(bs);
             }
-            catch (Exception ex) { Console.WriteLine("unable to remove files: " + ex.Message + Environment.NewLine + "any key to continue..."); Console.ReadLine(); }
+            catch (Exception ex) { log("unable to remove files: " + ex.Message + Environment.NewLine + "any key to continue...");  }
             Environment.CurrentDirectory = od;
+            log("Update finished.");
+            logf.Close();
+        }
+
+        static void log(string msg)
+        {
+            if (logf == null)
+                return;
+            logf.WriteLine(DateTime.Now.ToString()+": "+msg);
         }
     }
 }
