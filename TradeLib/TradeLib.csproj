@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Account.cs" />
+    <Compile Include="AsyncResponse.cs" />
     <Compile Include="Auth.cs" />
     <Compile Include="Bar.cs" />
     <Compile Include="BarList.cs" />
