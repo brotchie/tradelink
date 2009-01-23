@@ -21,6 +21,30 @@
 		BROKERNAME = 28,
 		VERSION = 31,
 		ISSHORTABLE,
+		VWAP,	// GetVwap
+		LASTTRADESIZE,	// GetLastTradeSize
+		LASTTRADEPRICE,	// GetLastTradePrice
+		LASTBID,				// GetBid
+		LASTASK,				// GetAsk
+		BIDSIZE,			// GetBidSize
+		ASKSIZE,			// GetAskSize
+		DAYLOW,			// GetDayLow
+		DAYHIGH,			// GetDayHigh
+		OPENPRICE,		// GetOpenPrice
+		CLOSEPRICE,		// GetClosePrice - yesterday
+		LRPBUY,				// GetLRP buy side
+		LRPSELL,			// GetLRP sell side
+		AMEXLASTTRADE,		// GetAmexLastTrade
+		NASDAQLASTTRADE,		// GetNasdaqLastTrade
+		NYSEBID,			// GetNyseBid
+		NYSEASK,			// GetNyseAsk
+		NYSEDAYHIGH,		// GetNyseDayHigh
+		NYSEDAYLOW,			// GetNyseDayLow
+		NYSELASTTRADE,		// GetNyseLastTrade
+		NASDAQIMBALANCE,	// GetNasdaqImbalance
+		NASDAQPREVIOUSIMBALANCE,	// GetNasdaqPreviousImbalance
+		NYSEIMBALACE,		// GetNyseImbalance
+		NYSEPREVIOUSIMBALANCE,	// GetNysePreviousImbalance
 		TICKNOTIFY = 100,
 		EXECUTENOTIFY,
 		REGISTERCLIENT,

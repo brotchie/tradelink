@@ -76,7 +76,258 @@ namespace TradeLibFast
 				return shortable ? 1 : 0;
 			}
 			break;
-		}
+
+		case VWAP:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				Money money ;
+				money = stock->GetVwap() ;
+				return MoneyToPacked(money) ;
+			}
+			break;	// GetVwap
+
+		///
+		/// GetLastTradeSize
+		///
+		case LASTTRADESIZE:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				return stock->GetLastTradeSize() ;
+			}
+			break;	// GetLastTradeSize
+
+		///
+		/// GetLastTradePrice	
+		///
+		case LASTTRADEPRICE:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				Money money ;
+				money = stock->GetLastTradePrice() ;
+				return MoneyToPacked(money) ;
+			}
+			break;	// GetLastTradePrice
+
+		///
+		/// GetBid
+		///
+		case LASTBID:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				Money money ;
+				money = stock->GetBid() ;
+				return MoneyToPacked(money) ;
+			}
+			break;			// GetBid
+
+		///
+		/// GetAsk
+		///
+		case LASTASK:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				Money money ;
+				money = stock->GetAsk() ;
+				return MoneyToPacked(money) ;
+			}
+			break;			// GetAsk
+
+		///
+		/// GetBidSize
+		///
+		case BIDSIZE:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				return stock->GetBidSize() ;
+			}
+			break;		// GetBidSize
+
+		///
+		/// GetAskSize
+		///
+		case ASKSIZE:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				return stock->GetAskSize() ;
+			}
+			break;		// GetAskSize
+
+		///
+		/// GetDayLow
+		///
+		case DAYLOW:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				Money money ;
+				money = stock->GetDayLow() ;
+				return MoneyToPacked(money) ;
+			}
+			break;			// GetDayLow
+
+		///
+		/// GetDayHigh
+		///
+		case DAYHIGH:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				Money money ;
+				money = stock->GetDayHigh() ;
+				return MoneyToPacked(money) ;
+			}
+			break;		// GetDayHigh
+
+		///
+		/// GetOpenPrice
+		///
+		case OPENPRICE:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				Money money ;
+				money = stock->GetOpenPrice() ;
+				return MoneyToPacked(money) ;
+			}
+			break;		// GetOpenPrice
+
+		///
+		/// GetClosePrice - yesterday
+		///
+		case CLOSEPRICE:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				Money money ;
+				money = stock->GetClosePrice() ;
+				return MoneyToPacked(money) ;
+			}
+			break;		// GetClosePrice - yesterday
+
+		///
+		/// GetLRP - both sides
+	
+		case LRPBUY:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				Money money ;
+				money = stock->GetLRP(true);	// not sure if this is correct.
+				return MoneyToPacked(money) ;
+			}
+			break;			// GetLRP - both sides
+
+		case LRPSELL:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				Money money ;
+				money = stock->GetLRP(false);	// not sure if this is correct.
+				return MoneyToPacked(money) ;
+			}
+			break;			// GetLRP - both sides
+
+		case AMEXLASTTRADE:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				Money money ;
+				money = stock->GetAmexLastTrade() ;
+				return MoneyToPacked(money) ;
+			}
+			break;			// GetAmexLastTrade
+
+		case NASDAQLASTTRADE:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				Money money ;
+				money = stock->GetNasdaqLastTrade() ;
+				return MoneyToPacked(money) ;
+			}
+			break;			// GetNasdaqLastTrade
+		case NYSEBID:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				Money money ;
+				money = stock->GetNyseBid() ;
+				return MoneyToPacked(money) ;
+
+			}
+			break;				// GetNyseBid
+		case NYSEASK:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				Money money ;
+				money = stock->GetNyseAsk() ;
+				return MoneyToPacked(money) ;
+			}
+			break;				// GetNyseAsk
+		case NYSEDAYHIGH:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				Money money ;
+				money = stock->GetNyseDayHigh() ;
+				return MoneyToPacked(money) ;
+			}
+			break;			// GetNyseDayHigh
+		case NYSEDAYLOW:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				Money money ;
+				money = stock->GetNyseDayLow() ;
+				return MoneyToPacked(money) ;
+			}
+			break;			// GetNyseDayLow
+		case NYSELASTTRADE:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				Money money ;
+				money = stock->GetNyseLastTrade() ;
+				return MoneyToPacked(money) ;
+			}
+			break;			// GetNyseLastTrade
+		case NASDAQIMBALANCE:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				return stock->GetNasdaqImbalance() ;
+			}
+			break;			// GetNasdaqImbalance
+		case NASDAQPREVIOUSIMBALANCE:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				return stock->GetNasdaqPreviousImbalance() ;
+			}
+			break;		// GetNasdaqPreviousImbalance
+		case NYSEIMBALACE:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				return stock->GetNyseImbalance() ;
+			}
+			break;			// GetNyseImbalance
+		case NYSEPREVIOUSIMBALANCE:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				return stock->GetNysePreviousImbalance() ;
+			}
+			break;		// GetNysePreviousImbalance
+		}	// switch
 		return UNKNOWNMSG;
 	}
 
@@ -348,6 +599,21 @@ namespace TradeLibFast
 		f.push_back(TICKNOTIFY);
 		f.push_back(EXECUTENOTIFY);
 		f.push_back(ORDERNOTIFY);
+
+		// added 2009.01.17
+		f.push_back(VWAP);	// GetVwap
+		f.push_back(LASTTRADESIZE);	// GetLastTradeSize
+		f.push_back(LASTTRADEPRICE);	// GetLastTradePrice
+		f.push_back(LASTBID);			// GetBid
+		f.push_back(LASTASK);			// GetAsk
+		f.push_back(BIDSIZE);		// GetBidSize
+		f.push_back(ASKSIZE);		// GetAskSize
+		f.push_back(DAYLOW);			// GetDayLow
+		f.push_back(DAYHIGH);		// GetDayHigh
+		f.push_back(OPENPRICE);		// GetOpenPrice
+		f.push_back(CLOSEPRICE);		// GetClosePrice - yesterday
+		f.push_back(LRPBUY);			// GetLRP - both sides
+		f.push_back(LRPSELL);
 		return f;
 	}
 
@@ -505,36 +771,3 @@ namespace TradeLibFast
 
 }
 
-/*
-
-	int GetStockI(CString msg, int funct) {
-		const char* symbol = (LPCTSTR)msg;
-		const StockBase* Stock = B_GetStockHandle(symbol);
-		int s = 0;
-		if (Stock) {
-			if (funct==LASTSIZE) s = Stock->GetLastTradeSize();
-		}
-		return s;
-	}
-
-	long GetStockF(CString msg, int funct) {
-		const char* symbol = (LPCTSTR)msg;
-		const StockBase* Stock = B_GetStockHandle(symbol);
-		Money& p = Money(0,0);
-		long price = 0;
-		if (Stock) {
-			if (funct==LRPBID) p = Stock->GetLRP(true); // true = bid
-			else if (funct==LRPASK) p = Stock->GetLRP(false); // false = ask
-			else if (funct==LASTTRADE) p = Stock->GetLastTradePrice();
-			else if (funct==NDAYHIGH) p = Stock->GetNyseDayHigh();
-			else if (funct==NDAYLOW) p = Stock->GetNyseDayLow();
-			else if (funct==OPENPRICE) p = Stock->GetOpenPrice();
-			else if (funct==CLOSEPRICE) p = Stock->GetTodaysClosePrice();
-			else if (funct==YESTCLOSE) p = Stock->GetClosePrice();
-			price = MoneyToPacked(p);
-		}
-		return price;
-	}
-
-
-*/
