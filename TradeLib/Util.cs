@@ -390,21 +390,32 @@ namespace TradeLib
         public const string BROKERSERVER = "BrokerServer";
         public const string TRADELINKSUITE = "TradeLinkSuite";
         /// <summary>
-        /// Gets latest version number of an application located on tradelink project site.
+        /// Gets latest version number of an application's exe file, when version is embedded in file name like 'MyAppName-123.exe', and can be found at URL.
         /// </summary>
+        /// <param name="URL">URL of the location to get versions from</param>
         /// <param name="Application">Util.BROKERSERVER|Util.TRADELINKSUITE</param>
         /// <returns></returns>
         public static int LatestVersion(string Application)
         {
+            const string TLSITE = "http://code.google.com/p/tradelink/";
+            return LatestVersion(TLSITE, Application);
+        }
+        public static int LatestVersion(string URL, string Application)
+        {
             var wc = new WebClient();
             int ver = 0;
-            const string URL= "http://franta.com/projects/tradelink/ver.cgi?a=";
             try
             {
-                string res = wc.DownloadString(URL + Application);
-                ver = Convert.ToInt32(res);
+                string res = wc.DownloadString(URL);
+                MatchCollection mc = Regex.Matches(res, Application + @"-([0-9]+).exe");
+                foreach (Match m in mc)
+                {
+                    string r = m.Result("$1");
+                    int v = Convert.ToInt32(r);
+                    if (v>ver) ver = v;
+                }
             }
-            catch (Exception) { return ver; }
+            catch (Exception ex) { return ver; }
             return ver;
         }
         /// <summary>
@@ -424,6 +435,7 @@ namespace TradeLib
         /// <returns></returns>
         public static bool ExistsNewBS(TLClient_WM tl)
         {
+            if (tl == null) return false;
             if (tl.LinkType == TLTypes.NONE) return false;
             int latest = 0;
             if (tl.LinkType== TLTypes.HISTORICALBROKER)
