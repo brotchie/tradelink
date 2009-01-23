@@ -70,7 +70,7 @@ DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 extern "C" {
 #endif
 
-	int SendOrder(std::string sym, bool side, int size, double price, double stop, int id)
+	int TLSendOrder(std::string sym, bool side, int size, double price, double stop, int id)
 	{
 		TLClient_WM tl;
 		TLOrder o;
@@ -83,7 +83,7 @@ extern "C" {
 		int error = tl.SendOrder(o);
 		return error;
 	}
-	void SendCancel(int orderid)
+	void TLSendCancel(int orderid)
 	{
 		TLClient_WM tl;
 		tl.CancelOrder(orderid);
