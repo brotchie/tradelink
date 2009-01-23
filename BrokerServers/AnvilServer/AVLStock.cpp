@@ -102,7 +102,7 @@ void AVLStock::Load()
 		bidi = B_CreateLevel2AndBookIterator(m_stockHandle, true, false,false, booki, 1, this);
 		aski = B_CreateLevel2AndBookIterator(m_stockHandle, false, false,false, booki, 1, this);
 		B_TransactionIteratorSetStock(pnti, m_stockHandle, this);
-		if (m_stockHandle->isLoaded())
+		if (isLoaded())
 		{
 			TradeNotify();
 			QuoteNotify();
@@ -113,7 +113,7 @@ void AVLStock::Load()
 
 void AVLStock::QuoteNotify()
 {
-	if (m_stockHandle)
+	if (isLoaded())
 	{
 			time_t now;
 			time(&now);
@@ -144,7 +144,7 @@ void AVLStock::QuoteNotify()
 }
 void AVLStock::TradeNotify()
 {
-	if (m_stockHandle)
+	if (isLoaded())
 	{
 			time_t now;
 			time(&now);
