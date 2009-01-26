@@ -70,7 +70,7 @@ DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 extern "C" {
 #endif
 
-	int TLSendOrder(std::string sym, bool side, int size, double price, double stop, int id, std::string account)
+	int TLSendOrder(std::string sym, bool side, int size, double price, double stop, int id, std::string account, std::string exchange)
 	{
 		TLClient_WM tl;
 		TLOrder o;
@@ -81,6 +81,8 @@ extern "C" {
 		o.stop = stop;
 		o.id = id;
 		o.account = CString(account.c_str());
+		if (exchange!="")
+			o.exchange = CString(exchange.c_str());
 		int error = tl.SendOrder(o);
 		return error;
 	}
