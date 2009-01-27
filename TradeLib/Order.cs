@@ -231,6 +231,7 @@ namespace TradeLib
             r &= Security == o.Security;
             return r;
         }
+        public static uint Unique { get { return (uint)((decimal)DateTime.Now.TimeOfDay.TotalMilliseconds); } }
     }
 
     public enum OrderField
