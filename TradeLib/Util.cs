@@ -459,7 +459,12 @@ namespace TradeLib
             if (t) p.Add(Util.TRADELINKSUITE);
             if (b) p.Add(Util.BROKERSERVER);
             if ((t || b) && displayalert)
-                System.Windows.Forms.MessageBox.Show("There are new versions available for: " + string.Join(",", p.ToArray()) + Environment.NewLine + "Download using TradeLink Update tool, or from http://tradelink.googlecode.com", "New versions of software available.");
+            {
+                string ps = string.Join(",",p.ToArray());
+                NewVersion nv = new NewVersion(ps, "http://tradelink.googlecode.com", "Grab new versions of: " + ps+Environment.NewLine+"Or run TradeLink Update.");
+                nv.Show();
+            }
+
             return t || b;
         }
         

@@ -71,6 +71,12 @@
     <Compile Include="LimitOrder.cs" />
     <Compile Include="MarketBasket.cs" />
     <Compile Include="MarketOrder.cs" />
+    <Compile Include="NewVersion.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NewVersion.Designer.cs">
+      <DependentUpon>NewVersion.cs</DependentUpon>
+    </Compile>
     <Compile Include="Order.cs" />
     <Compile Include="ParamPrompt.cs">
       <SubType>Form</SubType>
@@ -117,6 +123,9 @@
   <ItemGroup>
     <EmbeddedResource Include="EarlyClose.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NewVersion.resx">
+      <DependentUpon>NewVersion.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Ticket.resx">
       <DependentUpon>Ticket.cs</DependentUpon>
