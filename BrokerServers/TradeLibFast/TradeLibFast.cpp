@@ -81,8 +81,9 @@ extern "C" {
 		o.stop = stop;
 		o.id = id;
 		o.account = CString(account.c_str());
-		if (exchange!="")
-			o.exchange = CString(exchange.c_str());
+		CString ex = CString(exchange.c_str());
+		if (ex!="")
+			o.exchange = ex;
 		int error = tl.SendOrder(o);
 		return error;
 	}
