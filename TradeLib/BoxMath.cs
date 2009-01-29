@@ -99,6 +99,72 @@ namespace TradeLib
         {
             return side ? AvgPrice + offset : AvgPrice - offset;
         }
+        /// <summary>
+        /// Defaults to 100% of position at target.
+        /// </summary>
+        /// <param name="p">your position</param>
+        /// <param name="offset">your target</param>
+        /// <returns>profit taking limit order</returns>
+        public static Order PositionProfit(Position p, decimal offset) { return PositionProfit(p, offset, 1, false, 1); }
+        /// <summary>
+        /// Generates profit taking order for a given position, at a specified per-share profit target.  
+        /// </summary>
+        /// <param name="p">your position</param>
+        /// <param name="offset">target price, per share/contract</param>
+        /// <param name="percent">percent of the position to close with this order</param>
+        /// <returns></returns>
+        public static Order PositionProfit(Position p, decimal offset, decimal percent) { return PositionProfit(p, offset, percent, false, 1); }
+        /// <summary>
+        /// Generates profit taking order for a given position, at a specified per-share profit target.  
+        /// </summary>
+        /// <param name="p">your position</param>
+        /// <param name="offset">target price, per share/contract</param>
+        /// <param name="percent">percent of the position to close with this order</param>
+        /// <param name="normalizesize">whether to normalize order to be an even-lot trade</param>
+        /// <param name="MINSIZE">size of an even lot</param>
+        /// <returns></returns>
+        public static Order PositionProfit(Position p, decimal offset, decimal percent, bool normalizesize, int MINSIZE)
+        {
+            Order o = new Order();
+            if (!p.isValid || p.isFlat) return o;
+            decimal price = OffsetPrice(p,Math.Abs(offset));
+            int size = !normalizesize ? (int)(p.FlatSize * percent) : Norm2Min(p.FlatSize*percent,MINSIZE);
+            o = new LimitOrder(p.Symbol, !p.isLong, size, price);
+            return o;
+        }
+        /// <summary>
+        /// Generate a stop order for a position, at a specified per-share/contract price.  Defaults to 100% of position.
+        /// </summary>
+        /// <param name="p">your position</param>
+        /// <param name="offset">how far away stop is</param>
+        /// <returns></returns>
+        public static Order PositionStop(Position p, decimal offset) { return PositionStop(p,offset,1,false,1); }
+        /// <summary>
+        /// Generate a stop order for a position, at a specified per-share/contract price
+        /// </summary>
+        /// <param name="p">your position</param>
+        /// <param name="offset">how far away stop is</param>
+        /// <param name="percent">what percent of position to close</param>
+        /// <returns></returns>
+        public static Order PositionStop(Position p, decimal offset, decimal percent) { return PositionStop(p, offset, percent, false, 1); }
+        /// <summary>
+        /// Generate a stop order for a position, at a specified per-share/contract price
+        /// </summary>
+        /// <param name="p">your position</param>
+        /// <param name="offset">how far away stop is</param>
+        /// <param name="percent">what percent of position to close</param>
+        /// <param name="normalizesize">whether to normalize size to even-lots</param>
+        /// <param name="MINSIZE">size of an even lot</param>
+        /// <returns></returns>
+        public static Order PositionStop(Position p, decimal offset, decimal percent, bool normalizesize, int MINSIZE)
+        {
+            Order o = new Order();
+            if (!p.isValid || p.isFlat) return o;
+            decimal price = OffsetPrice(p, Math.Abs(offset)*-1);
+            int size = !normalizesize ? (int)(p.FlatSize * percent) : Norm2Min(p.FlatSize * percent, MINSIZE);
+            o = new StopOrder(p.Symbol, !p.isLong, size, price);
+            return o;
+        }
 
     }
 }
