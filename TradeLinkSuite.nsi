@@ -4,7 +4,7 @@ XPStyle on
 CRCCheck force
 ShowInstDetails show
 SetOverWrite on
-Icon "tradelinkinstaller.ico"
+Icon "InstallSuite\tradelinkinstaller.ico"
 
 ; The file to write
 OutFile "TradeLinkSuite.exe"
@@ -53,31 +53,30 @@ Section "TradeLinkSuite"
   
   ; Put file there
   File "VERSION.txt"
-  File "Update.exe"  
-  File "Kadina.exe"
-  File "Kadina.exe.config"
-  File "Replay.exe"
-  File "SterServer.exe"
-  File Interop.SterlingLib.dll
-  File "Responses.dll"
-  File "Quotopia.exe"
-  File "Quotopia.exe.config"
-  File "Multimedia.dll"
-  File "TradeLib.dll"
-  File "Gauntlet.exe"
-  File "Gauntlet.exe.config"
-  File "EarlyClose.csv"
-  File "Chartographer.exe.config"
-  File "Chartographer.exe"
-  File "TimeSales.exe"
-  File "SplitEPF.exe"
-  File "Tattle.exe"
-  File "Tript.exe"
-  File "ASP.exe"
-  File "Tript.exe.settings.xml"
-  File "ResearchLib.dll"
-  File "Record.exe"
-  File /r /x ".svn" "Properties"
+  File "Update\bin\release\Update.exe"  
+  File "Kadina\bin\release\Kadina.exe"
+  File "Kadina\bin\release\Kadina.exe.config"
+  File "Replay\bin\release\Replay.exe"
+  File "SterServer\bin\release\SterServer.exe"
+  File "SterServer\Interop.SterlingLib.dll"
+  File "Responses\bin\release\Responses.dll"
+  File "Quotopia\bin\release\Quotopia.exe"
+  File "Quotopia\bin\release\Quotopia.exe.config"
+  File "Quotopia\bin\release\Multimedia.dll"
+  File "TradeLib\bin\release\TradeLib.dll"
+  File "Gauntlet\bin\release\Gauntlet.exe"
+  File "Gauntlet\bin\release\Gauntlet.exe.config"
+  File "Gauntlet\bin\release\EarlyClose.csv"
+  File "Chartographer\bin\release\Chartographer.exe.config"
+  File "Chartographer\bin\release\Chartographer.exe"
+  File "TimeAndSales\bin\release\TimeSales.exe"
+  File "SplitEPF\bin\release\SplitEPF.exe"
+  File "Tattle\bin\release\Tattle.exe"
+  File "Tript\bin\release\Tript.exe"
+  File "Tript\bin\release\Tript.exe.settings.xml"
+  File "ASP\bin\release\ASP.exe"
+  File "ResearchLib\bin\release\ResearchLib.dll"
+  File "Record\bin\release\Record.exe"
   ; Write the installation path into the registry
   WriteRegStr HKLM SOFTWARE\TradeLinkSuite "Install_Dir" "$INSTDIR"
   	
@@ -135,7 +134,7 @@ Function .onInit
 
   ; plugins dir should be automatically removed after installer runs
   InitPluginsDir
-  File /oname=$PLUGINSDIR\splash.bmp "tradelinklogo.bmp"
+  File /oname=$PLUGINSDIR\splash.bmp "InstallSuite\tradelinklogo.bmp"
   splash::show 1000 $PLUGINSDIR\splash
 
   Pop $0 ; $0 has '1' if the user closed the splash screen early,
