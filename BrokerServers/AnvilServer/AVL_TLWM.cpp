@@ -472,11 +472,12 @@ namespace TradeLibFast
 		{
 			vector<int> now;
 			id = GetTickCount();
+			while (!IdIsUnique(id))
+				id--;
 		}
 		for (unsigned int i = 0; i<ordercache.size(); i++)
 			if (ordercache[i]==o) 
 				return false; // already had this order, fail
-		if (!IdIsUnique(id)) return false; // if id has already been used, fail
 		ordercache.push_back(o); // save the order
 		orderids.push_back(id); // save the id
 		return true; // didn't find order so we added it and returned index
