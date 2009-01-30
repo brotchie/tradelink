@@ -28,8 +28,8 @@ namespace ResearchLib
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.urlbox = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.urlnamebox = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.okbut = new System.Windows.Forms.Button();
@@ -38,6 +38,8 @@ namespace ResearchLib
             this.nasdaqbut = new System.Windows.Forms.CheckBox();
             this.allsymbolsbut = new System.Windows.Forms.RadioButton();
             this.linkedonlybut = new System.Windows.Forms.RadioButton();
+            this.fileurlbut = new System.Windows.Forms.CheckBox();
+            this.tipurl = new System.Windows.Forms.ToolTip(this.components);
             this.SuspendLayout();
             // 
             // urlbox
@@ -52,16 +54,6 @@ namespace ResearchLib
             this.urlbox.DragDrop += new System.Windows.Forms.DragEventHandler(this.urlbox_DragDrop);
             this.urlbox.DragOver += new System.Windows.Forms.DragEventHandler(this.urlbox_DragOver);
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(2, 45);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(58, 20);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "Url/File";
-            this.label1.DoubleClick += new System.EventHandler(this.urlbox_DoubleClick);
-            // 
             // urlnamebox
             // 
             this.urlnamebox.FormattingEnabled = true;
@@ -70,6 +62,7 @@ namespace ResearchLib
             this.urlnamebox.Name = "urlnamebox";
             this.urlnamebox.Size = new System.Drawing.Size(174, 28);
             this.urlnamebox.TabIndex = 2;
+            this.tipurl.SetToolTip(this.urlnamebox, "Save or restore locations");
             this.urlnamebox.SelectedIndexChanged += new System.EventHandler(this.urlnamebox_SelectedIndexChanged);
             // 
             // label2
@@ -112,7 +105,7 @@ namespace ResearchLib
             this.nysebut.Location = new System.Drawing.Point(12, 79);
             this.nysebut.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.nysebut.Name = "nysebut";
-            this.nysebut.Size = new System.Drawing.Size(72, 24);
+            this.nysebut.Size = new System.Drawing.Size(75, 24);
             this.nysebut.TabIndex = 6;
             this.nysebut.Text = "NYSE";
             this.nysebut.UseVisualStyleBackColor = true;
@@ -123,7 +116,7 @@ namespace ResearchLib
             this.nasdaqbut.Location = new System.Drawing.Point(12, 112);
             this.nasdaqbut.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.nasdaqbut.Name = "nasdaqbut";
-            this.nasdaqbut.Size = new System.Drawing.Size(73, 24);
+            this.nasdaqbut.Size = new System.Drawing.Size(76, 24);
             this.nasdaqbut.TabIndex = 7;
             this.nasdaqbut.Text = "NASD";
             this.nasdaqbut.UseVisualStyleBackColor = true;
@@ -134,10 +127,11 @@ namespace ResearchLib
             this.allsymbolsbut.Location = new System.Drawing.Point(111, 78);
             this.allsymbolsbut.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.allsymbolsbut.Name = "allsymbolsbut";
-            this.allsymbolsbut.Size = new System.Drawing.Size(105, 24);
+            this.allsymbolsbut.Size = new System.Drawing.Size(108, 24);
             this.allsymbolsbut.TabIndex = 8;
             this.allsymbolsbut.TabStop = true;
             this.allsymbolsbut.Text = "All symbols";
+            this.tipurl.SetToolTip(this.allsymbolsbut, "Imports all found symbols");
             this.allsymbolsbut.UseVisualStyleBackColor = true;
             // 
             // linkedonlybut
@@ -147,11 +141,25 @@ namespace ResearchLib
             this.linkedonlybut.Location = new System.Drawing.Point(111, 111);
             this.linkedonlybut.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.linkedonlybut.Name = "linkedonlybut";
-            this.linkedonlybut.Size = new System.Drawing.Size(125, 24);
+            this.linkedonlybut.Size = new System.Drawing.Size(128, 24);
             this.linkedonlybut.TabIndex = 9;
             this.linkedonlybut.TabStop = true;
             this.linkedonlybut.Text = "Clickable Only";
+            this.tipurl.SetToolTip(this.linkedonlybut, "For URLs, only hyperlinked symbols are imported");
             this.linkedonlybut.UseVisualStyleBackColor = true;
+            // 
+            // fileurlbut
+            // 
+            this.fileurlbut.Appearance = System.Windows.Forms.Appearance.Button;
+            this.fileurlbut.AutoSize = true;
+            this.fileurlbut.Location = new System.Drawing.Point(8, 40);
+            this.fileurlbut.Name = "fileurlbut";
+            this.fileurlbut.Size = new System.Drawing.Size(56, 30);
+            this.fileurlbut.TabIndex = 10;
+            this.fileurlbut.Text = "URL:";
+            this.tipurl.SetToolTip(this.fileurlbut, "Click to get basket from file instead of by URL.");
+            this.fileurlbut.UseVisualStyleBackColor = true;
+            this.fileurlbut.CheckedChanged += new System.EventHandler(this.fileurlbut_CheckedChanged);
             // 
             // FetchBasket
             // 
@@ -160,6 +168,7 @@ namespace ResearchLib
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cancelbut;
             this.ClientSize = new System.Drawing.Size(248, 186);
+            this.Controls.Add(this.fileurlbut);
             this.Controls.Add(this.linkedonlybut);
             this.Controls.Add(this.allsymbolsbut);
             this.Controls.Add(this.nasdaqbut);
@@ -168,7 +177,6 @@ namespace ResearchLib
             this.Controls.Add(this.okbut);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.urlnamebox);
-            this.Controls.Add(this.label1);
             this.Controls.Add(this.urlbox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -182,7 +190,6 @@ namespace ResearchLib
         #endregion
 
         private System.Windows.Forms.TextBox urlbox;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox urlnamebox;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button okbut;
@@ -191,5 +198,7 @@ namespace ResearchLib
         private System.Windows.Forms.CheckBox nasdaqbut;
         private System.Windows.Forms.RadioButton allsymbolsbut;
         private System.Windows.Forms.RadioButton linkedonlybut;
+        private System.Windows.Forms.CheckBox fileurlbut;
+        private System.Windows.Forms.ToolTip tipurl;
     }
 }

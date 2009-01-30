@@ -21,6 +21,7 @@ namespace ResearchLib
             foreach (FetchTarget ft in recentlist)
                 urlnamebox.Items.Add(ft);
             urlnamebox.Items.Add("");
+
         }
         public bool NameInUse(string newname)
         {
@@ -95,17 +96,7 @@ namespace ResearchLib
 
         private void urlbox_DoubleClick(object sender, EventArgs e)
         {
-            OpenFileDialog od = new OpenFileDialog();
-            od.Multiselect = false;
-            od.Title = "Select a file to import stocks from";
-            DialogResult res = od.ShowDialog();
-            if (res == DialogResult.OK)
-            {
-                _ft.File = od.FileName;
-                urlbox.Text = od.FileName;
 
-                
-            }
             // otherwise do nothing
         }
 
@@ -123,6 +114,27 @@ namespace ResearchLib
                 urlbox.Text = (string)e.Data.GetData(DataFormats.Text);
             }
             catch (Exception) { }
+        }
+
+        private void fileurlbut_CheckedChanged(object sender, EventArgs e)
+        {
+            if (fileurlbut.Checked)
+            {
+                fileurlbut.Text = "File";
+                OpenFileDialog od = new OpenFileDialog();
+                od.Multiselect = false;
+                od.Title = "Select a file to import stocks from";
+                DialogResult res = od.ShowDialog();
+                if (res == DialogResult.OK)
+                {
+                    _ft.File = od.FileName;
+                    urlbox.Text = od.FileName;
+
+
+                }
+            }
+            else
+                fileurlbut.Text = "URL";
         }
     }
 }
