@@ -67,28 +67,36 @@ DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 }
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"  {
 #endif
 
-	int TLSendOrder(std::string sym, bool side, int size, double price, double stop, int id, std::string account, std::string exchange)
+	int __stdcall TLSENDORDER(LPSTR sym, BOOL side, int size, double price, double stop, int id, LPSTR account, LPSTR exchange)
 	{
+		// we need this line here in order to create windows from this dll
+		if (!AfxWinInit(::GetModuleHandle(NULL), NULL, ::GetCommandLine(), 0))
+			return -1;
+
 		TLClient_WM tl;
 		TLOrder o;
-		o.symbol = CString(sym.c_str());
+		o.symbol = sym;
 		o.side = side;
 		o.size = abs(size);
 		o.price = price;
 		o.stop = stop;
 		o.id = id;
-		o.account = CString(account.c_str());
-		CString ex = CString(exchange.c_str());
+		o.account = account;
+		CString ex = exchange;
 		if (ex!="")
 			o.exchange = ex;
 		int error = tl.SendOrder(o);
 		return error;
 	}
-	void TLSendCancel(int orderid)
+	void __stdcall TLSENDCANCEL(int orderid)
 	{
+		// we need this line here in order to create windows from this dll
+		if (!AfxWinInit(::GetModuleHandle(NULL), NULL, ::GetCommandLine(), 0))
+			return;
+
 		TLClient_WM tl;
 		tl.CancelOrder(orderid);
 	}
