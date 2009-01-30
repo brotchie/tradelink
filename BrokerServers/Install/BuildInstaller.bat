@@ -4,13 +4,13 @@ FOR /F "tokens=2 skip=4" %%G IN ('svn info --revision HEAD') DO ^
 IF NOT DEFINED REVISION SET REVISION=%%G
 echo Building installer for BrokerServer-%REVISION%
 echo Removing last installer...
-del BrokerServer*.exe
+del BrokerServer*.exe > NUL
 echo %REVISION% >> VERSION.txt
 echo Getting latest releases...
 echo.
 set ANVILDIR=AnvilRelease_x32_2_7_0_5
 echo ANVILSERVER %ANVILDIR%
-xcopy /q /y ..\AnvilServer\Release\AnvilServer.dll %ANVILDIR%
+xcopy /q /y ..\AnvilServer\Release\AnvilServer.dll %ANVILDIR% > NUL
 echo.
 echo IBSERVER
 xcopy /q /y ..\Release\TWSServer.exe . > NUL
