@@ -13,9 +13,9 @@ echo ANVILSERVER %ANVILDIR%
 xcopy /q /y ..\AnvilServer\Release\AnvilServer.dll %ANVILDIR%
 echo.
 echo IBSERVER
-xcopy /q /y ..\Release\TWSServer.exe .
-xcopy /q /y ..\Release\TWSServer.Config.txt .
-xcopy /q /y ..\Release\TradeLibFast.dll
+xcopy /q /y ..\Release\TWSServer.exe . > NUL
+xcopy /q /y ..\Release\TWSServer.Config.txt . > NUL
+xcopy /q /y ..\Release\TradeLibFast.dll > NUL
 echo.
 
 if not exist "c:\progra~1\nsis\makensis.exe" (
@@ -29,21 +29,21 @@ goto :eof
 ) else (
 echo NSIS found.  Building installer...
 echo.
-c:\progra~1\nsis\makensis.exe /v1 BrokerServer.nsi
+c:\progra~1\nsis\makensis.exe /v1 BrokerServer.nsi > NUL
 )
 
 if exist BrokerServer.exe (
 echo Installer build completed.
 echo.
 echo Removing working releases...
-ren BrokerServer.exe BrokerServer.tmp
-ren TwsSocketClient.dll SC.tmp
-del *.exe
-del *.dll
-del VERSION.txt
-del Tws*.txt
-ren BrokerServer.tmp BrokerServer-%REVISION%.exe
-ren SC.tmp TwsSocketClient.dll
+ren BrokerServer.exe BrokerServer.tmp > NUL
+ren TwsSocketClient.dll SC.tmp > NUL
+del *.exe > NUL
+del *.dll > NUL
+del VERSION.txt > NUL
+del Tws*.txt > NUL
+ren BrokerServer.tmp BrokerServer-%REVISION%.exe > NUL
+ren SC.tmp TwsSocketClient.dll > NUL
 ) else (
 echo Installer failed, see errors above!
 echo.
