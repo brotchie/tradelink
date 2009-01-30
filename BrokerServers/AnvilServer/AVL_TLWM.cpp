@@ -473,7 +473,10 @@ namespace TradeLibFast
 			vector<int> now;
 			id = GetTickCount();
 			while (!IdIsUnique(id))
+			{
+				if (id<2) id = 4000000000;
 				id--;
+			}
 		}
 		for (unsigned int i = 0; i<ordercache.size(); i++)
 			if (ordercache[i]==o) 
