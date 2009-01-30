@@ -14,7 +14,7 @@ using System.Windows.Forms;
 namespace TradeLib
 {
 	/// <summary>
-	/// Param Prompts use .NET property grids to allow users to edit box properties from a GUI interface without needing to edit source code.
+	/// Param Prompt quickly creates a GUI to edit properties of your Response
 	/// </summary>
 	public partial class ParamPrompt : Form
 	{
@@ -22,9 +22,9 @@ namespace TradeLib
         private PropertyGrid propertyGrid1;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ParamPrompt"/> class.
+        /// You create a param prompt to display a gui for your Response
         /// </summary>
-        /// <param name="DisplayParamsOfObject">The Box for which you want the user to specify or alter the properties for.</param>
+        /// <param name="DisplayParamsOfObject">The Response for which you want the user to specify or alter the properties for.</param>
 		public ParamPrompt(Response DisplayParamsOfObject)
 		{
 			//

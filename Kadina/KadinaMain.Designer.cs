@@ -31,7 +31,7 @@ namespace Kadina
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(kadinamain));
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.recent = new System.Windows.Forms.ToolStripDropDownButton();
-            this.boxlist = new System.Windows.Forms.ToolStripDropDownButton();
+            this.reslist = new System.Windows.Forms.ToolStripDropDownButton();
             this.playtobut = new System.Windows.Forms.ToolStripDropDownButton();
             this.filter = new System.Windows.Forms.ToolStripSplitButton();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -60,7 +60,7 @@ namespace Kadina
             this.statusStrip1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.recent,
-            this.boxlist,
+            this.reslist,
             this.playtobut,
             this.filter});
             this.statusStrip1.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.VerticalStackWithOverflow;
@@ -85,14 +85,14 @@ namespace Kadina
             // 
             // boxlist
             // 
-            this.boxlist.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.boxlist.Image = ((System.Drawing.Image)(resources.GetObject("boxlist.Image")));
-            this.boxlist.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.boxlist.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.boxlist.Name = "boxlist";
-            this.boxlist.Size = new System.Drawing.Size(79, 29);
-            this.boxlist.Text = "Boxes";
-            this.boxlist.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.reslist.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.reslist.Image = ((System.Drawing.Image)(resources.GetObject("boxlist.Image")));
+            this.reslist.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.reslist.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.reslist.Name = "boxlist";
+            this.reslist.Size = new System.Drawing.Size(79, 29);
+            this.reslist.Text = "Responses";
+            this.reslist.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // playtobut
             // 
@@ -284,7 +284,7 @@ namespace Kadina
         #endregion
 
         private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.ToolStripDropDownButton boxlist;
+        private System.Windows.Forms.ToolStripDropDownButton reslist;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabmsg;
         private System.Windows.Forms.RichTextBox msgbox;

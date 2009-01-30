@@ -3,7 +3,7 @@ using System;
 
 namespace TradeLib
 {
-    public class BoxMath
+    public class Calc
     {
         /// <summary>
         /// Gets the open PL on a per-share basis, ignoring the size of the position.

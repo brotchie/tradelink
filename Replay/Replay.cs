@@ -81,7 +81,7 @@ namespace Replay
             decimal totalopenpl = 0;
             foreach (Position p in posdict.Values)
                 if (!p.isFlat)
-                    totalopenpl += BoxMath.OpenPL(last[p.Symbol], p);
+                    totalopenpl += Calc.OpenPL(last[p.Symbol], p);
             return totalopenpl;
         }
 

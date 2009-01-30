@@ -4,7 +4,7 @@ using System.Text;
 using NUnit.Framework;
 using TradeLib;
 
-namespace BoxExamples
+namespace Responses
 {
     [TestFixture]
     public class TestBlade

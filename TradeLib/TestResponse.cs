@@ -37,7 +37,7 @@ namespace TestTradeLib
             sbcount = 0;
             Assert.That(b.isValid);
             Assert.That(sbcount == 0);
-            // default box does not trade
+            // default response does not trade
             // for every tick that it trades
             for (int i = 0; i < timesales.Length; i++)
             {
@@ -97,7 +97,7 @@ namespace TestTradeLib
             }
         }
 
-        // make sure this box generates an order for every trade
+        // make sure this response generates an order for every trade
         [Test]
         public void AlwaysEnter()
         {
@@ -146,7 +146,7 @@ namespace TestTradeLib
         public void NewsTest()
         {
             // subscribe to news service that will count everytime a debug is sent
-            Always b = new Always(); // send debugs from this box to our news service
+            Always b = new Always(); // send debugs from reponse to our news service
             b.SendDebug += new DebugFullDelegate(b_SendDebug);
             b.SendOrder+=new OrderDelegate(b_SendOrder);
             int good = 0;

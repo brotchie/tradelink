@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using TradeLib;
 
-namespace BoxExamples
+namespace Responses
 {
     // you can copy+paste this to get a working response w/o all the comments
     public class EmptyResponseTemplate : Response

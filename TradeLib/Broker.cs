@@ -405,7 +405,7 @@ namespace TradeLib
             if (!MasterTrades.ContainsKey(account.ID)) return points;
             foreach (Trade t in MasterTrades[account.ID])
             {
-                points += BoxMath.ClosePT(pos, t);
+                points += Calc.ClosePT(pos, t);
                 pos.Adjust(t);
             }
             return points;
@@ -433,7 +433,7 @@ namespace TradeLib
                     poslist.Add(trade.symbol, new Position(trade.symbol));
                     ptlist.Add(trade.symbol, 0);
                 }
-                ptlist[trade.symbol] += BoxMath.ClosePT(poslist[trade.symbol], trade);
+                ptlist[trade.symbol] += Calc.ClosePT(poslist[trade.symbol], trade);
                 poslist[trade.symbol].Adjust(trade);
             }
             decimal points = 0;

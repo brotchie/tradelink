@@ -59,7 +59,7 @@ Section "TradeLinkSuite"
   File "Replay.exe"
   File "SterServer.exe"
   File Interop.SterlingLib.dll
-  File "BoxExamples.dll"
+  File "Responses.dll"
   File "Quotopia.exe"
   File "Quotopia.exe.config"
   File "Multimedia.dll"

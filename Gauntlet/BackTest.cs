@@ -27,7 +27,7 @@ namespace WinGauntlet
         public bool debug = false;
         private bool _idx = true;
         public int time;
-        public string aname = "c:\\program files\\tradelink\\tradelinksuite\\box.dll";
+        public string aname = "c:\\program files\\tradelink\\tradelinksuite\\Responses.dll";
         public eSigTick tick = new eSigTick();
         public int bint = 5;
         public bool UseIndex { get { return _idx; } set { _idx = value; } }
@@ -52,7 +52,7 @@ namespace WinGauntlet
         void BackTest_DoWork(object sender, DoWorkEventArgs e)
         {
             BackTestArgs arg = (BackTestArgs)e.Argument;
-            Test(arg.Files,arg.Box);
+            Test(arg.Files,arg.Res);
         }
         public void TickFile(string filename) 
         {
@@ -82,7 +82,7 @@ namespace WinGauntlet
 
         
 
-        public int Test(List<FileInfo> tf,Response mybox) 
+        public int Test(List<FileInfo> tf,Response myres) 
         {
             show("Starting run "+name+" containing "+ tf.Count + " symbols."+Environment.NewLine);
             int totfills = 0;
@@ -99,7 +99,7 @@ namespace WinGauntlet
                 show("Symbol " + this.symbol + " (" + i + " of " + tf.Count + ") ");
 
                 // reset per-symbol statistics
-                if (mybox!=null) mybox.Reset();
+                if (myres!=null) myres.Reset();
                 int fills = 0;
                 tick = new eSigTick(); // reset our tick
                 
@@ -115,12 +115,12 @@ namespace WinGauntlet
 
                     // execute any pending orders on this tick
                     if (mybroker.GetOrderList().Count>0) fills += mybroker.Execute(tick); 
-                    // trade box on this tick, if he generates any orders then send them
-                    if (mybox != null)
+                    // trade response on this tick, if he generates any orders then send them
+                    if (myres != null)
                     {
-                        mybox.GotTick(tick);
-                        // quit early if box shuts itself off and no pending orders
-                        if (!mybox.isValid && (mybroker.GetOrderList().Count == 0)) break;
+                        myres.GotTick(tick);
+                        // quit early if response becomes invalid and no pending orders
+                        if (!myres.isValid && (mybroker.GetOrderList().Count == 0)) break;
                     }
 
 
@@ -178,9 +178,9 @@ namespace WinGauntlet
 
     public class BackTestArgs
     {
-        public Response Box = new InvalidResponse();
+        public Response Res = new InvalidResponse();
         public List<FileInfo> Files = new List<FileInfo>();
-        public BackTestArgs(List<FileInfo> files, Response box) { Box = box; Files = files; }
+        public BackTestArgs(List<FileInfo> files, Response box) { Res = box; Files = files; }
     }
 
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using TradeLib;
 
-namespace BoxExamples
+namespace Responses
 {
     public class Blade : BarListIndicator
     {

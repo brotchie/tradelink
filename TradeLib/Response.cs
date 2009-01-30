@@ -4,7 +4,6 @@ using System.Text;
 
 namespace TradeLib
 {
-    // base template class for issue #32
     public interface Response
     {
         // Response input
@@ -34,10 +33,10 @@ namespace TradeLib
     {
 
         /// <summary>
-        /// Create a box from a DLL containing Box classes.  
+        /// Create a single Response from a DLL containing many Responses.  
         /// </summary>
-        /// <param name="boxname">The fully-qualified boxname (as in Box.FullName).</param>
-        /// <param name="dllname">The dllname.</param>
+        /// <param name="fullname">The fully-qualified Response Name (as in 'BoxExamples.Name').  </param>
+        /// <param name="dllname">The path and filename of DLL.</param>
         /// <returns></returns>
         public static Response FromDLL(string fullname, string dllname)
         {
@@ -50,10 +49,10 @@ namespace TradeLib
             return FromAssembly(a, fullname);
         }
         /// <summary>
-        /// Create a box from an Assembly containing Box classes.
+        /// Create a single Response from an Assembly containing many Responses. 
         /// </summary>
-        /// <param name="a">the assembly.</param>
-        /// <param name="boxname">The fully-qualified boxname.</param>
+        /// <param name="a">the assembly object</param>
+        /// <param name="boxname">The fully-qualified Response Name (as in Response.FullName).</param>
         /// <returns></returns>
         public static Response FromAssembly(System.Reflection.Assembly a, string fullname)
         {

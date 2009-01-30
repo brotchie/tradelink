@@ -1,16 +1,16 @@
 using System;
 using TradeLib;
 
-namespace BoxExamples
+namespace Responses
 {
     /// <summary>
-    /// This box will always enter long on every tick, unless he's already in a position.
+    /// This response will always enter long on every tick, unless he's already in a position.
     /// 
     /// If he's in a position, he will exit at pre-defined stop and loss targets.  (then get back in)
     /// 
-    /// Used for testing applications that use boxes.  (Quotopia, Gauntlet, etc)
+    /// Used for testing applications that use responsees.  (Quotopia, Gauntlet, etc)
     /// </summary>
-    public class AlwaysEnter : BlackBoxEasy
+    public class AlwaysEnter : BlackResponseEasy
     {
         public AlwaysEnter() : base() 
         {

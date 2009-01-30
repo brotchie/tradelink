@@ -14,9 +14,9 @@ namespace Kadina
     {
         Security sec = null;
         string tickfile = "";
-        string boxdll = "";
-        string boxname = "";
-        Response mybox;
+        string responsedll = "";
+        string resname = "";
+        Response myres;
         PlayTo pt = PlayTo.OneMin;
 
         DataTable dt = new DataTable("ticktable");
@@ -38,7 +38,7 @@ namespace Kadina
         public kadinamain()
         {
             InitializeComponent();
-            boxlist.DropDownItemClicked += new ToolStripItemClickedEventHandler(boxlist_DropDownItemClicked);
+            reslist.DropDownItemClicked += new ToolStripItemClickedEventHandler(boxlist_DropDownItemClicked);
             playtobut.DropDownItemClicked += new ToolStripItemClickedEventHandler(playtobut_DropDownItemClicked);
             InitPlayTo();
             InitTickGrid();
@@ -52,9 +52,11 @@ namespace Kadina
             bw.WorkerSupportsCancellation = true;
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(PlayComplete);
             status(Util.TLSIdentity());
-            debug("Drag and drop tick files and DLL containing boxes to test, or select from Recent menu.");
-            debug("Then select a box from Boxes list, and a PlayTo time.");
-            debug("Finally right click and click play to play to that time.");
+            debug("1. Drag and drop tick files, or select from Recent menu.");
+            debug("2. Drag and drop DLL containing Responses to test, or select from Recent menu.");
+            debug("3. Select a Response from Responses list.");
+            debug("4. PlayTo time.");
+            debug("5. Finally right click and click play to play to that time.");
         }
 
         void h_GotTick(Tick t)
@@ -103,7 +105,7 @@ namespace Kadina
         void rightplay(object sender, EventArgs e)
         {
             if (epffiles.Count==0) { status("You must select a tickfile to play."); return; }
-            if (mybox == null) { status("You must drop a box dll AND select a specific box from the Boxes menu."); return; }
+            if (myres == null) { status("You must drop a box dll AND select a specific box from the Boxes menu."); return; }
             if (!igridinit) InitIGrid();
             if (bw.IsBusy) { status("Play is already running..."); return; }
             bw.RunWorkerAsync(pt);
@@ -124,10 +126,10 @@ namespace Kadina
             tabControl1.Refresh();
             if (it != null) { it.Clear(); it.Columns.Clear(); }
             loadfile(tickfile);
-            loadfile(boxdll);
-            loadboxname(boxname);
-            if (mybox!=null) mybox.Reset();
-            status("Reset box " + mybox.Name + " for stock " + sec.Symbol);
+            loadfile(responsedll);
+            loadboxname(resname);
+            if (myres!=null) myres.Reset();
+            status("Reset box " + myres.Name + " for stock " + sec.Symbol);
         }
 
         bool igridinit = false;
@@ -232,10 +234,10 @@ namespace Kadina
 
         void InitIGrid()
         {
-            if ((mybox == null) || (mybox.Indicators.Length==0))
+            if ((myres == null) || (myres.Indicators.Length==0))
                 return;
-            for (int i = 0; i < mybox.Indicators.Length; i++)
-                it.Columns.Add(mybox.Indicators[i]);
+            for (int i = 0; i < myres.Indicators.Length; i++)
+                it.Columns.Add(myres.Indicators[i]);
 
             msgbox.Clear(); // clear the message box on first box run
             ig.Parent = itab;
@@ -339,7 +341,7 @@ namespace Kadina
             }
             else
             {
-                cpt = BoxMath.ClosePT(mypos, t);
+                cpt = Calc.ClosePT(mypos, t);
                 cpl = mypos.Adjust(t);
                 poslist[t.symbol] = mypos;
             }
@@ -400,60 +402,60 @@ namespace Kadina
 
         void boxlist_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            boxname = e.ClickedItem.Text;
-            loadboxname(boxname);
+            resname = e.ClickedItem.Text;
+            loadboxname(resname);
         }
 
         void loadboxname(string name)
         {
             try
             {
-                mybox = ResponseLoader.FromDLL(name, boxdll);
+                myres = ResponseLoader.FromDLL(name, responsedll);
             }
             catch (Exception ex) { debug(ex.Message); debug("Error, quitting..."); return; }
-            if ((mybox != null) && (mybox.FullName == name))
+            if ((myres != null) && (myres.FullName == name))
             {
-                mybox.SendDebug += new DebugFullDelegate(mybox_GotDebug);
-                mybox.SendCancel += new UIntDelegate(mybox_CancelOrderSource);
-                mybox.SendOrder += new OrderDelegate(mybox_SendOrder);
-                mybox.SendIndicators += new ObjectArrayDelegate(mybox_SendIndicators);
-                h.SimBroker.GotOrder += new OrderDelegate(mybox.GotOrder);
-                h.SimBroker.GotFill += new FillDelegate(mybox.GotFill);
-                h.GotTick += new TickDelegate(mybox.GotTick);
-                status(boxname + " is current box.");
+                myres.SendDebug += new DebugFullDelegate(myres_GotDebug);
+                myres.SendCancel += new UIntDelegate(myres_CancelOrderSource);
+                myres.SendOrder += new OrderDelegate(myres_SendOrder);
+                myres.SendIndicators += new ObjectArrayDelegate(myres_SendIndicators);
+                h.SimBroker.GotOrder += new OrderDelegate(myres.GotOrder);
+                h.SimBroker.GotFill += new FillDelegate(myres.GotFill);
+                h.GotTick += new TickDelegate(myres.GotTick);
+                status(resname + " is current response.");
             }
-            else status("Box did not load.");
+            else status("Response did not load.");
 
         }
 
-        void mybox_SendIndicators(object[] parameters)
+        void myres_SendIndicators(object[] parameters)
         {
-            if (mybox == null) return;
-            if (mybox.Indicators.Length == 0)
-                debug("No indicators defined on box " + mybox.Name);
+            if (myres == null) return;
+            if (myres.Indicators.Length == 0)
+                debug("No indicators defined on response: " + myres.Name);
             else
                 NewIRow(new object[] { parameters });
         }
 
-        void mybox_SendOrder(Order o)
+        void myres_SendOrder(Order o)
         {
             h.SimBroker.sendOrder(o);
         }
 
         void broker_GotOrderCancel(string sym, bool side, uint id)
         {
-            if (mybox != null)
-                mybox.GotOrderCancel(id);
+            if (myres != null)
+                myres.GotOrderCancel(id);
         }
 
-        void mybox_CancelOrderSource(uint number)
+        void myres_CancelOrderSource(uint number)
         {
             h.SimBroker.CancelOrder(number);
         }
 
-        void mybox_GotDebug(Debug msg)
+        void myres_GotDebug(Debug msg)
         {
-            debug(nowtime+":"+mybox.Name+" "+msg.Msg);
+            debug(nowtime+":"+myres.Name+" "+msg.Msg);
         }
 
 
@@ -478,17 +480,17 @@ namespace Kadina
          private bool loadfile(string path)
          {
              string f = path;
-            if (isBOX(f))
+            if (isResponse(f))
             {
-                boxdll = f;
-                boxlist.DropDownItems.Clear();
-                List<string> l = Util.GetBoxList(boxdll);
+                responsedll = f;
+                reslist.DropDownItems.Clear();
+                List<string> l = Util.GetResponseList(responsedll);
                 if (System.IO.File.Exists(f))
                     if (!isRecent(f))
                         recent.DropDownItems.Add(f);
                 for (int i = 0; i < l.Count; i++)
-                    boxlist.DropDownItems.Add(l[i]);
-                status("Found " + l.Count + " boxes in DLL.  Please select a box from Boxes Menu.");
+                    reslist.DropDownItems.Add(l[i]);
+                status("Found " + l.Count + " responses.  Please select one from Responses drop-down.");
                 return true;
             }
             else if (isEPF(f))
@@ -552,7 +554,7 @@ namespace Kadina
         }
 
         bool isEPF(string path) { return path.Contains("EPF")||path.Contains("epf"); }
-        bool isBOX(string path) { return path.Contains("DLL")||path.Contains("dll"); }
+        bool isResponse(string path) { return path.Contains("DLL")||path.Contains("dll"); }
 
         void PlayComplete(object sender, RunWorkerCompletedEventArgs e)
         {
@@ -608,7 +610,7 @@ namespace Kadina
         void browserecent(object sender, EventArgs e)
         {
             OpenFileDialog of = new OpenFileDialog();
-            of.Filter = "Box DLL (*.dll)|*.dll|TickFile (*.EPF)|*.EPF";
+            of.Filter = "Responses and TickFiles (*.dll;*.epf)|*.dll;*.epf|AllFiles|*.*";
             of.Multiselect = true;
             if (of.ShowDialog() == DialogResult.OK)
             {

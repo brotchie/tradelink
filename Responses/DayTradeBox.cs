@@ -4,9 +4,9 @@ using System.Text;
 using System.ComponentModel;
 using TradeLib;
 
-namespace BoxExamples
+namespace Responses
 {
-    public class DayTradeBox : Response
+    public class DayTradeResponse : Response
     {
         protected event TickDelegate gotTick;
         public event FillDelegate gotFill;
@@ -130,7 +130,7 @@ namespace BoxExamples
 
         public void GotOrder(Order o)
         {
-            // track orders sent from this box
+            // track orders sent from this response
             if (o.symbol != Symbol) return;
             if (o.side && !_buyids.Contains(o.id))
                 _buyids.Add(o.id);
@@ -144,7 +144,7 @@ namespace BoxExamples
         }
 
         /// <summary>
-        /// Reset this box instance.  (eg for another box run, a new trading day, etc)
+        /// Reset this response instance.  (eg for another response run, a new trading day, etc)
         /// </summary>
         public virtual void Reset()
         {
@@ -161,11 +161,11 @@ namespace BoxExamples
         private bool OrdersAllowed { get { return (_multipleorders || (!_multipleorders && (_pos.Size == _expectedpossize))); } }
 
         /// <summary>
-        /// Cancel all orders sent from this box
+        /// Cancel all orders sent from this response
         /// </summary>
         protected void CancelOrders() { CancelOrders(true); CancelOrders(false); }
         /// <summary>
-        /// Cancel all orders sent from a given side of this box.
+        /// Cancel all orders sent from a given side of this response.
         /// </summary>
         /// <param name="side">True to cancel long orders, false to cancel short orders</param>
         protected void CancelOrders(bool side)
@@ -179,7 +179,7 @@ namespace BoxExamples
                     SendCancel(id);
         }
         /// <summary>
-        /// Debugging facility for box.  Send text messages here to get picked up by other programs.
+        /// Debugging facility for response.  Send text messages here to get picked up by other programs.
         /// </summary>
         /// <param name="debug">your debugging message</param>
         protected void D(string debug) 
@@ -191,7 +191,7 @@ namespace BoxExamples
             }
         }
         /// <summary>
-        /// Status facility for this box.  Send status messages to get picked up by other programs.
+        /// Status facility for this response.  Send status messages to get picked up by other programs.
         /// </summary>
         /// <param name="status">your status message</param>
         protected void S(string status)
@@ -205,7 +205,7 @@ namespace BoxExamples
         }
 
         /// <summary>
-        /// Override this function to subclass this box with bar/position/shutdown features.
+        /// Override this function to subclass this response with bar/position/shutdown features.
         /// </summary>
         /// <param name="t">Most Recent Tick</param>
         /// <param name="bl">Current BarList</param>
@@ -214,7 +214,7 @@ namespace BoxExamples
 
 
         /// <summary>
-        /// Shutdowns the box so no more trades occur, with the specified debug message.
+        /// Shutdowns the response so no more trades occur, with the specified debug message.
         /// </summary>
         /// <param name="message">The message.</param>
         public void Shutdown(string message)
@@ -224,7 +224,7 @@ namespace BoxExamples
         }
 
         /// <summary>
-        /// Activates a box from shutdown state, with the specified message.
+        /// Activates a response from shutdown state, with the specified message.
         /// </summary>
         /// <param name="message">The message.</param>
         public void Activate(string message)
@@ -237,13 +237,13 @@ namespace BoxExamples
         /// Gets or sets the day start, in 24hour time as an integer (eg 1415 = 2:15PM).
         /// </summary>
         /// <value>The day start.</value>
-        [CategoryAttribute("TL DayTradeInfo"), DescriptionAttribute("Sets inclusive start time for box each day.")]
+        [CategoryAttribute("TL DayTradeInfo"), DescriptionAttribute("Sets inclusive start time for response each day.")]
         public int DayStart { get { return _sday; } set { _sday = value; } }
         /// <summary>
         /// Gets or sets the day end, in 24hour time as an integer (eg 1600 = 4:00PM)
         /// </summary>
         /// <value>The day end.</value>
-        [CategoryAttribute("TL DayTradeInfo"), DescriptionAttribute("Sets inclusive stop time for box each day.")]
+        [CategoryAttribute("TL DayTradeInfo"), DescriptionAttribute("Sets inclusive stop time for response each day.")]
         public int DayEnd { get { if ((_eday % 100) != 0) return _eday - _DayEndBuff; return _eday - 40 - _DayEndBuff; } set { _eday = value; } }
         /// <summary>
         /// Gets the current date.
@@ -260,7 +260,7 @@ namespace BoxExamples
         [BrowsableAttribute(false)]
         public int Time { get { return _time; } }
         /// <summary>
-        /// Gets or sets the size of the maximum position size allowed by this box (maxsize of a single position).
+        /// Gets or sets the size of the maximum position size allowed by this response (maxsize of a single position).
         /// </summary>
         /// <value>The size of the max.</value>
         [CategoryAttribute("TL DayTradeInfo"), DescriptionAttribute("Maximum size of a single position.")]
@@ -272,22 +272,22 @@ namespace BoxExamples
         [CategoryAttribute("TL DayTradeInfo"), DescriptionAttribute("Minimum size of a single position.")]
         public int MinSize { get { return MINSIZE; } set { MINSIZE = value; } }
         /// <summary>
-        /// Gets or sets the full name of the box, as defined in the source code.
+        /// Gets or sets the full name of the response, as defined in the source code.
         /// </summary>
         /// <value>The full name.</value>
-        [CategoryAttribute("TL DayTradeInfo"), DescriptionAttribute("Fully qualified box class name."), ReadOnlyAttribute(true)]
+        [CategoryAttribute("TL DayTradeInfo"), DescriptionAttribute("Fully qualified response class name."), ReadOnlyAttribute(true)]
         public string FullName { get { return _fullname; } set { _fullname = value; } }
         /// <summary>
-        /// Gets or sets the name of this box as described by the user.
+        /// Gets or sets the name of this response as described by the user.
         /// </summary>
         /// <value>The name.</value>
-        [CategoryAttribute("TL DayTradeInfo"), DescriptionAttribute("Name of this box.")]
+        [CategoryAttribute("TL DayTradeInfo"), DescriptionAttribute("Name of this response.")]
         public string Name { get { return _name; } set { _name = value; } }
         /// <summary>
-        /// Gets a value indicating whether this <see cref="Box"/> is shutdown.
+        /// Gets a value indicating whether this <see cref="Response"/> is shutdown.
         /// </summary>
         /// <value><c>true</c> if off; otherwise, <c>false</c>.</value>
-        [CategoryAttribute("TL DayTradeInfo"), Description("True if the box is Shutdown.")]
+        [CategoryAttribute("TL DayTradeInfo"), Description("True if the response is Shutdown.")]
         public bool Off { get { return _shut; } }
         [BrowsableAttribute(false)]
         public Position Pos { get { return _pos; } }

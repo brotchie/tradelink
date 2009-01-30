@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 using TradeLib;
 
-namespace BoxExamples
+namespace Responses
 {
-    public class OpenCancel : DayTradeBox
+    public class OpenCancel : DayTradeResponse
     {
         /// <summary>
-        /// Demo of box order-canceling features
+        /// Demo of response order-canceling features
         /// </summary>
         public OpenCancel() 
         { 

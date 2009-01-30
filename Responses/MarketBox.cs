@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using TradeLib;
 
-namespace BoxExamples
+namespace Responses
 {
-    public class MarketBox : DayTradeBox
+    public class MarketResponse : DayTradeResponse
     {
         protected virtual int Read(Tick t, BarList bl) { return 0; }
         protected override Order ReadOrder(Tick t, BarList bl)
@@ -16,7 +16,7 @@ namespace BoxExamples
         }
 
         /// <summary>
-        /// Adjusts the box's current position up or down by the specified number of shares.
+        /// Adjusts the response's current position up or down by the specified number of shares.
         /// </summary>
         /// <param name="asize">The adjustment size. Zero for no change.</param>
         /// <returns>A market order for specified size</returns>
@@ -25,7 +25,7 @@ namespace BoxExamples
             if (asize == 0) return new Order();
             int size = asize;
             int ts = Pos.Size;
-            if (Math.Abs(size) < 11) size = BoxMath.Norm2Min(ts * size,MINSIZE);
+            if (Math.Abs(size) < 11) size = Calc.Norm2Min(ts * size,MINSIZE);
             Boolean side = size > 0;
             size = NoCrossingFlat(size);
             if (Math.Abs(size + ts) > MAXSIZE) size = (MAXSIZE - Math.Abs(ts)) * (side ? 1 : -1);

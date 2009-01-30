@@ -47,7 +47,7 @@ namespace WinGauntlet
             this.lastmessage = new System.Windows.Forms.ToolStripStatusLabel();
             this.label7 = new System.Windows.Forms.Label();
             this.queuebut = new System.Windows.Forms.Button();
-            this.boxlist = new System.Windows.Forms.ListBox();
+            this.reslist = new System.Windows.Forms.ListBox();
             this.stocklist = new System.Windows.Forms.ListBox();
             this.optionpage = new System.Windows.Forms.TabPage();
             this.spreadlist = new System.Windows.Forms.TextBox();
@@ -128,7 +128,7 @@ namespace WinGauntlet
             this.studypage.Controls.Add(this.statusStrip1);
             this.studypage.Controls.Add(this.label7);
             this.studypage.Controls.Add(this.queuebut);
-            this.studypage.Controls.Add(this.boxlist);
+            this.studypage.Controls.Add(this.reslist);
             this.studypage.Controls.Add(this.stocklist);
             this.studypage.Location = new System.Drawing.Point(4, 29);
             this.studypage.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -267,7 +267,7 @@ namespace WinGauntlet
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(53, 20);
             this.label7.TabIndex = 7;
-            this.label7.Text = "Boxes";
+            this.label7.Text = "Responses";
             // 
             // queuebut
             // 
@@ -282,14 +282,14 @@ namespace WinGauntlet
             // 
             // boxlist
             // 
-            this.boxlist.FormattingEnabled = true;
-            this.boxlist.ItemHeight = 20;
-            this.boxlist.Location = new System.Drawing.Point(381, 165);
-            this.boxlist.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.boxlist.Name = "boxlist";
-            this.boxlist.Size = new System.Drawing.Size(280, 124);
-            this.boxlist.TabIndex = 2;
-            this.boxlist.SelectedIndexChanged += new System.EventHandler(this.boxlist_SelectedIndexChanged);
+            this.reslist.FormattingEnabled = true;
+            this.reslist.ItemHeight = 20;
+            this.reslist.Location = new System.Drawing.Point(381, 165);
+            this.reslist.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.reslist.Name = "boxlist";
+            this.reslist.Size = new System.Drawing.Size(280, 124);
+            this.reslist.TabIndex = 2;
+            this.reslist.SelectedIndexChanged += new System.EventHandler(this.boxlist_SelectedIndexChanged);
             // 
             // stocklist
             // 
@@ -591,7 +591,7 @@ namespace WinGauntlet
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(119, 20);
             this.label2.TabIndex = 4;
-            this.label2.Text = "Select Box DLL";
+            this.label2.Text = "Select Response DLL";
             // 
             // button2
             // 
@@ -612,7 +612,7 @@ namespace WinGauntlet
             this.showdebug.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.showdebug.Size = new System.Drawing.Size(140, 24);
             this.showdebug.TabIndex = 2;
-            this.showdebug.Text = "Box Debugging";
+            this.showdebug.Text = "Response Debugging";
             this.showdebug.UseVisualStyleBackColor = true;
             // 
             // label1
@@ -761,7 +761,7 @@ namespace WinGauntlet
         private System.Windows.Forms.TabPage messagepage;
         private System.Windows.Forms.ListBox stocklist;
         private System.Windows.Forms.Button queuebut;
-        private System.Windows.Forms.ListBox boxlist;
+        private System.Windows.Forms.ListBox reslist;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.RichTextBox messages;

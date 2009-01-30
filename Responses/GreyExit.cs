@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.Text;
 using TradeLib;
 
-// we need this library to be able to read the parameter comments from our box
+// we need this library to be able to read the parameter comments from our response
 using System.ComponentModel;
 
-namespace BoxExamples
+namespace Responses
 {
     /// <summary>
-    /// Grey box that will monitor existing position and exit you if the market crosses the 5 minute moving average for your position.
+    /// Grey response that will monitor existing position and exit you if the market crosses the 5 minute moving average for your position.
     /// 
     /// Essentially a smarter stop-loss.
     /// </summary>
-    public class GreyExit : MarketBox
+    public class GreyExit : MarketResponse
     {
 
         // here's the exit size we allow the user to choose at startup
@@ -33,7 +33,7 @@ namespace BoxExamples
         public GreyExit()
             : base()
         {
-            Name = "GreyBox";
+            Name = "GreyResponse";
 
             // here's how we prompt for parameters
             ParamPrompt param = new ParamPrompt(this); // read the parameters
@@ -63,7 +63,7 @@ namespace BoxExamples
 
                 bool pricecross = _above ? (tick.trade > MA) : (tick.trade < MA);
 
-                return  (pricecross) ? BoxMath.Norm2Min(Pos.FlatSize*exitpercent,MINSIZE) : 0;
+                return  (pricecross) ? Calc.Norm2Min(Pos.FlatSize*exitpercent,MINSIZE) : 0;
             }
             return 0;
            

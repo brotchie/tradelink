@@ -10,20 +10,20 @@
 using System;
 using TradeLib;
 
-namespace BoxExamples
+namespace Responses
 {
 	/// <summary>
-	/// Moving-average box
+	/// Moving-average response
 	/// </summary>
-	public class MAbox : BlackBoxEasy
+	public class MAresponse : BlackResponseEasy
 	{
         // indicator identifiers
         const int imkt = 0;
         const int ibar = 1;
-		public MAbox() : base()
+		public MAresponse() : base()
 		{
-			Name = "MABox";
-            // auto-money-management features provided by BlackBoxEasy
+			Name = "MAResponse";
+            // auto-money-management features provided by BlackResponseEasy
 			this.ProfitTarget = 1;
 			this.Stop = .5m;
 

@@ -10,7 +10,7 @@ using System.IO;
 {
     public partial class Gauntlet : Form
     {
-        Response mybox;
+        Response myres;
         BackTest bt;
         public Gauntlet()
         {
@@ -18,7 +18,7 @@ using System.IO;
             FindStocks((WinGauntlet.Properties.Settings.Default.tickfolder == null) ? @"c:\program files\tradelink\tickdata\" : WinGauntlet.Properties.Settings.Default.tickfolder);
             string fn = (WinGauntlet.Properties.Settings.Default.boxdll== null) ? "box.dll" : WinGauntlet.Properties.Settings.Default.boxdll;
             if (File.Exists(fn))
-                UpdateBoxes(Util.GetBoxList(fn));
+                UpdateResponses(Util.GetResponseList(fn));
             exchlist.SelectedItem = "NYS";
             ProgressBar1.Enabled = false;
             FormClosing+=new FormClosingEventHandler(Gauntlet_FormClosing);
@@ -124,15 +124,15 @@ using System.IO;
             if (of.ShowDialog() == DialogResult.OK)
             {
                 WinGauntlet.Properties.Settings.Default.boxdll = of.FileName;
-                UpdateBoxes(Util.GetBoxList(of.FileName));
+                UpdateResponses(Util.GetResponseList(of.FileName));
             }
         }
 
-        void UpdateBoxes(List<string> boxes)
+        void UpdateResponses(List<string> responses)
         {
-            boxlist.Items.Clear();
-            for (int i = 0; i < boxes.Count; i++)
-                boxlist.Items.Add(boxes[i]);
+            reslist.Items.Clear();
+            for (int i = 0; i < responses.Count; i++)
+                reslist.Items.Add(responses[i]);
         }
 
         private void messages_DoubleClick(object sender, EventArgs e)
@@ -159,9 +159,9 @@ using System.IO;
         {
             bt = new BackTest();
             bt.BTStatus += new DebugFullDelegate(bt_BTStatus);
-            bt.mybroker.GotOrder += new OrderDelegate(mybox.GotOrder);
+            bt.mybroker.GotOrder += new OrderDelegate(myres.GotOrder);
             bt.mybroker.GotOrderCancel += new Broker.OrderCancelDelegate(mybroker_GotOrderCancel);
-            bt.mybroker.GotFill+=new FillDelegate(mybox.GotFill);
+            bt.mybroker.GotFill+=new FillDelegate(myres.GotFill);
             if (cleartrades.Checked) trades.Rows.Clear();
             if (clearorders.Checked) orders.Rows.Clear();
             if (clearmessages.Checked) messages.Clear();
@@ -219,9 +219,9 @@ using System.IO;
             }
 
             bt.name = DateTime.Now.ToString("yyyMMdd.HHmm");
-            if (mybox==null)
+            if (myres==null)
             { 
-                show("You must select a box to run the gauntlet."); 
+                show("You must select a response to run the gauntlet."); 
                 return; 
             } 
             string exfilt = "";
@@ -234,7 +234,7 @@ using System.IO;
             bt.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bt_RunWorkerCompleted);
             ProgressBar1.Enabled = true;
             queuebut.Enabled = false;
-            bt.RunWorkerAsync(new BackTestArgs(tf,mybox));
+            bt.RunWorkerAsync(new BackTestArgs(tf,myres));
         }
 
         void bt_BTStatus(Debug debug)
@@ -357,17 +357,17 @@ using System.IO;
         {
             try
             {
-                mybox = ResponseLoader.FromDLL((string)boxlist.SelectedItem, WinGauntlet.Properties.Settings.Default.boxdll);
+                myres = ResponseLoader.FromDLL((string)reslist.SelectedItem, WinGauntlet.Properties.Settings.Default.boxdll);
             }
-            catch (Exception ex) { show("Box failed to load, quitting... (" + ex.Message + (ex.InnerException != null ? ex.InnerException.Message.ToString() : "") + ")"); }
-            if (!mybox.isValid) { show("Box did not load or loaded in a shutdown state. "+mybox.Name+ " "+mybox.FullName); return; }
-            mybox.SendIndicators += new ObjectArrayDelegate(mybox_IndicatorUpdate);
-            mybox.SendDebug += new DebugFullDelegate(mybox_GotDebug);
-            mybox.SendCancel+= new UIntDelegate(mybox_CancelOrderSource);
-            mybox.SendOrder += new OrderDelegate(mybox_SendOrder);
+            catch (Exception ex) { show("Response failed to load, quitting... (" + ex.Message + (ex.InnerException != null ? ex.InnerException.Message.ToString() : "") + ")"); }
+            if (!myres.isValid) { show("Response did not load or loaded in a shutdown state. "+myres.Name+ " "+myres.FullName); return; }
+            myres.SendIndicators += new ObjectArrayDelegate(myres_IndicatorUpdate);
+            myres.SendDebug += new DebugFullDelegate(myres_GotDebug);
+            myres.SendCancel+= new UIntDelegate(myres_CancelOrderSource);
+            myres.SendOrder += new OrderDelegate(myres_SendOrder);
         }
 
-        void mybox_SendOrder(Order o)
+        void myres_SendOrder(Order o)
         {
             if ((bt != null) && (bt.mybroker != null))
                 bt.mybroker.sendOrder(o);
@@ -375,24 +375,24 @@ using System.IO;
 
         void mybroker_GotOrderCancel(string sym, bool side, uint id)
         {
-            if (mybox != null)
-                mybox.GotOrderCancel(id);
+            if (myres != null)
+                myres.GotOrderCancel(id);
         }
 
-        void mybox_CancelOrderSource(uint number)
+        void myres_CancelOrderSource(uint number)
         {
             if ((bt != null) && (bt.mybroker != null))
                 bt.mybroker.CancelOrder(number);
             
         }
 
-        void mybox_GotDebug(Debug debug)
+        void myres_GotDebug(Debug debug)
         {
             if (!showdebug.Checked) return;
             show(debug.Msg);
         }
         StreamWriter indf = null;
-        void mybox_IndicatorUpdate(object[] parameters)
+        void myres_IndicatorUpdate(object[] parameters)
         {
             if (indicatorscsv.Checked)
             {
@@ -400,7 +400,7 @@ using System.IO;
                 {
                     string unique = csvnamesunique.Checked ? "." + bt.name : "";
                     indf= new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Indicators" + unique + ".csv", false);
-                    indf.WriteLine(string.Join(",", mybox.Indicators));
+                    indf.WriteLine(string.Join(",", myres.Indicators));
                     indf.AutoFlush = true;
                 }
                 string[] ivals = new string[parameters.Length];

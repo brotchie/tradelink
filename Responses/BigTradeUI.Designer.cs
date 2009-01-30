@@ -1,4 +1,4 @@
-﻿namespace BoxExamples
+﻿namespace Responses
 {
     partial class BigTradeUI
     {

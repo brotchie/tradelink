@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 using TradeLib;
 
-namespace BoxExamples
+namespace Responses
 {
     /// <summary>
-    /// Feature-rich version of Box class.  More structure for trader/user.  Full-concept of a round-turn with explicit entry and exit definition.  Stoploss and profit-taking included.
+    /// Feature-rich version of Response class.  More structure for trader/user.  Full-concept of a round-turn with explicit entry and exit definition.  Stoploss and profit-taking included.
     /// </summary>
-    public class BlackBoxEasy : DayTradeBox
+    public class BlackResponseEasy : DayTradeResponse
     {
-        public BlackBoxEasy() : base() { }
+        public BlackResponseEasy() : base() { }
         protected decimal sPrice = 0;
         protected int lotsize = 100;
         protected decimal stop = .1m;
@@ -18,7 +18,7 @@ namespace BoxExamples
         protected int profitsize = 0;
         protected bool side = true;
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="BlackBoxEasy"/> is processing long trades.
+        /// Gets or sets a value indicating whether this <see cref="BlackResponseEasy"/> is processing long trades.
         /// </summary>
         /// <value><c>true</c> if it's considering long trades; otherwise, a short trade.</value>
         public bool Side { get { return side; } set { side = value; } }

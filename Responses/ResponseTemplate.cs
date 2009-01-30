@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using TradeLib;
 
-namespace BoxExamples
+namespace Responses
 {
-    // A response is the most generic type of box you can have
+    // A response is the most generic type of response you can have
     // responses will work in all the TradeLink programs (gauntlet/asp/kadina)
     public class ResponseTemplate : Response
     {
@@ -55,7 +55,7 @@ namespace BoxExamples
             // if (idx!=-1) this.MyOrders.RemoveAt(idx);
         }
         /// <summary>
-        /// Call this to reset your box parameters
+        /// Call this to reset your response parameters
         /// </summary>
         public void Reset()
         {
@@ -81,11 +81,11 @@ namespace BoxExamples
         /// </summary>
         public string[] Indicators { get { return _inds; } set { _inds = value; } }
         /// <summary>
-        /// Custom name of box set by you
+        /// Custom name of response set by you
         /// </summary>
         public string Name { get { return _name; } set { _name = value; } }
         /// <summary>
-        /// Full name of this box set by programs (includes namespace)
+        /// Full name of this response set by programs (includes namespace)
         /// </summary>
         public string FullName { get { return _full; } set { _full = value; } }
 

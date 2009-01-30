@@ -10,10 +10,10 @@
 using System;
 using TradeLib;
 
-namespace BoxExamples
+namespace Responses
 {
 	/// <summary>
-	/// Simple-Moving-Average class used by other boxes
+	/// Simple-Moving-Average class used by other responsees
 	/// </summary>
 	public class SMA
 	{

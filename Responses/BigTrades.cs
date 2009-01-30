@@ -4,10 +4,10 @@ using System.Text;
 using TradeLib;
 using System.Data;
 
-namespace BoxExamples
+namespace Responses
 {
     /// <summary>
-    /// This box saves the last 10 biggest trades, and lets user
+    /// This response saves the last 10 biggest trades, and lets user
     /// send buy and sell market orders
     /// </summary>
     public class BigTrades : Response

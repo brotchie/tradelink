@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
-namespace BoxExamples
+namespace Responses
 {
     public delegate void BigTradeMarket(bool side);
     public partial class BigTradeUI : Form

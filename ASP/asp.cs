@@ -32,14 +32,14 @@ namespace ASP
             this.FormClosing += new FormClosingEventHandler(ASP_FormClosing);
             status(Util.TLSIdentity());
             Util.ExistsNewVersions(tl);
-            LoadBoxDLL(Properties.Settings.Default.boxdll);
+            LoadResponseDLL(Properties.Settings.Default.boxdll);
         }
 
         void tl_gotOrderCancel(uint number)
         {
             foreach (string sym in symidx.Keys)
                 foreach (int idx in symidx[sym])
-                    boxlist[idx].GotOrderCancel(number);
+                    reslist[idx].GotOrderCancel(number);
         }
 
         void tl_gotOrder(Order o)
@@ -48,7 +48,7 @@ namespace ASP
             if (!symidx.TryGetValue(o.Sec.FullName, out idxs))
                 return;
             foreach (int idx in idxs)
-                boxlist[idx].GotOrder(o);
+                reslist[idx].GotOrder(o);
         }
 
         void ASP_FormClosing(object sender, FormClosingEventArgs e)
@@ -80,7 +80,7 @@ namespace ASP
             if (!symidx.TryGetValue(t.Sec.FullName, out idxs))
                 return;
             foreach (int idx in idxs)
-                boxlist[idx].GotTick(t);
+                reslist[idx].GotTick(t);
         }
 
         private int count = 0;
@@ -92,7 +92,7 @@ namespace ASP
             if (!symidx.TryGetValue(t.Sec.FullName, out idxs))
                 return;
             foreach (int idx in idxs)
-                boxlist[idx].GotFill(t);
+                reslist[idx].GotFill(t);
         }
 
 
@@ -109,11 +109,11 @@ namespace ASP
 
 
         MarketBasket mb = new MarketBasket();
-        Response workingbox = new InvalidResponse();
+        Response workingres = new InvalidResponse();
 
-        // name of dll of box names
+        // name of dll of response names
 
-        void LoadBoxDLL(string filename)
+        void LoadResponseDLL(string filename)
         {
             if (!System.IO.File.Exists(filename))
             {
@@ -123,11 +123,11 @@ namespace ASP
 
             Properties.Settings.Default.boxdll = filename;
 
-            List<string> list = Util.GetBoxList(filename);
-            Boxes.Items.Clear();
-            foreach (string box in list)
+            List<string> list = Util.GetResponseList(filename);
+            Responses.Items.Clear();
+            foreach (string res in list)
             {
-                Boxes.Items.Add(box);
+                Responses.Items.Add(res);
             }
         }
 
@@ -135,15 +135,15 @@ namespace ASP
         {
             OpenFileDialog of = new OpenFileDialog();
             of.DefaultExt = ".dll";
-            of.Filter = "BoxDLL|*.dll";
+            of.Filter = "Response DLL|*.dll|All Files|*.*";
             of.Multiselect = false;
             if(of.ShowDialog() == DialogResult.OK) 
             {
-                LoadBoxDLL(of.FileName);
+                LoadResponseDLL(of.FileName);
 
             }
 
-            boxlist.Clear();
+            reslist.Clear();
         }
 
         TLClient_WM tl;
@@ -151,11 +151,11 @@ namespace ASP
 
         private void Boxes_SelectedIndexChanged(object sender, EventArgs e)
         {
-            string boxname = (string)Boxes.SelectedItem;
-            workingbox = ResponseLoader.FromDLL(boxname, Properties.Settings.Default.boxdll);
-            workingbox.SendOrder += new OrderDelegate(workingbox_SendOrder);
-            workingbox.SendDebug+= new DebugFullDelegate(workingbox_GotDebug);
-            workingbox.SendCancel+= new UIntDelegate(workingbox_CancelOrderSource);
+            string resname = (string)Responses.SelectedItem;
+            workingres = ResponseLoader.FromDLL(resname, Properties.Settings.Default.boxdll);
+            workingres.SendOrder += new OrderDelegate(workingbox_SendOrder);
+            workingres.SendDebug+= new DebugFullDelegate(workingres_GotDebug);
+            workingres.SendCancel+= new UIntDelegate(workingres_CancelOrderSource);
         }
 
         void workingbox_SendOrder(Order o)
@@ -166,12 +166,12 @@ namespace ASP
             tl.SendOrder(o);
         }
 
-        void workingbox_CancelOrderSource(uint number)
+        void workingres_CancelOrderSource(uint number)
         {
             tl.CancelOrder((long)number);
         }
 
-        void workingbox_GotDebug(Debug debug)
+        void workingres_GotDebug(Debug debug)
         {
             if (!debugon.Checked) return;
             if (sw != null)
@@ -192,7 +192,7 @@ namespace ASP
                     status("Security invalid: " + sec.ToString());
                     return;
                 }
-                if (Boxes.SelectedIndex == -1)
+                if (Responses.SelectedIndex == -1)
                 {
                     status("Please select a box.");
                     return;
@@ -208,13 +208,13 @@ namespace ASP
                 }
 
             }
-            lock (boxlist) // potentially used by other threads
+            lock (reslist) // potentially used by other threads
             {
-                boxlist.Add(workingbox);
+                reslist.Add(workingres);
             }
-            int idx = boxlist.Count -1;
+            int idx = reslist.Count -1;
             tl.Subscribe(mb);
-            boxcriteria.Items.Add(workingbox.Name+" ["+string.Join(",",valid.ToArray())+"]");
+            boxcriteria.Items.Add(workingres.Name+" ["+string.Join(",",valid.ToArray())+"]");
             foreach (Security sec in seclist.Values)
                 if (symidx.ContainsKey(sec.FullName))
                 {
@@ -226,23 +226,23 @@ namespace ASP
                 else symidx.Add(sec.FullName, new int[] { idx });
             stock.Text = "";
             status("");
-            Boxes.SelectedIndex = -1;
+            Responses.SelectedIndex = -1;
             
         }
 
         Dictionary<string,Security> seclist = new Dictionary<string,Security>();
         Dictionary<string, int[]> symidx = new Dictionary<string, int[]>();
-        List<Response> boxlist = new List<Response>();
+        List<Response> reslist = new List<Response>();
         
         
 
         private void boxcriteria_SelectedIndexChanged(object sender, EventArgs e)
         {
             int selbox = boxcriteria.SelectedIndex;
-            if (!boxlist[selbox].isValid)
-                status("Box " + boxlist[selbox].Name + " is off.");
+            if (!reslist[selbox].isValid)
+                status("Resonse " + reslist[selbox].Name + " is off.");
             else
-                status("Box " + boxlist[selbox].Name +  " is on.");
+                status("Response " + reslist[selbox].Name +  " is on.");
 
         }
 

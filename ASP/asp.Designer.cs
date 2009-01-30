@@ -30,7 +30,7 @@ namespace ASP
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ASP));
             this.LoadDLL = new System.Windows.Forms.Button();
-            this.Boxes = new System.Windows.Forms.ComboBox();
+            this.Responses = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.Trade = new System.Windows.Forms.Button();
             this.boxcriteria = new System.Windows.Forms.ListBox();
@@ -48,25 +48,25 @@ namespace ASP
             // 
             // LoadDLL
             // 
-            this.LoadDLL.Location = new System.Drawing.Point(602, 273);
+            this.LoadDLL.Location = new System.Drawing.Point(549, 273);
             this.LoadDLL.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.LoadDLL.Name = "LoadDLL";
-            this.LoadDLL.Size = new System.Drawing.Size(95, 29);
+            this.LoadDLL.Size = new System.Drawing.Size(148, 29);
             this.LoadDLL.TabIndex = 0;
-            this.LoadDLL.Text = "Box Library";
+            this.LoadDLL.Text = "Response Library";
             this.LoadDLL.UseVisualStyleBackColor = true;
             this.LoadDLL.Click += new System.EventHandler(this.LoadDLL_Click);
             // 
-            // Boxes
+            // Responses
             // 
-            this.Boxes.FormattingEnabled = true;
-            this.Boxes.Location = new System.Drawing.Point(377, 9);
-            this.Boxes.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.Boxes.Name = "Boxes";
-            this.Boxes.Size = new System.Drawing.Size(320, 28);
-            this.Boxes.TabIndex = 1;
-            this.Boxes.Text = "Select a box";
-            this.Boxes.SelectedIndexChanged += new System.EventHandler(this.Boxes_SelectedIndexChanged);
+            this.Responses.FormattingEnabled = true;
+            this.Responses.Location = new System.Drawing.Point(377, 9);
+            this.Responses.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.Responses.Name = "Responses";
+            this.Responses.Size = new System.Drawing.Size(320, 28);
+            this.Responses.TabIndex = 1;
+            this.Responses.Text = "Select a response";
+            this.Responses.SelectedIndexChanged += new System.EventHandler(this.Boxes_SelectedIndexChanged);
             // 
             // label1
             // 
@@ -74,9 +74,9 @@ namespace ASP
             this.label1.Location = new System.Drawing.Point(245, 17);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(109, 20);
+            this.label1.Size = new System.Drawing.Size(121, 20);
             this.label1.TabIndex = 2;
-            this.label1.Text = "Configure Box";
+            this.label1.Text = "New Response:";
             // 
             // Trade
             // 
@@ -149,9 +149,9 @@ namespace ASP
             this.label3.Location = new System.Drawing.Point(6, 21);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(139, 20);
+            this.label3.Size = new System.Drawing.Size(94, 20);
             this.label3.TabIndex = 11;
-            this.label3.Text = "Configured Boxes:";
+            this.label3.Text = "Responses:";
             // 
             // listBox1
             // 
@@ -207,7 +207,7 @@ namespace ASP
             this.Controls.Add(this.boxcriteria);
             this.Controls.Add(this.Trade);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.Boxes);
+            this.Controls.Add(this.Responses);
             this.Controls.Add(this.LoadDLL);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -223,7 +223,7 @@ namespace ASP
         #endregion
 
         private System.Windows.Forms.Button LoadDLL;
-        private System.Windows.Forms.ComboBox Boxes;
+        private System.Windows.Forms.ComboBox Responses;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button Trade;
         private System.Windows.Forms.ListBox boxcriteria;

@@ -292,7 +292,7 @@ namespace TradeLib
                 else
                 {
                     cpl = posdict[s].Adjust(t); // update the trade and get any closed pl
-                    opl = BoxMath.OpenPL(t.xprice, posdict[s]); // get any leftover open pl
+                    opl = Calc.OpenPL(t.xprice, posdict[s]); // get any leftover open pl
                     if (cpl != 0) csize = t.xsize; // if we closed any pl, get the size
                 }
                 string[] pl = new string[] { opl.ToString("f2"), cpl.ToString("f2"), posdict[s].Size.ToString(), csize.ToString(), posdict[s].AvgPrice.ToString("f2") };
@@ -325,39 +325,39 @@ namespace TradeLib
             return typeof(Response).IsAssignableFrom(t);
         }
         /// <summary>
-        /// Gets teh fully qualified boxnames found in a given file.
+        /// Gets full Response names found in a given file.
         /// </summary>
         /// <param name="boxdll">The file path of the assembly containing the boxes.</param>
         /// <returns></returns>
-        public static List<string> GetBoxList(string boxdll)
+        public static List<string> GetResponseList(string dllfilepath)
         {
-            List<string> boxlist = new List<string>();
-            if (!File.Exists(boxdll)) return boxlist;
+            List<string> reslist = new List<string>();
+            if (!File.Exists(dllfilepath)) return reslist;
             Assembly a;
             try
             {
-                a = Assembly.LoadFrom(boxdll);
+                a = Assembly.LoadFrom(dllfilepath);
             }
-            catch (Exception ex) { boxlist.Add(ex.Message); return boxlist; }
-            return GetBoxList(a);
+            catch (Exception ex) { reslist.Add(ex.Message); return reslist; }
+            return GetResponseList(a);
         }
         /// <summary>
-        /// Gets all the fully-qualified boxnames found in a given assembly.
+        /// Gets all Response names found in a given assembly.  Names are FullNames, which means namespace.FullName.  eg 'BoxExamples.BigTradeUI'
         /// </summary>
         /// <param name="boxdll">The assembly.</param>
-        /// <returns></returns>
-        public static List<string> GetBoxList(Assembly boxdll)
+        /// <returns>list of response names</returns>
+        public static List<string> GetResponseList(Assembly responseassembly)
         {
-            List<string> boxlist = new List<string>();
+            List<string> reslist = new List<string>();
             Type[] t;
             try
             {
-                t = boxdll.GetTypes();
+                t = responseassembly.GetTypes();
             }
-            catch (Exception ex) { boxlist.Add(ex.Message); return boxlist; }
+            catch (Exception ex) { reslist.Add(ex.Message); return reslist; }
             for (int i = 0; i < t.GetLength(0); i++)
-                if (IsResponse(t[i])) boxlist.Add(t[i].FullName);
-            return boxlist;
+                if (IsResponse(t[i])) reslist.Add(t[i].FullName);
+            return reslist;
         }
 
         /// <summary>

@@ -10,7 +10,7 @@
 using System;
 using TradeLib;
 
-namespace BoxExamples
+namespace Responses
 {
     /// <summary>
     /// An example of a strategy that buys and sells Asymetries around the open.
@@ -18,7 +18,7 @@ namespace BoxExamples
     /// If the open and the low are close but the high is far away, sell the open when the market reapproaches it.
     /// If the open and high and close but the low is far away, buy the open when the market reapproaches it.
     /// </summary>
-	public class A : MarketBox
+	public class A : MarketResponse
 	{
         public A() : base() 
         { 
@@ -27,7 +27,7 @@ namespace BoxExamples
         }
         BarList bars;
 
-        // we need high-low and open for this box
+        // we need high-low and open for this response
         decimal h{ get { return BarMath.HH(bars); } }
         decimal l { get { return BarMath.LL(bars); } }
         decimal o { get { return bars.Get(0).Open; } }
@@ -53,7 +53,7 @@ namespace BoxExamples
             if (((o-l)<=a) && ((tick.trade-l)>e)) return MaxSize*-1;
 
             // profit and loss tests
-            decimal PL = BoxMath.OpenPT(tick.trade, Pos.AvgPrice, Pos.Size);
+            decimal PL = Calc.OpenPT(tick.trade, Pos.AvgPrice, Pos.Size);
             if (PL > p) return Pos.FlatSize;
             if (PL < s) return Pos.FlatSize;
 

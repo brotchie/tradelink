@@ -54,7 +54,7 @@
     <Compile Include="TestBar.cs" />
     <Compile Include="TestBarList.cs" />
     <Compile Include="TestResponse.cs" />
-    <Compile Include="TestBoxMath.cs" />
+    <Compile Include="TestCalc.cs" />
     <Compile Include="TestBroker.cs" />
     <Compile Include="TesteSigTick.cs" />
     <Compile Include="TestHistSim.cs" />

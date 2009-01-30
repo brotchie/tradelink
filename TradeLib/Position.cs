@@ -55,7 +55,7 @@ namespace TradeLib
             if (!pos.isValid) throw new Exception("Invalid position adjustment, existing:" + this.ToString() + " adjustment:" + pos.ToString());
             if (pos.isFlat) return 0; // nothing to do
             bool oldside = isLong;
-            decimal pl = BoxMath.ClosePL(this,pos.ToTrade());
+            decimal pl = Calc.ClosePL(this,pos.ToTrade());
             if (this.isFlat) this._price = pos._price; // if we're leaving flat just copy price
             else if ((pos.isLong && this.isLong) || (!pos.isLong && !this.isLong)) // sides match, adding so adjust price
                 this._price = ((this._price * this._size) + (pos._price * pos._size)) / (pos._size + this._size);

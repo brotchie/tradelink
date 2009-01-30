@@ -5,7 +5,7 @@ using TradeLib;
 namespace TestTradeLib
 {
     [TestFixture]
-    public class TestBoxMath
+    public class TestCalc
     {
         bool Long = true;
         bool Short = false;
@@ -30,23 +30,23 @@ namespace TestTradeLib
         public void OpenPL()
         {
             decimal pl = .98m;
-            Assert.AreEqual(pl,BoxMath.OpenPT(last, entry, Long));
-            Assert.AreEqual(-pl,BoxMath.OpenPT(last, entry, Short));
-            Assert.AreEqual(pl, BoxMath.OpenPT(last, entry, lsize));
-            Assert.AreEqual(-pl,BoxMath.OpenPT(last, entry, ssize));
-            Assert.AreEqual(pl, BoxMath.OpenPT(last, lp));
-            Assert.AreEqual(-pl,BoxMath.OpenPT(last, sp));
-            Assert.AreEqual(lp.Size * pl,BoxMath.OpenPL(last, lp) );
-            Assert.AreEqual(sp.Size * pl,BoxMath.OpenPL(last, sp) );
+            Assert.AreEqual(pl,Calc.OpenPT(last, entry, Long));
+            Assert.AreEqual(-pl,Calc.OpenPT(last, entry, Short));
+            Assert.AreEqual(pl, Calc.OpenPT(last, entry, lsize));
+            Assert.AreEqual(-pl,Calc.OpenPT(last, entry, ssize));
+            Assert.AreEqual(pl, Calc.OpenPT(last, lp));
+            Assert.AreEqual(-pl,Calc.OpenPT(last, sp));
+            Assert.AreEqual(lp.Size * pl,Calc.OpenPL(last, lp) );
+            Assert.AreEqual(sp.Size * pl,Calc.OpenPL(last, sp) );
         }
         [Test]
         public void ClosePL()
         {
             decimal pl = .98m;
-            Assert.AreEqual(pl,BoxMath.ClosePT(lp, lc));
-            Assert.AreEqual(-pl,BoxMath.ClosePT(sp, sc));
-            Assert.AreEqual(pl*(lsize/2),BoxMath.ClosePL(lp, lc)); // matches closing size
-            Assert.AreEqual((entry-last)*-ssize, BoxMath.ClosePL(sp, sc));
+            Assert.AreEqual(pl,Calc.ClosePT(lp, lc));
+            Assert.AreEqual(-pl,Calc.ClosePT(sp, sc));
+            Assert.AreEqual(pl*(lsize/2),Calc.ClosePL(lp, lc)); // matches closing size
+            Assert.AreEqual((entry-last)*-ssize, Calc.ClosePL(sp, sc));
         }
     }
 }
