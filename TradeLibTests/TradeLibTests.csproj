@@ -73,7 +73,7 @@
     <Compile Include="TestWMUtil.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="TradeLib.csproj">
+    <ProjectReference Include="..\TradeLib\TradeLib.csproj">
       <Project>{A0FE06A2-F31B-49DE-8901-917B5D593E43}</Project>
       <Name>TradeLib</Name>
     </ProjectReference>
