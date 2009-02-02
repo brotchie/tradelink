@@ -12,6 +12,7 @@ namespace TradeLib
         uint readcounter = 0;
         uint writecounter = 0;
         public event TickDelegate GotTick;
+        volatile bool flipped = false;
 
         void ReadIt()
         {
@@ -22,14 +23,17 @@ namespace TradeLib
                 {
                     if (readthread.ThreadState == ThreadState.StopRequested)
                         return;
-                    if (readcounter>=writecounter)
+                    if ((readcounter>=writecounter) && !flipped)
                         break;
                     Tick k = tickcache[readcounter];
                     if (GotTick != null)
                         GotTick(k);
                     readcounter++;
                     if (readcounter >= tickcache.Length)
+                    {
                         readcounter = 0;
+                        flipped = false;
+                    }
                 }
                 mre.WaitOne(); // wait for a signal to continue reading
                     
@@ -40,8 +44,11 @@ namespace TradeLib
         {
             tickcache[writecounter] = k;
             writecounter++;
-            if (writecounter >= tickcache.Length) 
+            if (writecounter >= tickcache.Length)
+            {
                 writecounter = 0;
+                flipped = true;
+            }
 
             if ((readthread != null) && (readthread.ThreadState == ThreadState.Unstarted))
                 readthread.Start();

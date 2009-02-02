@@ -20,6 +20,7 @@ namespace Quotopia
         public int GetTime { get { DateTime d = DateTime.Now; int i = (d.Hour * 100) + (d.Minute); return i; } }
         public event TickDelegate spillTick;
         public event OrderStatusDel orderStatus;
+        AsyncResponse ar = new AsyncResponse();
 
         public Quote()
         {
@@ -41,9 +42,8 @@ namespace Quotopia
             ticker.Resolution = 500;
             ticker.Period = 100;
             ticker.Mode = Multimedia.TimerMode.Periodic;
-            ticker.Tick += new EventHandler(ticker_Tick);
             ticker.Start();
-            
+            ar.GotTick += new TickDelegate(ar_GotTick);
             tl.gotTick += new TickDelegate(tl_gotTick);
             tl.gotFill += new FillDelegate(tl_gotFill);
             tl.gotOrder += new OrderDelegate(tl_gotOrder);
@@ -58,6 +58,7 @@ namespace Quotopia
             Util.ExistsNewVersions(tl);
 
         }
+
 
         string[] accts;
 
@@ -88,17 +89,6 @@ namespace Quotopia
 
         Dictionary<string, Position> posdict = new Dictionary<string, Position>();
 
-        void ticker_Tick(object sender, EventArgs e)
-        {
-            // update the screen periodically
-            for (int r = 0; r<ticks.Length; r++)
-            {
-                Tick t = ticks[r];
-                if ((t==null) || !t.isValid) continue;
-                if (spillTick != null) spillTick(t);
-                RefreshRow(t);
-            }
-        }
 
         void statfade_Tick(object sender, EventArgs e)
         {
@@ -153,7 +143,7 @@ namespace Quotopia
         void Quote_FormClosing(object sender, FormClosingEventArgs e)
         {
             Properties.Settings.Default.Save();
-
+            ar.Stop();
             try
             {
                 tl.Unsubscribe();
@@ -545,17 +535,24 @@ namespace Quotopia
                 TradesView.Rows.Add(t.xdate, t.xtime, t.xsec, t.symbol, (t.side ? "BUY" : "SELL"), t.xsize, t.xprice.ToString("N2"), t.comment, t.Account.ToString()); // if we accept trade, add it to list
             }
         }
-        Tick[] ticks = new Tick[100];
 
-        void tl_gotTick(Tick t)
+        void ar_GotTick(Tick t)
         {
-            int[] rows = GetSymbolRows(t.Sec.FullName);
-            if ((rows==null)||(rows.Length == 0) ) return;
-            ticks[rows[0]] = t;
+            if (spillTick != null) 
+                spillTick(t);
+            RefreshRow(t);
             BarList bl = null;
             if (bardict.TryGetValue(t.symbol, out bl))
                 bardict[t.symbol].newTick(t);
+
         }
+
+        void tl_gotTick(Tick k)
+        {
+            ar.WriteIt(k);
+        }
+
+
 
         TLClient_WM tl = new TLClient_WM("quotopia.client",true);
         ~Quote() { QuotopiaClose(); }
