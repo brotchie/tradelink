@@ -17,7 +17,7 @@ namespace TradeLib
         public Position(Trade t) 
         {
             if (!t.isValid) throw new Exception("Can't construct a position object from invalid trade.");
-            _sym = t.symbol; _price = t.xprice; _size = t.xsize; _date = t.xdate; _time = t.time; _sec = t.xsec;
+            _sym = t.symbol; _price = t.xprice; _size = t.xsize; _date = t.xdate; _time = t.time; _sec = t.xsec; _acct = t.Account;
             if (_size>0) _size *= t.side ? 1 : -1;
         }
         string _acct = "";
