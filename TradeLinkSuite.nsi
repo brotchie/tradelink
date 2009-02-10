@@ -6,6 +6,11 @@ ShowInstDetails show
 SetOverWrite on
 Icon "InstallSuite\tradelinkinstaller.ico"
 
+!define SHORT_APP_NAME "TradeLink"
+!define SUPPORT_EMAIL "trade@franta.com"
+
+!include "InstallSuite\DotNET.nsh"
+
 ; The file to write
 OutFile "TradeLinkSuite.exe"
 
@@ -30,6 +35,7 @@ CompletedText "For additional documentation, see http://tradelink.googlecode.com
 Section "TradeLinkSuite"
 
   SectionIn RO
+  !insertmacro CheckDotNET
   
   ; Set output path to the installation directory.
   SetOutPath $INSTDIR
