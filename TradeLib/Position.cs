@@ -20,6 +20,7 @@ namespace TradeLib
             _sym = t.symbol; _price = t.xprice; _size = t.xsize; _date = t.xdate; _time = t.time; _sec = t.xsec;
             if (_size>0) _size *= t.side ? 1 : -1;
         }
+        string _acct = "";
         protected string _sym = "";
         protected int _size = 0;
         protected decimal _price = 0;
@@ -42,6 +43,7 @@ namespace TradeLib
         public bool isFlat { get { return _size==0; } }
         public bool isShort { get { return _size < 0; } }
         public int FlatSize { get { return _size * -1; } }
+        public string Account { get { return _acct; } }
         // returns any closed PL calculated on position basis (not per share)
         /// <summary>
         /// Adjusts the position by applying a new position.
@@ -50,7 +52,9 @@ namespace TradeLib
         /// <returns></returns>
         public decimal Adjust(Position pos)
         {
-            if (this.hasSymbol && (this.Symbol != pos.Symbol)) throw new Exception("Invalid Position: Position MUST have a symbol.");
+            if (this.hasSymbol && (this.Symbol != pos.Symbol)) throw new Exception("Failed because adjustment symbol did not match position symbol");
+            if (_acct == "") _acct = pos.Account;
+            if (_acct != pos.Account) throw new Exception("Failed because adjustment account did not match position account.");
             if (!hasSymbol && pos.hasSymbol) _sym = pos.Symbol;
             if (!pos.isValid) throw new Exception("Invalid position adjustment, existing:" + this.ToString() + " adjustment:" + pos.ToString());
             if (pos.isFlat) return 0; // nothing to do
