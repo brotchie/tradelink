@@ -55,6 +55,26 @@ namespace TestTradeLib
         }
 
         [Test]
+        public void PositionAccountTest()
+        {
+            Trade t = new Trade("TST", 100, 100);
+            t.Account = "ME";
+            Trade t2 = new Trade("TST", 200, 200);
+            Assert.That(t.isValid);
+            Assert.That(t2.isValid);
+            t2.Account = "HIM";
+            Position p = new Position(t);
+            p.Adjust(t);
+            bool failed = false;            try
+            {
+                p.Adjust(t2);
+            }
+            catch (Exception) { failed = true; }
+            Assert.IsTrue(failed);
+
+        }
+
+        [Test]
         public void FlipSideInOneTrade()
         {
             // this is illegal on the exchanges, but supported by certain
