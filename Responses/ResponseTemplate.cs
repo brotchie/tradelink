@@ -75,7 +75,7 @@ namespace Responses
         /// <summary>
         /// Whether response can be used or not
         /// </summary>
-        public bool isValid { get { return true; } }
+        public bool isValid { get { return true; } set { } }
         /// <summary>
         /// Names of the indicators used by your response.
         /// Length must correspond to actual indicator values send with SendIndicators event

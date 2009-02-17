@@ -87,7 +87,7 @@ namespace Responses
         string _full = "";
 
 
-        public bool isValid { get { return true; } }
+        public bool isValid { get { return true; } set { } }
         public string[] Indicators { get { return _inds; } set { _inds = value; } }
         public string Name { get { return _name; } set { _name = value; }  }
         public string FullName { get { return _full; } set { _full = value; } }

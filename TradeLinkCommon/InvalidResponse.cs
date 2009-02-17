@@ -27,7 +27,7 @@ namespace TradeLink.Common
         string _fullname = "";
 
         // Response Information
-        public bool isValid { get { return false; } }
+        public bool isValid { get { return false; } set { } }
         public string Name { get { return _name; } set { _name = value; } }
         public string FullName { get { return _fullname; } set { _fullname = value; } }
         public string[] Indicators { get { return new string[0]; } set { } }

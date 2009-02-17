@@ -76,7 +76,7 @@ namespace TestTradeLink
             string _name = "";
             string _full = "";
 
-            public bool isValid { get { return true; } }
+            public bool isValid { get { return true; } set { } }
 
             public string[] Indicators { get { return _inds; } set { _inds = value; } }
 

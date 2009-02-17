@@ -295,7 +295,7 @@ namespace Responses
         [BrowsableAttribute(false)]
         protected BarListImpl BL { get { return _bl; } }
         [BrowsableAttribute(false)]
-        public bool isValid { get { return !_shut; } }
+        public bool isValid { get { return !_shut; } set { _shut = !value; } }
         [BrowsableAttribute(false)]
         public virtual string[] Indicators { get { return _iname; } set { _iname = value; } }
         [BrowsableAttribute(false)]

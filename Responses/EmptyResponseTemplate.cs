@@ -23,7 +23,7 @@ namespace Responses
         }
         public void Reset() { }
         public void GotPosition(Position p) { }
-        public bool isValid { get { return true; } }
+        public bool isValid { get { return true; } set { } }
         public string[] Indicators { get { return new string[0]; } set { } }
         public string Name { get { return ""; } set { } }
         public string FullName { get { return ""; } set { } }

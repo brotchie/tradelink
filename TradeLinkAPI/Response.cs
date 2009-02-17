@@ -23,7 +23,7 @@ namespace TradeLink.API
         void Reset();
 
         // Response Information
-        bool isValid { get; }
+        bool isValid { get; set; }
         string Name { get; set; }
         string FullName { get; set; }
         string[] Indicators { get; set; }

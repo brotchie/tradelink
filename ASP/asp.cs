@@ -30,10 +30,22 @@ namespace ASP
             tl.gotFill += new FillDelegate(tl_gotFill);
             tl.gotOrder += new OrderDelegate(tl_gotOrder);
             tl.gotOrderCancel += new UIntDelegate(tl_gotOrderCancel);
+            boxcriteria.ContextMenu = new ContextMenu();
+            boxcriteria.ContextMenu.MenuItems.Add("Activate/Shutdown", new EventHandler(toggleresponse));
             this.FormClosing += new FormClosingEventHandler(ASP_FormClosing);
             status(Util.TLSIdentity());
             Util.ExistsNewVersions(tl);
             LoadResponseDLL(Properties.Settings.Default.boxdll);
+        }
+
+        void toggleresponse(object sender, EventArgs e)
+        {
+            int selbox = boxcriteria.SelectedIndex;
+            reslist[selbox].isValid = !reslist[selbox].isValid;
+            if (!reslist[selbox].isValid)
+                status("Resonse " + reslist[selbox].Name + " is off.");
+            else
+                status("Response " + reslist[selbox].Name + " is on.");            
         }
 
         void tl_gotOrderCancel(uint number)
@@ -95,7 +107,6 @@ namespace ASP
             foreach (int idx in idxs)
                 reslist[idx].GotFill(t);
         }
-
 
         void Debug(string message)
         {
@@ -161,6 +172,7 @@ namespace ASP
 
         void workingbox_SendOrder(Order o)
         {
+            o.Account = _account.Text;
             o.Security = seclist[o.symbol].Type;
             o.Exchange = seclist[o.symbol].DestEx;
             o.LocalSymbol = o.symbol;
@@ -269,6 +281,11 @@ namespace ASP
         {
             if (e.KeyData == Keys.Enter)
                 Trade_Click(null, null);
+        }
+
+        private void _togglemsgs_Click(object sender, EventArgs e)
+        {
+            listBox1.Visible = !listBox1.Visible;
         }                                            
     }
 }
