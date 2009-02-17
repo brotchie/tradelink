@@ -1,10 +1,10 @@
 
-namespace TradeLib
+namespace TradeLink.Common
 {
     /// <summary>
     /// Create limit orders.
     /// </summary>
-    public class LimitOrder : Order
+    public class LimitOrder : OrderImpl
     {
         public LimitOrder(string sym, bool side, int size, decimal price, string comment) : base(sym, side, size, price, 0, comment, 0, 0) { }
         public LimitOrder(string sym, bool side, int size, decimal price) : base (sym,side,size,price,0,"",0,0) { }
@@ -12,7 +12,7 @@ namespace TradeLib
     /// <summary>
     /// Create buy limit orders.
     /// </summary>
-    public class BuyLimit : Order
+    public class BuyLimit : OrderImpl
     {
         public BuyLimit(string sym, int size, decimal price, string comment) : base (sym,true,size,price,0,comment,0,0) { }
         public BuyLimit(string sym, int size, decimal price) : base (sym,true,size,price,0,"",0,0) { }
@@ -21,7 +21,7 @@ namespace TradeLib
     /// <summary>
     /// Create sell-limit orders.
     /// </summary>
-    public class SellLimit : Order
+    public class SellLimit : OrderImpl
     {
         public SellLimit(string sym, int size, decimal price, string comment) : base (sym,false,size,price,0,comment,0,0) { }
         public SellLimit(string sym, int size, decimal price) : base (sym,false,size,price,0,"",0,0) { }
@@ -30,19 +30,19 @@ namespace TradeLib
     /// <summary>
     /// Create a buy OPG order
     /// </summary>
-    public class BuyOPG : Order
+    public class BuyOPG : OrderImpl
     {
         public BuyOPG(string sym, int size, decimal price, string comment) : base(sym,true,size,price,0,comment,0,0) { TIF = "OPG"; }
         public BuyOPG(string sym, int size,decimal price) : this(sym,size,price,"") {}
     }
 
-    public class SellOPG : Order
+    public class SellOPG : OrderImpl
     {
         public SellOPG(string sym, int size, decimal price, string comment) : base(sym, false, size, price, 0, comment, 0, 0) { TIF = "OPG"; }
         public SellOPG(string sym, int size, decimal price) : this(sym, size, price, "") { }
     }
 
-    public class OPGOrder : Order
+    public class OPGOrder : OrderImpl
     {
         public OPGOrder(string sym, bool side, int size, decimal price, string comment) : base(sym, side, size, price, 0, comment, 0, 0) { TIF = "OPG"; }
         public OPGOrder(string sym, bool side, int size, decimal price) : this(sym, side, size, price, "") { }

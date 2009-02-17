@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using TradeLink.API;
 
-namespace TradeLib
+namespace TradeLink.Common
 {
     public class HistSim 
     {
@@ -17,7 +18,7 @@ namespace TradeLib
         int _executions = 0;
         int _tickcount = 0;
         long _bytestoprocess = 0;
-        List<Security> Instruments = new List<Security>();
+        List<SecurityImpl> Instruments = new List<SecurityImpl>();
         
         // events
         public event TickDelegate GotTick;
@@ -123,7 +124,7 @@ namespace TradeLib
             // now we have our list, initialize instruments from files
             foreach (string file in _tickfiles)
             {
-                Instruments.Add(Security.FromFile(file));
+                Instruments.Add(SecurityImpl.FromFile(file));
             }
 
             D("Initialized " + (_tickfiles.Length ) + " instruments.");
@@ -158,7 +159,7 @@ namespace TradeLib
             else throw new Exception("Histsim was unable to initialize");
         }
 
-        List<Tick> tickcache = new List<Tick>();
+        List<TickImpl> tickcache = new List<TickImpl>();
         List<string> cachedsymbols = new List<string>();
 
         private void StockPlayTo(DateTime time)
@@ -171,7 +172,7 @@ namespace TradeLib
         {  
             // if a tick is in the cache it's because it's too new (in future)
             // so we only need to fetch ticks for uncached symbols
-            foreach (Security i in Instruments)
+            foreach (SecurityImpl i in Instruments)
             {
                 if (cachedsymbols.Contains(i.Name)) continue;
 
@@ -179,8 +180,8 @@ namespace TradeLib
                 switch (i.Type)
                 {
                     case SecurityType.STK:
-                        Security s = (Security)i;
-                        Tick next = s.NextTick;
+                        SecurityImpl s = (SecurityImpl)i;
+                        TickImpl next = s.NextTick;
                         if (next.isValid)
                         {
                             tickcache.Add(next); // add next tick to cache

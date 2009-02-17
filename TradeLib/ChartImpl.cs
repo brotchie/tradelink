@@ -5,22 +5,27 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using TradeLink.API;
 
-namespace TradeLib
+namespace TradeLink.Common
 {
     /// <summary>
     /// Used to pass changes to barlists
     /// </summary>
-    public delegate void BarListUpdated(BarList newbl);
+    public delegate void BarListUpdated(BarListImpl newbl);
 
     /// <summary>
     /// A generic charting form that plots BarList objects
     /// </summary>
-    public partial class Chart : Form
+    public partial class ChartImpl : Form, Chart
     {
         public event SecurityDelegate FetchStock;
         BarList bl = null;
-        public BarList Bars { get { return bl; } set { bl = value; } }
+        public BarList Bars 
+        { 
+            get { return bl; } 
+            set { NewBarList(value); } 
+        }
         string sym = "";
         public string Symbol { get { return sym; } set { sym = value; Text = Title; } }
         Graphics g = null;
@@ -34,14 +39,14 @@ namespace TradeLib
         decimal  pixperdollar = 0;
         string newstock = "";
         List<TextLabel> points = new List<TextLabel>();
-        public Chart() : this(null,false) { }
-        public Chart(BarList b) : this(b, false) { }
+        public ChartImpl() : this(null,false) { }
+        public ChartImpl(BarList b) : this(b, false) { }
         /// <summary>
         /// Initializes a new instance of the <see cref="Chart"/> class.
         /// </summary>
         /// <param name="b">The barlist.</param>
         /// <param name="allowtype">if set to <c>true</c> [allowtype] will allow typing/changing of new symbols on the chart window.</param>
-        public Chart(BarList b,bool allowtype)
+        public ChartImpl(BarList b,bool allowtype)
         {
             InitializeComponent();
             Paint += new PaintEventHandler(Chart_Paint);
@@ -54,16 +59,12 @@ namespace TradeLib
             }
         }
 
-        /// <summary>
-        /// Provide this chart with a new barlist, and refresh the display.
-        /// </summary>
-        /// <param name="barlist">The barlist.</param>
         public void NewBarList(BarList barlist)
         {
             bl = barlist;
-            Symbol = bl.Symbol;
+            Symbol = barlist.Symbol;
             Text = Title;
-            Refresh();
+            Invalidate(true);
         }
 
         void Chart_KeyUp(object sender, KeyEventArgs e)
@@ -80,7 +81,7 @@ namespace TradeLib
             {
                 string stock = newstock.ToString();
                 newstock = "";
-                if (FetchStock != null) FetchStock(new Security(stock));
+                if (FetchStock != null) FetchStock(new SecurityImpl(stock));
                 Refresh();
             }
 
@@ -128,28 +129,28 @@ namespace TradeLib
 
             for (int i = 0; i < barc; i++)
             {
-                Color bcolor = (bl.Get(i).Close > bl.Get(i).Open) ? Color.Green : Color.Red;
+                Color bcolor = (bl[i].Close > bl[i].Open) ? Color.Green : Color.Red;
                 p = new Pen(bcolor);
                 try
                 {
                     // draw high/low bar
-                    g.DrawLine(p, getX(i), getY(bl.Get(i).Low), getX(i), getY(bl.Get(i).High));
+                    g.DrawLine(p, getX(i), getY(bl[i].Low), getX(i), getY(bl[i].High));
                     // draw open bar
-                    g.DrawLine(p, getX(i), getY(bl.Get(i).Open), getX(i) - (int)(pixperbar / 3), getY(bl.Get(i).Open));
+                    g.DrawLine(p, getX(i), getY(bl[i].Open), getX(i) - (int)(pixperbar / 3), getY(bl[i].Open));
                     // draw close bar
-                    g.DrawLine(p, getX(i), getY(bl.Get(i).Close), getX(i) + (int)(pixperbar / 3), getY(bl.Get(i).Close));
+                    g.DrawLine(p, getX(i), getY(bl[i].Close), getX(i) + (int)(pixperbar / 3), getY(bl[i].Close));
                     // draw time labels (time @30min and date@noon)
 
                     if (bl.Int != BarInterval.Day)
                     {
-                        if ((i % 6) == 0) g.DrawString(bl.Get(i).Bartime.ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (f.Font.GetHeight() * 3));
-                        if (bl.Get(i).Bartime == 1200) g.DrawString(bl.Get(i).Bardate.ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (float)(f.Font.GetHeight() * 1.5));
+                        if ((i % 6) == 0) g.DrawString(bl[i].Bartime.ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (f.Font.GetHeight() * 3));
+                        if (bl[i].Bartime == 1200) g.DrawString(bl[i].Bardate.ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (float)(f.Font.GetHeight() * 1.5));
                     }
                     else
                     {
-                        int[] date = BarMath.Date(bl.Get(i).Bardate);
+                        int[] date = BarMath.Date(bl[i].Bardate);
                         int[] lastbardate = date;
-                        if ((i - 1) > 0) lastbardate = BarMath.Date(bl.Get(i - 1).Bardate);
+                        if ((i - 1) > 0) lastbardate = BarMath.Date(bl[i-1].Bardate);
                         if ((getX(lastlabelcoord) + minxlabelwidth) <= getX(i))
                         {
                             lastlabelcoord = i;
@@ -285,7 +286,7 @@ namespace TradeLib
             {
                 bl.Int = (biord - 1 < 0) ? v[v.Length - 1] : v[biord - 1];
             }
-            if ((bl.Int != old) && bl.Has(1)) NewBarList(this.bl);
+            if ((bl.Int != old) && bl.Has(1,bl.Int)) Bars = this.bl;
         }
     }
     public class TextLabel

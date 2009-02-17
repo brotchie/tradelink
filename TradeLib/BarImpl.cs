@@ -1,16 +1,18 @@
 using System;
 using System.Collections.Generic;
+using TradeLink.API;
 
-
-namespace TradeLib
+namespace TradeLink.Common
 {
 
 
     /// <summary>
     /// A single bar of price data, which represents OHLC and volume for an interval of time.
     /// </summary>
-    public class Bar : TickIndicator, BarInterface
+    public class BarImpl : TickIndicator, TradeLink.API.Bar
     {
+        string _sym = "";
+        public string Symbol { get { return _sym; } set { _sym = value; } }
         private decimal h = decimal.MinValue;
         private decimal l = decimal.MaxValue;
         private decimal o = 0;
@@ -31,8 +33,8 @@ namespace TradeLib
         public bool isValid { get { return (h >= l) && (o != 0) && (c != 0); } }
         public int TradeCount { get { return tradesinbar; } }
 
-        public Bar() : this(BarInterval.FiveMin) { }
-        public Bar(decimal open, decimal high, decimal low, decimal close, int vol, int date, int time)
+        public BarImpl() : this(BarInterval.FiveMin) { }
+        public BarImpl(decimal open, decimal high, decimal low, decimal close, int vol, int date, int time)
         {
             h = high;
             o = open;
@@ -42,7 +44,7 @@ namespace TradeLib
             bardate = date;
             bartime = time;
         }
-        public Bar(decimal open, decimal high, decimal low, decimal close, int vol, int date)
+        public BarImpl(decimal open, decimal high, decimal low, decimal close, int vol, int date)
         {
             h = high;
             o = open;
@@ -51,7 +53,7 @@ namespace TradeLib
             v = vol;
             bardate = date;
         }
-        public Bar(Bar b)
+        public BarImpl(BarImpl b)
         {
             h = b.High;
             l = b.Low;
@@ -63,7 +65,7 @@ namespace TradeLib
         }
         
         
-        public Bar(BarInterval tu) 
+        public BarImpl(BarInterval tu) 
         {
             tunits = tu;
         }
@@ -85,6 +87,8 @@ namespace TradeLib
         /// <returns>true if the tick is accepted, false if it belongs to another bar.</returns>
         public bool newTick(Tick t)
         {
+            if (_sym == "") _sym = t.symbol;
+            if (_sym != t.symbol) throw new InvalidTick();
             if (bartime == 0) { bartime = BarTime(t.time); bardate = t.date;}
             if (bardate != t.date) DAYEND = true;
             else DAYEND = false;
@@ -104,7 +108,7 @@ namespace TradeLib
         /// </summary>
         /// <param name="record">The record in comma-delimited format.</param>
         /// <returns>The equivalent Bar</returns>
-        public static Bar FromCSV(string record)
+        public static BarImpl FromCSV(string record)
         {
             // google used as example
             string[] r = record.Split(',');
@@ -121,38 +125,10 @@ namespace TradeLib
             decimal low = Convert.ToDecimal(r[3]);
             decimal close = Convert.ToDecimal(r[4]);
             int vol = Convert.ToInt32(r[5]);
-            return new Bar(open,high,low,close,vol,date);
+            return new BarImpl(open,high,low,close,vol,date);
         }
+
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    public enum BarInterval
-    {
-        /// <summary>
-        /// One-minute intervals
-        /// </summary>
-        Minute = 1,
-        /// <summary>
-        /// Five-minute interval
-        /// </summary>
-        FiveMin = 5,
-        /// <summary>
-        /// FifteenMinute intervals
-        /// </summary>
-        FifteenMin = 15,
-        /// <summary>
-        /// Hour-long intervals
-        /// </summary>
-        ThirtyMin = 30,
-        /// <summary>
-        /// Hour-long intervals
-        /// </summary>
-        Hour = 60,
-        /// <summary>
-        /// Day-long intervals
-        /// </summary>
-        Day = 450
-    }
+
 }

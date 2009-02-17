@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using TradeLink.API;
 
-
-namespace TradeLib
+namespace TradeLink.Common
 {
     public static class BarMath
     {
@@ -18,7 +18,7 @@ namespace TradeLib
             int year = (bardate - (month * 100) - day) / 10000;
             return new int[] { year, month, day };
         }
-        public static int[] Date(Bar bar) { return Date(bar.Bardate); }
+        public static int[] Date(BarImpl bar) { return Date(bar.Bardate); }
         /// <summary>
         /// Returns the highest-high of the barlist, for so many bars back.
         /// </summary>
@@ -73,7 +73,7 @@ namespace TradeLib
         public static decimal[] Highs(BarList chart)
         {
             List<decimal> l = new List<decimal>();
-            foreach (Bar b in chart)
+            foreach (BarImpl b in chart)
                 l.Add(b.High);
             return l.ToArray();
         }
@@ -81,7 +81,7 @@ namespace TradeLib
         public static decimal[] Lows(BarList chart)
         {
             List<decimal> l = new List<decimal>();
-            foreach (Bar b in chart)
+            foreach (BarImpl b in chart)
                 l.Add(b.Low);
             return l.ToArray();
         }
@@ -89,7 +89,7 @@ namespace TradeLib
         public static decimal[] Opens(BarList chart)
         {
             List<decimal> l = new List<decimal>();
-            foreach (Bar b in chart)
+            foreach (BarImpl b in chart)
                 l.Add(b.Open);
             return l.ToArray();
         }
@@ -97,7 +97,7 @@ namespace TradeLib
         public static decimal[] Closes(BarList chart)
         {
             List<decimal> l = new List<decimal>();
-            foreach (Bar b in chart)
+            foreach (BarImpl b in chart)
                 l.Add(b.Close);
             return l.ToArray();
         }
@@ -105,7 +105,7 @@ namespace TradeLib
         public static int[] Volumes(BarList chart)
         {
             List<int> l = new List<int>();
-            foreach (Bar b in chart)
+            foreach (BarImpl b in chart)
                 l.Add(b.Volume);
             return l.ToArray();
         }
@@ -113,7 +113,7 @@ namespace TradeLib
         public static decimal[] HLRange(BarList chart)
         {
             List<decimal> l = new List<decimal>();
-            foreach (Bar b in chart)
+            foreach (BarImpl b in chart)
                 l.Add(b.High - b.Low);
             return l.ToArray();
         }
@@ -121,7 +121,7 @@ namespace TradeLib
         public static decimal[] CORange(BarList chart)
         {
             List<decimal> l = new List<decimal>();
-            foreach (Bar b in chart)
+            foreach (BarImpl b in chart)
                 l.Add(b.Close - b.Open);
             return l.ToArray();
         }
@@ -145,7 +145,7 @@ namespace TradeLib
             List<BarList> l = new List<BarList>();
             foreach (string sym in symbols)
             {
-                BarList bl = new BarList(BarInterval.Day, sym);
+                BarListImpl bl = new BarListImpl(BarInterval.Day, sym);
                 if (bl.DayFromGoogle())
                     l.Add(bl);
             }

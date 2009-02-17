@@ -1,17 +1,9 @@
-/*
- * Created by SharpDevelop.
- * User: josh
- * Date: 1/30/2008
- * Time: 4:29 PM
- * 
- * To change this template use Tools | Options | Coding | Edit Standard Headers.
- */
-
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using TradeLink.API;
 
-namespace TradeLib
+namespace TradeLink.Common
 {
 	/// <summary>
 	/// Param Prompt quickly creates a GUI to edit properties of your Response

@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
-using TradeLib;
+using TradeLink.Common;
+using TradeLink.API;
 
-namespace TradeLib
+namespace TradeLink.Common
 {
 
     /// <summary>
@@ -10,7 +11,6 @@ namespace TradeLib
     /// </summary>
     public class Broker
     {
-        public delegate void OrderCancelDelegate(string sym, bool side, uint id);
         /// <summary>
         /// Occurs when [got order cancel].
         /// </summary>
@@ -49,19 +49,19 @@ namespace TradeLib
 
         public Order BestBidOrOffer(string symbol,bool side)
         {
-            Order best = new Order();
-            Order next = new Order();
+            Order best = new OrderImpl();
+            Order next = new OrderImpl();
             foreach (Account a in MasterOrders.Keys)
             {
                 // get our first order
                 if (!best.isValid)
                 {
                     // if we don't have a valid one yet, check this account
-                    best = new Order(BestBidOrOffer(symbol,side,a));
+                    best = new OrderImpl(BestBidOrOffer(symbol,side,a));
                     continue;  // keep checking the accounts till we find a valid one
                 }
                 // now we have our first order, which will be best if we can't find a second one
-                next = new Order(BestBidOrOffer(symbol,side,a));
+                next = new OrderImpl(BestBidOrOffer(symbol,side,a));
                 if (!next.isValid) continue; // keep going till we have a second order
                 best = BestBidOrOffer(best, next); // when we have two, compare and get best
                 // then keep fetching next valid order to see if it's better
@@ -71,19 +71,19 @@ namespace TradeLib
 
         public Order BestBidOrOffer(string sym, bool side,Account Account)
         {
-            Order best = new Order();
+            Order best = new OrderImpl();
             if (!MasterOrders.ContainsKey(Account)) return best;
-            foreach (Order o in MasterOrders[Account])
+            foreach (OrderImpl o in MasterOrders[Account])
             {
                 if (o.symbol != sym) continue;
                 if (o.Side != side) continue;
                 if (!best.isValid)
                 {
-                    best = new Order(o);
+                    best = new OrderImpl(o);
                     continue;
                 }
                 Order test = BestBidOrOffer(best, o);
-                if (test.isValid) best = new Order(test);
+                if (test.isValid) best = new OrderImpl(test);
             }
             return best;
         }
@@ -94,17 +94,17 @@ namespace TradeLib
         public Order BestBidOrOffer(Order first,Order second)
         {
             if ((first.symbol!= second.symbol) || (first.side!=second.side) || !first.isLimit || !second.isLimit)
-                return new Order(); // if not comparable return an invalid order
+                return new OrderImpl(); // if not comparable return an invalid order
             if ((first.side && (first.price > second.price)) || // if first is better, use it
                 (!first.side && (first.price < second.price)))
-                return new Order(first);
+                return new OrderImpl(first);
             else if ((first.side && (first.price < second.price)) || // if second is better, use it
                 (!first.side && (first.price > second.price)))
-                return new Order(second);
+                return new OrderImpl(second);
 
             // if order is matching then add the sizes
-            Order add = new Order(first);
-            add.size = add.UnSignedSize + second.UnSignedSize * (add.Side ? 1 : -1);
+            OrderImpl add = new OrderImpl(first);
+            add.size = add.UnSignedSize + second.UnsignedSize * (add.Side ? 1 : -1);
             return add;
         }
 
@@ -115,7 +115,7 @@ namespace TradeLib
             {
                 // get best bid or offer from opposite side,
                 // see if we can match against this BBO and cross locally
-                Order match = BestBidOrOffer(o.Symbol, !o.Side);
+                Order match = BestBidOrOffer(o.symbol, !o.side);
 
                 // first we need to make sure the book we're matching to allows executions
                 Account ma = new Account();
@@ -123,21 +123,22 @@ namespace TradeLib
                 {
                     // if it's allowed, try to match it
                     bool filled = o.Fill(match);
-                    int avail = o.UnSignedSize;
+                    int avail = o.UnsignedSize;
                     // if it matched 
                     if (filled)
                     {
                         // record trade
-                        MasterTrades[a.ID].Add((Trade)o); 
+                        Trade t = (Trade)o;
+                        MasterTrades[a.ID].Add(t); 
                         // notify the trade occured
                         if (GotFill != null) 
-                            GotFill((Trade)o);
+                            GotFill(t);
 
                         // update the order's size (in case it was a partial fill)
-                        o.size = (avail - Math.Abs(o.xsize)) * (o.Side ? 1 : -1);
+                        o.size = (avail - Math.Abs(t.xsize)) * (o.side ? 1 : -1);
 
                         // if it was a full fill, no need to add order to the book
-                        if (Math.Abs(o.xsize) == avail) return;
+                        if (Math.Abs(t.xsize) == avail) return;
                     }
                 }
             }
@@ -163,7 +164,7 @@ namespace TradeLib
                 if (MasterOrders[a][i].id == orderid) // if we have order with requested id
                 {
                     if ((GotOrderCancel != null) && a.Notify)
-                        GotOrderCancel(MasterOrders[a][i].symbol, MasterOrders[a][i].Side,orderid); //send cancel notifcation to any subscribers
+                        GotOrderCancel(MasterOrders[a][i].symbol, MasterOrders[a][i].side,orderid); //send cancel notifcation to any subscribers
                     MasterOrders[a].RemoveAt(i); // remove/cancel order
                     return true;
                 }
@@ -176,7 +177,7 @@ namespace TradeLib
         /// <returns>true if the order was accepted.</returns>
         public uint sendOrder(Order o) 
         {
-            if (!o.isValid) return (uint)TL2.BAD_PARAMETERS;
+            if (!o.isValid) return (uint)MessageTypes.BAD_PARAMETERS;
             if (o.Account == "") // make sure book is clearly stamped
             {
                 o.Account = DEFAULT.ID;
@@ -246,7 +247,7 @@ namespace TradeLib
                     if (filled)
                     {
                         remove.Add(i);
-                        tick.size -= o.UnSignedSize;
+                        tick.size -= o.UnsignedSize;
                         if (!MasterTrades.ContainsKey(a.ID)) MasterTrades.Add(a.ID, new List<Trade>());
                         MasterTrades[a.ID].Add((Trade)o); // record trade
                         if ((GotFill != null) && a.Notify)
@@ -291,7 +292,7 @@ namespace TradeLib
             if (!MasterOrders.ContainsKey(a)) return;
             foreach (Order o in MasterOrders[a])
                 if ((GotOrderCancel != null) && a.Notify)
-                    GotOrderCancel(o.symbol,o.Side,o.id); //send cancel notifcation to any subscribers
+                    GotOrderCancel(o.symbol,o.side,o.id); //send cancel notifcation to any subscribers
             MasterOrders[a].Clear();  // clear the account
         }
         /// <summary>
@@ -323,9 +324,9 @@ namespace TradeLib
         /// <returns>current position</returns>
         public Position GetOpenPosition(string symbol,Account a)
         {
-            Position pos = new Position(symbol);
+            Position pos = new PositionImpl(symbol);
             if (!MasterTrades.ContainsKey(a.ID)) return pos;
-            foreach (Trade trade in MasterTrades[a.ID]) 
+            foreach (TradeImpl trade in MasterTrades[a.ID]) 
                 if (trade.symbol==symbol) 
                     pos.Adjust(trade);
             return pos;
@@ -339,7 +340,7 @@ namespace TradeLib
         /// <returns>Closed PL</returns>
         public decimal GetClosedPL(string symbol, Account a)
         {
-            Position pos = new Position(symbol);
+            Position pos = new PositionImpl(symbol);
             decimal pl = 0;
             if (!MasterTrades.ContainsKey(a.ID)) return pl;
             foreach (Trade trade in MasterTrades[a.ID])
@@ -372,11 +373,11 @@ namespace TradeLib
             Dictionary<string, Position> poslist = new Dictionary<string, Position>();
             Dictionary<string,decimal> pllist = new Dictionary<string,decimal>();
             if (!MasterTrades.ContainsKey(a.ID)) return 0;
-            foreach (Trade trade in MasterTrades[a.ID])
+            foreach (TradeImpl trade in MasterTrades[a.ID])
             {
                 if (!poslist.ContainsKey(trade.symbol))
                 {
-                    poslist.Add(trade.symbol, new Position(trade.symbol));
+                    poslist.Add(trade.symbol, new PositionImpl(trade.symbol));
                     pllist.Add(trade.symbol, 0);
                 }
                 pllist[trade.symbol] += poslist[trade.symbol].Adjust(trade);
@@ -400,10 +401,10 @@ namespace TradeLib
         /// <returns>points</returns>
         public decimal GetClosedPT(string symbol, Account account)
         {
-            Position pos = new Position(symbol);
+            PositionImpl pos = new PositionImpl(symbol);
             decimal points = 0;
             if (!MasterTrades.ContainsKey(account.ID)) return points;
-            foreach (Trade t in MasterTrades[account.ID])
+            foreach (TradeImpl t in MasterTrades[account.ID])
             {
                 points += Calc.ClosePT(pos, t);
                 pos.Adjust(t);
@@ -423,14 +424,14 @@ namespace TradeLib
         /// <returns></returns>
         public decimal GetClosedPT(Account account)
         {
-            Dictionary<string, Position> poslist = new Dictionary<string, Position>();
+            Dictionary<string, PositionImpl> poslist = new Dictionary<string, PositionImpl>();
             Dictionary<string, decimal> ptlist = new Dictionary<string, decimal>();
             if (!MasterTrades.ContainsKey(account.ID)) return 0;
-            foreach (Trade trade in MasterTrades[account.ID])
+            foreach (TradeImpl trade in MasterTrades[account.ID])
             {
                 if (!poslist.ContainsKey(trade.symbol))
                 {
-                    poslist.Add(trade.symbol, new Position(trade.symbol));
+                    poslist.Add(trade.symbol, new PositionImpl(trade.symbol));
                     ptlist.Add(trade.symbol, 0);
                 }
                 ptlist[trade.symbol] += Calc.ClosePT(poslist[trade.symbol], trade);

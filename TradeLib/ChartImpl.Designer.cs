@@ -1,6 +1,6 @@
-namespace TradeLib
+namespace TradeLink.Common
 {
-    partial class Chart
+    partial class ChartImpl
     {
         /// <summary>
         /// Required designer variable.

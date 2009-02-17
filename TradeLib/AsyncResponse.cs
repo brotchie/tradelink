@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Text;
+using TradeLink.API;
 
-namespace TradeLib
+namespace TradeLink.Common
 {
     public class AsyncResponse
     {
         const uint MAXTICK = 10000;
-        Tick[] tickcache = new Tick[MAXTICK];
+        Tick[] tickcache = new TickImpl[MAXTICK];
         uint readcounter = 0;
         uint writecounter = 0;
         public event TickDelegate GotTick;
@@ -67,7 +68,7 @@ namespace TradeLib
         {
             if ((readthread!=null) && ((readthread.ThreadState != ThreadState.Stopped) && (readthread.ThreadState != ThreadState.StopRequested)))
                 readthread.Abort();
-            tickcache = new Tick[MAXTICK];
+            tickcache = new TickImpl[MAXTICK];
             writecounter = 0;
             readcounter = 0;
             mre.Reset();

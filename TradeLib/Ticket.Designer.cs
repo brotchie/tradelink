@@ -1,4 +1,4 @@
-namespace TradeLib
+namespace TradeLink.Common
 {
     partial class Ticket
     {

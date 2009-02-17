@@ -2,17 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
+using TradeLink.API;
 
-namespace TradeLib
+namespace TradeLink.Common
 {
     public class TLServer_WM : Form, TradeLinkServer
     {
-        public delegate decimal DecimalStringDelegate(string s);
-        public delegate int IntStringDelegate(string s);
-        public delegate string StringDelegate();
-        public delegate Position[] PositionArrayDelegate(string account);
-        public event DecimalStringDelegate gotSrvAcctOpenPLRequest;
-        public event DecimalStringDelegate gotSrvAcctClosedPLRequest;
         public event StringDelegate gotSrvAcctRequest;
         public event DecimalStringDelegate PositionPriceRequest;
         public event IntStringDelegate PositionSizeRequest;
@@ -44,13 +39,13 @@ namespace TradeLib
                 this.Invoke(new DebugDelegate(SrvDoExecute), new object[] { msg });
             else
             {
-                Order o = Order.Deserialize(msg);
+                Order o = OrderImpl.Deserialize(msg);
                 if (gotSrvFillRequest != null) gotSrvFillRequest(o); //request fill
             }
         }
 
 
-        delegate void tlneworderdelegate(Order o, bool allclients);
+        delegate void tlneworderdelegate(OrderImpl o, bool allclients);
         public void newOrder(Order o) { newOrder(o, false); }
         public void newOrder(Order o, bool allclients)
         {
@@ -60,7 +55,7 @@ namespace TradeLib
             {
                 for (int i = 0; i < client.Count; i++)
                     if ((client[i] != null) && (client[i] != "") && (stocks[i].Contains(o.symbol) || allclients))
-                        WMUtil.SendMsg(o.Serialize(), TL2.ORDERNOTIFY, Handle, client[i]);
+                        WMUtil.SendMsg(OrderImpl.Serialize(o), MessageTypes.ORDERNOTIFY, Handle, client[i]);
             }
         }
 
@@ -78,27 +73,27 @@ namespace TradeLib
                 if (!tick.isValid) return; // need a valid tick
                 for (int i = 0; i < client.Count; i++) // send tick to each client that has subscribed to tick's stock
                     if ((client[i] != null) && (stocks[i].Contains(tick.symbol)))
-                        WMUtil.SendMsg(tick.Serialize(), TL2.TICKNOTIFY, Handle, client[i]);
+                        WMUtil.SendMsg(TickImpl.Serialize(tick), MessageTypes.TICKNOTIFY, Handle, client[i]);
             }
         }
 
-        delegate void tlnewfilldelegate(Trade t, bool allclients);
+        delegate void tlnewfilldelegate(TradeImpl t, bool allclients);
         /// <summary>
         /// Notifies subscribed clients of a new execution.
         /// </summary>
         /// <param name="trade">The trade to include in the notification.</param>
         public void newFill(Trade trade) { newFill(trade, false); }
-        public void newFill(Trade trade,bool allclients)
+        public void newFill(Trade trade, bool allclients)
         {
             if (this.InvokeRequired)
                 this.Invoke(new tlnewfilldelegate(newFill), new object[] { trade,allclients });
             else
             {
                 // make sure our trade is filled and initialized properly
-                if (!trade.isValid || !trade.isFilled) return;
+                if (!trade.isValid) return;
                 for (int i = 0; i < client.Count; i++) // send tick to each client that has subscribed to tick's stock
                     if ((client[i] != null) && ((stocks[i].Contains(trade.symbol) || allclients)))
-                        WMUtil.SendMsg(trade.Serialize(), TL2.EXECUTENOTIFY, Handle, client[i]);
+                        WMUtil.SendMsg(TradeImpl.Serialize(trade), MessageTypes.EXECUTENOTIFY, Handle, client[i]);
             }
         }
 
@@ -181,7 +176,7 @@ namespace TradeLib
         public void newOrderCancel(long orderid_being_cancled)
         {
             foreach (string c in client) // send order cancel notifcation to clients
-                WMUtil.SendMsg(orderid_being_cancled.ToString(), TL2.ORDERCANCELRESPONSE, Handle, c);
+                WMUtil.SendMsg(orderid_being_cancled.ToString(), MessageTypes.ORDERCANCELRESPONSE, Handle, c);
         }
 
         public Brokers BrokerName = Brokers.TradeLinkSimulation;
@@ -196,14 +191,14 @@ namespace TradeLib
             }
             string msg = tlm.body;
 
-            long result = (long)TL2.OK;
+            long result = (long)MessageTypes.OK;
             switch (tlm.type)
             {
-                case TL2.ACCOUNTREQUEST:
+                case MessageTypes.ACCOUNTREQUEST:
                     if (gotSrvAcctRequest == null) break;
-                    WMUtil.SendMsg(gotSrvAcctRequest(), TL2.ACCOUNTRESPONSE, Handle, msg);
+                    WMUtil.SendMsg(gotSrvAcctRequest(), MessageTypes.ACCOUNTRESPONSE, Handle, msg);
                     break;
-                case TL2.POSITIONREQUEST:
+                case MessageTypes.POSITIONREQUEST:
                     if (gotSrvPosList == null) break;
                     string [] pm = msg.Split('+');
                     if (pm.Length<2) break;
@@ -211,76 +206,76 @@ namespace TradeLib
                     string acct = pm[1];
                     Position[] list = gotSrvPosList(acct);
                     foreach (Position pos in list)
-                        WMUtil.SendMsg(pos.Serialize(), TL2.POSITIONRESPONSE, Handle, client);
+                        WMUtil.SendMsg(PositionImpl.Serialize(pos), MessageTypes.POSITIONRESPONSE, Handle, client);
                     break;
-                case TL2.ORDERCANCELREQUEST:
+                case MessageTypes.ORDERCANCELREQUEST:
                     if (OrderCancelRequest != null)
                         OrderCancelRequest(Convert.ToUInt32(msg));
                     break;
-                case TL2.SENDORDER:
+                case MessageTypes.SENDORDER:
                     SrvDoExecute(msg);
                     break;
-                case TL2.REGISTERCLIENT:
+                case MessageTypes.REGISTERCLIENT:
                     SrvRegClient(msg);
                     break;
-                case TL2.REGISTERSTOCK:
+                case MessageTypes.REGISTERSTOCK:
                     string[] m2 = msg.Split('+');
                     SrvRegStocks(m2[0], m2[1]);
                     break;
-                case TL2.CLEARCLIENT:
+                case MessageTypes.CLEARCLIENT:
                     SrvClearClient(msg);
                     break;
-                case TL2.CLEARSTOCKS:
+                case MessageTypes.CLEARSTOCKS:
                     SrvClearStocks(msg);
                     break;
-                case TL2.HEARTBEAT:
+                case MessageTypes.HEARTBEAT:
                     SrvBeatHeart(msg);
                     break;
-                case TL2.BROKERNAME :
+                case MessageTypes.BROKERNAME :
                     result = (long)BrokerName;
                     break;
-                case TL2.FEATUREREQUEST:
-                    TL2[] f = GetFeatures();
+                case MessageTypes.FEATUREREQUEST:
+                    MessageTypes[] f = GetFeatures();
                     List<string> mf = new List<string>();
-                    foreach (TL2 t in f)
+                    foreach (MessageTypes t in f)
                     {
                         int ti = (int)t;
                         mf.Add(ti.ToString());
                     }
                     string msf = string.Join(",", mf.ToArray());
-                    WMUtil.SendMsg(msf, TL2.FEATURERESPONSE, Handle, msg);
+                    WMUtil.SendMsg(msf, MessageTypes.FEATURERESPONSE, Handle, msg);
                     break;
-                case TL2.VERSION :
+                case MessageTypes.VERSION :
                     result = (long)MinorVer;
                     break;
                 default:
-                    result = (long)TL2.FEATURE_NOT_IMPLEMENTED;
+                    result = (long)MessageTypes.FEATURE_NOT_IMPLEMENTED;
                     break;
             }
             m.Result = (IntPtr)result;
         }
 
-        TL2[] GetFeatures()
+        MessageTypes[] GetFeatures()
         {
-            List<TL2> f = new List<TL2>();
+            List<MessageTypes> f = new List<MessageTypes>();
 
-            f.Add(TL2.ACCOUNTREQUEST);
-            f.Add(TL2.ACCOUNTRESPONSE);
-            f.Add(TL2.BROKERNAME);
-            f.Add(TL2.CLEARCLIENT);
-            f.Add(TL2.CLEARSTOCKS);
-            f.Add(TL2.EXECUTENOTIFY);
-            f.Add(TL2.FEATUREREQUEST);
-            f.Add(TL2.FEATURERESPONSE);
-            f.Add(TL2.HEARTBEAT);
-            f.Add(TL2.ORDERCANCELREQUEST);
-            f.Add(TL2.ORDERCANCELRESPONSE);
-            f.Add(TL2.ORDERNOTIFY);
-            f.Add(TL2.REGISTERCLIENT);
-            f.Add(TL2.REGISTERSTOCK);
-            f.Add(TL2.SENDORDER);
-            f.Add(TL2.TICKNOTIFY);
-            f.Add(TL2.VERSION);
+            f.Add(MessageTypes.ACCOUNTREQUEST);
+            f.Add(MessageTypes.ACCOUNTRESPONSE);
+            f.Add(MessageTypes.BROKERNAME);
+            f.Add(MessageTypes.CLEARCLIENT);
+            f.Add(MessageTypes.CLEARSTOCKS);
+            f.Add(MessageTypes.EXECUTENOTIFY);
+            f.Add(MessageTypes.FEATUREREQUEST);
+            f.Add(MessageTypes.FEATURERESPONSE);
+            f.Add(MessageTypes.HEARTBEAT);
+            f.Add(MessageTypes.ORDERCANCELREQUEST);
+            f.Add(MessageTypes.ORDERCANCELRESPONSE);
+            f.Add(MessageTypes.ORDERNOTIFY);
+            f.Add(MessageTypes.REGISTERCLIENT);
+            f.Add(MessageTypes.REGISTERSTOCK);
+            f.Add(MessageTypes.SENDORDER);
+            f.Add(MessageTypes.TICKNOTIFY);
+            f.Add(MessageTypes.VERSION);
             return f.ToArray();
         }
 

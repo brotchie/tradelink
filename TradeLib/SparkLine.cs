@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
+using TradeLink.API;
 
-namespace TradeLib
+namespace TradeLink.Common
 {
     public class SparkLine
     {
@@ -13,11 +14,11 @@ namespace TradeLib
         decimal low = 0;
         public SparkLine(int H, int W) { h = H; w = W; }
 
-        public Image DrawBarListBlack(BarList bl) { return DrawBarList(bl, BarInterval.FiveMin, Color.Black, Color.Black); }
-        public Image DrawBarListBlack(BarList bl, BarInterval bi) { return DrawBarList(bl, bi, Color.Black,Color.Black); }
-        public Image DrawBarList(BarList bl) { return DrawBarList(bl, BarInterval.FiveMin, Color.Green, Color.Red); }
-        public Image DrawBarList(BarList bl, BarInterval bi) { return DrawBarList(bl, bi, Color.Green, Color.Red); }
-        public Image DrawBarList(BarList bl, BarInterval bi,Color up, Color down)
+        public Image DrawBarListBlack(BarListImpl bl) { return DrawBarList(bl, BarInterval.FiveMin, Color.Black, Color.Black); }
+        public Image DrawBarListBlack(BarListImpl bl, BarInterval bi) { return DrawBarList(bl, bi, Color.Black,Color.Black); }
+        public Image DrawBarList(BarListImpl bl) { return DrawBarList(bl, BarInterval.FiveMin, Color.Green, Color.Red); }
+        public Image DrawBarList(BarListImpl bl, BarInterval bi) { return DrawBarList(bl, bi, Color.Green, Color.Red); }
+        public Image DrawBarList(BarListImpl bl, BarInterval bi,Color up, Color down)
         {
             bl.Int = bi;
             Bitmap sl = new Bitmap(w, h);

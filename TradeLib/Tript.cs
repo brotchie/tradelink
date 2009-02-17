@@ -1,6 +1,6 @@
 using System;
 
-// this namespace is intentionally different from the rest of TradeLib
+// this namespace is intentionally different from the rest of TradeLink.Common
 namespace Tript // a special class/namespace for use only with Tript
 {
     public static class q

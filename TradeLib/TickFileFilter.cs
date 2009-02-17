@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-namespace TradeLib
+namespace TradeLink.Common
 {
     /// <summary>
     /// Filters tick files (EPF/IDX) based on symbol name and trading date.

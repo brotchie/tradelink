@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Net.Mail;
 
-namespace TradeLib
+namespace TradeLink.Common
 {
     public static class Email
     {

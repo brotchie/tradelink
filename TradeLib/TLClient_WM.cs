@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
+using TradeLink.API;
 
-
-namespace TradeLib
+namespace TradeLink.Common
 {
     public class TLClient_WM : Form , TradeLinkClient
     {
@@ -18,7 +18,7 @@ namespace TradeLib
         public event OrderDelegate gotOrder;
         public event DebugDelegate gotAccounts;
         public event UIntDelegate gotOrderCancel;
-        public event TL2MsgDelegate gotSupportedFeatures;
+        public event MessageTypesMsgDelegate gotSupportedFeatures;
         public event PositionDelegate gotPosition;
 
         public TLClient_WM() : this("TradeLinkClient",true,true) { }
@@ -174,9 +174,9 @@ namespace TradeLib
         /// </summary>
         public void GoTest() { Disconnect(); himh = WMUtil.HisHandle(WMUtil.TESTWINDOW); LinkType = TLTypes.TESTBROKER; Register(); }
         IntPtr himh = IntPtr.Zero;
-        public long TLSend(TL2 type) { return TLSend(type, ""); }
-        delegate long TLSendDelegate(TL2 type, string msg);
-        public long TLSend(TL2 type, string m)
+        public long TLSend(MessageTypes type) { return TLSend(type, ""); }
+        delegate long TLSendDelegate(MessageTypes type, string msg);
+        public long TLSend(MessageTypes type, string m)
         {
             if (InvokeRequired)
                 return (long)Invoke(new TLSendDelegate(TLSend), new object[] { type, m });
@@ -194,17 +194,17 @@ namespace TradeLib
         /// <returns>Zero if succeeded, Broker error code otherwise.</returns>
         public int SendOrder(Order o)
         {
-            if (o == null) return (int)TL2.GOTNULLORDER;
-            if (!o.isValid) return (int)TL2.OK;
-            string m = o.Serialize();
-            return (int)TLSend(TL2.SENDORDER, m);
+            if (o == null) return (int)MessageTypes.GOTNULLORDER;
+            if (!o.isValid) return (int)MessageTypes.OK;
+            string m = OrderImpl.Serialize(o);
+            return (int)TLSend(MessageTypes.SENDORDER, m);
         }
 
-        public void RequestFeatures() { TLSend(TL2.FEATUREREQUEST,Text); }
+        public void RequestFeatures() { TLSend(MessageTypes.FEATUREREQUEST,Text); }
 
         Dictionary<string, decimal> chighs = new Dictionary<string, decimal>();
         Dictionary<string, decimal> clows = new Dictionary<string, decimal>();
-        Dictionary<string, Position> cpos = new Dictionary<string, Position>();
+        Dictionary<string, PositionImpl> cpos = new Dictionary<string, PositionImpl>();
 
         /// <summary>
         /// Today's high
@@ -243,59 +243,59 @@ namespace TradeLib
         /// Request an order be canceled
         /// </summary>
         /// <param name="orderid">the id of the order being canceled</param>
-        public void CancelOrder(Int64 orderid) { TLSend(TL2.ORDERCANCELREQUEST, orderid.ToString()); }
+        public void CancelOrder(Int64 orderid) { TLSend(MessageTypes.ORDERCANCELREQUEST, orderid.ToString()); }
 
         /// <summary>
         /// Send an account request, response is returned via the gotAccounts event.
         /// </summary>
         /// <returns>error code, and list of accounts via the gotAccounts event.</returns>
         /// 
-        public int RequestAccounts() { return (int)TLSend(TL2.ACCOUNTREQUEST, Text); }
+        public int RequestAccounts() { return (int)TLSend(MessageTypes.ACCOUNTREQUEST, Text); }
         /// <summary>
         /// Sends a request for current positions.  gotPosition event will fire for each position record held by the broker.
         /// </summary>
         /// <param name="account">account to obtain position list for (required)</param>
         /// <returns>number of positions to expect</returns>
-        public int RequestPositions(string account) { if (account == "") return 0; return (int)TLSend(TL2.POSITIONREQUEST, Text + "+" + account); }
+        public int RequestPositions(string account) { if (account == "") return 0; return (int)TLSend(MessageTypes.POSITIONREQUEST, Text + "+" + account); }
 
         public Brokers BrokerName 
         { 
             get 
             { 
-                long res = TLSend(TL2.BROKERNAME);
+                long res = TLSend(MessageTypes.BROKERNAME);
                 return (Brokers)res;
             } 
         }
 
-        public int ServerVersion { get { return (int)TLSend(TL2.VERSION); } }
+        public int ServerVersion { get { return (int)TLSend(MessageTypes.VERSION); } }
 
         public void Disconnect()
         {
             try
             {
-                TLSend(TL2.CLEARCLIENT, Text);
+                TLSend(MessageTypes.CLEARCLIENT, Text);
             }
             catch (TLServerNotFound) { }
         }
 
         public void Register()
         {
-            TLSend(TL2.REGISTERCLIENT, Text);
+            TLSend(MessageTypes.REGISTERCLIENT, Text);
         }
 
-        public void Subscribe(MarketBasket mb)
+        public void Subscribe(TradeLink.API.MarketBasket mb)
         {
-            TLSend(TL2.REGISTERSTOCK, Text + "+" + mb.ToString());
+            TLSend(MessageTypes.REGISTERSTOCK, Text + "+" + mb.ToString());
         }
 
         public void Unsubscribe()
         {
-            TLSend(TL2.CLEARSTOCKS, Text);
+            TLSend(MessageTypes.CLEARSTOCKS, Text);
         }
 
         public int HeartBeat()
         {
-            return (int)TLSend(TL2.HEARTBEAT, Text);
+            return (int)TLSend(MessageTypes.HEARTBEAT, Text);
         }
 
 
@@ -324,11 +324,11 @@ namespace TradeLib
             string[] r = msg.Split(',');
             switch (tlm.type)
             {
-                case TL2.ORDERCANCELRESPONSE:
+                case MessageTypes.ORDERCANCELRESPONSE:
                     if (gotOrderCancel != null) gotOrderCancel(Convert.ToUInt32(msg));
                     break;
-                case TL2.TICKNOTIFY:
-                    Tick t = Tick.Deserialize(msg);
+                case MessageTypes.TICKNOTIFY:
+                    Tick t = TickImpl.Deserialize(msg);
                     if (t.isTrade)
                     {
                         try
@@ -344,31 +344,31 @@ namespace TradeLib
                     }
                     if (gotTick != null) gotTick(t);
                     break;
-                case TL2.EXECUTENOTIFY:
+                case MessageTypes.EXECUTENOTIFY:
                     // date,time,symbol,side,size,price,comment
-                    Trade tr = Trade.Deserialize(msg);
+                    Trade tr = TradeImpl.Deserialize(msg);
                     if (gotFill != null) gotFill(tr);
                     break;
-                case TL2.ORDERNOTIFY:
-                    Order o = Order.Deserialize(msg);
+                case MessageTypes.ORDERNOTIFY:
+                    Order o = OrderImpl.Deserialize(msg);
                     if (gotOrder != null) gotOrder(o);
                     break;
-                case TL2.POSITIONRESPONSE:
-                    Position pos = Position.Deserialize(msg);
+                case MessageTypes.POSITIONRESPONSE:
+                    Position pos = PositionImpl.Deserialize(msg);
                     if (gotPosition != null) gotPosition(pos);
                     break;
 
-                case TL2.ACCOUNTRESPONSE:
+                case MessageTypes.ACCOUNTRESPONSE:
                     if (gotAccounts != null) gotAccounts(msg);
                     break;
-                case TL2.FEATURERESPONSE:
+                case MessageTypes.FEATURERESPONSE:
                     string[] p = msg.Split(',');
-                    List<TL2> f = new List<TL2>();
+                    List<MessageTypes> f = new List<MessageTypes>();
                     foreach (string s in p)
                     {
                         try
                         {
-                            f.Add((TL2)Convert.ToInt32(s));
+                            f.Add((MessageTypes)Convert.ToInt32(s));
                         }
                         catch (Exception) { }
                     }

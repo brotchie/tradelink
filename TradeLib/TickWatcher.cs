@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using TradeLink.API;
 
-namespace TradeLib
+namespace TradeLink.Common
 {
     /// <summary>
     /// Used to watch a stream of ticks, and send alerts when the stream goes idle for a specified time.
@@ -20,8 +21,8 @@ namespace TradeLib
         /// </summary>
         /// <param name="tick">The tick.</param>
         /// <returns></returns>
-        public bool Watch(Tick tick) { return Watch(tick, _defaultwait); }
-        public bool Watch(Tick tick, int NoTicksAlertWait) 
+        public bool Watch(TickImpl tick) { return Watch(tick, _defaultwait); }
+        public bool Watch(TickImpl tick, int NoTicksAlertWait) 
         {
             long last = Util.ToDateTime(tick.date, tick.time, tick.sec).Ticks;
             if (!_last.ContainsKey(tick.symbol))
@@ -29,13 +30,13 @@ namespace TradeLib
                 _last.Add(tick.symbol, last);
                 if (_alertonfirst) // if we're notifying when first tick arrives, do it.
                     if (FirstTick != null) 
-                        FirstTick(Security.Parse(tick.symbol, Util.ToTLDate(_last[tick.symbol])));
+                        FirstTick(SecurityImpl.Parse(tick.symbol, Util.ToTLDate(_last[tick.symbol])));
                 return true;
             }
             TimeSpan span = new TimeSpan(Util.ToDateTime(tick.date, tick.time, tick.sec).Ticks - _last[tick.symbol]);
             bool alert = span.TotalSeconds>NoTicksAlertWait;
             _last[tick.symbol] = last;
-            if (alert && (Alerted!=null)) Alerted(Security.Parse(tick.symbol,tick.date));
+            if (alert && (Alerted!=null)) Alerted(SecurityImpl.Parse(tick.symbol,tick.date));
             return !alert;
         }
         /// <summary>
@@ -56,7 +57,7 @@ namespace TradeLib
             foreach (string sym in _last.Keys)
                 if (Alerted!=null)
                     if ((new TimeSpan(date.Ticks - _last[sym])).TotalSeconds>AlertSecondsWithoutTick)
-                        Alerted(Security.Parse(sym,Util.ToTLDate(_last[sym])));
+                        Alerted(SecurityImpl.Parse(sym,Util.ToTLDate(_last[sym])));
         }
 
 

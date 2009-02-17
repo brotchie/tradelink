@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Collections;
+using TradeLink.API;
 
-namespace TradeLib
+namespace TradeLink.Common
 {
     /// <summary>
     /// Holds a succession of bars.  Will acceptt ticks and automatically create new bars as needed.
     /// </summary>
-    public class BarList : TickIndicator
+    public class BarListImpl : TickIndicator, TradeLink.API.BarList
     {
-        public IEnumerator GetEnumerator() { foreach (Bar b in DefaultBar) yield return b; }
+        public IEnumerator GetEnumerator() { foreach (BarImpl b in DefaultBar) yield return b; }
         public Bar this[int index, BarInterval bint]
         {
             get { return Get(index, bint); }
@@ -20,16 +21,16 @@ namespace TradeLib
         {
             get { return Get(index); }
         }
-        public BarList(string symbol) : this(BarInterval.FiveMin, symbol) { }
-        public BarList() : this(BarInterval.FiveMin, "") { }
+        public BarListImpl(string symbol) : this(BarInterval.FiveMin, symbol) { }
+        public BarListImpl() : this(BarInterval.FiveMin, "") { }
         string sym = "";
-        public BarList(BarInterval PreferredInt) : this(PreferredInt, "") { }
+        public BarListImpl(BarInterval PreferredInt) : this(PreferredInt, "") { }
         /// <summary>
         /// Initializes a new instance of the <see cref="BarList"/> class.
         /// </summary>
         /// <param name="PreferredInterval">The preferred time-interval on requests if none is specified.</param>
         /// <param name="stock">The stock.</param>
-        public BarList(BarInterval PreferredInterval, string stock)
+        public BarListImpl(BarInterval PreferredInterval, string stock)
         {
             Int = PreferredInterval;
             sym = stock;
@@ -62,12 +63,12 @@ namespace TradeLib
             hourlist.Clear();
             daylist.Clear();
         }
-        protected List<Bar> minlist = new List<Bar>();
-        protected List<Bar> fivelist = new List<Bar>();
-        protected List<Bar> fifteenlist = new List<Bar>();
-        protected List<Bar> thirtylist = new List<Bar>();
-        protected List<Bar> hourlist = new List<Bar>();
-        protected List<Bar> daylist = new List<Bar>();
+        protected List<BarImpl> minlist = new List<BarImpl>();
+        protected List<BarImpl> fivelist = new List<BarImpl>();
+        protected List<BarImpl> fifteenlist = new List<BarImpl>();
+        protected List<BarImpl> thirtylist = new List<BarImpl>();
+        protected List<BarImpl> hourlist = new List<BarImpl>();
+        protected List<BarImpl> daylist = new List<BarImpl>();
         public string Symbol { get { return sym; } }
         public int Count { get { return DefaultBar.Count; } }
         public int Last { get { return Count - 1; } }
@@ -82,7 +83,7 @@ namespace TradeLib
                 {
                     return this[Last];
                 }
-                catch (Exception) { return new Bar(); }
+                catch (Exception) { return new BarImpl(); }
             }
         }
         /// <summary>
@@ -91,11 +92,11 @@ namespace TradeLib
         /// <value><c>true</c> if [new bar]; otherwise, <c>false</c>.</value>
         public bool NewBar { get { return this.HasBar() && RecentBar.isNew; } }
         protected BarInterval interval = BarInterval.FiveMin;
-        protected List<Bar> DefaultBar
+        protected List<BarImpl> DefaultBar
         {
             get
             {
-                List<Bar> bars = new List<Bar>();
+                List<BarImpl> bars = new List<BarImpl>();
                 switch (Int)
                 {
                     case BarInterval.FiveMin: bars = fivelist; break;
@@ -118,16 +119,16 @@ namespace TradeLib
         /// </summary>
         /// <param name="BarNum">The bar num.</param>
         /// <returns></returns>
-        public Bar Get(int BarNum) { return Get(BarNum, Int); }
+        public BarImpl Get(int BarNum) { return Get(BarNum, Int); }
         /// <summary>
         /// Gets the specified bar number, with the specified bar interval.
         /// </summary>
         /// <param name="i">The barnumber.</param>
         /// <param name="barinterval">The barinterval.</param>
         /// <returns></returns>
-        public Bar Get(int i, BarInterval barinterval)
+        public BarImpl Get(int i, BarInterval barinterval)
         {
-            List<Bar> bars = new List<Bar>();
+            List<BarImpl> bars = new List<BarImpl>();
             switch (barinterval)
             {
                 case BarInterval.FiveMin: bars = fivelist; break;
@@ -137,10 +138,10 @@ namespace TradeLib
                 case BarInterval.Hour: bars = hourlist; break;
                 case BarInterval.Day: bars = daylist; break;
             }
-            if ((i < 0) || (i >= bars.Count)) return new Bar();
+            if ((i < 0) || (i >= bars.Count)) return new BarImpl();
             return bars[i];
         }
-        public void AddTick(Tick t) { newTick(t); }
+        public void AddTick(TickImpl t) { newTick(t); }
         /// <summary>
         /// Adds the tick to the barlist, creates other bars if needed.
         /// </summary>
@@ -155,12 +156,12 @@ namespace TradeLib
             // if we have no bars, add bar with a tick
             if (Count == 0)
             {
-                minlist.Add(new Bar(BarInterval.Minute));
-                fivelist.Add(new Bar(BarInterval.FiveMin));
-                fifteenlist.Add(new Bar(BarInterval.FifteenMin));
-                thirtylist.Add(new Bar(BarInterval.ThirtyMin));
-                hourlist.Add(new Bar(BarInterval.Hour));
-                daylist.Add(new Bar(BarInterval.Day));
+                minlist.Add(new BarImpl(BarInterval.Minute));
+                fivelist.Add(new BarImpl(BarInterval.FiveMin));
+                fifteenlist.Add(new BarImpl(BarInterval.FifteenMin));
+                thirtylist.Add(new BarImpl(BarInterval.ThirtyMin));
+                hourlist.Add(new BarImpl(BarInterval.Hour));
+                daylist.Add(new BarImpl(BarInterval.Day));
                 minlist[minlist.Count - 1].newTick(t);
                 fivelist[fivelist.Count - 1].newTick(t);
                 fifteenlist[fifteenlist.Count - 1].newTick(t);
@@ -173,12 +174,12 @@ namespace TradeLib
                 // if we have at least a bar, get most current bar
                 foreach (BarInterval inv in Enum.GetValues(typeof(BarInterval)))
                 {
-                    Bar cbar = this[this.Last, inv];
+                    BarImpl cbar = (BarImpl)this[this.Last, inv];
                     // if tick fits in current bar, then we're done for this interval
                     if (cbar.newTick(t)) continue;
                     else // otherwise we need another bar in this interval
                         if (AddBar(inv))
-                            this[this.Last,inv].newTick(t);
+                            ((BarImpl)this[this.Last,inv]).newTick(t);
                }
             }
             return NewBar;
@@ -188,40 +189,31 @@ namespace TradeLib
         {
             switch (bint)
             {
-                case BarInterval.Day: daylist.Add(new Bar(BarInterval.Day)); break;
-                case BarInterval.FifteenMin: fifteenlist.Add(new Bar(BarInterval.FifteenMin)); break;
-                case BarInterval.FiveMin: fivelist.Add(new Bar(BarInterval.FiveMin)); break;
-                case BarInterval.Hour: hourlist.Add(new Bar(BarInterval.Hour)); break;
-                case BarInterval.Minute: minlist.Add(new Bar(BarInterval.Minute)); break;
-                case BarInterval.ThirtyMin: thirtylist.Add(new Bar(BarInterval.ThirtyMin)); break;
+                case BarInterval.Day: daylist.Add(new BarImpl(BarInterval.Day)); break;
+                case BarInterval.FifteenMin: fifteenlist.Add(new BarImpl(BarInterval.FifteenMin)); break;
+                case BarInterval.FiveMin: fivelist.Add(new BarImpl(BarInterval.FiveMin)); break;
+                case BarInterval.Hour: hourlist.Add(new BarImpl(BarInterval.Hour)); break;
+                case BarInterval.Minute: minlist.Add(new BarImpl(BarInterval.Minute)); break;
+                case BarInterval.ThirtyMin: thirtylist.Add(new BarImpl(BarInterval.ThirtyMin)); break;
                 default: return false;
             }
             return true;
         }
     
-
-        public Security ToSecurity()
-        {
-            if (!HasBar()) throw new Exception("Can't generate a stock instance from an empty barlist!");
-            Security s = new Security(Symbol);
-            s.Date = RecentBar.Bardate;
-            return s;
-        }
-
         /// <summary>
         /// Create a barlist from a succession of bar records provided as comma-delimited OHLC+volume data.
         /// </summary>
         /// <param name="symbol">The symbol.</param>
         /// <param name="file">The file containing the CSV records.</param>
         /// <returns></returns>
-        public static BarList FromCSV(string symbol, string file)
+        public static BarListImpl FromCSV(string symbol, string file)
         {
-            BarList b = new BarList(BarInterval.Day, symbol);
+            BarListImpl b = new BarListImpl(BarInterval.Day, symbol);
             string[] line = file.Split(Environment.NewLine.ToCharArray());
             for (int i = line.Length - 1; i > 0; i--)
             {
-                Bar mybar = null;
-                if (line[i] != "") mybar = Bar.FromCSV(line[i]);
+                BarImpl mybar = null;
+                if (line[i] != "") mybar = BarImpl.FromCSV(line[i]);
                 if (mybar != null) b.daylist.Add(mybar);
             }
             return b;
@@ -245,8 +237,8 @@ namespace TradeLib
             string[] line = res.Split(Environment.NewLine.ToCharArray());
             for (int i = line.Length - 1; i > 0; i--)
             {
-                Bar mybar = null;
-                if (line[i] != "") mybar = Bar.FromCSV(line[i]);
+                BarImpl mybar = null;
+                if (line[i] != "") mybar = BarImpl.FromCSV(line[i]);
                 if (mybar != null) daylist.Add(mybar);
             }
             return true;
@@ -267,11 +259,11 @@ namespace TradeLib
         /// </summary>
         /// <param name="filename">The filename.</param>
         /// <returns>barlist</returns>
-        public static BarList FromEPF(string filename)
+        public static BarListImpl FromEPF(string filename)
         {
             System.IO.StreamReader sr = new System.IO.StreamReader(filename);
-            Security s = eSigTick.InitEpf(sr);
-            BarList b = new BarList(BarInterval.FiveMin, s.Symbol);
+            SecurityImpl s = eSigTick.InitEpf(sr);
+            BarListImpl b = new BarListImpl(BarInterval.FiveMin, s.Symbol);
             while (!sr.EndOfStream)
                 b.AddTick(eSigTick.FromStream(s.Symbol, sr));
             return b;

@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Runtime.InteropServices;
+using TradeLink.API;
 
-namespace TradeLib
+namespace TradeLink.Common
 {
     public static class WMUtil
     {
@@ -94,7 +95,7 @@ namespace TradeLib
             if (cds.cbData > 0)
             {
                 m.body = Marshal.PtrToStringAnsi(cds.lpData);
-                m.type = (TL2)cds.dwData;
+                m.type = (MessageTypes)cds.dwData;
             }
             return m;
         }
@@ -132,7 +133,7 @@ namespace TradeLib
         /// <param name="messagetype">The messagetype.</param>
         /// <param name="destinationwindow">The destinationwindow.</param>
         /// <returns></returns>
-        public static long SendMsg(string message, TL2 messagetype, IntPtr sourcehandle,string destinationwindow)
+        public static long SendMsg(string message, MessageTypes messagetype, IntPtr sourcehandle,string destinationwindow)
         {
             IntPtr him = WMUtil.HisHandle(destinationwindow);
             return WMUtil.SendMsg(message, him,sourcehandle, (int)messagetype);
@@ -141,8 +142,8 @@ namespace TradeLib
 
     public class TradeLinkMessage
     {
-        public TL2 type = TL2.UNKNOWNMSG;
+        public MessageTypes type = MessageTypes.UNKNOWNMSG;
         public string body = "";
-        public long response = (long)TL2.OK;
+        public long response = (long)MessageTypes.OK;
     }
 }

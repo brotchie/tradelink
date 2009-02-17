@@ -1,20 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using TradeLink.API;
 
-namespace TradeLib
+namespace TradeLink.Common
 {
-    public class Security
+    public class SecurityImpl : Security
     {
-        public Security(string sym, string exchange, SecurityType type)
+        public SecurityImpl(string sym, string exchange, SecurityType type)
         {
             _sym = sym;
             _destex = exchange;
             _type = type;
         }
-        public Security() : this("", "", SecurityType.STK) { }
-        public Security(string sym) : this(sym, "", SecurityType.STK) { }
-        public Security(string sym, SecurityType type) : this(sym, "", type) { }
+        public SecurityImpl() : this("", "", SecurityType.STK) { }
+        public SecurityImpl(string sym) : this(sym, "", SecurityType.STK) { }
+        public SecurityImpl(string sym, SecurityType type) : this(sym, "", type) { }
         protected string _sym = "";
         protected SecurityType _type = SecurityType.STK;
         protected string _destex = "";
@@ -37,11 +38,11 @@ namespace TradeLib
             string[] r = { _sym, t.ToString(), _destex };
             return string.Join(" ", r);
         }
-        public static Security Parse(string msg) { return Parse(msg, 0); }
-        public static Security Parse(string msg, int date)
+        public static SecurityImpl Parse(string msg) { return Parse(msg, 0); }
+        public static SecurityImpl Parse(string msg, int date)
         {
             string[] r = msg.Split(' ');
-            Security sec = new Security();
+            SecurityImpl sec = new SecurityImpl();
             sec.Symbol = r[0];
             if (r.Length > 2)
             {
@@ -91,15 +92,15 @@ namespace TradeLib
         /// <summary>
         /// Fetches next historical tick for stock, or invalid tick if no historical data is available.
         /// </summary>
-        public Tick NextTick
+        public TickImpl NextTick
         {
             get
             {
-                if (!hasHistorical) return new Tick();
-                Tick t = new Tick();
+                if (!hasHistorical) return new TickImpl();
+                TickImpl t = new TickImpl();
                 do
                 {
-                    t = (Tick)eSigTick.FromStream(Symbol, _histfile);
+                    t = (TickImpl)eSigTick.FromStream(Symbol, _histfile);
                 } while ((!t.isValid) && hasHistorical);
                 if (!t.isValid) { _histfile.Close(); _histfile = null; }
                 return t;
@@ -108,26 +109,14 @@ namespace TradeLib
         /// <summary>
         /// Initializes a security with historical data from tick archive file
         /// </summary>
-        public static Security FromFile(string filename)
+        public static SecurityImpl FromFile(string filename)
         {
             System.IO.StreamReader sr = new System.IO.StreamReader(filename);
-            Security s = eSigTick.InitEpf(sr);
+            SecurityImpl s = eSigTick.InitEpf(sr);
             s._histfile = sr;
             return s;
         }
     }
 
-    public enum SecurityType
-    {
-        STK,
-        OPT,
-        FUT,
-        CFD,
-        FOR,
-        FOP,
-        WAR,
-        FOX,
-        IDX,
-        BND,
-    }
+
 }

@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using TradeLink.API;
 
-namespace TradeLib
+namespace TradeLink.Common
 {
     public class TickArchiver
     {
@@ -51,7 +52,7 @@ namespace TradeLib
                     if (File.Exists(fn))
                     {
                         StreamReader sr = new StreamReader(fn);
-                        Security s = eSigTick.InitEpf(sr);
+                        SecurityImpl s = eSigTick.InitEpf(sr);
                         if (s.isValid)
                             hasheader = true;
                         sr.Close();

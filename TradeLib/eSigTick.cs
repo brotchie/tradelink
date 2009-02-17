@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using TradeLink.API;
 
-namespace TradeLib
+namespace TradeLink.Common
 {
     /// <summary>
     /// Marshalls eSignal-specific tickdata into and out of TradeLink's generic Tick type.
     /// </summary>
-    public class eSigTick : Tick
+    public class eSigTick : TickImpl
     {
         // eSignal record order definitions for quotes and trades
         enum Q { TYPE, DATE, TIME, BID, ASK, BIDSIZE, ASKSIZE, BIDEX, ASKEX };
@@ -16,7 +17,7 @@ namespace TradeLib
         const string TRADE = "T";
         const string QUOTE = "Q";
         public eSigTick() : base() {}
-        public eSigTick(Tick t) : base(t) { }
+        public eSigTick(TickImpl t) : base(t) { }
 
         /// <summary>
         /// Loads a tick straight from an EPF file in the form of a StreamReader
@@ -122,7 +123,7 @@ namespace TradeLib
         /// </summary>
         /// <param name="sec">The security</param>
         /// <returns></returns>
-        public static string EPFheader(Security sec)
+        public static string EPFheader(SecurityImpl sec)
         {
         	return EPFheader(sec.Symbol,sec.Date);
         }
@@ -132,7 +133,7 @@ namespace TradeLib
         /// </summary>
         /// <param name="EPFfile">The EP ffile.</param>
         /// <returns></returns>
-        public static Security InitEpf(StreamReader EPFfile) 
+        public static SecurityImpl InitEpf(StreamReader EPFfile) 
         {
             StreamReader cf = EPFfile; 
             string symline = cf.ReadLine();
@@ -142,7 +143,7 @@ namespace TradeLib
             MatchCollection r = se.Matches(symline, 0);
             string t = r[0].Value;
             string symbol = t.Substring(1, t.Length - 1);
-            Security s = Security.Parse(symbol.ToUpper());
+            SecurityImpl s = SecurityImpl.Parse(symbol.ToUpper());
             string date = dateline.Contains("/") ? dse.Replace(dateline, "20$3$1$2") : Regex.Match(dateline, "[0-9]+").ToString();
             s.Date = Convert.ToInt32(date);
             return s;

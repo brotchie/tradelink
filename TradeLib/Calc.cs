@@ -1,7 +1,8 @@
 using System;
+using TradeLink.API;
 
 
-namespace TradeLib
+namespace TradeLink.Common
 {
     public class Calc
     {
@@ -60,8 +61,8 @@ namespace TradeLib
             if (!existing.isValid || !adjust.isValid) 
                 throw new Exception("Invalid position provided. (existing:" + existing.ToString() + " adjustment:" + adjust.ToString());
             if (existing.isFlat) return 0; // nothing to close
-            if (existing.isLong == adjust.Side) return 0; // if we're adding, nothing to close
-            return existing.isLong ? adjust.Price - existing.Price : existing.Price - adjust.Price;
+            if (existing.isLong == adjust.side) return 0; // if we're adding, nothing to close
+            return existing.isLong ? adjust.xprice- existing.AvgPrice: existing.AvgPrice- adjust.xprice;
         }
 
         /// <summary>
@@ -72,8 +73,8 @@ namespace TradeLib
         /// <returns></returns>
         public static decimal ClosePL(Position existing, Trade adjust)
         {
-            int closedsize = Math.Abs(adjust.Size + existing.Size);
-            return ClosePT(existing, adjust) * (closedsize==0 ? Math.Abs(adjust.Size) : closedsize);
+            int closedsize = Math.Abs(adjust.xsize + existing.Size);
+            return ClosePT(existing, adjust) * (closedsize==0 ? Math.Abs(adjust.xsize) : closedsize);
         }
 
         /// <summary>
@@ -125,7 +126,7 @@ namespace TradeLib
         /// <returns></returns>
         public static Order PositionProfit(Position p, decimal offset, decimal percent, bool normalizesize, int MINSIZE)
         {
-            Order o = new Order();
+            Order o = new OrderImpl();
             if (!p.isValid || p.isFlat) return o;
             decimal price = OffsetPrice(p,Math.Abs(offset));
             int size = !normalizesize ? (int)(p.FlatSize * percent) : Norm2Min(p.FlatSize*percent,MINSIZE);
@@ -138,7 +139,7 @@ namespace TradeLib
         /// <param name="p">your position</param>
         /// <param name="offset">how far away stop is</param>
         /// <returns></returns>
-        public static Order PositionStop(Position p, decimal offset) { return PositionStop(p,offset,1,false,1); }
+        public static Order PositionStop(PositionImpl p, decimal offset) { return PositionStop(p,offset,1,false,1); }
         /// <summary>
         /// Generate a stop order for a position, at a specified per-share/contract price
         /// </summary>
@@ -146,7 +147,7 @@ namespace TradeLib
         /// <param name="offset">how far away stop is</param>
         /// <param name="percent">what percent of position to close</param>
         /// <returns></returns>
-        public static Order PositionStop(Position p, decimal offset, decimal percent) { return PositionStop(p, offset, percent, false, 1); }
+        public static Order PositionStop(PositionImpl p, decimal offset, decimal percent) { return PositionStop(p, offset, percent, false, 1); }
         /// <summary>
         /// Generate a stop order for a position, at a specified per-share/contract price
         /// </summary>
@@ -156,9 +157,9 @@ namespace TradeLib
         /// <param name="normalizesize">whether to normalize size to even-lots</param>
         /// <param name="MINSIZE">size of an even lot</param>
         /// <returns></returns>
-        public static Order PositionStop(Position p, decimal offset, decimal percent, bool normalizesize, int MINSIZE)
+        public static Order PositionStop(PositionImpl p, decimal offset, decimal percent, bool normalizesize, int MINSIZE)
         {
-            Order o = new Order();
+            Order o = new OrderImpl();
             if (!p.isValid || p.isFlat) return o;
             decimal price = OffsetPrice(p, Math.Abs(offset)*-1);
             int size = !normalizesize ? (int)(p.FlatSize * percent) : Norm2Min(p.FlatSize * percent, MINSIZE);

@@ -1,11 +1,11 @@
 
 
-namespace TradeLib
+namespace TradeLink.Common
 {
     /// <summary>
     /// Create market orders.
     /// </summary>
-    public class MarketOrder : Order
+    public class MarketOrder : OrderImpl
     {
         public MarketOrder(string sym, int size) : base(sym, size) { }
         public MarketOrder(string sym, bool side, int size) : base(sym, side, System.Math.Abs(size)) { }
@@ -14,7 +14,7 @@ namespace TradeLib
     /// <summary>
     /// Create buy market orders.
     /// </summary>
-    public class BuyMarket : Order
+    public class BuyMarket : OrderImpl
     {
         public BuyMarket(string sym, int size) : base(sym, true, System.Math.Abs(size)) { }
         public BuyMarket(string sym, int size, string comment) : base(sym, true, System.Math.Abs(size), comment) { }
@@ -22,7 +22,7 @@ namespace TradeLib
     /// <summary>
     /// Create sell market orders.
     /// </summary>
-    public class SellMarket : Order
+    public class SellMarket : OrderImpl
     {
         public SellMarket(string sym, int size) : base(sym, false, System.Math.Abs(size)) { }
         public SellMarket(string sym, int size, string comment) : base(sym, false, System.Math.Abs(size), comment) { }

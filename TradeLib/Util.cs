@@ -5,8 +5,9 @@ using System.Text.RegularExpressions;
 using System.IO;
 using System.Reflection;
 using System.Net;
+using TradeLink.API;
 
-namespace TradeLib
+namespace TradeLink.Common
 {
     /// <summary>
     /// Utility class holding commonly used properties for TradeLinkSuite
@@ -253,11 +254,11 @@ namespace TradeLib
         /// <param name="stocktrades"></param>
         /// <param name="delimiter"></param>
         /// <param name="filepath"></param>
-        public static void FillsToText(List<Trade> stocktrades,char delimiter,string filepath)
+        public static void FillsToText(List<TradeImpl> stocktrades,char delimiter,string filepath)
         { // works on a queue of Trade objects
             StreamWriter sw = new StreamWriter(filepath, false);
             sw.WriteLine("Date,Time,Symbol,Side,xSize,xPrice,Comment");
-            foreach (Trade t in stocktrades)
+            foreach (TradeImpl t in stocktrades)
                 sw.WriteLine(t.ToString(delimiter));
             sw.Close();
         }
@@ -277,8 +278,8 @@ namespace TradeLib
         public static string[] TradesToClosedPL(List<Trade> tradelist, char delimiter)
         {
             List<string> rowoutput = new List<string>();
-            Dictionary<string, Position> posdict = new Dictionary<string, Position>();
-            foreach (Trade t in tradelist)
+            Dictionary<string, PositionImpl> posdict = new Dictionary<string, PositionImpl>();
+            foreach (TradeImpl t in tradelist)
             {
                 string r = t.ToString(delimiter) + delimiter;
                 string s = t.symbol;
@@ -287,7 +288,7 @@ namespace TradeLib
                 int csize = 0;
                 if (!posdict.ContainsKey(s))
                 {
-                    posdict.Add(s, new Position(t));
+                    posdict.Add(s, new PositionImpl(t));
                 }
                 else
                 {
@@ -367,16 +368,16 @@ namespace TradeLib
         /// <returns></returns>
         public static string PrettyError(Brokers broker, int errorcode)
         {
-            TL2 message = (TL2)errorcode;
+            MessageTypes message = (MessageTypes)errorcode;
             switch (message)
             {
                 // tradelink messages
-                case TL2.FEATURE_NOT_IMPLEMENTED: return "Feature not implemented yet.";
-                case TL2.UNKNOWNSYM: return "Unknown symbol.";
-                case TL2.UNKNOWNMSG: return "Unknown message.";
-                case TL2.TL_CONNECTOR_MISSING: return "TradeLink Server not found.";
-                case TL2.GOTNULLORDER: return "Unable to read order.";
-                case TL2.OK: return "Ok";
+                case MessageTypes.FEATURE_NOT_IMPLEMENTED: return "Feature not implemented yet.";
+                case MessageTypes.UNKNOWNSYM: return "Unknown symbol.";
+                case MessageTypes.UNKNOWNMSG: return "Unknown message.";
+                case MessageTypes.TL_CONNECTOR_MISSING: return "TradeLink Server not found.";
+                case MessageTypes.GOTNULLORDER: return "Unable to read order.";
+                case MessageTypes.OK: return "Ok";
                 default:
                     // broker-specific messages
                     if (broker == Brokers.Assent)

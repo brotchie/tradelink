@@ -5,13 +5,14 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using TradeLib;
+using TradeLink.Common;
+using TradeLink.API;
 
-namespace TradeLib
+namespace TradeLink.Common
 {
     public partial class Ticket : Form
     {
-        Order work = new Order();
+        Order work = new OrderImpl();
         public Order WorkingOrder { get { return work; } set { work = value; } }
         public Ticket(Order working)
         {
@@ -24,11 +25,11 @@ namespace TradeLib
             }
 
 
-            isize = work.UnSignedSize;
+            isize = work.UnsignedSize;
             Text = work.symbol;
 
             osize.Text = work.ToString();
-            oprice.Text = work.Price.ToString();
+            oprice.Text = work.price.ToString();
             if (work.Side) { obuybut.Checked = true; osellbut.Checked = false; }
             else { osellbut.Checked = true; obuybut.Checked = false; }
             oprice.MouseWheel += new MouseEventHandler(order_MouseWheel);

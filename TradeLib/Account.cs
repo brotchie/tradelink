@@ -1,7 +1,7 @@
 using System;
 
 
-namespace TradeLib
+namespace TradeLink.Common
 {
     /// <summary>
     /// A token used to identify one brokerage account from another.

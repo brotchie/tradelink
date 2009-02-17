@@ -1,46 +1,62 @@
 using System;
+using TradeLink.API;
 
-namespace TradeLib
+namespace TradeLink.Common
 {
     /// <summary>
     /// A tick is both the smallest unit of time and the most simple unit of data in TradeLink (and the markets)
     /// It is an abstract container for last trade, last trade size, best bid, best offer, bid and offer sizes.
     /// </summary>
     [Serializable]
-    public class Tick
+    public class TickImpl : TradeLink.API.Tick
     {
-        public string symbol = "";
-        public Security Sec = new Security();
+        public string symbol { get { return _sym; } set { _sym = value; } }
+        public Security Sec { get { return _Sec; } set { _Sec = value; } }
         public int factor = 100;
-        public int time;
-        public int date;
-        public int sec;
-        public int size;
-        public decimal trade;
-        public decimal bid;
-        public decimal ask;
-        public int bs;
-        public int os;
-        public string be = "";
-        public string oe = "";
-        public string ex = "";
-        public bool IndexTick { get { return size < 0; } }
-        public bool hasBid { get { return (bid != 0) && (bs != 0); } }
-        public bool hasAsk { get { return (ask != 0) && (os != 0); } }
-        public bool FullQuote { get { return hasBid && hasAsk; } }
+        public int size { get { return _size; } set { _size = value; } }
+        public int date { get { return _date; } set { _date = value; } }
+        public int time { get { return _time; } set { _time = value; } }
+        public int sec { get { return _sec; } set { _sec = value; } }
+        public int bs { get { return _bs; } set { _bs = value; } }
+        public int os { get { return _os; } set { _os = value; } }
+        public decimal trade { get { return _trade; } set { _trade = value; } }
+        public decimal bid { get { return _bid; } set { _bid = value; } }
+        public decimal ask { get { return _ask; } set { _ask = value; } }
+        public string ex { get { return _ex; } set { _ex = value; } }
+        public string be { get { return _be; } set { _be = value; } }
+        public string oe { get { return _oe; } set { _oe = value; } }
+        public bool IndexTick { get { return _size < 0; } }
+        public bool hasBid { get { return (_bid != 0) && (_bs != 0); } }
+        public bool hasAsk { get { return (_ask != 0) && (_os != 0); } }
+        public bool isFullQuote { get { return hasBid && hasAsk; } }
         public bool isQuote { get { return (!isTrade && (hasBid || hasAsk)); } }
-        public bool isTrade { get { return (trade != 0) && (size> 0); } }
+        public bool isTrade { get { return (_trade != 0) && (_size> 0); } }
         public bool hasTick { get { return (this.isTrade || hasBid || hasAsk); } }
-        public bool isValid { get { return (symbol != "") && hasTick; } }
-        public bool atHigh(decimal high) { return (isTrade && (trade>=high)); }
-        public bool atLow(decimal low) { return (isTrade && (trade <= low)); }
-        public int BidSize { get { return bs * 100; } set { bs = (int)(value / 100); } }
-        public int AskSize { get { return os * 100; } set { os = (int)(value / 100); } }
-        public int TradeSize { get { return ts*100; } set { size = (int)(value / 100); } }
-        public int ts { get { return size / 100; } } // normalized to bs/os
-        public Tick() { }
-        public Tick(string symbol) { this.symbol = symbol; }
-        public Tick(Tick c)
+        public bool isValid { get { return (_sym!= "") && hasTick; } }
+        public bool atHigh(decimal high) { return (isTrade && (_trade>=high)); }
+        public bool atLow(decimal low) { return (isTrade && (_trade <= low)); }
+        public int BidSize { get { return _bs * 100; } set { _bs = (int)(value / 100); } }
+        public int AskSize { get { return _os * 100; } set { _os = (int)(value / 100); } }
+        public int TradeSize { get { return ts*100; } set { _size = (int)(value / 100); } }
+        public int ts { get { return _size / 100; } } // normalized to bs/os
+        Security _Sec = new SecurityImpl();
+        string _sym = "";
+        string _be = "";
+        string _oe = "";
+        string _ex = "";
+        int _bs;
+        int _os;
+        int _size;
+        int _sec;
+        int _date;
+        int _time;
+        decimal _trade;
+        decimal _bid;
+        decimal _ask;
+
+        public TickImpl() { }
+        public TickImpl(string symbol) { this.symbol = symbol; }
+        public TickImpl(Tick c)
         {
             if (c.symbol!="") symbol = c.symbol;
             time = c.time;
@@ -56,11 +72,14 @@ namespace TradeLib
             oe = c.oe;
             ex = c.ex;
         }
-        public Tick(Tick a, Tick b)
-        {   // this constructor creates a new tick by combining two ticks
-            // this is to handle tick updates that only provide bid/ask changes (like anvil)
-
-            // a = old tick, b = new tick or tick update
+        /// <summary>
+        /// this constructor creates a new tick by combining two ticks
+        /// this is to handle tick updates that only provide bid/ask changes.
+        /// </summary>
+        /// <param name="a">old tick</param>
+        /// <param name="b">new tick or update</param>
+        public TickImpl(TickImpl a, TickImpl b)
+        {   
             if (b.symbol != a.symbol) return; // don't combine different symbols
             if (b.time < a.time) return; // don't process old updates
             time = b.time;
@@ -129,9 +148,8 @@ namespace TradeLib
             else return symbol+" "+this.bid + "x" + this.ask + " (" + this.bs + "x" + this.os + ") " + this.be + "," + this.oe;
         }
 
-        public string Serialize()
+        public static string Serialize(Tick t)
         {
-            Tick t = this;
             const char d = ',';
             string secname = t.Sec.isValid ? t.Sec.FullName : t.symbol;
             string s = secname + d + t.date + d + t.time + d + t.sec + d + t.trade + d + t.size + d + t.ex + d + t.bid + d + t.ask + d + t.bs + d + t.os + d + t.be + d + t.oe + d;
@@ -141,8 +159,8 @@ namespace TradeLib
         public static Tick Deserialize(string msg)
         {
             string [] r = msg.Split(',');
-            Tick t = new Tick();
-            t.Sec = Security.Parse(r[(int)TickField.symbol]);
+            Tick t = new TickImpl();
+            t.Sec = SecurityImpl.Parse(r[(int)TickField.symbol]);
             t.symbol = t.Sec.Symbol;
             t.trade = Convert.ToDecimal(r[(int)TickField.trade]);
             t.size = Convert.ToInt32(r[(int)TickField.tsize]);
@@ -189,11 +207,11 @@ namespace TradeLib
         }
 
 
-        public static Tick NewBid(string sym, decimal bid, int bidsize) { return NewQuote(sym, 0, 0, 0, bid, 0, bidsize, 0, "", ""); }
-        public static Tick NewAsk(string sym, decimal ask, int asksize) { return NewQuote(sym, 0, 0, 0, 0, ask, 0, asksize, "", ""); }
-        public static Tick NewQuote(string sym, int date, int time, int sec, decimal bid, decimal ask, int bidsize, int asksize, string be, string oe)
+        public static TickImpl NewBid(string sym, decimal bid, int bidsize) { return NewQuote(sym, 0, 0, 0, bid, 0, bidsize, 0, "", ""); }
+        public static TickImpl NewAsk(string sym, decimal ask, int asksize) { return NewQuote(sym, 0, 0, 0, 0, ask, 0, asksize, "", ""); }
+        public static TickImpl NewQuote(string sym, int date, int time, int sec, decimal bid, decimal ask, int bidsize, int asksize, string be, string oe)
         {
-            Tick q = new Tick(sym);
+            TickImpl q = new TickImpl(sym);
             q.date = date;
             q.time = time;
             q.sec = sec;
@@ -208,10 +226,10 @@ namespace TradeLib
             return q;
         }
 
-        public static Tick NewTrade(string sym, decimal trade, int size) { return NewTrade(sym, 0, 0, 0, trade, size, ""); }
-        public static Tick NewTrade(string sym, int date, int time, int sec, decimal trade, int size, string ex)
+        public static TickImpl NewTrade(string sym, decimal trade, int size) { return NewTrade(sym, 0, 0, 0, trade, size, ""); }
+        public static TickImpl NewTrade(string sym, int date, int time, int sec, decimal trade, int size, string ex)
         {
-            Tick t = new Tick(sym);
+            TickImpl t = new TickImpl(sym);
             t.date = date;
             t.time = time;
             t.sec = sec;

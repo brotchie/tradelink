@@ -4,7 +4,7 @@ using System.Text;
 using System.Management;
 using System.Net;
 
-namespace TradeLib
+namespace TradeLink.Common
 {
     public class Auth
     {

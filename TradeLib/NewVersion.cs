@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
-namespace TradeLib
+namespace TradeLink.Common
 {
     public partial class NewVersion : Form
     {
