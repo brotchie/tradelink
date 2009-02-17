@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using TradeLib;
+using TradeLink.Common;
 using NUnit.Framework;
+using TradeLink.API;
 
-namespace TestTradeLib
+namespace TestTradeLink
 {
     [TestFixture]
     public class TestTick
@@ -15,7 +16,7 @@ namespace TestTradeLib
         [Test]
         public void Basics()
         {
-            Tick t = new Tick();
+            TickImpl t = new TickImpl();
             Assert.That(!t.isValid);
             t.symbol = "IBM";
             t.size = 100;
@@ -24,15 +25,15 @@ namespace TestTradeLib
             Assert.That(t.isTrade);
             Assert.That(!t.isQuote);
 
-            t = new Tick("TST");
+            t = new TickImpl("TST");
             t.TradeSize = 100;
             Assert.That(t.TradeSize == t.ts * 100, t.TradeSize.ToString());
 
-            t = new Tick("TST");
+            t = new TickImpl("TST");
             t.BidSize = 200;
             Assert.That(t.BidSize == t.bs * 100, t.BidSize.ToString());
 
-            t = new Tick("TST");
+            t = new TickImpl("TST");
             t.AskSize = 300;
             Assert.That(t.AskSize == t.os*100, t.AskSize.ToString());
         }
@@ -46,7 +47,7 @@ namespace TestTradeLib
             const int z = 400;
             
             // produce a new ask tick
-            Tick t = Tick.NewAsk(s, p, z);
+            TickImpl t = TickImpl.NewAsk(s, p, z);
             Assert.That(t.hasAsk && !t.hasBid, t.ToString());
             Assert.That(t.ask==p, t.ask.ToString());
             Assert.That(t.AskSize == z, t.AskSize.ToString());
@@ -54,7 +55,7 @@ namespace TestTradeLib
             Assert.That(t.symbol == s);
 
             // produce bid tick
-            t = Tick.NewBid(s, p, z);
+            t = TickImpl.NewBid(s, p, z);
             Assert.That(t.hasBid && !t.hasAsk, t.ToString());
             Assert.That(t.bid== p, t.bid.ToString());
             Assert.That(t.BidSize == z, t.BidSize.ToString());
@@ -62,7 +63,7 @@ namespace TestTradeLib
             Assert.That(t.symbol == s);
 
             // produce a trade tick
-            t = Tick.NewTrade(s, p, z);
+            t = TickImpl.NewTrade(s, p, z);
             Assert.That(t.isTrade && !t.isQuote, t.ToString());
             Assert.That(t.trade == p, t.trade.ToString());
             Assert.That(t.TradeSize == z, t.TradeSize.ToString());
@@ -82,7 +83,7 @@ namespace TestTradeLib
             const int date = 20080702;
             const int time = 935;
             const int sec = 3;
-            Tick pre = Tick.NewTrade(t, p, s);
+            TickImpl pre = TickImpl.NewTrade(t, p, s);
             pre.time = time;
             pre.date = date;
             pre.sec = sec;
@@ -93,8 +94,8 @@ namespace TestTradeLib
             pre.ex = t;
             pre.be = t;
             pre.oe = t;
-            string serialize = pre.Serialize();
-            Tick post = Tick.Deserialize(serialize);
+            string serialize = TickImpl.Serialize(pre);
+            Tick post = TickImpl.Deserialize(serialize);
             Assert.That(post.time == pre.time, post.time.ToString());
             Assert.That(post.date == pre.date);
             Assert.That(post.sec == pre.sec);

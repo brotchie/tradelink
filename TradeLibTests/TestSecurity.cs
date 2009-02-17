@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using TradeLib;
+using TradeLink.Common;
 using NUnit.Framework;
+using TradeLink.API;
 
-namespace TestTradeLib
+namespace TestTradeLink
 {
     [TestFixture]
     public class TestSecurity 
@@ -15,20 +16,20 @@ namespace TestTradeLib
         public void Parsing()
         {
             // tests to parse and generate user-supplied security specifiers
-            Security nyse = new Security("LVS");
+            SecurityImpl nyse = new SecurityImpl("LVS");
             string p = nyse.ToString();
 
-            Security t = Security.Parse(p);
+            SecurityImpl t = SecurityImpl.Parse(p);
             Assert.That(t.Symbol == nyse.Symbol, t.Symbol);
             Assert.That(!t.hasDest, t.DestEx);
             Assert.That(t.Type == nyse.Type, t.Type.ToString());
 
-            Security crude = Security.Parse("CLV8 FUT GLOBEX");
+            SecurityImpl crude = SecurityImpl.Parse("CLV8 FUT GLOBEX");
             Assert.That(crude.Symbol == "CLV8", crude.Symbol);
             Assert.That(crude.hasDest, crude.DestEx);
             Assert.That(crude.Type == SecurityType.FUT, crude.Type.ToString());
             Assert.AreEqual("CLV8 FUT GLOBEX", crude.FullName);
-            Security goog = Security.Parse("GOOG");
+            SecurityImpl goog = SecurityImpl.Parse("GOOG");
             Assert.AreEqual("GOOG", goog.FullName);
 
 

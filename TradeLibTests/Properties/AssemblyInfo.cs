@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("TradeLib")]
+[assembly: AssemblyTitle("TradeLink.Common")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("TradeLib")]
+[assembly: AssemblyProduct("TradeLink.Common")]
 [assembly: AssemblyCopyright("Copyright ©  2007")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

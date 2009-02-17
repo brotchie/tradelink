@@ -1,8 +1,8 @@
 using System;
 using NUnit.Framework;
-using TradeLib;
+using TradeLink.Common;
 
-namespace TestTradeLib
+namespace TestTradeLink
 {
     [TestFixture]
     public class TestCalc
@@ -14,17 +14,17 @@ namespace TestTradeLib
         decimal entry = 99.47m;
         int lsize = 200;
         int ssize = -500;
-        Position lp, sp;
-        Trade lc, sc;
+        PositionImpl lp, sp;
+        TradeImpl lc, sc;
         [SetUp]
         protected void Setup()
         {
-            lp = new Position(stock, entry, lsize);
-            sp = new Position(stock, entry, ssize);
+            lp = new PositionImpl(stock, entry, lsize);
+            sp = new PositionImpl(stock, entry, ssize);
 
             //closing trades
-            lc = new Trade(stock, last, lsize / -2);
-            sc = new Trade(stock, last, -ssize);
+            lc = new TradeImpl(stock, last, lsize / -2);
+            sc = new TradeImpl(stock, last, -ssize);
         }
         [Test]
         public void OpenPL()

@@ -1,10 +1,11 @@
 using NUnit.Framework;
-using TradeLib;
+using TradeLink.Common;
 using System;
 using System.Collections.Generic;
+using TradeLink.API;
 
 
-namespace TestTradeLib
+namespace TestTradeLink
 {
     [TestFixture]
     public class TestUtil
@@ -62,9 +63,9 @@ namespace TestTradeLib
         {
             List<Trade> tradelist = new List<Trade>();
             string s = "WAG";
-            tradelist.Add(new Trade(s, 47.04m, 300)); // enter
-            tradelist.Add(new Trade(s, 47.31m, 500)); // add
-            tradelist.Add(new Trade(s, 47.74m, -800)); // exit
+            tradelist.Add(new TradeImpl(s, 47.04m, 300)); // enter
+            tradelist.Add(new TradeImpl(s, 47.31m, 500)); // add
+            tradelist.Add(new TradeImpl(s, 47.74m, -800)); // exit
 
             string[] closedpl = Util.TradesToClosedPL(tradelist);
             for (int i = 0; i<closedpl.Length; i++)

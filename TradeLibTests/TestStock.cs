@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using TradeLib;
+using TradeLink.Common;
 using NUnit.Framework;
 
-namespace TestTradeLib
+namespace TestTradeLink
 {
     [TestFixture]
     public class TestStock
@@ -15,10 +15,10 @@ namespace TestTradeLib
         [Test]
         public void Basics()
         {
-            Security s = new Security("");
+            SecurityImpl s = new SecurityImpl("");
             Assert.That(s != null);
             Assert.That(!s.isValid);
-            s = new Security("TST");
+            s = new SecurityImpl("TST");
             Assert.That(s.isValid);
         }
 

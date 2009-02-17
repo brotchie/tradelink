@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using TradeLib;
+using TradeLink.Common;
 using NUnit.Framework;
+using TradeLink.API;
 
-namespace TestTradeLib
+namespace TestTradeLink
 {
     [TestFixture]
     public class TestResponse
@@ -17,13 +18,13 @@ namespace TestTradeLib
         const string x = "NYS";
         const int d = 20070917;
         const int t = 929;
-        Order o = new Order();
+        Order o = new OrderImpl();
 
-        Tick[] timesales = new Tick[] { 
-                Tick.NewTrade(s,d,t,0,10,100,x),
-                Tick.NewTrade(s,d,t+1,0,10,100,x),
-                Tick.NewTrade(s,d,t+2,0,10,100,x),
-                Tick.NewTrade(s,d,t+3,0,10,100,x),
+        TickImpl[] timesales = new TickImpl[] { 
+                TickImpl.NewTrade(s,d,t,0,10,100,x),
+                TickImpl.NewTrade(s,d,t+1,0,10,100,x),
+                TickImpl.NewTrade(s,d,t+2,0,10,100,x),
+                TickImpl.NewTrade(s,d,t+3,0,10,100,x),
             };
 
 
@@ -60,7 +61,7 @@ namespace TestTradeLib
             public Always() {  }
             public virtual void GotTick(Tick tick)
             {
-                SendDebug(Debug.Create("entering"));
+                SendDebug(DebugImpl.Create("entering"));
                 SendOrder(new BuyMarket(tick.symbol, MinSize));
             }
 
@@ -112,15 +113,15 @@ namespace TestTradeLib
             b.GotTick(timesales[i++]);
             if (o.isValid)
                 good++;
-            o = new Order();
+            o = new OrderImpl();
             b.GotTick(timesales[i++]);
             if (o.isValid)
                 good++;
-            o = new Order(); 
+            o = new OrderImpl(); 
             b.GotTick(timesales[i++]);
             if (o.isValid)
                 good++;
-            o = new Order();
+            o = new OrderImpl();
             b.GotTick(timesales[i++]);
             if (o.isValid)
                 good++;
@@ -135,7 +136,7 @@ namespace TestTradeLib
         }
 
 
-        void broker_GotFill(Trade t)
+        void broker_GotFill(TradeImpl t)
         {
             
         }
@@ -153,7 +154,7 @@ namespace TestTradeLib
             debugs = 0;
             for (int i = 0; i < timesales.Length; i++)
             {
-                o = new Order();
+                o = new OrderImpl();
                 b.GotTick(timesales[i]);
                 if (o.isValid)                
                     good++;

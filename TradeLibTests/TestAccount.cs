@@ -1,8 +1,8 @@
 using System;
-using TradeLib;
+using TradeLink.Common;
 using NUnit.Framework;
 
-namespace TestTradeLib
+namespace TestTradeLink
 {
     [TestFixture]
     public class TestAccount

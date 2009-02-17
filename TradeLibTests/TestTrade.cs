@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
-using TradeLib;
+using TradeLink.Common;
+using TradeLink.API;
 
 
-namespace TestTradeLib
+namespace TestTradeLink
 {
     [TestFixture]
     public class TestTrade
@@ -15,7 +16,7 @@ namespace TestTradeLib
         [Test]
         public void Defaults()
         {
-            Trade t = new Trade();
+            TradeImpl t = new TradeImpl();
             Assert.That(!t.isValid, t.ToString());
             Assert.That(!t.isFilled, t.ToString());
         }
@@ -23,7 +24,7 @@ namespace TestTradeLib
         [Test]
         public void Construction()
         {
-            Trade t = new Trade("TST",10,100,DateTime.Now);
+            TradeImpl t = new TradeImpl("TST",10,100,DateTime.Now);
             Assert.That(t.isValid,t.ToString());
             Assert.That(t.isFilled,t.ToString());
 
@@ -46,18 +47,18 @@ namespace TestTradeLib
             decimal price = 10;
             int size = 100;
             DateTime date = DateTime.Now;
-            Trade t = new Trade(sym, price, size, date);
+            TradeImpl t = new TradeImpl(sym, price, size, date);
             uint magicid = 555;
             t.id = magicid;
             t.Exchange = "NYMEX";
             // serialize it for transmission
-            string msg = t.Serialize();
+            string msg = TradeImpl.Serialize(t);
             // deserialize it
             string threwexception = null;
             Trade newtrade = null;
             try
             {
-                newtrade = Trade.Deserialize(msg);
+                newtrade = TradeImpl.Deserialize(msg);
             }
             catch (Exception ex) { threwexception = ex.ToString(); }
 
@@ -70,7 +71,7 @@ namespace TestTradeLib
             Assert.That(newtrade.xtime != 0);
             Assert.That(newtrade.xsize == size);
             Assert.That(newtrade.id == magicid);
-            Assert.AreEqual(newtrade.Exchange,t.Exchange);
+            Assert.AreEqual(newtrade.ex,t.Exchange);
         }
 
     }

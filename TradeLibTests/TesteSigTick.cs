@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using TradeLib;
+using TradeLink.Common;
 using NUnit.Framework;
+using TradeLink.API;
 
-namespace TestTradeLib
+namespace TestTradeLink
 {
     [TestFixture]
     public class TesteSigTick
@@ -14,9 +15,12 @@ namespace TestTradeLib
         public void Hours()
         {
 
-            string[] file = TestTradeLib.Properties.Resources.TestWAG.Split(Environment.NewLine.ToCharArray());
+            System.IO.StreamReader sr = new System.IO.StreamReader("TestWAG.txt");
+            string contents = sr.ReadToEnd();
 
-            BarList bl = new BarList(BarInterval.Hour, "WAG");
+            string[] file = contents.Split(Environment.NewLine.ToCharArray());
+
+            BarListImpl bl = new BarListImpl(BarInterval.Hour, "WAG");
             int count = 0;
             eSigTick e = new eSigTick();
             for (int i = 0; i<file.Length; i++)

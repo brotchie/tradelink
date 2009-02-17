@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using TradeLib;
+using TradeLink.Common;
 using NUnit.Framework;
+using TradeLink.API;
 
-namespace TestTradeLib
+namespace TestTradeLink
 {
     [TestFixture]
     public class TestPosition
@@ -15,41 +16,41 @@ namespace TestTradeLib
         [Test]
         public void Basics()
         {
-            Position p = new Position(s);
+            PositionImpl p = new PositionImpl(s);
             Assert.AreEqual(0,p.Size);
-            Assert.That(p.hasSymbol,"hassymbol");
+            Assert.That(p.Symbol!="","hassymbol");
             Assert.AreEqual(0,p.AvgPrice);
             Assert.That(p.isFlat,"isflat");
             Assert.That(p.isValid,"isvalid");
-            Position p2 = new Position(s, 10, 100,0);
-            Position p2copy = new Position(p2);
+            PositionImpl p2 = new PositionImpl(s, 10, 100,0);
+            PositionImpl p2copy = new PositionImpl(p2);
             Assert.AreEqual(p2.AvgPrice, p2copy.AvgPrice);
             Assert.AreEqual(p2.Size, p2copy.Size);
             Assert.AreEqual(p2.ClosedPL, p2copy.ClosedPL);
             Assert.AreEqual(p2.Symbol, p2copy.Symbol);
             p.Adjust(p2);
             Assert.That(p.Size == 100);
-            Assert.IsTrue(p.hasSymbol, "hassymbol");
+            Assert.IsTrue(p.Symbol!="", "hassymbol");
             Assert.That(p.AvgPrice == 10);
             Assert.IsFalse(p.isFlat);
             Assert.IsTrue(p.isLong);
             Assert.IsTrue(p.isValid);
-            Position p3 = new Position(s, 0, 100,0);
+            PositionImpl p3 = new PositionImpl(s, 0, 100,0);
             Assert.That(!p3.isValid);
-            p3 = new Position(s, 12, 100,0);
+            p3 = new PositionImpl(s, 12, 100,0);
             p.Adjust(p3);
-            Assert.That(p.AvgPrice == 11);
+            Assert.AreEqual(11,p.AvgPrice);
             Assert.That(p.isLong);
             Assert.That(p.isValid);
             Assert.That(!p.isFlat);
             Assert.That(p.Size == 200);
-            p.Adjust(new Trade(s, 13, -100,dt));
+            p.Adjust(new TradeImpl(s, 13, -100,dt));
             Assert.That(p.AvgPrice == 11);
             Assert.That(p.isLong);
             Assert.That(p.isValid);
             Assert.That(!p.isFlat);
             Assert.That(p.Size == 100);
-            Trade lasttrade = new Trade(s, 12, -100,dt);
+            TradeImpl lasttrade = new TradeImpl(s, 12, -100,dt);
             decimal profitFromP2toLASTTRADE = Calc.ClosePL(p2, lasttrade);
             Assert.That(profitFromP2toLASTTRADE == (lasttrade.xprice-p2.AvgPrice)*Math.Abs(lasttrade.xsize));
         }
@@ -57,13 +58,13 @@ namespace TestTradeLib
         [Test]
         public void PositionAccountTest()
         {
-            Trade t = new Trade("TST", 100, 100);
+            TradeImpl t = new TradeImpl("TST", 100, 100);
             t.Account = "ME";
-            Trade t2 = new Trade("TST", 200, 200);
+            TradeImpl t2 = new TradeImpl("TST", 200, 200);
             Assert.That(t.isValid);
             Assert.That(t2.isValid);
             t2.Account = "HIM";
-            Position p = new Position(t);
+            PositionImpl p = new PositionImpl(t);
             p.Adjust(t);
             bool failed = false;            try
             {
@@ -82,9 +83,9 @@ namespace TestTradeLib
             // BE CAREFUL WITH THIS FEATURE.  make sure you won't be fined for doing this, before you do it.
             string s = "IBM";
             // long position
-            Position p = new Position(s, 100m,200);
+            PositionImpl p = new PositionImpl(s, 100m,200);
             // sell more than we've got to change sides
-            Trade flip = new Trade(s, 99, -400);
+            TradeImpl flip = new TradeImpl(s, 99, -400);
             decimal cpl = p.Adjust(flip);
             // make sure we captured close of trade
             Assert.AreEqual(-200, cpl); 
@@ -98,18 +99,18 @@ namespace TestTradeLib
         public void UsingTrades()
         {
             // long
-            Position p = new Position(new Trade(s, 80, 100,dt));
+            PositionImpl p = new PositionImpl(new TradeImpl(s, 80, 100,dt));
             Assert.That(p.isLong);
             Assert.That(p.Size == 100);
-            decimal pl = p.Adjust(new Trade(s, 84, -100,dt));
+            decimal pl = p.Adjust(new TradeImpl(s, 84, -100,dt));
             Assert.That(p.isFlat);
             Assert.AreEqual((84 - 80) * 100,pl);
             // short
             pl = 0;
-            p = new Position(new Trade(s, 84, -100,dt));
+            p = new PositionImpl(new TradeImpl(s, 84, -100,dt));
             Assert.That(!p.isLong);
             Assert.That(p.Size == -100);
-            pl = p.Adjust(new Trade(s, 80, 100,dt));
+            pl = p.Adjust(new TradeImpl(s, 80, 100,dt));
             Assert.That(pl == (84 - 80) * 100);
             Assert.That(p.isFlat);
         }
@@ -121,10 +122,10 @@ namespace TestTradeLib
             const decimal x = 10m;
             const int z = -100;
             const decimal cpl = 5.05m;
-            Position p = new Position(s, x, z, cpl);
-            string msg = p.Serialize();
+            PositionImpl p = new PositionImpl(s, x, z, cpl);
+            string msg = PositionImpl.Serialize(p);
 
-            Position c = Position.Deserialize(msg);
+            Position c = PositionImpl.Deserialize(msg);
             Assert.That(c.Symbol == s, c.Symbol);
             Assert.That(c.AvgPrice == x, c.AvgPrice.ToString());
             Assert.That(c.Size == z, c.Size.ToString());

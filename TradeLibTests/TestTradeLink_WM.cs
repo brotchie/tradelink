@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
-using TradeLib;
+using TradeLink.Common;
 using System.Windows.Forms;
+using TradeLink.API;
 
-namespace TestTradeLib
+namespace TestTradeLink
 {
     [TestFixture]
     public class TestTradeLink_WM
@@ -56,10 +57,10 @@ namespace TestTradeLib
             Assert.That(ticks == 0, ticks.ToString());
 
             // have to subscribe to a stock to get notified on fills for said stock
-            c.Subscribe(new MarketBasket(new Security("TST")));
+            c.Subscribe(new BasketImpl(new SecurityImpl("TST")));
 
             //send a tick from the server
-            Tick t = Tick.NewTrade("TST", 10, 100);
+            TickImpl t = TickImpl.NewTrade("TST", 10, 100);
             s.newTick(t);
 
             // make sure the client got it
@@ -75,7 +76,7 @@ namespace TestTradeLib
             Assert.That(fillrequest == 0, fillrequest.ToString());
 
             // client wants to buy 100 TST at market
-            Order o = new Order("TST", 100);
+            OrderImpl o = new OrderImpl("TST", 100);
             // if it works it'll return zero
             int error = c.SendOrder(o);
             Assert.That(error==0,error.ToString());
@@ -92,10 +93,10 @@ namespace TestTradeLib
             Assert.That(fills == 0, fills.ToString());
 
             // have to subscribe to a stock to get notified on fills for said stock
-            c.Subscribe(new MarketBasket(new Security("TST")));
+            c.Subscribe(new BasketImpl(new SecurityImpl("TST")));
 
             // prepare and send an execution from client to server
-            Trade t = new Trade("TST", 100, 300, DateTime.Now);
+            TradeImpl t = new TradeImpl("TST", 100, 300, DateTime.Now);
             s.newFill(t);
 
             // make sure client received and counted it

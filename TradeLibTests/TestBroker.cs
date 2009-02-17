@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
-using TradeLib;
+using TradeLink.Common;
 using NUnit.Framework;
+using TradeLink.API;
 
-namespace TestTradeLib
+namespace TestTradeLink
 {
     [TestFixture]
     public class TestBroker
@@ -22,29 +23,29 @@ namespace TestTradeLib
             Broker broker = new Broker();
             broker.GotFill += new FillDelegate(broker_GotFill);
             broker.GotOrder += new OrderDelegate(broker_GotOrder);
-            Order o = new Order();
+            OrderImpl o = new OrderImpl();
             uint failsoninvalid= broker.sendOrder(o);
-            Assert.AreNotEqual((int)TL2.OK,failsoninvalid);
+            Assert.AreNotEqual((int)MessageTypes.OK,failsoninvalid);
             Assert.That(orders == 0);
             Assert.That(fills == 0);
             o = new BuyMarket(s, 100);
             Assert.That(broker.sendOrder(o)>0);
             Assert.That(orders == 1);
             Assert.That(fills == 0);
-            Assert.That(broker.Execute(Tick.NewTrade(s,10,200)) == 1);
+            Assert.That(broker.Execute(TickImpl.NewTrade(s,10,200)) == 1);
             Assert.That(fills == 1);
 
             // test that a limit order is not filled outside the market
             o = new BuyLimit(s, 100, 9);
             broker.sendOrder(o);
-            Assert.AreEqual(0, broker.Execute(Tick.NewTrade(s, 10, 100)));
+            Assert.AreEqual(0, broker.Execute(TickImpl.NewTrade(s, 10, 100)));
             Assert.That(fills == 1); // redudant but for counting
 
             // test that limit order is filled inside the market
-            Assert.AreEqual(1, broker.Execute(Tick.NewTrade(s, 8, 100)));
+            Assert.AreEqual(1, broker.Execute(TickImpl.NewTrade(s, 8, 100)));
             Assert.That(fills == 2);
 
-            Order x = new Order();
+            OrderImpl x = new OrderImpl();
             // test that a market order is filled when opposite book exists
             o = new SellLimit(s, 100, 11);
             x = new BuyMarket(s, 100);
@@ -85,7 +86,7 @@ namespace TestTradeLib
         [Test]
         public void DataProvider()
         {
-            Tick t = Tick.NewTrade(s, 10, 700);
+            TickImpl t = TickImpl.NewTrade(s, 10, 700);
             // feature to pass-through ticks to any subscriber
             // this can be connected to tradelink library to allow filtered subscribptions
             // and interapplication communication
@@ -99,7 +100,7 @@ namespace TestTradeLib
         }
         void broker_GotTick(Tick tick)
         {
-            receivedtickDP = new Tick(tick);
+            receivedtickDP = new TickImpl(tick);
             gottickDP++;
         }
 
@@ -163,8 +164,8 @@ namespace TestTradeLib
             Account a = new Account(me);
             Account b = new Account(other);
             Account c = new Account("sleeper");
-            Order oa = new BuyMarket(sym,100);
-            Order ob = new BuyMarket(sym, 100);
+            OrderImpl oa = new BuyMarket(sym,100);
+            OrderImpl ob = new BuyMarket(sym, 100);
             oa.time = Util.ToTLTime(DateTime.Now);
             oa.date = Util.ToTLDate(DateTime.Now);
             ob.time = Util.ToTLTime(DateTime.Now);
@@ -175,7 +176,7 @@ namespace TestTradeLib
             // send order to account for jfranta
             Assert.That(broker.sendOrder(oa)>0);
             Assert.That(broker.sendOrder(ob)>0);
-            Tick t = new Tick(sym);
+            TickImpl t = new TickImpl(sym);
             t.trade = 100m;
             t.size = 200;
             t.date = Util.ToTLDate(DateTime.Now);
@@ -200,11 +201,11 @@ namespace TestTradeLib
             Broker broker = new Broker();
             const string s = "TST";
             // build and send an OPG order
-            Order opg = new BuyOPG(s, 200, 10);
+            OrderImpl opg = new BuyOPG(s, 200, 10);
             broker.sendOrder(opg);
 
             // build a tick on another exchange
-            Tick it = Tick.NewTrade(s, 9, 100);
+            TickImpl it = TickImpl.NewTrade(s, 9, 100);
             it.ex = "ISLD";
 
             // fill order (should fail)
@@ -212,7 +213,7 @@ namespace TestTradeLib
             Assert.AreEqual(0, c);
 
             // build opening price for desired exchange
-            Tick nt = Tick.NewTrade(s, 9, 10000);
+            TickImpl nt = TickImpl.NewTrade(s, 9, 10000);
             nt.ex = "NYS";
             // fill order (should work)
 
@@ -222,10 +223,10 @@ namespace TestTradeLib
 
             // add another OPG, make sure it's not filled with another tick
 
-            Tick next = Tick.NewTrade(s, 9, 2000);
+            TickImpl next = TickImpl.NewTrade(s, 9, 2000);
             next.ex = "NYS";
 
-            Order late = new BuyOPG(s, 200, 10);
+            OrderImpl late = new BuyOPG(s, 200, 10);
             broker.sendOrder(late);
             c = broker.Execute(next);
             Assert.AreEqual(0, c);

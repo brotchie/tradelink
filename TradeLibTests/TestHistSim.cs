@@ -2,22 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
-using TradeLib;
+using TradeLink.Common;
 
-namespace TestTradeLib
+namespace TestTradeLink
 {
     [TestFixture]
     public class TestHistSim
     {
         public TestHistSim() { }
 
-        Tick[] timesales = new Tick[] 
+        TickImpl[] timesales = new TickImpl[] 
             {
-                Tick.NewTrade("IBM",100,100),
-                Tick.NewTrade("LVS",90,200),
-                Tick.NewQuote("LVS",20080425,931,0,90.00m,90.11m,10,2,"NYS","NYS"),
-                Tick.NewTrade("LVS",90.11m,100),
-                Tick.NewTrade("IBM",100,200),
+                TickImpl.NewTrade("IBM",100,100),
+                TickImpl.NewTrade("LVS",90,200),
+                TickImpl.NewQuote("LVS",20080425,931,0,90.00m,90.11m,10,2,"NYS","NYS"),
+                TickImpl.NewTrade("LVS",90.11m,100),
+                TickImpl.NewTrade("IBM",100,200),
             };
 
         [Test]

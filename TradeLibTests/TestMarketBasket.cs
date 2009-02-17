@@ -1,8 +1,8 @@
 using System;
 using NUnit.Framework;
-using TradeLib;
+using TradeLink.Common;
 
-namespace TestTradeLib
+namespace TestTradeLink
 {
     [TestFixture]
     public class TestMarketBasket
@@ -14,18 +14,18 @@ namespace TestTradeLib
         [Test]
         public void BasketBasics()
         {
-            MarketBasket mb = new MarketBasket();
+            BasketImpl mb = new BasketImpl();
             Assert.That(mb != null);
-            Security i = new Security("IBM");
-            mb = new MarketBasket(i);
+            SecurityImpl i = new SecurityImpl("IBM");
+            mb = new BasketImpl(i);
             Assert.That(mb.hasStock);
             mb.Remove(i);
             Assert.That(!mb.hasStock);
-            mb.Add(new Security("LVS"));
-            Assert.That(mb.Get(0).Symbol=="LVS",mb[0].ToString());
-            mb.Add(new Security("IBM"));
+            mb.Add(new SecurityImpl("LVS"));
+            Assert.That(mb[0].Symbol=="LVS",mb[0].ToString());
+            mb.Add(new SecurityImpl("IBM"));
             Assert.That(mb[1].Symbol=="IBM");
-            MarketBasket newbasket = new MarketBasket(new Security("FDX"));
+            BasketImpl newbasket = new BasketImpl(new SecurityImpl("FDX"));
             newbasket.Add(mb);
             mb.Clear();
             Assert.That(mb.Count==0);
@@ -35,8 +35,8 @@ namespace TestTradeLib
         [Test]
         public void Multiple()
         {
-            MarketBasket mb = new MarketBasket(new string[] { "IBM","LVS","T","GS","MHS" } );
-            MarketBasket rem = new MarketBasket(new string[] { "LVS", "MHS" });
+            BasketImpl mb = new BasketImpl(new string[] { "IBM","LVS","T","GS","MHS" } );
+            BasketImpl rem = new BasketImpl(new string[] { "LVS", "MHS" });
             Assert.That(mb.Count == 5);
             Assert.That(rem.Count == 2);
             mb.Subtract(rem);
@@ -46,18 +46,18 @@ namespace TestTradeLib
         [Test]
         public void Serialization()
         {
-            MarketBasket mb = new MarketBasket();
-            mb.Add(new Security("IBM"));
-            MarketBasket compare = MarketBasket.FromString(mb.ToString());
+            BasketImpl mb = new BasketImpl();
+            mb.Add(new SecurityImpl("IBM"));
+            BasketImpl compare = BasketImpl.FromString(mb.ToString());
             Assert.That(compare.Count == 1);
             mb.Clear();
-            compare = MarketBasket.FromString(mb.ToString());
+            compare = BasketImpl.FromString(mb.ToString());
             Assert.That(compare.Count==0);
 
             mb.Clear();
-            Security longform = Security.Parse("CLZ8 FUT NYMEX");
+            SecurityImpl longform = SecurityImpl.Parse("CLZ8 FUT NYMEX");
             mb.Add(longform);
-            compare = MarketBasket.FromString(mb.ToString());
+            compare = BasketImpl.FromString(mb.ToString());
             Assert.AreEqual(longform.ToString(),compare[0].ToString());
 
 
@@ -67,10 +67,10 @@ namespace TestTradeLib
         [Test]
         public void Enumeration()
         {
-            MarketBasket mb = new MarketBasket(new string[] { "IBM", "MHS", "LVS", "GM" });
+            BasketImpl mb = new BasketImpl(new string[] { "IBM", "MHS", "LVS", "GM" });
             string[] l = new string[4];
             int i = 0;
-            foreach (Security s in mb)
+            foreach (SecurityImpl s in mb)
                 l[i++] = s.Symbol;
             Assert.AreEqual(4, i);
 

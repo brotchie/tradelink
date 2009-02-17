@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using TradeLib;
+using TradeLink.Common;
 using NUnit.Framework;
+using TradeLink.API;
 
-namespace TestTradeLib
+namespace TestTradeLink
 {
     [TestFixture]
     public class TestOrder
@@ -16,7 +17,7 @@ namespace TestTradeLib
         {
             // assert that a default order is:
             // not valid, not filled
-            Order o = new Order();
+            OrderImpl o = new OrderImpl();
             Assert.That(!o.isValid);
             Assert.That(!o.isFilled);
         }
@@ -25,7 +26,7 @@ namespace TestTradeLib
         public void MarketOrder()
         {
             const string s = "SYM";
-            Order o = new Order(s,100);
+            OrderImpl o = new OrderImpl(s,100);
             Assert.That(o.isValid);
             Assert.That(o.isMarket);
             Assert.That(!o.isLimit);
@@ -39,51 +40,51 @@ namespace TestTradeLib
         {
             const string s = "TST";
             // market should fill on trade but not on quote
-            Order o = new BuyMarket(s, 100);
-            Assert.That(o.Fill(Tick.NewTrade(s, 9, 100)));
-            Assert.That(!o.Fill(Tick.NewBid(s, 8, 100)));
+            OrderImpl o = new BuyMarket(s, 100);
+            Assert.That(o.Fill(TickImpl.NewTrade(s, 9, 100)));
+            Assert.That(!o.Fill(TickImpl.NewBid(s, 8, 100)));
 
             // buy limit
 
             // limit should fill if order price is inside market
             o = new BuyLimit(s, 100, 10m);
-            Assert.That(o.Fill(Tick.NewTrade(s, 9, 100)));
+            Assert.That(o.Fill(TickImpl.NewTrade(s, 9, 100)));
             // shouldn't fill outside market
             o = new BuyLimit(s, 100, 10m);
-            Assert.That(!o.Fill(Tick.NewTrade(s, 11, 100)));
+            Assert.That(!o.Fill(TickImpl.NewTrade(s, 11, 100)));
 
             // sell limit
 
             // limit should fill if order price is inside market
             o = new SellLimit(s, 100, 10m);
-            Assert.That(o.Fill(Tick.NewTrade(s, 11, 100)));
+            Assert.That(o.Fill(TickImpl.NewTrade(s, 11, 100)));
             // shouldn't fill outside market
             o = new SellLimit(s, 100, 10m);
-            Assert.That(!o.Fill(Tick.NewTrade(s, 9, 100)));
+            Assert.That(!o.Fill(TickImpl.NewTrade(s, 9, 100)));
 
             // buy stop
 
             o = new BuyStop(s, 100, 10m);
-            Assert.That(o.Fill(Tick.NewTrade(s, 11, 100)));
+            Assert.That(o.Fill(TickImpl.NewTrade(s, 11, 100)));
             // shouldn't fill outside market
             o = new BuyStop(s, 100, 10m);
-            Assert.That(!o.Fill(Tick.NewTrade(s, 9, 100)));
+            Assert.That(!o.Fill(TickImpl.NewTrade(s, 9, 100)));
 
             // sell stop
 
             o = new SellStop(s, 100, 10m);
-            Assert.That(o.Fill(Tick.NewTrade(s, 9, 100)));
+            Assert.That(o.Fill(TickImpl.NewTrade(s, 9, 100)));
             // shouldn't fill outside market
             o = new SellStop(s, 100, 10m);
-            Assert.That(!o.Fill(Tick.NewTrade(s, 11, 100)));
+            Assert.That(!o.Fill(TickImpl.NewTrade(s, 11, 100)));
 
             // always fail filling an invalid tick
             o = new BuyMarket(s, 100);
-            Assert.IsFalse(o.Fill(Tick.NewTrade(s, 0, 0)));
+            Assert.IsFalse(o.Fill(TickImpl.NewTrade(s, 0, 0)));
 
             // always fail filling invalid order
             o = new BuyLimit(s, 100, 10);
-            Order x = new Order();
+            OrderImpl x = new OrderImpl();
             Assert.IsFalse(o.Fill(x));
 
             // always fail filling an order that doesn't cross market
@@ -132,28 +133,28 @@ namespace TestTradeLib
             const string ot = "GTC";
             const decimal p = 10;
             const int z = 100;
-            const Currency c = Currency.USD;
+            const CurrencyType c = CurrencyType.USD;
             const SecurityType t = SecurityType.STK;
-            Order o = new Order(s, z);
+            Order o = new OrderImpl(s, z);
             o.sec = 2;
             o.date = 20080718;
             o.time = 948;
             o.price = p;
             o.Account = a;
-            o.Exchange = x;
+            o.ex = x;
             o.Currency = c;
             o.Security = t;
             o.comment = u;
             o.TIF = ot;
             // convert it to a message
-            string msg = o.Serialize();
+            string msg = OrderImpl.Serialize(o);
 
             // convert it back to an object and validate nothing was lost
             string exception=null;
-            Order n = new Order();
+            Order n = new OrderImpl();
             try
             {
-                n = Order.Deserialize(msg);
+                n = OrderImpl.Deserialize(msg);
             }
             catch (Exception ex) { exception = ex.ToString(); }
             Assert.That(exception==null, msg+" "+exception);
@@ -178,18 +179,18 @@ namespace TestTradeLib
             // http://msdn.microsoft.com/en-us/library/ms173147(VS.80).aspx
 
             // x.Equals(x) returns true.
-            Order x = new Order("XTST", -300);
+            OrderImpl x = new OrderImpl("XTST", -300);
             Assert.That(x.Equals(x), x.ToString());
 
             // x.Equals(y) returns the same value as y.Equals(x).
-            Order y = new Order("YTST",200);
+            OrderImpl y = new OrderImpl("YTST",200);
             bool v1 = x.Equals(y);
             bool v2 = y.Equals(x);
             Assert.That(v1 == v2, x.ToString() + y.ToString());
 
             // if (x.Equals(y) && y.Equals(z)) returns true, then x.Equals(z) returns true.
-            y = new Order(x);
-            Order z = new Order(x);
+            y = new OrderImpl(x);
+            OrderImpl z = new OrderImpl(x);
             Assert.That(x.Equals(y) && y.Equals(z) && x.Equals(z));
 
             // Successive invocations of x.Equals(y) return the same value as long as the objects referenced by x and y are not modified.
