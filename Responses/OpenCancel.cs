@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using TradeLib;
+using TradeLink.Common;
+using TradeLink.API;
 
 namespace Responses
 {
@@ -24,12 +25,12 @@ namespace Responses
 
         protected override Order ReadOrder(Tick tick, BarList bl)
         {
-            if (tick.sec % 5 != 0) return new Order();
+            if (tick.sec % 5 != 0) return new OrderImpl();
             if (_buyids.Count > 0)
                 CancelOrders(true);
             else
                 return new BuyLimit(Symbol, MinSize, 1);
-            return new Order();
+            return new OrderImpl();
         }
 
 

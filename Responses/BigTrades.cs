@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using TradeLib;
+using TradeLink.Common;
 using System.Data;
+using TradeLink.API;
 
 namespace Responses
 {
@@ -50,16 +51,16 @@ namespace Responses
             // if we don't have 10 trades yet, add it
             if (dt.Rows.Count < 10)
             {
-                dt.Rows.Add(tick.time, tick.trade, tick.TradeSize, tick.ex);
+                dt.Rows.Add(tick.time, tick.trade, tick.size, tick.ex);
                 ui.dg.Invalidate(true); // update the grid
                 return;
             }
 
             // otherwise, go through list and check to see if it's bigger
             for (int i = 0; i < dt.Rows.Count; i++)
-                if ((int)dt.Rows[i]["TradeSize"] < tick.TradeSize)
+                if ((int)dt.Rows[i]["TradeSize"] < tick.size)
                 {
-                    dt.Rows[i].ItemArray = new object[] { tick.time, tick.trade, tick.TradeSize, tick.ex };
+                    dt.Rows[i].ItemArray = new object[] { tick.time, tick.trade, tick.size, tick.ex };
                     ui.dg.InvalidateRow(i); // update the grid
                     return;
                 }

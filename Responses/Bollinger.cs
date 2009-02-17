@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using TradeLib;
+using TradeLink.Common;
+using TradeLink.API;
 
 namespace Responses
 {
-    public class Bollinger : TickIndicator, BarListIndicator
+    public class Bollinger 
     {
         private decimal sds;
         private int lookback;
@@ -40,7 +41,7 @@ namespace Responses
 
         public Bollinger() : this(2,10) { }
 
-        public bool newTick  ( Tick t )
+        public bool newTick  ( TickImpl t )
         {
             if (isbarcons) throw new Exception("You can't call newTick method without using the right constructor");
                 if (t.isTrade)
@@ -76,10 +77,10 @@ namespace Responses
         public bool hasLookbacks
         { get { return (l.Count == lookback); } }
         
-        public bool newBar(BarList bl)
+        public bool newBar(BarListImpl bl)
         {
             if (!bl.isValid) return false;
-            Bar obar = bl.Get(bl.Last);
+            BarImpl obar = bl.Get(bl.Last);
             if (!isbarcons) throw new Exception("You can't call a newBar method without using the right constructor.");
             if (bl.NewBar)
                 {

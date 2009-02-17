@@ -3,7 +3,7 @@ using System.Collections;
 using System.Text;
 using System.IO;
 using System.Text.RegularExpressions;
-using TradeLib;
+using TradeLink.Common;
 
 namespace SplitEPF
 {

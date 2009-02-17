@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using TradeLib;
+using TradeLink.Common;
+using TradeLink.API;
 
 namespace Responses
 {
@@ -37,8 +38,8 @@ namespace Responses
         /// </summary>
         /// <value>The size of the trade.</value>
         public int ProfitSize { get { return profitsize; } set { profitsize = value; } }
-        protected BarList bl;
-        protected Tick tick;
+        protected BarListImpl bl;
+        protected TickImpl tick;
         protected decimal getMostRecentTrade() { return tick.trade; }
         protected decimal getMostRecentBid() { return tick.bid; }
         protected decimal getMostRecentAsk() { return tick.ask; }
@@ -100,8 +101,8 @@ namespace Responses
         
         protected override Order ReadOrder(Tick t,BarList barlist)
         {
-            this.tick = new Tick(t); // save tick to member for child classes
-            this.bl = barlist; // save bars for same purpose
+            this.tick = new TickImpl(t); // save tick to member for child classes
+            this.bl = (BarListImpl)barlist; // save bars for same purpose
 
             int adjust = 0;
             if (newTrade()) getStop(); 

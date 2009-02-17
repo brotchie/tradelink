@@ -1,0 +1,65 @@
+﻿
+
+namespace TradeLink.API
+{
+    /// <summary>
+    /// TradeLink Message Types used in TradeLink protocol
+    /// http://tradelink.googlecode.com/wiki/TradeLinkProtocol
+    /// </summary>
+    public enum MessageTypes
+    {
+        OK = 0,
+        SENDORDER = 1,
+        BROKERNAME = 28,
+        VERSION = 31,
+        ISSHORTABLE,
+        VWAP,
+        LASTTRADESIZE,
+        LASTTRADEPRICE,
+        LASTBID,
+        LASTASK,
+        BIDSIZE,
+        ASKSIZE,
+        DAYLOW,
+        DAYHIGH,
+        OPENPRICE,
+        CLOSEPRICE,
+        LRPBUY,
+        LRPSELL,
+        AMEXLASTTRADE,
+        NASDAQLASTTRADE,
+        NYSEBID,
+        NYSEASK,
+        NYSEDAYHIGH,
+        NYSEDAYLOW,
+        NYSELASTTRADE,
+        NASDAQIMBALANCE,
+        NASDAQPREVIOUSIMBALANCE,
+        NYSEIMBALACE,
+        NYSEPREVIOUSIMBALANCE,
+        TICKNOTIFY = 100,
+        EXECUTENOTIFY,
+        REGISTERCLIENT,
+        REGISTERSTOCK,
+        CLEARSTOCKS,
+        CLEARCLIENT,
+        HEARTBEAT,
+        ORDERNOTIFY,
+        ACCOUNTRESPONSE = 500,
+        ACCOUNTREQUEST,
+        ORDERCANCELREQUEST,
+        ORDERCANCELRESPONSE,
+        FEATUREREQUEST,
+        FEATURERESPONSE,
+        POSITIONREQUEST,
+        POSITIONRESPONSE,
+        FEATURE_NOT_IMPLEMENTED = 994,
+        CLIENTNOTREGISTERED = 995,
+        GOTNULLORDER = 996,
+        UNKNOWNMSG,
+        UNKNOWNSYM,
+        TL_CONNECTOR_MISSING,
+        BAD_PARAMETERS,
+        DUPLICATE_ORDERID,
+    }
+}

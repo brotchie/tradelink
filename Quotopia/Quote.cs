@@ -8,7 +8,8 @@ using System.Windows.Forms;
 using System.Reflection;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using TradeLib;
+using TradeLink.Common;
+using TradeLink.API;
 
 namespace Quotopia
 {
@@ -129,7 +130,7 @@ namespace Quotopia
         void tl_gotOrder(Order o)
         {
             if (orderidx(o.id)==-1) // if we don't have this order, add it
-                ordergrid.Rows.Add(new object[] { o.id, o.symbol, (o.Side ? "BUY" : "SELL"),o.UnSignedSize, (o.price == 0 ? "Market" : o.price.ToString()), (o.stopp==0 ? "" : o.stopp.ToString()), o.Account });
+                ordergrid.Rows.Add(new object[] { o.id, o.symbol, (o.side ? "BUY" : "SELL"),o.UnsignedSize, (o.price == 0 ? "Market" : o.price.ToString()), (o.stopp==0 ? "" : o.stopp.ToString()), o.Account });
         }
 
         int orderidx(uint orderid)
@@ -245,8 +246,8 @@ namespace Quotopia
             Security s = GetVisibleSecurity(CurrentRow);
             if (s.Type == SecurityType.IDX) return;
             string sym = s.Symbol;
-            Order o = new Order(sym,0);
-            o.Exchange = s.DestEx;
+            Order o = new OrderImpl(sym,0);
+            o.ex = s.DestEx;
             o.Security = s.Type;
             o.LocalSymbol = sym;
             Ticket t = new Ticket(o);
@@ -292,10 +293,10 @@ namespace Quotopia
         void rightchart(object sender, EventArgs e)
         {
             string sym = GetVisibleSecurity(CurrentRow).Symbol;
-            Chart c = new Chart();
+            Chart c = null;
             try
             {
-                c = new Chart(bardict[sym]);
+                c = new ChartImpl(bardict[sym]);
             }
             catch (Exception) { return; }
             c.Symbol = sym;
@@ -323,7 +324,7 @@ namespace Quotopia
                 preface = "Adding index: ";
             if (e.KeyCode == Keys.Enter)
             {
-                Security sec = Security.Parse(newsymbol);
+                Security sec = SecurityImpl.Parse(newsymbol);
                 if (sec.isValid)
                 {
                     mb.Add(sec);
@@ -379,14 +380,14 @@ namespace Quotopia
             }
         }
 
-        Dictionary<string, BarList> bardict = new Dictionary<string, BarList>();
+        Dictionary<string, BarListImpl> bardict = new Dictionary<string, BarListImpl>();
 
         void addsymbol(string sym)
         {
             // SYM,LAST,TSIZE,BID,ASK,BSIZE,ASIZE,SIZES,OHLC(YEST),CHANGE
             DataRow r = qt.Rows.Add(sym, "", "", "", "", "", "", "", "", "", "", "");
             if (!bardict.ContainsKey(sym))
-                bardict.Add(sym, new BarList(BarInterval.FiveMin, sym));
+                bardict.Add(sym, new BarListImpl(BarInterval.FiveMin, sym));
             status("Added " + sym);
             symindex();
             tl.RequestPositions(accts!=null ? accts[0] : "");
@@ -400,7 +401,7 @@ namespace Quotopia
             for (int i = 0; i < qt.Rows.Count; i++)
             {
                 if (qt.Rows[i].RowState == DataRowState.Deleted) continue;
-                Security sec = Security.Parse(qt.Rows[i]["Symbol"].ToString());
+                Security sec = SecurityImpl.Parse(qt.Rows[i]["Symbol"].ToString());
                 string sym = sec.Symbol;
                 if (!symidx.ContainsKey(sec.FullName)) // if we've not seen this symbol add it's index
                     symidx.Add(sec.FullName, new int[] { i });
@@ -420,8 +421,8 @@ namespace Quotopia
 
         Security GetVisibleSecurity(int row)
         {
-            if ((row < 0) || (row >= qg.Rows.Count)) return new Security();
-            Security s = Security.Parse(qt.Rows[row]["Symbol"].ToString());
+            if ((row < 0) || (row >= qg.Rows.Count)) return new SecurityImpl();
+            Security s = SecurityImpl.Parse(qt.Rows[row]["Symbol"].ToString());
             return s;
         }
         int[] GetSymbolRows(string sym)
@@ -459,7 +460,7 @@ namespace Quotopia
                         if (t.size > 0) // make sure TSize is reported
                             qt.Rows[r]["TSize"] = t.size;
                     }
-                    else if (t.FullQuote)
+                    else if (t.isFullQuote)
                     {
 
                         qt.Rows[r]["Bid"] = t.bid.ToString("N2");
@@ -524,7 +525,7 @@ namespace Quotopia
                     posdict[t.symbol] = p;
                 }
                 else 
-                    posdict.Add(t.symbol, new Position(t));
+                    posdict.Add(t.symbol, new PositionImpl(t));
                 int size = posdict[t.symbol].Size;
                 decimal price = posdict[t.symbol].AvgPrice;
                 for (int i = 0; i < rows.Length; i++)
@@ -541,7 +542,7 @@ namespace Quotopia
             if (spillTick != null) 
                 spillTick(t);
             RefreshRow(t);
-            BarList bl = null;
+            BarListImpl bl = null;
             if (bardict.TryGetValue(t.symbol, out bl))
                 bardict[t.symbol].newTick(t);
 
@@ -601,7 +602,7 @@ namespace Quotopia
             }
         }
 
-        MarketBasket mb = new MarketBasket();
+        MarketBasket mb = new BasketImpl();
 
 
         private void importbasketbut_Click(object sender, EventArgs e)
@@ -625,7 +626,7 @@ namespace Quotopia
                     for (int i = 0; i < r.Length; i++)
                     {
                         bool add = true;
-                        Security sec = Security.Parse(r[i]);
+                        Security sec = SecurityImpl.Parse(r[i]);
                         if (sec.isValid)
                             mb.Add(sec);
                         else { add = false; skipped++; }

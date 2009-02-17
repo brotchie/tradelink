@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using TradeLib;
+using TradeLink.Common;
+using TradeLink.API;
 
 namespace Responses
 {
@@ -11,7 +12,7 @@ namespace Responses
         protected override Order ReadOrder(Tick t, BarList bl)
         {
             int adjust = Read(t, bl);
-            Order o = Adjust(adjust);
+            OrderImpl o = Adjust(adjust);
             return o;
         }
 
@@ -20,16 +21,16 @@ namespace Responses
         /// </summary>
         /// <param name="asize">The adjustment size. Zero for no change.</param>
         /// <returns>A market order for specified size</returns>
-        protected Order Adjust(int asize)
+        protected OrderImpl Adjust(int asize)
         {
-            if (asize == 0) return new Order();
+            if (asize == 0) return new OrderImpl();
             int size = asize;
             int ts = Pos.Size;
             if (Math.Abs(size) < 11) size = Calc.Norm2Min(ts * size,MINSIZE);
             Boolean side = size > 0;
             size = NoCrossingFlat(size);
             if (Math.Abs(size + ts) > MAXSIZE) size = (MAXSIZE - Math.Abs(ts)) * (side ? 1 : -1);
-            Order o = new Order(Symbol, side, size, Name);
+            OrderImpl o = new OrderImpl(Symbol, side, size, Name);
             return o;
         }
 

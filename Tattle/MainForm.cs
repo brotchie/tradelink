@@ -6,8 +6,9 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
-using TradeLib;
+using TradeLink.Common;
 using System.Reflection;
+using TradeLink.API;
 
 namespace Tattle
 {
@@ -145,7 +146,7 @@ namespace Tattle
                 if (!r.SymbolsTraded.Contains(tr.Source.symbol))
                     r.SymbolsTraded += tr.Source.symbol + ",";
                 r.Trades++;
-                r.HundredLots += (int)(tr.Source.Size / 100);
+                r.HundredLots += (int)(tr.Source.xsize / 100);
                 r.GrossPL += tr.ClosedPL;
                 if (tr.ClosedPL>0) r.Winners++;
                 if (tr.ClosedPL < 0) r.Losers++;
@@ -203,7 +204,7 @@ namespace Tattle
         public decimal GrossMargin { get { return (GrossPL==0) ? 0 : NetPL / GrossPL; } }
     }
 
-    public class TradeResult : Trade
+    public class TradeResult : TradeImpl
     {
         public Trade Source;
         public decimal OpenPL;
@@ -218,7 +219,7 @@ namespace Tattle
         {
             string[] res = resultline.Split(',');
             TradeResult r = new TradeResult();
-            r.Source = Trade.FromString(resultline);
+            r.Source = TradeImpl.FromString(resultline);
             r.OpenPL = Convert.ToDecimal(res[s]);
             r.ClosedPL = Convert.ToDecimal(res[s + 1]);
             r.OpenSize = Convert.ToInt32(res[s + 2]);

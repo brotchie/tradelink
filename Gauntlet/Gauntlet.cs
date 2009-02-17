@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Collections;
 using System.ComponentModel;
 using System.Windows.Forms;
-using TradeLib;
+using TradeLink.Common;
 using System.IO;
+using TradeLink.API;
 
     namespace WinGauntlet
 {
@@ -69,7 +70,7 @@ using System.IO;
             catch (Exception ex) { show("exception loading stocks: " + ex.ToString()); return; }
             for (int i = 0; i < fi.Length; i++)
             {
-                Security s = StockFromFileName(fi[i].Name);
+                SecurityImpl s = StockFromFileName(fi[i].Name);
                 if (!s.isValid) continue;
                 DateTime d = Util.ToDateTime(s.Date);
                 if (!stocklist.Items.Contains(s.Symbol))
@@ -85,18 +86,18 @@ using System.IO;
 
         
 
-        Security StockFromFileName(string filename)
+        SecurityImpl StockFromFileName(string filename)
         {
             try
             {
                 string ds = System.Text.RegularExpressions.Regex.Match(filename, "([0-9]{8})[.]", System.Text.RegularExpressions.RegexOptions.IgnoreCase).Result("$1");
                 string sym = filename.Replace(ds, "").Replace(".EPF", "");
-                Security s = new Security(sym);
+                SecurityImpl s = new SecurityImpl(sym);
                 s.Date = Convert.ToInt32(ds);
                 return s;
             }
             catch (Exception) { }
-            return new Security();
+            return new SecurityImpl();
             
         }
         private void button1_Click(object sender, EventArgs e)
@@ -160,7 +161,7 @@ using System.IO;
             bt = new BackTest();
             bt.BTStatus += new DebugFullDelegate(bt_BTStatus);
             bt.mybroker.GotOrder += new OrderDelegate(myres.GotOrder);
-            bt.mybroker.GotOrderCancel += new Broker.OrderCancelDelegate(mybroker_GotOrderCancel);
+            bt.mybroker.GotOrderCancel += new OrderCancelDelegate(mybroker_GotOrderCancel);
             bt.mybroker.GotFill+=new FillDelegate(myres.GotFill);
             if (cleartrades.Checked) trades.Rows.Clear();
             if (clearorders.Checked) orders.Rows.Clear();
@@ -293,7 +294,7 @@ using System.IO;
             {
                 StreamWriter sw = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Orders" + unique + ".csv", false);
                 for (int i = 0; i < bt.mybroker.GetOrderList().Count; i++)
-                    sw.WriteLine(bt.mybroker.GetOrderList()[i].Serialize());
+                    sw.WriteLine(OrderImpl.Serialize(bt.mybroker.GetOrderList()[i]));
                 sw.Close();
             }
             if (indf!=null)

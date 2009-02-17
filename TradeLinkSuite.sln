@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual C# Express 2008
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeLib", "TradeLib\TradeLib.csproj", "{A0FE06A2-F31B-49DE-8901-917B5D593E43}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeSales", "TimeAndSales\TimeSales.csproj", "{5FE9B310-BE7C-4ADE-8D33-DB8646D8FC3C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SplitEPF", "SplitEPF\SplitEPF.csproj", "{27B62DDE-28DF-4EEB-BE4D-8CC58EB1635C}"
@@ -33,7 +31,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Update", "Update\Update.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Responses", "Responses\Responses.csproj", "{3443CCF0-9CA3-46BD-A1D8-5455AA178F0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeLibTests", "TradeLibTests\TradeLibTests.csproj", "{293780F0-4BE5-49F9-8720-CFD5F79EC77D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeLink.Tests", "TradeLibTests\TradeLink.Tests.csproj", "{293780F0-4BE5-49F9-8720-CFD5F79EC77D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeLink.API", "TradeLinkAPI\TradeLink.API.csproj", "{1B99C9ED-7AF1-4D48-AC9D-A97CF30E1A82}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeLink.Common", "TradeLinkCommon\TradeLink.Common.csproj", "{A0FE06A2-F31B-49DE-8901-917B5D593E43}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,10 +43,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A0FE06A2-F31B-49DE-8901-917B5D593E43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A0FE06A2-F31B-49DE-8901-917B5D593E43}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A0FE06A2-F31B-49DE-8901-917B5D593E43}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A0FE06A2-F31B-49DE-8901-917B5D593E43}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5FE9B310-BE7C-4ADE-8D33-DB8646D8FC3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5FE9B310-BE7C-4ADE-8D33-DB8646D8FC3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FE9B310-BE7C-4ADE-8D33-DB8646D8FC3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -109,6 +107,14 @@ Global
 		{293780F0-4BE5-49F9-8720-CFD5F79EC77D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{293780F0-4BE5-49F9-8720-CFD5F79EC77D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{293780F0-4BE5-49F9-8720-CFD5F79EC77D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B99C9ED-7AF1-4D48-AC9D-A97CF30E1A82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B99C9ED-7AF1-4D48-AC9D-A97CF30E1A82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B99C9ED-7AF1-4D48-AC9D-A97CF30E1A82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B99C9ED-7AF1-4D48-AC9D-A97CF30E1A82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0FE06A2-F31B-49DE-8901-917B5D593E43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0FE06A2-F31B-49DE-8901-917B5D593E43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0FE06A2-F31B-49DE-8901-917B5D593E43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0FE06A2-F31B-49DE-8901-917B5D593E43}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

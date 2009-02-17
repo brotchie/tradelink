@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using TradeLib;
+using TradeLink.Common;
+using TradeLink.API;
 
 // we need this library to be able to read the parameter comments from our response
 using System.ComponentModel;

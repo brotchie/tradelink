@@ -5,7 +5,8 @@ using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
-using TradeLib;
+using TradeLink.Common;
+using TradeLink.API;
 
 namespace TimeSales
 {
@@ -103,7 +104,7 @@ namespace TimeSales
         void LoadEPF(string file)
         {
             StreamReader sr = new StreamReader(file);
-            Security s = eSigTick.InitEpf(sr);
+            SecurityImpl s = eSigTick.InitEpf(sr);
             total = 0;
             symbol = s.Symbol;
             date = s.Date;
@@ -148,7 +149,7 @@ namespace TimeSales
             
         }
 
-        delegate void TickCallback(Tick t);
+        
         void NewTick(Tick t)
         {
             string time = string.Format("{0}:{1:00}",t.time,t.sec);

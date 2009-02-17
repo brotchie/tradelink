@@ -4,8 +4,9 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
-using TradeLib;
+using TradeLink.Common;
 using System.Net;
+using TradeLink.API;
 
 namespace Chartographer
 {
@@ -13,7 +14,7 @@ namespace Chartographer
     {
         public event BarListUpdated newChartData;
         WebClient client = new WebClient();
-        Dictionary<string, BarList> blbox = new Dictionary<string, BarList>();
+        Dictionary<string, BarListImpl> blbox = new Dictionary<string, BarListImpl>();
         public Form1()
         {
             InitializeComponent();
@@ -47,11 +48,11 @@ namespace Chartographer
             if (e.Error != null) return;
             fetchstate f = (fetchstate)e.UserState;
             Security s = f.ChartStock;
-            if (!blbox.ContainsKey(s.Symbol)) blbox.Add(s.Symbol, BarList.FromCSV(s.Symbol,e.Result));
-            else blbox[s.Symbol] = BarList.FromCSV(s.Symbol,e.Result);
+            if (!blbox.ContainsKey(s.Symbol)) blbox.Add(s.Symbol, BarListImpl.FromCSV(s.Symbol,e.Result));
+            else blbox[s.Symbol] = BarListImpl.FromCSV(s.Symbol,e.Result);
             if (f.NewChart)
             {
-                Chart c = new Chart(blbox[s.Symbol], true);
+                ChartImpl c = new ChartImpl(blbox[s.Symbol], true);
                 c.Symbol = s.Symbol;
                 try
                 {
@@ -92,7 +93,7 @@ namespace Chartographer
         private void button1_Click(object sender, EventArgs e)
         {
             chartsymbolbox.Text = chartsymbolbox.Text.ToUpper();
-            downloaddata(new Security(chartsymbolbox.Text));
+            downloaddata(new SecurityImpl(chartsymbolbox.Text));
         }
 
         private void downloaddata(Security s)
@@ -148,8 +149,8 @@ namespace Chartographer
             od.InitialDirectory = "c:\\program files\\tradelink\\tickdata\\";
             od.Multiselect = false;
             od.ShowDialog();
-            BarList bl = BarList.FromEPF(od.FileName);
-            Chart c = new Chart(bl, false);
+            BarListImpl bl = BarListImpl.FromEPF(od.FileName);
+            ChartImpl c = new ChartImpl(bl, false);
             c.Symbol = bl.Symbol;
             try
             {

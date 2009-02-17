@@ -5,7 +5,7 @@
     
     Version 2.0
     
-    The primary goals of this format is to allow a simple XML format 
+    The primary goals of this format is to allow a se XML format 
     that is mostly human readable. The generation and parsing of the 
     various data types are done through the TypeConverter classes 
     associated with the data types.
@@ -27,7 +27,7 @@
         <comment>This is a comment</comment>
     </data>
                 
-    There are any number of "resheader" rows that contain simple 
+    There are any number of "resheader" rows that contain se 
     name/value pairs.
     
     Each data row contains a name, and value. The row also contains a 

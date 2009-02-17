@@ -5,14 +5,15 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using TradeLib;
+using TradeLink.Common;
 using System.IO;
+using TradeLink.API;
 
 namespace Kadina
 {
     public partial class kadinamain : Form
     {
-        Security sec = null;
+        SecurityImpl sec = null;
         string tickfile = "";
         string responsedll = "";
         string resname = "";
@@ -328,15 +329,15 @@ namespace Kadina
             for (int i = 0; i < list.Length; i++)
                 playtobut.DropDownItems.Add(list[i]);
         }
-        Dictionary<string, Position> poslist = new Dictionary<string, Position>();
+        Dictionary<string, PositionImpl> poslist = new Dictionary<string, PositionImpl>();
         void broker_GotFill(Trade t)
         {
-            Position mypos = new Position(t);
+            PositionImpl mypos = new PositionImpl(t);
             decimal cpl = 0;
             decimal cpt = 0;
             if (!poslist.TryGetValue(t.symbol, out mypos))
             {
-                mypos = new Position(t);
+                mypos = new PositionImpl(t);
                 poslist.Add(t.symbol, mypos);
             }
             else
@@ -347,7 +348,7 @@ namespace Kadina
             }
 
             ptab.Rows.Add(nowtime, mypos.Symbol,(mypos.isFlat ? "FLAT" : (mypos.isLong ? "LONG" : "SHORT")), mypos.Size, mypos.AvgPrice.ToString("N2"), cpl.ToString("C2"), cpt.ToString("N1"));
-            ft.Rows.Add(t.xtime.ToString() + "." + t.xsec.ToString(), t.symbol,(t.Side ? "BUY" : "SELL"),t.xsize, t.xprice.ToString("N2"));
+            ft.Rows.Add(t.xtime.ToString() + "." + t.xsec.ToString(), t.symbol,(t.side ? "BUY" : "SELL"),t.xsize, t.xprice.ToString("N2"));
         }
 
         void broker_GotOrder(Order o)
@@ -496,7 +497,7 @@ namespace Kadina
             else if (isEPF(f))
             {
 
-                sec = Security.FromFile(f);
+                sec = SecurityImpl.FromFile(f);
                 if (System.IO.File.Exists(f))
                     if (!isRecent(f) && sec.isValid)
                         recent.DropDownItems.Add(f);
@@ -505,7 +506,7 @@ namespace Kadina
                 h.SimBroker.GotOrder += new OrderDelegate(broker_GotOrder);
                 h.SimBroker.GotFill += new FillDelegate(broker_GotFill);
                 h.GotTick += new TickDelegate(h_GotTick);
-                h.SimBroker.GotOrderCancel += new Broker.OrderCancelDelegate(broker_GotOrderCancel);
+                h.SimBroker.GotOrderCancel += new OrderCancelDelegate(broker_GotOrderCancel);
 
 
                 status("Loaded "+sec.Symbol+" for "+Util.ToDateTime(sec.Date)+" ["+string.Join(",",PrettyEPF())+"]");

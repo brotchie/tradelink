@@ -5,8 +5,9 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using TradeLib;
+using TradeLink.Common;
 using System.IO;
+using TradeLink.API;
 
 
 
@@ -108,7 +109,7 @@ namespace ASP
         }
 
 
-        MarketBasket mb = new MarketBasket();
+        BasketImpl mb = new BasketImpl();
         Response workingres = new InvalidResponse();
 
         // name of dll of response names
@@ -186,7 +187,7 @@ namespace ASP
             foreach (string symt in syms)
             {
                 string sym = symt.ToUpper();
-                Security sec = Security.Parse(sym);
+                SecurityImpl sec = SecurityImpl.Parse(sym);
                 if (!sec.isValid)
                 {
                     status("Security invalid: " + sec.ToString());
@@ -215,7 +216,7 @@ namespace ASP
             int idx = reslist.Count -1;
             tl.Subscribe(mb);
             boxcriteria.Items.Add(workingres.Name+" ["+string.Join(",",valid.ToArray())+"]");
-            foreach (Security sec in seclist.Values)
+            foreach (SecurityImpl sec in seclist.Values)
                 if (symidx.ContainsKey(sec.FullName))
                 {
                     // add this boxes' index to subscriptions for this symbol
@@ -230,7 +231,7 @@ namespace ASP
             
         }
 
-        Dictionary<string,Security> seclist = new Dictionary<string,Security>();
+        Dictionary<string,SecurityImpl> seclist = new Dictionary<string,SecurityImpl>();
         Dictionary<string, int[]> symidx = new Dictionary<string, int[]>();
         List<Response> reslist = new List<Response>();
         

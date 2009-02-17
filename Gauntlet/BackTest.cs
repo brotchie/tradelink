@@ -3,9 +3,10 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using TradeLib;
+using TradeLink.Common;
 using System.Reflection;
 using System.ComponentModel;
+using TradeLink.API;
 
 namespace WinGauntlet
 {
@@ -171,7 +172,7 @@ namespace WinGauntlet
         public void show(string debug)
         {
             if (BTStatus != null)
-                BTStatus(TradeLib.Debug.Create(debug, DebugLevel.Status));
+                BTStatus(TradeLink.Common.DebugImpl.Create(debug, DebugLevel.Status));
         }
 
     }

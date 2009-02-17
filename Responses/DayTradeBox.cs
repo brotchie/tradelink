@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel;
-using TradeLib;
+using TradeLink.Common;
+using TradeLink.API;
 
 namespace Responses
 {
@@ -17,8 +18,8 @@ namespace Responses
         public event DebugFullDelegate SendDebug;
         public event ObjectArrayDelegate SendIndicators;
 
-        BarList _bl = new BarList();
-        Position _pos = new Position();
+        BarListImpl _bl = new BarListImpl();
+        Position _pos = new PositionImpl();
         string[] _iname = new string[0];
         string[] _syms = new string[0];
         private int _date = 0;
@@ -57,7 +58,7 @@ namespace Responses
                 }
                 catch (Exception ex) { D("Exception checking for EarlyClose..."+ex.Message); }
             }
-            Order o = new Order();
+            Order o = new OrderImpl();
             _bl.newTick(tick);
 
             _time = tick.time;
@@ -71,7 +72,7 @@ namespace Responses
             o = ReadOrder(tick, _bl);
 
             if (!OrdersAllowed) // if we're not allowed, mark order as invalid
-                o = new Order();
+                o = new OrderImpl();
 
             //flat us at the close
             if (!_sentshut && (Time >= (DayEnd - _DayEndBuff)))
@@ -85,7 +86,7 @@ namespace Responses
             if (o.isValid)
             {
                 // final prep for good orders
-                _expectedpossize += o.SignedSize;
+                _expectedpossize += o.size;
                 o.time = Time;
                 o.date = Date;
                 D("Sent order: " + o);
@@ -152,8 +153,8 @@ namespace Responses
             DayStart = 930; DayEnd = 1600;
             _buyids.Clear();
             _sellids.Clear();
-            _pos = new Position(Symbol);
-            _bl = new BarList();
+            _pos = new PositionImpl(Symbol);
+            _bl = new BarListImpl();
         }
 
 
@@ -187,7 +188,7 @@ namespace Responses
             if (SendDebug != null)
             {
                 string head = "[" + Name + "] " + Symbol + " " + Date + ":" + Time + " ";
-                SendDebug(Debug.Create(head + debug, DebugLevel.Debug));
+                SendDebug(DebugImpl.Create(head + debug, DebugLevel.Debug));
             }
         }
         /// <summary>
@@ -199,7 +200,7 @@ namespace Responses
             if (SendDebug != null)
             {
                 string head = "[" + Name + "] " + Symbol + " " + Date + ":" + Time + " ";
-                SendDebug(Debug.Create(head + status, DebugLevel.Status));
+                SendDebug(DebugImpl.Create(head + status, DebugLevel.Status));
             }
 
         }
@@ -210,7 +211,7 @@ namespace Responses
         /// <param name="t">Most Recent Tick</param>
         /// <param name="bl">Current BarList</param>
         /// <returns>You return an order in response to latest Bar/Tick (or invalid order to do nothing)</returns>
-        protected virtual Order ReadOrder(Tick t, BarList bl) { return new Order(); }
+        protected virtual Order ReadOrder(Tick t, BarList bl) { return new OrderImpl(); }
 
 
         /// <summary>
@@ -292,7 +293,7 @@ namespace Responses
         [BrowsableAttribute(false)]
         public Position Pos { get { return _pos; } }
         [BrowsableAttribute(false)]
-        protected BarList BL { get { return _bl; } }
+        protected BarListImpl BL { get { return _bl; } }
         [BrowsableAttribute(false)]
         public bool isValid { get { return !_shut; } }
         [BrowsableAttribute(false)]

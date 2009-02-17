@@ -5,7 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using TradeLib;
+using TradeLink.Common;
 
 namespace ResearchLib
 {
@@ -44,9 +44,9 @@ namespace ResearchLib
             Target = ft;
 
         }
-        MarketBasket _basket = new MarketBasket();
+        BasketImpl _basket = new BasketImpl();
 
-        public MarketBasket Basket { get { return _basket; }  }
+        public BasketImpl Basket { get { return _basket; }  }
         public FetchTarget Target 
         { 
             get { return _ft; }

@@ -7,13 +7,13 @@
 		<NAMESPACE>System.Text</NAMESPACE>
 		<NAMESPACE>System.Xml</NAMESPACE>
 		<NAMESPACE>System.Windows.Forms</NAMESPACE>
-		<NAMESPACE>TradeLib</NAMESPACE>
+		<NAMESPACE>TradeLink.Common</NAMESPACE>
 		<NAMESPACE>Tript</NAMESPACE>
 	</DEFAULTNAMESPACES>
 	<DEFAULTIMPORTS>
 		<DLL>System.dll</DLL>
 		<DLL>System.Xml.dll</DLL>
 		<DLL>System.Windows.Forms.dll</DLL>
-		<DLL>tradelib.dll</DLL>
+		<DLL>TradeLink.Common.dll</DLL>
 	</DEFAULTIMPORTS>
 </SETTINGS>

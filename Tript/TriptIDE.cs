@@ -6,7 +6,8 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
-using TradeLib;
+using TradeLink.Common;
+using TradeLink.API;
 
 
 namespace Tript

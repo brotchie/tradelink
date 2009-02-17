@@ -54,16 +54,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TradeLib\TradeLib.csproj">
-      <Project>{A0FE06A2-F31B-49DE-8901-917B5D593E43}</Project>
-      <Name>TradeLib</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Update.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\app.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TradeLinkCommon\TradeLink.Common.csproj">
+      <Project>{A0FE06A2-F31B-49DE-8901-917B5D593E43}</Project>
+      <Name>TradeLink.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

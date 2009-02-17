@@ -5,7 +5,8 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using TradeLib;
+using TradeLink.Common;
+using TradeLink.API;
 
 namespace Record
 {
@@ -14,7 +15,7 @@ namespace Record
         TickArchiver ta = new TickArchiver();
         TickWatcher tw = new TickWatcher();
         TLClient_WM tl = new TLClient_WM();
-        MarketBasket mb = new MarketBasket();
+        BasketImpl mb = new BasketImpl();
 
         public RecordMain()
         {
@@ -47,14 +48,14 @@ namespace Record
 
                 stockslist.Items.Clear();
                 for (int i = 0; i < mb.Count; i++)
-                    stockslist.Items.Add(mb[i].Name);
+                    stockslist.Items.Add(mb[i].Symbol);
             }
         }
 
         private void recordbut_Click(object sender, EventArgs e)
         {
             int size = mb.Count;
-            Security sec = Security.Parse(symbox.Text);
+            SecurityImpl sec = SecurityImpl.Parse(symbox.Text);
             if (sec.isValid)
                 mb.Add(sec);
             refreshlist(size);

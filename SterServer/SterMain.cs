@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
 using System.Windows.Forms;
-using TradeLib;
+using TradeLink.Common;
 using SterlingLib;
+using TradeLink.API;
 
 namespace SterServer
 {
@@ -39,7 +40,7 @@ namespace SterServer
 
             tl.BrokerName = Brokers.Sterling;
             tl.gotSrvFillRequest += new OrderDelegate(tl_gotSrvFillRequest);
-            tl.gotSrvPosList += new TLServer_WM.PositionArrayDelegate(tl_gotSrvPosList);
+            tl.gotSrvPosList += new PositionArrayDelegate(tl_gotSrvPosList);
             tl.RegisterStocks += new DebugDelegate(tl_RegisterStocks);
             tl.OrderCancelRequest += new UIntDelegate(tl_OrderCancelRequest);
 
@@ -91,7 +92,7 @@ namespace SterServer
                 order.Destination = o.Exchange;
                 order.Side = o.side ? "B" : "S";
                 order.Symbol = o.symbol;
-                order.Quantity = o.UnSignedSize;
+                order.Quantity = o.UnsignedSize;
                 order.Account = o.Account;
                 order.Destination = o.Exchange;
                 order.Tif = o.TIF;
@@ -146,7 +147,7 @@ namespace SterServer
 
         void stiEvents_OnSTITradeUpdate(ref structSTITradeUpdate t)
         {
-            Trade f = new Trade();
+            Trade f = new TradeImpl();
             f.symbol = t.bstrSymbol;
             f.Account = t.bstrAccount;
             f.id = Convert.ToUInt32(t.bstrClOrderId);
@@ -163,7 +164,7 @@ namespace SterServer
 
         void stiEvents_OnSTIOrderUpdate(ref structSTIOrderUpdate structOrderUpdate)
         {
-            Order o = new Order();
+            Order o = new OrderImpl();
             o.symbol = structOrderUpdate.bstrSymbol;
             o.id = Convert.ToUInt32(structOrderUpdate.bstrClOrderId);
             o.size = structOrderUpdate.nQuantity;
@@ -172,7 +173,7 @@ namespace SterServer
             o.stopp = (decimal)structOrderUpdate.fStpPrice;
             o.TIF = structOrderUpdate.bstrTif;
             o.Account = structOrderUpdate.bstrAccount;
-            o.Exchange = structOrderUpdate.bstrDestination;
+            o.ex= structOrderUpdate.bstrDestination;
             tl.newOrder(o);
 
         }
@@ -181,12 +182,12 @@ namespace SterServer
         Position[] tl_gotSrvPosList(string account)
         {
             stiPos.RegisterForPositions();
-            return new Position[0];
+            return new PositionImpl[0];
         }
 
         void stiQuote_OnSTIQuoteUpdate(ref structSTIQuoteUpdate q)
         {
-            Tick k = new Tick(q.bstrSymbol);
+            Tick k = new TickImpl(q.bstrSymbol);
             k.bid = (decimal)q.fBidPrice;
             k.ask = (decimal)q.fAskPrice;
             k.bs = q.nBidSize / 100;
@@ -208,7 +209,7 @@ namespace SterServer
 
         void stiQuote_OnSTIQuoteSnap(ref structSTIQuoteSnap q)
         {
-            Tick k = new Tick(q.bstrSymbol);
+            TickImpl k = new TickImpl(q.bstrSymbol);
             k.bid = (decimal)q.fBidPrice;
             k.ask = (decimal)q.fAskPrice;
             k.bs = q.nBidSize/100;
@@ -229,7 +230,7 @@ namespace SterServer
         }
 
         const int MAXRECORD = 5000;
-        Order[] oq = new Order[MAXRECORD];
+        Order[] oq = new OrderImpl[MAXRECORD];
         uint oc = 0;
         void tl_gotSrvFillRequest(Order o)
         {

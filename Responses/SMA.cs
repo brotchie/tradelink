@@ -8,7 +8,8 @@
  */
 
 using System;
-using TradeLib;
+using TradeLink.Common;
+using TradeLink.API;
 
 namespace Responses
 {
@@ -23,13 +24,13 @@ namespace Responses
 		
 		public static decimal BarSMA(BarList bl, BarInterval bi, int barsback)
 		{
-			if (!bl.Has(barsback)) return bl.Get(bl.Last).Close;
+			if (!bl.Has(barsback)) return bl.RecentBar.Close;
 			decimal sum = 0;
             for (int i = 0; i < barsback; i++)
             {
                 try
                 {
-                    sum += bl.Get(bl.Last - i, bi).Close;
+                    sum += bl[bl.Last - i, bi].Close;
                 } 
                 catch (ArgumentOutOfRangeException) 
                 { 

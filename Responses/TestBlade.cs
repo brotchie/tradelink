@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
-using TradeLib;
+using TradeLink.Common;
+using TradeLink.API;
 
 namespace Responses
 {
@@ -19,29 +20,29 @@ namespace Responses
             const int d = 20080509;
             const int t = 935;
             const string x = "NYSE";
-            Tick[] ticklist = new Tick[] { 
-                Tick.NewTrade(sym,d,t,0,10,100,x),
-                Tick.NewTrade(sym,d,t+1,0,10,100,x),
-                Tick.NewTrade(sym,d,t+2,0,10,100,x),
-                Tick.NewTrade(sym,d,t+3,0,10,100,x),
-                Tick.NewTrade(sym,d,t+4,0,15,100,x), // blade up
-                Tick.NewTrade(sym,d,t+5,0,16,100,x), // new bar (blades reset)
-                Tick.NewTrade(sym,d,t+6,0,16,100,x),
-                Tick.NewTrade(sym,d,t+7,0,10,100,x), // blade down
-                Tick.NewTrade(sym,d,t+7,10,10,100,x), // still a blade down (same bar)
-                Tick.NewTrade(sym,d,t+8,0,15,100,x), 
-                Tick.NewTrade(sym,d,t+15,0,15,800,x), // volume spike
-                Tick.NewTrade(sym,d,t+20,0,15,100,x), 
-                Tick.NewTrade(sym,d,t+25,0,15,100,x), 
+            TickImpl[] ticklist = new TickImpl[] { 
+                TickImpl.NewTrade(sym,d,t,0,10,100,x),
+                TickImpl.NewTrade(sym,d,t+1,0,10,100,x),
+                TickImpl.NewTrade(sym,d,t+2,0,10,100,x),
+                TickImpl.NewTrade(sym,d,t+3,0,10,100,x),
+                TickImpl.NewTrade(sym,d,t+4,0,15,100,x), // blade up
+                TickImpl.NewTrade(sym,d,t+5,0,16,100,x), // new bar (blades reset)
+                TickImpl.NewTrade(sym,d,t+6,0,16,100,x),
+                TickImpl.NewTrade(sym,d,t+7,0,10,100,x), // blade down
+                TickImpl.NewTrade(sym,d,t+7,10,10,100,x), // still a blade down (same bar)
+                TickImpl.NewTrade(sym,d,t+8,0,15,100,x), 
+                TickImpl.NewTrade(sym,d,t+15,0,15,800,x), // volume spike
+                TickImpl.NewTrade(sym,d,t+20,0,15,100,x), 
+                TickImpl.NewTrade(sym,d,t+25,0,15,100,x), 
             };
 
-            BarList bl = new BarList(BarInterval.FiveMin,sym);
+            BarListImpl bl = new BarListImpl(BarInterval.FiveMin,sym);
             Blade b = new Blade();
             Assert.That(b.BladePercentage != 0);
             b = new Blade(.2m); // 20 percent move is a blade
             int up=0,down=0,newbar=0,bigvol=0;
 
-            foreach (Tick k in ticklist)
+            foreach (TickImpl k in ticklist)
             {
                 bl.AddTick(k);
                 b.newBar(bl);
@@ -61,15 +62,15 @@ namespace Responses
         [Test]
         public void QuoteOnlyTest()
         {
-            Tick[] timesales = new Tick[] {
-                Tick.NewBid("TST",100m,100),
-                Tick.NewAsk("TST",100.1m,200),
+            TickImpl[] timesales = new TickImpl[] {
+                TickImpl.NewBid("TST",100m,100),
+                TickImpl.NewAsk("TST",100.1m,200),
             };
 
             Blade b = new Blade();
-            BarList bl = new BarList(BarInterval.FiveMin,"TST");
+            BarListImpl bl = new BarListImpl(BarInterval.FiveMin,"TST");
 
-            foreach (Tick k in timesales)
+            foreach (TickImpl k in timesales)
             {
                 bl.newTick(k);
                 b.newBar(bl);

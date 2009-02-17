@@ -5,8 +5,9 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using TradeLib;
+using TradeLink.Common;
 using System.IO;
+using TradeLink.API;
 
 namespace Replay
 {
@@ -21,19 +22,15 @@ namespace Replay
         {
             InitializeComponent();
             tl.gotSrvFillRequest += new OrderDelegate(tl_gotSrvFillRequest);
-            tl.PositionPriceRequest += new TLServer_WM.DecimalStringDelegate(tl_PositionPriceRequest);
-            tl.PositionSizeRequest += new TLServer_WM.IntStringDelegate(tl_PositionSizeRequest);
-            tl.DayHighRequest += new TLServer_WM.DecimalStringDelegate(tl_DayHighRequest);
-            tl.DayLowRequest += new TLServer_WM.DecimalStringDelegate(tl_DayLowRequest);
+            tl.DayHighRequest += new DecimalStringDelegate(tl_DayHighRequest);
+            tl.DayLowRequest += new DecimalStringDelegate(tl_DayLowRequest);
             tl.OrderCancelRequest += new UIntDelegate(tl_OrderCancelRequest);
-            tl.gotSrvAcctRequest += new TLServer_WM.StringDelegate(tl_gotSrvAcctRequest);
-            tl.gotSrvAcctClosedPLRequest += new TLServer_WM.DecimalStringDelegate(tl_gotSrvAcctClosedPLRequest);
-            tl.gotSrvAcctOpenPLRequest += new TLServer_WM.DecimalStringDelegate(tl_gotSrvAcctOpenPLRequest);
-            tl.gotSrvPosList += new TLServer_WM.PositionArrayDelegate(tl_gotSrvPosList);
+            tl.gotSrvAcctRequest += new StringDelegate(tl_gotSrvAcctRequest);
+            tl.gotSrvPosList += new PositionArrayDelegate(tl_gotSrvPosList);
             h.GotTick += new TickDelegate(h_GotTick);
             h.SimBroker.GotOrder += new OrderDelegate(SimBroker_GotOrder);
             h.SimBroker.GotFill += new FillDelegate(SimBroker_GotFill);
-            h.SimBroker.GotOrderCancel += new Broker.OrderCancelDelegate(SimBroker_GotOrderCancel);
+            h.SimBroker.GotOrderCancel += new OrderCancelDelegate(SimBroker_GotOrderCancel);
 
             status(Util.TLSIdentity());
 
@@ -46,11 +43,11 @@ namespace Replay
 
         Position[] tl_gotSrvPosList(string account)
         {
-            if (h==null) return new Position[0];
+            if (h==null) return new PositionImpl[0];
             List<Trade> tlist = h.SimBroker.GetTradeList(new Account(account));
             List<Position> plist = new List<Position>();
             List<string> slist = new List<string>();
-            foreach (Trade t in tlist)
+            foreach (TradeImpl t in tlist)
                 if (!slist.Contains(t.symbol))
                     slist.Add(t.symbol);
             foreach (string sym in slist)
@@ -67,13 +64,13 @@ namespace Replay
             // get trades from this account
             List<Trade> fills = h.SimBroker.GetTradeList(new Account(acct));
             // setup storage for positions we'll create from trades
-            Dictionary<string,Position> posdict = new Dictionary<string,Position>();
+            Dictionary<string,PositionImpl> posdict = new Dictionary<string,PositionImpl>();
             // go through every trade and populate the position
             foreach (Trade t in fills)
             {
-                Position p = null;
+                PositionImpl p = null;
                 if (!posdict.TryGetValue(t.symbol, out p))
-                    posdict.Add(t.symbol, new Position(t));
+                    posdict.Add(t.symbol, new PositionImpl(t));
                 else
                     posdict[t.symbol].Adjust(t);
             }
@@ -223,14 +220,14 @@ namespace Replay
                     o.date = Util.ToTLDate(time);
                 }
                 // before we send the order, get top of book for same side
-                Order oldbbo = h.SimBroker.BestBidOrOffer(o.symbol,o.Side);
+                Order oldbbo = h.SimBroker.BestBidOrOffer(o.symbol,o.side);
                 oldbbo.Account = "";
 
                 // then send the order
                 h.SimBroker.sendOrder(o);
 
                 // get the new top of book
-                Order newbbo = h.SimBroker.BestBidOrOffer(o.symbol,o.Side);
+                Order newbbo = h.SimBroker.BestBidOrOffer(o.symbol,o.side);
                 newbbo.Account = "";
 
                 // if it's changed, notify clients
@@ -326,21 +323,21 @@ namespace Replay
 
         Tick OrderToTick(Order o)
         {
-            Tick t = new Tick(o.symbol);
+            Tick t = new TickImpl(o.symbol);
             if (!o.isLimit) return t;
             t.time = o.time;
             t.date = o.date;
             t.sec = o.sec;
-            if (o.Side)
+            if (o.side)
             {
                 t.bid = o.price;
-                t.BidSize = o.UnSignedSize;
+                t.BidSize = o.UnsignedSize;
                 t.be = o.Exchange;
             }
             else
             {
                 t.ask = o.price;
-                t.AskSize = o.UnSignedSize;
+                t.AskSize = o.UnsignedSize;
                 t.oe = o.Exchange;
             }
             return t;
@@ -361,7 +358,7 @@ namespace Replay
                 // if we already have a book for this side we can get rid of it
                 foreach (uint oid in hasHistBook(t.symbol, false))
                     h.SimBroker.CancelOrder(oid); 
-                Order o = new SellLimit(t.symbol, t.AskSize, t.ask);
+                OrderImpl o = new SellLimit(t.symbol, t.AskSize, t.ask);
                 o.date = t.date;
                 o.time = t.time;
                 o.sec = t.sec;
@@ -373,7 +370,7 @@ namespace Replay
                 // if we already have a book for this side we can get rid of it
                 foreach (uint oid in hasHistBook(t.symbol, true))
                     h.SimBroker.CancelOrder(oid);
-                Order o = new BuyLimit(t.symbol, t.BidSize, t.bid);
+                OrderImpl o = new BuyLimit(t.symbol, t.BidSize, t.bid);
                 o.date = t.date;
                 o.time = t.time;
                 o.sec = t.sec; 
@@ -390,7 +387,7 @@ namespace Replay
             List<uint> idxlist = new List<uint>();
             List<Order> olist = h.SimBroker.GetOrderList(HISTBOOK);
             for (int i = 0; i < olist.Count; i++)
-                if ((olist[i].symbol == sym) && (olist[i].Side == side))
+                if ((olist[i].symbol == sym) && (olist[i].side == side))
                     idxlist.Add(olist[i].id);
             return idxlist.ToArray();
         }

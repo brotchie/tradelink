@@ -1,14 +1,7 @@
-/*
- * Created by SharpDevelop.
- * User: josh
- * Date: 2/5/2008
- * Time: 5:50 PM
- * 
- * To change this template use Tools | Options | Coding | Edit Standard Headers.
- */
 
 using System;
-using TradeLib;
+using TradeLink.Common;
+using TradeLink.API;
 
 namespace Responses
 {
@@ -30,7 +23,7 @@ namespace Responses
         // we need high-low and open for this response
         decimal h{ get { return BarMath.HH(bars); } }
         decimal l { get { return BarMath.LL(bars); } }
-        decimal o { get { return bars.Get(0).Open; } }
+        decimal o { get { return bars.RecentBar.Open; } }
 
         // here are the parameters that define how close we need to be to the open
         const decimal a = .06m; // minimum asymmetry allowed for entry
@@ -44,7 +37,7 @@ namespace Responses
         {
             // indicator setup
             bars = bl;
-            if (!bl.Has(2)) return 0; // must have at least one one bar
+            if (!bl.Has(2,bl.Int)) return 0; // must have at least one one bar
 
             // asymmetry tests
             if (((h - o) > a) && ((o - l) > a)) { Shutdown("Not enough Asymetry to trade."); return 0; }

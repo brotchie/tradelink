@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using TradeLib;
+using TradeLink.Common;
 using System.Web;
 
 namespace ResearchLib
@@ -26,18 +26,18 @@ namespace ResearchLib
         public bool ParseNYSE { get { return _nyse; } set { _nyse = value; } }
         public bool ParseNASD { get { return _nasd; } set { _nasd = value; } }
         public bool RemoveDupes { get { return _xdupe; } set { _xdupe = value; } }
-        public MarketBasket Go()
+        public BasketImpl Go()
         {
             if (_file != "") return FILE();
             return URL();
         }
-        public MarketBasket Go(string username)
+        public BasketImpl Go(string username)
         {
             return Go();
         }
-        public MarketBasket URL()
+        public BasketImpl URL()
         {
-            MarketBasket mb = new MarketBasket();
+            BasketImpl mb = new BasketImpl();
             if (!Uri.IsWellFormedUriString(_url, UriKind.RelativeOrAbsolute)) return mb;
             if (_nyse && _linkedonly) mb.Add(Fetch.LinkedNYSEFromURL(_url));
             else if (_nyse) mb.Add(Fetch.NYSEFromURL(_url));
@@ -46,9 +46,9 @@ namespace ResearchLib
             if (_xdupe) mb = Fetch.RemoveDupe(mb);
             return mb;
         }
-        public MarketBasket FILE()
+        public BasketImpl FILE()
         {
-            MarketBasket mb = new MarketBasket();
+            BasketImpl mb = new BasketImpl();
             if ((_file == "") || (_file == null)) return mb;
             System.IO.StreamReader sr = null;
             try

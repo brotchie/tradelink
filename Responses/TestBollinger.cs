@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using TradeLib;
+using TradeLink.Common;
 using NUnit.Framework;
+using TradeLink.API;
 
 
 namespace Responses
@@ -21,19 +22,19 @@ namespace Responses
         // we test 2 standard deviations here
 
 
-        Tick[] ticklist = new Tick[] {
-            Tick.NewTrade(s,d,t,0,1,100,x),
-            Tick.NewTrade(s,d,t+1,0,2,100,x),
-            Tick.NewTrade(s,d,t+2,0,3,100,x),
-            Tick.NewTrade(s,d,t+3,0,4,100,x),
-            Tick.NewTrade(s,d,t+4,0,5,100,x),
+        TickImpl[] ticklist = new TickImpl[] {
+            TickImpl.NewTrade(s,d,t,0,1,100,x),
+            TickImpl.NewTrade(s,d,t+1,0,2,100,x),
+            TickImpl.NewTrade(s,d,t+2,0,3,100,x),
+            TickImpl.NewTrade(s,d,t+3,0,4,100,x),
+            TickImpl.NewTrade(s,d,t+4,0,5,100,x),
         };
 
         [Test]
         public void BollingerTestticklookbacks()
         {
             Bollinger bbbb = new Bollinger(2, 4);
-            foreach (Tick t in ticklist)
+            foreach (TickImpl t in ticklist)
             {
                 bbbb.newTick(t);
             }
@@ -53,7 +54,7 @@ namespace Responses
         {
             Bollinger b = new Bollinger(2, 10);
 
-            foreach (Tick t in ticklist)
+            foreach (TickImpl t in ticklist)
             {
                 b.newTick(t);
             }
@@ -71,7 +72,7 @@ namespace Responses
         public void BollingerTestticknoargs()
         {
             Bollinger bb = new Bollinger();
-            foreach (Tick t in ticklist)
+            foreach (TickImpl t in ticklist)
             {
                 bb.newTick(t);
             }
@@ -92,9 +93,9 @@ namespace Responses
             string symbol = "TST";
 
 
-            BarList bl = new BarList(BarInterval.Minute, symbol);
+            BarListImpl bl = new BarListImpl(BarInterval.Minute, symbol);
             Bollinger bbb = new Bollinger(2, BarInterval.Minute, 10);
-            foreach (Tick t in ticklist)
+            foreach (TickImpl t in ticklist)
             {
                 bl.AddTick(t);
                 bbb.newBar(bl);
@@ -110,9 +111,9 @@ namespace Responses
         {
             string symbol = "TST";
 
-            BarList bl = new BarList(BarInterval.Minute, symbol);
+            BarListImpl bl = new BarListImpl(BarInterval.Minute, symbol);
             Bollinger bbb = new Bollinger(2, BarInterval.Minute, 4);
-            foreach (Tick t in ticklist)
+            foreach (TickImpl t in ticklist)
             {
                 bl.AddTick(t);
                 bbb.newBar(bl);
@@ -128,15 +129,15 @@ namespace Responses
         [Test]
         public void QuoteOnlyTest()
         {
-            Tick[] timesales = new Tick[] {
-                Tick.NewBid("TST",100m,100),
-                Tick.NewAsk("TST",100.1m,200),
+            TickImpl[] timesales = new TickImpl[] {
+                TickImpl.NewBid("TST",100m,100),
+                TickImpl.NewAsk("TST",100.1m,200),
             };
 
             Bollinger b = new Bollinger();
-            BarList bl = new BarList(BarInterval.FiveMin, "TST");
+            BarListImpl bl = new BarListImpl(BarInterval.FiveMin, "TST");
 
-            foreach (Tick k in timesales)
+            foreach (TickImpl k in timesales)
             {
                 bl.newTick(k);
                 b.newBar(bl);

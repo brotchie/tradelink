@@ -1,14 +1,7 @@
-/*
- * Created by SharpDevelop.
- * User: josh
- * Date: 2/7/2008
- * Time: 7:21 PM
- * 
- * To change this template use Tools | Options | Coding | Edit Standard Headers.
- */
 
 using System;
-using TradeLib;
+using TradeLink.Common;
+using TradeLink.API;
 
 namespace Responses
 {

@@ -1,33 +1,33 @@
 using System;
-using TradeLib;
+using TradeLink.Common;
 using System.Text.RegularExpressions;
 
 namespace ResearchLib
 {
     public class ParseStocks
     {
-        public static MarketBasket NYSE(string ParseStocks)
+        public static BasketImpl NYSE(string ParseStocks)
         {
-            MarketBasket mb = new MarketBasket();
+            BasketImpl mb = new BasketImpl();
             MatchCollection mc = Regex.Matches(ParseStocks, @"\b[A-Z]{1,3}\b");
             for (int i = 0; i < mc.Count; i++)
-                mb.Add(new Security(mc[i].Value.ToUpper()));
+                mb.Add(new SecurityImpl(mc[i].Value.ToUpper()));
             return mb;
         }
 
-        public static MarketBasket NASDAQ(string ParseStocks)
+        public static BasketImpl NASDAQ(string ParseStocks)
         {
-            MarketBasket mb = new MarketBasket();
+            BasketImpl mb = new BasketImpl();
             string regexp = @"\b[A-Z]{4}\b";
             MatchCollection mc = Regex.Matches(ParseStocks, regexp);
             for (int i = 0; i < mc.Count; i++)
-                mb.Add(new Security(mc[i].Value.ToUpper()));
+                mb.Add(new SecurityImpl(mc[i].Value.ToUpper()));
             return mb;
         }
 
-        public static MarketBasket LinkedOnlyNYSE(string parsestring)
+        public static BasketImpl LinkedOnlyNYSE(string parsestring)
         {
-            MarketBasket mb = new MarketBasket();
+            BasketImpl mb = new BasketImpl();
             string regexp = @">[A-Z]{1,3}</a>";
             MatchCollection mc = Regex.Matches(parsestring, regexp);
             for (int i = 0; i < mc.Count; i++)
@@ -35,14 +35,14 @@ namespace ResearchLib
                 string chunk = mc[i].Value;
                 chunk = chunk.Replace("</a>", "");
                 chunk = chunk.TrimStart('>');
-                mb.Add(new Security(chunk.ToUpper()));
+                mb.Add(new SecurityImpl(chunk.ToUpper()));
             }
             return mb;
         }
 
-        public static MarketBasket LinkedOnlyNASDAQ(string parsestring)
+        public static BasketImpl LinkedOnlyNASDAQ(string parsestring)
         {
-            MarketBasket mb = new MarketBasket();
+            BasketImpl mb = new BasketImpl();
             string regexp = @">[A-Z]{4}</a>";
             MatchCollection mc = Regex.Matches(parsestring, regexp);
             for (int i = 0; i < mc.Count; i++)
@@ -50,7 +50,7 @@ namespace ResearchLib
                 string chunk = mc[i].Value;
                 chunk = chunk.Replace("</a>", "");
                 chunk = chunk.TrimStart('>');
-                mb.Add(new Security(chunk.ToUpper()));
+                mb.Add(new SecurityImpl(chunk.ToUpper()));
             }
             return mb;
         }
