@@ -19,4 +19,6 @@ namespace TradeLink.API
     public delegate string StringDelegate();
     public delegate Position[] PositionArrayDelegate(string account);
     public delegate void OrderCancelDelegate(string sym, bool side, uint id);
+    public delegate MessageTypes[] MessageArrayDelegate();
+    public delegate long UnknownMessageDelegate(MessageTypes t, string msg);
 }

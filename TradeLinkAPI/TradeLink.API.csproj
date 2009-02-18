@@ -52,6 +52,7 @@
     <Compile Include="Order.cs" />
     <Compile Include="Position.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Providers.cs" />
     <Compile Include="Response.cs" />
     <Compile Include="Security.cs" />
     <Compile Include="SecurityType.cs" />

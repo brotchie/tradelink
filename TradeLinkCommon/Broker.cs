@@ -453,17 +453,6 @@ namespace TradeLink.Common
 
     }
 
-    public enum Brokers
-    {
-        Unknown = -1,
-        TradeLinkSimulation = 0,
-        Assent,
-        InteractiveBrokers,
-        Genesis,
-        Bright,
-        Echo,
-        Sterling,
-    }
 
     public enum FillMode
     {

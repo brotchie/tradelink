@@ -38,14 +38,37 @@ namespace SterServer
             stiQuote.OnSTIQuoteUpdate += new _ISTIQuoteEvents_OnSTIQuoteUpdateEventHandler(stiQuote_OnSTIQuoteUpdate);
             stiQuote.OnSTIQuoteSnap += new _ISTIQuoteEvents_OnSTIQuoteSnapEventHandler(stiQuote_OnSTIQuoteSnap);
 
-            tl.BrokerName = Brokers.Sterling;
-            tl.gotSrvFillRequest += new OrderDelegate(tl_gotSrvFillRequest);
-            tl.gotSrvPosList += new PositionArrayDelegate(tl_gotSrvPosList);
-            tl.RegisterStocks += new DebugDelegate(tl_RegisterStocks);
-            tl.OrderCancelRequest += new UIntDelegate(tl_OrderCancelRequest);
+            tl.newProviderName = Providers.Sterling;
+            tl.newSendOrderRequest += new OrderDelegate(tl_gotSrvFillRequest);
+            tl.newPosList += new PositionArrayDelegate(tl_gotSrvPosList);
+            tl.newRegisterStocks += new DebugDelegate(tl_RegisterStocks);
+            tl.newOrderCancelRequest += new UIntDelegate(tl_OrderCancelRequest);
+            tl.newFeatureRequest += new MessageArrayDelegate(tl_newFeatureRequest);
 
             debug(PROGRAM + Util.TLSIdentity());
             FormClosing += new FormClosingEventHandler(SterMain_FormClosing);
+        }
+
+        MessageTypes[] tl_newFeatureRequest()
+        {
+            List<MessageTypes> f = new List<MessageTypes>();
+            f.Add(MessageTypes.SENDORDER);
+            f.Add(MessageTypes.ORDERCANCELREQUEST);
+            f.Add(MessageTypes.ORDERCANCELRESPONSE);
+            f.Add(MessageTypes.OK);
+            f.Add(MessageTypes.BROKERNAME);
+            f.Add(MessageTypes.CLEARCLIENT);
+            f.Add(MessageTypes.CLEARSTOCKS);
+            f.Add(MessageTypes.FEATUREREQUEST);
+            f.Add(MessageTypes.FEATURERESPONSE);
+            f.Add(MessageTypes.HEARTBEAT);
+            f.Add(MessageTypes.ORDERNOTIFY);
+            f.Add(MessageTypes.REGISTERCLIENT);
+            f.Add(MessageTypes.REGISTERSTOCK);
+            f.Add(MessageTypes.SENDORDER);
+            f.Add(MessageTypes.TICKNOTIFY);
+            f.Add(MessageTypes.VERSION);
+            return f.ToArray();
         }
 
 
@@ -103,7 +126,7 @@ namespace SterServer
                 if ((err==0) && (!idacct.TryGetValue(o.id, out tmp)))
                     idacct.Add(o.id,order.Account);
                 if (err < 0)
-                    debug("Error sending order: " + Util.PrettyError(tl.BrokerName, err) + o.ToString());
+                    debug("Error sending order: " + Util.PrettyError(tl.newProviderName, err) + o.ToString());
                 if (err == -1)
                     debug("Make sure you have set the account in sending program.");
             }

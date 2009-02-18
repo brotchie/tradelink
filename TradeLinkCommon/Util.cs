@@ -366,7 +366,7 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="errorcode">The errorcode.</param>
         /// <returns></returns>
-        public static string PrettyError(Brokers broker, int errorcode)
+        public static string PrettyError(Providers provider, int errorcode)
         {
             MessageTypes message = (MessageTypes)errorcode;
             switch (message)
@@ -380,9 +380,9 @@ namespace TradeLink.Common
                 case MessageTypes.OK: return "Ok";
                 default:
                     // broker-specific messages
-                    if (broker == Brokers.Assent)
+                    if (provider == Providers.Assent)
                         return Enum.GetName(typeof(AnvilSendOrderError), errorcode);
-                    if (broker == Brokers.Sterling)
+                    if (provider == Providers.Sterling)
                         return Enum.GetName(typeof(SterlingSubmitOrderError), errorcode);
                     break;
             }

@@ -258,12 +258,12 @@ namespace TradeLink.Common
         /// <returns>number of positions to expect</returns>
         public int RequestPositions(string account) { if (account == "") return 0; return (int)TLSend(MessageTypes.POSITIONREQUEST, Text + "+" + account); }
 
-        public Brokers BrokerName 
+        public Providers BrokerName 
         { 
             get 
             { 
                 long res = TLSend(MessageTypes.BROKERNAME);
-                return (Brokers)res;
+                return (Providers)res;
             } 
         }
 

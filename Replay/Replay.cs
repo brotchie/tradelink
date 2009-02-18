@@ -21,12 +21,13 @@ namespace Replay
         public Replay()
         {
             InitializeComponent();
-            tl.gotSrvFillRequest += new OrderDelegate(tl_gotSrvFillRequest);
-            tl.DayHighRequest += new DecimalStringDelegate(tl_DayHighRequest);
-            tl.DayLowRequest += new DecimalStringDelegate(tl_DayLowRequest);
-            tl.OrderCancelRequest += new UIntDelegate(tl_OrderCancelRequest);
-            tl.gotSrvAcctRequest += new StringDelegate(tl_gotSrvAcctRequest);
-            tl.gotSrvPosList += new PositionArrayDelegate(tl_gotSrvPosList);
+            tl.newSendOrderRequest += new OrderDelegate(tl_gotSrvFillRequest);
+            tl.newDayHighRequest += new DecimalStringDelegate(tl_DayHighRequest);
+            tl.newDayLowRequest += new DecimalStringDelegate(tl_DayLowRequest);
+            tl.newOrderCancelRequest += new UIntDelegate(tl_OrderCancelRequest);
+            tl.newAcctRequest += new StringDelegate(tl_gotSrvAcctRequest);
+            tl.newPosList += new PositionArrayDelegate(tl_gotSrvPosList);
+            tl.newFeatureRequest+=new MessageArrayDelegate(GetFeatures);
             h.GotTick += new TickDelegate(h_GotTick);
             h.SimBroker.GotOrder += new OrderDelegate(SimBroker_GotOrder);
             h.SimBroker.GotFill += new FillDelegate(SimBroker_GotFill);
@@ -39,6 +40,23 @@ namespace Replay
             // (this is for determining top of book between historical sources and our own orders)
             HISTBOOK.Execute = false; // make sure our special book is never executed by simulator
             HISTBOOK.Notify = false; // don't notify 
+        }
+
+        MessageTypes[] GetFeatures()
+        {
+            List<MessageTypes> f = new List<MessageTypes>();
+
+            f.Add(MessageTypes.ACCOUNTREQUEST);
+            f.Add(MessageTypes.ACCOUNTRESPONSE);
+            f.Add(MessageTypes.EXECUTENOTIFY);
+            f.Add(MessageTypes.ORDERCANCELREQUEST);
+            f.Add(MessageTypes.ORDERCANCELRESPONSE);
+            f.Add(MessageTypes.ORDERNOTIFY);
+            f.Add(MessageTypes.REGISTERCLIENT);
+            f.Add(MessageTypes.REGISTERSTOCK);
+            f.Add(MessageTypes.SENDORDER);
+            f.Add(MessageTypes.TICKNOTIFY);
+            return f.ToArray();
         }
 
         Position[] tl_gotSrvPosList(string account)

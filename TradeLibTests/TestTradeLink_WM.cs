@@ -27,7 +27,7 @@ namespace TestTradeLink
             c = new TLClient_WM("testtradelink",false);
 
             // register server events (so server can process orders)
-            s.gotSrvFillRequest += new OrderDelegate(tl_gotSrvFillRequest);
+            s.newSendOrderRequest += new OrderDelegate(tl_gotSrvFillRequest);
 
             // setup client events
             c.gotFill += new FillDelegate(tlclient_gotFill);

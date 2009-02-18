@@ -8,14 +8,18 @@ namespace TradeLink.Common
 {
     public class TLServer_WM : Form, TradeLinkServer
     {
-        public event StringDelegate gotSrvAcctRequest;
-        public event DecimalStringDelegate PositionPriceRequest;
-        public event IntStringDelegate PositionSizeRequest;
-        public event DecimalStringDelegate DayHighRequest;
-        public event DecimalStringDelegate DayLowRequest;
-        public event OrderDelegate gotSrvFillRequest;
-        public event UIntDelegate OrderCancelRequest;
-        public event PositionArrayDelegate gotSrvPosList;
+        public event StringDelegate newAcctRequest;
+        public event DecimalStringDelegate newPositionPriceRequest;
+        public event IntStringDelegate newPositionSizeRequest;
+        public event DecimalStringDelegate newDayHighRequest;
+        public event DecimalStringDelegate newDayLowRequest;
+        public event OrderDelegate newSendOrderRequest;
+        public event UIntDelegate newOrderCancelRequest;
+        public event PositionArrayDelegate newPosList;
+        public event DebugDelegate newRegisterStocks;
+        public event MessageArrayDelegate newFeatureRequest;
+        public event UnknownMessageDelegate newUnknownRequest;
+
         public string Version() { return Util.TLSIdentity(); }
         protected int MinorVer = 0;
 
@@ -40,7 +44,7 @@ namespace TradeLink.Common
             else
             {
                 Order o = OrderImpl.Deserialize(msg);
-                if (gotSrvFillRequest != null) gotSrvFillRequest(o); //request fill
+                if (newSendOrderRequest != null) newSendOrderRequest(o); //request fill
             }
         }
 
@@ -129,14 +133,14 @@ namespace TradeLink.Common
             index.Add("");
             SrvBeatHeart(cname);
         }
-        public event DebugDelegate RegisterStocks;
+        
         void SrvRegStocks(string cname, string stklist)
         {
             int cid = client.IndexOf(cname);
             if (cid == -1) return;
             stocks[cid] = stklist;
             SrvBeatHeart(cname);
-            if (RegisterStocks != null) RegisterStocks(stklist);
+            if (newRegisterStocks != null) newRegisterStocks(stklist);
         }
 
         void SrvClearStocks(string cname)
@@ -179,7 +183,7 @@ namespace TradeLink.Common
                 WMUtil.SendMsg(orderid_being_cancled.ToString(), MessageTypes.ORDERCANCELRESPONSE, Handle, c);
         }
 
-        public Brokers BrokerName = Brokers.TradeLinkSimulation;
+        public Providers newProviderName = Providers.TradeLinkSimulation;
 
         protected override void WndProc(ref Message m)
         {
@@ -195,22 +199,22 @@ namespace TradeLink.Common
             switch (tlm.type)
             {
                 case MessageTypes.ACCOUNTREQUEST:
-                    if (gotSrvAcctRequest == null) break;
-                    WMUtil.SendMsg(gotSrvAcctRequest(), MessageTypes.ACCOUNTRESPONSE, Handle, msg);
+                    if (newAcctRequest == null) break;
+                    WMUtil.SendMsg(newAcctRequest(), MessageTypes.ACCOUNTRESPONSE, Handle, msg);
                     break;
                 case MessageTypes.POSITIONREQUEST:
-                    if (gotSrvPosList == null) break;
+                    if (newPosList == null) break;
                     string [] pm = msg.Split('+');
                     if (pm.Length<2) break;
                     string client = pm[0];
                     string acct = pm[1];
-                    Position[] list = gotSrvPosList(acct);
+                    Position[] list = newPosList(acct);
                     foreach (Position pos in list)
                         WMUtil.SendMsg(PositionImpl.Serialize(pos), MessageTypes.POSITIONRESPONSE, Handle, client);
                     break;
                 case MessageTypes.ORDERCANCELREQUEST:
-                    if (OrderCancelRequest != null)
-                        OrderCancelRequest(Convert.ToUInt32(msg));
+                    if (newOrderCancelRequest != null)
+                        newOrderCancelRequest(Convert.ToUInt32(msg));
                     break;
                 case MessageTypes.SENDORDER:
                     SrvDoExecute(msg);
@@ -232,52 +236,53 @@ namespace TradeLink.Common
                     SrvBeatHeart(msg);
                     break;
                 case MessageTypes.BROKERNAME :
-                    result = (long)BrokerName;
+                    result = (long)newProviderName;
                     break;
                 case MessageTypes.FEATUREREQUEST:
-                    MessageTypes[] f = GetFeatures();
+                    string msf = "";
+                    List<MessageTypes> f = new List<MessageTypes>();
+                    f.Add(MessageTypes.HEARTBEAT);
+                    f.Add(MessageTypes.CLEARCLIENT);
+                    f.Add(MessageTypes.CLEARSTOCKS);
+                    f.Add(MessageTypes.REGISTERCLIENT);
+                    f.Add(MessageTypes.REGISTERSTOCK);
+                    f.Add(MessageTypes.FEATUREREQUEST);
+                    f.Add(MessageTypes.FEATURERESPONSE);
+                    f.Add(MessageTypes.VERSION);
+                    f.Add(MessageTypes.BROKERNAME);
                     List<string> mf = new List<string>();
                     foreach (MessageTypes t in f)
                     {
                         int ti = (int)t;
                         mf.Add(ti.ToString());
                     }
-                    string msf = string.Join(",", mf.ToArray());
+                    if (newFeatureRequest!=null)
+                    {
+                        MessageTypes[] f2 = newFeatureRequest();
+                        foreach (MessageTypes t in f2)
+                        {
+                            int ti = (int)t;
+                            mf.Add(ti.ToString());
+                        }
+                    }
+                    msf = string.Join(",", mf.ToArray());
                     WMUtil.SendMsg(msf, MessageTypes.FEATURERESPONSE, Handle, msg);
                     break;
                 case MessageTypes.VERSION :
                     result = (long)MinorVer;
                     break;
                 default:
-                    result = (long)MessageTypes.FEATURE_NOT_IMPLEMENTED;
+                    if (newUnknownRequest != null)
+                        result = newUnknownRequest(tlm.type,msg);
+                    else 
+                        result = (long)MessageTypes.FEATURE_NOT_IMPLEMENTED;
                     break;
             }
             m.Result = (IntPtr)result;
         }
 
-        MessageTypes[] GetFeatures()
-        {
-            List<MessageTypes> f = new List<MessageTypes>();
 
-            f.Add(MessageTypes.ACCOUNTREQUEST);
-            f.Add(MessageTypes.ACCOUNTRESPONSE);
-            f.Add(MessageTypes.BROKERNAME);
-            f.Add(MessageTypes.CLEARCLIENT);
-            f.Add(MessageTypes.CLEARSTOCKS);
-            f.Add(MessageTypes.EXECUTENOTIFY);
-            f.Add(MessageTypes.FEATUREREQUEST);
-            f.Add(MessageTypes.FEATURERESPONSE);
-            f.Add(MessageTypes.HEARTBEAT);
-            f.Add(MessageTypes.ORDERCANCELREQUEST);
-            f.Add(MessageTypes.ORDERCANCELRESPONSE);
-            f.Add(MessageTypes.ORDERNOTIFY);
-            f.Add(MessageTypes.REGISTERCLIENT);
-            f.Add(MessageTypes.REGISTERSTOCK);
-            f.Add(MessageTypes.SENDORDER);
-            f.Add(MessageTypes.TICKNOTIFY);
-            f.Add(MessageTypes.VERSION);
-            return f.ToArray();
-        }
+
 
 
     }
