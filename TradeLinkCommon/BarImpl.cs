@@ -92,10 +92,13 @@ namespace TradeLink.Common
             if (bartime == 0) { bartime = BarTime(t.time); bardate = t.date;}
             if (bardate != t.date) DAYEND = true;
             else DAYEND = false;
-            if ((BarTime(t.time) != bartime) || (bardate!=t.date)) return false; // not our tick
-            if (!t.isTrade) return true; // if it's not a trade, accept tick but don't update anything
+            // check if this bar's tick
+            if ((BarTime(t.time) != bartime) || (bardate!=t.date)) return false; 
+            // if tick doesn't have trade or index, ignore
+            if (!t.isTrade && !t.isIndex) return true; 
             tradesinbar++; // count it
-            v += t.size; // add trade size to bar volume
+            // only count volume on trades, not indicies
+            if (!t.isIndex) v += t.size; // add trade size to bar volume
             if (o == 0) o = t.trade;
             if (t.trade > h) h = t.trade;
             if (t.trade < l) l = t.trade;

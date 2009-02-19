@@ -25,14 +25,14 @@ namespace TradeLink.Common
         public string ex { get { return _ex; } set { _ex = value; } }
         public string be { get { return _be; } set { _be = value; } }
         public string oe { get { return _oe; } set { _oe = value; } }
-        public bool IndexTick { get { return _size < 0; } }
+        public bool isIndex { get { return _size < 0; } }
         public bool hasBid { get { return (_bid != 0) && (_bs != 0); } }
         public bool hasAsk { get { return (_ask != 0) && (_os != 0); } }
         public bool isFullQuote { get { return hasBid && hasAsk; } }
         public bool isQuote { get { return (!isTrade && (hasBid || hasAsk)); } }
         public bool isTrade { get { return (_trade != 0) && (_size> 0); } }
         public bool hasTick { get { return (this.isTrade || hasBid || hasAsk); } }
-        public bool isValid { get { return (_sym!= "") && hasTick; } }
+        public bool isValid { get { return (_sym!= "") && (isIndex || hasTick); } }
         public bool atHigh(decimal high) { return (isTrade && (_trade>=high)); }
         public bool atLow(decimal low) { return (isTrade && (_trade <= low)); }
         public int BidSize { get { return _bs * 100; } set { _bs = (int)(value / 100); } }

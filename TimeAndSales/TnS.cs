@@ -162,7 +162,11 @@ namespace TimeSales
             string be = "";
             string oe = "";
             string ex = "";
-            if (t.isTrade)
+            if (t.isIndex)
+            {
+                trade = t.trade.ToString("N2");
+            }
+            else if (t.isTrade)
             {
                 trade = t.trade.ToString("N2");
                 ts = t.size.ToString();

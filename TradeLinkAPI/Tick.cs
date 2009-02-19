@@ -29,6 +29,7 @@ namespace TradeLink.API
         bool isFullQuote { get; }
         bool isQuote { get; }
         bool isValid { get; }
+        bool isIndex { get; }
     }
 
     public class InvalidTick : Exception { }

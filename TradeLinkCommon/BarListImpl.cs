@@ -152,7 +152,7 @@ namespace TradeLink.Common
                 this.sym = t.symbol; // if we have no symbol, take ticks symbol
             else if ((t.symbol != Symbol) && (Symbol != ""))
                 return NewBar; //don't process ticks for other stocks
-            if (!t.isTrade) return NewBar; // don't process quotes
+            if (!t.isTrade && !t.isIndex) return NewBar; // don't process quotes
             // if we have no bars, add bar with a tick
             if (Count == 0)
             {
