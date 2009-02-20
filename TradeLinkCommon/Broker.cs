@@ -174,10 +174,10 @@ namespace TradeLink.Common
         /// Sends the order to the broker. (uses the default account)
         /// </summary>
         /// <param name="o">The order to be send.</param>
-        /// <returns>true if the order was accepted.</returns>
-        public uint sendOrder(Order o) 
+        /// <returns>status code</returns>
+        public int sendOrder(Order o) 
         {
-            if (!o.isValid) return (uint)MessageTypes.BAD_PARAMETERS;
+            if (!o.isValid) return (int)MessageTypes.BAD_PARAMETERS;
             if (o.Account == "") // make sure book is clearly stamped
             {
                 o.Account = DEFAULT.ID;
@@ -194,14 +194,14 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="o">The order to be sent.</param>
         /// <param name="a">the account to send with the order.</param>
-        /// <returns>order id if order was accepted, zero otherwise</returns>
-        public uint sendOrder(Order o,Account a)
+        /// <returns>status code</returns>
+        public int sendOrder(Order o,Account a)
         {
             if ((GotOrder != null) && a.Notify)
                 GotOrder(o);
             AddOrder(o, a);
 
-            return o.id;
+            return (int)MessageTypes.OK;
         }
 
         List<string> hasopened = new List<string>();

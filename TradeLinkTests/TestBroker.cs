@@ -24,12 +24,12 @@ namespace TestTradeLink
             broker.GotFill += new FillDelegate(broker_GotFill);
             broker.GotOrder += new OrderDelegate(broker_GotOrder);
             OrderImpl o = new OrderImpl();
-            uint failsoninvalid= broker.sendOrder(o);
-            Assert.AreNotEqual((int)MessageTypes.OK,failsoninvalid);
+            int error = broker.sendOrder(o);
+            Assert.AreNotEqual((int)MessageTypes.OK,error);
             Assert.That(orders == 0);
             Assert.That(fills == 0);
             o = new BuyMarket(s, 100);
-            Assert.That(broker.sendOrder(o)>0);
+            broker.sendOrder(o);
             Assert.That(orders == 1);
             Assert.That(fills == 0);
             Assert.That(broker.Execute(TickImpl.NewTrade(s,10,200)) == 1);
@@ -122,22 +122,28 @@ namespace TestTradeLink
             Assert.That(!offer.isValid, offer.ToString());
 
             // add better bid, make sure it's BBO
-            uint id1 = broker.sendOrder(new BuyLimit(s, x, p2));
+            Order o;
+            o = new BuyLimit(s, x, p2);
+            o.id = 1;
+            broker.sendOrder(o);
             bid = broker.BestBid(s);
             offer = broker.BestOffer(s);
             Assert.That(bid.isValid && (bid.price == p2) && (bid.size == x), bid.ToString());
             Assert.That(!offer.isValid, offer.ToString());
 
             // add another bid at same price on another account, make sure it's additive
-            uint id2 = broker.sendOrder(new BuyLimit(s, x, p2),new Account("ANOTHER_ACCOUNT"));
+            o = new BuyLimit(s, x, p2);
+            o.id = 2;
+            o.Account = "ANOTHER_ACCOUNT";
+            broker.sendOrder(o);
             bid = broker.BestBid(s);
             offer = broker.BestOffer(s);
             Assert.That(bid.isValid && (bid.price == p2) && (bid.size == (2*x)), bid.ToString());
             Assert.That(!offer.isValid, offer.ToString());
 
             // cancel order and make sure bbo returns
-            broker.CancelOrder(id1);
-            broker.CancelOrder(id2);
+            broker.CancelOrder(1);
+            broker.CancelOrder(2);
             bid = broker.BestBid(s);
             offer = broker.BestOffer(s);
             Assert.That(bid.isValid && (bid.price == p1) && (bid.size == x), bid.ToString());
@@ -174,8 +180,8 @@ namespace TestTradeLink
             oa.Account = me;
             ob.Account = other;
             // send order to account for jfranta
-            Assert.That(broker.sendOrder(oa)>0);
-            Assert.That(broker.sendOrder(ob)>0);
+            broker.sendOrder(oa);
+            broker.sendOrder(ob);
             TickImpl t = new TickImpl(sym);
             t.trade = 100m;
             t.size = 200;

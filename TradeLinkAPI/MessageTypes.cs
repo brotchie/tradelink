@@ -8,10 +8,29 @@ namespace TradeLink.API
     /// </summary>
     public enum MessageTypes
     {
+        // START TRADELINK STATUS MESSAGES
+        FEATURE_NOT_IMPLEMENTED = -108,
+        CLIENTNOTREGISTERED = -107,
+        GOTNULLORDER = -106,
+        UNKNOWNMSG = -105,
+        UNKNOWNSYM = -104,
+        TL_CONNECTOR_MISSING = -103,
+        BAD_PARAMETERS = -102,
+        DUPLICATE_ORDERID = -101,
+        SYMBOL_NOT_LOADED = -100,
         OK = 0,
-        SENDORDER = 1,
-        BROKERNAME = 28,
-        VERSION = 31,
+        // END STATUS MESSAGES
+        // START CUSTOM MESSAGES
+        CUSTOM1 = 1,
+        CUSTOM2,
+        CUSTOM3,
+        CUSTOM4,
+        CUSTOM5,
+        CUSTOM6,
+        CUSTOM7,
+        CUSTOM8,
+        CUSTOM9,
+        CUSTOM10,
         ISSHORTABLE,
         VWAP,
         LASTTRADESIZE,
@@ -37,7 +56,16 @@ namespace TradeLink.API
         NASDAQPREVIOUSIMBALANCE,
         NYSEIMBALACE,
         NYSEPREVIOUSIMBALANCE,
-        TICKNOTIFY = 100,
+        POSPRICEREQUEST,
+        POSSIZEREQUEST,
+        SENDORDEROCO,
+        SENDORDEROSO,
+        // END CUSTOM MESSAGES
+        // START TRADELINK MESSAGES
+        SENDORDER = 5000,
+        BROKERNAME,
+        VERSION,
+        TICKNOTIFY,
         EXECUTENOTIFY,
         REGISTERCLIENT,
         REGISTERSTOCK,
@@ -45,7 +73,7 @@ namespace TradeLink.API
         CLEARCLIENT,
         HEARTBEAT,
         ORDERNOTIFY,
-        ACCOUNTRESPONSE = 500,
+        ACCOUNTRESPONSE,
         ACCOUNTREQUEST,
         ORDERCANCELREQUEST,
         ORDERCANCELRESPONSE,
@@ -53,13 +81,7 @@ namespace TradeLink.API
         FEATURERESPONSE,
         POSITIONREQUEST,
         POSITIONRESPONSE,
-        FEATURE_NOT_IMPLEMENTED = 994,
-        CLIENTNOTREGISTERED = 995,
-        GOTNULLORDER = 996,
-        UNKNOWNMSG,
-        UNKNOWNSYM,
-        TL_CONNECTOR_MISSING,
-        BAD_PARAMETERS,
-        DUPLICATE_ORDERID,
+        // END TRADELINK MESSAGES
+
     }
 }
