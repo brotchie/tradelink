@@ -15,6 +15,7 @@ namespace TradeLibFast
 	public:
 		TLClient_WM(char* client = "tlclient");
 		~TLClient_WM(void);
+		static long TLSend(int type,LPCTSTR msg,CString windname);
 		int TLFound(int mask);
 		void Mode(int mode);
 		void Unsubscribe();
@@ -34,7 +35,6 @@ namespace TradeLibFast
 		afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct);
 		CString _him;
 		CString _me;
-		int TLSend(int type,LPCTSTR msg,CString windname);
 		DECLARE_MESSAGE_MAP()
 	};
 }

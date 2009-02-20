@@ -22,7 +22,7 @@ namespace TradeLibFast
 		bool ENABLED;
 		__event void GotDebug(LPCTSTR msg);
 		CString debugbuffer;
-		static int TLSend(int type,LPCTSTR msg,CString windname);
+		static long TLSend(int type,LPCTSTR msg,CString windname);
 		void SrvGotOrder(TLOrder order);
 		void SrvGotFill(TLTrade trade);
 		void SrvGotTick(TLTick tick);

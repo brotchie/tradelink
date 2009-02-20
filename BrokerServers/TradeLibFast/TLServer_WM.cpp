@@ -322,9 +322,9 @@ namespace TradeLibFast
 	}
 
 
-	int TLServer_WM::TLSend(int type,LPCTSTR msg,CString windname) 
+	long TLServer_WM::TLSend(int type,LPCTSTR msg,CString windname) 
 	{
-		LRESULT result = 999;
+		LRESULT result = TL_CONNECTOR_MISSING;
 		HWND dest = FindWindowA(NULL,(LPCSTR)(LPCTSTR)windname)->GetSafeHwnd();
 		
 		if (dest) 
@@ -338,7 +338,7 @@ namespace TradeLibFast
 			CD.lpData = (void*)msg;	//here's the data we're sending
 			result = ::SendMessageA(dest,WM_COPYDATA,0,(LPARAM)&CD);
 		} 
-		return (int)result;
+		return (long)result;
 	}
 }
 

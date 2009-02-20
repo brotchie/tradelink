@@ -79,7 +79,7 @@ extern "C"  {
 		TLClient_WM tl;
 		TLOrder o;
 		o.symbol = sym;
-		o.side = side;
+		o.side = side != 0;
 		o.size = abs(size);
 		o.price = price;
 		o.stop = stop;
