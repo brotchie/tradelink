@@ -53,6 +53,11 @@ namespace TradeLink.Common
         /// </summary>
         public HistSim() : this(Util.TLTickDir, null) { }
         /// <summary>
+        /// Create historical simulator with your own tick folder
+        /// </summary>
+        /// <param name="TickFolder"></param>
+        public HistSim(string TickFolder) : this(TickFolder, null) { }
+        /// <summary>
         /// Create a historical simulator
         /// </summary>
         /// <param name="tff"></param>
@@ -67,14 +72,10 @@ namespace TradeLink.Common
             _folder = TickFolder;
             if (tff != null)
                 _filter = tff;
-        }
-        /// <summary>
-        /// Create a historical simulator
-        /// </summary>
-        /// <param name="filename">Single file to use</param>
-        public HistSim(string filename)
-        {
-            _tickfiles = new string[] { filename };
+            else
+            {
+                _filter.DefaultDeny = false;
+            }
         }
         /// <summary>
         /// Create a historical simulator
@@ -93,7 +94,6 @@ namespace TradeLink.Common
         /// </summary>
         public void Reset()
         {
-
             _inited = false;
             _tickfiles = new string[0];
             Instruments.Clear();

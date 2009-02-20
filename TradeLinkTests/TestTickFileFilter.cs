@@ -27,8 +27,8 @@ namespace TestTradeLink
             tff = new TickFileFilter();
             tff.DateFilter(20070000, DateMatchType.Year);
             result = tff.Allows(filenames);
-            Assert.That(result.Length == 3);
-            Assert.That(result[2] == filenames[3]);
+            Assert.AreEqual(3, result.Length);
+            Assert.AreEqual(filenames[3], result[2]);
         }
 
     }
