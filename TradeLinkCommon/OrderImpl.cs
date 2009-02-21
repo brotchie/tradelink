@@ -211,32 +211,6 @@ namespace TradeLink.Common
             return o;
         }
 
-        public override int GetHashCode()
-        {
-            return symbol.GetHashCode() + Account.GetHashCode() + (int)(price * 100) + (int)(stopp * 100) + _ex.GetHashCode() + SignedSize + LocalSymbol.GetHashCode() + (int)Currency + (int)Security;
-        }
-        public override bool Equals(object obj)
-        {
-            if (obj == null) return false;
-            OrderImpl o = (OrderImpl)obj;
-            return Equals(o);
-        }
-
-        public bool Equals(Order o)
-        {
-            if (o == null) return false;
-            bool r = true;
-            r &= price == o.price;
-            r &= stopp == o.stopp;
-            r &= symbol == o.symbol;
-            r &= Account == o.Account;
-            r &= ex== o.ex;
-            r &= TIF == o.TIF;
-            r &= LocalSymbol == o.LocalSymbol;
-            r &= size== o.size;
-            r &= Security == o.Security;
-            return r;
-        }
         public static uint Unique { get { return (uint)((decimal)DateTime.Now.TimeOfDay.TotalMilliseconds); } }
     }
 
