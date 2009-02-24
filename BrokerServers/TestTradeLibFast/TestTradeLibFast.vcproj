@@ -232,6 +232,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\TestTLImbalance.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\TestTLMarketBasket.cpp"
 			>
 		</File>

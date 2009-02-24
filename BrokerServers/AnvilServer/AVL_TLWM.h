@@ -36,6 +36,8 @@ namespace TradeLibFast
 		void CancelRequest(long order);
 
 		// account monitoring stuff
+		Observable* imbalance;
+		int imbalance_client;
 		vector<Observable*> accounts;
 		vector<uint> orderids;
 		uint fetchOrderId(Order * order);

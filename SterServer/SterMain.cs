@@ -20,7 +20,8 @@ namespace SterServer
         TLServer_WM tl = new TLServer_WM(TLTypes.LIVEBROKER);
         const string PROGRAM = "SterServer ";
         Timer tt = new Timer();
-
+        bool imbalance = false;
+        string imbalance_client = "";
 
         public SterMain()
         {
@@ -44,9 +45,26 @@ namespace SterServer
             tl.newRegisterStocks += new DebugDelegate(tl_RegisterStocks);
             tl.newOrderCancelRequest += new UIntDelegate(tl_OrderCancelRequest);
             tl.newFeatureRequest += new MessageArrayDelegate(tl_newFeatureRequest);
+            tl.newUnknownRequest += new UnknownMessageDelegate(tl_newUnknownRequest);
 
             debug(PROGRAM + Util.TLSIdentity());
             FormClosing += new FormClosingEventHandler(SterMain_FormClosing);
+        }
+
+        long tl_newUnknownRequest(MessageTypes t, string msg)
+        {
+            switch (t)
+            {
+                case MessageTypes.IMBALANCEREQUEST:
+                    {
+                        // register for imbalance data
+                        stiQuote.RegisterForMdx(true);
+                        imbalance = true;
+                        imbalance_client = msg;
+                    }
+                    break;
+            }
+            return (long)MessageTypes.UNKNOWNMSG;
         }
 
         MessageTypes[] tl_newFeatureRequest()
@@ -68,6 +86,8 @@ namespace SterServer
             f.Add(MessageTypes.SENDORDER);
             f.Add(MessageTypes.TICKNOTIFY);
             f.Add(MessageTypes.VERSION);
+            f.Add(MessageTypes.IMBALANCEREQUEST);
+            f.Add(MessageTypes.IMBALANCERESPONSE);
             return f.ToArray();
         }
 
@@ -228,6 +248,10 @@ namespace SterServer
             k.trade = (decimal)q.fLastPrice;
             k.size = q.nLastSize;
             tl.newTick(k);
+            if (q.bValidMktImb==0) return;
+            ImbalanceImpl i = new ImbalanceImpl(k.symbol, k.ex, q.nMktImbalance, k.time, 0, 0);
+            tl.TLSend(ImbalanceImpl.Serialize(i), MessageTypes.IMBALANCERESPONSE, imbalance_client);
+            
         }
 
         void stiQuote_OnSTIQuoteSnap(ref structSTIQuoteSnap q)

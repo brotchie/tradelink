@@ -9,6 +9,7 @@ namespace TradeLink.API
     public enum MessageTypes
     {
         // START TRADELINK STATUS MESSAGES
+        UNKNOWN_ERROR = -109,
         FEATURE_NOT_IMPLEMENTED = -108,
         CLIENTNOTREGISTERED = -107,
         GOTNULLORDER = -106,
@@ -81,6 +82,8 @@ namespace TradeLink.API
         FEATURERESPONSE,
         POSITIONREQUEST,
         POSITIONRESPONSE,
+        IMBALANCEREQUEST,
+        IMBALANCERESPONSE,
         // END TRADELINK MESSAGES
 
     }

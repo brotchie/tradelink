@@ -234,6 +234,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\TLImbalance.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\TLImbalance.h"
+			>
+		</File>
+		<File
 			RelativePath=".\TLMarketBasket.cpp"
 			>
 		</File>

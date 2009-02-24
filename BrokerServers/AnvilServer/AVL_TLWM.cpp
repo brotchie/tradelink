@@ -11,11 +11,17 @@ namespace TradeLibFast
 	AVL_TLWM* AVL_TLWM::instance = NULL;	
 
 
-
-
 	AVL_TLWM::AVL_TLWM(void)
 	{
 		instance = this;
+
+		// imbalances are off by default
+		imbalance = NULL;
+		// only one client can subscribe to imbalances
+		imbalance_client = -1;
+
+		// add this object as observer to every account,
+		// so we can get fill and order notifications
 
 		void* iterator = B_CreateAccountIterator();
 		B_StartIteration(iterator);
@@ -41,6 +47,12 @@ namespace TradeLibFast
 		B_DestroyIterator(iterator);
 		accounts.clear();
 		ordercache.clear();
+
+		if (imbalance!=NULL)
+		{
+			imbalance->Remove(this);
+			imbalance = NULL;
+		}
 
 
 		// stock stuff, close down hammer subscriptions
@@ -71,9 +83,20 @@ namespace TradeLibFast
 		case ISSHORTABLE :
 			{
 				const StockBase* s = preload(msg);
-				if ((s==NULL)|| !s->isLoaded()) return -1;
+				if ((s==NULL)|| !s->isLoaded()) return SYMBOL_NOT_LOADED;
 				bool shortable = (s->GetStockAttributes() & STOCKATTR_UPC11830) == 0;
 				return shortable ? 1 : 0;
+			}
+			break;
+		case IMBALANCEREQUEST :
+			{
+				// get an observable for imbalances, 
+				imbalance = B_GetMarketImbalanceObservable();
+				// make this object watch it
+				imbalance->Add(this);
+				// set this client to receive imbalances
+				imbalance_client = FindClient(msg);
+				return OK;
 			}
 			break;
 
@@ -572,6 +595,35 @@ namespace TradeLibFast
 
 			}
 			break;
+			case M_MARKET_IMBALANCE:
+			case M_NEW_MARKET_IMBALANCE:
+				{
+					if ((imbalance_client == -1)|| (client[imbalance_client]=="")) return;
+					if (additionalInfo && (additionalInfo->GetType()==M_AI_STOCK_MOVEMENT))
+					{
+						const StockMovement* sm = ((MsgStockMovement*)additionalInfo)->m_stock;
+						TLImbalance nyi;
+						nyi.Symbol = CString(sm->GetSymbol());
+						nyi.ThisImbalance = sm->GetNyseImbalance();
+						nyi.PrevImbalance = sm->GetNysePreviousImbalance();
+						nyi.Ex = CString("NYSE");
+						nyi.ThisTime = sm->GetNyseImbalanceTime();
+						nyi.PrevTime = sm->GetNysePreviousImbalanceTime();
+						if (nyi.hasImbalance()||nyi.hadImbalance())
+							TLSend(IMBALANCERESPONSE,TLImbalance::Serialize(nyi),client[imbalance_client]);
+						TLImbalance qyi;
+						qyi.Symbol = CString(sm->GetSymbol());
+						qyi.ThisImbalance = sm->GetNasdaqImbalance();
+						qyi.PrevImbalance = sm->GetNasdaqPreviousImbalance();
+						qyi.Ex = CString("NASDAQ");
+						qyi.ThisTime = sm->GetNasdaqImbalanceTime();
+						qyi.PrevTime = sm->GetNasdaqPreviousImbalanceTime();
+						if (qyi.hasImbalance()||qyi.hadImbalance())
+							TLSend(IMBALANCERESPONSE,TLImbalance::Serialize(nyi),client[imbalance_client]);
+					}
+
+					break;
+				}
 		} // switchend
 	}
 
@@ -603,6 +655,8 @@ namespace TradeLibFast
 		f.push_back(TICKNOTIFY);
 		f.push_back(EXECUTENOTIFY);
 		f.push_back(ORDERNOTIFY);
+		f.push_back(IMBALANCEREQUEST);
+		f.push_back(IMBALANCERESPONSE);
 
 		// added 2009.01.17
 		f.push_back(VWAP);	// GetVwap

@@ -35,6 +35,8 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bar.cs" />
@@ -43,8 +45,10 @@
     <Compile Include="CurrencyType.cs" />
     <Compile Include="Debug.cs" />
     <Compile Include="Delegates.cs" />
+    <Compile Include="Imbalance.cs" />
     <Compile Include="Indicators.cs" />
     <Compile Include="MarketBasket.cs" />
+    <Compile Include="MessageImbalance.cs" />
     <Compile Include="MessageOrder.cs" />
     <Compile Include="MessagePositionResponse.cs" />
     <Compile Include="MessageTradeNotify.cs" />

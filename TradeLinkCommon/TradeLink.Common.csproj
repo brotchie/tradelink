@@ -66,6 +66,7 @@
     <Compile Include="Email.cs" />
     <Compile Include="eSigTick.cs" />
     <Compile Include="HistSim.cs" />
+    <Compile Include="ImbalanceImpl.cs" />
     <Compile Include="InvalidResponse.cs" />
     <Compile Include="LimitOrder.cs" />
     <Compile Include="BasketImpl.cs" />

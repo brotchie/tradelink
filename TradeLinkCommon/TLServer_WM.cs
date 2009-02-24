@@ -81,6 +81,12 @@ namespace TradeLink.Common
             }
         }
 
+        public void TLSend(string message, MessageTypes type, string client)
+        {
+            if (client == "") return;
+            WMUtil.SendMsg(message, type, Handle, client);
+        }
+
         delegate void tlnewfilldelegate(TradeImpl t, bool allclients);
         /// <summary>
         /// Notifies subscribed clients of a new execution.
