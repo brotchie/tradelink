@@ -70,6 +70,10 @@
     <Compile Include="InvalidResponse.cs" />
     <Compile Include="LimitOrder.cs" />
     <Compile Include="BasketImpl.cs" />
+    <Compile Include="TLClient_IP.cs" />
+    <Compile Include="Packet.cs" />
+    <Compile Include="TLServer_IP.cs" />
+    <Compile Include="Listener.cs" />
     <Compile Include="MarketOrder.cs" />
     <Compile Include="NewVersion.cs">
       <SubType>Form</SubType>

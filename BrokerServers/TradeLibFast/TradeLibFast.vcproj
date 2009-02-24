@@ -274,6 +274,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\TLServer_IP.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\TLServer_IP.h"
+			>
+		</File>
+		<File
 			RelativePath=".\TLServer_WM.cpp"
 			>
 		</File>
