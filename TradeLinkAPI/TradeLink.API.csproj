@@ -47,7 +47,7 @@
     <Compile Include="Delegates.cs" />
     <Compile Include="Imbalance.cs" />
     <Compile Include="Indicators.cs" />
-    <Compile Include="MarketBasket.cs" />
+    <Compile Include="Basket.cs" />
     <Compile Include="MessageImbalance.cs" />
     <Compile Include="MessageOrder.cs" />
     <Compile Include="MessagePositionResponse.cs" />
