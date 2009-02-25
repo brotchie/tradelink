@@ -28,6 +28,7 @@ namespace Quotopia
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -77,6 +78,7 @@ namespace Quotopia
             this.OrderSideCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.OrderTimeCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.OrderDateCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.quoteTab.SuspendLayout();
             this.Markets.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -607,5 +609,6 @@ namespace Quotopia
         private System.Windows.Forms.TextBox accountname;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox exchdest;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }

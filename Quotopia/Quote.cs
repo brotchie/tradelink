@@ -200,6 +200,7 @@ namespace Quotopia
             qg.ContextMenuStrip.Items.Add("Chart", null,new EventHandler(rightchart));
             qg.ContextMenuStrip.Items.Add("Ticket", null,new EventHandler(rightticket));
             qg.ContextMenuStrip.Items.Add("Import Basket", null,new EventHandler(importbasketbut_Click));
+            qg.ContextMenuStrip.Items.Add("Export Basket", null, new EventHandler(exportbasket));
             qg.BackgroundColor = Quotopia.Properties.Settings.Default.marketbgcolor;
             qg.ForeColor = Quotopia.Properties.Settings.Default.marketfontcolor;
             qg.DefaultCellStyle.BackColor = qg.BackgroundColor;
@@ -602,40 +603,46 @@ namespace Quotopia
             }
         }
 
-        MarketBasket mb = new BasketImpl();
+        Basket mb = new BasketImpl();
 
+        void exportbasket(object send, EventArgs e)
+        {
+            SaveFileDialog sd = new SaveFileDialog();
+            sd.AddExtension = true;
+            sd.DefaultExt = ".txt";
+            if (sd.ShowDialog() == DialogResult.OK)
+            {
+                BasketImpl.ToFile(mb, sd.FileName);
+            }
+        }
 
         private void importbasketbut_Click(object sender, EventArgs e)
         {
             OpenFileDialog od = new OpenFileDialog();
             od.Multiselect = true;
-            od.Filter = "Basket (*.mb)|*.mb|All files (*.*)|*.*";
+            od.Filter = "Basket (*.txt)|*.txt|All files (*.*)|*.*";
             od.AddExtension = true;
-            od.DefaultExt = ".mb";
+            od.DefaultExt = ".txt";
             od.CheckFileExists = true;
             od.Title = "Select the baskets you wish to import to quototpia";
             if (od.ShowDialog() == DialogResult.OK)
             {
+                int count = 0;
                 foreach (string f in od.FileNames)
                 {
-                    StreamReader sr = new StreamReader(f);
-                    string line = sr.ReadLine();
-                    sr.Close();
-                    string[] r = line.Split(',');
-                    int skipped = 0;
-                    for (int i = 0; i < r.Length; i++)
-                    {
-                        bool add = true;
-                        Security sec = SecurityImpl.Parse(r[i]);
-                        if (sec.isValid)
-                            mb.Add(sec);
-                        else { add = false; skipped++; }
-                        if (add) addsymbol(r[i]);
-                    }
-                    status("Imported " + (r.Length - skipped) + " instruments.");
+                    Basket nb = BasketImpl.FromFile(f);
+                    mb.Add(nb);
+                    count += nb.Count;
                 }
+                status("Imported " + count + " instruments.");
             }
             tl.Subscribe(mb);
+        }
+
+        void addbasket(Basket b)
+        {
+            foreach (Security s in b)
+                addsymbol(s.FullName);
         }
 
         private void saveSettingsbut_Click(object sender, EventArgs e)

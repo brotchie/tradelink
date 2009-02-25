@@ -283,7 +283,7 @@ namespace TradeLink.Common
             TLSend(MessageTypes.REGISTERCLIENT, Text);
         }
 
-        public void Subscribe(TradeLink.API.MarketBasket mb)
+        public void Subscribe(TradeLink.API.Basket mb)
         {
             TLSend(MessageTypes.REGISTERSTOCK, Text + "+" + mb.ToString());
         }

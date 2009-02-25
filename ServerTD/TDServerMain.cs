@@ -36,7 +36,7 @@ namespace TDServer
 
         void tl_newRegisterStocks(string msg)
         {
-            MarketBasket mb = BasketImpl.FromString(msg);
+            Basket mb = BasketImpl.Deserialize(msg);
             List<int> bad = new List<int>();
             for (int i = 0; i < mb.Count; i++)
             {

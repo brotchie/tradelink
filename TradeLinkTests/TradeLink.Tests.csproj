@@ -60,7 +60,7 @@
     <Compile Include="TestBroker.cs" />
     <Compile Include="TesteSigTick.cs" />
     <Compile Include="TestHistSim.cs" />
-    <Compile Include="TestMarketBasket.cs" />
+    <Compile Include="TestBasket.cs" />
     <Compile Include="TestOrder.cs" />
     <Compile Include="TestPosition.cs" />
     <Compile Include="TestSecurity.cs" />

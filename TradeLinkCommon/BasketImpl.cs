@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections;
 using TradeLink.API;
+using System.IO;
 
 namespace TradeLink.Common
 {
@@ -9,7 +10,7 @@ namespace TradeLink.Common
     /// Holds collections of stock instances.
     /// </summary>
     [Serializable]
-    public class BasketImpl : TradeLink.API.MarketBasket
+    public class BasketImpl : TradeLink.API.Basket
     {
         /// <summary>
         /// Create a basket of securities
@@ -50,12 +51,12 @@ namespace TradeLink.Common
         public int Count { get { return symbols.Count; } }
         public bool hasStock { get { return symbols.Count >0; } }
         public void Add(Security s) { if (s.isValid) symbols.Add(s); }
-        public void Add(BasketImpl mb)
+        public void Add(Basket mb)
         {
             for (int i = 0; i < mb.Count; i++)
                 this.Add(mb[i]);
         }
-        public void Subtract(BasketImpl mb)
+        public void Remove(Basket mb)
         {
             List<int> remove = new List<int>();
             for (int i = 0; i < symbols.Count; i++)
@@ -68,13 +69,14 @@ namespace TradeLink.Common
         public void Remove(int i) { symbols.RemoveAt(i); }
         public void Remove(Security s) { symbols.Remove(s); }
         public void Clear() { symbols.Clear(); }
-        public override string  ToString()
+        public static string Serialize(Basket b)
         {
             List<string> s = new List<string>();
-            for (int i = 0; i < symbols.Count; i++) s.Add(this[i].FullName);
+            for (int i = 0; i < b.Count; i++) s.Add(b[i].FullName);
             return string.Join(",", s.ToArray());
         }
-        public static BasketImpl FromString(string serialBasket)
+
+        public static BasketImpl Deserialize(string serialBasket)
         {
             BasketImpl mb = new BasketImpl();
             if ((serialBasket == null) || (serialBasket == "")) return mb;
@@ -88,6 +90,27 @@ namespace TradeLink.Common
             }
             return mb;
         }
+        public static Basket FromFile(string filename)
+        {
+            StreamReader sr = new StreamReader(filename);
+            string file = sr.ReadToEnd();
+            sr.Close();
+            string[] syms = file.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            BasketImpl b = new BasketImpl(syms);
+            return b;
+        }
+
+        public static void ToFile(Basket b, string filename) { ToFile(b, filename, false); }
+        public static void ToFile(Basket b, string filename, bool append)
+        {
+            StreamWriter sw = new StreamWriter(filename, append);
+            for (int i = 0; i < b.Count; i++)
+                sw.WriteLine(b[i].Symbol);
+            sw.Close();
+
+        }
+        public override string ToString() { return Serialize(this); }
+        public static BasketImpl FromString(string serialbasket) { return Deserialize(serialbasket); }
         public IEnumerator GetEnumerator() { foreach (SecurityImpl s in symbols) yield return s; }
 
     }

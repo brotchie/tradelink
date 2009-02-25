@@ -15,7 +15,7 @@ namespace TradeLink.API
         void GoSim();
         void Disconnect();
         void Register();
-        void Subscribe(MarketBasket mb);
+        void Subscribe(Basket mb);
         void Unsubscribe();
         long TLSend(MessageTypes type, string message);
         int HeartBeat();
