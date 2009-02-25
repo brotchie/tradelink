@@ -14,6 +14,16 @@ namespace TradeLink.Common
 
         public Position this[string symbol] { get { Position p; if (posdict.TryGetValue(symbol, out p)) return p; return new PositionImpl(symbol);  } }
         public IEnumerator GetEnumerator() { foreach (Position p in posdict.Values) yield return p; }
+
+        public int Count { get { return posdict.Count; } }
+        public Position[] ToArray()
+        {
+            Position[] pl = new Position[posdict.Count];
+            int i = 0;
+            foreach (Position p in posdict.Values)
+                pl[i++] = p;
+            return pl;
+        }
         
         /// <summary>
         /// Create a new position, or overwrite existing position

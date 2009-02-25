@@ -10,10 +10,11 @@ namespace TradeLink.Common
     public class PositionImpl : TradeLink.API.Position
     {
         public PositionImpl() : this("") { }
-        public PositionImpl(Position p) : this(p.Symbol, p.AvgPrice, p.Size, p.ClosedPL) { }
-        public PositionImpl(string symbol) : this(symbol, 0m, 0,0) { }
-        public PositionImpl(string symbol, decimal price, int size) : this(symbol, price, size, 0) { }
-        public PositionImpl(string symbol, decimal price, int size, decimal closedpl) { _sym = symbol; if (size == 0) price = 0; _price = price; _size = size; _closedpl = closedpl; }
+        public PositionImpl(Position p) : this(p.Symbol, p.AvgPrice, p.Size, p.ClosedPL,p.Account) { }
+        public PositionImpl(string symbol) : this(symbol, 0m, 0,0,"") { }
+        public PositionImpl(string symbol, decimal price, int size) : this(symbol, price, size, 0,"") { }
+        public PositionImpl(string symbol, decimal price, int size, decimal closedpl) : this(symbol, price, size, closedpl, "") { }
+        public PositionImpl(string symbol, decimal price, int size, decimal closedpl, string account) { _sym = symbol; if (size == 0) price = 0; _price = price; _size = size; _closedpl = closedpl; _acct = account; }
         public PositionImpl(Trade t) 
         {
             if (!t.isValid) throw new Exception("Can't construct a position object from invalid trade.");

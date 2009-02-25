@@ -22,6 +22,7 @@ namespace SterServer
         Timer tt = new Timer();
         bool imbalance = false;
         string imbalance_client = "";
+        PositionTracker pt = new PositionTracker();
 
         public SterMain()
         {
@@ -38,7 +39,9 @@ namespace SterServer
             stiPos.OnSTIPositionUpdate += new _ISTIPositionEvents_OnSTIPositionUpdateEventHandler(stiPos_OnSTIPositionUpdate);
             stiQuote.OnSTIQuoteUpdate += new _ISTIQuoteEvents_OnSTIQuoteUpdateEventHandler(stiQuote_OnSTIQuoteUpdate);
             stiQuote.OnSTIQuoteSnap += new _ISTIQuoteEvents_OnSTIQuoteSnapEventHandler(stiQuote_OnSTIQuoteSnap);
+            stiPos.GetCurrentPositions();
 
+            tl.newAcctRequest += new StringDelegate(tl_newAcctRequest);
             tl.newProviderName = Providers.Sterling;
             tl.newSendOrderRequest += new OrderDelegate(tl_gotSrvFillRequest);
             tl.newPosList += new PositionArrayDelegate(tl_gotSrvPosList);
@@ -49,6 +52,11 @@ namespace SterServer
 
             debug(PROGRAM + Util.TLSIdentity());
             FormClosing += new FormClosingEventHandler(SterMain_FormClosing);
+        }
+
+        string tl_newAcctRequest()
+        {
+            return string.Join(",", accts.ToArray());
         }
 
         long tl_newUnknownRequest(MessageTypes t, string msg)
@@ -88,6 +96,10 @@ namespace SterServer
             f.Add(MessageTypes.VERSION);
             f.Add(MessageTypes.IMBALANCEREQUEST);
             f.Add(MessageTypes.IMBALANCERESPONSE);
+            f.Add(MessageTypes.POSITIONREQUEST);
+            f.Add(MessageTypes.POSITIONRESPONSE);
+            f.Add(MessageTypes.ACCOUNTREQUEST);
+            f.Add(MessageTypes.ACCOUNTRESPONSE);
             return f.ToArray();
         }
 
@@ -136,8 +148,9 @@ namespace SterServer
                 order.Side = o.side ? "B" : "S";
                 order.Symbol = o.symbol;
                 order.Quantity = o.UnsignedSize;
-                order.Account = o.Account;
-                order.Destination = o.Exchange;
+                string acct = accts.Count>0 ? accts[0] : "";
+                order.Account = o.Account != "" ? o.Account : acct;
+                order.Destination = o.Exchange != "" ? o.ex : "NYSE";
                 order.Tif = o.TIF;
                 order.PriceType = o.isMarket ? STIPriceTypes.ptSTIMkt : (o.isLimit ? STIPriceTypes.ptSTILmt : STIPriceTypes.ptSTISvrStp);
                 order.ClOrderID = o.id.ToString();
@@ -224,8 +237,7 @@ namespace SterServer
 
         Position[] tl_gotSrvPosList(string account)
         {
-            stiPos.RegisterForPositions();
-            return new PositionImpl[0];
+            return pt.ToArray();
         }
 
         void stiQuote_OnSTIQuoteUpdate(ref structSTIQuoteUpdate q)
@@ -281,14 +293,30 @@ namespace SterServer
         uint oc = 0;
         void tl_gotSrvFillRequest(Order o)
         {
-            if (o.id ==0 ) o.id = (uint)(DateTime.Now.Ticks + acct.GetHashCode());
+            if (o.id ==0 ) o.id = (uint)(DateTime.Now.TimeOfDay.Ticks);
             oq[oc++] = o;
         }
 
-        string acct = "";
+        List<string> accts = new List<string>();
         void stiPos_OnSTIPositionUpdate(ref structSTIPositionUpdate structPositionUpdate)
         {
-            
+            // symbol
+            string sym = structPositionUpdate.bstrSym;
+            // size
+            int size = structPositionUpdate.nSharesBot - structPositionUpdate.nSharesSld;
+            // price
+            decimal price = Math.Abs((decimal)structPositionUpdate.fPositionCost / size);
+            // closed pl
+            decimal cpl = (decimal)structPositionUpdate.fReal;
+            // account
+            string ac = structPositionUpdate.bstrAcct;
+            // build position
+            Position p = new PositionImpl(sym, price, size, cpl, ac);
+            // track it
+            pt.NewPosition(p);
+            // track account
+            if (!accts.Contains(ac))
+                accts.Add(ac);
         }
 
 
