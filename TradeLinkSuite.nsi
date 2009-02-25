@@ -8,7 +8,7 @@ Icon "InstallSuite\tradelinkinstaller.ico"
 
 !define SHORT_APP_NAME "TradeLink"
 !define SUPPORT_EMAIL "trade@franta.com"
-
+!addplugindir InstallSuite
 !include "InstallSuite\DotNET.nsh"
 
 ; The file to write
