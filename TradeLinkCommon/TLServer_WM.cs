@@ -50,7 +50,7 @@ namespace TradeLink.Common
 
 
         delegate void tlneworderdelegate(OrderImpl o, bool allclients);
-        public void newOrder(Order o) { newOrder(o, false); }
+        public void newOrder(Order o) { newOrder(o, true); }
         public void newOrder(Order o, bool allclients)
         {
             if (this.InvokeRequired)
@@ -92,7 +92,7 @@ namespace TradeLink.Common
         /// Notifies subscribed clients of a new execution.
         /// </summary>
         /// <param name="trade">The trade to include in the notification.</param>
-        public void newFill(Trade trade) { newFill(trade, false); }
+        public void newFill(Trade trade) { newFill(trade, true); }
         public void newFill(Trade trade, bool allclients)
         {
             if (this.InvokeRequired)
@@ -102,7 +102,7 @@ namespace TradeLink.Common
                 // make sure our trade is filled and initialized properly
                 if (!trade.isValid) return;
                 for (int i = 0; i < client.Count; i++) // send tick to each client that has subscribed to tick's stock
-                    if ((client[i] != null) && ((stocks[i].Contains(trade.symbol) || allclients)))
+                    if ((client[i] != null) && (allclients || (stocks[i].Contains(trade.symbol))))
                         WMUtil.SendMsg(TradeImpl.Serialize(trade), MessageTypes.EXECUTENOTIFY, Handle, client[i]);
             }
         }

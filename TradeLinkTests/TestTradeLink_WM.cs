@@ -13,6 +13,7 @@ namespace TestTradeLink
     {
         // each side of our "link"
         TLClient_WM c;
+        TLClient_WM c2;
         TLServer_WM s;
 
         // counters used to test link events are working
@@ -21,10 +22,17 @@ namespace TestTradeLink
         int orders;
         int fillrequest;
 
+        // 2nd client counters
+        int copyticks;
+        int copyfills;
+        int copyorders;
+
         public TestTradeLink_WM() 
         {
             s = new TLServer_WM();
             c = new TLClient_WM("testtradelink",false);
+            // create a second client to verify order and fill copying work
+            c2 = new TLClient_WM("client2", false);
 
             // register server events (so server can process orders)
             s.newSendOrderRequest += new OrderDelegate(tl_gotSrvFillRequest);
@@ -33,8 +41,14 @@ namespace TestTradeLink
             c.gotFill += new FillDelegate(tlclient_gotFill);
             c.gotOrder += new OrderDelegate(tlclient_gotOrder);
             c.gotTick += new TickDelegate(tlclient_gotTick);
+            // setup second client events to check copying
+            c2.gotFill += new FillDelegate(c2_gotFill);
+            c2.gotOrder += new OrderDelegate(c2_gotOrder);
+            c2.gotTick += new TickDelegate(c2_gotTick);
 
         }
+
+
 
         [Test]
         public void StartupTests()
@@ -65,6 +79,9 @@ namespace TestTradeLink
 
             // make sure the client got it
             Assert.That(ticks == 1, ticks.ToString());
+            // make sure other clients did not get ticks 
+            // (cause we didnt' subscribe from other clients)
+            Assert.AreNotEqual(copyticks, ticks);
         }
 
         [Test]
@@ -84,6 +101,8 @@ namespace TestTradeLink
             Assert.That(orders == 1, orders.ToString());
             // server should have gotten a request to fill an order
             Assert.That(fillrequest == 1, fillrequest.ToString());
+            // make sure order was copied to other clients
+            Assert.AreEqual(copyorders, orders);
         }
 
         [Test]
@@ -101,6 +120,9 @@ namespace TestTradeLink
 
             // make sure client received and counted it
             Assert.That(fills == 1, fills.ToString());
+
+            // make sure fill was copied
+            Assert.AreEqual(fills, copyfills);
         }
 
         // event handlers
@@ -125,6 +147,22 @@ namespace TestTradeLink
         void tlclient_gotFill(Trade t)
         {
             fills++;
+        }
+
+        // 2nd client handlers
+        void c2_gotTick(Tick t)
+        {
+            copyticks++;
+        }
+
+        void c2_gotOrder(Order o)
+        {
+            copyorders++; 
+        }
+
+        void c2_gotFill(Trade t)
+        {
+            copyfills++;
         }
     }
 }

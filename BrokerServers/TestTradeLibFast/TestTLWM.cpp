@@ -45,6 +45,7 @@ static void __stdcall Basics()
 	TLServer_WM s;
 	s.Start(true);
 	TestClient c;
+	TestClient c2;
 	CString sym = "TST";
 	int size = 200;
 	double price = 100;
@@ -64,6 +65,8 @@ static void __stdcall Basics()
 	CFIX_ASSERT(c.ticks==1);
 	CFIX_ASSERT(c.lasttick.sym==k.sym);
 	CFIX_ASSERT(c.lasttick.trade==k.trade);
+	// make sure ticks were not copied to other clients
+	CFIX_ASSERT(c.ticks!=c2.ticks);
 
 	// Fill test
 	TLTrade f;
@@ -78,6 +81,8 @@ static void __stdcall Basics()
 	CFIX_ASSERT(c.fills==1);
 	CFIX_ASSERT(c.lastfill.symbol==f.symbol);
 	CFIX_ASSERT(c.lastfill.xprice==f.xprice);
+	// make sure fills were copiedto other clients
+	CFIX_ASSERT(c.fills==c2.fills);
 
 	// Order test
 	TLOrder o;
@@ -88,6 +93,8 @@ static void __stdcall Basics()
 	CFIX_ASSERT(c.orders==1);
 	CFIX_ASSERT(c.lastorder.symbol==o.symbol);
 	CFIX_ASSERT(c.lastorder.price==o.price);
+	// make sure orders were copied to other clients
+	CFIX_ASSERT(c.orders==c2.orders);
 
 
 }
