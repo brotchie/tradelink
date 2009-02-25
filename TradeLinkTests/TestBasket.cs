@@ -1,13 +1,14 @@
 using System;
 using NUnit.Framework;
 using TradeLink.Common;
+using TradeLink.API;
 
 namespace TestTradeLink
 {
     [TestFixture]
-    public class TestMarketBasket
+    public class TestBasket
     {
-        public TestMarketBasket()
+        public TestBasket()
         {
         }
 
@@ -39,7 +40,7 @@ namespace TestTradeLink
             BasketImpl rem = new BasketImpl(new string[] { "LVS", "MHS" });
             Assert.That(mb.Count == 5);
             Assert.That(rem.Count == 2);
-            mb.Subtract(rem);
+            mb.Remove(rem);
             Assert.That(mb.Count == 3,mb.Count.ToString());
         }
 
@@ -48,16 +49,16 @@ namespace TestTradeLink
         {
             BasketImpl mb = new BasketImpl();
             mb.Add(new SecurityImpl("IBM"));
-            BasketImpl compare = BasketImpl.FromString(mb.ToString());
+            BasketImpl compare = BasketImpl.Deserialize(mb.ToString());
             Assert.That(compare.Count == 1);
             mb.Clear();
-            compare = BasketImpl.FromString(mb.ToString());
+            compare = BasketImpl.Deserialize(mb.ToString());
             Assert.That(compare.Count==0);
 
             mb.Clear();
             SecurityImpl longform = SecurityImpl.Parse("CLZ8 FUT NYMEX");
             mb.Add(longform);
-            compare = BasketImpl.FromString(mb.ToString());
+            compare = BasketImpl.Deserialize(mb.ToString());
             Assert.AreEqual(longform.ToString(),compare[0].ToString());
 
 
@@ -74,6 +75,24 @@ namespace TestTradeLink
                 l[i++] = s.Symbol;
             Assert.AreEqual(4, i);
 
+        }
+
+        [Test]
+        public void Files()
+        {
+            // create basket
+            BasketImpl mb = new BasketImpl(new string[] { "IBM", "MHS", "LVS", "GM" });
+            // save it to a file
+            const string file = "test.txt";
+            BasketImpl.ToFile(mb, file);
+            // restore it
+            Basket nb = BasketImpl.FromFile(file);
+            // verify it has same number of symbols
+            Assert.AreEqual(mb.Count, nb.Count);
+            // remove original contents from restored copy
+            nb.Remove(mb);
+            // verify nothing is left
+            Assert.AreEqual(0, nb.Count);
         }
     }
 }
