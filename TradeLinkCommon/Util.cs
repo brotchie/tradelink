@@ -403,7 +403,7 @@ namespace TradeLink.Common
         }
         public static int LatestVersion(string URL, string Application)
         {
-            var wc = new WebClient();
+            WebClient wc = new WebClient();
             int ver = 0;
             try
             {
