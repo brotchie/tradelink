@@ -198,7 +198,71 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath=".\CONNECTS.CPP"
+			>
+		</File>
+		<File
+			RelativePath=".\CONNECTS.H"
+			>
+		</File>
+		<File
+			RelativePath=".\Convert.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Convert.h"
+			>
+		</File>
+		<File
+			RelativePath=".\ErrorString.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\ErrorString.h"
+			>
+		</File>
+		<File
+			RelativePath=".\LISTENS.CPP"
+			>
+		</File>
+		<File
+			RelativePath=".\LISTENS.H"
+			>
+		</File>
+		<File
+			RelativePath=".\Log.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Log.h"
+			>
+		</File>
+		<File
 			RelativePath=".\resource.h"
+			>
+		</File>
+		<File
+			RelativePath=".\ServerSocket.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\ServerSocket.h"
+			>
+		</File>
+		<File
+			RelativePath=".\ServerT.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\ServerT.h"
+			>
+		</File>
+		<File
+			RelativePath=".\SocketThread.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\SocketThread.h"
 			>
 		</File>
 		<File
@@ -303,6 +367,14 @@
 		</File>
 		<File
 			RelativePath=".\TLTrade.h"
+			>
+		</File>
+		<File
+			RelativePath=".\TracePacket.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\TracePacket.h"
 			>
 		</File>
 		<File

@@ -1,0 +1,1 @@
+CString ErrorString(DWORD err);
