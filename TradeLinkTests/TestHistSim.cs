@@ -11,7 +11,7 @@ namespace TestTradeLink
     {
         public TestHistSim() { }
 
-        const double EXPECT2SYMTIME = 1.6;
+        const double EXPECT2SYMTIME = .6;
 
         [Test]
         public void PlaybackTime()
@@ -23,7 +23,7 @@ namespace TestTradeLink
             Assert.AreEqual(0, tickcount);
             Assert.AreEqual(0, syms.Count);
             Assert.AreEqual(0, lasttime);
-            Assert.Greater(h.ApproxTotalTicks, 0);
+            Assert.Greater(h.TicksPresent, 0);
 
             DateTime start = DateTime.Now;
 
@@ -37,8 +37,8 @@ namespace TestTradeLink
             // check running time
             Assert.LessOrEqual(time, EXPECT2SYMTIME,"may fail on slow machines");
             Assert.AreEqual(2,syms.Count);
-            // 42614 (FTI) + 5001 (SPX)
-            Assert.AreEqual(42614+4991, tickcount);
+            // 42610 (FTI) + 5001 (SPX)
+            Assert.AreEqual(42610 + 4991, tickcount);
             // last time is 1649 on SPX
             //Assert.AreEqual(1649, lasttime);
             // printout simulation runtime
