@@ -16,7 +16,7 @@ namespace TradeLink.Common
         bool _inited = false;
         int _nextticktime = DT2FT(ENDSIM);
         int _executions = 0;
-        int _tickcount = 0;
+        volatile int _tickcount;
         long _bytestoprocess = 0;
         List<SecurityImpl> Instruments = new List<SecurityImpl>();
         
@@ -104,7 +104,6 @@ namespace TradeLink.Common
             _master = new cursor();
             _broker.Reset();
             _executions = 0;
-            _tickcount = 0;
             _bytestoprocess = 0;
 
         }
@@ -122,7 +121,6 @@ namespace TradeLink.Common
                 string[] files = Directory.GetFiles(_folder, tickext);
                 _tickfiles = _filter.Allows(files);
             }
-            D("got tickfiles: "+string.Join(",",_tickfiles));
 
             // now we have our list, initialize instruments from files
             foreach (string file in _tickfiles)
@@ -136,6 +134,7 @@ namespace TradeLink.Common
             _endstream = new bool[Instruments.Count];
 
             D("Initialized " + (_tickfiles.Length ) + " instruments.");
+            D(string.Join(Environment.NewLine.ToString(), _tickfiles));
             FillCache();
             D("Read initial ticks into cache...");
 
@@ -311,9 +310,11 @@ namespace TradeLink.Common
                 // skip invalid ticks
                 if (k == null) continue;
                 // fill tick against pending orders
-                SimBroker.Execute(k);
+                _executions += SimBroker.Execute(k);
                 // notify listeners
                 GotTick(k);
+                // count total tick
+                _tickcount++;
             }
             return continuesim;
         }
