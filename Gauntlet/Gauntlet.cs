@@ -23,33 +23,8 @@ using TradeLink.API;
             exchlist.SelectedItem = "NYS";
             ProgressBar1.Enabled = false;
             FormClosing+=new FormClosingEventHandler(Gauntlet_FormClosing);
-            Grids();
-            show(Util.TLSIdentity());
+            debug(Util.TLSIdentity());
         }
-
-        void Grids()
-        {
-            trades.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
-            trades.Columns.Add("date", "Date");
-            trades.Columns.Add("time", "Time");
-            trades.Columns.Add("sym", "Symbol");
-            trades.Columns.Add("size", "XSize");
-            trades.Columns.Add("side", "Side");
-            trades.Columns.Add("price", "XPrice");
-            trades.Columns.Add("user", "Comment");
-            
-
-            orders.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
-            orders.Columns.Add("date", "Date");
-            orders.Columns.Add("time", "Time");
-            orders.Columns.Add("sym", "Symbol");
-            orders.Columns.Add("type", "Type");
-            orders.Columns.Add("size", "Size");
-            orders.Columns.Add("side", "Side");
-            orders.Columns.Add("price", "Price");
-            orders.Columns.Add("user", "Comment");
-        }
-
 
 
         void FindStocks(string path)
@@ -68,6 +43,14 @@ using TradeLink.API;
                 fi = di.GetFiles("*.epf");
             }
             catch (Exception ex) { show("exception loading stocks: " + ex.ToString()); return; }
+
+            int[] years = new int[200];
+            int[] days = new int[31];
+            int[] months = new int[12];
+            int yc = 0;
+            int dc = 0;
+            int mc = 0;
+
             for (int i = 0; i < fi.Length; i++)
             {
                 SecurityImpl s = StockFromFileName(fi[i].Name);
@@ -75,14 +58,28 @@ using TradeLink.API;
                 DateTime d = Util.ToDateTime(s.Date);
                 if (!stocklist.Items.Contains(s.Symbol))
                     stocklist.Items.Add(s.Symbol);
-                if (!yearlist.Items.Contains(d.Year))
-                    yearlist.Items.Add(d.Year);
-                if (!monthlist.Items.Contains(d.Month))
-                    monthlist.Items.Add(d.Month);
-                if (!daylist.Items.Contains(d.Day))
-                    daylist.Items.Add(d.Day);
+                if (!contains(d.Year,years))
+                    years[yc++] = d.Year;
+                if (!contains(d.Month, months))
+                    months[mc++] = d.Month;
+                if (!contains(d.Day, days))
+                    days[dc++] = d.Day;
             }
+            Array.Sort(years);
+            Array.Sort(days);
+            Array.Sort(months);
+            for (int i = 0; i<years.Length; i++)
+                if (years[i]==0) continue;
+                else yearlist.Items.Add(years[i]);
+            for (int i = 0; i < months.Length; i++)
+                if (months[i] == 0) continue;
+                else monthlist.Items.Add(months[i]);
+            for (int i = 0; i < days.Length; i++)
+                if (days[i] == 0) continue;
+                else daylist.Items.Add(days[i]);
         }
+
+        bool contains(int number, int[] array) { for (int i = 0; i < array.Length; i++) if (array[i] == number) return true; return false; }
 
         
 
@@ -142,6 +139,7 @@ using TradeLink.API;
         }
 
         delegate void ShowCallBack(string msg);
+        void debug(string message) { show(message + Environment.NewLine); }
         void show(string message)
         {
             if (messages.InvokeRequired)
@@ -163,11 +161,7 @@ using TradeLink.API;
             bt.mybroker.GotOrder += new OrderDelegate(myres.GotOrder);
             bt.mybroker.GotOrderCancel += new OrderCancelDelegate(mybroker_GotOrderCancel);
             bt.mybroker.GotFill+=new FillDelegate(myres.GotFill);
-            if (cleartrades.Checked) trades.Rows.Clear();
-            if (clearorders.Checked) orders.Rows.Clear();
-            if (clearmessages.Checked) messages.Clear();
-            //bt.mybroker.GotFill += new FillDelegate(mybroker_GotFill);
-            //bt.mybroker.GotOrder += new OrderDelegate(mybroker_GotOrder);
+
             List<FileInfo> tf = new List<FileInfo>();
             string dir = WinGauntlet.Properties.Settings.Default.tickfolder;
             if (!Directory.Exists(dir))
@@ -185,7 +179,12 @@ using TradeLink.API;
                 bool symmatch = true;
                 bool ud = usedates.Checked;
                 bool us = usestocks.Checked;
-                DateTime d = Util.ToDateTime(StockFromFileName(fi[i].Name).Date);
+                SecurityImpl s = StockFromFileName(fi[i].Name);
+                if (!s.isValid)
+                {
+                    continue;
+                }
+                DateTime d = Util.ToDateTime(s.Date);
                 if (ud)
                 {
                     for (int j = 0; j < yearlist.SelectedItems.Count; j++)
@@ -204,12 +203,15 @@ using TradeLink.API;
                         if (fi[i].Name.Contains((string)stocklist.SelectedItems[j])) { symmatch = true; break; }
                         else symmatch = false;
                 }
-           
-           
+
+
                 if ((ud && us && datematch && symmatch) ||
                     (ud && datematch) ||
                     (us && symmatch))
+                {
+                    debug("added to run: " + fi[i]);
                     tf.Add(fi[i]);
+                }
             }
             if (tf.Count == 0)
             {
@@ -243,51 +245,10 @@ using TradeLink.API;
             show(debug.Msg);
         }
 
-        void mybroker_GotOrder(Order o)
-        {
-            if (orders.InvokeRequired)
-                Invoke(new OrderDelegate(mybroker_GotOrder), new object[] { o });
-            else
-            {
-                orders.Rows.Add(o.date, o.time, o.symbol, o.isMarket ? "Mkt" : (o.isStop ? "Stp" : "Lmt"), o.size, o.side, o.price, o.stopp, o.comment);
-                orders.AutoResizeColumns();
-            }
-        }
-
-        void mybroker_GotFill(Trade t)
-        {
-            if (trades.InvokeRequired)
-                Invoke(new FillDelegate(mybroker_GotFill), new object[] { t });
-            else
-            {
-                trades.Rows.Add(t.xdate, t.xtime, t.symbol, t.xsize, t.side, t.xprice, t.comment);
-                trades.AutoResizeColumns();
-            }
-        }
-
 
         void bt_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             string unique = csvnamesunique.Checked ? "."+bt.name : "";
-            if (ordersinwind.Checked)
-            {
-                for (int i = 0; i < bt.mybroker.GetOrderList().Count; i++)
-                {
-                    Order o = bt.mybroker.GetOrderList()[i];
-                    orders.Rows.Add(Util.ToDateTime(o.date).ToString("yyyy/MM/dd"), Util.ToDateTime(o.time, 0).ToString("HH:mm:ss"), o.symbol, o.isMarket ? "Mkt" : (o.isStop ? "Stp" : "Lmt"), o.size, o.side ? "BUY" : "SELL", o.isStop ? o.stopp.ToString("N2") : o.price.ToString("N2"), o.comment);
-                }
-                orders.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
-
-            }
-            if (tradesinwind.Checked)
-            {
-                for (int i = 0; i < bt.mybroker.GetTradeList().Count; i++)
-                {
-                    Trade t = bt.mybroker.GetTradeList()[i];
-                    trades.Rows.Add(Util.ToDateTime(t.xdate).ToString("yyyy/MM/dd"), Util.ToDateTime(t.xtime,t.xsec).ToString("HH:mm:ss"), t.symbol, t.xsize, t.side ? "BUY" : "SELL", t.xprice.ToString("N2"), t.comment);
-                }
-                trades.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
-            }
             if (tradesincsv.Checked)
                 Util.ClosedPLToText(bt.mybroker.GetTradeList(),',',Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)+"\\Gauntlet.Trades"+unique+".csv");
             if (ordersincsv.Checked)
@@ -334,15 +295,6 @@ using TradeLink.API;
             daylist.Enabled = !daylist.Enabled;
         }
 
-        private void orders_DoubleClick(object sender, EventArgs e)
-        {
-            orders.Rows.Clear();
-        }
-
-        private void trades_DoubleClick(object sender, EventArgs e)
-        {
-            trades.Rows.Clear();
-        }
 
         private void button4_Click(object sender, EventArgs e)
         {
@@ -409,24 +361,5 @@ using TradeLink.API;
                 indf.WriteLine(string.Join(",", ivals));
             }
         }
-
-        public List<object[]> Indicators = new List<object[]>();
-
-        private void spreadliston_CheckedChanged(object sender, EventArgs e)
-        {
-            spreadallon.Checked = !spreadliston.Checked;
-            spreadlist.Visible = spreadliston.Checked;
-        }
-
-        private void spreadallon_CheckedChanged(object sender, EventArgs e)
-        {
-            spreadallon.Checked = !spreadliston.Checked;
-            spreadlist.Visible = spreadliston.Checked;
-        }
-
-
-
-
-
     }
 }

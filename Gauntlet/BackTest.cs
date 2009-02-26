@@ -97,7 +97,7 @@ namespace WinGauntlet
                 TickFile(f.Name); // set current file
                 if (f.Length == 0) continue; // ignore if tick file is empty
                 show(Environment.NewLine);
-                show("Symbol " + this.symbol + " (" + i + " of " + tf.Count + ") ");
+                show("Symbol " + this.symbol + " "+date.ToString()+" (" + i + " of " + tf.Count + ") ");
 
                 // reset per-symbol statistics
                 if (myres!=null) myres.Reset();
