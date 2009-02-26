@@ -17,15 +17,18 @@ namespace TestTradeLink
         public void PlaybackTime()
         {
             HistSim h = new HistSim(Environment.CurrentDirectory+"\\");
+            h.Initialize();
             h.GotTick += new TradeLink.API.TickDelegate(h_GotTick);
 
             Assert.AreEqual(0, tickcount);
             Assert.AreEqual(0, syms.Count);
             Assert.AreEqual(0, lasttime);
+            Assert.Greater(h.ApproxTotalTicks, 0);
 
             DateTime start = DateTime.Now;
 
             h.PlayTo(HistSim.ENDSIM);
+            
 
             double time = DateTime.Now.Subtract(start).TotalSeconds;
 
@@ -51,7 +54,8 @@ namespace TestTradeLink
             if (!syms.Contains(t.symbol))
                 syms.Add(t.symbol);
             tickcount++;
-            GOODTIME &= (t.time>=lasttime);
+            bool viol = t.time<lasttime;
+            GOODTIME &= !viol;
             lasttime = t.time;
         }
     }
