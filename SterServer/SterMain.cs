@@ -106,7 +106,14 @@ namespace SterServer
 
         void SterMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            stiQuote.DeRegisterAllQuotes();
+            try
+            {
+                stiQuote.DeRegisterAllQuotes();
+            }
+            catch (Exception)
+            {
+                // incase stering was already closed 
+            }
         }
 
 
