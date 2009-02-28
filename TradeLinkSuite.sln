@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeLink.Tests", "TradeLin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeLink.Research", "TradeLinkResearch\TradeLink.Research.csproj", "{BBDF2EFE-BFE6-4880-977B-4724C3A67D76}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerMB", "ServerMB\ServerMB.csproj", "{FC5B2974-2A1D-4A07-8643-F533461788B5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -121,6 +123,10 @@ Global
 		{BBDF2EFE-BFE6-4880-977B-4724C3A67D76}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BBDF2EFE-BFE6-4880-977B-4724C3A67D76}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BBDF2EFE-BFE6-4880-977B-4724C3A67D76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC5B2974-2A1D-4A07-8643-F533461788B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC5B2974-2A1D-4A07-8643-F533461788B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC5B2974-2A1D-4A07-8643-F533461788B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC5B2974-2A1D-4A07-8643-F533461788B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

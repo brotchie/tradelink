@@ -87,6 +87,12 @@ Section "TradeLinkSuite"
   File "ASP\bin\release\ASP.exe"
   File "TradeLinkResearch\bin\release\TradeLinkResearch.dll"
   File "Record\bin\release\Record.exe"
+  File "ServerMB\bin\release\ServerMB.exe"
+  File "ServerMB\bin\release\ServerMB.exe.config"
+  File "ServerMB\bin\release\Interop.MBTCOMLib.dll"  
+  File "ServerMB\bin\release\Interop.MBTHISTLib.dll"    
+  File "ServerMB\bin\release\Interop.MBTORDERSLib.dll"    
+  File "ServerMB\bin\release\Interop.MBTQUOTELib.dll"    
   ; Write the installation path into the registry
   WriteRegStr HKLM SOFTWARE\TradeLinkSuite "Install_Dir" "$INSTDIR"
   	
