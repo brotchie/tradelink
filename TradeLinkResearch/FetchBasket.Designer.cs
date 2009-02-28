@@ -1,4 +1,4 @@
-namespace ResearchLib
+namespace TradeLink.Research
 {
     partial class FetchBasket
     {

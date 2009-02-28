@@ -2,7 +2,7 @@ using System;
 using TradeLink.Common;
 using System.Text.RegularExpressions;
 
-namespace ResearchLib
+namespace TradeLink.Research
 {
     public class ParseStocks
     {

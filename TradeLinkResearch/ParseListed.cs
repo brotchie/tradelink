@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ResearchLib
+namespace TradeLink.Research
 {
 
     public class SymbolList 
@@ -17,13 +17,15 @@ namespace ResearchLib
         {
             // format:
             // Symbol|CUSIP|Company|Industry|IndCode|
-            string[] master = ResearchLib.Properties.ResearchLib.nyse.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            string nyse = Properties.Resources.nyse;
+            string[] master = nyse.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
             IEnumerable<string> query = from line in master let x = line.Split('|') select x[SYM];
             return query.ToArray();
         }
         public static string[] NASDAQ() 
         {
-            string[] master = ResearchLib.Properties.ResearchLib.nasdaq.Split(Environment.NewLine.ToCharArray());
+            string nasdaq = Properties.Resources.nasdaq;
+            string[] master = nasdaq.Split(Environment.NewLine.ToCharArray());
             return master;
         }
         public static string[] ALL() 

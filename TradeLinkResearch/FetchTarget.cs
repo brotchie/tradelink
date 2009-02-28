@@ -4,7 +4,7 @@ using System.Text;
 using TradeLink.Common;
 using System.Web;
 
-namespace ResearchLib
+namespace TradeLink.Research
 {
     public class FetchTarget
     {

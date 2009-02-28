@@ -4,7 +4,7 @@ using TradeLink.Common;
 using System.Net;
 
 
-namespace ResearchLib
+namespace TradeLink.Research
 {
     public class Fetch
     {

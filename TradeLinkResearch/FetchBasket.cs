@@ -7,7 +7,7 @@ using System.Text;
 using System.Windows.Forms;
 using TradeLink.Common;
 
-namespace ResearchLib
+namespace TradeLink.Research
 {
     public partial class FetchBasket : Form
     {

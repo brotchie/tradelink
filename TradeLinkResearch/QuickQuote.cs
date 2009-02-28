@@ -4,7 +4,7 @@ using System.Text;
 using System.Web;
 using System.Net;
 
-namespace ResearchLib
+namespace TradeLink.Research
 {
     public class QuickQuote
     {
