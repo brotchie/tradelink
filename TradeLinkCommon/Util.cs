@@ -84,6 +84,90 @@ namespace TradeLink.Common
             }
             return new DateTime(year, month, day, hour, min, TradeLinkSec);
         }
+        /// <summary>
+        /// converts datetime to fasttime format
+        /// </summary>
+        /// <param name="d"></param>
+        /// <returns></returns>
+        public static int DT2FT(DateTime d) { return TL2FT(d.Hour, d.Minute, d.Second); }
+        /// <summary>
+        /// converts tradelink time to fasttime
+        /// </summary>
+        /// <param name="hour"></param>
+        /// <param name="min"></param>
+        /// <param name="sec"></param>
+        /// <returns></returns>
+        public static int TL2FT(int hour, int min, int sec) { return hour * 10000 + min * 100 + sec; }
+        /// <summary>
+        /// gets fasttime from a tradelink tick
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public static int TL2FT(Tick t) { return t.time * 100 + t.sec; }
+        /// <summary>
+        /// gets elapsed seconds between two fasttimes
+        /// </summary>
+        /// <param name="firsttime"></param>
+        /// <param name="latertime"></param>
+        /// <returns></returns>
+        public static int FTDIFF(int firsttime, int latertime)
+        {
+            int span1 = FT2FTS(firsttime);
+            int span2 = FT2FTS(latertime);
+            return span2 - span1;
+        }
+        /// <summary>
+        /// converts fasttime to fasttime span, or elapsed seconds
+        /// </summary>
+        /// <param name="fasttime"></param>
+        /// <returns></returns>
+        public static int FT2FTS(int fasttime)
+        {
+            int s1 = fasttime % 100;
+            int m1 = ((fasttime - s1) / 100) % 100;
+            int h1 = (int)((fasttime - (m1 * 100) - s1) / 10000);
+            return h1 * 3600 + m1 * 60 + s1;
+        }
+        /// <summary>
+        /// adds fasttime and fasttimespan (in seconds).  does not rollover 24hr periods.
+        /// </summary>
+        /// <param name="firsttime"></param>
+        /// <param name="secondtime"></param>
+        /// <returns></returns>
+        public static int FTADD(int firsttime, int fasttimespaninseconds)
+        {
+            int s1 = firsttime % 100;
+            int m1 = ((firsttime - s1) / 100) % 100;
+            int h1 = (int)((firsttime - m1 * 100 - s1) / 10000);
+            s1+= fasttimespaninseconds;
+            if (s1 >= 60)
+            {
+                m1 += (int)(s1 / 60);
+                s1 = s1 % 60;
+            }
+            if (m1 >= 60)
+            {
+                h1 += (int)(m1 / 60);
+                m1 = m1 % 60;
+            }
+            int sum = h1 * 10000 + m1 * 100 + s1;
+            return sum;
+
+
+        }
+        /// <summary>
+        /// converts fasttime to a datetime
+        /// </summary>
+        /// <param name="ftime"></param>
+        /// <returns></returns>
+        public static DateTime FT2DT(int ftime)
+        {
+            int s = ftime % 100;
+            int m = ((ftime - s) / 100) % 100;
+            int h = (int)((ftime - m * 100 - s) / 10000);
+            return new DateTime(1, 1, 1, h, m, s);
+        }
+
         public const string ZEROBUILD = "0";
         /// <summary>
         /// Gets a number representing the build of an installation.

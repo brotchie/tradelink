@@ -104,6 +104,46 @@ namespace TestTradeLink
                 }
             }
         }
+
+        [Test]
+        public void FastTime()
+        {
+            // dt2ft
+            int h = 23;
+            int m = 59;
+            int s = 48;
+            DateTime now = new DateTime(1, 1, 1, h,m,s);
+            int ft = Util.DT2FT(now);
+            Assert.AreEqual(235948, ft);
+
+            // f2fts
+
+            int span = Util.FT2FTS(ft);
+            Assert.AreEqual(h * 60 * 60 + m * 60 + s, span);
+
+            // ft2dt
+
+            DateTime next = Util.FT2DT(ft);
+            Assert.AreEqual(now.Hour, next.Hour);
+            Assert.AreEqual(now.Minute, next.Minute);
+            Assert.AreEqual(now.Second, next.Second);
+
+            // diff (subtraction => fast timespan)
+
+            int t1 = 115100;
+            int t2 = 231408;
+            span = Util.FTDIFF(t1, t2);
+            Assert.AreEqual(11*60*60+23*60+8, span);
+
+            // addition (addition of fastime and fasttimespan => fasttime)
+            t1 = 133709;
+            span = 300 * 60; // 300 minutes
+            int endtime = Util.FTADD(t1, span);
+            Assert.AreEqual(183709, endtime);
+
+
+
+        }
     }
 
 
