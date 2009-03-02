@@ -351,7 +351,7 @@ namespace TradeLibFast
 			}
 			break;		// GetNysePreviousImbalance
 		}	// switch
-		return UNKNOWNMSG;
+		return UNKNOWN_MESSAGE;
 	}
 
 
@@ -402,8 +402,10 @@ namespace TradeLibFast
 		const Money trailm = Money((int)(o.trail*1024));
 		unsigned int mytif = TIFId(o.TIF);
 
-		if ((Stock==NULL) || (!Stock->isLoaded()))
-			return UNKNOWNSYM;
+		if (Stock==NULL)
+			return UNKNOWN_SYMBOL;
+		if (!Stock->isLoaded())
+			return SYMBOL_NOT_LOADED;
 
 		uint error = 0;
 
@@ -718,7 +720,7 @@ namespace TradeLibFast
 
 	int AVL_TLWM::PositionResponse(CString account, CString client)
 	{
-		if (account=="") return BAD_PARAMETERS;
+		if (account=="") return INVALID_ACCOUNT;
 		Observable* m_account = B_GetAccount(account);
 		void* iterator = B_CreatePositionIterator(POSITION_FLAT|POSITION_LONG|POSITION_SHORT, (1 << ST_LAST) - 1,m_account);
 		B_StartIteration(iterator);

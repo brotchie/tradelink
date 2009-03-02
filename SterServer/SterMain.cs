@@ -72,7 +72,7 @@ namespace SterServer
                     }
                     break;
             }
-            return (long)MessageTypes.UNKNOWNMSG;
+            return (long)MessageTypes.UNKNOWN_MESSAGE;
         }
 
         MessageTypes[] tl_newFeatureRequest()

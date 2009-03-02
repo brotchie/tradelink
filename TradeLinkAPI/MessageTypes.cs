@@ -9,14 +9,16 @@ namespace TradeLink.API
     public enum MessageTypes
     {
         // START TRADELINK STATUS MESSAGES
+        TLCLIENT_NOT_FOUND = -111,
+        INVALID_ACCOUNT = -110,
         UNKNOWN_ERROR = -109,
         FEATURE_NOT_IMPLEMENTED = -108,
         CLIENTNOTREGISTERED = -107,
-        GOTNULLORDER = -106,
-        UNKNOWNMSG = -105,
-        UNKNOWNSYM = -104,
-        TL_CONNECTOR_MISSING = -103,
-        BAD_PARAMETERS = -102,
+        EMPTY_ORDER = -106,
+        UNKNOWN_MESSAGE = -105,
+        UNKNOWN_SYMBOL = -104,
+        BROKERSERVER_NOT_FOUND = -103,
+        INVALID_ORDERSIZE = -102,
         DUPLICATE_ORDERID = -101,
         SYMBOL_NOT_LOADED = -100,
         OK = 0,

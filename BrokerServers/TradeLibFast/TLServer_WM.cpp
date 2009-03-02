@@ -150,7 +150,7 @@ namespace TradeLibFast
 				{
 				vector<CString> r;
 				gsplit(msg,CString("+"),r);
-				if (r.size()!=2) return BAD_PARAMETERS;
+				if (r.size()!=2) return UNKNOWN_MESSAGE;
 				return PositionResponse(r[1],r[0]);
 				}
 			case REGISTERCLIENT :
@@ -184,7 +184,7 @@ namespace TradeLibFast
 
 	int TLServer_WM::UnknownMessage(int MessageType, CString msg)
 	{
-		return UNKNOWNMSG;
+		return UNKNOWN_MESSAGE;
 	}
 
 	int TLServer_WM::HeartBeat(CString clientname)
@@ -324,7 +324,7 @@ namespace TradeLibFast
 
 	long TLServer_WM::TLSend(int type,LPCTSTR msg,CString windname) 
 	{
-		LRESULT result = TL_CONNECTOR_MISSING;
+		LRESULT result = TLCLIENT_NOT_FOUND;
 		HWND dest = FindWindowA(NULL,(LPCSTR)(LPCTSTR)windname)->GetSafeHwnd();
 		
 		if (dest) 

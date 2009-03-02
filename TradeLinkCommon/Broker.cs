@@ -177,7 +177,7 @@ namespace TradeLink.Common
         /// <returns>status code</returns>
         public int sendOrder(Order o) 
         {
-            if (!o.isValid) return (int)MessageTypes.BAD_PARAMETERS;
+            if (!o.isValid) return (int)MessageTypes.INVALID_ORDERSIZE;
             if (o.Account == "") // make sure book is clearly stamped
             {
                 o.Account = DEFAULT.ID;

@@ -122,7 +122,7 @@ namespace TradeLibFast
 
 	int TWS_TLWM::UnknownMessage(int MessageType, CString msg)
 	{
-		return UNKNOWNMSG;
+		return UNKNOWN_MESSAGE;
 	}
 
 	uint TWS_TLWM::TL2IBID(uint tlid)
@@ -154,8 +154,9 @@ namespace TradeLibFast
 	int TWS_TLWM::SendOrder(TLOrder o)
 	{
 		// check our order
-		if (!o.isValid()) return GOTNULLORDER;
-		if (o.symbol=="") return UNKNOWNSYM;
+		if (o.symbol=="") return UNKNOWN_SYMBOL;
+		if (!o.isValid()) return INVALID_ORDERSIZE;
+
 
 		// create broker-specific objects here
 		Order* order(new Order);

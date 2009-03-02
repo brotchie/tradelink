@@ -194,7 +194,7 @@ namespace TradeLink.Common
         /// <returns>Zero if succeeded, Broker error code otherwise.</returns>
         public int SendOrder(Order o)
         {
-            if (o == null) return (int)MessageTypes.GOTNULLORDER;
+            if (o == null) return (int)MessageTypes.EMPTY_ORDER;
             if (!o.isValid) return (int)MessageTypes.OK;
             string m = OrderImpl.Serialize(o);
             return (int)TLSend(MessageTypes.SENDORDER, m);

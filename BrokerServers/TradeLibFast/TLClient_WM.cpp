@@ -123,7 +123,7 @@ namespace TradeLibFast
 
 	long TLClient_WM::TLSend(int type,LPCTSTR msg,CString windname) 
 	{
-		LRESULT result = TL_CONNECTOR_MISSING;
+		LRESULT result = BROKERSERVER_NOT_FOUND;
 		HWND dest = FindWindowA(NULL,(LPCSTR)(LPCTSTR)windname)->GetSafeHwnd();
 		
 		if (dest) 

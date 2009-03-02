@@ -189,7 +189,7 @@ namespace TradeLink.Common
                 WMUtil.SendMsg(orderid_being_cancled.ToString(), MessageTypes.ORDERCANCELRESPONSE, Handle, c);
         }
 
-        public Providers newProviderName = Providers.TradeLinkSimulation;
+        public Providers newProviderName = Providers.TradeLink;
 
         protected override void WndProc(ref Message m)
         {

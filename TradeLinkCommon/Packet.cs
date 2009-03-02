@@ -38,7 +38,7 @@ namespace TradeLink.Common
                 lp.To = BitConverter.ToInt32(message, (int)PacketOffset.dest);
                 lp.Intention = (MessageTypes)BitConverter.ToInt32(message, (int)PacketOffset.type);
             }
-            catch (Exception ex) { lp.Intention = MessageTypes.UNKNOWNMSG; return lp; }
+            catch (Exception ex) { lp.Intention = MessageTypes.UNKNOWN_MESSAGE; return lp; }
             ASCIIEncoding encoder = new ASCIIEncoding();
             lp.Data = encoder.GetString(message, (int)PacketOffset.message, length - (int)PacketOffset.message);
             return lp;

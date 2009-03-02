@@ -142,7 +142,7 @@ namespace TradeLink.Common
 
     public class TradeLinkMessage
     {
-        public MessageTypes type = MessageTypes.UNKNOWNMSG;
+        public MessageTypes type = MessageTypes.UNKNOWN_MESSAGE;
         public string body = "";
         public long response = (long)MessageTypes.OK;
     }

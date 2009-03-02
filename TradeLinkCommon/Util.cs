@@ -368,25 +368,21 @@ namespace TradeLink.Common
         /// <returns></returns>
         public static string PrettyError(Providers provider, int errorcode)
         {
-            MessageTypes message = (MessageTypes)errorcode;
-            switch (message)
+            // it's a tradelink error code
+            if (errorcode<=(int)MessageTypes.SYMBOL_NOT_LOADED)
+                return Enum.GetName(typeof(MessageTypes),errorcode);
+            string err = "";
+            switch (provider)
             {
-                // tradelink messages
-                case MessageTypes.FEATURE_NOT_IMPLEMENTED: return "Feature not implemented yet.";
-                case MessageTypes.UNKNOWNSYM: return "Unknown symbol.";
-                case MessageTypes.UNKNOWNMSG: return "Unknown message.";
-                case MessageTypes.TL_CONNECTOR_MISSING: return "TradeLink Server not found.";
-                case MessageTypes.GOTNULLORDER: return "Unable to read order.";
-                case MessageTypes.OK: return "Ok";
-                default:
-                    // broker-specific messages
-                    if (provider == Providers.Assent)
-                        return Enum.GetName(typeof(AnvilSendOrderError), errorcode);
-                    if (provider == Providers.Sterling)
-                        return Enum.GetName(typeof(SterlingSubmitOrderError), errorcode);
+                case Providers.Assent:
+                    err = Enum.GetName(typeof(AnvilSendOrderError), errorcode);
+                    break;
+                case Providers.Sterling:
+                    err = Enum.GetName(typeof(SterlingSubmitOrderError), errorcode);
                     break;
             }
-            return "Unknown error: " + errorcode.ToString();
+            if ((err != null) && (err != "") && (err != " ")) return err;
+            return "UnknownError: " + errorcode.ToString();
         }
         public const string BROKERSERVER = "BrokerServer";
         public const string TRADELINKSUITE = "TradeLinkSuite";
