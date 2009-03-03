@@ -80,10 +80,8 @@ namespace Kadina
             if (e.Cancel) return;
             int t = (int)type;
             h.Initialize();
-            DateTime start = h.NextTickTime;
             int maxmin = (t > 127) && (t < 450) ? t - 127 : 0;
-            DateTime stop = start.AddMinutes(maxmin);
-            if (time != 0) stop = Util.ToDateTime(Util.ToTLDate(start),time, 0);
+            int stop = Util.FTADD(h.NextTickTime, maxmin * 60);
             h.PlayTo(stop);
         }
 

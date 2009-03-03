@@ -19,7 +19,7 @@ namespace WinGauntlet
         private string PATH = null;
         public Broker mybroker;
         public string name;
-        private TextReader cf;
+        private StreamReader cf;
         int factorsize = 100;
         private int line = 0;
         private int delay = 0;
@@ -29,7 +29,7 @@ namespace WinGauntlet
         private bool _idx = true;
         public int time;
         public string aname = "c:\\program files\\tradelink\\tradelinksuite\\Responses.dll";
-        public eSigTick tick = new eSigTick();
+        public Tick tick = new TickImpl();
         public int bint = 5;
         public bool UseIndex { get { return _idx; } set { _idx = value; } }
         public string Path { get { return PATH; } set { PATH = value; } }
@@ -102,11 +102,10 @@ namespace WinGauntlet
                 // reset per-symbol statistics
                 if (myres!=null) myres.Reset();
                 int fills = 0;
-                tick = new eSigTick(); // reset our tick
-                
 
-                while (this.getTick() && tick.hasTick)
+                while (!cf.EndOfStream)
                 { // process the ticks
+                    tick = eSigTick.FromStream(symbol, cf);
                     line++;
                     if ((line % 5000) == 0) show(".");
 
@@ -140,30 +139,7 @@ namespace WinGauntlet
             return totfills;
         }
 
-        public bool getTick()
-        {
-            string line = "";
-            try
-            {
-                line = this.cf.ReadLine();
-            }
-            catch (Exception ex) { show(ex.Message+Environment.NewLine); }
-            tick = new eSigTick();
-            tick.factor = factorsize;
-            bool good = false;
-            try
-            {
-                good = tick.Load(line);
-            }
-            catch (AlreadySmallSizeException)
-            {
-                factorsize = 1; // fix it for this file
-                tick.factor = factorsize;
-                good = tick.Load(line);
-            }
-            tick.symbol = symbol;
-            return good;
-        }
+
 
 
 
