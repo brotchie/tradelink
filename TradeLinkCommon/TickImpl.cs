@@ -8,11 +8,10 @@ namespace TradeLink.Common
     /// It is an abstract container for last trade, last trade size, best bid, best offer, bid and offer sizes.
     /// </summary>
     [Serializable]
-    public class TickImpl : TradeLink.API.Tick
+    public struct TickImpl : TradeLink.API.Tick
     {
         public string symbol { get { return _sym; } set { _sym = value; } }
         public Security Sec { get { return _Sec; } set { _Sec = value; } }
-        public int factor = 100;
         public int size { get { return _size; } set { _size = value; } }
         public int date { get { return _date; } set { _date = value; } }
         public int time { get { return _time; } set { _time = value; } }
@@ -39,11 +38,11 @@ namespace TradeLink.Common
         public int AskSize { get { return _os * 100; } set { _os = (int)(value / 100); } }
         public int TradeSize { get { return ts*100; } set { _size = (int)(value / 100); } }
         public int ts { get { return _size / 100; } } // normalized to bs/os
-        Security _Sec = new SecurityImpl();
-        string _sym = "";
-        string _be = "";
-        string _oe = "";
-        string _ex = "";
+        Security _Sec;
+        string _sym;
+        string _be;
+        string _oe;
+        string _ex;
         int _bs;
         int _os;
         int _size;
@@ -54,23 +53,40 @@ namespace TradeLink.Common
         decimal _bid;
         decimal _ask;
 
-        public TickImpl() { }
-        public TickImpl(string symbol) { this.symbol = symbol; }
-        public TickImpl(Tick c)
+        public TickImpl(string symbol) 
         {
-            if (c.symbol!="") symbol = c.symbol;
-            time = c.time;
-            date = c.date;
-            sec = c.sec;
-            size = c.size;
-            trade = c.trade; 
-            bid = c.bid; 
-            ask = c.ask;
-            bs = c.bs;
-            os = c.os;
-            be = c.be;
-            oe = c.oe;
-            ex = c.ex;
+            _Sec = new SecurityImpl(symbol);
+            _sym = symbol;
+            _be = "";
+            _oe = "";
+            _ex = "";
+            _bs = 0;
+            _os = 0;
+            _size = 0;
+            _date = 0;
+            _time = 0;
+            _sec = 0;
+            _trade = 0m;
+            _bid = 0;
+            _ask = 0;
+        }
+        public static TickImpl Copy(Tick c)
+        {
+            TickImpl k = new TickImpl();
+            if (c.symbol != "") k.symbol = c.symbol;
+            k.time = c.time;
+            k.date = c.date;
+            k.sec = c.sec;
+            k.size = c.size;
+            k.trade = c.trade;
+            k.bid = c.bid;
+            k.ask = c.ask;
+            k.bs = c.bs;
+            k.os = c.os;
+            k.be = c.be;
+            k.oe = c.oe;
+            k.ex = c.ex;
+            return k;
         }
         /// <summary>
         /// this constructor creates a new tick by combining two ticks
@@ -78,67 +94,69 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="a">old tick</param>
         /// <param name="b">new tick or update</param>
-        public TickImpl(TickImpl a, TickImpl b)
-        {   
-            if (b.symbol != a.symbol) return; // don't combine different symbols
-            if (b.time < a.time) return; // don't process old updates
-            time = b.time;
-            date = b.date;
-            sec = b.sec;
-            symbol = b.symbol;
+        public static Tick Copy(TickImpl a, TickImpl b)
+        {
+            TickImpl k = new TickImpl();
+            if (b.symbol != a.symbol) return k; // don't combine different symbols
+            if (b.time < a.time) return k; // don't process old updates
+            k.time = b.time;
+            k.date = b.date;
+            k.sec = b.sec;
+            k.symbol = b.symbol;
 
             if (b.isTrade)
             {
-                trade = b.trade;
-                size = b.size;
-                ex = b.ex;
+                k.trade = b.trade;
+                k.size = b.size;
+                k.ex = b.ex;
                 //
-                bid = a.bid;
-                ask = a.ask;
-                os = a.os;
-                bs = a.bs;
-                be = a.be;
-                oe = a.oe;
+                k.bid = a.bid;
+                k.ask = a.ask;
+                k.os = a.os;
+                k.bs = a.bs;
+                k.be = a.be;
+                k.oe = a.oe;
             }
             else if (b.hasAsk && b.hasBid)
             {
-                bid = b.bid;
-                ask = b.ask;
-                bs = b.bs;
-                os = b.os;
-                be = b.be;
-                oe = b.oe;
+                k.bid = b.bid;
+                k.ask = b.ask;
+                k.bs = b.bs;
+                k.os = b.os;
+                k.be = b.be;
+                k.oe = b.oe;
                 //
-                trade = a.trade;
-                size = a.size;
-                ex = a.ex;
+                k.trade = a.trade;
+                k.size = a.size;
+                k.ex = a.ex;
             }
             else if (b.hasAsk)
             {
-                ask = b.ask;
-                os = b.os;
-                oe = b.oe;
+                k.ask = b.ask;
+                k.os = b.os;
+                k.oe = b.oe;
                 //
-                bid = a.bid;
-                bs = a.bs;
-                be = a.be;
-                trade = a.trade;
-                size = a.size;
-                ex = a.ex;
+                k.bid = a.bid;
+                k.bs = a.bs;
+                k.be = a.be;
+                k.trade = a.trade;
+                k.size = a.size;
+                k.ex = a.ex;
             }
             else if (b.hasBid)
             {
-                bid = b.bid;
-                bs = b.bs;
-                be = b.be;
+                k.bid = b.bid;
+                k.bs = b.bs;
+                k.be = b.be;
                 //
-                ask = a.ask;
-                os = a.os;
-                oe = a.oe;
-                trade = a.trade;
-                size = a.size;
-                ex = a.ex;
+                k.ask = a.ask;
+                k.os = a.os;
+                k.oe = a.oe;
+                k.trade = a.trade;
+                k.size = a.size;
+                k.ex = a.ex;
             }
+            return k;
         }
 
         public override string ToString()

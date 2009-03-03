@@ -9,7 +9,7 @@ namespace TradeLink.Common
     public class AsyncResponse
     {
         const uint MAXTICK = 10000;
-        Tick[] tickcache = new TickImpl[MAXTICK];
+        Tick[] tickcache = new Tick[MAXTICK];
         uint readcounter = 0;
         uint writecounter = 0;
         public event TickDelegate GotTick;
@@ -68,7 +68,7 @@ namespace TradeLink.Common
         {
             if ((readthread!=null) && ((readthread.ThreadState != ThreadState.Stopped) && (readthread.ThreadState != ThreadState.StopRequested)))
                 readthread.Abort();
-            tickcache = new TickImpl[MAXTICK];
+            tickcache = new Tick[MAXTICK];
             writecounter = 0;
             readcounter = 0;
             mre.Reset();

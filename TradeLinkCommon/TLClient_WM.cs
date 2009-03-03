@@ -107,7 +107,6 @@ namespace TradeLink.Common
                     }
                     else GoSim();
                     return true;
-                    break;
                 case TLTypes.HISTORICALBROKER:
                     if (HandleExceptions)
                     {
@@ -125,7 +124,6 @@ namespace TradeLink.Common
                     }
                     else GoHist();
                     return true;
-                    break;
                 case TLTypes.TESTBROKER:
                     if (HandleExceptions)
                     {
@@ -143,7 +141,6 @@ namespace TradeLink.Common
                     }
                     else GoTest();
                     return true;
-                    break;
                 default:
                     if (showwarning) 
                         System.Windows.Forms.MessageBox.Show("No valid broker instance was found.  Make sure broker application + TradeLink server is running.", "TradeLink server not found");

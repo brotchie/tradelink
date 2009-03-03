@@ -8,7 +8,7 @@ namespace TradeLink.Common
     /// <summary>
     /// Holds a succession of bars.  Will acceptt ticks and automatically create new bars as needed.
     /// </summary>
-    public class BarListImpl : TickIndicator, TradeLink.API.BarList
+    public class BarListImpl : TradeLink.API.BarList
     {
         public IEnumerator GetEnumerator() { foreach (BarImpl b in DefaultBar) yield return b; }
         public Bar this[int index, BarInterval bint]
@@ -42,12 +42,12 @@ namespace TradeLink.Common
         {
             switch (interval)
             {
-                case BarInterval.Day: return daylist.Count >= MinimumBars; break;
-                case BarInterval.FifteenMin: return fifteenlist.Count >= MinimumBars; break;
-                case BarInterval.ThirtyMin: return thirtylist.Count >= MinimumBars; break;
-                case BarInterval.FiveMin: return fivelist.Count >= MinimumBars; break;
-                case BarInterval.Hour: return hourlist.Count >= MinimumBars; break;
-                case BarInterval.Minute: return minlist.Count >= MinimumBars; break;
+                case BarInterval.Day: return daylist.Count >= MinimumBars; 
+                case BarInterval.FifteenMin: return fifteenlist.Count >= MinimumBars; 
+                case BarInterval.ThirtyMin: return thirtylist.Count >= MinimumBars; 
+                case BarInterval.FiveMin: return fivelist.Count >= MinimumBars; 
+                case BarInterval.Hour: return hourlist.Count >= MinimumBars; 
+                case BarInterval.Minute: return minlist.Count >= MinimumBars;
             }
             return false;
         }
@@ -141,18 +141,18 @@ namespace TradeLink.Common
             if ((i < 0) || (i >= bars.Count)) return new BarImpl();
             return bars[i];
         }
-        public void AddTick(TickImpl t) { newTick(t); }
+        public void AddTick(Tick t) { newTick(t); }
         /// <summary>
         /// Adds the tick to the barlist, creates other bars if needed.
         /// </summary>
         /// <param name="t">The tick to add.</param>
-        public bool newTick(Tick t)
+        public void newTick(Tick t)
         {
             if ((t.symbol != Symbol) && (Symbol == ""))
                 this.sym = t.symbol; // if we have no symbol, take ticks symbol
             else if ((t.symbol != Symbol) && (Symbol != ""))
-                return NewBar; //don't process ticks for other stocks
-            if (!t.isTrade && !t.isIndex) return NewBar; // don't process quotes
+                return; //don't process ticks for other stocks
+            if (!t.isTrade && !t.isIndex) return; // don't process quotes
             // if we have no bars, add bar with a tick
             if (Count == 0)
             {
@@ -182,7 +182,7 @@ namespace TradeLink.Common
                             ((BarImpl)this[this.Last,inv]).newTick(t);
                }
             }
-            return NewBar;
+            return;
         }
 
         bool AddBar(BarInterval bint)

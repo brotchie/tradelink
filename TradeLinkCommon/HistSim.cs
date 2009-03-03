@@ -14,7 +14,7 @@ namespace TradeLink.Common
         Broker _broker = new Broker();
         string[] _tickfiles = new string[0];
         bool _inited = false;
-        int _nextticktime = DT2FT(ENDSIM);
+        int _nextticktime = ENDSIM;
         int _executions = 0;
         volatile int _tickcount;
         long _bytestoprocess = 0;
@@ -41,7 +41,7 @@ namespace TradeLink.Common
         /// <summary>
         /// Gets next tick in the simulation
         /// </summary>
-        public DateTime NextTickTime { get { return FT2DT(_nextticktime); } }
+        public int NextTickTime { get { return _nextticktime; } }
         /// <summary>
         /// Gets broker used in the simulation
         /// </summary>
@@ -96,15 +96,17 @@ namespace TradeLink.Common
             _inited = false;
             _tickfiles = new string[0];
             Instruments.Clear();
-            _tickcache = new TickImpl[MAXTICKS];
+            _tickcache = new Tick[MAXTICKS];
             _timecache = new int[MAXTICKS];
             _readcount = new uint[Instruments.Count];
             _writecount = new uint[Instruments.Count];
             _endstream = new bool[Instruments.Count];
             _master = new cursor();
+            _nextticktime = ENDSIM;
             _broker.Reset();
             _executions = 0;
             _bytestoprocess = 0;
+            _tickcount = 0;
 
         }
 
@@ -136,7 +138,6 @@ namespace TradeLink.Common
             D("Initialized " + (_tickfiles.Length ) + " instruments.");
             D(string.Join(Environment.NewLine.ToString(), _tickfiles));
             FillCache();
-            D("Read initial ticks into cache...");
 
             // get total bytes represented by files
             
@@ -155,45 +156,34 @@ namespace TradeLink.Common
         /// Run simulation to specific time
         /// </summary>
         /// <param name="time">Simulation will run until this time (use HistSim.ENDSIM for last time)</param>
-        public void PlayTo(DateTime time)
+        public void PlayTo(int ftime)
         {
             if (!_inited)
                 Initialize();
             if (_inited)
             {
-                int ftime = DT2FT(time);
                 SecurityPlayTo(ftime); // then do stocks
             }
             else throw new Exception("Histsim was unable to initialize");
         }
 
-        static int DT2FT(DateTime d) { return TL2FT(d.Hour,d.Minute,d.Second); }
-        static int TL2FT(int hour, int min, int sec) { return hour * 10000 + min * 100 + sec; }
-        static int TL2FT(Tick t) { return t.time * 100 + t.sec; }
-        static DateTime FT2DT(int ftime)
-        {
-            int s = ftime % 100;
-            int m = ((ftime - s)/100) % 100;
-            int h = ((ftime - m*100 - s)/100) % 100;
-            return new DateTime(1, 1, 1, h, m, s);
-        }
-
         const int TICKCACHEPERINSTRUMENT = 100;
         const uint MAXTICKS = 10000;
-        TickImpl[] _tickcache = new TickImpl[MAXTICKS];
+        Tick[] _tickcache = new Tick[MAXTICKS];
         int[] _timecache = new int[MAXTICKS];
         uint[] _symcache = new uint[MAXTICKS];
         cursor _master = new cursor();
         uint[] _writecount;
         uint[] _readcount;
         bool[] _endstream;
-        volatile bool haveticks = true;
+        bool haveticks { get { return _master.read != _master.write; } }
 
         private void SecurityPlayTo(int ftime)
         {
             // continue flushing cache until nothing left to flush
-            while (FlushCache(ftime) && haveticks) 
-                FillCache(); // repopulate cache
+            do
+                FillCache();  // repopulate cache
+            while (haveticks && FlushCache(ftime));
         }
 
 
@@ -223,13 +213,11 @@ namespace TradeLink.Common
             int loc;
             // get list of instruments with no cache
             int[] list = needcachefill();
-            // make sure we have something to fill
-            haveticks = list.Length > 0;
             // for every one of said instruments:
             for (uint i = 0; i < list.Length; i++)
             {
                 int ci = list[i];
-                TickImpl k;
+                Tick k;
                 try
                 {
                     // get tick
@@ -237,7 +225,7 @@ namespace TradeLink.Common
                 }
                 catch (EndSecurityTicks) { _endstream[ci] = true; continue; }
                 // get time
-                int ftime = TL2FT(k);
+                int ftime = Util.TL2FT(k);
                 // get cache location
                 lock (_master)
                     loc = (int)(_master.write % MAXTICKS);
@@ -245,6 +233,8 @@ namespace TradeLink.Common
                 _tickcache[loc] = k;
                 // cache time
                 _timecache[loc] = ftime;
+                // see if this time is newer
+                _nextticktime = ftime <= _nextticktime ? ftime : _nextticktime;
                 // cache symbol's index
                 _symcache[loc] = (uint)ci;
                 // prepare for next write
@@ -258,7 +248,7 @@ namespace TradeLink.Common
         bool FlushCache(int endsim)
         {
             // we stop sim when simtime is exceeded
-            bool continuesim = true;
+            bool stopsim = false;
             // get size of unordered, unread cache
             int start, end, size;
             bool flipped = false;
@@ -292,14 +282,14 @@ namespace TradeLink.Common
                 // update current time
                 _nextticktime = times[i];
                 // see if we've exceeded user's desire
-                continuesim = _nextticktime < endsim;
-                if (!continuesim) break;
+                stopsim = (_nextticktime > endsim) && (_nextticktime != 0);
+                if (stopsim) break;
                 // get original location of tick using index
                 int idxval = idx[i] + start;
                 // readjust the location if we have overrun situation
                 int loc = idxval>end ? (int)(MAXTICKS-idxval) : idxval;
                 // get the tick
-                TickImpl k = _tickcache[loc];
+                Tick k = _tickcache[loc];
                 // count tick as read (global)
                 _master.read++;
                 // count tick as read (per-instrument)
@@ -316,11 +306,11 @@ namespace TradeLink.Common
                 // count total tick
                 _tickcount++;
             }
-            return continuesim;
+            return !stopsim;
         }
         int[] genidx(int length) { int[] idx = new int[length]; for (int i = 0; i < length; i++) idx[i] = i; return idx; }
-        public static DateTime ENDSIM = DateTime.MaxValue;
-        public static DateTime STARTSIM = DateTime.MinValue;
+        public static int ENDSIM = Util.DT2FT(DateTime.MaxValue);
+        public static int STARTSIM = Util.DT2FT(DateTime.MinValue);
 
     }
 

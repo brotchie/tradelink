@@ -9,15 +9,13 @@ namespace TradeLink.Common
     /// <summary>
     /// Marshalls eSignal-specific tickdata into and out of TradeLink's generic Tick type.
     /// </summary>
-    public class eSigTick : TickImpl
+    public static class eSigTick
     {
         // eSignal record order definitions for quotes and trades
         enum Q { TYPE, DATE, TIME, BID, ASK, BIDSIZE, ASKSIZE, BIDEX, ASKEX };
         enum T { TYPE, DATE, TIME, PRICE, SIZE, EXCH };
         const string TRADE = "T";
         const string QUOTE = "Q";
-        public eSigTick() : base() {}
-        public eSigTick(TickImpl t) : base(t) { }
 
         /// <summary>
         /// Loads a tick straight from an EPF file in the form of a StreamReader
@@ -25,61 +23,52 @@ namespace TradeLink.Common
         /// <param name="symbol">The symbol.</param>
         /// <param name="sr">The sr.</param>
         /// <returns></returns>
-        public static eSigTick FromStream(string symbol, System.IO.StreamReader sr)
+        public static Tick FromStream(string symbol,StreamReader sr)
         {
-            eSigTick e = new eSigTick();
-            e.Load(sr.ReadLine());
-            e.symbol = symbol;
-            return e;
-        }
-        public static eSigTick FromStream(System.IO.StreamReader sr)
-        { return FromStream("",sr); }
-
-
-        /// <summary>
-        /// Loads the specified tickfile from a line(string).
-        /// </summary>
-        /// <param name="line">The line.</param>
-        /// <returns>true if worked, false if not or if EOF</returns>
-        /// <exception cref="AlreadySmallSizeException"></exception>
-        public bool Load(string line)
-        {
-            if ((line != null) && (line != ""))
+            TickImpl t = new TickImpl();
+            string line = "";
+            try
             {
-                try
-                {
-                    string[] r = line.Split(',');
-                    this.time = TickTime(r[(int)Q.TIME]);
-                    this.date = TickDate(r[(int)Q.DATE]);
-                    this.sec = TickSec(r[(int)Q.TIME]);
-                    // we divide trade-size by 100 to match bid and offer size units (hundreds of shares)
-                    if (r[(int)Q.TYPE] == TRADE)
-                    {
-                        int isize = Convert.ToInt32(r[(int)T.SIZE]);
-                        
-                        this.SetTrade(date, time, sec, Convert.ToDecimal(r[(int)T.PRICE]), isize, r[(int)T.EXCH]);
-                    }
-                    else this.SetQuote(date, time, sec, Convert.ToDecimal(r[(int)Q.BID]), Convert.ToDecimal(r[(int)Q.ASK]), Convert.ToInt32(r[(int)Q.BIDSIZE]), Convert.ToInt32(r[(int)Q.ASKSIZE]), r[(int)Q.BIDEX], r[(int)Q.ASKEX]);
-                }
-                catch (Exception ex) { string s = ex.Message; return false; }
-                return true;
+                line = sr.ReadLine();
             }
-            return false;
+            catch (Exception) { return t; }
+            string[] r = line.Split(',');
+            if (r.Length < 6) return t;
+            t.time = TickTime(r[(int)Q.TIME]);
+            t.date = TickDate(r[(int)Q.DATE]);
+            t.sec = TickSec(r[(int)Q.TIME]);
+            if (r[(int)Q.TYPE] == TRADE)
+            {
+                t.trade = Convert.ToDecimal(r[(int)T.PRICE]);
+                t.size = Convert.ToInt32(r[(int)T.SIZE]);
+                t.ex = r[(int)T.EXCH];
+            }
+            else
+            {
+                t.bid = Convert.ToDecimal(r[(int)Q.BID]);
+                t.ask = Convert.ToDecimal(r[(int)Q.ASK]);
+                t.bs =Convert.ToInt32(r[(int)Q.BIDSIZE]);
+                t.os = Convert.ToInt32(r[(int)Q.ASKSIZE]);
+                t.be = r[(int)Q.BIDEX];
+                t.oe = r[(int)Q.ASKEX];
+            }
+            t.symbol = symbol;
+            return t;
         }
 
-        private int TickSec(string ticktime)
+        static int TickSec(string ticktime)
         {
             string t = ticktime.Substring(4, 2);
             return Convert.ToInt32(t);
         }
 
-        private int TickTime(string ticktime)
+        static int TickTime(string ticktime)
         {
             string t = ticktime.Substring(0, 4);
             return Convert.ToInt32(t);
         }
 
-        private int TickDate(string tickdate)
+        static int TickDate(string tickdate)
         {
             int yr = Convert.ToInt32(tickdate.Substring(0, 2));
             int mo = Convert.ToInt32(tickdate.Substring(2, 2));
@@ -149,10 +138,4 @@ namespace TradeLink.Common
             return s;
         }
     }
-
-    public class AlreadySmallSizeException : Exception 
-    
-    {
-    }
-
 }

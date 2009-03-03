@@ -31,7 +31,7 @@ namespace TestTradeLink
             Assert.That(tw.Watch(t, 300));
             tw.DefaultWait = 300;
             Assert.That(tw.DefaultWait == 300);
-            TickImpl t2 = new TickImpl(t);
+            TickImpl t2 = TickImpl.Copy(t);
             t2.time = 1304;
             t2.sec = 58;
             // this should succeed bc it's within the window
@@ -40,7 +40,7 @@ namespace TestTradeLink
             // this time check should send no alerts bc it's w/in window
             tw.SendAlerts(new DateTime(y,m,d, 13, 7, 0));
 
-            TickImpl t3 = new TickImpl(t2);
+            TickImpl t3 = TickImpl.Copy(t2);
             t3.time = 1310;
             // this should return false and send an alert
             Assert.That(!tw.Watch(t3));

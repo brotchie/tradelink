@@ -496,7 +496,7 @@ namespace TradeLink.Common
                     if (v>ver) ver = v;
                 }
             }
-            catch (Exception ex) { return ver; }
+            catch (Exception) { return ver; }
             return ver;
         }
         /// <summary>

@@ -56,6 +56,10 @@ namespace Replay
             f.Add(MessageTypes.REGISTERSTOCK);
             f.Add(MessageTypes.SENDORDER);
             f.Add(MessageTypes.TICKNOTIFY);
+            f.Add(MessageTypes.POSITIONREQUEST);
+            f.Add(MessageTypes.POSITIONRESPONSE);
+            f.Add(MessageTypes.FEATUREREQUEST);
+            f.Add(MessageTypes.FEATURERESPONSE);
             return f.ToArray();
         }
 
@@ -206,7 +210,7 @@ namespace Replay
             _playback = new Playback(h);
             _playback.RunWorkerCompleted += new RunWorkerCompletedEventHandler(_playback_RunWorkerCompleted);
             _playback.ProgressChanged+=new ProgressChangedEventHandler(_playback_ProgressChanged);
-            _playback.RunWorkerAsync(new PlayBackArgs((int)trackBar1.Value/5,daystartpicker.Value));
+            _playback.RunWorkerAsync(new PlayBackArgs((int)trackBar1.Value/5,Util.DT2FT(daystartpicker.Value)));
             status("Playback started...");
             playbut.Enabled = false;
             stopbut.Enabled = true;
@@ -233,7 +237,7 @@ namespace Replay
                 if (o.time * o.date == 0)
                 {
                     DateTime time = h.NextTickTime == HistSim.STARTSIM ? 
-                        DateTime.Now : h.NextTickTime;
+                        DateTime.Now : Util.FT2DT(h.NextTickTime);
                     o.time = Util.ToTLTime(time);
                     o.date = Util.ToTLDate(time);
                 }

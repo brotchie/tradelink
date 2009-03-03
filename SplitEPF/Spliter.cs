@@ -14,7 +14,7 @@ namespace SplitEPF
         string fname = "";
         StreamReader inf = null;
         StreamWriter of = null;
-        eSigTick t;
+        TickImpl t = new TickImpl();
         string symbol = "";
         int lastdate = 0;
         public void Reduce()
@@ -29,7 +29,7 @@ namespace SplitEPF
                 string ofile = "";
                 bool SAME = false;
 
-                while (!SAME && getTick() && t.hasTick) // while we have ticks in this file,
+                while (!SAME && !inf.EndOfStream  && t.hasTick) // while we have ticks in this file,
                 {
                     if (fname.Equals(symbol + t.date + ".epf", StringComparison.CurrentCultureIgnoreCase)) { SAME = true; continue; }
                     if (of == null)  // our first day in this input file, open new output file
@@ -56,17 +56,6 @@ namespace SplitEPF
                 inf.Close();
             }
 
-        }
-        bool getTick()
-        {
-            string line = "";
-            t = new eSigTick();
-            try
-            {
-                line = this.inf.ReadLine();
-            }
-            catch (Exception ex) { show(ex.Message); }
-            return t.Load(line);
         }
 
         ArrayList TickFiles()

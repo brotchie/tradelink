@@ -121,27 +121,24 @@ namespace TradeLink.Common
         public static Trade Deserialize(string message)
         {
             Trade t = null;
-            try
-            {
-                string[] rec = message.Split(',');
-                bool side = Convert.ToBoolean(rec[(int)TradeField.Side]);
-                int size = Convert.ToInt32(rec[(int)TradeField.Size]);
-                size = Math.Abs(size) * (side ? 1 : -1);
-                decimal xprice = Convert.ToDecimal(rec[(int)TradeField.Price]);
-                string sym = rec[(int)TradeField.Symbol];
-                t = new TradeImpl(sym, xprice, size);
-                t.xdate = Convert.ToInt32(rec[(int)TradeField.xDate]);
-                t.xtime = Convert.ToInt32(rec[(int)TradeField.xTime]);
-                t.xsec = Convert.ToInt32(rec[(int)TradeField.xSeconds]);
-                t.comment = rec[(int)TradeField.Comment];
-                t.Account = rec[(int)TradeField.Account];
-                t.LocalSymbol = rec[(int)TradeField.LocalSymbol];
-                t.id = Convert.ToUInt32(rec[(int)TradeField.ID]);
-                t.ex = rec[(int)TradeField.Exch];
-                t.Currency = (CurrencyType)Enum.Parse(typeof(CurrencyType), rec[(int)TradeField.Currency]);
-                t.Security = (SecurityType)Enum.Parse(typeof(SecurityType), rec[(int)TradeField.Security]);
-            }
-            catch (Exception ex) { throw new InvalidTrade(); }
+            string[] rec = message.Split(',');
+            if (rec.Length < 14) throw new InvalidTrade();
+            bool side = Convert.ToBoolean(rec[(int)TradeField.Side]);
+            int size = Convert.ToInt32(rec[(int)TradeField.Size]);
+            size = Math.Abs(size) * (side ? 1 : -1);
+            decimal xprice = Convert.ToDecimal(rec[(int)TradeField.Price]);
+            string sym = rec[(int)TradeField.Symbol];
+            t = new TradeImpl(sym, xprice, size);
+            t.xdate = Convert.ToInt32(rec[(int)TradeField.xDate]);
+            t.xtime = Convert.ToInt32(rec[(int)TradeField.xTime]);
+            t.xsec = Convert.ToInt32(rec[(int)TradeField.xSeconds]);
+            t.comment = rec[(int)TradeField.Comment];
+            t.Account = rec[(int)TradeField.Account];
+            t.LocalSymbol = rec[(int)TradeField.LocalSymbol];
+            t.id = Convert.ToUInt32(rec[(int)TradeField.ID]);
+            t.ex = rec[(int)TradeField.Exch];
+            t.Currency = (CurrencyType)Enum.Parse(typeof(CurrencyType), rec[(int)TradeField.Currency]);
+            t.Security = (SecurityType)Enum.Parse(typeof(SecurityType), rec[(int)TradeField.Security]);
 
             return t;
         }

@@ -92,7 +92,7 @@ namespace TradeLink.Common
         /// <summary>
         /// Fetches next historical tick for stock, or invalid tick if no historical data is available.
         /// </summary>
-        public TickImpl NextTick()
+        public Tick NextTick()
         {
             if (!hasHistorical)
             {
@@ -103,10 +103,10 @@ namespace TradeLink.Common
                 }
                 throw new EndSecurityTicks();
             }
-            TickImpl t = null;
+            Tick t = null;
             do
             {
-                t = (TickImpl)eSigTick.FromStream(Symbol, _histfile);
+                t = eSigTick.FromStream(Symbol, _histfile);
             } 
             while ((t==null) && hasHistorical);
             return t;

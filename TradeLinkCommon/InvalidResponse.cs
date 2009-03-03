@@ -31,5 +31,12 @@ namespace TradeLink.Common
         public string Name { get { return _name; } set { _name = value; } }
         public string FullName { get { return _fullname; } set { _fullname = value; } }
         public string[] Indicators { get { return new string[0]; } set { } }
+        void Void()
+        {
+            SendIndicators(new object[] { null });
+            SendOrder(new OrderImpl());
+            SendDebug(new DebugImpl(""));
+            SendCancel(5);
+        }
     }
 }

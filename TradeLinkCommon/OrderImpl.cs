@@ -15,7 +15,7 @@ namespace TradeLink.Common
         public new int UnsignedSize { get { return Math.Abs(_size); } }
         public string TIF { get { return _tif; } set { _tif = value; } }
         public decimal trail { get { return _trail; } set { _trail = value; } }
-        public string ex { get { return _ex; } set { _ex = value; } }
+        public new string ex { get { return _ex; } set { _ex = value; } }
         public int size { get { return _size; } set { _size = value; } }
         public int sec { get { return _sec; } set { _sec = value; } }
         public decimal price { get { return _price; } set { _price = value; } }
@@ -183,31 +183,28 @@ namespace TradeLink.Common
         public new static Order Deserialize(string message)
         {
             Order o = null;
-            try
-            {
-                string[] rec = message.Split(','); // get the record
-                bool side = Convert.ToBoolean(rec[(int)OrderField.Side]);
-                int size = Convert.ToInt32(rec[(int)OrderField.Size]);
-                decimal oprice = Convert.ToDecimal(rec[(int)OrderField.Price]);
-                decimal ostop = Convert.ToDecimal(rec[(int)OrderField.Stop]);
-                string sym = rec[(int)OrderField.Symbol];
-                o = new OrderImpl(sym, side, size);
-                o.price = oprice;
-                o.stopp = ostop;
-                o.comment = rec[(int)OrderField.Comment];
-                o.Account = rec[(int)OrderField.Account];
-                o.ex = rec[(int)OrderField.Exchange];
-                o.LocalSymbol = rec[(int)OrderField.LocalSymbol];
-                o.Currency = (CurrencyType)Enum.Parse(typeof(CurrencyType), rec[(int)OrderField.Currency]);
-                o.Security = (SecurityType)Enum.Parse(typeof(SecurityType), rec[(int)OrderField.Security]);
-                o.id = Convert.ToUInt32(rec[(int)OrderField.OrderID]);
-                o.TIF = rec[(int)OrderField.OrderTIF];
-                o.trail = Convert.ToDecimal(rec[(int)OrderField.Trail]);
-                o.date = Convert.ToInt32(rec[(int)OrderField.oDate]);
-                o.time = Convert.ToInt32(rec[(int)OrderField.oTime]);
-                o.sec = Convert.ToInt32(rec[(int)OrderField.oSec]);
-            }
-            catch (Exception ex) { throw new InvalidOrder(); }
+            string[] rec = message.Split(','); // get the record
+            if (rec.Length < 17) throw new InvalidOrder();
+            bool side = Convert.ToBoolean(rec[(int)OrderField.Side]);
+            int size = Convert.ToInt32(rec[(int)OrderField.Size]);
+            decimal oprice = Convert.ToDecimal(rec[(int)OrderField.Price]);
+            decimal ostop = Convert.ToDecimal(rec[(int)OrderField.Stop]);
+            string sym = rec[(int)OrderField.Symbol];
+            o = new OrderImpl(sym, side, size);
+            o.price = oprice;
+            o.stopp = ostop;
+            o.comment = rec[(int)OrderField.Comment];
+            o.Account = rec[(int)OrderField.Account];
+            o.ex = rec[(int)OrderField.Exchange];
+            o.LocalSymbol = rec[(int)OrderField.LocalSymbol];
+            o.Currency = (CurrencyType)Enum.Parse(typeof(CurrencyType), rec[(int)OrderField.Currency]);
+            o.Security = (SecurityType)Enum.Parse(typeof(SecurityType), rec[(int)OrderField.Security]);
+            o.id = Convert.ToUInt32(rec[(int)OrderField.OrderID]);
+            o.TIF = rec[(int)OrderField.OrderTIF];
+            o.trail = Convert.ToDecimal(rec[(int)OrderField.Trail]);
+            o.date = Convert.ToInt32(rec[(int)OrderField.oDate]);
+            o.time = Convert.ToInt32(rec[(int)OrderField.oTime]);
+            o.sec = Convert.ToInt32(rec[(int)OrderField.oSec]);
             return o;
         }
 

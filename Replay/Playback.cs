@@ -24,26 +24,34 @@ namespace Replay
             if (e.Cancel)
                 return;
             PlayBackArgs args = (PlayBackArgs)e.Argument;
-            DateTime prevtime = DateTime.MinValue;
-            DateTime playto = h.NextTickTime;
-            while (h.NextTickTime != HistSim.ENDSIM)
+            int prevtime = HistSim.STARTSIM;
+            do
             {
+                // if cancel was requested, quit
                 if (CancellationPending)
                 {
                     e.Cancel = true;
                     return;
                 }
-
-                // if we're past user specified DayStart, use user-specified delay otherwise no delay
-                int delay = (h.NextTickTime.TimeOfDay >= args.DayStart.TimeOfDay) ? 
-                    (int)h.NextTickTime.Subtract(prevtime).TotalMilliseconds * args.DELAYSCALE : 0;
-                if (prevtime!=DateTime.MinValue) // if it's not first time doing this
-                    System.Threading.Thread.CurrentThread.Join(delay); // wait realistic time
-                prevtime = new DateTime(h.NextTickTime.Ticks); // save last time mark
+                // play first tick
+                int next = h.NextTickTime;
+                h.PlayTo(next); 
+                // adjust delay, based on user's setting of 'speed'
+                // as well as daystart (no delay before daystart)
+                int delay = next >= args.DayStart ?
+                    Util.FTDIFF(prevtime, next) * 1000 * args.DELAYSCALE : 0;
+                // if not first tick, wait realistic time between ticks
+                if (prevtime != HistSim.STARTSIM) 
+                    System.Threading.Thread.CurrentThread.Join(delay); 
+                // save time for calculating next day
+                prevtime = next; 
+                // calculate progress
                 double progress = 100.0 * (h.TicksProcessed / (double)h.TicksPresent);
-                ReportProgress((int)progress); // report progress
-                h.PlayTo(h.NextTickTime); // this will throw tick/idx events and get next time mark
+                // report progress
+                ReportProgress((int)progress); 
+                
             }
+            while (h.NextTickTime != HistSim.ENDSIM);
             base.OnDoWork(e);
         }
 
@@ -61,12 +69,12 @@ namespace Replay
 
     public class PlayBackArgs
     {
-        public PlayBackArgs(int DelayScale, DateTime StartOfDay)
+        public PlayBackArgs(int DelayScale, int StartOfDay)
         {
             DELAYSCALE = DelayScale;
             DayStart = StartOfDay;
         }
         public int DELAYSCALE = 1;
-        public DateTime DayStart;
+        public int DayStart;
     }
 }

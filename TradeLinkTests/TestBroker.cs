@@ -100,7 +100,7 @@ namespace TestTradeLink
         }
         void broker_GotTick(Tick tick)
         {
-            receivedtickDP = new TickImpl(tick);
+            receivedtickDP = TickImpl.Copy(tick);
             gottickDP++;
         }
 

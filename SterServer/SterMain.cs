@@ -275,7 +275,8 @@ namespace SterServer
 
         void stiQuote_OnSTIQuoteSnap(ref structSTIQuoteSnap q)
         {
-            TickImpl k = new TickImpl(q.bstrSymbol);
+            TickImpl k = new TickImpl();
+            k.symbol = q.bstrSymbol;
             k.bid = (decimal)q.fBidPrice;
             k.ask = (decimal)q.fAskPrice;
             k.bs = q.nBidSize/100;

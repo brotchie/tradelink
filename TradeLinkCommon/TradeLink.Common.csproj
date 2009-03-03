@@ -91,7 +91,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResponseLoader.cs" />
     <Compile Include="ScreenCapture.cs" />
-    <Compile Include="Security.cs" />
+    <Compile Include="SecurityImpl.cs" />
     <Compile Include="SparkLine.cs" />
     <Compile Include="StopOrder.cs" />
     <Compile Include="TickImpl.cs" />
