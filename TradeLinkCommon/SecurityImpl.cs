@@ -111,14 +111,19 @@ namespace TradeLink.Common
             while ((t==null) && hasHistorical);
             return t;
         }
+        int _approxticks = 0;
+        public int ApproxTicks { get { return _approxticks; } set { _approxticks = value; } }
         /// <summary>
         /// Initializes a security with historical data from tick archive file
         /// </summary>
         public static SecurityImpl FromFile(string filename)
         {
+            System.IO.FileInfo fi = new System.IO.FileInfo(filename);
             System.IO.StreamReader sr = new System.IO.StreamReader(filename);
             SecurityImpl s = eSigTick.InitEpf(sr);
             s._histfile = sr;
+            // for epf files
+            s._approxticks = (int)(fi.Length / 40);
             return s;
         }
     }
