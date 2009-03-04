@@ -81,7 +81,7 @@ namespace Kadina
             int t = (int)type;
             h.Initialize();
             int maxmin = (t > 127) && (t < 450) ? t - 127 : 0;
-            int stop = Util.FTADD(h.NextTickTime, maxmin * 60);
+            int stop = Util.FTADD((int)h.NextTickTime, maxmin * 60);
             h.PlayTo(stop);
         }
 

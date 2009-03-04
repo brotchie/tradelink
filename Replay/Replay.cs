@@ -236,10 +236,8 @@ namespace Replay
             {
                 if (o.time * o.date == 0)
                 {
-                    DateTime time = h.NextTickTime == HistSim.STARTSIM ? 
-                        DateTime.Now : Util.FT2DT(h.NextTickTime);
-                    o.time = Util.ToTLTime(time);
-                    o.date = Util.ToTLDate(time);
+                    o.time = lasttime == 0 ? (int)h.NextTickTime : (int)lasttime;
+                    o.date = lastdate;
                 }
                 // before we send the order, get top of book for same side
                 Order oldbbo = h.SimBroker.BestBidOrOffer(o.symbol,o.side);
@@ -293,8 +291,12 @@ namespace Replay
         Dictionary<string, decimal> highs = new Dictionary<string, decimal>();
         Dictionary<string, decimal> lows = new Dictionary<string, decimal>();
         Dictionary<string, decimal> last = new Dictionary<string, decimal>();
+        long lasttime = 0;
+        int lastdate = 0;
         void h_GotTick(Tick t)
         {
+            lasttime = t.time;
+            lastdate = t.date;
             if (t.isTrade)
             {
                 decimal price = 0;

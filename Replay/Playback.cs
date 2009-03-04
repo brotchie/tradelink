@@ -24,7 +24,7 @@ namespace Replay
             if (e.Cancel)
                 return;
             PlayBackArgs args = (PlayBackArgs)e.Argument;
-            int prevtime = HistSim.STARTSIM;
+            long prevtime = 0;
             do
             {
                 // if cancel was requested, quit
@@ -34,14 +34,14 @@ namespace Replay
                     return;
                 }
                 // play first tick
-                int next = h.NextTickTime;
+                long next = h.NextTickTime;
                 h.PlayTo(next); 
                 // adjust delay, based on user's setting of 'speed'
                 // as well as daystart (no delay before daystart)
                 int delay = next >= args.DayStart ?
-                    Util.FTDIFF(prevtime, next) * 1000 * args.DELAYSCALE : 0;
+                    Util.FTDIFF((int)prevtime, (int)next) * 1000 * args.DELAYSCALE : 0;
                 // if not first tick, wait realistic time between ticks
-                if (prevtime != HistSim.STARTSIM) 
+                if (prevtime != 0) 
                     System.Threading.Thread.CurrentThread.Join(delay); 
                 // save time for calculating next day
                 prevtime = next; 

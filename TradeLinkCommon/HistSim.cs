@@ -128,7 +128,7 @@ namespace TradeLink.Common
             D("Initialized " + (_tickfiles.Length ) + " instruments.");
             D(string.Join(Environment.NewLine.ToString(), _tickfiles));
             // read in single tick just to get first time for user
-            FillCache(0);
+            FillCache(1);
             // set first time as hint for user
             setnexttime();
 
