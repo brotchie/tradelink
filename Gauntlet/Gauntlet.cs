@@ -12,7 +12,9 @@ using TradeLink.API;
     public partial class Gauntlet : Form
     {
         Response myres;
-        BackTest bt;
+        HistSim h;
+        BackgroundWorker bw = new BackgroundWorker();
+
         public Gauntlet()
         {
             InitializeComponent();
@@ -24,79 +26,164 @@ using TradeLink.API;
             ProgressBar1.Enabled = false;
             FormClosing+=new FormClosingEventHandler(Gauntlet_FormClosing);
             debug(Util.TLSIdentity());
+            bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_RunWorkerCompleted);
+            bw.DoWork += new DoWorkEventHandler(bw_DoWork);
         }
 
 
-        void FindStocks(string path)
+
+        // when run button is clicked, setup the simulation
+        private void queuebut_Click(object sender, EventArgs e)
         {
-            // build list of available stocks and dates available
-            stocklist.Items.Clear();
-            yearlist.Items.Clear();
-            daylist.Items.Clear();
-            monthlist.Items.Clear();
-            DirectoryInfo di;
-            FileInfo[] fi;
-
-            try
+            // make sure we only have one background thread
+            if (bw.IsBusy)
             {
-                di = new DirectoryInfo(path);
-                fi = di.GetFiles("*.epf");
+                debug("simulation already in progress.");
+                return;
             }
-            catch (Exception ex) { show("exception loading stocks: " + ex.ToString()); return; }
-
-            int[] years = new int[200];
-            int[] days = new int[31];
-            int[] months = new int[12];
-            int yc = 0;
-            int dc = 0;
-            int mc = 0;
-
-            for (int i = 0; i < fi.Length; i++)
+            // make sure tick folder is valid
+            string dir = WinGauntlet.Properties.Settings.Default.tickfolder;
+            if (!Directory.Exists(dir))
             {
-                SecurityImpl s = StockFromFileName(fi[i].Name);
-                if (!s.isValid) continue;
-                DateTime d = Util.TLD2DT(s.Date);
-                if (!stocklist.Items.Contains(s.Symbol))
-                    stocklist.Items.Add(s.Symbol);
-                if (!contains(d.Year,years))
-                    years[yc++] = d.Year;
-                if (!contains(d.Month, months))
-                    months[mc++] = d.Month;
-                if (!contains(d.Day, days))
-                    days[dc++] = d.Day;
+                string msg = "No tick folder option is configured.";
+                MessageBox.Show(msg, "Tick folder missing");
+                show(msg);
+                return;
             }
-            Array.Sort(years);
-            Array.Sort(days);
-            Array.Sort(months);
-            for (int i = 0; i<years.Length; i++)
-                if (years[i]==0) continue;
-                else yearlist.Items.Add(years[i]);
-            for (int i = 0; i < months.Length; i++)
-                if (months[i] == 0) continue;
-                else monthlist.Items.Add(months[i]);
-            for (int i = 0; i < days.Length; i++)
-                if (days[i] == 0) continue;
-                else daylist.Items.Add(days[i]);
+            // make sure response is valid
+            if ((myres == null) || !myres.isValid)
+            {
+                show("No valid response was selected, quitting.");
+                return;
+            }
+            // prepare date filter
+            List<TickFileFilter.TLDateFilter> datefilter = new List<TickFileFilter.TLDateFilter>();
+            if (usedates.Checked)
+            {
+                for (int j = 0; j < yearlist.SelectedIndices.Count; j++)
+                    datefilter.Add(new TickFileFilter.TLDateFilter(Convert.ToInt32(yearlist.Items[yearlist.SelectedIndices[j]]) * 10000, DateMatchType.Year));
+                for (int j = 0; j < monthlist.SelectedItems.Count; j++)
+                    datefilter.Add(new TickFileFilter.TLDateFilter(Convert.ToInt32(monthlist.Items[monthlist.SelectedIndices[j]]) * 100, DateMatchType.Month));
+                for (int j = 0; j < daylist.SelectedItems.Count; j++)
+                    datefilter.Add(new TickFileFilter.TLDateFilter(Convert.ToInt32(daylist.Items[daylist.SelectedIndices[j]]), DateMatchType.Day));
+            }
+            // prepare symbol filter
+            List<string> symfilter = new List<string>();
+            if (usestocks.Checked)
+                for (int j = 0; j < stocklist.SelectedItems.Count; j++)
+                    symfilter.Add(stocklist.Items[stocklist.SelectedIndices[j]].ToString());
+
+            // build consolidated filter
+            TickFileFilter tff = new TickFileFilter(symfilter, datefilter);
+            // prepare other arguments for the run
+            SimWorker args = new SimWorker();
+            args.Name = DateTime.Now.ToString("yyyMMdd.HHmm");
+            args.filter = tff;
+            args.TickFolder = dir;
+            args.Started = DateTime.Now;
+
+            // enable progress reporting
+            ProgressBar1.Enabled = true;
+            // disable more than one simulation at once
+            queuebut.Enabled = false;
+
+            // prepare indicator output if requested
+            if (indicatorscsv.Checked)
+            {
+                if (indf == null)
+                {
+                    string unique = csvnamesunique.Checked ? "." + args.Name : "";
+                    indf = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Indicators" + unique + ".csv", false);
+                    indf.WriteLine(string.Join(",", myres.Indicators));
+                    indf.AutoFlush = true;
+                }
+            }
+
+            // start the run in the background
+            bw.RunWorkerAsync(args);
+
         }
 
-        bool contains(int number, int[] array) { for (int i = 0; i < array.Length; i++) if (array[i] == number) return true; return false; }
-
-        
-
-        SecurityImpl StockFromFileName(string filename)
+        // runs the simulation in background
+        void bw_DoWork(object sender, DoWorkEventArgs e)
         {
-            try
-            {
-                string ds = System.Text.RegularExpressions.Regex.Match(filename, "([0-9]{8})[.]", System.Text.RegularExpressions.RegexOptions.IgnoreCase).Result("$1");
-                string sym = filename.Replace(ds, "").Replace(".EPF", "");
-                SecurityImpl s = new SecurityImpl(sym);
-                s.Date = Convert.ToInt32(ds);
-                return s;
-            }
-            catch (Exception) { }
-            return new SecurityImpl();
-            
+            // get simulation arguments
+            SimWorker sw = (SimWorker)e.Argument;
+            // notify user
+            debug("Run started: " + sw.Name);
+            // prepare simulator
+            h = new HistSim(sw.TickFolder,sw.filter);
+            h.GotDebug += new DebugDelegate(h_GotDebug);
+            h.GotTick += new TickDelegate(h_GotTick);
+            // start simulation
+            h.PlayTo(sw.PlayTo);
+            // end simulation
+            sw.Stopped = DateTime.Now;
+            sw.TicksProcessed = h.TicksProcessed;
+            sw.Executions = h.FillCount;
+            // save result
+            e.Result = sw;
         }
+
+        // runs after simulation is complete
+        void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            SimWorker args = (SimWorker)e.Result;
+            string unique = csvnamesunique.Checked ? "." + args.Name : "";
+            if (tradesincsv.Checked)
+            {
+                debug("writing trades...");
+                Util.ClosedPLToText(h.SimBroker.GetTradeList(), ',', Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Trades" + unique + ".csv");
+            }
+            if (ordersincsv.Checked)
+            {
+                debug("writing orders...");
+                StreamWriter sw = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Orders" + unique + ".csv", false);
+                for (int i = 0; i < h.SimBroker.GetOrderList().Count; i++)
+                    sw.WriteLine(OrderImpl.Serialize(h.SimBroker.GetOrderList()[i]));
+                sw.Close();
+            }
+            debug("Completed. Ticks: " + args.TicksProcessed+" Speed:"+args.TicksSecond.ToString("N0")+" t/s  Fills: "+args.Executions.ToString());
+            // close indicators
+            if (indf != null)
+                indf.Close();
+            // reset simulation
+            h.Reset();
+            // enable new runs
+            ProgressBar1.Enabled = false;
+            ProgressBar1.Value = 0;
+            queuebut.Enabled = true;
+        }
+
+        int count = 0;
+        void h_GotTick(Tick t)
+        {
+            if (myres == null) return;
+            count++;
+            myres.GotTick(t);
+            uint percent = (uint)((double)count*100 / h.TicksPresent);
+            if (percent % 5 == 0)
+                updatepercent(percent);
+
+        }
+
+        void updatepercent(uint per)
+        {
+            if (InvokeRequired)
+                Invoke(new UIntDelegate(updatepercent), new object[] { per });
+            else
+            {
+                ProgressBar1.Value = (int)per;
+                ProgressBar1.Invalidate();
+            }
+        }
+
+
+        void h_GotDebug(string msg)
+        {
+            debug(msg);
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
             // tick folder
@@ -112,12 +199,12 @@ using TradeLink.API;
 
         private void button2_Click(object sender, EventArgs e)
         {
-            // box DLL selection
+            // response library selection
             OpenFileDialog of = new OpenFileDialog();
             of.CheckPathExists = true;
             of.CheckFileExists = true;
             of.DefaultExt = ".dll";
-            of.Filter = "Box DLL|*.dll";
+            of.Filter = "Response DLL|*.dll";
             of.Multiselect = false;
             if (of.ShowDialog() == DialogResult.OK)
             {
@@ -154,118 +241,12 @@ using TradeLink.API;
 
         
 
-        private void queuebut_Click(object sender, EventArgs e)
-        {
-            bt = new BackTest();
-            bt.BTStatus += new DebugFullDelegate(bt_BTStatus);
-            bt.mybroker.GotOrder += new OrderDelegate(myres.GotOrder);
-            bt.mybroker.GotOrderCancel += new OrderCancelDelegate(mybroker_GotOrderCancel);
-            bt.mybroker.GotFill+=new FillDelegate(myres.GotFill);
-
-            List<FileInfo> tf = new List<FileInfo>();
-            string dir = WinGauntlet.Properties.Settings.Default.tickfolder;
-            if (!Directory.Exists(dir))
-            {
-                string msg = "You must select a valid tick directory containing historical tick files.";
-                MessageBox.Show(msg,"Nonexistent tick directory");
-                show(msg);
-                return;
-            }
-            DirectoryInfo di = new DirectoryInfo(dir);
-            FileInfo [] fi = di.GetFiles("*.EPF");
-            for (int i = 0; i < fi.Length; i++)
-            {
-                bool datematch = true;
-                bool symmatch = true;
-                bool ud = usedates.Checked;
-                bool us = usestocks.Checked;
-                SecurityImpl s = StockFromFileName(fi[i].Name);
-                if (!s.isValid)
-                {
-                    continue;
-                }
-                DateTime d = Util.TLD2DT(s.Date);
-                if (ud)
-                {
-                    for (int j = 0; j < yearlist.SelectedItems.Count; j++)
-                        if ((int)yearlist.SelectedItems[j] == d.Year) { datematch &= true; break; }
-                        else datematch &= false;
-                    for (int j = 0; j < monthlist.SelectedItems.Count; j++)
-                        if ((int)monthlist.SelectedItems[j] == d.Month) { datematch &= true; break; }
-                        else datematch &= false;
-                    for (int j = 0; j < daylist.SelectedItems.Count; j++)
-                        if ((int)daylist.SelectedItems[j] == d.Day) { datematch &= true; break; }
-                        else datematch &= false;
-                }
-                if (us)
-                {
-                    for (int j = 0; j < stocklist.SelectedItems.Count; j++)
-                        if (fi[i].Name.Contains((string)stocklist.SelectedItems[j])) { symmatch = true; break; }
-                        else symmatch = false;
-                }
-
-
-                if ((ud && us && datematch && symmatch) ||
-                    (ud && datematch) ||
-                    (us && symmatch))
-                {
-                    debug("added to run: " + fi[i]);
-                    tf.Add(fi[i]);
-                }
-            }
-            if (tf.Count == 0)
-            {
-                string msg = "You didn't select any valid tick files, or none were available.";
-                MessageBox.Show(msg, "No tick files selected.");
-                show(msg);
-                return;
-            }
-
-            bt.name = DateTime.Now.ToString("yyyMMdd.HHmm");
-            if (myres==null)
-            { 
-                show("You must select a response to run the gauntlet."); 
-                return; 
-            } 
-            string exfilt = "";
-            if ((exchlist.SelectedIndices.Count > 0) && 
-                !exchlist.SelectedItem.ToString().Contains("NoFilter")) 
-                exfilt = (string)exchlist.SelectedItem;
-            bt.ExchFilter(exfilt);
-            bt.Path = WinGauntlet.Properties.Settings.Default.tickfolder+"\\";
-            bt.ProgressChanged += new ProgressChangedEventHandler(bt_ProgressChanged);
-            bt.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bt_RunWorkerCompleted);
-            ProgressBar1.Enabled = true;
-            queuebut.Enabled = false;
-            bt.RunWorkerAsync(new BackTestArgs(tf,myres));
-        }
-
         void bt_BTStatus(Debug debug)
         {
             show(debug.Msg);
         }
 
 
-        void bt_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            string unique = csvnamesunique.Checked ? "."+bt.name : "";
-            if (tradesincsv.Checked)
-                Util.ClosedPLToText(bt.mybroker.GetTradeList(),',',Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)+"\\Gauntlet.Trades"+unique+".csv");
-            if (ordersincsv.Checked)
-            {
-                StreamWriter sw = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Orders" + unique + ".csv", false);
-                for (int i = 0; i < bt.mybroker.GetOrderList().Count; i++)
-                    sw.WriteLine(OrderImpl.Serialize(bt.mybroker.GetOrderList()[i]));
-                sw.Close();
-            }
-            if (indf!=null)
-                indf.Close();
-            bt = null;
-            
-            ProgressBar1.Enabled = false;
-            ProgressBar1.Value = 0;
-            queuebut.Enabled = true;
-        }
 
         void bt_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
@@ -322,8 +303,8 @@ using TradeLink.API;
 
         void myres_SendOrder(Order o)
         {
-            if ((bt != null) && (bt.mybroker != null))
-                bt.mybroker.sendOrder(o);
+            if (h!=null)
+                h.SimBroker.sendOrder(o);
         }
 
         void mybroker_GotOrderCancel(string sym, bool side, uint id)
@@ -334,32 +315,110 @@ using TradeLink.API;
 
         void myres_CancelOrderSource(uint number)
         {
-            if ((bt != null) && (bt.mybroker != null))
-                bt.mybroker.CancelOrder(number);
+            if (h!=null)
+                h.SimBroker.CancelOrder(number);
             
         }
 
-        void myres_GotDebug(Debug debug)
+        void myres_GotDebug(Debug msg)
         {
             if (!showdebug.Checked) return;
-            show(debug.Msg);
+            debug(msg.Msg);
         }
         StreamWriter indf = null;
         void myres_IndicatorUpdate(object[] parameters)
         {
-            if (indicatorscsv.Checked)
+            if (indf == null) return;
+            string[] ivals = new string[parameters.Length];
+            for (int i = 0; i < parameters.Length; i++) ivals[i] = parameters[i].ToString();
+            indf.WriteLine(string.Join(",", ivals));
+        }
+
+        void FindStocks(string path)
+        {
+            // build list of available stocks and dates available
+            stocklist.Items.Clear();
+            yearlist.Items.Clear();
+            daylist.Items.Clear();
+            monthlist.Items.Clear();
+            DirectoryInfo di;
+            FileInfo[] fi;
+
+            try
             {
-                if (indf== null)
-                {
-                    string unique = csvnamesunique.Checked ? "." + bt.name : "";
-                    indf= new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Indicators" + unique + ".csv", false);
-                    indf.WriteLine(string.Join(",", myres.Indicators));
-                    indf.AutoFlush = true;
-                }
-                string[] ivals = new string[parameters.Length];
-                for (int i = 0; i < parameters.Length; i++) ivals[i] = parameters[i].ToString();
-                indf.WriteLine(string.Join(",", ivals));
+                di = new DirectoryInfo(path);
+                fi = di.GetFiles("*.epf");
             }
+            catch (Exception ex) { show("exception loading stocks: " + ex.ToString()); return; }
+
+            int[] years = new int[200];
+            int[] days = new int[31];
+            int[] months = new int[12];
+            int yc = 0;
+            int dc = 0;
+            int mc = 0;
+
+            for (int i = 0; i < fi.Length; i++)
+            {
+                SecurityImpl s = StockFromFileName(fi[i].Name);
+                if (!s.isValid) continue;
+                DateTime d = Util.ToDateTime(s.Date,0);
+                if (!stocklist.Items.Contains(s.Symbol))
+                    stocklist.Items.Add(s.Symbol);
+                if (!contains(d.Year, years))
+                    years[yc++] = d.Year;
+                if (!contains(d.Month, months))
+                    months[mc++] = d.Month;
+                if (!contains(d.Day, days))
+                    days[dc++] = d.Day;
+            }
+            Array.Sort(years);
+            Array.Sort(days);
+            Array.Sort(months);
+            for (int i = 0; i < years.Length; i++)
+                if (years[i] == 0) continue;
+                else yearlist.Items.Add(years[i]);
+            for (int i = 0; i < months.Length; i++)
+                if (months[i] == 0) continue;
+                else monthlist.Items.Add(months[i]);
+            for (int i = 0; i < days.Length; i++)
+                if (days[i] == 0) continue;
+                else daylist.Items.Add(days[i]);
+        }
+
+        bool contains(int number, int[] array) { for (int i = 0; i < array.Length; i++) if (array[i] == number) return true; return false; }
+
+
+        SecurityImpl StockFromFileName(string filename)
+        {
+            try
+            {
+                string ds = System.Text.RegularExpressions.Regex.Match(filename, "([0-9]{8})[.]", System.Text.RegularExpressions.RegexOptions.IgnoreCase).Result("$1");
+                string sym = filename.Replace(ds, "").Replace(".EPF", "");
+                SecurityImpl s = new SecurityImpl(sym);
+                s.Date = Convert.ToInt32(ds);
+                return s;
+            }
+            catch (Exception) { }
+            return new SecurityImpl();
+
         }
     }
+
+    public class SimWorker
+    {
+        public string Name;
+        public int TicksProcessed = 0;
+        public int Executions = 0;
+        public TickFileFilter filter = new TickFileFilter();
+        public string TickFolder = Properties.Settings.Default.tickfolder;
+        public long PlayTo = HistSim.ENDSIM;
+        public DateTime Started = DateTime.MaxValue;
+        public DateTime Stopped = DateTime.MaxValue;
+        public double Seconds { get { return Stopped.Subtract(Started).TotalSeconds; } }
+        public double TicksSecond { get { return Seconds == 0 ? 0 : ((double)TicksProcessed / Seconds); } }
+    }
+
+
+
 }
