@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{A0FE06A2-F31B-49DE-8901-917B5D593E43}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -66,6 +66,7 @@
     <Compile Include="Email.cs" />
     <Compile Include="eSigTick.cs" />
     <Compile Include="HistSim.cs">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="ImbalanceImpl.cs" />
     <Compile Include="InvalidResponse.cs" />

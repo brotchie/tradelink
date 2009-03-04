@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using TradeLink.API;
+using System.ComponentModel;
 
 namespace TradeLink.Common
 {
@@ -14,11 +15,11 @@ namespace TradeLink.Common
         Broker _broker = new Broker();
         string[] _tickfiles = new string[0];
         bool _inited = false;
-        int _nextticktime = ENDSIM;
+        long _nextticktime = ENDSIM;
         int _executions = 0;
         volatile int _tickcount;
         long _bytestoprocess = 0;
-        List<SecurityImpl> Instruments = new List<SecurityImpl>();
+        List<simworker> Workers = new List<simworker>();
         
         // events
         public event TickDelegate GotTick;
@@ -41,7 +42,7 @@ namespace TradeLink.Common
         /// <summary>
         /// Gets next tick in the simulation
         /// </summary>
-        public int NextTickTime { get { return _nextticktime; } }
+        public long NextTickTime { get { return _nextticktime; } }
         /// <summary>
         /// Gets broker used in the simulation
         /// </summary>
@@ -95,14 +96,8 @@ namespace TradeLink.Common
         {
             _inited = false;
             _tickfiles = new string[0];
-            Instruments.Clear();
-            _tickcache = new Tick[MAXTICKS];
-            _timecache = new int[MAXTICKS];
-            _readcount = new uint[Instruments.Count];
-            _writecount = new uint[Instruments.Count];
-            _endstream = new bool[Instruments.Count];
-            _master = new cursor();
-            _nextticktime = ENDSIM;
+            Workers.Clear();
+            _nextticktime = STARTSIM;
             _broker.Reset();
             _executions = 0;
             _bytestoprocess = 0;
@@ -127,20 +122,17 @@ namespace TradeLink.Common
             // now we have our list, initialize instruments from files
             foreach (string file in _tickfiles)
             {
-                Instruments.Add(SecurityImpl.FromFile(file));
+                Workers.Add(new simworker(SecurityImpl.FromFile(file)));
             }
-
-            // setup per-instrument read and write cursors
-            _readcount = new uint[Instruments.Count];
-            _writecount = new uint[Instruments.Count];
-            _endstream = new bool[Instruments.Count];
 
             D("Initialized " + (_tickfiles.Length ) + " instruments.");
             D(string.Join(Environment.NewLine.ToString(), _tickfiles));
-            FillCache();
+            // read in single tick just to get first time for user
+            FillCache(0);
+            // set first time as hint for user
+            setnexttime();
 
             // get total bytes represented by files
-            
             DirectoryInfo di = new DirectoryInfo(_folder);
             FileInfo[] fi = di.GetFiles("*.epf", SearchOption.AllDirectories);
             foreach (FileInfo thisfi in fi)
@@ -156,7 +148,7 @@ namespace TradeLink.Common
         /// Run simulation to specific time
         /// </summary>
         /// <param name="time">Simulation will run until this time (use HistSim.ENDSIM for last time)</param>
-        public void PlayTo(int ftime)
+        public void PlayTo(long ftime)
         {
             if (!_inited)
                 Initialize();
@@ -167,156 +159,109 @@ namespace TradeLink.Common
             else throw new Exception("Histsim was unable to initialize");
         }
 
-        const int TICKCACHEPERINSTRUMENT = 100;
-        const uint MAXTICKS = 10000;
-        Tick[] _tickcache = new Tick[MAXTICKS];
-        int[] _timecache = new int[MAXTICKS];
-        uint[] _symcache = new uint[MAXTICKS];
-        cursor _master = new cursor();
-        uint[] _writecount;
-        uint[] _readcount;
-        bool[] _endstream;
-        bool haveticks { get { return _master.read != _master.write; } }
-
-        private void SecurityPlayTo(int ftime)
+        private void SecurityPlayTo(long ftime)
         {
-            // continue flushing cache until nothing left to flush
-            do
-                FillCache();  // repopulate cache
-            while (haveticks && FlushCache(ftime));
+            // start all the workers reading files in background
+            FillCache(int.MaxValue);
+            // wait a moment to allow tick reading to start
+            System.Threading.Thread.Sleep(5);
+            // continuously loop through next ticks, playing most
+            // recent ones, until simulation end is reached.
+            FlushCache(ftime);
+            // when we end simulation, stop reading
+            CancelWorkers();
+            // set next tick time as hint to user
+            setnexttime();
         }
 
 
-        bool needcache(int symidx) { return (!_endstream[symidx]) && (_readcount[symidx] == _writecount[symidx]); }
-
-        int[] needcachefill()
+        void FillCache(int readahead)
         {
-            // we reverse count to allow us to use CopyTo later
-            int nocachecount = 0;
-            // store instruments w/no ticks cached
-            int[] uncached = new int[Instruments.Count];
-            // check every instrument to see if it has a cache
-            for (int i = 0; i < Instruments.Count; i++)
-                if (needcache(i)) // if it has no cached ticks
-                    uncached[nocachecount++] = i; // mark it for 'filling'
-            // now we know how big our result is, size it
-            int[] ret = new int[nocachecount];
-            // copy only the instruments that need more ticks
-            Array.ConstrainedCopy(uncached,0,ret,0,nocachecount);
-            // return only instruments needing more ticks
-            return ret;
-        }
-
-
-        void FillCache()
-        {
-            int loc;
-            // get list of instruments with no cache
-            int[] list = needcachefill();
-            // for every one of said instruments:
-            for (uint i = 0; i < list.Length; i++)
-            {
-                int ci = list[i];
-                Tick k;
-                try
-                {
-                    // get tick
-                    k = Instruments[ci].NextTick();
-                }
-                catch (EndSecurityTicks) { _endstream[ci] = true; continue; }
-                // get time
-                int ftime = Util.TL2FT(k);
-                // get cache location
-                lock (_master)
-                    loc = (int)(_master.write % MAXTICKS);
-                // cache tick
-                _tickcache[loc] = k;
-                // cache time
-                _timecache[loc] = ftime;
-                // see if this time is newer
-                _nextticktime = ftime <= _nextticktime ? ftime : _nextticktime;
-                // cache symbol's index
-                _symcache[loc] = (uint)ci;
-                // prepare for next write
-                _master.write++;
-                // make note of write on per-symbol counter
-                _writecount[ci]++;
-            }
+            // start all the workers not running
+            // have them read 'readahead' ticks in advance
+            for (int i = 0; i < Workers.Count; i++)
+                if (!Workers[i].IsBusy)
+                    Workers[i].RunWorkerAsync(readahead);
 
         }
-
-        bool FlushCache(int endsim)
+        
+        void FlushCache(long endsim)
         {
-            // we stop sim when simtime is exceeded
-            bool stopsim = false;
-            // get size of unordered, unread cache
-            int start, end, size;
-            bool flipped = false;
-            lock (_master)
+            bool simrunning = true;
+            while (simrunning)
             {
-                // start/end is remainder of ticks cached less size of array
-                size = _master.write - _master.read;
-                start = (int)(_master.read % MAXTICKS);
-                end = (int)(_master.write % MAXTICKS);
-                flipped = end < start;
-            }
-            // make a point-in-time copy of cache from start to end
-            int[] times = new int[size];
-            // if we've overrun buffer, we copy in two steps
-            if (flipped)
-            {
-                int preflipsize = _timecache.Length - start;
-                Array.ConstrainedCopy(_timecache, start, times, 0, preflipsize);
-                Array.ConstrainedCopy(_timecache, 0, times, preflipsize, size - preflipsize);
-            }
-            else // otherwise we can copy in single step
-                Array.ConstrainedCopy(_timecache, start, times, 0, size);
-            // assign every ticktime an index value, so when we 
-            // re-order the times we can still get matching tick
-            int[] idx = genidx(size);
-            // sort it by most recent time first
-            Array.Sort(times, idx);
-            // play every cached tick until end is reached
-            for (uint i = 0; i < times.Length; i++)
-            {
-                // update current time
-                _nextticktime = times[i];
-                // see if we've exceeded user's desire
-                stopsim = (_nextticktime > endsim) && (_nextticktime != 0);
-                if (stopsim) break;
-                // get original location of tick using index
-                int idxval = idx[i] + start;
-                // readjust the location if we have overrun situation
-                int loc = idxval>end ? (int)(MAXTICKS-idxval) : idxval;
-                // get the tick
-                Tick k = _tickcache[loc];
-                // count tick as read (global)
-                _master.read++;
-                // count tick as read (per-instrument)
-                _readcount[_symcache[loc]]++;
-                // invalidate cache entry
-                _tickcache[loc] = null;
-                _timecache[loc] = 0;
-                // skip invalid ticks
-                if (k == null) continue;
-                // fill tick against pending orders
-                _executions += SimBroker.Execute(k);
-                // notify listeners
+                long[] times = nexttimes();
+                int[] idx = genidx(times.Length);
+                Array.Sort(times, idx);
+                int nextidx = 0;
+                while ((nextidx<times.Length) && (times[nextidx] == -1))
+                    nextidx++;
+                simrunning = (nextidx<times.Length) && (times[nextidx]<=endsim);
+                if (!simrunning) break;
+                Tick k = Workers[idx[nextidx]].NextTick();
                 GotTick(k);
-                // count total tick
+                _executions += SimBroker.Execute(k);
                 _tickcount++;
             }
-            return !stopsim;
         }
+        void setnexttime()
+        {
+            long[] times = nexttimes();
+            int i = 0;
+            while ((i<times.Length) && (times[i] == -1))
+                i++;
+            _nextticktime = i==times.Length ? HistSim.ENDSIM : times[i];
+        }
+        long[] nexttimes()
+        {
+            long[] times = new long[Workers.Count];
+            for (int i = 0; i < times.Length; i++)
+                times[i] = Workers[i].hasUnread ? Workers[i].NextTime() : -1;
+            return times;
+        }
+        void CancelWorkers() { for (int i = 0; i < Workers.Count; i++) Workers[i].CancelAsync(); } 
         int[] genidx(int length) { int[] idx = new int[length]; for (int i = 0; i < length; i++) idx[i] = i; return idx; }
-        public static int ENDSIM = Util.DT2FT(DateTime.MaxValue);
-        public static int STARTSIM = Util.DT2FT(DateTime.MinValue);
+        public static long ENDSIM = (long)Util.DT2FT(DateTime.MaxValue);
+        public static long STARTSIM = (long)Util.DT2FT(DateTime.MinValue);
 
     }
 
-    class cursor
+    // reads ticks from file into queue
+    public class simworker : BackgroundWorker
     {
-        public int read;
-        public int write;
+        Queue<Tick> Ticks = new Queue<Tick>(100000);
+        SecurityImpl workersec = null;
+        volatile int readcount = 0;
+        public bool hasUnread { get { lock (Ticks) { return Ticks.Count>0; } } }
+        public Tick NextTick() { lock (Ticks) { return Ticks.Dequeue(); } } 
+        public long NextTime() { return (long)Ticks.Peek().time; } 
+        public simworker(SecurityImpl sec)
+        {
+            workersec = sec;
+            DoWork += new DoWorkEventHandler(simworker_DoWork);
+            WorkerSupportsCancellation = true;
+            RunWorkerCompleted += new RunWorkerCompletedEventHandler(simworker_RunWorkerCompleted);
+        }
+
+        void simworker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            // reset counts
+            readcount = 0;
+        }
+
+        void simworker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            int readahead = (int)e.Argument;
+            while (!e.Cancel && workersec.hasHistorical && (readcount++ < readahead))
+                lock (Ticks)
+                {
+                    Ticks.Enqueue(workersec.NextTick());
+                }
+           
+        }
+
+
+
+
     }
 }

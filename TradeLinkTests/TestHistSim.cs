@@ -33,18 +33,18 @@ namespace TestTradeLink
             double time = DateTime.Now.Subtract(start).TotalSeconds;
 
             // make sure ticks arrived in order
-            //Assert.IsTrue(GOODTIME,"Tick arrived out-of-order.");
+            Assert.IsTrue(GOODTIME,"Tick arrived out-of-order.");
             // check running time
             Assert.LessOrEqual(time, EXPECT2SYMTIME,"may fail on slow machines");
             Assert.AreEqual(2,syms.Count);
             // tick count is = 42610 (FTI) + 5001 (SPX)
-            Assert.AreEqual(42610 + 4991, tickcount);
+            Assert.AreEqual(42610 + 4995, tickcount);
             // variance from approximate count should be less than 1%
             Assert.Less((tickcount - h.TicksPresent) / h.TicksPresent, .01);
             // actual count should equal simulation count
             Assert.AreEqual(h.TicksProcessed, tickcount);
             // last time is 1649 on SPX
-            //Assert.AreEqual(1649, lasttime);
+            Assert.AreEqual(1649, lasttime);
             // printout simulation runtime
             Console.WriteLine();
             Console.WriteLine("Ticks: " + tickcount + ", versus: " + h.TicksPresent + " estimated.");
