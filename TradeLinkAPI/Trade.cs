@@ -10,7 +10,6 @@ namespace TradeLink.API
         decimal xprice { get; set; }
         int xtime { get; set; }
         int xdate { get; set; }
-        int xsec { get; set; }
         string comment { get; set; }
         bool side { get; set; }
         string Account { get; set; }

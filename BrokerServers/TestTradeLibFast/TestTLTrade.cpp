@@ -30,7 +30,7 @@ static void __stdcall SerializeDeserialize()
 	TLTrade o;
 	o.symbol = sym;
 	o.xdate = 20081201;
-	o.xtime = 1531;
+	o.xtime = 153100;
 	o.xprice = 0;
 	o.xsize = -100;
 	o.side = false;
@@ -46,7 +46,6 @@ static void __stdcall SerializeDeserialize()
 	CFIX_ASSERT(o.side==d.side);
 	CFIX_ASSERT(o.xdate==d.xdate);
 	CFIX_ASSERT(o.xtime==d.xtime);
-	CFIX_ASSERT(o.xsec==d.xsec);
 	CFIX_ASSERT(o.exchange==d.exchange);
 
 }

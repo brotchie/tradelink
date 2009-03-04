@@ -35,7 +35,7 @@ namespace TradeLink.Common
                 string ext = System.IO.Path.GetExtension(filepath).Replace(".", "");
                 string date = Regex.Match(fn, "[0-9]{8}$").Value;
                 tfi.type = (TickFileType)Enum.Parse(typeof(TickFileType), ext.ToUpper());
-                tfi.date = ToDateTime(Convert.ToInt32(date));
+                tfi.date = TLD2DT(Convert.ToInt32(date));
                 tfi.symbol = Regex.Match(fn, "^[A-Z]+").Value;
             }
             catch (Exception) { tfi.type = TickFileType.Invalid; }
@@ -46,43 +46,57 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="TradeLinkDate"></param>
         /// <returns></returns>
-        public static DateTime ToDateTime(int TradeLinkDate)
+        public static DateTime TLD2DT(int TradeLinkDate)
         {
             if (TradeLinkDate < 10000) throw new Exception("Not a date, or invalid date provided");
-            return ToDateTime(TradeLinkDate, 0, 0);
+            return ToDateTime(TradeLinkDate, 0);
         }
         /// <summary>
-        /// Converts TradeLink Time and seconds format to DateTime.  If not using seconds, put a zero.
+        /// Converts TradeLink Time to DateTime.  If not using seconds, put a zero.
         /// </summary>
         /// <param name="TradeLinkTime"></param>
         /// <param name="TradeLinkSec"></param>
         /// <returns></returns>
-        public static DateTime ToDateTime(int TradeLinkTime, int TradeLinkSec)
+        public static DateTime TLT2DT(int TradeLinkTime)
         {
-            return ToDateTime(0, TradeLinkTime, TradeLinkSec);
+            return ToDateTime(0, TradeLinkTime);
+        }
+        /// <summary>
+        /// gets datetime of a tick
+        /// </summary>
+        /// <param name="k"></param>
+        /// <returns></returns>
+        public static DateTime TLT2DT(Tick k)
+        {
+            return ToDateTime(0,k.time);
         }
 
         /// <summary>
         /// Converts TradeLink Date and Time format to a DateTime. 
-        /// eg DateTime ticktime = ToDateTime(tick.date,tick.time,tick.sec);
+        /// eg DateTime ticktime = ToDateTime(tick.date,tick.time);
         /// </summary>
         /// <param name="TradeLinkDate"></param>
         /// <param name="TradeLinkTime"></param>
         /// <param name="TradeLinkSec"></param>
         /// <returns></returns>
-        public static DateTime ToDateTime(int TradeLinkDate, int TradeLinkTime, int TradeLinkSec)
+        public static DateTime ToDateTime(int TradeLinkDate, int TradeLinkTime)
         {
-            int hour = (int)Math.Floor((decimal)TradeLinkTime / 100);
-            int min = TradeLinkTime - (hour*100);
+            int sec = TradeLinkTime % 100;
+            int hm = TradeLinkTime % 10000;
+            int hour = (int)((TradeLinkTime-hm)/10000);
+            int min = (TradeLinkTime - (hour*10000))/100;
+            if (sec>59) { sec -= 60; min++; }
             if (min > 59) { hour++; min-=60; }
             int year = 1, day = 1, month = 1;
             if (TradeLinkDate != 0)
             {
-                year = Convert.ToInt32(TradeLinkDate.ToString().Substring(0, 4));
-                month = Convert.ToInt32(TradeLinkDate.ToString().Substring(4, 2));
-                day = Convert.ToInt32(TradeLinkDate.ToString().Substring(6, 2));
+                int ym = (TradeLinkDate % 10000);
+                year = (int)((TradeLinkDate - ym)/10000);
+                int mm = ym % 100;
+                month = (int)((ym - mm) / 100);
+                day = mm;
             }
-            return new DateTime(year, month, day, hour, min, TradeLinkSec);
+            return new DateTime(year, month, day, hour, min, sec);
         }
         /// <summary>
         /// converts datetime to fasttime format
@@ -103,7 +117,7 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static int TL2FT(Tick t) { return t.time * 100 + t.sec; }
+        public static int TL2FT(Tick t) { return t.time; }
         /// <summary>
         /// gets elapsed seconds between two fasttimes
         /// </summary>

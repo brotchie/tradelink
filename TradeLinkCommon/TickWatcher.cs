@@ -11,7 +11,7 @@ namespace TradeLink.Common
     {
         private int _defaultwait = 60;
         private bool _alertonfirst = true;
-        private Dictionary<string, long> _last = new Dictionary<string, long>();
+        private Dictionary<string, int> _last = new Dictionary<string, int>();
         public event SecurityDelegate Alerted;
         public event SecurityDelegate FirstTick;
         public bool FireFirstTick { get { return _alertonfirst; } set { _alertonfirst = value; } }
@@ -24,19 +24,19 @@ namespace TradeLink.Common
         public bool Watch(TickImpl tick) { return Watch(tick, _defaultwait); }
         public bool Watch(TickImpl tick, int NoTicksAlertWait) 
         {
-            long last = Util.ToDateTime(tick.date, tick.time, tick.sec).Ticks;
+            int last = tick.time;
             if (!_last.ContainsKey(tick.symbol))
             {
                 _last.Add(tick.symbol, last);
                 if (_alertonfirst) // if we're notifying when first tick arrives, do it.
                     if (FirstTick != null) 
-                        FirstTick(SecurityImpl.Parse(tick.symbol, Util.ToTLDate(_last[tick.symbol])));
+                        FirstTick(SecurityImpl.Parse(tick.symbol));
                 return true;
             }
-            TimeSpan span = new TimeSpan(Util.ToDateTime(tick.date, tick.time, tick.sec).Ticks - _last[tick.symbol]);
-            bool alert = span.TotalSeconds>NoTicksAlertWait;
+            int span = Util.FTDIFF(_last[tick.symbol],last);
+            bool alert = span>NoTicksAlertWait;
             _last[tick.symbol] = last;
-            if (alert && (Alerted!=null)) Alerted(SecurityImpl.Parse(tick.symbol,tick.date));
+            if (alert && (Alerted!=null)) Alerted(SecurityImpl.Parse(tick.symbol,_last[tick.symbol]));
             return !alert;
         }
         /// <summary>
@@ -56,8 +56,8 @@ namespace TradeLink.Common
         { 
             foreach (string sym in _last.Keys)
                 if (Alerted!=null)
-                    if ((new TimeSpan(date.Ticks - _last[sym])).TotalSeconds>AlertSecondsWithoutTick)
-                        Alerted(SecurityImpl.Parse(sym,Util.ToTLDate(_last[sym])));
+                    if (Util.FTDIFF(_last[sym],Util.DT2FT(date))>AlertSecondsWithoutTick)
+                        Alerted(SecurityImpl.Parse(sym,_last[sym]));
         }
 
 

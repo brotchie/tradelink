@@ -15,18 +15,18 @@ namespace TestTradeLink
 
         const string sym = "TST";
         const int d = 20070517;
-        const int t = 935;
+        const int t = 93500;
         const string x = "NYSE";
         TickImpl[] ticklist = new TickImpl[] { 
-                TickImpl.NewTrade(sym,d,t,0,10,100,x),
-                TickImpl.NewTrade(sym,d,t+1,0,10,100,x),
-                TickImpl.NewTrade(sym,d,t+2,0,10,100,x),
-                TickImpl.NewTrade(sym,d,t+3,0,10,100,x),
-                TickImpl.NewTrade(sym,d,t+4,0,15,100,x), 
-                TickImpl.NewTrade(sym,d,t+5,0,16,100,x), 
-                TickImpl.NewTrade(sym,d,t+6,0,16,100,x),
-                TickImpl.NewTrade(sym,d,t+7,0,10,100,x), 
-                TickImpl.NewTrade(sym,d,t+7,10,10,100,x), 
+                TickImpl.NewTrade(sym,d,t,10,100,x),
+                TickImpl.NewTrade(sym,d,t+100,10,100,x),
+                TickImpl.NewTrade(sym,d,t+200,10,100,x),
+                TickImpl.NewTrade(sym,d,t+300,10,100,x),
+                TickImpl.NewTrade(sym,d,t+400,15,100,x), 
+                TickImpl.NewTrade(sym,d,t+500,16,100,x), 
+                TickImpl.NewTrade(sym,d,t+600,16,100,x),
+                TickImpl.NewTrade(sym,d,t+700,10,100,x), 
+                TickImpl.NewTrade(sym,d,t+710,10,100,x), 
             };
 
         [Test]
@@ -57,19 +57,19 @@ namespace TestTradeLink
             int accepts = 0;
             foreach (TickImpl k in ticklist)
                 if (b.newTick(k)) accepts++;
-            Assert.That(accepts == 5);
+            Assert.AreEqual(5, accepts);
 
             b = new BarImpl(BarInterval.FifteenMin);
             accepts = 0;
             foreach (TickImpl k in ticklist)
                 if (b.newTick(k)) accepts++;
-            Assert.That(accepts == 9);
+            Assert.AreEqual(9, accepts);
 
             b = new BarImpl(BarInterval.Minute);
             accepts = 0;
             for (int i = 7; i<ticklist.Length; i++)
                 if (b.newTick(ticklist[i])) accepts++;
-            Assert.That(accepts == 2);
+            Assert.AreEqual(2,accepts);
 
         }
     }

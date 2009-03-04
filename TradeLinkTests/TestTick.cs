@@ -81,12 +81,10 @@ namespace TestTradeLink
             const decimal p = 10m;
             const int s = 300;
             const int date = 20080702;
-            const int time = 935;
-            const int sec = 3;
+            const int time = 93503;
             TickImpl pre = TickImpl.NewTrade(t, p, s);
             pre.time = time;
             pre.date = date;
-            pre.sec = sec;
             pre.bid = p;
             pre.ask = p;
             pre.os = s;
@@ -98,7 +96,6 @@ namespace TestTradeLink
             Tick post = TickImpl.Deserialize(serialize);
             Assert.That(post.time == pre.time, post.time.ToString());
             Assert.That(post.date == pre.date);
-            Assert.That(post.sec == pre.sec);
             Assert.That(post.bs == pre.bs);
             Assert.That(post.bid == pre.bid);
             Assert.That(post.ask == pre.ask);

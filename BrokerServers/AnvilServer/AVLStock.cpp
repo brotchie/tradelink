@@ -120,8 +120,7 @@ void AVLStock::QuoteNotify()
 			CTime ct(now);
 			TLTick k;
 			k.date = (ct.GetYear()*10000) + (ct.GetMonth()*100) + ct.GetDay();
-			k.time = (ct.GetHour()*100)+ct.GetMinute();
-			k.sec = ct.GetSecond();
+			k.time = (ct.GetHour()*10000)+(ct.GetMinute()*100) + ct.GetSecond();
 			k.sym = CString(m_symbol.c_str());
 			// get bid
 			B_StartIteration(bidi);
@@ -151,8 +150,7 @@ void AVLStock::TradeNotify()
 			CTime ct(now);
 			TLTick k;
 			k.date = (ct.GetYear()*10000) + (ct.GetMonth()*100) + ct.GetDay();
-			k.time = (ct.GetHour()*100)+ct.GetMinute();
-			k.sec = ct.GetSecond();
+			k.time = (ct.GetHour()*10000)+(ct.GetMinute()*100) + ct.GetSecond();
 			k.sym = CString(m_symbol.c_str());
 			// get trade
 			B_StartIteration(pnti);

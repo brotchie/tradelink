@@ -20,6 +20,8 @@ namespace TradeLink.Common
         volatile int _tickcount;
         long _bytestoprocess = 0;
         List<simworker> Workers = new List<simworker>();
+        int[] idx;
+        int[] cidx;
         
         // events
         public event TickDelegate GotTick;
@@ -124,6 +126,9 @@ namespace TradeLink.Common
             {
                 Workers.Add(new simworker(SecurityImpl.FromFile(file)));
             }
+            // setup our initial index
+            idx = genidx(Workers.Count);
+            cidx = new int[Workers.Count];
 
             D("Initialized " + (_tickfiles.Length ) + " instruments.");
             D(string.Join(Environment.NewLine.ToString(), _tickfiles));
@@ -168,7 +173,7 @@ namespace TradeLink.Common
             // continuously loop through next ticks, playing most
             // recent ones, until simulation end is reached.
             FlushCache(ftime);
-            // when we end simulation, stop reading
+            // when we end simulation, stop reading but don't touch buffer
             CancelWorkers();
             // set next tick time as hint to user
             setnexttime();
@@ -184,21 +189,22 @@ namespace TradeLink.Common
                     Workers[i].RunWorkerAsync(readahead);
 
         }
-        
+
+
         void FlushCache(long endsim)
         {
             bool simrunning = true;
             while (simrunning)
             {
                 long[] times = nexttimes();
-                int[] idx = genidx(times.Length);
-                Array.Sort(times, idx);
+                Buffer.BlockCopy(idx,0,cidx, 0,idx.Length*4);
+                Array.Sort(times, cidx);
                 int nextidx = 0;
                 while ((nextidx<times.Length) && (times[nextidx] == -1))
                     nextidx++;
                 simrunning = (nextidx<times.Length) && (times[nextidx]<=endsim);
                 if (!simrunning) break;
-                Tick k = Workers[idx[nextidx]].NextTick();
+                Tick k = Workers[cidx[nextidx]].NextTick();
                 GotTick(k);
                 _executions += SimBroker.Execute(k);
                 _tickcount++;
@@ -221,8 +227,8 @@ namespace TradeLink.Common
         }
         void CancelWorkers() { for (int i = 0; i < Workers.Count; i++) Workers[i].CancelAsync(); } 
         int[] genidx(int length) { int[] idx = new int[length]; for (int i = 0; i < length; i++) idx[i] = i; return idx; }
-        public static long ENDSIM = (long)Util.DT2FT(DateTime.MaxValue);
-        public static long STARTSIM = (long)Util.DT2FT(DateTime.MinValue);
+        public static long ENDSIM = long.MaxValue;
+        public static long STARTSIM = long.MinValue;
 
     }
 
@@ -234,7 +240,7 @@ namespace TradeLink.Common
         volatile int readcount = 0;
         public bool hasUnread { get { lock (Ticks) { return Ticks.Count>0; } } }
         public Tick NextTick() { lock (Ticks) { return Ticks.Dequeue(); } } 
-        public long NextTime() { return (long)Ticks.Peek().time; } 
+        public long NextTime() { return Ticks.Peek().datetime; } 
         public simworker(SecurityImpl sec)
         {
             workersec = sec;

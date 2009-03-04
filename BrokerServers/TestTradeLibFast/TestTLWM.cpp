@@ -75,7 +75,6 @@ static void __stdcall Basics()
 	f.xsize = size;
 	f.xdate = 20081220;
 	f.xtime = 1556;
-	f.xsec = 0;
 	f.side = true;
 	s.SrvGotFill(f);
 	CFIX_ASSERT(c.fills==1);

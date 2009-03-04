@@ -328,7 +328,6 @@ namespace TradeLibFast
 			TLTimeNow(nowtime);
 			o.date = nowtime[TLdate];
 			o.time = nowtime[TLtime];
-			o.sec = nowtime[TLsec];
 			this->SrvGotOrder(o);
 
 	}
@@ -386,9 +385,9 @@ namespace TradeLibFast
 		std::vector<CString> r2;
 		gsplit(execution.time," ",r);
 		gsplit(r[2],":",r2);
+		int sec = atoi(r2[2]);
 		trade.xdate = atoi(r[0]);
-		trade.xtime = (atoi(r2[0])*100)+atoi(r2[1]);
-		trade.xsec = atoi(r2[2]);
+		trade.xtime = (atoi(r2[0])*10000)+(atoi(r2[1])*100)+sec;
 		this->SrvGotFill(trade);
 
 	}
@@ -440,8 +439,7 @@ namespace TradeLibFast
 			CTime ct(now);
 			TLTick k;
 			k.date = (ct.GetYear()*10000) + (ct.GetMonth()*100) + ct.GetDay();
-			k.time = (ct.GetHour()*100)+ct.GetMinute();
-			k.sec = ct.GetSecond();
+			k.time = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
 			k.sym = stockticks[tickerId].sym;
 			if (tickType==LAST)
 			{
@@ -476,8 +474,7 @@ namespace TradeLibFast
 			CTime ct(now);
 			TLTick k;
 			k.date = (ct.GetYear()*10000) + (ct.GetMonth()*100) + ct.GetDay();
-			k.time = (ct.GetHour()*100)+ct.GetMinute();
-			k.sec = ct.GetSecond();
+			k.time = (ct.GetHour()*10000)+(ct.GetMinute()*100) + ct.GetSecond();
 			k.sym = stockticks[tickerId].sym;
 			TLSecurity sec = TLSecurity::Deserialize(k.sym);
 			bool hundrednorm = sec.type== STK;

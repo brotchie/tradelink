@@ -534,10 +534,9 @@ namespace TradeLibFast
 				// build the serialized trade object
 				CTime ct(msg->x_Time);
 				int xd = (ct.GetYear()*10000)+(ct.GetMonth()*100)+ct.GetDay();
-				int xt = (ct.GetHour()*100)+ct.GetMinute();
+				int xt = (ct.GetHour()*10000)+(ct.GetMinute()*100)*ct.GetSecond();
 				TradeLibFast::TLTrade fill;
 				fill.id = thisid;
-				fill.xsec = ct.GetSecond();
 				fill.xtime = xt;
 				fill.xdate = xd;
 				fill.side = (order->GetSide()=='B');
@@ -573,9 +572,8 @@ namespace TradeLibFast
 				TLOrder o;
 				o.id = id;
 				o.price = order->isMarketOrder() ? 0: order->GetOrderPrice().toDouble();
-				o.sec = ct.GetSecond();
 				o.stop = order->GetStopPrice()->toDouble();
-				o.time = (ct.GetHour()*100)+ct.GetMinute();
+				o.time = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
 				o.date = (ct.GetYear()*10000)+(ct.GetMonth()*100)+ct.GetDay();
 				o.size = order->GetSize();
 				o.side = order->GetSide()=='B';

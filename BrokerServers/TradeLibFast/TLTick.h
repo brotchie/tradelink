@@ -10,7 +10,6 @@ namespace TradeLibFast
 		CString sym;
 		int date;
 		int time;
-		int sec;
 		int size;
 		double trade;
 		double bid;
@@ -33,7 +32,7 @@ namespace TradeLibFast
         ksymbol = 0,
         kdate,
         ktime,
-        ksec,
+        KUNUSED,
         ktrade,
         ktsize,
         ktex,

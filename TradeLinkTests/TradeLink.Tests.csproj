@@ -95,6 +95,9 @@
     <None Include="%24SPX20070926.EPF">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="ABN20080318.EPF">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="FTI20070926.EPF">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

@@ -16,7 +16,6 @@ namespace TradeLibFast
 		CString symbol;
 		int date;
 		int time;
-		int sec;
 		CString comment;
 		CString account;
 		CString exchange;
@@ -48,14 +47,14 @@ namespace TradeLibFast
 		oUSER,
 		oEXCH,
 		oACCT,
-		oSECT,
+		oUNUSEDT,
 		oCURR,
 		oLSYM,
 		oID,
 		oTIF,
 		oDate,
 		oTime,
-		oSec,
+		oUNUSED,
 		oTRAIL,
 	};
 

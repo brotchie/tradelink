@@ -21,10 +21,10 @@ namespace TestTradeLink
         Order o = new OrderImpl();
 
         TickImpl[] timesales = new TickImpl[] { 
-                TickImpl.NewTrade(s,d,t,0,10,100,x),
-                TickImpl.NewTrade(s,d,t+1,0,10,100,x),
-                TickImpl.NewTrade(s,d,t+2,0,10,100,x),
-                TickImpl.NewTrade(s,d,t+3,0,10,100,x),
+                TickImpl.NewTrade(s,d,t,10,100,x),
+                TickImpl.NewTrade(s,d,t+100,10,100,x),
+                TickImpl.NewTrade(s,d,t+200,10,100,x),
+                TickImpl.NewTrade(s,d,t+300,10,100,x),
             };
 
 

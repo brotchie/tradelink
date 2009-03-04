@@ -12,7 +12,6 @@ namespace TradeLibFast
 		double xprice;
 		int xtime;
 		int xdate;
-		int xsec;
 
 		bool isValid();
 		bool isFilled();
@@ -25,7 +24,7 @@ namespace TradeLibFast
     {
         xDate=0,
         xTime,
-        xSeconds,
+        xUNUSED,
         tSymbol,
         tSide,
         tSize,

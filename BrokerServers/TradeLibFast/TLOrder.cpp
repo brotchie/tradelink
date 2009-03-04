@@ -16,7 +16,6 @@ namespace TradeLibFast
 		comment = "";
 		date = 0;
 		time = 0;
-		sec = 0;
 		security = "STK";
 		currency = "USD";
 		account = "";
@@ -34,7 +33,7 @@ namespace TradeLibFast
 		CString sde = (this->side) ? CString("True") : CString("False");
 		CString m;
 		// sym,side,size,price,stop,user,exch,acct,sect,curr,lsym,id,TIF,date,time,sec,trail
-		m.Format(_T("%s,%s,%i,%f,%f,%s,%s,%s,%s,%s,%s,%u,%s,%i,%i,%i,%f"),symbol,sde,size,price,stop,comment,exchange,account,security,currency,localsymbol,id,TIF,date,time,sec,trail);
+		m.Format(_T("%s,%s,%i,%f,%f,%s,%s,%s,%s,%s,%s,%u,%s,%i,%i,,%f"),symbol,sde,size,price,stop,comment,exchange,account,security,currency,localsymbol,id,TIF,date,time,trail);
 		return m;
 	}
 
@@ -52,7 +51,7 @@ namespace TradeLibFast
 		o.currency = r[oCURR];
 		o.exchange = r[oEXCH];
 		o.price = _tstof(r[oPRCE].GetBuffer());
-		o.security = r[oSECT];
+		o.security = r[oUNUSEDT];
 		CString sde = r[oSIDE];
 		o.side = (sde.CompareNoCase(_T("True"))==0);
 		o.size = _tstoi(r[oSIZE].GetBuffer());
@@ -64,7 +63,6 @@ namespace TradeLibFast
 		o.TIF = r[oTIF];
 		o.date = _tstoi(r[oDate].GetBuffer());
 		o.time = _tstoi(r[oTime].GetBuffer());
-		o.sec = _tstoi(r[oSec].GetBuffer());
 		return o;
 	}
 

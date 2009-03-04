@@ -25,7 +25,7 @@ namespace Responses
 
         protected override Order ReadOrder(Tick tick, BarList bl)
         {
-            if (tick.sec % 5 != 0) return new OrderImpl();
+            if (tick.time % 5 != 0) return new OrderImpl();
             if (_buyids.Count > 0)
                 CancelOrders(true);
             else

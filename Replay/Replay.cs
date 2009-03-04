@@ -351,7 +351,6 @@ namespace Replay
             if (!o.isLimit) return t;
             t.time = o.time;
             t.date = o.date;
-            t.sec = o.sec;
             if (o.side)
             {
                 t.bid = o.price;
@@ -385,7 +384,6 @@ namespace Replay
                 OrderImpl o = new SellLimit(t.symbol, t.AskSize, t.ask);
                 o.date = t.date;
                 o.time = t.time;
-                o.sec = t.sec;
                 o.Exchange = t.oe;
                 h.SimBroker.sendOrder(o,HISTBOOK);
             }
@@ -397,7 +395,6 @@ namespace Replay
                 OrderImpl o = new BuyLimit(t.symbol, t.BidSize, t.bid);
                 o.date = t.date;
                 o.time = t.time;
-                o.sec = t.sec; 
                 o.Exchange = t.be;
                 h.SimBroker.sendOrder(o, HISTBOOK);
             }

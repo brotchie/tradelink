@@ -66,7 +66,7 @@ void AVLIndex::FillInfo()
 	time_t now;
 	CTime ct(time(&now));
 	int xd = (ct.GetYear()*10000)+(ct.GetMonth()*100)+ct.GetDay();
-	int xt = (ct.GetHour()*100)+ct.GetMinute();
+	int xt = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
 	double val = m_index->GetValue().toDouble();
 	double open = m_index->GetOpenValue().toDouble();
 	double high = m_index->GetHigh().toDouble();
@@ -77,7 +77,6 @@ void AVLIndex::FillInfo()
 	k.sym = m_index->GetSymbol();
 	k.trade = val;
 	k.size = -1;
-	k.sec = ct.GetSecond();
 	k.date = xd;
 	k.time = xt;
 	tl->SrvGotTick(k);

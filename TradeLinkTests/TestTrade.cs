@@ -31,10 +31,8 @@ namespace TestTradeLink
             //midnight check
             t.xdate = 20081205;
             t.xtime = 0;
-            t.xsec = 0;
             Assert.That(t.isValid);
             t.xtime = 0;
-            t.xsec = 0;
             t.xdate = 0;
             Assert.That(!t.isValid);
         }

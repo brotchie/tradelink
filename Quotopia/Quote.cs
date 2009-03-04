@@ -37,13 +37,9 @@ namespace Quotopia
             show(Util.TLSIdentity());
             QuoteGridSetup();
             FetchTLServer();
-            statfade.Interval = 5000;
+            statfade.Interval = 3000;
             statfade.Tick += new EventHandler(statfade_Tick);
             statfade.Start();
-            ticker.Resolution = 500;
-            ticker.Period = 100;
-            ticker.Mode = Multimedia.TimerMode.Periodic;
-            ticker.Start();
             ar.GotTick += new TickDelegate(ar_GotTick);
             tl.gotTick += new TickDelegate(tl_gotTick);
             tl.gotFill += new FillDelegate(tl_gotFill);
@@ -93,7 +89,7 @@ namespace Quotopia
 
         void statfade_Tick(object sender, EventArgs e)
         {
-            if (DateTime.Now.Subtract(laststat).TotalSeconds > 10)
+            if (DateTime.Now.Subtract(laststat).TotalSeconds > 5)
                 statusStrip1.Visible = false;
         }
 
@@ -534,7 +530,7 @@ namespace Quotopia
                     qt.Rows[rows[i]]["PosSize"] = size.ToString();
                     qt.Rows[rows[i]]["AvgPrice"] = price.ToString("N2");
                 }
-                TradesView.Rows.Add(t.xdate, t.xtime, t.xsec, t.symbol, (t.side ? "BUY" : "SELL"), t.xsize, t.xprice.ToString("N2"), t.comment, t.Account.ToString()); // if we accept trade, add it to list
+                TradesView.Rows.Add(t.xdate, t.xtime, t.symbol, (t.side ? "BUY" : "SELL"), t.xsize, t.xprice.ToString("N2"), t.comment, t.Account.ToString()); // if we accept trade, add it to list
             }
         }
 

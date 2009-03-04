@@ -13,18 +13,18 @@ namespace TestTradeLink
 
         const string sym = "TST";
         const int d = 20070517;
-        const int t = 935;
+        const int t = 93500;
         const string x = "NYSE";
         TickImpl[] ticklist = new TickImpl[] { 
-                TickImpl.NewTrade(sym,d,t,0,10,100,x), // new on all intervals
-                TickImpl.NewTrade(sym,d,t+1,0,10,100,x), //new on 1min
-                TickImpl.NewTrade(sym,d,t+2,0,10,100,x),
-                TickImpl.NewTrade(sym,d,t+3,0,10,100,x),
-                TickImpl.NewTrade(sym,d,t+4,0,15,100,x), 
-                TickImpl.NewTrade(sym,d,t+5,0,16,100,x), //new on 5min
-                TickImpl.NewTrade(sym,d,t+6,0,16,100,x),
-                TickImpl.NewTrade(sym,d,t+7,0,10,100,x), 
-                TickImpl.NewTrade(sym,d,t+7,10,10,100,x), 
+                TickImpl.NewTrade(sym,d,t,10,100,x), // new on all intervals
+                TickImpl.NewTrade(sym,d,t+100,10,100,x), //new on 1min
+                TickImpl.NewTrade(sym,d,t+200,10,100,x),
+                TickImpl.NewTrade(sym,d,t+300,10,100,x),
+                TickImpl.NewTrade(sym,d,t+400,15,100,x), 
+                TickImpl.NewTrade(sym,d,t+500,16,100,x), //new on 5min
+                TickImpl.NewTrade(sym,d,t+600,16,100,x),
+                TickImpl.NewTrade(sym,d,t+700,10,100,x), 
+                TickImpl.NewTrade(sym,d,t+710,10,100,x), 
             };
 
         [Test]
@@ -39,7 +39,7 @@ namespace TestTradeLink
                     newbars++;
             }
 
-            Assert.That(newbars == 2, newbars.ToString());
+            Assert.AreEqual(2,newbars);
 
 
             bl = new BarListImpl(BarInterval.Minute);
@@ -51,24 +51,24 @@ namespace TestTradeLink
                     newbars++;
             }
 
-            Assert.That(newbars == 8, newbars.ToString());
+            Assert.AreEqual(8, newbars);
 
         }
         [Test]
         public void HourTest()
         {
-            int t = 1915;
+            int t = 191500;
             TickImpl[] tape = new TickImpl[] { 
-                TickImpl.NewTrade(sym,d,t,0,10,100,x), // new on all intervals
-                TickImpl.NewTrade(sym,d,t+1,0,10,100,x), 
-                TickImpl.NewTrade(sym,d,t+2,0,10,100,x),
-                TickImpl.NewTrade(sym,d,t+3,0,10,100,x),
-                TickImpl.NewTrade(sym,d,t+4,0,15,100,x), 
-                TickImpl.NewTrade(sym,d,t+5,0,16,100,x), 
-                TickImpl.NewTrade(sym,d,t+6,0,16,100,x),
-                TickImpl.NewTrade(sym,d,t+7,0,10,100,x), 
-                TickImpl.NewTrade(sym,d,t+7,10,10,100,x), 
-                TickImpl.NewTrade(sym,d,t+100,0,10,100,x), // new on hour interval
+                TickImpl.NewTrade(sym,d,t,10,100,x), // new on all intervals
+                TickImpl.NewTrade(sym,d,t+100,10,100,x), 
+                TickImpl.NewTrade(sym,d,t+200,10,100,x),
+                TickImpl.NewTrade(sym,d,t+300,10,100,x),
+                TickImpl.NewTrade(sym,d,t+400,15,100,x), 
+                TickImpl.NewTrade(sym,d,t+500,16,100,x), 
+                TickImpl.NewTrade(sym,d,t+600,16,100,x),
+                TickImpl.NewTrade(sym,d,t+700,10,100,x), 
+                TickImpl.NewTrade(sym,d,t+710,10,100,x), 
+                TickImpl.NewTrade(sym,d,t+10000,10,100,x), // new on hour interval
             };
 
             int newbars = 0;
@@ -80,7 +80,7 @@ namespace TestTradeLink
                     newbars++;
             }
 
-            Assert.That(newbars == 2, newbars.ToString());
+            Assert.AreEqual(2, newbars);
         }
 
 

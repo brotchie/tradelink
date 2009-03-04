@@ -30,7 +30,7 @@ static void __stdcall SerializeDeserialize()
 	o.symbol = sym;
 	o.exchange = ex;
 	o.date = 20081201;
-	o.time = 1531;
+	o.time = 153100;
 	o.price = 0;
 	o.size = -100;
 	o.side = false;
@@ -46,7 +46,6 @@ static void __stdcall SerializeDeserialize()
 	CFIX_ASSERT(o.exchange==d.exchange);
 	CFIX_ASSERT(o.date==d.date);
 	CFIX_ASSERT(o.time==d.time);
-	CFIX_ASSERT(o.sec==d.sec);
 }
 
 CFIX_BEGIN_FIXTURE( TestTLOrder)

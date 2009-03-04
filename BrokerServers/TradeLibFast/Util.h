@@ -13,5 +13,4 @@ enum TLTimeField
 {
 	TLdate,
 	TLtime,
-	TLsec,
 };

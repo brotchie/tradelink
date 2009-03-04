@@ -63,7 +63,7 @@ namespace Kadina
         void h_GotTick(Tick t)
         {
             // get time for display
-            nowtime = t.time.ToString() + ":" + t.sec.ToString();
+            nowtime = t.time.ToString();
             
             // don't display ticks for unmatched exchanges
             if (t.isTrade && !isDesiredExchange(t.ex)) return;
@@ -346,7 +346,7 @@ namespace Kadina
             }
 
             ptab.Rows.Add(nowtime, mypos.Symbol,(mypos.isFlat ? "FLAT" : (mypos.isLong ? "LONG" : "SHORT")), mypos.Size, mypos.AvgPrice.ToString("N2"), cpl.ToString("C2"), cpt.ToString("N1"));
-            ft.Rows.Add(t.xtime.ToString() + "." + t.xsec.ToString(), t.symbol,(t.side ? "BUY" : "SELL"),t.xsize, t.xprice.ToString("N2"));
+            ft.Rows.Add(t.xtime.ToString(), t.symbol,(t.side ? "BUY" : "SELL"),t.xsize, t.xprice.ToString("N2"));
         }
 
         void broker_GotOrder(Order o)
@@ -384,7 +384,7 @@ namespace Kadina
                 try
                 {
                     time = Convert.ToInt32(extra);
-                    DateTime dt = Util.ToDateTime(time, 0); // this should throw exceptions for bad times
+                    DateTime dt = Util.TLT2DT(time); // this should throw exceptions for bad times
                 }
                 catch (Exception) { status("You entered an invalid time."); return; }
             }
@@ -507,7 +507,7 @@ namespace Kadina
                 h.SimBroker.GotOrderCancel += new OrderCancelDelegate(broker_GotOrderCancel);
 
 
-                status("Loaded "+sec.Symbol+" for "+Util.ToDateTime(sec.Date)+" ["+string.Join(",",PrettyEPF())+"]");
+                status("Loaded "+sec.Symbol+" for "+Util.TLD2DT(sec.Date)+" ["+string.Join(",",PrettyEPF())+"]");
                 return true;
             }
 

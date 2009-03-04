@@ -21,11 +21,9 @@ void TLTimeNow(std::vector<int> & nowtime)
 	time(&now);
 	CTime ct(now);
 	int date = (ct.GetYear()*10000) + (ct.GetMonth()*100) + ct.GetDay();
-	int time = (ct.GetHour()*100)+ct.GetMinute();
-	int sec = ct.GetSecond();
+	int time = (ct.GetHour()*10000)+(ct.GetMinute()*100) + ct.GetSecond();
 	nowtime.push_back(date);
 	nowtime.push_back(time);
-	nowtime.push_back(sec);
 }
 
 

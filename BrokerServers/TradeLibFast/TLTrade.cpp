@@ -9,7 +9,6 @@ namespace TradeLibFast
 		xsize = 0;
 		xtime = 0;
 		xdate = 0;
-		xsec = 0;
 		xprice = 0;
 	}
 
@@ -31,7 +30,7 @@ namespace TradeLibFast
 		CString m;
 		CString sde = this->side ? _T("True") : _T("False");
 		// date,time,sec,symbol,side,size,price,comment,acc,sect,currency,localsymbol,exchange
-		m.Format(_T("%i,%i,%i,%s,%s,%i,%f,%s,%s,%s,%s,%s,%u,%s"),xdate,xtime,xsec,symbol,sde,xsize,xprice,comment,account,security,currency,localsymbol,id,exchange);
+		m.Format(_T("%i,%i,,%s,%s,%i,%f,%s,%s,%s,%s,%s,%u,%s"),xdate,xtime,symbol,sde,xsize,xprice,comment,account,security,currency,localsymbol,id,exchange);
 		return m;
 	}
 
@@ -42,7 +41,6 @@ namespace TradeLibFast
 		gsplit(message,_T(","),r);
 		t.xdate = _tstoi(r[xDate]);
 		t.xtime = _tstoi(r[xTime]);
-		t.xsec = _tstoi(r[xSeconds]);
 		t.symbol = r[tSymbol];
 		t.side = (r[tSide].CompareNoCase(_T("True"))==0);
 		t.xsize = _tstoi(r[tSize]);

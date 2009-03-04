@@ -21,19 +21,19 @@ namespace Responses
             const int t = 935;
             const string x = "NYSE";
             TickImpl[] ticklist = new TickImpl[] { 
-                TickImpl.NewTrade(sym,d,t,0,10,100,x),
-                TickImpl.NewTrade(sym,d,t+1,0,10,100,x),
-                TickImpl.NewTrade(sym,d,t+2,0,10,100,x),
-                TickImpl.NewTrade(sym,d,t+3,0,10,100,x),
-                TickImpl.NewTrade(sym,d,t+4,0,15,100,x), // blade up
-                TickImpl.NewTrade(sym,d,t+5,0,16,100,x), // new bar (blades reset)
-                TickImpl.NewTrade(sym,d,t+6,0,16,100,x),
-                TickImpl.NewTrade(sym,d,t+7,0,10,100,x), // blade down
-                TickImpl.NewTrade(sym,d,t+7,10,10,100,x), // still a blade down (same bar)
-                TickImpl.NewTrade(sym,d,t+8,0,15,100,x), 
-                TickImpl.NewTrade(sym,d,t+15,0,15,800,x), // volume spike
-                TickImpl.NewTrade(sym,d,t+20,0,15,100,x), 
-                TickImpl.NewTrade(sym,d,t+25,0,15,100,x), 
+                TickImpl.NewTrade(sym,d,t,10,100,x),
+                TickImpl.NewTrade(sym,d,t+100,10,100,x),
+                TickImpl.NewTrade(sym,d,t+200,10,100,x),
+                TickImpl.NewTrade(sym,d,t+300,10,100,x),
+                TickImpl.NewTrade(sym,d,t+400,15,100,x), // blade up
+                TickImpl.NewTrade(sym,d,t+500,16,100,x), // new bar (blades reset)
+                TickImpl.NewTrade(sym,d,t+600,16,100,x),
+                TickImpl.NewTrade(sym,d,t+700,10,100,x), // blade down
+                TickImpl.NewTrade(sym,d,t+700,10,100,x), // still a blade down (same bar)
+                TickImpl.NewTrade(sym,d,t+800,15,100,x), 
+                TickImpl.NewTrade(sym,d,t+1500,15,800,x), // volume spike
+                TickImpl.NewTrade(sym,d,t+2000,15,100,x), 
+                TickImpl.NewTrade(sym,d,t+2500,15,100,x), 
             };
 
             BarListImpl bl = new BarListImpl(BarInterval.FiveMin,sym);

@@ -11,7 +11,7 @@ namespace TradeLink.API
         Security Sec { get; set; } // security type
         int time { get; set; }// time in 1601 format
         int date { get; set; }// date in 20070926 format
-        int sec { get; set; } // time in seconds
+        long datetime { get; set; } // datetime as long
         int size { get; set; } // trade size
         decimal trade { get; set; } // trade price
         decimal bid { get; set; } // bid price

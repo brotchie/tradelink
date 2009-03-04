@@ -8,7 +8,7 @@ namespace TradeLink.API
     {
         xDate = 0,
         xTime,
-        xSeconds,
+        xUNUSED,
         Symbol,
         Side,
         Size,

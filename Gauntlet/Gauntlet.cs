@@ -55,7 +55,7 @@ using TradeLink.API;
             {
                 SecurityImpl s = StockFromFileName(fi[i].Name);
                 if (!s.isValid) continue;
-                DateTime d = Util.ToDateTime(s.Date);
+                DateTime d = Util.TLD2DT(s.Date);
                 if (!stocklist.Items.Contains(s.Symbol))
                     stocklist.Items.Add(s.Symbol);
                 if (!contains(d.Year,years))
@@ -184,7 +184,7 @@ using TradeLink.API;
                 {
                     continue;
                 }
-                DateTime d = Util.ToDateTime(s.Date);
+                DateTime d = Util.TLD2DT(s.Date);
                 if (ud)
                 {
                     for (int j = 0; j < yearlist.SelectedItems.Count; j++)

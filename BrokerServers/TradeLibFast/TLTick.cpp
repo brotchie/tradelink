@@ -18,7 +18,6 @@ namespace TradeLibFast
 		oe = "";
 		date = 0;
 		time = 0;
-		sec = 0;
 	}
 	bool TLTick::isTrade()
 	{
@@ -33,7 +32,7 @@ namespace TradeLibFast
 	CString TLTick::Serialize(void)
 	{
 		CString m;
-		m.Format(_T("%s,%i,%i,%i,%f,%i,%s,%f,%f,%i,%i,%s,%s"),sym,date,time,sec,trade,size,ex,bid,ask,bs,os,be,oe);
+		m.Format(_T("%s,%i,%i,,%f,%i,%s,%f,%f,%i,%i,%s,%s"),sym,date,time,trade,size,ex,bid,ask,bs,os,be,oe);
 		return m;
 	}
 	TLTick TLTick::Deserialize(CString message)
@@ -44,7 +43,6 @@ namespace TradeLibFast
 		k.sym = r[ksymbol];
 		k.date = _tstoi(r[kdate]);
 		k.time = _tstoi(r[ktime]);
-		k.sec = _tstoi(r[ksec]);
 		k.trade = _tstof(r[ktrade]);
 		k.size = _tstoi(r[ktsize]);
 		k.ex = r[ktex];

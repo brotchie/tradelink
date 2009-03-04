@@ -23,11 +23,11 @@ namespace Responses
 
 
         TickImpl[] ticklist = new TickImpl[] {
-            TickImpl.NewTrade(s,d,t,0,1,100,x),
-            TickImpl.NewTrade(s,d,t+1,0,2,100,x),
-            TickImpl.NewTrade(s,d,t+2,0,3,100,x),
-            TickImpl.NewTrade(s,d,t+3,0,4,100,x),
-            TickImpl.NewTrade(s,d,t+4,0,5,100,x),
+            TickImpl.NewTrade(s,d,t,100,100,x),
+            TickImpl.NewTrade(s,d,t+110,2,100,x),
+            TickImpl.NewTrade(s,d,t+200,3,100,x),
+            TickImpl.NewTrade(s,d,t+300,4,100,x),
+            TickImpl.NewTrade(s,d,t+400,5,100,x),
         };
 
         [Test]

@@ -14,7 +14,7 @@ namespace TestTradeLink
         const double EXPECT2SYMTIME = .6;
 
         [Test]
-        public void PlaybackTime()
+        public void RawTicks()
         {
             HistSim h = new HistSim(Environment.CurrentDirectory+"\\");
             h.Initialize();
@@ -36,15 +36,15 @@ namespace TestTradeLink
             Assert.IsTrue(GOODTIME,"Tick arrived out-of-order.");
             // check running time
             Assert.LessOrEqual(time, EXPECT2SYMTIME,"may fail on slow machines");
-            Assert.AreEqual(2,syms.Count);
+            Assert.AreEqual(3,syms.Count);
             // tick count is = 42610 (FTI) + 5001 (SPX)
-            Assert.AreEqual(42610 + 4995, tickcount);
+            Assert.AreEqual(42610 + 4991 + 8041, tickcount);
             // variance from approximate count should be less than 1%
             Assert.Less((tickcount - h.TicksPresent) / h.TicksPresent, .01);
             // actual count should equal simulation count
             Assert.AreEqual(h.TicksProcessed, tickcount);
             // last time is 1649 on SPX
-            Assert.AreEqual(1649, lasttime);
+            Assert.AreEqual(20080318155843, lasttime);
             // printout simulation runtime
             Console.WriteLine();
             Console.WriteLine("Ticks: " + tickcount + ", versus: " + h.TicksPresent + " estimated.");
@@ -53,16 +53,37 @@ namespace TestTradeLink
         }
         int tickcount = 0;
         List<string> syms = new List<string>();
-        int lasttime = 0;
+        long lasttime = 0;
         bool GOODTIME = true;
         void h_GotTick(TradeLink.API.Tick t)
         {
             if (!syms.Contains(t.symbol))
                 syms.Add(t.symbol);
             tickcount++;
-            bool viol = t.time<lasttime;
+            bool viol = t.datetime<lasttime;
             GOODTIME &= !viol;
-            lasttime = t.time;
+            lasttime = t.datetime;
+        }
+
+
+        public void ExecutionTest()
+        {
+            HistSim h = new HistSim(Environment.CurrentDirectory + "\\");
+            h.Initialize();
+
+
+            Assert.AreEqual(0, tickcount);
+            Assert.AreEqual(0, syms.Count);
+            Assert.AreEqual(0, lasttime);
+            Assert.Greater(h.TicksPresent, 0);
+
+            DateTime start = DateTime.Now;
+
+            h.PlayTo(HistSim.ENDSIM);
+
+
+            double time = DateTime.Now.Subtract(start).TotalSeconds;
+
         }
     }
 }

@@ -63,7 +63,6 @@ namespace Responses
 
             _time = tick.time;
             _date = tick.date;
-            _sec = tick.sec;
 
             if ((Time < DayStart) || (Time > DayEnd)) return; // is market open?
             if (Off) return; // don't trade if shutdown

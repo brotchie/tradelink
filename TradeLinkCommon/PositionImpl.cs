@@ -18,7 +18,7 @@ namespace TradeLink.Common
         public PositionImpl(Trade t) 
         {
             if (!t.isValid) throw new Exception("Can't construct a position object from invalid trade.");
-            _sym = t.symbol; _price = t.xprice; _size = t.xsize; _date = t.xdate; _time = t.xtime; _sec = t.xsec; _acct = t.Account;
+            _sym = t.symbol; _price = t.xprice; _size = t.xsize; _date = t.xdate; _time = t.xtime;  _acct = t.Account;
             if (_size>0) _size *= t.side ? 1 : -1;
         }
         string _acct = "";
@@ -27,7 +27,6 @@ namespace TradeLink.Common
         protected decimal _price = 0;
         protected int _date = 0;
         protected int _time = 0;
-        protected int _sec = 0;
         protected decimal _closedpl = 0;
         public bool isValid
         {
@@ -82,7 +81,7 @@ namespace TradeLink.Common
         }
         public Trade ToTrade()
         {
-            DateTime dt = (_date*_time!=0) ? Util.ToDateTime(_date, _time, _sec) : DateTime.Now;
+            DateTime dt = (_date*_time!=0) ? Util.ToDateTime(_date, _time) : DateTime.Now;
             return (TradeLink.API.Trade)new TradeImpl(Symbol, AvgPrice, Size,dt );
         }
 

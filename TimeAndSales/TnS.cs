@@ -152,7 +152,7 @@ namespace TimeSales
         
         void NewTick(Tick t)
         {
-            string time = string.Format("{0}:{1:00}",t.time,t.sec);
+            string time = t.time.ToString();
             string trade = "";
             string bid = "";
             string ask = "";

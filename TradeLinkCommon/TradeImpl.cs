@@ -20,7 +20,6 @@ namespace TradeLink.Common
         protected int _xsize = 0;
         protected int _xdate = 0;
         protected int _xtime = 0;
-        protected int _xsec = 0;
         protected decimal _xprice = 0;
         protected string _ex = "NYSE";
         public int UnsignedSize { get { return Math.Abs(_xsize); } }
@@ -39,7 +38,6 @@ namespace TradeLink.Common
         public decimal xprice { get { return _xprice; } set { _xprice = value; } }
         public int xdate { get { return _xdate; } set { _xdate = value; } }
         public int xtime { get { return _xtime; } set { _xtime = value; } }
-        public int xsec { get { return _xsec; } set { _xsec = value; } }
         public bool isFilled { get { return (xprice * xsize) != 0; } }
         public bool Side { get { return side; } }
         public int Size { get { return xsize; } }
@@ -56,12 +54,11 @@ namespace TradeLink.Common
             comment = copytrade.comment;
             xsize = copytrade.xsize;
             xprice = copytrade.xprice;
-            xsec = copytrade.xsec;
             xtime = copytrade.xtime;
             xdate = copytrade.xdate;
         }
         public virtual decimal Price { get { return xprice; } }
-        public virtual bool isValid { get { return (xsize != 0) && (xprice != 0) && (xtime+xsec+xdate != 0) && (symbol != null) && (symbol!=""); } }
+        public virtual bool isValid { get { return (xsize != 0) && (xprice != 0) && (xtime+xdate != 0) && (symbol != null) && (symbol!=""); } }
         /// <summary>
         /// true if this is a real Trade, otherwise it's still an order.
         /// </summary>
@@ -112,7 +109,7 @@ namespace TradeLink.Common
         public static string Serialize(Trade t)
         {
             const char d = ',';
-            return t.xdate.ToString() + d + t.xtime.ToString() + d + t.xsec.ToString() + d + t.symbol + d + t.side.ToString() + d + t.xsize.ToString() + d + t.xprice.ToString() + d + t.comment + d + t.Account + d + t.Security.ToString() + d + t.Currency.ToString() + d + t.LocalSymbol + d + t.id.ToString() + d + t.ex; ;
+            return t.xdate.ToString() + d + t.xtime.ToString() + d +  d + t.symbol + d + t.side.ToString() + d + t.xsize.ToString() + d + t.xprice.ToString() + d + t.comment + d + t.Account + d + t.Security.ToString() + d + t.Currency.ToString() + d + t.LocalSymbol + d + t.id.ToString() + d + t.ex; ;
         }
         /// <summary>
         /// Deserialize string to Trade
@@ -131,7 +128,6 @@ namespace TradeLink.Common
             t = new TradeImpl(sym, xprice, size);
             t.xdate = Convert.ToInt32(rec[(int)TradeField.xDate]);
             t.xtime = Convert.ToInt32(rec[(int)TradeField.xTime]);
-            t.xsec = Convert.ToInt32(rec[(int)TradeField.xSeconds]);
             t.comment = rec[(int)TradeField.Comment];
             t.Account = rec[(int)TradeField.Account];
             t.LocalSymbol = rec[(int)TradeField.LocalSymbol];

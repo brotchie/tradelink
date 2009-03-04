@@ -34,53 +34,42 @@ namespace TradeLink.Common
             catch (Exception) { return t; }
             string[] r = line.Split(',');
             if (r.Length < 6) return t;
-            t.time = TickTime(r[(int)Q.TIME]);
-            t.date = TickDate(r[(int)Q.DATE]);
-            t.sec = TickSec(r[(int)Q.TIME]);
+            t.symbol = symbol;
+            decimal td = 0;
+            int ti = 0;
+            if (int.TryParse(r[(int)Q.TIME], out ti))
+            {
+                t.time = ti;
+            }
+            if (int.TryParse(r[(int)Q.DATE], out ti))
+                t.date = ti + 20000000;
+            t.datetime = ((long)t.date * 1000000) + (long)t.time;
             if (r[(int)Q.TYPE] == TRADE)
             {
-                t.trade = Convert.ToDecimal(r[(int)T.PRICE]);
-                t.size = Convert.ToInt32(r[(int)T.SIZE]);
+                if (decimal.TryParse(r[(int)T.PRICE], out td))
+                    t.trade = td;
+                if (int.TryParse(r[(int)T.SIZE], out ti))
+                    t.size = ti;
                 t.ex = r[(int)T.EXCH];
             }
             else
             {
-                t.bid = Convert.ToDecimal(r[(int)Q.BID]);
-                t.ask = Convert.ToDecimal(r[(int)Q.ASK]);
-                t.bs =Convert.ToInt32(r[(int)Q.BIDSIZE]);
-                t.os = Convert.ToInt32(r[(int)Q.ASKSIZE]);
+                if (decimal.TryParse(r[(int)Q.BID], out td))
+                    t.bid = td;
+                if (decimal.TryParse(r[(int)Q.ASK], out td))
+                    t.ask = td;
+                if (int.TryParse(r[(int)Q.BIDSIZE], out ti))
+                    t.bs = ti;
+                if (int.TryParse(r[(int)Q.ASKSIZE], out ti))
+                    t.os = ti;
                 t.be = r[(int)Q.BIDEX];
                 t.oe = r[(int)Q.ASKEX];
             }
-            t.symbol = symbol;
             return t;
         }
 
-        static int TickSec(string ticktime)
-        {
-            string t = ticktime.Substring(4, 2);
-            return Convert.ToInt32(t);
-        }
-
-        static int TickTime(string ticktime)
-        {
-            string t = ticktime.Substring(0, 4);
-            return Convert.ToInt32(t);
-        }
-
-        static int TickDate(string tickdate)
-        {
-            int yr = Convert.ToInt32(tickdate.Substring(0, 2));
-            int mo = Convert.ToInt32(tickdate.Substring(2, 2));
-            int dy = Convert.ToInt32(tickdate.Substring(4, 2));
-            yr += 2000;
-            yr *= 10000;
-            mo *= 100;
-            yr += mo + dy;
-            return yr;
-        }
         static string epfdate(int d) { string s = d.ToString();  return s.Substring(2); }
-        static string epftime(int time, int sec) { int num = time * 100 + sec; string s = num.ToString();  return s.PadLeft(6, '0'); }
+        static string epftime(int time) { string s = time.ToString();  return s.PadLeft(6, '0'); }
 
         /// <summary>
         /// Converts the tick to a string-equivalent that can be written to an EPF file.
@@ -90,8 +79,8 @@ namespace TradeLink.Common
         public static string ToEPF(Tick t)
         {
             string s = "";
-            if (!t.isTrade) s = "Q," + epfdate(t.date) + "," + epftime(t.time, t.sec) + "," + t.bid + "," + t.ask + "," + t.bs + "," + t.os + "," + t.be + "," + t.oe;
-            else s = "T," + epfdate(t.date) + "," + epftime(t.time, t.sec) + "," + t.trade + "," + (t.size) + "," + t.ex;
+            if (!t.isTrade) s = "Q," + epfdate(t.date) + "," + epftime(t.time) + "," + t.bid + "," + t.ask + "," + t.bs + "," + t.os + "," + t.be + "," + t.oe;
+            else s = "T," + epfdate(t.date) + "," + epftime(t.time) + "," + t.trade + "," + (t.size) + "," + t.ex;
             return s;
         }
         /// <summary>

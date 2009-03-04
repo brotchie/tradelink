@@ -15,7 +15,7 @@ namespace TradeLink.Common
         public int size { get { return _size; } set { _size = value; } }
         public int date { get { return _date; } set { _date = value; } }
         public int time { get { return _time; } set { _time = value; } }
-        public int sec { get { return _sec; } set { _sec = value; } }
+        public long datetime { get { return _datetime; } set { _datetime = value; } }
         public int bs { get { return _bs; } set { _bs = value; } }
         public int os { get { return _os; } set { _os = value; } }
         public decimal trade { get { return _trade; } set { _trade = value; } }
@@ -38,6 +38,7 @@ namespace TradeLink.Common
         public int AskSize { get { return _os * 100; } set { _os = (int)(value / 100); } }
         public int TradeSize { get { return ts*100; } set { _size = (int)(value / 100); } }
         public int ts { get { return _size / 100; } } // normalized to bs/os
+        public long _datetime;
         Security _Sec;
         string _sym;
         string _be;
@@ -69,6 +70,7 @@ namespace TradeLink.Common
             _trade = 0m;
             _bid = 0;
             _ask = 0;
+            _datetime = 0;
         }
         public static TickImpl Copy(Tick c)
         {
@@ -76,7 +78,7 @@ namespace TradeLink.Common
             if (c.symbol != "") k.symbol = c.symbol;
             k.time = c.time;
             k.date = c.date;
-            k.sec = c.sec;
+            k.datetime = c.datetime;
             k.size = c.size;
             k.trade = c.trade;
             k.bid = c.bid;
@@ -101,7 +103,7 @@ namespace TradeLink.Common
             if (b.time < a.time) return k; // don't process old updates
             k.time = b.time;
             k.date = b.date;
-            k.sec = b.sec;
+            k.datetime = b.datetime;
             k.symbol = b.symbol;
 
             if (b.isTrade)
@@ -170,7 +172,7 @@ namespace TradeLink.Common
         {
             const char d = ',';
             string secname = t.Sec.isValid ? t.Sec.FullName : t.symbol;
-            string s = secname + d + t.date + d + t.time + d + t.sec + d + t.trade + d + t.size + d + t.ex + d + t.bid + d + t.ask + d + t.bs + d + t.os + d + t.be + d + t.oe + d;
+            string s = secname + d + t.date + d + t.time + d + "" + d + t.trade + d + t.size + d + t.ex + d + t.bid + d + t.ask + d + t.bs + d + t.os + d + t.be + d + t.oe + d;
             return s;
         }
 
@@ -190,8 +192,8 @@ namespace TradeLink.Common
             t.be = r[(int)TickField.bidex];
             t.oe = r[(int)TickField.askex];
             t.time = Convert.ToInt32(r[(int)TickField.time]);
-            t.sec = Convert.ToInt32(r[(int)TickField.sec]);
             t.date = Convert.ToInt32(r[(int)TickField.date]);
+            t.datetime = t.date * 1000000 + t.time;
             return t;
         }
 
@@ -199,7 +201,6 @@ namespace TradeLink.Common
         {
         	this.date = date;
         	this.time = time;
-        	this.sec = sec;
         	this.bid = bid;
         	this.ask = ask;
         	this.bs = bidsize;
@@ -215,7 +216,6 @@ namespace TradeLink.Common
         	this.ex = exch;
         	this.date = date;
         	this.time = time;
-        	this.sec = sec;
         	this.trade = price;
         	this.size = size;
         	this.bid = 0;
@@ -232,7 +232,6 @@ namespace TradeLink.Common
             TickImpl q = new TickImpl(sym);
             q.date = date;
             q.time = time;
-            q.sec = sec;
             q.bid = bid;
             q.ask = ask;
             q.be = be.Trim();
@@ -244,13 +243,12 @@ namespace TradeLink.Common
             return q;
         }
 
-        public static TickImpl NewTrade(string sym, decimal trade, int size) { return NewTrade(sym, 0, 0, 0, trade, size, ""); }
-        public static TickImpl NewTrade(string sym, int date, int time, int sec, decimal trade, int size, string ex)
+        public static TickImpl NewTrade(string sym, decimal trade, int size) { return NewTrade(sym, 0, 0,  trade, size, ""); }
+        public static TickImpl NewTrade(string sym, int date, int time, decimal trade, int size, string ex)
         {
             TickImpl t = new TickImpl(sym);
             t.date = date;
             t.time = time;
-            t.sec = sec;
             t.trade = trade;
             t.size = size;
             t.ex = ex.Trim();
@@ -267,7 +265,7 @@ namespace TradeLink.Common
         symbol = 0,
         date,
         time,
-        sec,
+        KUNUSED,
         trade,
         tsize,
         tex,

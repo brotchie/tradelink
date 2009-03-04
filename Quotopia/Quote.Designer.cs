@@ -52,15 +52,6 @@ namespace Quotopia
             this.oaccount = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.TradeTab = new System.Windows.Forms.TabPage();
             this.TradesView = new System.Windows.Forms.DataGridView();
-            this.Date = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Sec = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Symbol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Side = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.xSize = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.xPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Comment = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColAccount = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Settings = new System.Windows.Forms.TabPage();
             this.label2 = new System.Windows.Forms.Label();
             this.exchdest = new System.Windows.Forms.TextBox();
@@ -79,6 +70,14 @@ namespace Quotopia
             this.OrderTimeCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.OrderDateCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.Date = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Symbol = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Side = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.xSize = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.xPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Comment = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ColAccount = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.quoteTab.SuspendLayout();
             this.Markets.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -288,7 +287,6 @@ namespace Quotopia
             this.TradesView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Date,
             this.Time,
-            this.Sec,
             this.Symbol,
             this.Side,
             this.xSize,
@@ -316,64 +314,6 @@ namespace Quotopia
             this.TradesView.ShowEditingIcon = false;
             this.TradesView.Size = new System.Drawing.Size(924, 666);
             this.TradesView.TabIndex = 0;
-            // 
-            // Date
-            // 
-            this.Date.HeaderText = "Date";
-            this.Date.Name = "Date";
-            this.Date.ReadOnly = true;
-            // 
-            // Time
-            // 
-            this.Time.HeaderText = "Time";
-            this.Time.Name = "Time";
-            this.Time.ReadOnly = true;
-            // 
-            // Sec
-            // 
-            this.Sec.HeaderText = "Seconds";
-            this.Sec.Name = "Sec";
-            this.Sec.ReadOnly = true;
-            this.Sec.Visible = false;
-            // 
-            // Symbol
-            // 
-            this.Symbol.HeaderText = "Symbol";
-            this.Symbol.Name = "Symbol";
-            this.Symbol.ReadOnly = true;
-            // 
-            // Side
-            // 
-            this.Side.HeaderText = "Side";
-            this.Side.Name = "Side";
-            this.Side.ReadOnly = true;
-            // 
-            // xSize
-            // 
-            this.xSize.HeaderText = "Size";
-            this.xSize.Name = "xSize";
-            this.xSize.ReadOnly = true;
-            // 
-            // xPrice
-            // 
-            dataGridViewCellStyle6.Format = "N2";
-            dataGridViewCellStyle6.NullValue = null;
-            this.xPrice.DefaultCellStyle = dataGridViewCellStyle6;
-            this.xPrice.HeaderText = "Price";
-            this.xPrice.Name = "xPrice";
-            this.xPrice.ReadOnly = true;
-            // 
-            // Comment
-            // 
-            this.Comment.HeaderText = "Comment";
-            this.Comment.Name = "Comment";
-            this.Comment.ReadOnly = true;
-            // 
-            // ColAccount
-            // 
-            this.ColAccount.HeaderText = "Account";
-            this.ColAccount.Name = "ColAccount";
-            this.ColAccount.ReadOnly = true;
             // 
             // Settings
             // 
@@ -535,6 +475,57 @@ namespace Quotopia
             this.OrderDateCol.Name = "OrderDateCol";
             this.OrderDateCol.ReadOnly = true;
             // 
+            // Date
+            // 
+            this.Date.HeaderText = "Date";
+            this.Date.Name = "Date";
+            this.Date.ReadOnly = true;
+            // 
+            // Time
+            // 
+            this.Time.HeaderText = "Time";
+            this.Time.Name = "Time";
+            this.Time.ReadOnly = true;
+            // 
+            // Symbol
+            // 
+            this.Symbol.HeaderText = "Symbol";
+            this.Symbol.Name = "Symbol";
+            this.Symbol.ReadOnly = true;
+            // 
+            // Side
+            // 
+            this.Side.HeaderText = "Side";
+            this.Side.Name = "Side";
+            this.Side.ReadOnly = true;
+            // 
+            // xSize
+            // 
+            this.xSize.HeaderText = "Size";
+            this.xSize.Name = "xSize";
+            this.xSize.ReadOnly = true;
+            // 
+            // xPrice
+            // 
+            dataGridViewCellStyle6.Format = "N2";
+            dataGridViewCellStyle6.NullValue = null;
+            this.xPrice.DefaultCellStyle = dataGridViewCellStyle6;
+            this.xPrice.HeaderText = "Price";
+            this.xPrice.Name = "xPrice";
+            this.xPrice.ReadOnly = true;
+            // 
+            // Comment
+            // 
+            this.Comment.HeaderText = "Comment";
+            this.Comment.Name = "Comment";
+            this.Comment.ReadOnly = true;
+            // 
+            // ColAccount
+            // 
+            this.ColAccount.HeaderText = "Account";
+            this.ColAccount.Name = "ColAccount";
+            this.ColAccount.ReadOnly = true;
+            // 
             // Quote
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -585,15 +576,6 @@ namespace Quotopia
         private System.Windows.Forms.Button restoredefaultsbut;
         private System.Windows.Forms.Button resetsetbut;
         private System.Windows.Forms.RichTextBox statusWindow;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Date;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Time;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Sec;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Symbol;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Side;
-        private System.Windows.Forms.DataGridViewTextBoxColumn xSize;
-        private System.Windows.Forms.DataGridViewTextBoxColumn xPrice;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Comment;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColAccount;
         private System.Windows.Forms.TabPage ordertab;
         private System.Windows.Forms.DataGridView ordergrid;
         private System.Windows.Forms.DataGridViewTextBoxColumn oid;
@@ -610,5 +592,13 @@ namespace Quotopia
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox exchdest;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Date;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Time;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Symbol;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Side;
+        private System.Windows.Forms.DataGridViewTextBoxColumn xSize;
+        private System.Windows.Forms.DataGridViewTextBoxColumn xPrice;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Comment;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ColAccount;
     }
 }

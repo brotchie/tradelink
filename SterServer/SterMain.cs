@@ -217,10 +217,10 @@ namespace SterServer
             f.xprice = (decimal)t.fExecPrice;
             f.xsize = t.nQuantity;
             long now = Convert.ToInt64(t.bstrUpdateTime);
-            f.xsec = (int)(now % 100);
-            long rem = (now - f.xsec) / 100;
+            int xsec = (int)(now % 100);
+            long rem = (now - xsec) / 100;
             f.side = t.bstrSide == "B";
-            f.xtime = (int)(rem % 10000);
+            f.xtime = ((int)(rem % 10000))*100+xsec;
             f.xdate = (int)((rem - f.xtime) / 10000);
             tl.newFill(f);
         }
@@ -262,8 +262,8 @@ namespace SterServer
                 k.oe = q.bstrAskExch;
             int now = Convert.ToInt32(q.bstrUpdateTime);
             k.date = Util.ToTLDate(DateTime.Now);
-            k.sec = now % 100;
-            k.time = (now - k.sec) / 100;
+            int sec = now % 100;
+            k.time = now;
             k.trade = (decimal)q.fLastPrice;
             k.size = q.nLastSize;
             tl.newTick(k);
@@ -289,8 +289,7 @@ namespace SterServer
                 k.oe = q.bstrAskExch;
             int now = Convert.ToInt32(q.bstrUpdateTime);
             k.date = Util.ToTLDate(DateTime.Now);
-            k.sec = now % 100;
-            k.time = (now - k.sec) / 100;
+            k.time = now;
             k.trade = (decimal)q.fLastPrice;
             k.size = q.nLastSize;
             tl.newTick(k);

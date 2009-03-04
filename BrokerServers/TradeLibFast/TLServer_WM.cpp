@@ -252,7 +252,7 @@ namespace TradeLibFast
 			CString line;
 			vector<int> now;
 			TLTimeNow(now);
-			line.Format("%i:%i %s%s",now[1],now[2],message,NEWLINE);
+			line.Format("%i %s%s",now[TLtime],message,NEWLINE);
 			debugbuffer.Append(line);
 			__raise this->GotDebug(line);
 		}
