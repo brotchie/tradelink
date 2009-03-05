@@ -18,16 +18,20 @@ namespace ServerMB
     public partial class ServerMBMain : Form, IMbtQuotesNotify
     {
         TLServer_WM tl = new TLServer_WM();
-        public MBTCOMLib.MbtComMgr m_ComMgr;
-        public MBTORDERSLib.MbtOrderClient m_OrderClient;
-        public MBTORDERSLib.MbtAccount m_Account;
-        public MbtQuotes m_Quotes;
+        static MBTCOMLib.MbtComMgr m_ComMgr;
+        static MBTORDERSLib.MbtOrderClient m_OrderClient;
+        static MbtQuotes m_Quotes;
         PositionTracker pt = new PositionTracker();
         bool showmessage = false;
         public ServerMBMain()
         {
             InitializeComponent();
             _msg.SendToBack();
+            m_ComMgr = new MBTCOMLib.MbtComMgrClass();
+            m_ComMgr.SilentMode = true;
+            m_ComMgr.EnableSplash(false);
+            m_OrderClient = m_ComMgr.OrderClient;
+            m_Quotes = m_ComMgr.Quotes;
             ContextMenu = new ContextMenu();
             ContextMenu.MenuItems.Add("Messages", new EventHandler(rightmessage));
 
@@ -42,6 +46,8 @@ namespace ServerMB
 
 
             // mb bindings
+            m_ComMgr.OnLogonSucceed += new IMbtComMgrEvents_OnLogonSucceedEventHandler(m_ComMgr_OnLogonSucceed);
+            m_ComMgr.OnLogonDeny += new IMbtComMgrEvents_OnLogonDenyEventHandler(m_ComMgr_OnLogonDeny);
             m_OrderClient.OnSubmit += new _IMbtOrderClientEvents_OnSubmitEventHandler(m_OrderClient_OnSubmit);
             m_OrderClient.OnRemove += new _IMbtOrderClientEvents_OnRemoveEventHandler(m_OrderClient_OnRemove);
             m_OrderClient.OnPositionUpdated += new _IMbtOrderClientEvents_OnPositionUpdatedEventHandler(m_OrderClient_OnPositionUpdated);
@@ -51,19 +57,39 @@ namespace ServerMB
 
         }
 
+        void m_ComMgr_OnLogonDeny(string bstrReason)
+        {
+            debug("login denied: " + bstrReason);
+        }
+
+        void m_ComMgr_OnLogonSucceed()
+        {
+            debug("login successful");
+        }
+
+
         void rightmessage(object sender, EventArgs e)
         {
             showmessage = !showmessage;
             if (showmessage)
+            {
+                _msg.Visible = true;
                 _msg.BringToFront();
+                Invalidate(true);
+            }
             else
+            {
+                _msg.Visible = false;
                 _msg.SendToBack();
+                Invalidate(true);
+            }
         }
 
 
 
         void ServerMBMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            Properties.Settings.Default.Save();
             try
             {
                 m_Quotes.Disconnect();
@@ -199,8 +225,11 @@ namespace ServerMB
             int voltype = MBConst.VALUE_NORMAL;
             DateTime dt = new DateTime(0);
             string res = null;
-            bool good = m_OrderClient.Submit(side, o.UnsignedSize, o.symbol, (double)o.price, (double)o.stopp, tif, 0, otype, voltype, 0, m_Account, route, "", 0, 0, dt, dt, 0, 0, 0, 0, 0, ref res);
+            MbtAccount m_account = getaccount(o.Account);
+            bool good = m_OrderClient.Submit(side, o.UnsignedSize, o.symbol, (double)o.price, (double)o.stopp, tif, 0, otype, voltype, 0, m_account, route, "", 0, 0, dt, dt, 0, 0, 0, 0, 0, ref res);
         }
+
+        MbtAccount getaccount(string name) { foreach (MbtAccount a in m_OrderClient.Accounts) if (a.Account == name) return a; return m_OrderClient.Accounts.DefaultAccount; }
 
         MessageTypes[] tl_newFeatureRequest()
         {

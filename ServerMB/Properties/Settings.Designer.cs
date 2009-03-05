@@ -46,5 +46,17 @@ namespace ServerMB.Properties {
                 this["password"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public decimal memberid {
+            get {
+                return ((decimal)(this["memberid"]));
+            }
+            set {
+                this["memberid"] = value;
+            }
+        }
     }
 }

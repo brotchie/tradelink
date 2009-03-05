@@ -49,13 +49,16 @@
             this._msg.Name = "_msg";
             this._msg.Size = new System.Drawing.Size(278, 244);
             this._msg.TabIndex = 0;
+            this._msg.Visible = false;
             // 
             // _user
             // 
+            this._user.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::ServerMB.Properties.Settings.Default, "username", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this._user.Location = new System.Drawing.Point(131, 66);
             this._user.Name = "_user";
             this._user.Size = new System.Drawing.Size(100, 26);
             this._user.TabIndex = 1;
+            this._user.Text = global::ServerMB.Properties.Settings.Default.username;
             // 
             // label1
             // 
@@ -68,11 +71,13 @@
             // 
             // _pass
             // 
+            this._pass.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::ServerMB.Properties.Settings.Default, "password", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this._pass.Location = new System.Drawing.Point(130, 99);
             this._pass.Name = "_pass";
             this._pass.PasswordChar = '*';
             this._pass.Size = new System.Drawing.Size(100, 26);
             this._pass.TabIndex = 3;
+            this._pass.Text = global::ServerMB.Properties.Settings.Default.password;
             this._pass.UseSystemPasswordChar = true;
             // 
             // label2
@@ -105,11 +110,18 @@
             // 
             // _id
             // 
+            this._id.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::ServerMB.Properties.Settings.Default, "memberid", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this._id.Location = new System.Drawing.Point(131, 34);
+            this._id.Maximum = new decimal(new int[] {
+            -727379968,
+            232,
+            0,
+            0});
             this._id.Name = "_id";
             this._id.Size = new System.Drawing.Size(99, 26);
             this._id.TabIndex = 8;
             this._id.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this._id.Value = global::ServerMB.Properties.Settings.Default.memberid;
             // 
             // ServerMBMain
             // 
