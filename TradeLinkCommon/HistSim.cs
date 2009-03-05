@@ -134,8 +134,6 @@ namespace TradeLink.Common
             D(string.Join(Environment.NewLine.ToString(), _tickfiles));
             // read in single tick just to get first time for user
             FillCache(1);
-            // set first time as hint for user
-            setnexttime();
 
             // get total bytes represented by files
             DirectoryInfo di = new DirectoryInfo(_folder);
@@ -148,6 +146,8 @@ namespace TradeLink.Common
             }
             D("Approximately " + TicksPresent + " ticks to process...");
             _inited = true;
+            // set first time as hint for user
+            setnexttime();
         }
         /// <summary>
         /// Run simulation to specific time

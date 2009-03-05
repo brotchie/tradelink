@@ -33,6 +33,7 @@ namespace WinGauntlet
             this.button1 = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.studypage = new System.Windows.Forms.TabPage();
+            this._stopbut = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -59,8 +60,6 @@ namespace WinGauntlet
             this.clearmessages = new System.Windows.Forms.CheckBox();
             this.saveonexit = new System.Windows.Forms.CheckBox();
             this.savesettings = new System.Windows.Forms.Button();
-            this.label4 = new System.Windows.Forms.Label();
-            this.exchlist = new System.Windows.Forms.ListBox();
             this.label2 = new System.Windows.Forms.Label();
             this.button2 = new System.Windows.Forms.Button();
             this.showdebug = new System.Windows.Forms.CheckBox();
@@ -77,7 +76,7 @@ namespace WinGauntlet
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(12, 54);
+            this.button1.Location = new System.Drawing.Point(306, 101);
             this.button1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(32, 28);
@@ -100,6 +99,7 @@ namespace WinGauntlet
             // 
             // studypage
             // 
+            this.studypage.Controls.Add(this._stopbut);
             this.studypage.Controls.Add(this.label6);
             this.studypage.Controls.Add(this.label5);
             this.studypage.Controls.Add(this.label3);
@@ -121,6 +121,17 @@ namespace WinGauntlet
             this.studypage.TabIndex = 0;
             this.studypage.Text = "Studies";
             this.studypage.UseVisualStyleBackColor = true;
+            // 
+            // _stopbut
+            // 
+            this._stopbut.Enabled = false;
+            this._stopbut.Location = new System.Drawing.Point(534, 300);
+            this._stopbut.Name = "_stopbut";
+            this._stopbut.Size = new System.Drawing.Size(78, 31);
+            this._stopbut.TabIndex = 17;
+            this._stopbut.Text = "Stop";
+            this._stopbut.UseVisualStyleBackColor = true;
+            this._stopbut.Click += new System.EventHandler(this._stopbut_Click);
             // 
             // label6
             // 
@@ -260,7 +271,7 @@ namespace WinGauntlet
             this.queuebut.Location = new System.Drawing.Point(106, 300);
             this.queuebut.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.queuebut.Name = "queuebut";
-            this.queuebut.Size = new System.Drawing.Size(506, 31);
+            this.queuebut.Size = new System.Drawing.Size(421, 31);
             this.queuebut.TabIndex = 4;
             this.queuebut.Text = "Run the Gauntlet";
             this.toolTip1.SetToolTip(this.queuebut, "start the backtesting run");
@@ -305,8 +316,6 @@ namespace WinGauntlet
             this.optionpage.Controls.Add(this.clearmessages);
             this.optionpage.Controls.Add(this.saveonexit);
             this.optionpage.Controls.Add(this.savesettings);
-            this.optionpage.Controls.Add(this.label4);
-            this.optionpage.Controls.Add(this.exchlist);
             this.optionpage.Controls.Add(this.label2);
             this.optionpage.Controls.Add(this.button2);
             this.optionpage.Controls.Add(this.showdebug);
@@ -327,7 +336,7 @@ namespace WinGauntlet
             this.csvnamesunique.Checked = global::WinGauntlet.Properties.Settings.Default.csvnamesunique;
             this.csvnamesunique.CheckState = System.Windows.Forms.CheckState.Checked;
             this.csvnamesunique.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "csvnamesunique", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.csvnamesunique.Location = new System.Drawing.Point(12, 338);
+            this.csvnamesunique.Location = new System.Drawing.Point(306, 154);
             this.csvnamesunique.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.csvnamesunique.Name = "csvnamesunique";
             this.csvnamesunique.Size = new System.Drawing.Size(191, 24);
@@ -341,7 +350,7 @@ namespace WinGauntlet
             this.indicatorscsv.AutoSize = true;
             this.indicatorscsv.Checked = global::WinGauntlet.Properties.Settings.Default.indicatorsincsv;
             this.indicatorscsv.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "indicatorsincsv", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.indicatorscsv.Location = new System.Drawing.Point(12, 306);
+            this.indicatorscsv.Location = new System.Drawing.Point(306, 223);
             this.indicatorscsv.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.indicatorscsv.Name = "indicatorscsv";
             this.indicatorscsv.Size = new System.Drawing.Size(154, 24);
@@ -356,7 +365,7 @@ namespace WinGauntlet
             this.tradesincsv.Checked = global::WinGauntlet.Properties.Settings.Default.tradesincsv;
             this.tradesincsv.CheckState = System.Windows.Forms.CheckState.Checked;
             this.tradesincsv.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "tradesincsv", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.tradesincsv.Location = new System.Drawing.Point(12, 273);
+            this.tradesincsv.Location = new System.Drawing.Point(306, 189);
             this.tradesincsv.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tradesincsv.Name = "tradesincsv";
             this.tradesincsv.Size = new System.Drawing.Size(133, 24);
@@ -370,7 +379,7 @@ namespace WinGauntlet
             this.ordersincsv.AutoSize = true;
             this.ordersincsv.Checked = global::WinGauntlet.Properties.Settings.Default.ordersincsv;
             this.ordersincsv.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "ordersincsv", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.ordersincsv.Location = new System.Drawing.Point(12, 239);
+            this.ordersincsv.Location = new System.Drawing.Point(306, 257);
             this.ordersincsv.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.ordersincsv.Name = "ordersincsv";
             this.ordersincsv.Size = new System.Drawing.Size(132, 24);
@@ -409,7 +418,7 @@ namespace WinGauntlet
             this.messagewrite.Checked = global::WinGauntlet.Properties.Settings.Default.writeonmessages;
             this.messagewrite.CheckState = System.Windows.Forms.CheckState.Checked;
             this.messagewrite.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "writeonmessages", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.messagewrite.Location = new System.Drawing.Point(12, 205);
+            this.messagewrite.Location = new System.Drawing.Point(42, 257);
             this.messagewrite.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.messagewrite.Name = "messagewrite";
             this.messagewrite.Size = new System.Drawing.Size(206, 24);
@@ -424,7 +433,7 @@ namespace WinGauntlet
             this.clearmessages.Checked = global::WinGauntlet.Properties.Settings.Default.clearmessages;
             this.clearmessages.CheckState = System.Windows.Forms.CheckState.Checked;
             this.clearmessages.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "clearmessages", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.clearmessages.Location = new System.Drawing.Point(12, 171);
+            this.clearmessages.Location = new System.Drawing.Point(42, 223);
             this.clearmessages.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.clearmessages.Name = "clearmessages";
             this.clearmessages.Size = new System.Drawing.Size(201, 24);
@@ -439,7 +448,7 @@ namespace WinGauntlet
             this.saveonexit.Checked = global::WinGauntlet.Properties.Settings.Default.saveonexit;
             this.saveonexit.CheckState = System.Windows.Forms.CheckState.Checked;
             this.saveonexit.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "saveonexit", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.saveonexit.Location = new System.Drawing.Point(12, 103);
+            this.saveonexit.Location = new System.Drawing.Point(42, 154);
             this.saveonexit.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.saveonexit.Name = "saveonexit";
             this.saveonexit.RightToLeft = System.Windows.Forms.RightToLeft.No;
@@ -461,43 +470,10 @@ namespace WinGauntlet
             this.savesettings.UseVisualStyleBackColor = true;
             this.savesettings.Click += new System.EventHandler(this.savesettings_Click);
             // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(303, 103);
-            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(119, 20);
-            this.label4.TabIndex = 9;
-            this.label4.Text = "Exchange Filter";
-            // 
-            // exchlist
-            // 
-            this.exchlist.FormattingEnabled = true;
-            this.exchlist.ItemHeight = 20;
-            this.exchlist.Items.AddRange(new object[] {
-            "<NoFiltering>",
-            "NYS",
-            "NMS",
-            "PSE",
-            "ARCA",
-            "NASD",
-            "NSDQ",
-            "ISLND",
-            "BATS",
-            "AMEX",
-            "NYSE"});
-            this.exchlist.Location = new System.Drawing.Point(307, 137);
-            this.exchlist.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.exchlist.Name = "exchlist";
-            this.exchlist.Size = new System.Drawing.Size(127, 84);
-            this.exchlist.TabIndex = 8;
-            this.toolTip1.SetToolTip(this.exchlist, "only send ticks from desired exchange to response");
-            // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(269, 62);
+            this.label2.Location = new System.Drawing.Point(77, 106);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(165, 20);
@@ -507,7 +483,7 @@ namespace WinGauntlet
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(231, 56);
+            this.button2.Location = new System.Drawing.Point(42, 103);
             this.button2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(30, 26);
@@ -518,7 +494,7 @@ namespace WinGauntlet
             // showdebug
             // 
             this.showdebug.AutoSize = true;
-            this.showdebug.Location = new System.Drawing.Point(12, 137);
+            this.showdebug.Location = new System.Drawing.Point(42, 189);
             this.showdebug.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.showdebug.Name = "showdebug";
             this.showdebug.RightToLeft = System.Windows.Forms.RightToLeft.No;
@@ -531,7 +507,7 @@ namespace WinGauntlet
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(51, 61);
+            this.label1.Location = new System.Drawing.Point(346, 106);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(135, 20);
@@ -601,8 +577,6 @@ namespace WinGauntlet
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.RichTextBox messages;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.ListBox exchlist;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.CheckBox saveonexit;
         private System.Windows.Forms.Button savesettings;
@@ -626,6 +600,7 @@ namespace WinGauntlet
         private System.Windows.Forms.CheckBox indicatorscsv;
         private System.Windows.Forms.CheckBox csvnamesunique;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.Button _stopbut;
     }
 }
 

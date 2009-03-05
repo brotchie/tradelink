@@ -69,9 +69,41 @@ namespace Kadina
             if (t.isTrade && !isDesiredExchange(t.ex)) return;
             else if (t.hasBid && !isDesiredExchange(t.be)) return;
             else if (t.hasAsk && !isDesiredExchange(t.oe)) return;
+            string time = t.time.ToString();
+            string trade = "";
+            string bid = "";
+            string ask = "";
+            string ts = "";
+            string bs = "";
+            string os = "";
+            string be = "";
+            string oe = "";
+            string ex = "";
+            if (t.isIndex)
+            {
+                trade = t.trade.ToString("N2");
+            }
+            else if (t.isTrade)
+            {
+                trade = t.trade.ToString("N2");
+                ts = t.size.ToString();
+                ex = t.ex;
+            }
+            if (t.hasBid)
+            {
+                bs = t.bs.ToString();
+                be = t.be;
+                bid = t.bid.ToString("N2");
+            }
+            if (t.hasAsk)
+            {
+                ask = t.ask.ToString("N2");
+                oe = t.oe;
+                os = t.os.ToString();
+            }
             
             // add tick to grid
-            NewTRow(new object[] { nowtime, t.symbol,(t.trade!=0 ? t.trade.ToString("N2") : ""), t.size != 0 ? t.size.ToString() : "", t.bid!=0 ? t.bid.ToString("N2") : "", t.ask!=0 ? t.ask.ToString("N2") : "", t.bs!=0 ? t.bs.ToString() : "", t.os!=0 ? t.os.ToString() : "", t.ex,t.be,t.oe });
+            NewTRow(new string[] { nowtime,t.symbol,trade,ts,bid,ask,bs,os,ex,be,oe});
         }
 
         void Play(object sender, DoWorkEventArgs e)
@@ -81,8 +113,11 @@ namespace Kadina
             int t = (int)type;
             h.Initialize();
             int maxmin = (t > 127) && (t < 450) ? t - 127 : 0;
-            int stop = Util.FTADD((int)h.NextTickTime, maxmin * 60);
-            h.PlayTo(stop);
+            long firsttime = h.NextTickTime % 1000000;
+            long rem = h.NextTickTime - firsttime;
+            int stop = Util.FTADD((int)firsttime, maxmin * 60);
+            rem += stop;
+            h.PlayTo(rem);
         }
 
 
@@ -356,14 +391,14 @@ namespace Kadina
         string nowtime = "0";
 
 
-
-        void NewTRow(object[] values)
+        delegate void StringArrayDelegate(string[] vals);
+        void NewTRow(string[] values)
         {
             if (dg.InvokeRequired)
             {
                 try
                 {
-                    Invoke(new ObjectArrayDelegate(NewTRow), new object[] { values });
+                    Invoke(new StringArrayDelegate(NewTRow), new object[] { values });
                 }
                 catch (ObjectDisposedException) { }
             }

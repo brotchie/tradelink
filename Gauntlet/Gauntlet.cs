@@ -22,10 +22,10 @@ using TradeLink.API;
             string fn = (WinGauntlet.Properties.Settings.Default.boxdll== null) ? "box.dll" : WinGauntlet.Properties.Settings.Default.boxdll;
             if (File.Exists(fn))
                 UpdateResponses(Util.GetResponseList(fn));
-            exchlist.SelectedItem = "NYS";
             ProgressBar1.Enabled = false;
             FormClosing+=new FormClosingEventHandler(Gauntlet_FormClosing);
             debug(Util.TLSIdentity());
+            bw.WorkerSupportsCancellation = true;
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_RunWorkerCompleted);
             bw.DoWork += new DoWorkEventHandler(bw_DoWork);
         }
@@ -86,6 +86,8 @@ using TradeLink.API;
             ProgressBar1.Enabled = true;
             // disable more than one simulation at once
             queuebut.Enabled = false;
+            // enable canceling
+            _stopbut.Enabled = true;
 
             // prepare indicator output if requested
             if (indicatorscsv.Checked)
@@ -128,42 +130,56 @@ using TradeLink.API;
         // runs after simulation is complete
         void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            SimWorker args = (SimWorker)e.Result;
-            string unique = csvnamesunique.Checked ? "." + args.Name : "";
-            if (tradesincsv.Checked)
+
+            if (!e.Cancelled)
             {
-                debug("writing trades...");
-                Util.ClosedPLToText(h.SimBroker.GetTradeList(), ',', Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Trades" + unique + ".csv");
+                SimWorker args = (SimWorker)e.Result;
+                string unique = csvnamesunique.Checked ? "." + args.Name : "";
+                if (tradesincsv.Checked)
+                {
+                    debug("writing trades...");
+                    Util.ClosedPLToText(h.SimBroker.GetTradeList(), ',', Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Trades" + unique + ".csv");
+                }
+                if (ordersincsv.Checked)
+                {
+                    debug("writing orders...");
+                    StreamWriter sw = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Orders" + unique + ".csv", false);
+                    for (int i = 0; i < h.SimBroker.GetOrderList().Count; i++)
+                        sw.WriteLine(OrderImpl.Serialize(h.SimBroker.GetOrderList()[i]));
+                    sw.Close();
+                }
+                debug("Completed. Ticks: " + args.TicksProcessed + " Speed:" + args.TicksSecond.ToString("N0") + " t/s  Fills: " + args.Executions.ToString());
             }
-            if (ordersincsv.Checked)
-            {
-                debug("writing orders...");
-                StreamWriter sw = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Orders" + unique + ".csv", false);
-                for (int i = 0; i < h.SimBroker.GetOrderList().Count; i++)
-                    sw.WriteLine(OrderImpl.Serialize(h.SimBroker.GetOrderList()[i]));
-                sw.Close();
-            }
-            debug("Completed. Ticks: " + args.TicksProcessed+" Speed:"+args.TicksSecond.ToString("N0")+" t/s  Fills: "+args.Executions.ToString());
+            else debug("Canceled.");
             // close indicators
             if (indf != null)
                 indf.Close();
+
             // reset simulation
             h.Reset();
+            count = 0;
+            lastp = 0;
             // enable new runs
             ProgressBar1.Enabled = false;
             ProgressBar1.Value = 0;
             queuebut.Enabled = true;
+            _stopbut.Enabled = false;
+            Invalidate(true);
         }
 
         int count = 0;
+        uint lastp = 0;
         void h_GotTick(Tick t)
         {
             if (myres == null) return;
             count++;
             myres.GotTick(t);
             uint percent = (uint)((double)count*100 / h.TicksPresent);
-            if (percent % 5 == 0)
+            if (percent != lastp)
+            {
                 updatepercent(percent);
+                lastp = percent;
+            }
 
         }
 
@@ -173,8 +189,12 @@ using TradeLink.API;
                 Invoke(new UIntDelegate(updatepercent), new object[] { per });
             else
             {
-                ProgressBar1.Value = (int)per;
-                ProgressBar1.Invalidate();
+                try
+                {
+                    ProgressBar1.Value = (int)per;
+                    ProgressBar1.Invalidate();
+                }
+                catch (Exception) { }
             }
         }
 
@@ -403,6 +423,14 @@ using TradeLink.API;
             return new SecurityImpl();
 
         }
+
+        private void _stopbut_Click(object sender, EventArgs e)
+        {
+            if (bw.IsBusy)
+                bw.CancelAsync();
+        }
+
+
     }
 
     public class SimWorker
