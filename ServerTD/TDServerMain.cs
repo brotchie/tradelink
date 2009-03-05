@@ -37,14 +37,6 @@ namespace TDServer
         void tl_newRegisterStocks(string msg)
         {
             Basket mb = BasketImpl.Deserialize(msg);
-            List<int> bad = new List<int>();
-            for (int i = 0; i < mb.Count; i++)
-            {
-                if (!api.TD_IsStockSymbolValid(mb[i].Symbol))
-                    bad.Add(i);
-            }
-            for (int i = 0; i < bad.Count; i++)
-                mb.Remove(bad[i]);
             api.rs_LevelOneStreaming = new AmeritradeBrokerAPI.RequestState();
 
             // Assign the callback method to invoke and update the user interface.
