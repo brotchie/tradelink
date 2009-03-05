@@ -171,8 +171,7 @@ namespace TradeLink.Common
         public static string Serialize(Tick t)
         {
             const char d = ',';
-            string secname = t.Sec.isValid ? t.Sec.FullName : t.symbol;
-            string s = secname + d + t.date + d + t.time + d + "" + d + t.trade + d + t.size + d + t.ex + d + t.bid + d + t.ask + d + t.bs + d + t.os + d + t.be + d + t.oe + d;
+            string s = t.symbol + d + t.date + d + t.time + d + d + t.trade + d + t.size + d + t.ex + d + t.bid + d + t.ask + d + t.bs + d + t.os + d + t.be + d + t.oe + d;
             return s;
         }
 

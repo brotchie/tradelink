@@ -262,7 +262,8 @@ namespace Replay
         void _playback_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             progressbar.Value = (e.ProgressPercentage < 101) && (e.ProgressPercentage>=0) ? e.ProgressPercentage : 0;
-            string time = (h != null) ? h.NextTickTime.ToString() : "";
+            int ctime = (int)(h.NextTickTime % 1000000) / 100;
+            string time = (h != null) ? ctime.ToString("N0") : "";
             status("Playing: " +time+ " ("+e.ProgressPercentage + "%)");
         }
 

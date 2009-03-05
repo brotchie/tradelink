@@ -71,7 +71,13 @@ namespace TradeLink.Common
         public void newTick(Tick tick)
         {
             if (this.InvokeRequired)
-                this.Invoke(new TickDelegate(newTick), new object[] { tick });
+            {
+                try
+                {
+                    this.Invoke(new TickDelegate(newTick), new object[] { tick });
+                }
+                catch (Exception) { }
+            }
             else
             {
                 if (!tick.isValid) return; // need a valid tick
