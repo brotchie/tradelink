@@ -221,7 +221,7 @@ namespace SterServer
             long rem = (now - xsec) / 100;
             f.side = t.bstrSide == "B";
             f.xtime = ((int)(rem % 10000))*100+xsec;
-            f.xdate = (int)((rem - f.xtime) / 10000);
+            f.xdate = (int)((now - f.xtime) / 1000000);
             tl.newFill(f);
         }
 
