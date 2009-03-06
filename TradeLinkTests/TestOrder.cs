@@ -136,9 +136,8 @@ namespace TestTradeLink
             const CurrencyType c = CurrencyType.USD;
             const SecurityType t = SecurityType.STK;
             Order o = new OrderImpl(s, z);
-            o.sec = 2;
             o.date = 20080718;
-            o.time = 948;
+            o.time = 94800;
             o.price = p;
             o.Account = a;
             o.ex = x;
@@ -169,7 +168,6 @@ namespace TestTradeLink
             Assert.That(n.TIF == ot, n.TIF);
             Assert.That(n.date == o.date, n.date.ToString());
             Assert.That(n.time == o.time, n.time.ToString());
-            Assert.That(n.sec == o.sec, n.sec.ToString());
         }
 
 

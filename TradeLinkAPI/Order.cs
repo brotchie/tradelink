@@ -18,7 +18,6 @@ namespace TradeLink.API
         int UnsignedSize { get; }
         int date { get; set; }
         int time { get; set; }
-        int sec { get; set; }
         bool isFilled { get; }
         bool isLimit { get; }
         bool isStop { get; }

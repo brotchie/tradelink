@@ -173,7 +173,7 @@ namespace TradeLink.Common
         public static string Serialize(Order o)
         {
             if (o.isFilled) return TradeImpl.Serialize((Trade)o);
-            string[] r = new string[] { o.symbol, (o.side ? "true" : "false"), o.UnsignedSize.ToString(), o.price.ToString(), o.stopp.ToString(), o.comment, o.ex, o.Account, o.Security.ToString(), o.Currency.ToString(), o.LocalSymbol, o.id.ToString(), o.TIF, o.date.ToString(), o.time.ToString(), o.sec.ToString(), o.trail.ToString() };
+            string[] r = new string[] { o.symbol, (o.side ? "true" : "false"), o.UnsignedSize.ToString(), o.price.ToString(), o.stopp.ToString(), o.comment, o.ex, o.Account, o.Security.ToString(), o.Currency.ToString(), o.LocalSymbol, o.id.ToString(), o.TIF, o.date.ToString(), o.time.ToString(), "", o.trail.ToString() };
             return string.Join(",", r);
         }
         /// <summary>
@@ -204,7 +204,6 @@ namespace TradeLink.Common
             o.trail = Convert.ToDecimal(rec[(int)OrderField.Trail]);
             o.date = Convert.ToInt32(rec[(int)OrderField.oDate]);
             o.time = Convert.ToInt32(rec[(int)OrderField.oTime]);
-            o.sec = Convert.ToInt32(rec[(int)OrderField.oSec]);
             return o;
         }
 

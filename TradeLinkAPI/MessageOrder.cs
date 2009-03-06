@@ -21,7 +21,7 @@ namespace TradeLink.API
         OrderTIF,
         oDate,
         oTime,
-        oSec,
+        oUNUSED,
         Trail,
     }
 }
