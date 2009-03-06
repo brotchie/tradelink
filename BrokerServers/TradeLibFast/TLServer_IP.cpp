@@ -44,6 +44,10 @@ namespace TradeLibFast
 			// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
 			m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	}
+	TLServer_IP::~TLServer_IP()
+	{
+		debugbuffer = "";
+	}
 	
 
 	BEGIN_MESSAGE_MAP(TLServer_IP, CWnd)
@@ -536,5 +540,197 @@ namespace TradeLibFast
 		 c_Record.AddString(s);
 		 return 0;
 		} // TLServer_IP::OnSendComplete
+
+	// start tradelink functions
+
+	int TLServer_IP::UnknownMessage(int MessageType, CString msg)
+	{
+		return UNKNOWN_MESSAGE;
+	}
+
+	int TLServer_IP::HeartBeat(CString clientname)
+	{
+			int cid = FindClient(clientname);
+			if (cid==-1) return -1;
+			time_t now;
+			time(&now);
+			time_t then = heart[cid];
+			double dif = difftime(now,then);
+			heart[cid] = now;
+			return (int)dif;
+	}
+
+	int TLServer_IP::RegisterStocks(CString clientname) { return OK; }
+	std::vector<int> TLServer_IP::GetFeatures() { std::vector<int> blank; return blank; } 
+
+	int TLServer_IP::AccountResponse(CString clientname)
+	{
+		return FEATURE_NOT_IMPLEMENTED;
+	}
+
+	int TLServer_IP::PositionResponse(CString account, CString clientname)
+	{
+		return FEATURE_NOT_IMPLEMENTED;
+	}
+
+	int TLServer_IP::BrokerName(void)
+	{
+		return UnknownBroker;
+	}
+
+	int TLServer_IP::SendOrder(TLOrder order)
+	{
+		return FEATURE_NOT_IMPLEMENTED;
+	}
+
+	int TLServer_IP::ClearClient(CString clientname)
+	{
+		int cid = FindClient(clientname);
+		if (cid==-1) return CLIENTNOTREGISTERED;
+		client[cid] = "";
+		stocks[cid] = clientstocklist(0);
+		heart[cid] = NULL;
+		D(CString(_T("Client ")+clientname+_T(" disconnected.")));
+		return OK;
+	}
+	int TLServer_IP::ClearStocks(CString clientname)
+	{
+		int cid = FindClient(clientname);
+		if (cid==-1) return CLIENTNOTREGISTERED;
+		stocks[cid] = clientstocklist(0);
+		HeartBeat(clientname);
+		D(CString(_T("Cleared stocks for ")+clientname));
+		return OK;
+	}
+
+
+	void TLServer_IP::D(const CString & message)
+	{
+
+		if (this->TLDEBUG)
+		{
+			const CString NEWLINE = "\n";
+			CString line;
+			vector<int> now;
+			TLTimeNow(now);
+			line.Format("%i %s%s",now[TLtime],message,NEWLINE);
+			debugbuffer.Append(line);
+			__raise this->GotDebug(line);
+		}
+	}
+
+	void TLServer_IP::SrvGotOrder(TLOrder order)
+	{
+		if (order.symbol=="") return;
+		for (size_t i = 0; i<client.size(); i++)
+			if (client[i]!="")
+				TLSend(ORDERNOTIFY,order.Serialize(),client[i]);
+	}
+
+	void TLServer_IP::SrvGotFill(TLTrade trade)
+	{
+		if (!trade.isValid()) return;
+		for (size_t i = 0; i<client.size(); i++)
+			if (client[i]!="")
+				TLSend(EXECUTENOTIFY,trade.Serialize(),client[i]);
+	}
+
+	void TLServer_IP::SrvGotTick(TLTick tick)
+	{
+		if (tick.sym=="") return;
+		for (uint i = 0; i<stocks.size(); i++)
+			for (uint j = 0; j<stocks[i].size(); j++)
+			{
+				if (stocks[i][j]==tick.sym)
+					TLSend(TICKNOTIFY,tick.Serialize(),client[i]);
+			}
+	}
+
+	void TLServer_IP::SrvGotCancel(int orderid)
+	{
+		CString id;
+		id.Format(_T("%i"),orderid);
+		for (size_t i = 0; i<client.size(); i++)
+			if (client[i]!="")
+				TLSend(ORDERCANCELRESPONSE,id,client[i]);
+	}
+
+	void TLServer_IP::CancelRequest(long order)
+	{
+		return;
+	}
+
+	bool TLServer_IP::HaveSubscriber(CString stock)
+	{
+		for (size_t i = 0; i<stocks.size(); i++) // go through each client
+			for (size_t j = 0; j<stocks[i].size(); j++) // and each stock
+				if (stocks[i][j].CompareNoCase(stock)==0) 
+					return true;
+		return false;
+	}
+
+
+	void TLServer_IP::Start(bool live)
+	{
+		if (!ENABLED)
+		{
+			CString wind(live ? LIVEWINDOW : SIMWINDOW);
+			this->Create(NULL, wind, 0,CRect(0,0,20,20), CWnd::GetDesktopWindow(),NULL);
+			this->ShowWindow(SW_HIDE); // hide our window
+			CString msg;
+			msg.Format("Started TL BrokerServer %s [ %.1f.%i]",wind,MajorVer,MinorVer);
+			this->D(msg);
+			ENABLED = true;
+		}
+	}
+
+	int TLServer_IP::RegisterClient(CString  clientname)
+	{
+		if (FindClient(clientname)!=-1) return OK;
+		client.push_back(clientname);
+		time_t now;
+		time(&now);
+		heart.push_back(now); // save heartbeat at client index
+		clientstocklist my = clientstocklist(0);
+		stocks.push_back(my);
+		D(CString(_T("Client ")+clientname+_T(" connected.")));
+		return OK;
+	}
+
+	unsigned int TLServer_IP::FindClientFromStock(CString stock)
+	{
+		for (unsigned int i = 0; i<client.size(); i++)
+			for (unsigned int j = 0; j<stocks[i].size(); j++)
+			{
+				if (stocks[i][j].CompareNoCase(stock)==0)
+					return i;
+			}
+		return -1;
+	}
+
+	bool TLServer_IP::needStock(CString stock)
+	{
+		for (size_t i = 0; i<stocks.size(); i++)
+			for (size_t j = 0; j<stocks[i].size(); j++)
+			{
+				if (stocks[i][j]==stock) return true;
+			}
+		return false;
+	}
+
+	int TLServer_IP::FindClient(CString cwind)
+	{
+		size_t len = client.size();
+		for (size_t i = 0; i<len; i++) if (client[i]==cwind) return (int)i;
+		return -1;
+	}
+
+
+	long TLServer_IP::TLSend(int type,LPCTSTR msg,CString client) 
+	{
+		LRESULT result = TLCLIENT_NOT_FOUND;
+		return (long)result;
+	}
+
 
 }

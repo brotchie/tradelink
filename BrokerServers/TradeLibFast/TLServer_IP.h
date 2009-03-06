@@ -20,7 +20,53 @@ namespace TradeLibFast
 		   // socket member that listens for new connections
 		   CListensoc m_listensoc;
 
+		   // tradelink functions
+			~TLServer_IP(void);
+			bool TLDEBUG;
+			bool ENABLED;
+			__event void GotDebug(LPCTSTR msg);
+			CString debugbuffer;
+			static long TLSend(int type,LPCTSTR msg,CString client);
+			void SrvGotOrder(TLOrder order);
+			void SrvGotFill(TLTrade trade);
+			void SrvGotTick(TLTick tick);
+			void SrvGotCancel(int orderid);
+			CString Version();
+
+			int RegisterClient(CString  clientname);
+			int ServiceMessage(int MessageType, CString msg);
+			int HeartBeat(CString clientname);
+			virtual int UnknownMessage(int MessageType, CString msg);
+			virtual int BrokerName(void);
+			virtual int SendOrder(TLOrder order);
+			virtual int AccountResponse(CString clientname);
+			virtual int PositionResponse(CString account, CString clientname);
+			virtual int RegisterStocks(CString clientname);
+			virtual std::vector<int> GetFeatures();
+			virtual int ClearClient(CString client);
+			virtual int ClearStocks(CString client);
+			virtual void CancelRequest(long order);
+			virtual void Start(bool live = true);
+
+			void D(const CString & message);
+
+
+		bool HaveSubscriber(CString stock);
+
 		protected:
+
+			// tradelink protected stuff
+			bool needStock(CString stock);
+			int FindClient(CString clientname);
+			double MajorVer;
+			int MinorVer;
+
+			vector <CString>client; // map client ids to name
+			vector <time_t>heart; // map last contact to id
+			typedef vector <CString> clientstocklist; // hold a single clients stocks
+			vector < clientstocklist > stocks; // map stocklist to id
+			unsigned int FindClientFromStock(CString stock);
+
 		   CFont font;
 		   int m_close;
 

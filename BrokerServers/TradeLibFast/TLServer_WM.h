@@ -60,7 +60,7 @@ namespace TradeLibFast
 		virtual void CancelRequest(long order);
 		virtual void Start(bool live = true);
 
-		void TLServer_WM::D(const CString & message);
+		void D(const CString & message);
 
 
 		bool HaveSubscriber(CString stock);
