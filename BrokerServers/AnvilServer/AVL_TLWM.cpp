@@ -534,7 +534,7 @@ namespace TradeLibFast
 				// build the serialized trade object
 				CTime ct(msg->x_Time);
 				int xd = (ct.GetYear()*10000)+(ct.GetMonth()*100)+ct.GetDay();
-				int xt = (ct.GetHour()*10000)+(ct.GetMinute()*100)*ct.GetSecond();
+				int xt = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
 				TradeLibFast::TLTrade fill;
 				fill.id = thisid;
 				fill.xtime = xt;
