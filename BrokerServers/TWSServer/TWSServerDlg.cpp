@@ -50,7 +50,7 @@ BOOL CTWSServerDlg::OnInitDialog()
 	ShowWindow(SW_MINIMIZE);
 
 	cstat("Starting tradelink broker server...");
-	tl = new TWS_TLWM();
+	tl = new TWS_TLServer();
 	__hook(&TLServer_WM::GotDebug,tl,&CTWSServerDlg::status);
 	tl->Start();
 

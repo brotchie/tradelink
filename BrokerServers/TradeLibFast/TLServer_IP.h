@@ -3,6 +3,8 @@
 #include "Listens.h"    // Added by ClassView
 #include "ASresource.h"
 #include "Log.h"
+#include "TradeLibFast.h"
+using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////
 // TLServer_IP dialog

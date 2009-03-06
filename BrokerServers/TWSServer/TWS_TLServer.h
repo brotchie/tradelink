@@ -8,16 +8,18 @@
 #include "Contract.h"
 #include "TLServer_WM.h"
 
+
+
 namespace TradeLibFast
 {
 
-	class TWS_TLWM :
+	class TWS_TLServer :
 		public TLServer_WM ,
 		public EWrapper
 	{
 	public:
-		TWS_TLWM(void);
-		~TWS_TLWM(void);
+		TWS_TLServer(void);
+		~TWS_TLServer(void);
 
 		// these are the TradeLink methods we're overriding
 		int SendOrder(TLOrder o);

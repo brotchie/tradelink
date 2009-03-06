@@ -3,7 +3,7 @@
 
 #pragma once
 #include "afxwin.h"
-#include "TWS_TLWM.h"
+#include "TWS_TLServer.h"
 
 
 // CTWSServerDlg dialog
@@ -34,7 +34,7 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 	CEdit m_status;
-	TradeLibFast::TWS_TLWM* tl;
+	TradeLibFast::TWS_TLServer* tl;
 public:
 	void cstat(CString msg);
 	void status(LPCTSTR msg);

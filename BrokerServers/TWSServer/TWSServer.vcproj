@@ -257,11 +257,11 @@
 			>
 		</File>
 		<File
-			RelativePath=".\TWS_TLWM.cpp"
+			RelativePath=".\TWS_TLServer.cpp"
 			>
 		</File>
 		<File
-			RelativePath=".\TWS_TLWM.h"
+			RelativePath=".\TWS_TLServer.h"
 			>
 		</File>
 		<File

@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "TWS_TLWM.h"
+#include "TWS_TLServer.h"
 #include "Util.h"
 #include "Execution.h"
 #include <fstream>
@@ -10,7 +10,7 @@ namespace TradeLibFast
 	const char* CONFIGFILE = "TwsServer.Config.txt";
 	const char* LINE = "-------------------------------";
 
-	TWS_TLWM::TWS_TLWM(void)
+	TWS_TLServer::TWS_TLServer(void)
 	{
 		IGNOREERRORS = false;
 
@@ -18,7 +18,7 @@ namespace TradeLibFast
 
 
 
-	TWS_TLWM::~TWS_TLWM(void)
+	TWS_TLServer::~TWS_TLServer(void)
 	{
 		// cancel subscriptions
 		for (size_t i = 0; i<stockticks.size(); i++)
@@ -32,7 +32,7 @@ namespace TradeLibFast
 
 	}
 
-	void TWS_TLWM::Start(void)
+	void TWS_TLServer::Start(void)
 	{
 		TLServer_WM::Start();
 
@@ -69,7 +69,7 @@ namespace TradeLibFast
 		D(msg);
 	}
 
-	void TWS_TLWM::InitSockets(int maxsockets, int clientid)
+	void TWS_TLServer::InitSockets(int maxsockets, int clientid)
 	{
 
 		// start socket connections that attempt to connect
@@ -103,7 +103,7 @@ namespace TradeLibFast
 		IGNOREERRORS = false;
 	}
 
-	std::vector<int> TWS_TLWM::GetFeatures()
+	std::vector<int> TWS_TLServer::GetFeatures()
 	{
 		std::vector<int> f;
 		f.push_back(SENDORDER);
@@ -120,19 +120,19 @@ namespace TradeLibFast
 		return f;
 	}
 
-	int TWS_TLWM::UnknownMessage(int MessageType, CString msg)
+	int TWS_TLServer::UnknownMessage(int MessageType, CString msg)
 	{
 		return UNKNOWN_MESSAGE;
 	}
 
-	uint TWS_TLWM::TL2IBID(uint tlid)
+	uint TWS_TLServer::TL2IBID(uint tlid)
 	{
 		for (uint i = 0; i<tlorders.size(); i++)
 			if (tlorders[i]==tlid)
 				return iborders[i];
 		return 0;
 	}
-	uint TWS_TLWM::IB2TLID(uint ibid)
+	uint TWS_TLServer::IB2TLID(uint ibid)
 	{
 		for (uint i = 0 ; i<iborders.size(); i++)
 			if (iborders[i]==ibid)
@@ -140,7 +140,7 @@ namespace TradeLibFast
 		return 0;
 	}
 
-	uint TWS_TLWM::newOrder(uint tlid,CString acct)
+	uint TWS_TLServer::newOrder(uint tlid,CString acct)
 	{
 		if (tlid==0) tlid = GetTickCount(); // if no id, auto-assign one
 		uint ibid = TL2IBID(tlid);
@@ -151,7 +151,7 @@ namespace TradeLibFast
 		return ibid;
 	}
 
-	int TWS_TLWM::SendOrder(TLOrder o)
+	int TWS_TLServer::SendOrder(TLOrder o)
 	{
 		// check our order
 		if (o.symbol=="") return UNKNOWN_SYMBOL;
@@ -197,14 +197,14 @@ namespace TradeLibFast
 		return OK;
 	}
 
-	int TWS_TLWM::BrokerName(void)
+	int TWS_TLServer::BrokerName(void)
 	{
 		return InteractiveBrokers;
 	}
 
 
 
-	bool TWS_TLWM::hasAccount(CString account)
+	bool TWS_TLServer::hasAccount(CString account)
 	{
 		if (account=="") return false; // don't match empty strings
 		for (size_t i = 0; i<accts.size(); i++)
@@ -213,7 +213,7 @@ namespace TradeLibFast
 	}
 
 
-	void TWS_TLWM::updateAccountValue( const CString &key, const CString &val,
+	void TWS_TLServer::updateAccountValue( const CString &key, const CString &val,
 										  const CString &currency, const CString &accountName) 
 	{
 		// make sure we don't have this account already
@@ -223,13 +223,13 @@ namespace TradeLibFast
 		}
 	}
 
-	void TWS_TLWM::managedAccounts(const CString& accountsList)
+	void TWS_TLServer::managedAccounts(const CString& accountsList)
 	{
 		CString msg(accountsList);
 		accts.push_back(msg); //save the list of FA accounts
 	}
 
-	int TWS_TLWM::AccountResponse(CString clientname)
+	int TWS_TLServer::AccountResponse(CString clientname)
 	{
 		std::vector<CString> all;
 		for (size_t i = 0; i<accts.size(); i++)
@@ -244,7 +244,7 @@ namespace TradeLibFast
 		return OK;
 	}
 
-	EClient* TWS_TLWM::GetOrderSink(CString account)
+	EClient* TWS_TLServer::GetOrderSink(CString account)
 	{
 		for (size_t i = 0; i<accts.size(); i++)
 			if (accts[i].Find(account)!=-1)
@@ -254,12 +254,12 @@ namespace TradeLibFast
 
 
 
-	void TWS_TLWM::nextValidId( OrderId orderId) 
+	void TWS_TLServer::nextValidId( OrderId orderId) 
 	{ 
 		m_nextorderids.push_back(orderId);
 	}
 
-	OrderId TWS_TLWM::getNextOrderId(CString account)
+	OrderId TWS_TLServer::getNextOrderId(CString account)
 	{
 		for (size_t i = 0; i<accts.size(); i++)
 			if (accts[i].Find(account)!=-1)
@@ -267,7 +267,7 @@ namespace TradeLibFast
 		return m_nextorderids[0]++; // default is first one
 	}
 
-	int TWS_TLWM::getMlinkId(OrderId id)
+	int TWS_TLServer::getMlinkId(OrderId id)
 	{
 		// find the closest order id to an order and return 
 		// the mlink associated with this id
@@ -304,7 +304,7 @@ namespace TradeLibFast
 		return false;
 	}
 
-	void TWS_TLWM::openOrder( OrderId orderId, const Contract& contract,
+	void TWS_TLServer::openOrder( OrderId orderId, const Contract& contract,
 								const Order& order, const OrderState& orderState)
 	{
 			// count order
@@ -332,7 +332,7 @@ namespace TradeLibFast
 
 	}
 
-	void TWS_TLWM::IncOrderId(CString account)
+	void TWS_TLServer::IncOrderId(CString account)
 	{
 		for (size_t i = 0; i<accts.size(); i++)
 			if (accts[i].Find(account)!=-1)
@@ -343,7 +343,7 @@ namespace TradeLibFast
 		m_nextorderids[0]++;
 	}
 
-	void TWS_TLWM::CancelRequest(OrderId orderid)
+	void TWS_TLServer::CancelRequest(OrderId orderid)
 	{
 		// gets mlink associated with order
 		int mlink = getMlinkId(orderid);
@@ -351,11 +351,11 @@ namespace TradeLibFast
 		m_link[this->validlinkids[mlink]]->cancelOrder(ibid);
 	}
 
-	void TWS_TLWM::winError( const CString &str, int lastError)
+	void TWS_TLServer::winError( const CString &str, int lastError)
 	{
 		D(str);
 	}
-	void TWS_TLWM::error(const int id, const int errorCode, const CString errorString)
+	void TWS_TLServer::error(const int id, const int errorCode, const CString errorString)
 	{
 		// for some reason IB sends order cancels as an error rather than
 		// as an order update message
@@ -365,7 +365,7 @@ namespace TradeLibFast
 		else D(errorString); // print other errors
 	}
 
-	void TWS_TLWM::execDetails( OrderId orderId, const Contract& contract, const Execution& execution) 
+	void TWS_TLServer::execDetails( OrderId orderId, const Contract& contract, const Execution& execution) 
 	{ 
 		// convert to a tradelink trade
 		TLTrade trade;
@@ -393,14 +393,14 @@ namespace TradeLibFast
 	}
 
 
-	bool TWS_TLWM::hasTicker(CString symbol)
+	bool TWS_TLServer::hasTicker(CString symbol)
 	{
 		for (size_t i = 0; i<stockticks.size(); i++)
 			if (stockticks[i].sym==symbol) return true;
 		return false;
 	}
 
-	int TWS_TLWM::RegisterStocks(CString clientname)
+	int TWS_TLServer::RegisterStocks(CString clientname)
 	{
 		TLServer_WM::RegisterStocks(clientname);
 		int cid = this->FindClient(clientname);  // get client id so we can find his stocks
@@ -430,7 +430,7 @@ namespace TradeLibFast
 
 	}
 
-	void TWS_TLWM::tickPrice( TickerId tickerId, TickType tickType, double price, int canAutoExecute) 
+	void TWS_TLServer::tickPrice( TickerId tickerId, TickType tickType, double price, int canAutoExecute) 
 	{ 
 		if ((tickerId>=0)&&(tickerId<(TickerId)stockticks.size()) && needStock(stockticks[tickerId].sym))
 		{
@@ -465,7 +465,7 @@ namespace TradeLibFast
 		}
 	
 	}
-	void TWS_TLWM::tickSize( TickerId tickerId, TickType tickType, int size) 
+	void TWS_TLServer::tickSize( TickerId tickerId, TickType tickType, int size) 
 	{ 
 		if ((tickerId>=0)&&(tickerId<(TickerId)stockticks.size()) && needStock(stockticks[tickerId].sym))
 		{
@@ -503,41 +503,41 @@ namespace TradeLibFast
 
 
 	}
-	void TWS_TLWM::tickOptionComputation( TickerId ddeId, TickType field, double impliedVol,
+	void TWS_TLServer::tickOptionComputation( TickerId ddeId, TickType field, double impliedVol,
 		double delta, double modelPrice, double pvDividend) { }
-	void TWS_TLWM::tickGeneric(TickerId tickerId, TickType tickType, double value) { }
-	void TWS_TLWM::tickString(TickerId tickerId, TickType tickType, const CString& value) { }
-	void TWS_TLWM::tickEFP(TickerId tickerId, TickType tickType, double basisPoints,
+	void TWS_TLServer::tickGeneric(TickerId tickerId, TickType tickType, double value) { }
+	void TWS_TLServer::tickString(TickerId tickerId, TickType tickType, const CString& value) { }
+	void TWS_TLServer::tickEFP(TickerId tickerId, TickType tickType, double basisPoints,
 		const CString& formattedBasisPoints, double totalDividends, int holdDays,
 		const CString& futureExpiry, double dividendImpact, double dividendsToExpiry) { }
-	void TWS_TLWM::orderStatus( OrderId orderId, const CString &status, int filled, int remaining, 
+	void TWS_TLServer::orderStatus( OrderId orderId, const CString &status, int filled, int remaining, 
 		double avgFillPrice, int permId, int parentId, double lastFillPrice,
 		int clientId, const CString& whyHeld) { }
-	void TWS_TLWM::connectionClosed() { D("TWS connection closed.");}
+	void TWS_TLServer::connectionClosed() { D("TWS connection closed.");}
 
-	void TWS_TLWM::updatePortfolio( const Contract& contract, int position,
+	void TWS_TLServer::updatePortfolio( const Contract& contract, int position,
 		double marketPrice, double marketValue, double averageCost,
 		double unrealizedPNL, double realizedPNL, const CString &accountName) { }
-	void TWS_TLWM::updateAccountTime(const CString &timeStamp) { }
-	void TWS_TLWM::contractDetails( int reqId, const ContractDetails& contractDetails) {}
-	void TWS_TLWM::bondContractDetails( int reqId, const ContractDetails& contractDetails) {}
-	void TWS_TLWM::contractDetailsEnd( int reqId) {}
-	void TWS_TLWM::updateMktDepth( TickerId id, int position, int operation, int side, 
+	void TWS_TLServer::updateAccountTime(const CString &timeStamp) { }
+	void TWS_TLServer::contractDetails( int reqId, const ContractDetails& contractDetails) {}
+	void TWS_TLServer::bondContractDetails( int reqId, const ContractDetails& contractDetails) {}
+	void TWS_TLServer::contractDetailsEnd( int reqId) {}
+	void TWS_TLServer::updateMktDepth( TickerId id, int position, int operation, int side, 
 			double price, int size) { }
-	void TWS_TLWM::updateMktDepthL2( TickerId id, int position, CString marketMaker, int operation, 
+	void TWS_TLServer::updateMktDepthL2( TickerId id, int position, CString marketMaker, int operation, 
 			int side, double price, int size) { }
-	void TWS_TLWM::updateNewsBulletin(int msgId, int msgType, const CString& newsMessage, const CString& originExch) { }
-	void TWS_TLWM::receiveFA(faDataType pFaDataType, const CString& cxml) { }
-	void TWS_TLWM::historicalData(TickerId reqId, const CString& date, double open, double high, double low,
+	void TWS_TLServer::updateNewsBulletin(int msgId, int msgType, const CString& newsMessage, const CString& originExch) { }
+	void TWS_TLServer::receiveFA(faDataType pFaDataType, const CString& cxml) { }
+	void TWS_TLServer::historicalData(TickerId reqId, const CString& date, double open, double high, double low,
 								   double close, int volume, int barCount, double WAP, int hasGaps) {}
-	void TWS_TLWM::scannerParameters(const CString &xml) { }
-	void TWS_TLWM::scannerData(int reqId, int rank, const ContractDetails &contractDetails, const CString &distance,
+	void TWS_TLServer::scannerParameters(const CString &xml) { }
+	void TWS_TLServer::scannerData(int reqId, int rank, const ContractDetails &contractDetails, const CString &distance,
 		const CString &benchmark, const CString &projection, const CString &legsStr) { }
-	void TWS_TLWM::scannerDataEnd(int reqId) { }
-	void TWS_TLWM::realtimeBar(TickerId reqId, long time, double open, double high, double low, double close,
+	void TWS_TLServer::scannerDataEnd(int reqId) { }
+	void TWS_TLServer::realtimeBar(TickerId reqId, long time, double open, double high, double low, double close,
 	   long volume, double wap, int count) { }
-	void TWS_TLWM::currentTime(long time) {}
-	void TWS_TLWM::fundamentalData(TickerId reqId, const CString& data) {}
+	void TWS_TLServer::currentTime(long time) {}
+	void TWS_TLServer::fundamentalData(TickerId reqId, const CString& data) {}
 }
 
 
