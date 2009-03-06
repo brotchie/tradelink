@@ -237,6 +237,11 @@ namespace SterServer
             o.TIF = structOrderUpdate.bstrTif;
             o.Account = structOrderUpdate.bstrAccount;
             o.ex= structOrderUpdate.bstrDestination;
+            long now = Convert.ToInt64(structOrderUpdate.bstrUpdateTime);
+            int xsec = (int)(now % 100);
+            long rem = (now - xsec) / 100;
+            o.time = ((int)(rem % 10000)) * 100 + xsec;
+            o.date = (int)((rem - o.time) / 10000);
             tl.newOrder(o);
 
         }
