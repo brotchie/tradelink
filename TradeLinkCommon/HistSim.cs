@@ -205,8 +205,8 @@ namespace TradeLink.Common
                 simrunning = (nextidx<times.Length) && (times[nextidx]<=endsim);
                 if (!simrunning) break;
                 Tick k = Workers[cidx[nextidx]].NextTick();
-                GotTick(k);
                 _executions += SimBroker.Execute(k);
+                GotTick(k);
                 _tickcount++;
             }
         }
