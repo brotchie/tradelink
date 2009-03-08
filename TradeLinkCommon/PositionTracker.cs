@@ -24,6 +24,12 @@ namespace TradeLink.Common
                 pl[i++] = p;
             return pl;
         }
+
+        decimal _totalclosedpl = 0;
+        /// <summary>
+        /// gets sum of all closed pl for all positions
+        /// </summary>
+        public decimal TotalClosedPL { get { return _totalclosedpl; } }
         
         /// <summary>
         /// Create a new position, or overwrite existing position
@@ -31,6 +37,7 @@ namespace TradeLink.Common
         /// <param name="newpos"></param>
         public void NewPosition(Position newpos)
         {
+            _totalclosedpl += newpos.ClosedPL;
             Position p;
             if (posdict.TryGetValue(newpos.Symbol, out p))
                 posdict[newpos.Symbol] = newpos;
@@ -51,7 +58,19 @@ namespace TradeLink.Common
                 cpl += posdict[fill.symbol].Adjust(fill);
             else
                 posdict.Add(fill.symbol, new PositionImpl(fill));
+            _totalclosedpl += cpl;
             return cpl;
+        }
+        /// <summary>
+        /// overwrite existing position, or start new position
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        public decimal Adjust(Position p)
+        {
+            // overwrite existing position
+            NewPosition(p);
+            return 0;
         }
 
 

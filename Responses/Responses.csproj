@@ -64,6 +64,8 @@
     <Compile Include="MAbox.cs" />
     <Compile Include="MarketBox.cs" />
     <Compile Include="OpenCancel.cs" />
+    <Compile Include="PairsResponse.cs" />
+    <Compile Include="PairsTracker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResponseTemplate.cs" />
     <Compile Include="SMA.cs" />

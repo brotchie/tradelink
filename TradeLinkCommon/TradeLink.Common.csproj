@@ -73,6 +73,7 @@
     <Compile Include="InvalidResponse.cs" />
     <Compile Include="LimitOrder.cs" />
     <Compile Include="BasketImpl.cs" />
+    <Compile Include="MarketOrderFlat.cs" />
     <Compile Include="PositionTracker.cs" />
     <Compile Include="TLClient_IP.cs" />
     <Compile Include="Packet.cs" />
