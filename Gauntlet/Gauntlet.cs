@@ -6,28 +6,51 @@ using System.Windows.Forms;
 using TradeLink.Common;
 using System.IO;
 using TradeLink.API;
+using System.Runtime.InteropServices;
 
-    namespace WinGauntlet
+namespace WinGauntlet
 {
     public partial class Gauntlet : Form
     {
-        Response myres;
+        // minimization stuff
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr HWND, int CMDSHOW);
+        const int SW_MINIMIZE = 6;
+
         HistSim h;
         BackgroundWorker bw = new BackgroundWorker();
+        static GauntArgs args = new GauntArgs();
+        const string PROGRAM = "Gauntlet";
+        StreamWriter indf;
+        StreamWriter log;
+        bool background = false;
+
+
 
         public Gauntlet()
         {
             InitializeComponent();
-            FindStocks((WinGauntlet.Properties.Settings.Default.tickfolder == null) ? @"c:\program files\tradelink\tickdata\" : WinGauntlet.Properties.Settings.Default.tickfolder);
-            string fn = (WinGauntlet.Properties.Settings.Default.boxdll== null) ? "box.dll" : WinGauntlet.Properties.Settings.Default.boxdll;
-            if (File.Exists(fn))
-                UpdateResponses(Util.GetResponseList(fn));
-            ProgressBar1.Enabled = false;
-            FormClosing+=new FormClosingEventHandler(Gauntlet_FormClosing);
+            args.ParseArgs(Environment.GetCommandLineArgs());
+            FormClosing += new FormClosingEventHandler(Gauntlet_FormClosing);
             debug(Util.TLSIdentity());
             bw.WorkerSupportsCancellation = true;
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_RunWorkerCompleted);
             bw.DoWork += new DoWorkEventHandler(bw_DoWork);
+
+            if (args.isUnattended)
+            {
+                background = true;
+                //ShowWindow(System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle, SW_MINIMIZE);
+                bindresponseevents();
+                queuebut_Click(null, null);
+            }
+            else
+            {
+                FindStocks(args.Folder);
+                UpdateResponses(Util.GetResponseList(args.DllName));
+
+            }
+            
         }
 
 
@@ -41,45 +64,22 @@ using TradeLink.API;
                 debug("simulation already in progress.");
                 return;
             }
-            // make sure tick folder is valid
-            string dir = WinGauntlet.Properties.Settings.Default.tickfolder;
-            if (!Directory.Exists(dir))
-            {
-                string msg = "No tick folder option is configured.";
-                MessageBox.Show(msg, "Tick folder missing");
-                show(msg);
-                return;
-            }
             // make sure response is valid
-            if ((myres == null) || !myres.isValid)
+            if ((args.Response == null) || !args.Response.isValid)
             {
                 show("No valid response was selected, quitting.");
                 return;
             }
-            // prepare date filter
-            List<TickFileFilter.TLDateFilter> datefilter = new List<TickFileFilter.TLDateFilter>();
-            if (usedates.Checked)
+            // make sure tick folder is valid
+            if (!args.isUnattended)
             {
-                for (int j = 0; j < yearlist.SelectedIndices.Count; j++)
-                    datefilter.Add(new TickFileFilter.TLDateFilter(Convert.ToInt32(yearlist.Items[yearlist.SelectedIndices[j]]) * 10000, DateMatchType.Year));
-                for (int j = 0; j < monthlist.SelectedItems.Count; j++)
-                    datefilter.Add(new TickFileFilter.TLDateFilter(Convert.ToInt32(monthlist.Items[monthlist.SelectedIndices[j]]) * 100, DateMatchType.Month));
-                for (int j = 0; j < daylist.SelectedItems.Count; j++)
-                    datefilter.Add(new TickFileFilter.TLDateFilter(Convert.ToInt32(daylist.Items[daylist.SelectedIndices[j]]), DateMatchType.Day));
+                string msg = "No tick folder option is configured.";
+                show(msg);
+                if (!background) MessageBox.Show(msg);
+                return;
             }
-            // prepare symbol filter
-            List<string> symfilter = new List<string>();
-            if (usestocks.Checked)
-                for (int j = 0; j < stocklist.SelectedItems.Count; j++)
-                    symfilter.Add(stocklist.Items[stocklist.SelectedIndices[j]].ToString());
-
-            // build consolidated filter
-            TickFileFilter tff = new TickFileFilter(symfilter, datefilter);
             // prepare other arguments for the run
-            SimWorker args = new SimWorker();
-            args.Name = DateTime.Now.ToString("yyyMMdd.HHmm");
-            args.filter = tff;
-            args.TickFolder = dir;
+            args.Name = PROGRAM+DateTime.Now.ToString("yyyMMdd.HHmm");
             args.Started = DateTime.Now;
 
             // enable progress reporting
@@ -89,16 +89,12 @@ using TradeLink.API;
             // enable canceling
             _stopbut.Enabled = true;
 
-            // prepare indicator output if requested
-            if (indicatorscsv.Checked)
+            // prepare indicator output
+            if (indf == null)
             {
-                if (indf == null)
-                {
-                    string unique = csvnamesunique.Checked ? "." + args.Name : "";
-                    indf = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Indicators" + unique + ".csv", false);
-                    indf.WriteLine(string.Join(",", myres.Indicators));
-                    indf.AutoFlush = true;
-                }
+                indf = new StreamWriter(OutPrefix("Indicators") + Unique(_unique.Checked,args.Name)+ ".csv", false);
+                indf.WriteLine(string.Join(",", args.Response.Indicators));
+                indf.AutoFlush = true;
             }
 
             // start the run in the background
@@ -106,25 +102,29 @@ using TradeLink.API;
 
         }
 
+        string Unique(bool unique, string name) { return unique ? "." + name : ""; }
+
+        string OutPrefix(string type) { return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\" + PROGRAM+"."+type; }
+
         // runs the simulation in background
         void bw_DoWork(object sender, DoWorkEventArgs e)
         {
             // get simulation arguments
-            SimWorker sw = (SimWorker)e.Argument;
+            GauntArgs ga = (GauntArgs)e.Argument;
             // notify user
-            debug("Run started: " + sw.Name);
+            debug("Run started: " + ga.Name);
             // prepare simulator
-            h = new HistSim(sw.TickFolder,sw.filter);
+            h = new HistSim(ga.Folder,ga.Filter);
             h.GotDebug += new DebugDelegate(h_GotDebug);
             h.GotTick += new TickDelegate(h_GotTick);
             // start simulation
-            h.PlayTo(sw.PlayTo);
+            h.PlayTo(ga.PlayTo);
             // end simulation
-            sw.Stopped = DateTime.Now;
-            sw.TicksProcessed = h.TicksProcessed;
-            sw.Executions = h.FillCount;
+            ga.Stopped = DateTime.Now;
+            ga.TicksProcessed = h.TicksProcessed;
+            ga.Executions = h.FillCount;
             // save result
-            e.Result = sw;
+            e.Result = ga;
         }
 
         // runs after simulation is complete
@@ -133,17 +133,14 @@ using TradeLink.API;
 
             if (!e.Cancelled)
             {
-                SimWorker args = (SimWorker)e.Result;
-                string unique = csvnamesunique.Checked ? "." + args.Name : "";
-                if (tradesincsv.Checked)
-                {
-                    debug("writing trades...");
-                    Util.ClosedPLToText(h.SimBroker.GetTradeList(), ',', Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Trades" + unique + ".csv");
-                }
+                GauntArgs args = (GauntArgs)e.Result;
+                string unique = _unique.Checked ? "." + args.Name : "";
+                debug("writing trades...");
+                Util.ClosedPLToText(h.SimBroker.GetTradeList(), ',', OutPrefix("Trades") + unique + ".csv");
                 if (ordersincsv.Checked)
                 {
                     debug("writing orders...");
-                    StreamWriter sw = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Gauntlet.Orders" + unique + ".csv", false);
+                    StreamWriter sw = new StreamWriter(OutPrefix("Orders") + unique + ".csv", false);
                     for (int i = 0; i < h.SimBroker.GetOrderList().Count; i++)
                         sw.WriteLine(OrderImpl.Serialize(h.SimBroker.GetOrderList()[i]));
                     sw.Close();
@@ -153,12 +150,20 @@ using TradeLink.API;
             else debug("Canceled.");
             // close indicators
             if (indf != null)
+            {
                 indf.Close();
+                indf = null;
+            }
 
             // reset simulation
             h.Reset();
             count = 0;
             lastp = 0;
+            if (background)
+            {
+                Close();
+                return;
+            }
             // enable new runs
             ProgressBar1.Enabled = false;
             ProgressBar1.Value = 0;
@@ -171,9 +176,10 @@ using TradeLink.API;
         uint lastp = 0;
         void h_GotTick(Tick t)
         {
-            if (myres == null) return;
+            if (args.Response == null) return;
             count++;
-            myres.GotTick(t);
+            args.Response.GotTick(t);
+            if (background) return;
             uint percent = (uint)((double)count*100 / h.TicksPresent);
             if (percent != lastp)
             {
@@ -204,15 +210,41 @@ using TradeLink.API;
             debug(msg);
         }
 
+        void PrepareFilter()
+        {
+            // prepare date filter
+            List<TickFileFilter.TLDateFilter> datefilter = new List<TickFileFilter.TLDateFilter>();
+            if (usedates.Checked)
+            {
+                for (int j = 0; j < yearlist.SelectedIndices.Count; j++)
+                    datefilter.Add(new TickFileFilter.TLDateFilter(Convert.ToInt32(yearlist.Items[yearlist.SelectedIndices[j]]) * 10000, DateMatchType.Year));
+                for (int j = 0; j < monthlist.SelectedItems.Count; j++)
+                    datefilter.Add(new TickFileFilter.TLDateFilter(Convert.ToInt32(monthlist.Items[monthlist.SelectedIndices[j]]) * 100, DateMatchType.Month));
+                for (int j = 0; j < daylist.SelectedItems.Count; j++)
+                    datefilter.Add(new TickFileFilter.TLDateFilter(Convert.ToInt32(daylist.Items[daylist.SelectedIndices[j]]), DateMatchType.Day));
+            }
+            // prepare symbol filter
+            List<string> symfilter = new List<string>();
+            if (usestocks.Checked)
+                for (int j = 0; j < stocklist.SelectedItems.Count; j++)
+                    symfilter.Add(stocklist.Items[stocklist.SelectedIndices[j]].ToString());
+
+            // build consolidated filter
+            TickFileFilter tff = new TickFileFilter(symfilter, datefilter);
+            //save it
+            args.Filter = tff;
+
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
             // tick folder
             FolderBrowserDialog fd = new FolderBrowserDialog();
             fd.Description = "Select the folder containing tick files";
-            fd.SelectedPath = (WinGauntlet.Properties.Settings.Default.tickfolder == null) ? @"c:\program files\tradelink\tickdata\" : WinGauntlet.Properties.Settings.Default.tickfolder;
+            fd.SelectedPath = args.Folder;
             if (fd.ShowDialog() == DialogResult.OK)
             {
-                WinGauntlet.Properties.Settings.Default.tickfolder = fd.SelectedPath;
+                args.Folder = fd.SelectedPath;
                 FindStocks(fd.SelectedPath);
             }
         }
@@ -228,7 +260,7 @@ using TradeLink.API;
             of.Multiselect = false;
             if (of.ShowDialog() == DialogResult.OK)
             {
-                WinGauntlet.Properties.Settings.Default.boxdll = of.FileName;
+                args.DllName = of.FileName;
                 UpdateResponses(Util.GetResponseList(of.FileName));
             }
         }
@@ -249,12 +281,20 @@ using TradeLink.API;
         void debug(string message) { show(message + Environment.NewLine); }
         void show(string message)
         {
+            if (log == null)
+            {
+                log = new StreamWriter(OutPrefix("Debugs") + Unique(_unique.Checked, args.Name) + ".txt", true);
+                log.AutoFlush = true;
+            }
+            else
+                log.WriteLine(message);
+            if (background) return;
             if (messages.InvokeRequired)
                 Invoke(new ShowCallBack(show), new object[] { message });
             else
             {
                 messages.AppendText(message);
-                if (message.Contains(Environment.NewLine)) lastmessage.Text = message.Replace(Environment.NewLine,"");
+                if (message.Contains(Environment.NewLine)) lastmessage.Text = message.Replace(Environment.NewLine, "");
                 else lastmessage.Text = lastmessage.Text + message;
             }
         }
@@ -268,12 +308,6 @@ using TradeLink.API;
 
 
 
-        void bt_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            ProgressBar1.Value = e.ProgressPercentage > 100 ? 100 : e.ProgressPercentage;
-        }
-
-
         private void savesettings_Click(object sender, EventArgs e)
         {
             WinGauntlet.Properties.Settings.Default.Save();
@@ -281,7 +315,12 @@ using TradeLink.API;
 
         private void Gauntlet_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (saveonexit.Checked) WinGauntlet.Properties.Settings.Default.Save();
+            if (saveonexit.Checked && !background)
+            {
+                Properties.Settings.Default.tickfolder = args.Folder;
+                Properties.Settings.Default.boxdll = args.DllName;
+                WinGauntlet.Properties.Settings.Default.Save();
+            }
         }
 
         private void usestocks_CheckedChanged(object sender, EventArgs e)
@@ -311,17 +350,29 @@ using TradeLink.API;
         {
             try
             {
-                myres = ResponseLoader.FromDLL((string)reslist.SelectedItem, WinGauntlet.Properties.Settings.Default.boxdll);
+                args.Response = ResponseLoader.FromDLL((string)reslist.SelectedItem, WinGauntlet.Properties.Settings.Default.boxdll);
             }
             catch (Exception ex) { show("Response failed to load, quitting... (" + ex.Message + (ex.InnerException != null ? ex.InnerException.Message.ToString() : "") + ")"); }
-            if (!myres.isValid) { show("Response did not load or loaded in a shutdown state. "+myres.Name+ " "+myres.FullName); return; }
-            myres.SendIndicators += new ObjectArrayDelegate(myres_IndicatorUpdate);
-            myres.SendDebug += new DebugFullDelegate(myres_GotDebug);
-            myres.SendCancel+= new UIntDelegate(myres_CancelOrderSource);
-            myres.SendOrder += new OrderDelegate(myres_SendOrder);
+            if (!args.Response.isValid) { show("Response did not load or loaded in a shutdown state. "+args.Response.Name+ " "+args.Response.FullName); return; }
+            bindresponseevents();
         }
 
-        void myres_SendOrder(Order o)
+        bool _boundonce = false;
+        bool bindresponseevents()
+        {
+            if ((args.Response== null) || !args.Response.isValid)
+                return false;
+            if (_boundonce) return true;
+            args.Response.SendIndicators += new ObjectArrayDelegate(Response_IndicatorUpdate);
+            args.Response.SendDebug += new DebugFullDelegate(Response_GotDebug);
+            args.Response.SendCancel += new UIntDelegate(Response_CancelOrderSource);
+            args.Response.SendOrder += new OrderDelegate(Response_SendOrder);
+            _boundonce = true;
+            return true;
+        }
+
+
+        void Response_SendOrder(Order o)
         {
             if (h!=null)
                 h.SimBroker.sendOrder(o);
@@ -329,24 +380,24 @@ using TradeLink.API;
 
         void mybroker_GotOrderCancel(string sym, bool side, uint id)
         {
-            if (myres != null)
-                myres.GotOrderCancel(id);
+            if (args.Response != null)
+                args.Response.GotOrderCancel(id);
         }
 
-        void myres_CancelOrderSource(uint number)
+        void Response_CancelOrderSource(uint number)
         {
             if (h!=null)
                 h.SimBroker.CancelOrder(number);
             
         }
 
-        void myres_GotDebug(Debug msg)
+        void Response_GotDebug(Debug msg)
         {
-            if (!showdebug.Checked) return;
+            if (!showdebug.Checked && !background) return;
             debug(msg.Msg);
         }
-        StreamWriter indf = null;
-        void myres_IndicatorUpdate(object[] parameters)
+
+        void Response_IndicatorUpdate(object[] parameters)
         {
             if (indf == null) return;
             string[] ivals = new string[parameters.Length];
@@ -430,22 +481,113 @@ using TradeLink.API;
                 bw.CancelAsync();
         }
 
+        class GauntArgs
+        {
+            const int DLL = 1;
+            const int RESPONSE = 2;
+            const int TICKFOLDER = 3;
+            const int FILEFILTERFILE = 4;
+            public string Name;
+            public int TicksProcessed = 0;
+            public int Executions = 0;
+            public long PlayTo = HistSim.ENDSIM;
+            public DateTime Started = DateTime.MaxValue;
+            public DateTime Stopped = DateTime.MaxValue;
+            public double Seconds { get { return Stopped.Subtract(Started).TotalSeconds; } }
+            public double TicksSecond { get { return Seconds == 0 ? 0 : ((double)TicksProcessed / Seconds); } }
+
+            string _dllname = "";
+            string _resp = Properties.Settings.Default.boxdll == null ? "Responses.dll" : Properties.Settings.Default.boxdll;
+            Response _response;
+            string _folder = (Properties.Settings.Default.tickfolder == null) ? Util.TLTickDir : Properties.Settings.Default.tickfolder;
+            TickFileFilter _filter = new TickFileFilter();
+            string _filterloc = "";
+            public string DllName { get { return _dllname; } set { _dllname = value; } }
+            public string ResponseName { get { return _resp; } set { _resp = value; } }
+            public Response Response { get { return _response; } set { _response = value; } }
+            public string Folder { get { return _folder; } set { _folder = value; } }
+            public TickFileFilter Filter { get { return _filter; } set { _filter = value; } }
+            public string FilterLocation { get { return _filterloc; } set { _filterloc = value; } }
+            public bool isUnattended { get { return (_response != null) && Directory.Exists(_folder); } }
+
+            public void ParseArgs(string[] args)
+            {
+                int l = args.Length;
+                if (l> FILEFILTERFILE)
+                {
+                    SetFilter(args[FILEFILTERFILE]);
+                    SetFolder(args[TICKFOLDER]);
+                    SetDll(args[DLL]);
+                    SetResponse(args[DLL]);
+                }
+                else if (l < FILEFILTERFILE)
+                {
+                    SetFolder(args[TICKFOLDER]);
+                    SetDll(args[DLL]);
+                    SetResponse(args[DLL]);
+
+                }
+                else if (l < TICKFOLDER)
+                {
+                    SetDll(args[DLL]);
+                    SetResponse(args[DLL]);
+                } 
+                else if (l<RESPONSE)
+                {
+                    SetDll(args[DLL]);
+
+                }
+
+                
+            }
+
+            bool SetFolder(string folder)
+            {
+                if (!Directory.Exists(folder))
+                    return false;
+                _folder = folder;
+                return true;
+            }
+            bool SetResponse(string name)
+            {
+                // dll must exist, otherwise quit
+                if (DllName== "") return false;
+                // response must exist in dll, otherwise quit
+                if (!Util.GetResponseList(DllName).Contains(name))
+                    return false;
+                _resp = name;
+                _response = ResponseLoader.FromDLL(_resp, DllName);
+                return true;
+            }
+
+            bool SetDll(string file)
+            {
+                if (File.Exists(file))
+                {
+                    _dllname = file;
+                    return true;
+                }
+                return false;
+
+            }
+
+            bool SetFilter(string file)
+            {
+                if (File.Exists(file))
+                {
+                    _filterloc = file;
+                    _filter = TickFileFilter.FromFile(file);
+                    return true;
+                }
+                return false;
+            }
+        }
+
 
     }
 
-    public class SimWorker
-    {
-        public string Name;
-        public int TicksProcessed = 0;
-        public int Executions = 0;
-        public TickFileFilter filter = new TickFileFilter();
-        public string TickFolder = Properties.Settings.Default.tickfolder;
-        public long PlayTo = HistSim.ENDSIM;
-        public DateTime Started = DateTime.MaxValue;
-        public DateTime Stopped = DateTime.MaxValue;
-        public double Seconds { get { return Stopped.Subtract(Started).TotalSeconds; } }
-        public double TicksSecond { get { return Seconds == 0 ? 0 : ((double)TicksProcessed / Seconds); } }
-    }
+
+
 
 
 

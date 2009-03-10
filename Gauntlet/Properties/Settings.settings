@@ -6,18 +6,9 @@
       <Value Profile="(Default)">c:\program files\tradelink\tickdata\</Value>
     </Setting>
     <Setting Name="boxdll" Type="System.String" Scope="User">
-      <Value Profile="(Default)">c:\program files\tradelink\tradelinksuite\box.dll</Value>
-    </Setting>
-    <Setting Name="boxfolder" Type="System.String" Scope="User">
-      <Value Profile="(Default)">c:\program files\tradelink\tradelinksuite\</Value>
+      <Value Profile="(Default)">c:\program files\tradelink\tradelinksuite\responses.dll</Value>
     </Setting>
     <Setting Name="saveonexit" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="clearorders" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="cleartrades" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="clearmessages" Type="System.Boolean" Scope="User">
@@ -26,19 +17,7 @@
     <Setting Name="writeonmessages" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="ordersinwind" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
     <Setting Name="ordersincsv" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="tradesincsv" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="tradesinwind" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="indicatorsincsv" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="csvnamesunique" Type="System.Boolean" Scope="User">

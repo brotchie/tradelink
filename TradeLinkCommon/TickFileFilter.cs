@@ -131,10 +131,86 @@ namespace TradeLink.Common
             { this.date = date; this.type = type; }
             public int date;
             public DateMatchType type;
+            const char dl = '+';
+            public static string Serialize(TLDateFilter df)
+            {
+                return df.date.ToString() + dl + ((int)df.type).ToString();
+            }
+            public static TLDateFilter Deserialize(string msg)
+            {
+                string [] r = msg.Split(dl);
+                TLDateFilter df = new TLDateFilter();
+                int ir = 0;
+                if (int.TryParse(r[1], out ir))
+                    df.type = (DateMatchType)ir;
+                if (int.TryParse(r[0], out ir))
+                    df.date = ir;
+                return df;
+            }
         }
 
         public static int TLYearMask(int year) { return year * 10000; }
         public static int TLMonthMask(int month) { return month * 100; }
+
+        const char d = ',';
+        const char name = 'N';
+        const char date = 'D';
+
+        public static string Serialize(TickFileFilter tff)
+        {
+            string s = "";
+            string newl = Environment.NewLine;
+            // names
+            foreach (string sym in tff.namelist)
+                s += name.ToString() + d.ToString() + sym + newl;
+            foreach (TLDateFilter df in tff.datelist)
+                s += date.ToString() + d.ToString() + TLDateFilter.Serialize(df) + newl;
+            return s;
+        }
+
+        public static TickFileFilter Deserialize(string msg)
+        {
+            string[] r = msg.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            List<string> names = new List<string>();
+            List<TLDateFilter> dates = new List<TLDateFilter>();
+            foreach (string line in r)
+            {
+                string[] l = line.Split(d);
+                if (l[(int)MessageTickFileFilter.TFF_FILTERTYPE][0] == name)
+                    names.Add(l[(int)MessageTickFileFilter.TFF_FILTERCONTENT]);
+                else if (l[(int)MessageTickFileFilter.TFF_FILTERTYPE][0] == date)
+                    dates.Add(TLDateFilter.Deserialize(l[(int)MessageTickFileFilter.TFF_FILTERCONTENT]));
+            }
+            TickFileFilter tff = new TickFileFilter(names, dates);
+            return tff;
+        }
+
+        public static TickFileFilter FromFile(string filename)
+        {
+            StreamReader sr = new StreamReader(filename);
+            string msg = sr.ReadToEnd();
+            TickFileFilter tff = TickFileFilter.Deserialize(msg);
+            return tff;
+        }
+
+        public static bool ToFile(TickFileFilter tff, string filename)
+        {
+            try
+            {
+                StreamWriter sw = new StreamWriter(filename, false);
+                sw.AutoFlush = true;
+                sw.WriteLine(TickFileFilter.Serialize(tff));
+                sw.Close();
+            }
+            catch (Exception) { return false; }
+            return true;
+        }
+
+        public enum MessageTickFileFilter
+        {
+            TFF_FILTERTYPE = 0,
+            TFF_FILTERCONTENT = 1,
+        }
 
     }
 }

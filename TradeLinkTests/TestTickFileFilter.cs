@@ -31,5 +31,20 @@ namespace TestTradeLink
             Assert.AreEqual(filenames[3], result[2]);
         }
 
+        [Test]
+        public void SerializeDeserialize()
+        {
+            TickFileFilter tff = new TickFileFilter(new string[] { "IBM", "MHS", "T" });
+            tff.DateFilter(20070000, DateMatchType.Year);
+            string msg = TickFileFilter.Serialize(tff);
+
+            TickFileFilter f2 = TickFileFilter.Deserialize(msg);
+
+            string msg2 = TickFileFilter.Serialize(f2);
+
+            Assert.AreEqual(msg, msg2);
+
+        }
+
     }
 }
