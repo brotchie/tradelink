@@ -34,16 +34,9 @@ namespace TradeLink.Common
             catch (Exception) { return t; }
             string[] r = line.Split(',');
             if (r.Length < 6) return t;
-            t.symbol = symbol;
             decimal td = 0;
             int ti = 0;
-            if (int.TryParse(r[(int)Q.TIME], out ti))
-            {
-                t.time = ti;
-            }
-            if (int.TryParse(r[(int)Q.DATE], out ti))
-                t.date = ti + 20000000;
-            t.datetime = ((long)t.date * 1000000) + (long)t.time;
+
             if (r[(int)Q.TYPE] == TRADE)
             {
                 if (decimal.TryParse(r[(int)T.PRICE], out td))
@@ -54,6 +47,7 @@ namespace TradeLink.Common
             }
             else
             {
+                if (r.Length < 9) return t;
                 if (decimal.TryParse(r[(int)Q.BID], out td))
                     t.bid = td;
                 if (decimal.TryParse(r[(int)Q.ASK], out td))
@@ -65,6 +59,14 @@ namespace TradeLink.Common
                 t.be = r[(int)Q.BIDEX];
                 t.oe = r[(int)Q.ASKEX];
             }
+            t.symbol = symbol;
+            if (int.TryParse(r[(int)Q.TIME], out ti))
+            {
+                t.time = ti;
+            }
+            if (int.TryParse(r[(int)Q.DATE], out ti))
+                t.date = ti + 20000000;
+            t.datetime = ((long)t.date * 1000000) + (long)t.time;
             return t;
         }
 
@@ -116,7 +118,7 @@ namespace TradeLink.Common
             StreamReader cf = EPFfile; 
             string symline = cf.ReadLine();
             string dateline = cf.ReadLine();
-            Regex se = new Regex("=[a-z-A-Z0-9]+");
+            Regex se = new Regex("=[$^a-z-A-Z0-9]+");
             Regex dse = new Regex(@"; Date=([0-9]+)/([0-9]+)/([0-9]+).*$");
             MatchCollection r = se.Matches(symline, 0);
             string t = r[0].Value;

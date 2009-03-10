@@ -66,6 +66,7 @@ namespace WinGauntlet
             this.messagepage = new System.Windows.Forms.TabPage();
             this.messages = new System.Windows.Forms.RichTextBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this._indicatcsv = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.studypage.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -306,6 +307,7 @@ namespace WinGauntlet
             // 
             // optionpage
             // 
+            this.optionpage.Controls.Add(this._indicatcsv);
             this.optionpage.Controls.Add(this._debugfile);
             this.optionpage.Controls.Add(this._unique);
             this.optionpage.Controls.Add(this.ordersincsv);
@@ -360,7 +362,7 @@ namespace WinGauntlet
             this.ordersincsv.AutoSize = true;
             this.ordersincsv.Checked = global::WinGauntlet.Properties.Settings.Default.ordersincsv;
             this.ordersincsv.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "ordersincsv", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.ordersincsv.Location = new System.Drawing.Point(306, 223);
+            this.ordersincsv.Location = new System.Drawing.Point(306, 257);
             this.ordersincsv.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.ordersincsv.Name = "ordersincsv";
             this.ordersincsv.Size = new System.Drawing.Size(132, 24);
@@ -520,6 +522,17 @@ namespace WinGauntlet
             this.messages.TabIndex = 0;
             this.messages.Text = "";
             // 
+            // _indicatcsv
+            // 
+            this._indicatcsv.AutoSize = true;
+            this._indicatcsv.Location = new System.Drawing.Point(306, 223);
+            this._indicatcsv.Name = "_indicatcsv";
+            this._indicatcsv.Size = new System.Drawing.Size(138, 24);
+            this._indicatcsv.TabIndex = 28;
+            this._indicatcsv.Text = "Indicators CSV";
+            this.toolTip1.SetToolTip(this._indicatcsv, "save indicators to log for analysis");
+            this._indicatcsv.UseVisualStyleBackColor = true;
+            // 
             // Gauntlet
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -581,6 +594,7 @@ namespace WinGauntlet
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.Button _stopbut;
         private System.Windows.Forms.CheckBox _debugfile;
+        private System.Windows.Forms.CheckBox _indicatcsv;
     }
 }
 

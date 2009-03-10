@@ -6,16 +6,12 @@ using System.Windows.Forms;
 using TradeLink.Common;
 using System.IO;
 using TradeLink.API;
-using System.Runtime.InteropServices;
 
 namespace WinGauntlet
 {
     public partial class Gauntlet : Form
     {
-        // minimization stuff
-        [DllImport("user32.dll")]
-        static extern bool ShowWindow(IntPtr HWND, int CMDSHOW);
-        const int SW_MINIMIZE = 6;
+
 
         HistSim h;
         BackgroundWorker bw = new BackgroundWorker();
@@ -30,9 +26,11 @@ namespace WinGauntlet
         public Gauntlet()
         {
             InitializeComponent();
+            debug(Util.TLSIdentity());
+            args.GotDebug += new DebugDelegate(args_GotDebug);
             args.ParseArgs(Environment.GetCommandLineArgs());
             FormClosing += new FormClosingEventHandler(Gauntlet_FormClosing);
-            debug(Util.TLSIdentity());
+
             bw.WorkerSupportsCancellation = true;
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_RunWorkerCompleted);
             bw.DoWork += new DoWorkEventHandler(bw_DoWork);
@@ -40,6 +38,7 @@ namespace WinGauntlet
             if (args.isUnattended)
             {
                 background = true;
+                ordersincsv.Checked = true;
                 //ShowWindow(System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle, SW_MINIMIZE);
                 bindresponseevents();
                 queuebut_Click(null, null);
@@ -48,9 +47,14 @@ namespace WinGauntlet
             {
                 FindStocks(args.Folder);
                 UpdateResponses(Util.GetResponseList(args.DllName));
-
+                debug(Util.TLSIdentity());
             }
             
+        }
+
+        void args_GotDebug(string msg)
+        {
+            debug(msg);
         }
 
 
@@ -67,19 +71,26 @@ namespace WinGauntlet
             // make sure response is valid
             if ((args.Response == null) || !args.Response.isValid)
             {
-                show("No valid response was selected, quitting.");
+                status("No valid response was selected, quitting.");
                 return;
             }
             // make sure tick folder is valid
-            if (!args.isUnattended)
+            if (args.Folder=="")
             {
                 string msg = "No tick folder option is configured.";
-                show(msg);
+                status(msg);
                 if (!background) MessageBox.Show(msg);
                 return;
             }
             // prepare other arguments for the run
-            args.Name = PROGRAM+DateTime.Now.ToString("yyyMMdd.HHmm");
+            if (!background)
+            {
+                args.Orders = ordersincsv.Checked;
+                args.Indicators = _indicatcsv.Checked;
+                args.Debugs = messagewrite.Checked;
+                args.Filter = PrepareFilter();
+            }
+            args.Name = args.Response.Name+uniquen;
             args.Started = DateTime.Now;
 
             // enable progress reporting
@@ -89,22 +100,13 @@ namespace WinGauntlet
             // enable canceling
             _stopbut.Enabled = true;
 
-            // prepare indicator output
-            if (indf == null)
-            {
-                indf = new StreamWriter(OutPrefix("Indicators") + Unique(_unique.Checked,args.Name)+ ".csv", false);
-                indf.WriteLine(string.Join(",", args.Response.Indicators));
-                indf.AutoFlush = true;
-            }
-
             // start the run in the background
             bw.RunWorkerAsync(args);
 
         }
+        string uniquen { get { return DateTime.Now.ToString(".yyyMMdd.HHmm"); } }
 
-        string Unique(bool unique, string name) { return unique ? "." + name : ""; }
-
-        string OutPrefix(string type) { return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\" + PROGRAM+"."+type; }
+        string LogFile(string logtype) { return OUTFOLD+args.Response.Name+(_unique.Checked ? uniquen:"")+ "."+logtype+".csv"; }
 
         // runs the simulation in background
         void bw_DoWork(object sender, DoWorkEventArgs e)
@@ -134,15 +136,20 @@ namespace WinGauntlet
             if (!e.Cancelled)
             {
                 GauntArgs args = (GauntArgs)e.Result;
-                string unique = _unique.Checked ? "." + args.Name : "";
-                debug("writing trades...");
-                Util.ClosedPLToText(h.SimBroker.GetTradeList(), ',', OutPrefix("Trades") + unique + ".csv");
-                if (ordersincsv.Checked)
+                if (args.Trades)
                 {
+                    debug("writing trades...");
+                    Util.ClosedPLToText(h.SimBroker.GetTradeList(), ',', LogFile("Trades"));
+                }
+                if (args.Orders)
+                {
+                    List<Order> olist = h.SimBroker.GetOrderList();
                     debug("writing orders...");
-                    StreamWriter sw = new StreamWriter(OutPrefix("Orders") + unique + ".csv", false);
-                    for (int i = 0; i < h.SimBroker.GetOrderList().Count; i++)
-                        sw.WriteLine(OrderImpl.Serialize(h.SimBroker.GetOrderList()[i]));
+                    StreamWriter sw = new StreamWriter(LogFile("Orders"), false);
+                    string[] cols = Enum.GetNames(typeof(OrderField));
+                    sw.WriteLine(string.Join(",", cols));
+                    for (int i = 0; i < olist.Count; i++)
+                        sw.WriteLine(OrderImpl.Serialize(olist[i]));
                     sw.Close();
                 }
                 debug("Completed. Ticks: " + args.TicksProcessed + " Speed:" + args.TicksSecond.ToString("N0") + " t/s  Fills: " + args.Executions.ToString());
@@ -210,7 +217,7 @@ namespace WinGauntlet
             debug(msg);
         }
 
-        void PrepareFilter()
+        TickFileFilter PrepareFilter()
         {
             // prepare date filter
             List<TickFileFilter.TLDateFilter> datefilter = new List<TickFileFilter.TLDateFilter>();
@@ -231,8 +238,8 @@ namespace WinGauntlet
 
             // build consolidated filter
             TickFileFilter tff = new TickFileFilter(symfilter, datefilter);
-            //save it
-            args.Filter = tff;
+            //return it
+            return tff;
 
         }
 
@@ -278,19 +285,19 @@ namespace WinGauntlet
         }
 
         delegate void ShowCallBack(string msg);
-        void debug(string message) { show(message + Environment.NewLine); }
-        void show(string message)
+        string OUTFOLD = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\";
+        void debug(string message) { status(message + Environment.NewLine); }
+        void status(string message)
         {
             if (log == null)
             {
-                log = new StreamWriter(OutPrefix("Debugs") + Unique(_unique.Checked, args.Name) + ".txt", true);
+                log = new StreamWriter(OUTFOLD+"Debugs"+uniquen+".txt", true);
                 log.AutoFlush = true;
             }
-            else
-                log.WriteLine(message);
+            log.Write(DateTime.Now.ToShortTimeString()+": "+message);
             if (background) return;
             if (messages.InvokeRequired)
-                Invoke(new ShowCallBack(show), new object[] { message });
+                Invoke(new ShowCallBack(status), new object[] { message });
             else
             {
                 messages.AppendText(message);
@@ -298,15 +305,6 @@ namespace WinGauntlet
                 else lastmessage.Text = lastmessage.Text + message;
             }
         }
-
-        
-
-        void bt_BTStatus(Debug debug)
-        {
-            show(debug.Msg);
-        }
-
-
 
         private void savesettings_Click(object sender, EventArgs e)
         {
@@ -352,8 +350,8 @@ namespace WinGauntlet
             {
                 args.Response = ResponseLoader.FromDLL((string)reslist.SelectedItem, WinGauntlet.Properties.Settings.Default.boxdll);
             }
-            catch (Exception ex) { show("Response failed to load, quitting... (" + ex.Message + (ex.InnerException != null ? ex.InnerException.Message.ToString() : "") + ")"); }
-            if (!args.Response.isValid) { show("Response did not load or loaded in a shutdown state. "+args.Response.Name+ " "+args.Response.FullName); return; }
+            catch (Exception ex) { status("Response failed to load, quitting... (" + ex.Message + (ex.InnerException != null ? ex.InnerException.Message.ToString() : "") + ")"); }
+            if (!args.Response.isValid) { status("Response did not load or loaded in a shutdown state. "+args.Response.Name+ " "+args.Response.FullName); return; }
             bindresponseevents();
         }
 
@@ -393,13 +391,20 @@ namespace WinGauntlet
 
         void Response_GotDebug(Debug msg)
         {
-            if (!showdebug.Checked && !background) return;
+            if (!args.Debugs) return;
             debug(msg.Msg);
         }
 
         void Response_IndicatorUpdate(object[] parameters)
         {
-            if (indf == null) return;
+            if (!args.Indicators) return;
+            // prepare indicator output
+            if (indf == null)
+            {
+                indf = new StreamWriter(LogFile("Indicators"), false);
+                indf.WriteLine(string.Join(",", args.Response.Indicators));
+                indf.AutoFlush = true;
+            }
             string[] ivals = new string[parameters.Length];
             for (int i = 0; i < parameters.Length; i++) ivals[i] = parameters[i].ToString();
             indf.WriteLine(string.Join(",", ivals));
@@ -420,7 +425,7 @@ namespace WinGauntlet
                 di = new DirectoryInfo(path);
                 fi = di.GetFiles("*.epf");
             }
-            catch (Exception ex) { show("exception loading stocks: " + ex.ToString()); return; }
+            catch (Exception ex) { status("exception loading stocks: " + ex.ToString()); return; }
 
             int[] years = new int[200];
             int[] days = new int[31];
@@ -483,10 +488,17 @@ namespace WinGauntlet
 
         class GauntArgs
         {
+            public GauntArgs() 
+            { 
+                // if using default filter then make it inclusive
+                _filter.DefaultDeny = false; 
+            }
+            // command line arguments
             const int DLL = 1;
             const int RESPONSE = 2;
-            const int TICKFOLDER = 3;
-            const int FILEFILTERFILE = 4;
+            const int FLAGS = 3;
+            const int TICKFOLDER = 4;
+            const int FILEFILTERFILE = 5;
             public string Name;
             public int TicksProcessed = 0;
             public int Executions = 0;
@@ -496,12 +508,22 @@ namespace WinGauntlet
             public double Seconds { get { return Stopped.Subtract(Started).TotalSeconds; } }
             public double TicksSecond { get { return Seconds == 0 ? 0 : ((double)TicksProcessed / Seconds); } }
 
+            bool _debugs = false;
+            bool _indicators = false;
+            bool _trades = true;
+            bool _orders = false;
+            public bool Orders { get { return _orders; } set { _orders = value; } }
+            public bool Trades { get { return _trades; } set { _trades = value; } }
+            public bool Indicators { get { return _indicators; } set { _indicators = value; } }
+            public bool Debugs { get { return _debugs; } set { _debugs = value; } }
             string _dllname = "";
             string _resp = Properties.Settings.Default.boxdll == null ? "Responses.dll" : Properties.Settings.Default.boxdll;
             Response _response;
             string _folder = (Properties.Settings.Default.tickfolder == null) ? Util.TLTickDir : Properties.Settings.Default.tickfolder;
             TickFileFilter _filter = new TickFileFilter();
             string _filterloc = "";
+            void D(string msg) { if (GotDebug != null) GotDebug(msg); }
+            public event DebugDelegate GotDebug;
             public string DllName { get { return _dllname; } set { _dllname = value; } }
             public string ResponseName { get { return _resp; } set { _resp = value; } }
             public Response Response { get { return _response; } set { _response = value; } }
@@ -509,43 +531,78 @@ namespace WinGauntlet
             public TickFileFilter Filter { get { return _filter; } set { _filter = value; } }
             public string FilterLocation { get { return _filterloc; } set { _filterloc = value; } }
             public bool isUnattended { get { return (_response != null) && Directory.Exists(_folder); } }
-
+            public override string ToString()
+            {
+                string[] r = new string[] { DllName, ResponseName, Folder, FilterLocation };
+                return string.Join("/", r);
+            }
             public void ParseArgs(string[] args)
             {
-                int l = args.Length;
-                if (l> FILEFILTERFILE)
+                int l = args.Length-1;
+                if (l == FILEFILTERFILE)
                 {
                     SetFilter(args[FILEFILTERFILE]);
                     SetFolder(args[TICKFOLDER]);
                     SetDll(args[DLL]);
-                    SetResponse(args[DLL]);
+                    SetResponse(args[RESPONSE]);
+                    SetFlags(args[FLAGS]);
                 }
-                else if (l < FILEFILTERFILE)
+                else if (l == TICKFOLDER)
                 {
                     SetFolder(args[TICKFOLDER]);
                     SetDll(args[DLL]);
-                    SetResponse(args[DLL]);
-
+                    SetResponse(args[RESPONSE]);
+                    SetFlags(args[FLAGS]);
                 }
-                else if (l < TICKFOLDER)
+                else if (l == FLAGS)
                 {
                     SetDll(args[DLL]);
-                    SetResponse(args[DLL]);
-                } 
-                else if (l<RESPONSE)
+                    SetResponse(args[RESPONSE]);
+                    SetFlags(args[FLAGS]);
+                }
+                else if (l == RESPONSE)
+                {
+                    SetDll(args[DLL]);
+                    SetResponse(args[RESPONSE]);
+                }
+                else if (l == DLL)
                 {
                     SetDll(args[DLL]);
 
                 }
+                else
+                {
+                    Console.WriteLine("");
+                    Console.WriteLine("GAUNTLET USAGE: ");
+                    Console.WriteLine("gauntlet.exe [Response.dll] [ResponseName] [FLAGS] [TickPath] [TickFileFilterPath]");
+                    Console.WriteLine("Flags: control output produced.  (O)rders (T)rades (I)ndicators (D)ebugs");
+                    Console.WriteLine(@"eg: gauntlet 'c:\users\administrator\my documents\MyStrategies.dll' ");
+                    Console.WriteLine("\t\tMyStrategies.MyStrategy OTIF 'c:\\tradelink\\tickdata\\' ");
+                    Console.WriteLine("\t\t'c:\\users\\administrator\\my documents\\filefilter.txt'");
+                    Console.WriteLine("");
+                }
+                D("dll/resp/fold/filt: " + this.ToString());
 
                 
             }
-
+            string Flags { get { return (Orders ? "O" : "") + (Debugs ? "D" : "") + (Indicators ? "I" : "") + (Trades ? "T" : ""); } }
+            void SetFlags(string flags)
+            {
+                _orders = flags.Contains("O");
+                _debugs = flags.Contains("F");
+                _trades = flags.Contains("T");
+                _indicators = flags.Contains("I");
+                D("set flags: "+Flags);
+            }
             bool SetFolder(string folder)
             {
                 if (!Directory.Exists(folder))
+                {
+                    D("no folder exists: " + folder);
                     return false;
+                }
                 _folder = folder;
+                D("tickfolder: " + folder);
                 return true;
             }
             bool SetResponse(string name)
@@ -557,7 +614,12 @@ namespace WinGauntlet
                     return false;
                 _resp = name;
                 _response = ResponseLoader.FromDLL(_resp, DllName);
-                return true;
+                bool r = _response.isValid;
+                if (r)
+                    D("loaded response: " + name);
+                else
+                    D("invalid response: " + name + " " + _response.FullName);
+                return r;
             }
 
             bool SetDll(string file)
@@ -565,8 +627,11 @@ namespace WinGauntlet
                 if (File.Exists(file))
                 {
                     _dllname = file;
+                    D("found dll: " + file);
                     return true;
                 }
+                else
+                    D("no dll found: " + file);
                 return false;
 
             }
@@ -577,8 +642,10 @@ namespace WinGauntlet
                 {
                     _filterloc = file;
                     _filter = TickFileFilter.FromFile(file);
+                    D("found filter: " + file);
                     return true;
                 }
+                else D("no filter found: " + file);
                 return false;
             }
         }

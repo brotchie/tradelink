@@ -124,7 +124,9 @@ namespace TradeLink.Common
             // now we have our list, initialize instruments from files
             foreach (string file in _tickfiles)
             {
-                Workers.Add(new simworker(SecurityImpl.FromFile(file)));
+                SecurityImpl s = SecurityImpl.FromFile(file);
+                if (s!=null)
+                    Workers.Add(new simworker(s));
             }
             // setup our initial index
             idx = genidx(Workers.Count);

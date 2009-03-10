@@ -118,12 +118,17 @@ namespace TradeLink.Common
         /// </summary>
         public static SecurityImpl FromFile(string filename)
         {
-            System.IO.FileInfo fi = new System.IO.FileInfo(filename);
-            System.IO.StreamReader sr = new System.IO.StreamReader(filename);
-            SecurityImpl s = eSigTick.InitEpf(sr);
-            s._histfile = sr;
-            // for epf files
-            s._approxticks = (int)(fi.Length / 40);
+            SecurityImpl s = null;
+            try
+            {
+                System.IO.FileInfo fi = new System.IO.FileInfo(filename);
+                System.IO.StreamReader sr = new System.IO.StreamReader(filename);
+                s = eSigTick.InitEpf(sr);
+                s._histfile = sr;
+                // for epf files
+                s._approxticks = (int)(fi.Length / 40);
+            }
+            catch (Exception) { }
             return s;
         }
     }
