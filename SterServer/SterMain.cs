@@ -213,7 +213,9 @@ namespace SterServer
             Trade f = new TradeImpl();
             f.symbol = t.bstrSymbol;
             f.Account = t.bstrAccount;
-            f.id = Convert.ToUInt32(t.bstrClOrderId);
+            uint id = 0;
+            if (!uint.TryParse(t.bstrClOrderId, out id))
+                f.id = id;
             f.xprice = (decimal)t.fExecPrice;
             f.xsize = t.nQuantity;
             long now = Convert.ToInt64(t.bstrUpdateTime);
@@ -229,7 +231,10 @@ namespace SterServer
         {
             Order o = new OrderImpl();
             o.symbol = structOrderUpdate.bstrSymbol;
-            o.id = Convert.ToUInt32(structOrderUpdate.bstrClOrderId);
+            uint id = 0;
+            if (!uint.TryParse(structOrderUpdate.bstrClOrderId, out id))
+                id = (uint)structOrderUpdate.nOrderRecordId;
+            o.id = id;
             o.size = structOrderUpdate.nQuantity;
             o.side = o.size > 0;
             o.price = (decimal)structOrderUpdate.fLmtPrice;
@@ -315,7 +320,7 @@ namespace SterServer
             // symbol
             string sym = structPositionUpdate.bstrSym;
             // size
-            int size = structPositionUpdate.nSharesBot - structPositionUpdate.nSharesSld;
+            int size = structPositionUpdate.nSharesBot - structPositionUpdate.nSharesSld + structPositionUpdate.nOpeningPosition;
             // price
             decimal price = Math.Abs((decimal)structPositionUpdate.fPositionCost / size);
             // closed pl
