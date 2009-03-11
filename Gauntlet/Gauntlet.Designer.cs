@@ -34,22 +34,14 @@ namespace WinGauntlet
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.studypage = new System.Windows.Forms.TabPage();
             this._stopbut = new System.Windows.Forms.Button();
-            this.label6 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.usedates = new System.Windows.Forms.CheckBox();
-            this.usestocks = new System.Windows.Forms.CheckBox();
-            this.daylist = new System.Windows.Forms.ListBox();
-            this.monthlist = new System.Windows.Forms.ListBox();
-            this.yearlist = new System.Windows.Forms.ListBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.ProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.lastmessage = new System.Windows.Forms.ToolStripStatusLabel();
             this.label7 = new System.Windows.Forms.Label();
             this.queuebut = new System.Windows.Forms.Button();
             this.reslist = new System.Windows.Forms.ListBox();
-            this.stocklist = new System.Windows.Forms.ListBox();
             this.optionpage = new System.Windows.Forms.TabPage();
+            this._indicatcsv = new System.Windows.Forms.CheckBox();
             this._debugfile = new System.Windows.Forms.CheckBox();
             this._unique = new System.Windows.Forms.CheckBox();
             this.ordersincsv = new System.Windows.Forms.CheckBox();
@@ -66,7 +58,7 @@ namespace WinGauntlet
             this.messagepage = new System.Windows.Forms.TabPage();
             this.messages = new System.Windows.Forms.RichTextBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this._indicatcsv = new System.Windows.Forms.CheckBox();
+            this.tickFileFilterControl1 = new TradeLink.Common.TickFileFilterControl();
             this.tabControl1.SuspendLayout();
             this.studypage.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -100,19 +92,11 @@ namespace WinGauntlet
             // studypage
             // 
             this.studypage.Controls.Add(this._stopbut);
-            this.studypage.Controls.Add(this.label6);
-            this.studypage.Controls.Add(this.label5);
-            this.studypage.Controls.Add(this.label3);
-            this.studypage.Controls.Add(this.usedates);
-            this.studypage.Controls.Add(this.usestocks);
-            this.studypage.Controls.Add(this.daylist);
-            this.studypage.Controls.Add(this.monthlist);
-            this.studypage.Controls.Add(this.yearlist);
             this.studypage.Controls.Add(this.statusStrip1);
             this.studypage.Controls.Add(this.label7);
             this.studypage.Controls.Add(this.queuebut);
             this.studypage.Controls.Add(this.reslist);
-            this.studypage.Controls.Add(this.stocklist);
+            this.studypage.Controls.Add(this.tickFileFilterControl1);
             this.studypage.Location = new System.Drawing.Point(4, 29);
             this.studypage.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.studypage.Name = "studypage";
@@ -132,106 +116,6 @@ namespace WinGauntlet
             this._stopbut.Text = "Stop";
             this._stopbut.UseVisualStyleBackColor = true;
             this._stopbut.Click += new System.EventHandler(this._stopbut_Click);
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(236, 138);
-            this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(37, 20);
-            this.label6.TabIndex = 16;
-            this.label6.Text = "Day";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(174, 138);
-            this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(54, 20);
-            this.label5.TabIndex = 15;
-            this.label5.Text = "Month";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(102, 138);
-            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(43, 20);
-            this.label3.TabIndex = 14;
-            this.label3.Text = "Year";
-            // 
-            // usedates
-            // 
-            this.usedates.Appearance = System.Windows.Forms.Appearance.Button;
-            this.usedates.AutoSize = true;
-            this.usedates.Location = new System.Drawing.Point(14, 165);
-            this.usedates.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.usedates.Name = "usedates";
-            this.usedates.Size = new System.Drawing.Size(62, 30);
-            this.usedates.TabIndex = 13;
-            this.usedates.Text = "Dates";
-            this.toolTip1.SetToolTip(this.usedates, "toggle whether per-date filters are used");
-            this.usedates.UseVisualStyleBackColor = true;
-            this.usedates.CheckedChanged += new System.EventHandler(this.usedates_CheckedChanged);
-            // 
-            // usestocks
-            // 
-            this.usestocks.Appearance = System.Windows.Forms.Appearance.Button;
-            this.usestocks.AutoSize = true;
-            this.usestocks.Location = new System.Drawing.Point(14, 10);
-            this.usestocks.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.usestocks.Name = "usestocks";
-            this.usestocks.Size = new System.Drawing.Size(79, 30);
-            this.usestocks.TabIndex = 12;
-            this.usestocks.Text = "Symbols";
-            this.toolTip1.SetToolTip(this.usestocks, "toggle whether per-symbol filters are used");
-            this.usestocks.UseVisualStyleBackColor = true;
-            this.usestocks.CheckedChanged += new System.EventHandler(this.usestocks_CheckedChanged);
-            // 
-            // daylist
-            // 
-            this.daylist.ColumnWidth = 30;
-            this.daylist.Enabled = false;
-            this.daylist.HorizontalScrollbar = true;
-            this.daylist.ItemHeight = 20;
-            this.daylist.Location = new System.Drawing.Point(240, 165);
-            this.daylist.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.daylist.MultiColumn = true;
-            this.daylist.Name = "daylist";
-            this.daylist.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.daylist.Size = new System.Drawing.Size(99, 124);
-            this.daylist.TabIndex = 11;
-            this.toolTip1.SetToolTip(this.daylist, "days to trade on response");
-            // 
-            // monthlist
-            // 
-            this.monthlist.Enabled = false;
-            this.monthlist.FormattingEnabled = true;
-            this.monthlist.ItemHeight = 20;
-            this.monthlist.Location = new System.Drawing.Point(178, 165);
-            this.monthlist.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.monthlist.Name = "monthlist";
-            this.monthlist.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.monthlist.Size = new System.Drawing.Size(54, 124);
-            this.monthlist.TabIndex = 10;
-            this.toolTip1.SetToolTip(this.monthlist, "months to trade on response");
-            // 
-            // yearlist
-            // 
-            this.yearlist.Enabled = false;
-            this.yearlist.FormattingEnabled = true;
-            this.yearlist.ItemHeight = 20;
-            this.yearlist.Location = new System.Drawing.Point(106, 166);
-            this.yearlist.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.yearlist.Name = "yearlist";
-            this.yearlist.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.yearlist.Size = new System.Drawing.Size(62, 124);
-            this.yearlist.Sorted = true;
-            this.yearlist.TabIndex = 9;
-            this.toolTip1.SetToolTip(this.yearlist, "years to trade on this response");
             // 
             // statusStrip1
             // 
@@ -260,7 +144,7 @@ namespace WinGauntlet
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(343, 138);
+            this.label7.Location = new System.Drawing.Point(343, 143);
             this.label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(90, 20);
@@ -283,27 +167,13 @@ namespace WinGauntlet
             // 
             this.reslist.FormattingEnabled = true;
             this.reslist.ItemHeight = 20;
-            this.reslist.Location = new System.Drawing.Point(347, 166);
+            this.reslist.Location = new System.Drawing.Point(347, 168);
             this.reslist.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.reslist.Name = "reslist";
             this.reslist.Size = new System.Drawing.Size(265, 124);
             this.reslist.TabIndex = 2;
             this.toolTip1.SetToolTip(this.reslist, "select response to trade");
             this.reslist.SelectedIndexChanged += new System.EventHandler(this.boxlist_SelectedIndexChanged);
-            // 
-            // stocklist
-            // 
-            this.stocklist.Enabled = false;
-            this.stocklist.FormattingEnabled = true;
-            this.stocklist.ItemHeight = 20;
-            this.stocklist.Location = new System.Drawing.Point(106, 9);
-            this.stocklist.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.stocklist.MultiColumn = true;
-            this.stocklist.Name = "stocklist";
-            this.stocklist.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.stocklist.Size = new System.Drawing.Size(506, 124);
-            this.stocklist.TabIndex = 0;
-            this.toolTip1.SetToolTip(this.stocklist, "list of symbols found in your tick folder");
             // 
             // optionpage
             // 
@@ -330,6 +200,17 @@ namespace WinGauntlet
             this.optionpage.TabIndex = 1;
             this.optionpage.Text = "Options";
             this.optionpage.UseVisualStyleBackColor = true;
+            // 
+            // _indicatcsv
+            // 
+            this._indicatcsv.AutoSize = true;
+            this._indicatcsv.Location = new System.Drawing.Point(306, 223);
+            this._indicatcsv.Name = "_indicatcsv";
+            this._indicatcsv.Size = new System.Drawing.Size(138, 24);
+            this._indicatcsv.TabIndex = 28;
+            this._indicatcsv.Text = "Indicators CSV";
+            this.toolTip1.SetToolTip(this._indicatcsv, "save indicators to log for analysis");
+            this._indicatcsv.UseVisualStyleBackColor = true;
             // 
             // _debugfile
             // 
@@ -522,16 +403,12 @@ namespace WinGauntlet
             this.messages.TabIndex = 0;
             this.messages.Text = "";
             // 
-            // _indicatcsv
+            // tickFileFilterControl1
             // 
-            this._indicatcsv.AutoSize = true;
-            this._indicatcsv.Location = new System.Drawing.Point(306, 223);
-            this._indicatcsv.Name = "_indicatcsv";
-            this._indicatcsv.Size = new System.Drawing.Size(138, 24);
-            this._indicatcsv.TabIndex = 28;
-            this._indicatcsv.Text = "Indicators CSV";
-            this.toolTip1.SetToolTip(this._indicatcsv, "save indicators to log for analysis");
-            this._indicatcsv.UseVisualStyleBackColor = true;
+            this.tickFileFilterControl1.Location = new System.Drawing.Point(9, 9);
+            this.tickFileFilterControl1.Name = "tickFileFilterControl1";
+            this.tickFileFilterControl1.Size = new System.Drawing.Size(607, 298);
+            this.tickFileFilterControl1.TabIndex = 18;
             // 
             // Gauntlet
             // 
@@ -565,7 +442,6 @@ namespace WinGauntlet
         private System.Windows.Forms.CheckBox showdebug;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TabPage messagepage;
-        private System.Windows.Forms.ListBox stocklist;
         private System.Windows.Forms.Button queuebut;
         private System.Windows.Forms.ListBox reslist;
         private System.Windows.Forms.Label label2;
@@ -577,24 +453,17 @@ namespace WinGauntlet
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripProgressBar ProgressBar1;
         private System.Windows.Forms.ToolStripStatusLabel lastmessage;
-        private System.Windows.Forms.CheckBox usestocks;
-        private System.Windows.Forms.ListBox daylist;
-        private System.Windows.Forms.ListBox monthlist;
-        private System.Windows.Forms.ListBox yearlist;
-        private System.Windows.Forms.CheckBox usedates;
         private System.Windows.Forms.CheckBox clearmessages;
         private System.Windows.Forms.CheckBox messagewrite;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.CheckBox ordersincsv;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label6;
         private System.Windows.Forms.CheckBox _unique;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.Button _stopbut;
         private System.Windows.Forms.CheckBox _debugfile;
         private System.Windows.Forms.CheckBox _indicatcsv;
+        private TradeLink.Common.TickFileFilterControl tickFileFilterControl1;
     }
 }
 

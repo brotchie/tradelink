@@ -562,6 +562,52 @@ namespace TradeLink.Common
 
             return t || b;
         }
+
+        /// <summary>
+        /// builds list of readable tickfiles found in given folder
+        /// </summary>
+        /// <param name="Folder">path containing tickfiles</param>
+        /// <param name="tickext">file extension</param>
+        /// <returns></returns>
+        public static string[,] TickFileIndex(string Folder, string tickext)
+        {
+            string[] _tickfiles = Directory.GetFiles(Folder, tickext);
+            DirectoryInfo di = new DirectoryInfo(Folder);
+            FileInfo[] fi = di.GetFiles(tickext, SearchOption.AllDirectories);
+            string[,] index = new string[_tickfiles.Length, _tickfiles.Length];
+            foreach (FileInfo thisfi in fi)
+            {
+                for (int i = 0; i < _tickfiles.Length; i++)
+                    if (thisfi.FullName == _tickfiles[i])
+                    {
+                        index[i, 0] = thisfi.Name;
+                        index[i, 1] = thisfi.Length.ToString();
+                    }
+
+            }
+            return index;
+        }
+
+        /// <summary>
+        /// determine security from the filename, without opening file
+        /// (use SecurityImpl.FromFile to actually read it in)
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+        public static SecurityImpl SecurityFromFileName(string filename)
+        {
+            try
+            {
+                string ds = System.Text.RegularExpressions.Regex.Match(filename, "([0-9]{8})[.]", System.Text.RegularExpressions.RegexOptions.IgnoreCase).Result("$1");
+                string sym = filename.Replace(ds, "").Replace(".EPF", "");
+                SecurityImpl s = new SecurityImpl(sym);
+                s.Date = Convert.ToInt32(ds);
+                return s;
+            }
+            catch (Exception) { }
+            return new SecurityImpl();
+
+        }
         
     }
 

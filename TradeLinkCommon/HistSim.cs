@@ -139,7 +139,7 @@ namespace TradeLink.Common
 
             // get total bytes represented by files
             DirectoryInfo di = new DirectoryInfo(_folder);
-            FileInfo[] fi = di.GetFiles("*.epf", SearchOption.AllDirectories);
+            FileInfo[] fi = di.GetFiles(tickext, SearchOption.AllDirectories);
             foreach (FileInfo thisfi in fi)
             {
                 foreach (string file in _tickfiles)

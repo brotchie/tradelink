@@ -45,7 +45,7 @@ namespace WinGauntlet
             }
             else
             {
-                FindStocks(args.Folder);
+                tickFileFilterControl1.SetSymbols(args.Folder);
                 UpdateResponses(Util.GetResponseList(args.DllName));
                 debug(Util.TLSIdentity());
             }
@@ -88,7 +88,7 @@ namespace WinGauntlet
                 args.Orders = ordersincsv.Checked;
                 args.Indicators = _indicatcsv.Checked;
                 args.Debugs = messagewrite.Checked;
-                args.Filter = PrepareFilter();
+                args.Filter = tickFileFilterControl1.GetFilter();
             }
             args.Name = args.Response.Name+uniquen;
             args.Started = DateTime.Now;
@@ -217,31 +217,6 @@ namespace WinGauntlet
             debug(msg);
         }
 
-        TickFileFilter PrepareFilter()
-        {
-            // prepare date filter
-            List<TickFileFilter.TLDateFilter> datefilter = new List<TickFileFilter.TLDateFilter>();
-            if (usedates.Checked)
-            {
-                for (int j = 0; j < yearlist.SelectedIndices.Count; j++)
-                    datefilter.Add(new TickFileFilter.TLDateFilter(Convert.ToInt32(yearlist.Items[yearlist.SelectedIndices[j]]) * 10000, DateMatchType.Year));
-                for (int j = 0; j < monthlist.SelectedItems.Count; j++)
-                    datefilter.Add(new TickFileFilter.TLDateFilter(Convert.ToInt32(monthlist.Items[monthlist.SelectedIndices[j]]) * 100, DateMatchType.Month));
-                for (int j = 0; j < daylist.SelectedItems.Count; j++)
-                    datefilter.Add(new TickFileFilter.TLDateFilter(Convert.ToInt32(daylist.Items[daylist.SelectedIndices[j]]), DateMatchType.Day));
-            }
-            // prepare symbol filter
-            List<string> symfilter = new List<string>();
-            if (usestocks.Checked)
-                for (int j = 0; j < stocklist.SelectedItems.Count; j++)
-                    symfilter.Add(stocklist.Items[stocklist.SelectedIndices[j]].ToString());
-
-            // build consolidated filter
-            TickFileFilter tff = new TickFileFilter(symfilter, datefilter);
-            //return it
-            return tff;
-
-        }
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -252,7 +227,7 @@ namespace WinGauntlet
             if (fd.ShowDialog() == DialogResult.OK)
             {
                 args.Folder = fd.SelectedPath;
-                FindStocks(fd.SelectedPath);
+                tickFileFilterControl1.SetSymbols(args.Folder);
             }
         }
 
@@ -321,17 +296,6 @@ namespace WinGauntlet
             }
         }
 
-        private void usestocks_CheckedChanged(object sender, EventArgs e)
-        {
-            stocklist.Enabled = !stocklist.Enabled;
-        }
-
-        private void usedates_CheckedChanged(object sender, EventArgs e)
-        {
-            yearlist.Enabled = !yearlist.Enabled;
-            monthlist.Enabled = !monthlist.Enabled;
-            daylist.Enabled = !daylist.Enabled;
-        }
 
 
         private void button4_Click(object sender, EventArgs e)
@@ -410,75 +374,7 @@ namespace WinGauntlet
             indf.WriteLine(string.Join(",", ivals));
         }
 
-        void FindStocks(string path)
-        {
-            // build list of available stocks and dates available
-            stocklist.Items.Clear();
-            yearlist.Items.Clear();
-            daylist.Items.Clear();
-            monthlist.Items.Clear();
-            DirectoryInfo di;
-            FileInfo[] fi;
 
-            try
-            {
-                di = new DirectoryInfo(path);
-                fi = di.GetFiles("*.epf");
-            }
-            catch (Exception ex) { status("exception loading stocks: " + ex.ToString()); return; }
-
-            int[] years = new int[200];
-            int[] days = new int[31];
-            int[] months = new int[12];
-            int yc = 0;
-            int dc = 0;
-            int mc = 0;
-
-            for (int i = 0; i < fi.Length; i++)
-            {
-                SecurityImpl s = StockFromFileName(fi[i].Name);
-                if (!s.isValid) continue;
-                DateTime d = Util.ToDateTime(s.Date,0);
-                if (!stocklist.Items.Contains(s.Symbol))
-                    stocklist.Items.Add(s.Symbol);
-                if (!contains(d.Year, years))
-                    years[yc++] = d.Year;
-                if (!contains(d.Month, months))
-                    months[mc++] = d.Month;
-                if (!contains(d.Day, days))
-                    days[dc++] = d.Day;
-            }
-            Array.Sort(years);
-            Array.Sort(days);
-            Array.Sort(months);
-            for (int i = 0; i < years.Length; i++)
-                if (years[i] == 0) continue;
-                else yearlist.Items.Add(years[i]);
-            for (int i = 0; i < months.Length; i++)
-                if (months[i] == 0) continue;
-                else monthlist.Items.Add(months[i]);
-            for (int i = 0; i < days.Length; i++)
-                if (days[i] == 0) continue;
-                else daylist.Items.Add(days[i]);
-        }
-
-        bool contains(int number, int[] array) { for (int i = 0; i < array.Length; i++) if (array[i] == number) return true; return false; }
-
-
-        SecurityImpl StockFromFileName(string filename)
-        {
-            try
-            {
-                string ds = System.Text.RegularExpressions.Regex.Match(filename, "([0-9]{8})[.]", System.Text.RegularExpressions.RegexOptions.IgnoreCase).Result("$1");
-                string sym = filename.Replace(ds, "").Replace(".EPF", "");
-                SecurityImpl s = new SecurityImpl(sym);
-                s.Date = Convert.ToInt32(ds);
-                return s;
-            }
-            catch (Exception) { }
-            return new SecurityImpl();
-
-        }
 
         private void _stopbut_Click(object sender, EventArgs e)
         {

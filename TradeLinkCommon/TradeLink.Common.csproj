@@ -75,6 +75,12 @@
     <Compile Include="BasketImpl.cs" />
     <Compile Include="MarketOrderFlat.cs" />
     <Compile Include="PositionTracker.cs" />
+    <Compile Include="TickFileFilterControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TickFileFilterControl.Designer.cs">
+      <DependentUpon>TickFileFilterControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="TLClient_IP.cs" />
     <Compile Include="Packet.cs" />
     <Compile Include="TLServer_IP.cs" />
@@ -139,6 +145,9 @@
     <EmbeddedResource Include="Ticket.resx">
       <DependentUpon>Ticket.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TickFileFilterControl.resx">
+      <DependentUpon>TickFileFilterControl.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

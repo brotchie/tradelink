@@ -125,6 +125,30 @@ namespace TradeLink.Common
             return filenames.ToArray();
         }
 
+        public string[] Allows(string[,] index)
+        {
+            List<string> keep = new List<string>();
+            for (int i = 0; i < index.GetLength(0); i++)
+                if (Allow(index[i, 0]))
+                    keep.Add(index[i, 0]);
+            return keep.ToArray();
+        }
+
+        public string[,] AllowsIndex(string[,] index)
+        {
+            List<int> keep = new List<int>();
+            for (int i = 0; i < index.GetLength(0); i++)
+                if (Allow(index[i, 0]))
+                    keep.Add(i);
+            string[,] allow = new string[keep.Count, keep.Count];
+            for (int i = 0; i<keep.Count; i++)
+            {
+                allow[i,0] = index[keep[i],0];
+                allow[i,1] = index[keep[i],1];
+            }
+            return allow;
+        }
+
         public struct TLDateFilter
         {
             public TLDateFilter(int date, DateMatchType type)

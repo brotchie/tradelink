@@ -143,6 +143,27 @@ namespace TestTradeLink
 
 
         }
+
+        [Test]
+        public void TickIndex()
+        {
+
+            string[,] idx = Util.TickFileIndex(Environment.CurrentDirectory + "\\", "*.epf");
+            string[] syma = new string[] { "ABN", "$SPX", "FTI" };
+            string syms = string.Join(",", syma);
+            bool foundsym = true;
+            for (int i = 0; i < idx.GetLength(0); i++)
+            {
+                Security s = Util.SecurityFromFileName(idx[i, 0]);
+                foundsym &= syms.Contains(s.Symbol);
+            }
+            Assert.IsTrue(foundsym);
+            Assert.AreEqual(syma.Length, idx.GetLength(0));
+            Assert.AreEqual(syma.Length, idx.GetLength(1));
+
+
+        }
+
     }
 
 
