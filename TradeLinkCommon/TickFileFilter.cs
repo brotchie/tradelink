@@ -140,7 +140,7 @@ namespace TradeLink.Common
             for (int i = 0; i < index.GetLength(0); i++)
                 if (Allow(index[i, 0]))
                     keep.Add(i);
-            string[,] allow = new string[keep.Count, keep.Count];
+            string[,] allow = new string[keep.Count, 2];
             for (int i = 0; i<keep.Count; i++)
             {
                 allow[i,0] = index[keep[i],0];

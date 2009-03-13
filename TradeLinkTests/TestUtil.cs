@@ -159,7 +159,7 @@ namespace TestTradeLink
             }
             Assert.IsTrue(foundsym);
             Assert.AreEqual(syma.Length, idx.GetLength(0));
-            Assert.AreEqual(syma.Length, idx.GetLength(1));
+            Assert.AreEqual(2, idx.GetLength(1));
 
 
         }

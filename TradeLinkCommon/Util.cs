@@ -574,7 +574,7 @@ namespace TradeLink.Common
             string[] _tickfiles = Directory.GetFiles(Folder, tickext);
             DirectoryInfo di = new DirectoryInfo(Folder);
             FileInfo[] fi = di.GetFiles(tickext, SearchOption.AllDirectories);
-            string[,] index = new string[_tickfiles.Length, _tickfiles.Length];
+            string[,] index = new string[_tickfiles.Length, 2];
             foreach (FileInfo thisfi in fi)
             {
                 for (int i = 0; i < _tickfiles.Length; i++)

@@ -78,6 +78,7 @@
             this.daylist.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.daylist.Size = new System.Drawing.Size(99, 124);
             this.daylist.TabIndex = 17;
+            this.daylist.SelectedIndexChanged += new System.EventHandler(this.daylist_SelectedIndexChanged);
             // 
             // monthlist
             // 
@@ -90,6 +91,7 @@
             this.monthlist.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.monthlist.Size = new System.Drawing.Size(54, 124);
             this.monthlist.TabIndex = 16;
+            this.monthlist.SelectedIndexChanged += new System.EventHandler(this.monthlist_SelectedIndexChanged);
             // 
             // yearlist
             // 
@@ -103,6 +105,7 @@
             this.yearlist.Size = new System.Drawing.Size(62, 124);
             this.yearlist.Sorted = true;
             this.yearlist.TabIndex = 15;
+            this.yearlist.SelectedIndexChanged += new System.EventHandler(this.yearlist_SelectedIndexChanged);
             // 
             // stocklist
             // 
@@ -116,6 +119,7 @@
             this.stocklist.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.stocklist.Size = new System.Drawing.Size(506, 124);
             this.stocklist.TabIndex = 14;
+            this.stocklist.SelectedIndexChanged += new System.EventHandler(this.stocklist_SelectedIndexChanged);
             // 
             // label6
             // 

@@ -12,21 +12,42 @@ namespace TradeLink.Common
 {
     public partial class TickFileFilterControl : UserControl
     {
+        /// <summary>
+        /// sends debug messages from control
+        /// </summary>
         public event DebugFullDelegate SendDebug;
+        /// <summary>
+        /// sent whenever user changes filter
+        /// </summary>
+        public event EventHandler FilterUpdate;
+        /// <summary>
+        /// creates a tick file filter control
+        /// </summary>
         public TickFileFilterControl()
         {
             InitializeComponent();
         }
+        /// <summary>
+        /// creates a tick file filter control from a tickfolder path
+        /// </summary>
+        /// <param name="path"></param>
         public TickFileFilterControl(string path)
             : this()
         {
             SetSymbols(path);
         }
+        /// <summary>
+        /// creates tickfilefilter control from an index
+        /// </summary>
+        /// <param name="index"></param>
         public TickFileFilterControl(string[,] index)
         {
             SetSymbols(index);
         }
-
+        /// <summary>
+        /// gets currently selected filter
+        /// </summary>
+        /// <returns></returns>
         public TickFileFilter GetFilter()
         {
             // prepare date filter
@@ -54,7 +75,10 @@ namespace TradeLink.Common
         }
 
         string[,] _index = new string[0, 0];
-
+        /// <summary>
+        /// sets available symbols found in a system path
+        /// </summary>
+        /// <param name="path"></param>
         public void SetSymbols(string path)
         {
             // build list of available stocks and dates available
@@ -71,6 +95,10 @@ namespace TradeLink.Common
             catch (Exception ex) { status("exception loading stocks: " + ex.ToString()); return; }
             SetSymbols(_index);
         }
+        /// <summary>
+        /// sets available symbols from an index
+        /// </summary>
+        /// <param name="index"></param>
         public void SetSymbols(string[,] index)
         {
             _index = index;
@@ -117,6 +145,7 @@ namespace TradeLink.Common
         private void usestocks_CheckedChanged(object sender, EventArgs e)
         {
             stocklist.Enabled = !stocklist.Enabled;
+            fupdate(sender);
         }
 
         private void usedates_CheckedChanged(object sender, EventArgs e)
@@ -124,7 +153,30 @@ namespace TradeLink.Common
             yearlist.Enabled = !yearlist.Enabled;
             monthlist.Enabled = !monthlist.Enabled;
             daylist.Enabled = !daylist.Enabled;
+            fupdate(sender);
         }
+
+        private void stocklist_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            fupdate(sender);
+        }
+
+        private void daylist_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            fupdate(sender);
+        }
+
+        private void monthlist_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            fupdate(sender);
+        }
+
+        private void yearlist_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            fupdate(sender);
+
+        }
+        void fupdate(object sender) { if (FilterUpdate != null) FilterUpdate(sender, new EventArgs()); }
         void status(string msg)
         {
             if (SendDebug != null)
@@ -137,6 +189,8 @@ namespace TradeLink.Common
                 SendDebug(DebugImpl.Create(msg, DebugLevel.Debug));
 
         }
+
+
 
 
     }
