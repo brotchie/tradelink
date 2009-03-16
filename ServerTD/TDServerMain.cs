@@ -32,6 +32,7 @@ namespace TDServer
             tl.newUnknownRequest += new UnknownMessageDelegate(tl_newUnknownRequest);
             tl.newRegisterStocks += new DebugDelegate(tl_newRegisterStocks);
             
+            
         }
 
         void tl_newRegisterStocks(string msg)
@@ -177,6 +178,10 @@ namespace TDServer
             bool yes = api.TD_brokerLogin(_user.Text, _pass.Text, _sourceid.Text, APIVER);
             if (yes)
             {
+                api.TD_GetStreamerInfo(_user.Text, _pass.Text, _sourceid.Text, APIVER);
+                api.TD_KeepAlive(_user.Text, _pass.Text, _sourceid.Text, APIVER);
+                BackColor = Color.Green;
+                Invalidate(true);
                 debug("login succeeded");
             }
             else
