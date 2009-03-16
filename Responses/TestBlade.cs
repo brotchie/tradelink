@@ -18,7 +18,7 @@ namespace Responses
         {
             const string sym = "TST";
             const int d = 20080509;
-            const int t = 935;
+            const int t = 93500;
             const string x = "NYSE";
             TickImpl[] ticklist = new TickImpl[] { 
                 TickImpl.NewTrade(sym,d,t,10,100,x),
@@ -52,10 +52,10 @@ namespace Responses
                 if (b.isBigVolume) bigvol++;
             }
 
-            Assert.That(up == 1,up.ToString());
-            Assert.That(down == 2,down.ToString());
-            Assert.That(newbar == 5,newbar.ToString());
-            Assert.That(bigvol == 1,bigvol.ToString());
+            Assert.AreEqual(1, up);
+            Assert.AreEqual(2,down);
+            Assert.AreEqual(5, newbar);
+            Assert.AreEqual(1,bigvol);
 
         }
 

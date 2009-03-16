@@ -87,10 +87,10 @@ namespace WinGauntlet
             {
                 args.Orders = ordersincsv.Checked;
                 args.Indicators = _indicatcsv.Checked;
-                args.Debugs = messagewrite.Checked;
+                args.Debugs = _debugs.Checked;
                 args.Filter = tickFileFilterControl1.GetFilter();
             }
-            args.Name = args.Response.Name+uniquen;
+            args.Name = args.ResponseName+uniquen;
             args.Started = DateTime.Now;
 
             // enable progress reporting
@@ -132,16 +132,16 @@ namespace WinGauntlet
         // runs after simulation is complete
         void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-
+            GauntArgs gargs = (GauntArgs)e.Result;
             if (!e.Cancelled)
             {
-                GauntArgs args = (GauntArgs)e.Result;
-                if (args.Trades)
+
+                if (gargs.Trades)
                 {
                     debug("writing trades...");
                     Util.ClosedPLToText(h.SimBroker.GetTradeList(), ',', LogFile("Trades"));
                 }
-                if (args.Orders)
+                if (gargs.Orders)
                 {
                     List<Order> olist = h.SimBroker.GetOrderList();
                     debug("writing orders...");
@@ -152,7 +152,7 @@ namespace WinGauntlet
                         sw.WriteLine(OrderImpl.Serialize(olist[i]));
                     sw.Close();
                 }
-                debug("Completed. Ticks: " + args.TicksProcessed + " Speed:" + args.TicksSecond.ToString("N0") + " t/s  Fills: " + args.Executions.ToString());
+                debug("Completed. Ticks: " + gargs.TicksProcessed + " Speed:" + gargs.TicksSecond.ToString("N0") + " t/s  Fills: " + gargs.Executions.ToString());
             }
             else debug("Canceled.");
             // close indicators
@@ -214,7 +214,8 @@ namespace WinGauntlet
 
         void h_GotDebug(string msg)
         {
-            debug(msg);
+            if (args.Debugs)
+                debug(msg);
         }
 
 
@@ -272,12 +273,24 @@ namespace WinGauntlet
             log.Write(DateTime.Now.ToShortTimeString()+": "+message);
             if (background) return;
             if (messages.InvokeRequired)
-                Invoke(new ShowCallBack(status), new object[] { message });
+            {
+                try
+                {
+                    Invoke(new ShowCallBack(status), new object[] { message });
+                }
+                catch (ObjectDisposedException) { }
+            }
             else
             {
-                messages.AppendText(message);
-                if (message.Contains(Environment.NewLine)) lastmessage.Text = message.Replace(Environment.NewLine, "");
-                else lastmessage.Text = lastmessage.Text + message;
+                try
+                {
+                    messages.AppendText(message);
+                    if (message.Contains(Environment.NewLine)) lastmessage.Text = message.Substring(0,message.Length-2);
+                    else lastmessage.Text = lastmessage.Text + message;
+                    lastmessage.Invalidate();
+                    messages.Invalidate(true);
+                }
+                catch (ObjectDisposedException) { }
             }
         }
 
@@ -316,6 +329,7 @@ namespace WinGauntlet
             }
             catch (Exception ex) { status("Response failed to load, quitting... (" + ex.Message + (ex.InnerException != null ? ex.InnerException.Message.ToString() : "") + ")"); }
             if (!args.Response.isValid) { status("Response did not load or loaded in a shutdown state. "+args.Response.Name+ " "+args.Response.FullName); return; }
+            args.ResponseName = args.Response.FullName;
             bindresponseevents();
         }
 
@@ -385,9 +399,9 @@ namespace WinGauntlet
         class GauntArgs
         {
             public GauntArgs() 
-            { 
+            {
                 // if using default filter then make it inclusive
-                _filter.DefaultDeny = false; 
+                _filter.DefaultDeny = false;
             }
             // command line arguments
             const int DLL = 1;
@@ -412,8 +426,8 @@ namespace WinGauntlet
             public bool Trades { get { return _trades; } set { _trades = value; } }
             public bool Indicators { get { return _indicators; } set { _indicators = value; } }
             public bool Debugs { get { return _debugs; } set { _debugs = value; } }
-            string _dllname = "";
-            string _resp = Properties.Settings.Default.boxdll == null ? "Responses.dll" : Properties.Settings.Default.boxdll;
+            string _dllname = !File.Exists(WinGauntlet.Properties.Settings.Default.boxdll) ? "Responses.dll" : WinGauntlet.Properties.Settings.Default.boxdll;
+            string _resp = "";
             Response _response;
             string _folder = (Properties.Settings.Default.tickfolder == null) ? Util.TLTickDir : Properties.Settings.Default.tickfolder;
             TickFileFilter _filter = new TickFileFilter();
@@ -429,8 +443,8 @@ namespace WinGauntlet
             public bool isUnattended { get { return (_response != null) && Directory.Exists(_folder); } }
             public override string ToString()
             {
-                string[] r = new string[] { DllName, ResponseName, Folder, FilterLocation };
-                return string.Join("/", r);
+                string[] r = new string[] { DllName, ResponseName, Folder, Flags,FilterLocation };
+                return string.Join("|", r);
             }
             public void ParseArgs(string[] args)
             {
@@ -477,7 +491,7 @@ namespace WinGauntlet
                     Console.WriteLine("\t\t'c:\\users\\administrator\\my documents\\filefilter.txt'");
                     Console.WriteLine("");
                 }
-                D("dll/resp/fold/filt: " + this.ToString());
+                D("dll|resp|fold|flags|filt: " + this.ToString());
 
                 
             }

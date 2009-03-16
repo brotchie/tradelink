@@ -17,13 +17,13 @@ namespace Responses
         const string s = "TST";
         const string x = "NYS";
         const int d = 20070917;
-        const int t = 929;
+        const int t = 92900;
 
         // we test 2 standard deviations here
 
 
         TickImpl[] ticklist = new TickImpl[] {
-            TickImpl.NewTrade(s,d,t,100,100,x),
+            TickImpl.NewTrade(s,d,t,1,100,x),
             TickImpl.NewTrade(s,d,t+110,2,100,x),
             TickImpl.NewTrade(s,d,t+200,3,100,x),
             TickImpl.NewTrade(s,d,t+300,4,100,x),
@@ -101,10 +101,10 @@ namespace Responses
                 bbb.newBar(bl);
             }
 
-            Assert.That(bbb.Mean == 3, bbb.Mean.ToString());
-            Assert.That(bbb.Devavg == 2, bbb.Devavg.ToString());
-            Assert.That(bbb.Sd == 1.4142135623730950488016887242097, bbb.Sd.ToString());
-            Assert.That(bbb.Upperband == 5.8284271247462M, bbb.Upperband.ToString());
+            Assert.AreEqual(3, bbb.Mean);
+            Assert.AreEqual(2, bbb.Devavg);
+            Assert.AreEqual(1.4142135623730950488016887242097,bbb.Sd);
+            Assert.AreEqual(5.8284271247462M,bbb.Upperband);
         }
         [Test]
         public void BollingerBarlisttestlookbacks()

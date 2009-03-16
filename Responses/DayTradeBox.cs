@@ -25,8 +25,8 @@ namespace Responses
         private int _date = 0;
         private int _time = 0;
         private int _sec = 0;
-        private int _sday = 930;
-        private int _eday = 1600;
+        private int _sday = 93000;
+        private int _eday = 160000;
         protected int MAXSIZE = 100;
         protected int MINSIZE = 100;
         private string _name = "";
@@ -234,13 +234,13 @@ namespace Responses
         }
 
         /// <summary>
-        /// Gets or sets the day start, in 24hour time as an integer (eg 1415 = 2:15PM).
+        /// Gets or sets the day start, in 24hour time as an integer (eg 141549 = 2:15:49PM).
         /// </summary>
         /// <value>The day start.</value>
         [CategoryAttribute("TL DayTradeInfo"), DescriptionAttribute("Sets inclusive start time for response each day.")]
         public int DayStart { get { return _sday; } set { _sday = value; } }
         /// <summary>
-        /// Gets or sets the day end, in 24hour time as an integer (eg 1600 = 4:00PM)
+        /// Gets or sets the day end, in 24hour time with seconds as an integer (eg 160003 = 4:00:03PM )
         /// </summary>
         /// <value>The day end.</value>
         [CategoryAttribute("TL DayTradeInfo"), DescriptionAttribute("Sets inclusive stop time for response each day.")]

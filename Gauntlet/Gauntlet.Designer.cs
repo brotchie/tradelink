@@ -40,6 +40,7 @@ namespace WinGauntlet
             this.label7 = new System.Windows.Forms.Label();
             this.queuebut = new System.Windows.Forms.Button();
             this.reslist = new System.Windows.Forms.ListBox();
+            this.tickFileFilterControl1 = new TradeLink.Common.TickFileFilterControl();
             this.optionpage = new System.Windows.Forms.TabPage();
             this._indicatcsv = new System.Windows.Forms.CheckBox();
             this._debugfile = new System.Windows.Forms.CheckBox();
@@ -53,12 +54,11 @@ namespace WinGauntlet
             this.savesettings = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.button2 = new System.Windows.Forms.Button();
-            this.showdebug = new System.Windows.Forms.CheckBox();
+            this._debugs = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.messagepage = new System.Windows.Forms.TabPage();
             this.messages = new System.Windows.Forms.RichTextBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.tickFileFilterControl1 = new TradeLink.Common.TickFileFilterControl();
             this.tabControl1.SuspendLayout();
             this.studypage.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -175,6 +175,13 @@ namespace WinGauntlet
             this.toolTip1.SetToolTip(this.reslist, "select response to trade");
             this.reslist.SelectedIndexChanged += new System.EventHandler(this.boxlist_SelectedIndexChanged);
             // 
+            // tickFileFilterControl1
+            // 
+            this.tickFileFilterControl1.Location = new System.Drawing.Point(9, 9);
+            this.tickFileFilterControl1.Name = "tickFileFilterControl1";
+            this.tickFileFilterControl1.Size = new System.Drawing.Size(607, 298);
+            this.tickFileFilterControl1.TabIndex = 18;
+            // 
             // optionpage
             // 
             this.optionpage.Controls.Add(this._indicatcsv);
@@ -189,7 +196,7 @@ namespace WinGauntlet
             this.optionpage.Controls.Add(this.savesettings);
             this.optionpage.Controls.Add(this.label2);
             this.optionpage.Controls.Add(this.button2);
-            this.optionpage.Controls.Add(this.showdebug);
+            this.optionpage.Controls.Add(this._debugs);
             this.optionpage.Controls.Add(this.label1);
             this.optionpage.Controls.Add(this.button1);
             this.optionpage.Location = new System.Drawing.Point(4, 29);
@@ -355,18 +362,18 @@ namespace WinGauntlet
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
-            // showdebug
+            // _debugs
             // 
-            this.showdebug.AutoSize = true;
-            this.showdebug.Location = new System.Drawing.Point(42, 189);
-            this.showdebug.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.showdebug.Name = "showdebug";
-            this.showdebug.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.showdebug.Size = new System.Drawing.Size(186, 24);
-            this.showdebug.TabIndex = 2;
-            this.showdebug.Text = "Response Debugging";
-            this.toolTip1.SetToolTip(this.showdebug, "show your responses SendDebug messages in messages window");
-            this.showdebug.UseVisualStyleBackColor = true;
+            this._debugs.AutoSize = true;
+            this._debugs.Location = new System.Drawing.Point(42, 189);
+            this._debugs.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this._debugs.Name = "_debugs";
+            this._debugs.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this._debugs.Size = new System.Drawing.Size(186, 24);
+            this._debugs.TabIndex = 2;
+            this._debugs.Text = "Response Debugging";
+            this.toolTip1.SetToolTip(this._debugs, "show your responses SendDebug messages in messages window");
+            this._debugs.UseVisualStyleBackColor = true;
             // 
             // label1
             // 
@@ -403,13 +410,6 @@ namespace WinGauntlet
             this.messages.TabIndex = 0;
             this.messages.Text = "";
             // 
-            // tickFileFilterControl1
-            // 
-            this.tickFileFilterControl1.Location = new System.Drawing.Point(9, 9);
-            this.tickFileFilterControl1.Name = "tickFileFilterControl1";
-            this.tickFileFilterControl1.Size = new System.Drawing.Size(607, 298);
-            this.tickFileFilterControl1.TabIndex = 18;
-            // 
             // Gauntlet
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -439,7 +439,7 @@ namespace WinGauntlet
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage studypage;
         private System.Windows.Forms.TabPage optionpage;
-        private System.Windows.Forms.CheckBox showdebug;
+        private System.Windows.Forms.CheckBox _debugs;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TabPage messagepage;
         private System.Windows.Forms.Button queuebut;

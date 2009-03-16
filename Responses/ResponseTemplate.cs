@@ -12,70 +12,64 @@ namespace Responses
     {
         /// <summary>
         /// Called when new ticks are recieved
+        /// here is where you respond to ticks, eg to populate a barlist
+        /// this.MyBarList.newTick(tick);
         /// </summary>
         /// <param name="tick"></param>
-        public void GotTick(Tick tick)
+        public virtual void GotTick(Tick tick)
         {
-            // here is where you respond to ticks, eg to populate a barlist
-
-            // this.MyBarList.newTick(tick);
         }
         /// <summary>
         /// Called when new orders received
+        /// track or respond to orders here, eg:
+        /// this.MyOrders.Add(order);
         /// </summary>
         /// <param name="order"></param>
-        public void GotOrder(Order order)
+        public virtual void GotOrder(Order order)
         {
-            // track or respond to orders here, eg:
-            //
-            // this.MyOrders.Add(order);
         }
         /// <summary>
-        /// Called when orders are filled
+        /// Called when orders are filled as trades.
+        /// track or respond to trades here, eg:
+        /// positionTracker.Adjust(fill);
         /// </summary>
         /// <param name="fill"></param>
-        public void GotFill(Trade fill)
+        public virtual void GotFill(Trade fill)
         {
-            // track or respond to trades here
-
-            // eg create a position field in this class, 
-            // then adjust it with latest trade:
-            //
-            // this.MyPosition.Adjust(fill)
         }
         /// <summary>
         /// Called if a cancel has been processed
         /// </summary>
         /// <param name="cancelid"></param>
-        public void GotOrderCancel(uint cancelid)
+        public virtual void GotOrderCancel(uint cancelid)
         {
-            // order cancels dealt with here, eg:
-            // int idx = -1;
-            // for (int i = 0; i<this.MyOrders.Cout; i++)
-            //      if (this.MyOrders[i].id==cancelid) idx = i;
-            // if (idx!=-1) this.MyOrders.RemoveAt(idx);
+
         }
         /// <summary>
-        /// Call this to reset your response parameters
+        /// Call this to reset your response parameters.
+        /// You might need to reset groups of indicators or internal counters.
+        /// eg : MovingAverage = 0;
         /// </summary>
-        public void Reset()
+        public virtual void Reset()
         {
-            // here is where you can reset your own values between runs
-            // eg indicators and so forth at days end or between runs, etc:
-
-            // MovingAverage.Reset()
         }
 
-        public void GotPosition(Position p) { }
+        public virtual void D(string msg) { SendDebug(DebugImpl.Create(msg)); }
+        public virtual void O(Order o) { SendOrder(o); }
+        public virtual void C(uint id) { SendCancel(id); }
+        public virtual void I(object[] indicators) { SendIndicators(indicators); }
+
+        public virtual void GotPosition(Position p) { }
 
         string[] _inds = new string[0];
         string _name = "";
         string _full = "";
+        bool _valid = true;
 
         /// <summary>
         /// Whether response can be used or not
         /// </summary>
-        public bool isValid { get { return true; } set { } }
+        public bool isValid { get { return _valid; } set { _valid = value; } }
         /// <summary>
         /// Names of the indicators used by your response.
         /// Length must correspond to actual indicator values send with SendIndicators event

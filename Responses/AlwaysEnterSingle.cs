@@ -1,5 +1,6 @@
 using System;
 using TradeLink.Common;
+using TradeLink.API;
 
 namespace Responses
 {
@@ -12,30 +13,45 @@ namespace Responses
     /// 
     /// Used for testing applications that use responsees.  (Quotopia, Gauntlet, etc)
     /// </summary>
-    public class AlwaysEnterSingle : BlackResponseEasy
+    public class AlwaysEnterSingle : ResponseTemplate
     {
+        PositionTracker pt = new PositionTracker();
         public AlwaysEnterSingle() : base() 
         {
-            Name = "AlwaysEnter";
-            MinSize = 1;
-            EntrySize = 1;
-            DayStart = 0;
-            DayEnd = 3000;
+
         }
-        protected override bool EnterLong()
+
+        public override void GotTick(TradeLink.API.Tick tick)
         {
-            D("Entering Long");
-            return true;
+            // ignore quotes
+            if (!tick.isTrade) return;
+            // get current position
+            Position p = pt[tick.symbol];
+            // if we're flat, enter
+            if (p.isFlat)
+            {
+                D("entering long");
+                O(new BuyMarket(tick.symbol, 1));
+            }
+            // otherwise if we're up 10/th of a point, flat us
+            else if (Calc.OpenPT(tick.trade, p) > .1m)
+            {
+                D("hit profit target");
+                O(new MarketOrderFlat(p));
+            }
         }
-        protected override bool EnterShort()
+
+        public override void GotFill(TradeLink.API.Trade fill)
         {
-            return false;
+            // keep track of position
+            pt.Adjust(fill);
         }
-        protected override bool Exit()
+
+        public override void GotPosition(TradeLink.API.Position p)
         {
-            bool exit = (Profit > .15m) || (Profit < -.1m);
-            if (exit) D("Exiting: " + Profit);
-            return exit;
+            // keep track of position
+            pt.Adjust(p);
         }
+
     }
 }
