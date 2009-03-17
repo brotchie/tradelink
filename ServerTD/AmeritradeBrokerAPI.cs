@@ -7320,10 +7320,11 @@ namespace AMTD_API
                 }
             }
             catch (Exception exc2)
-            { }
+            { 
+                
+            }
 
         }
-
 
 
         private static void ReadCallBack(IAsyncResult asyncResult)
@@ -7577,8 +7578,8 @@ namespace AMTD_API
 
                 //// Add the request into the state so it can be passed around
 
-                this.rs_LevelOneStreaming = new RequestState();
-                //this.rs_LevelOneStreaming.TickWithArgs += new AmeritradeBrokerAPI.EventHandlerWithArgs(((Form1)oForm).processEvent);
+                //this.rs_LevelOneStreaming = new RequestState();
+                //this.rs_LevelOneStreaming.TickWithArgs += new AmeritradeBrokerAPI.EventHandlerWithArgs(((TDServerMain)oForm).processEvent);
                 this.rs_LevelOneStreaming.oParentForm = oForm;
                 this.rs_LevelOneStreaming.lNewStockSymbol = false;
 
