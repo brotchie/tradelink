@@ -48,14 +48,15 @@ ren TLS.tmp TradeLinkSuite-%REVISION%.exe > NUL
 if exist InstallSuite\_zipresponses (
 del /q *.zip > NUL
 echo Zipping responses...
-echo *.cs >> _pat.txt
-echo *.resx >> _pat.txt
-echo *.settings >> _pat.txt
-echo *.sln >> _pat.txt
-echo *.csproj >> _pat.txt
-echo *.config >> _pat.txt
-echo *.ico >> _pat.txt
-zip -R Responses-%REVISION%.zip Responses\. -i@_pat.txt > NUL
+echo .\Responses\*.cs >> _pat.txt
+echo .\Responses\*.resx >> _pat.txt
+echo .\Responses\*.settings >> _pat.txt
+echo .\Responses\*.sln >> _pat.txt
+echo .\Responses\*.csproj >> _pat.txt
+echo .\Responses\*.config >> _pat.txt
+echo .\Responses\*.ico >> _pat.txt
+echo .\Responses\*.cmd >> _pat.txt
+zip -R Responses-%REVISION%.zip .\Responses -i@_pat.txt > NUL
 del _pat.txt
 )
 ) else (
