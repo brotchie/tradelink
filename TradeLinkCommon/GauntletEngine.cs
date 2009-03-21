@@ -15,11 +15,12 @@ namespace TradeLink.Common
             _r.SendOrder += new OrderDelegate(_r_SendOrder);
             _r.SendCancel += new UIntDelegate(_r_SendCancel);
             _tff = tff;
+            _h = new HistSim(_tff);
             _h.GotTick += new TickDelegate(_h_GotTick);
             _h.SimBroker.GotOrderCancel += new OrderCancelDelegate(SimBroker_GotOrderCancel);
             _h.SimBroker.GotOrder += new OrderDelegate(_r.GotOrder);
             _h.SimBroker.GotFill += new FillDelegate(_r.GotFill);
-            _h = new HistSim(_tff);
+
         }
 
         public void Go() { _h.PlayTo(HistSim.ENDSIM); }
