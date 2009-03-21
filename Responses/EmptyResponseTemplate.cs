@@ -7,6 +7,11 @@ using TradeLink.API;
 namespace Responses
 {
     // you can copy+paste this to get a working response w/o all the comments
+    // OR... just implement ResponseTemplate
+    /// <summary>
+    /// Used as a blank implementation of response.
+    /// Also see ResponseTemplate.
+    /// </summary>
     public class EmptyResponseTemplate : Response
     {
         public void GotTick(Tick tick)
@@ -30,6 +35,6 @@ namespace Responses
         public event DebugFullDelegate SendDebug;
         public event OrderDelegate SendOrder;
         public event UIntDelegate SendCancel;
-        public event ObjectArrayDelegate SendIndicators;
+        public event StringParamDelegate SendIndicators;
     }
 }

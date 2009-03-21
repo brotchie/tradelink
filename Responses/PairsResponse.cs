@@ -6,12 +6,14 @@ using TradeLink.API;
 
 namespace Responses
 {
-    public class PairsResponse : Response
+    public class PairsResponse : ResponseTemplate
     {
         PairsTracker pairs;
         PositionTracker pt = new PositionTracker();
         public PairsResponse()
         {
+            Name = "PairsResponse";
+            isValid = true;
             pairs = new PairsTracker("WAG", "FRX", .78m, 10);
             pairs.SpreadOutsideBounds += new DecimalDelegate(pairs_SpreadOutsideBounds);
         }
@@ -20,14 +22,14 @@ namespace Responses
         {
             // b is relatively expensive here
             if (spread>0)
-            { 
-              SendOrder(new BuyMarket(pairs.Asym,100));
-              SendOrder(new SellMarket(pairs.Bsym,100));
+            {
+              sendorder(new BuyMarket(pairs.Asym, 100));
+              sendorder(new SellMarket(pairs.Bsym, 100));
             }
             else // b is cheap here
             {
-              SendOrder(new BuyMarket(pairs.Bsym,100));
-              SendOrder(new SellMarket(pairs.Asym, 100));
+                sendorder(new BuyMarket(pairs.Bsym, 100));
+                sendorder(new SellMarket(pairs.Asym, 100));
             }
         }
         public void GotTick(Tick tick)
@@ -36,10 +38,10 @@ namespace Responses
         }
         public void GotOrder(Order order)
         {
-            D("order: "+order.ToString());
+            senddebug("order: "+order.ToString());
         }
 
-        void D(string msg) { SendDebug(DebugImpl.Create(msg)); }
+
         public void GotFill(Trade fill)
         {
             D("fill: "+fill.ToString());
@@ -50,28 +52,19 @@ namespace Responses
         }
         void shutdown()
         {
-            if (!_valid) return;
-            SendOrder(new MarketOrderFlat(pt[pairs.Asym]));
-            SendOrder(new MarketOrderFlat(pt[pairs.Bsym]));
-            _valid = false;
+            if (!isValid) return;
+            sendorder(new MarketOrderFlat(pt[pairs.Asym]));
+            sendorder(new MarketOrderFlat(pt[pairs.Bsym]));
+            isValid= false;
         }
         public void GotOrderCancel(uint cancelid)
         {
-            D("canceled: " + cancelid);
+            senddebug("canceled: " + cancelid);
         }
-        public void Reset() { }
         public void GotPosition(Position p) 
         {
             pt.Adjust(p);
         }
-        bool _valid = true;
-        public bool isValid { get { return _valid; } set {  } }
-        public string[] Indicators { get { return new string[0]; } set { } }
-        public string Name { get { return ""; } set { } }
-        public string FullName { get { return ""; } set { } }
-        public event DebugFullDelegate SendDebug;
-        public event OrderDelegate SendOrder;
-        public event UIntDelegate SendCancel;
-        public event ObjectArrayDelegate SendIndicators;
+
     }
 }

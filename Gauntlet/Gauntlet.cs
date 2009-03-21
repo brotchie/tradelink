@@ -339,12 +339,25 @@ namespace WinGauntlet
             if ((args.Response== null) || !args.Response.isValid)
                 return false;
             if (_boundonce) return true;
-            args.Response.SendIndicators += new ObjectArrayDelegate(Response_IndicatorUpdate);
+            args.Response.SendIndicators += new StringParamDelegate(Response_SendIndicators);
             args.Response.SendDebug += new DebugFullDelegate(Response_GotDebug);
             args.Response.SendCancel += new UIntDelegate(Response_CancelOrderSource);
             args.Response.SendOrder += new OrderDelegate(Response_SendOrder);
             _boundonce = true;
             return true;
+        }
+
+        void Response_SendIndicators(string param)
+        {
+            if (!args.Indicators) return;
+            // prepare indicator output
+            if (indf == null)
+            {
+                indf = new StreamWriter(LogFile("Indicators"), false);
+                indf.WriteLine(string.Join(",", args.Response.Indicators));
+                indf.AutoFlush = true;
+            }
+            indf.WriteLine(param);
         }
 
 
@@ -375,17 +388,7 @@ namespace WinGauntlet
 
         void Response_IndicatorUpdate(object[] parameters)
         {
-            if (!args.Indicators) return;
-            // prepare indicator output
-            if (indf == null)
-            {
-                indf = new StreamWriter(LogFile("Indicators"), false);
-                indf.WriteLine(string.Join(",", args.Response.Indicators));
-                indf.AutoFlush = true;
-            }
-            string[] ivals = new string[parameters.Length];
-            for (int i = 0; i < parameters.Length; i++) ivals[i] = parameters[i].ToString();
-            indf.WriteLine(string.Join(",", ivals));
+
         }
 
 

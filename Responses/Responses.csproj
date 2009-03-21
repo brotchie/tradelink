@@ -67,7 +67,6 @@
     <Compile Include="PairsResponse.cs" />
     <Compile Include="PairsTracker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResponseTemplate.cs" />
     <Compile Include="SMA.cs" />
     <Compile Include="TestBlade.cs" />
     <Compile Include="TestBollinger.cs" />

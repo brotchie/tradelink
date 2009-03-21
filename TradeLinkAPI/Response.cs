@@ -14,7 +14,7 @@ namespace TradeLink.API
         void GotPosition(Position pos);
 
         // Response output
-        event ObjectArrayDelegate SendIndicators;
+        event StringParamDelegate SendIndicators;
         event OrderDelegate SendOrder;
         event UIntDelegate SendCancel;
         event DebugFullDelegate SendDebug;

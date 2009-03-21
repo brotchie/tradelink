@@ -2,6 +2,7 @@
 
 namespace TradeLink.API
 {
+    public delegate void StringParamDelegate(string param);
     public delegate void MessageDelegate(MessageTypes msgid, string source);
     public delegate void TickDelegate(Tick t);
     public delegate void FillDelegate(Trade t);

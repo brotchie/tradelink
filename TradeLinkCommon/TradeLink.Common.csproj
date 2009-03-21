@@ -66,6 +66,7 @@
     <Compile Include="DebugImpl.cs" />
     <Compile Include="Email.cs" />
     <Compile Include="eSigTick.cs" />
+    <Compile Include="GauntletEngine.cs" />
     <Compile Include="HistSim.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -75,6 +76,7 @@
     <Compile Include="BasketImpl.cs" />
     <Compile Include="MarketOrderFlat.cs" />
     <Compile Include="PositionTracker.cs" />
+    <Compile Include="ResponseTemplate.cs" />
     <Compile Include="TickFileFilterControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

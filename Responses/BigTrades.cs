@@ -94,6 +94,6 @@ namespace Responses
         public event DebugFullDelegate SendDebug;
         public event OrderDelegate SendOrder;
         public event UIntDelegate SendCancel;
-        public event ObjectArrayDelegate SendIndicators;
+        public event StringParamDelegate SendIndicators;
     }
 }

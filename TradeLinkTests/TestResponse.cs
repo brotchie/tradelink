@@ -54,44 +54,23 @@ namespace TestTradeLink
             sbcount++;
             o = order;
         }
-        public class Always : Response
+        public class Always : ResponseTemplate
         {
             public int MinSize = 100;
             public int MaxSize = 100;
             public Always() {  }
-            public virtual void GotTick(Tick tick)
+            public override void GotTick(Tick tick)
             {
-                SendDebug(DebugImpl.Create("entering"));
-                SendOrder(new BuyMarket(tick.symbol, MinSize));
+                senddebug("entering");
+                sendorder(new BuyMarket(tick.symbol, MinSize));
             }
 
-            public virtual void GotOrder(Order order) {}
-            public void GotFill(Trade fill) {}
-            public void GotOrderCancel(uint cancelid) { }
-            public void Reset() { }
-
-            public void GotPosition(Position p) { }
-
-            string[] _inds = new string[0];
-            string _name = "";
-            string _full = "";
-
-            public bool isValid { get { return true; } set { } }
-
-            public string[] Indicators { get { return _inds; } set { _inds = value; } }
-
-            public string Name { get { return _name; } set { _name = value; } }
-
-            public string FullName { get { return _full; } set { _full = value; } }
-
-            public event DebugFullDelegate SendDebug;
-            public event OrderDelegate SendOrder;
-            public event UIntDelegate SendCancel;
-            public event ObjectArrayDelegate SendIndicators;
         }
 
-        public class Never : Always
+        public class Never : ResponseTemplate
         {
+            public int MinSize = 100;
+            public int MaxSize = 100;
             public override void GotTick(Tick tick)
             {
                 

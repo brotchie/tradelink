@@ -51,6 +51,11 @@ namespace TradeLink.Common
                 b = new InvalidResponse(); b.Name = ex.InnerException.Message; return b;
             }
             b.FullName = fullname;
+            try
+            {
+                int partial = fullname.IndexOf('.');
+                b.Name = fullname.Substring(partial + 1, fullname.Length - partial);
+            } catch (Exception ex) {}
             return b;
         }
     }

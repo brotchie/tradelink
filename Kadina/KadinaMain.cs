@@ -452,7 +452,7 @@ namespace Kadina
                 myres.SendDebug += new DebugFullDelegate(myres_GotDebug);
                 myres.SendCancel += new UIntDelegate(myres_CancelOrderSource);
                 myres.SendOrder += new OrderDelegate(myres_SendOrder);
-                myres.SendIndicators += new ObjectArrayDelegate(myres_SendIndicators);
+                myres.SendIndicators += new StringParamDelegate(myres_SendIndicators); 
                 h.SimBroker.GotOrder += new OrderDelegate(myres.GotOrder);
                 h.SimBroker.GotFill += new FillDelegate(myres.GotFill);
                 h.GotTick += new TickDelegate(myres.GotTick);
@@ -462,14 +462,18 @@ namespace Kadina
 
         }
 
-        void myres_SendIndicators(object[] parameters)
+        void myres_SendIndicators(string param)
         {
             if (myres == null) return;
             if (myres.Indicators.Length == 0)
                 debug("No indicators defined on response: " + myres.Name);
             else
+            {
+                string[] parameters = param.Split(',');
                 NewIRow(new object[] { parameters });
+            }
         }
+
 
         void myres_SendOrder(Order o)
         {

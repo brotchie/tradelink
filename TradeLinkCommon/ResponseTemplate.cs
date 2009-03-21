@@ -4,7 +4,7 @@ using System.Text;
 using TradeLink.Common;
 using TradeLink.API;
 
-namespace Responses
+namespace TradeLink.Common
 {
     // A response is the most generic type of response you can have
     // responses will work in all the TradeLink programs (gauntlet/asp/kadina)
@@ -57,7 +57,11 @@ namespace Responses
         public virtual void D(string msg) { SendDebug(DebugImpl.Create(msg)); }
         public virtual void O(Order o) { SendOrder(o); }
         public virtual void C(uint id) { SendCancel(id); }
-        public virtual void I(object[] indicators) { SendIndicators(indicators); }
+        public virtual void I(string indicators) { SendIndicators(indicators); }
+        public void sendorder(Order o) { SendOrder(o); }
+        public void sendcancel(uint id) { SendCancel(id); }
+        public void sendindicators(string indicators) { sendindicators(indicators); }
+        public void senddebug(string msg) { SendDebug(DebugImpl.Create(msg)); }
 
         public virtual void GotPosition(Position p) { }
 
@@ -87,6 +91,6 @@ namespace Responses
         public event DebugFullDelegate SendDebug;
         public event OrderDelegate SendOrder;
         public event UIntDelegate SendCancel;
-        public event ObjectArrayDelegate SendIndicators;
+        public event StringParamDelegate SendIndicators;
     }
 }

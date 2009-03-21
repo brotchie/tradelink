@@ -16,7 +16,7 @@ namespace Responses
         PositionTracker pt = new PositionTracker();
         public AlwaysEnter() : base() 
         {
-
+            Name = "AlwaysEnter";
         }
 
         public override void GotTick(TradeLink.API.Tick tick)

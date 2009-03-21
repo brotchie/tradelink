@@ -16,7 +16,7 @@ namespace Responses
         public event UIntDelegate SendCancel;
         public event OrderDelegate SendOrder;
         public event DebugFullDelegate SendDebug;
-        public event ObjectArrayDelegate SendIndicators;
+        public event StringParamDelegate SendIndicators;
 
         BarListImpl _bl = new BarListImpl();
         Position _pos = new PositionImpl();
@@ -37,7 +37,7 @@ namespace Responses
         private int _expectedpossize = 0;
         protected List<uint> _buyids = new List<uint>();
         protected List<uint> _sellids = new List<uint>();
-        public void Indicate(object[] values) { if (SendIndicators != null) SendIndicators(values); }
+        public void Indicate(string values) { if (SendIndicators != null) SendIndicators(values); }
 
 
         public void GotTick(Tick tick)
