@@ -123,22 +123,26 @@ namespace TestTradeLink
 
             // add better bid, make sure it's BBO
             Order o;
-            o = new BuyLimit(s, x, p2);
-            o.id = 1;
+            // Order#1... 100 shares buy at $11 
+            o = new BuyLimit(s, x, p2,1);
             broker.sendOrder(o);
             bid = broker.BestBid(s);
             offer = broker.BestOffer(s);
-            Assert.That(bid.isValid && (bid.price == p2) && (bid.size == x), bid.ToString());
+            Assert.IsTrue(bid.isValid);
+            Assert.AreEqual(p2,bid.price);
+            Assert.AreEqual(x, bid.size);
             Assert.That(!offer.isValid, offer.ToString());
 
             // add another bid at same price on another account, make sure it's additive
-            o = new BuyLimit(s, x, p2);
-            o.id = 2;
+            //order #2... 100 shares buy at $11
+            o = new BuyLimit(s, x, p2,2);
             o.Account = "ANOTHER_ACCOUNT";
             broker.sendOrder(o);
             bid = broker.BestBid(s);
             offer = broker.BestOffer(s);
-            Assert.That(bid.isValid && (bid.price == p2) && (bid.size == (2*x)), bid.ToString());
+            Assert.IsTrue(bid.isValid);
+            Assert.AreEqual(p2, bid.price);
+            Assert.AreEqual(x*2, bid.size); 
             Assert.That(!offer.isValid, offer.ToString());
 
             // cancel order and make sure bbo returns
@@ -146,8 +150,10 @@ namespace TestTradeLink
             broker.CancelOrder(2);
             bid = broker.BestBid(s);
             offer = broker.BestOffer(s);
-            Assert.That(bid.isValid && (bid.price == p1) && (bid.size == x), bid.ToString());
-            Assert.That(!offer.isValid, offer.ToString());
+            Assert.IsTrue(bid.isValid);
+            Assert.AreEqual(p1,bid.price);
+            Assert.AreEqual(x,bid.size);
+            Assert.IsTrue(!offer.isValid, offer.ToString());
 
             // other test ideas
             // replicate above tests for sell-side

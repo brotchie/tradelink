@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using TradeLink.API;
 using System.Text;
 using NUnit.Framework;
+using TradeLink.Common;
 
-namespace TradeLink.Common
+namespace TestTradeLink
 {
     [TestFixture]
     public class TestOffsetTracker

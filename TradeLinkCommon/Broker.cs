@@ -40,7 +40,7 @@ namespace TradeLink.Common
         protected List<Order> Orders { get { return MasterOrders[DEFAULT]; } set { MasterOrders[DEFAULT] = value; } }
         protected List<Trade> FillList { get { return MasterTrades[DEFAULT.ID]; } set { MasterTrades[DEFAULT.ID] = value; } }
         public string[] Accounts { get { List<string> alist = new List<string>(); foreach (Account a in MasterOrders.Keys) alist.Add(a.ID); return alist.ToArray(); } }
-        uint _nextorderid = 1;
+        uint _nextorderid = OrderImpl.Unique;
 
         public Order BestBid(string symbol,Account account) { return BestBidOrOffer(symbol,true,account); }
         public Order BestBid(string symbol) { return BestBidOrOffer(symbol,true); }
@@ -146,8 +146,6 @@ namespace TradeLink.Common
             if (!MasterOrders.ContainsKey(a))  // see if we have a book for this account
                 MasterOrders.Add(a,new List<Order>()); // if not, create one
             o.Account = a.ID; // make sure order knows his account
-            if (o.id == 0) // if order id isn't set, set it
-                o.id = _nextorderid++;
             MasterOrders[a].Add(o); // record the order
         }
         public bool CancelOrder(uint orderid)
@@ -159,16 +157,19 @@ namespace TradeLink.Common
         }
         public bool CancelOrder(Account a, uint orderid)
         {
-            if (!MasterOrders.ContainsKey(a)) return false;
-            for (int i = MasterOrders[a].Count-1; i>=0; i--) // and every order
-                if (MasterOrders[a][i].id == orderid) // if we have order with requested id
+            List<Order> orderlist = new List<Order>();
+            if (!MasterOrders.TryGetValue(a, out orderlist)) return false;
+            int cancelidx = -1;
+            for (int i = orderlist.Count-1; i>=0; i--) // and every order
+                if (orderlist[i].id == orderid) // if we have order with requested id
                 {
                     if ((GotOrderCancel != null) && a.Notify)
-                        GotOrderCancel(MasterOrders[a][i].symbol, MasterOrders[a][i].side,orderid); //send cancel notifcation to any subscribers
-                    MasterOrders[a].RemoveAt(i); // remove/cancel order
-                    return true;
+                        GotOrderCancel(orderlist[i].symbol, orderlist[i].side,orderid); //send cancel notifcation to any subscribers
+                    cancelidx = i;
                 }
-            return false;
+            if (cancelidx == -1) return false;
+            MasterOrders[a].RemoveAt(cancelidx);
+            return true;
         }
         /// <summary>
         /// Sends the order to the broker. (uses the default account)
@@ -197,6 +198,8 @@ namespace TradeLink.Common
         /// <returns>status code</returns>
         public int sendOrder(Order o,Account a)
         {
+            if (o.id == 0) // if order id isn't set, set it
+                o.id = _nextorderid++;
             if ((GotOrder != null) && a.Notify)
                 GotOrder(o);
             AddOrder(o, a);
@@ -220,8 +223,10 @@ namespace TradeLink.Common
             { // go through each account
                 // if account has requested no executions, skip it
                 if (!a.Execute) continue;
-                // go through each order in the account
+                // track orders being removed and trades that need notification
+                List<int> notifytrade = new List<int>();
                 List<int> remove = new List<int>();
+                // go through each order in the account
                 for (int i = 0; i < MasterOrders[a].Count; i++)
                 { 
                     Order o = MasterOrders[a][i];
@@ -250,14 +255,19 @@ namespace TradeLink.Common
                         tick.size -= o.UnsignedSize;
                         if (!MasterTrades.ContainsKey(a.ID)) MasterTrades.Add(a.ID, new List<Trade>());
                         MasterTrades[a.ID].Add((Trade)o); // record trade
-                        if ((GotFill != null) && a.Notify)
-                            GotFill((Trade)o); // notify subscribers after recording trade
+                        // market it for notification
+                        notifytrade.Add(MasterTrades[a.ID].Count-1);
                         filledorders++; // count the trade
                     }
                 }
                 // remove the filled orders
                 for (int i = remove.Count - 1; i >= 0; i--)
                     MasterOrders[a].RemoveAt(remove[i]);
+                // notify subscribers of trade
+                if ((GotFill != null) && a.Notify)
+                    foreach (int tradeidx in notifytrade)
+                        GotFill(MasterTrades[a.ID][tradeidx]); 
+
             }
             return filledorders;
         }

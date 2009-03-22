@@ -457,10 +457,13 @@ namespace Kadina
                 h.SimBroker.GotFill += new FillDelegate(myres.GotFill);
                 h.GotTick += new TickDelegate(myres.GotTick);
                 status(resname + " is current response.");
+                updatetitle();
             }
             else status("Response did not load.");
 
         }
+        const string PROGRAM = "Kadina";
+        void updatetitle() { Text = PROGRAM + " - Study: " + resname + " " + PrettyEPF(); Invalidate(); }
 
         void myres_SendIndicators(string param)
         {
@@ -508,12 +511,12 @@ namespace Kadina
 
 
         List<string> epffiles = new List<string>();
-        string[] PrettyEPF()
+        string PrettyEPF()
         {
             string[] list = new string[epffiles.Count];
             for (int i = 0; i < epffiles.Count; i++)
-                list[i] = Util.ParseFile(epffiles[i]).symbol;
-            return list;
+                list[i] = Path.GetFileNameWithoutExtension(epffiles[i]);
+            return list.Length > 0 ? "[" + string.Join(",", list) + "]" : "[?]";
         }
          private bool loadfile(string path)
          {
@@ -534,7 +537,6 @@ namespace Kadina
             else if (isEPF(f))
             {
 
-                sec = SecurityImpl.FromFile(f);
                 if (System.IO.File.Exists(f))
                     if (!isRecent(f) && sec.isValid)
                         recent.DropDownItems.Add(f);
@@ -545,14 +547,16 @@ namespace Kadina
                 h.GotTick += new TickDelegate(h_GotTick);
                 h.SimBroker.GotOrderCancel += new OrderCancelDelegate(broker_GotOrderCancel);
 
-
-                status("Loaded "+sec.Symbol+" for "+Util.TLD2DT(sec.Date)+" ["+string.Join(",",PrettyEPF())+"]");
+                updatetitle();
+                status("Loaded tickdata: "+PrettyEPF());
                 return true;
             }
 
             return false;
 
         }
+
+        
         bool isRecent(string path)
         {
             for (int i = 0; i < recent.DropDownItems.Count; i++)
