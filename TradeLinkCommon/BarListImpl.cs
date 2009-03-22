@@ -21,6 +21,7 @@ namespace TradeLink.Common
         {
             get { return Get(index); }
         }
+        public int First { get { return 0; } }
         public BarListImpl(string symbol) : this(BarInterval.FiveMin, symbol) { }
         public BarListImpl() : this(BarInterval.FiveMin, "") { }
         string sym = "";

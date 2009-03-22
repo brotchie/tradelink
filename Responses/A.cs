@@ -2,6 +2,7 @@
 using System;
 using TradeLink.Common;
 using TradeLink.API;
+using System.ComponentModel; // required for ParamPrompt
 
 namespace Responses
 {
@@ -11,46 +12,88 @@ namespace Responses
     /// If the open and the low are close but the high is far away, sell the open when the market reapproaches it.
     /// If the open and high and close but the low is far away, buy the open when the market reapproaches it.
     /// </summary>
-	public class A : MarketResponse
+	public class OpenAsymetry : ResponseTemplate
 	{
-        public A() : base() 
-        { 
-            const string version = "$Rev$"; 
-            Name = "A"+Util.CleanVer(version); 
-        }
-        BarList bars;
-
-        // we need high-low and open for this response
-        decimal h{ get { return BarMath.HH(bars); } }
-        decimal l { get { return BarMath.LL(bars); } }
-        decimal o { get { return bars.RecentBar.Open; } }
-
-        // here are the parameters that define how close we need to be to the open
-        const decimal a = .06m; // minimum asymmetry allowed for entry
-        const decimal r = .37m; // minimum range required for asymmetry test
-        const decimal e = .1m; // how close market must be to asymmetry before entry
-        const decimal p = .2m; // profit target
-        const decimal s = -.11m; // stop loss
-        
-        // here are the trading rules that implement our strategy's intention
-        protected override int Read(Tick tick, BarList bl)
+        public OpenAsymetry()
         {
-            // indicator setup
-            bars = bl;
-            if (!bl.Has(2,bl.Int)) return 0; // must have at least one one bar
+            // enable prompting of user for parameters
+            ParamPrompt pp = new ParamPrompt(this);
+            // show the prompt
+            pp.ShowDialog();
+        }
 
-            // asymmetry tests
-            if (((h - o) > a) && ((o - l) > a)) { Shutdown("Not enough Asymetry to trade."); return 0; }
-            if ((h - l) < r) return 0; // must have the range
-            if (((h-o)<=a) && ((h-tick.trade)>e)) return MaxSize;
-            if (((o-l)<=a) && ((tick.trade-l)>e)) return MaxSize*-1;
+        // here are parameters to prompt for and their descriptions
+        [Description("minimum asymmetry allowed for entry")]
+        public decimal MinAsymetry { get { return a; } set { a = value; } }
+        [Description("minimum range required for asymmetry test")]
+        public decimal MinRange { get { return r; } set { r = value; } }
+        [Description("how close market must be to asymmetry before entry")]
+        public decimal AnticipateDistance { get { return d; } set { d = value; } }
+        [Description("profit target in points")]
+        public decimal Profit { get { return p; } set { p = value; } }
+        [Description("stop loss in points")]
+        public decimal Stop { get { return s; } set { s = value; } }
+        [Description("entry size for trade")]
+        public int EntrySize { get { return e; } set { e = value; } }
 
-            // profit and loss tests
-            decimal PL = Calc.OpenPT(tick.trade, Pos.AvgPrice, Pos.Size);
-            if (PL > p) return Pos.FlatSize;
-            if (PL < s) return Pos.FlatSize;
 
-            return 0;
+        // here are the defaults for the above parameters
+        decimal a = .06m;  
+        decimal r = .37m; 
+        decimal d = .1m; 
+        decimal p = .2m; 
+        decimal s = -.11m; 
+        int e = 100;
+        
+        // enable bar tracking
+        BarListTracker blt = new BarListTracker();
+        // enable position tracking
+        PositionTracker pt = new PositionTracker();
+
+        public override void  GotTick(Tick tick)
+        {
+            // enable bars for all ticks that come in
+            blt.newTick(tick);
+
+            // if we don't have one bar yet, wait for more ticks until continuing
+            if (!blt[tick.symbol].Has(1)) return; 
+
+            // get high
+            decimal h = Calc.HH(blt[tick.symbol]);
+            // get low
+            decimal l = Calc.LL(blt[tick.symbol]);
+            // get open
+            decimal o = blt[tick.symbol][0].Open;
+
+            // asymmetry calculations...
+
+            // if there is no asymetry in this market, shutdown this response
+            if (((h - o) > a) && ((o - l) > a))
+            {
+                isValid = false;
+                return;
+            }
+            // if the range for the market is too small, wait
+            if ((h - l) < r) return; 
+            // if the market gapped down after opening, 
+            // but now is turning around... go long
+            if (((h - o) <= a) && ((h - tick.trade) > e))
+                sendorder(new BuyMarket(tick.symbol, EntrySize));
+            // if market gapped up after open, 
+            // but now is turning around to go negative... go short
+            if (((o - l) <= a) && ((tick.trade - l) > e))
+                sendorder(new SellMarket(tick.symbol, EntrySize));
+
+            // get open pl in points
+            decimal points = Calc.OpenPT(tick.trade, pt[tick.symbol]);
+            // if we hit our profit or loss target, stop trading
+            if ((points > p) || (points < s))
+            {
+                // flat us
+                sendorder(new MarketOrderFlat(pt[tick.symbol]));
+                // don't trade anymore
+                isValid = false;
+            }
         }
     }
 }

@@ -74,6 +74,18 @@ namespace TradeLink.Common
             this.time = time;
             this.date = date;
         }
+        public OrderImpl(string sym, bool side, int size, decimal p, decimal s, string c, int time, int date, uint orderid)
+        {
+            this.symbol = sym;
+            this.side = side;
+            this.size = System.Math.Abs(size);
+            this.price = p;
+            this.stopp = s;
+            this.comment = c;
+            this.time = time;
+            this.date = date;
+            this.id = orderid;
+        }
         public OrderImpl(string sym, bool side, int size)
         {
             this.symbol = sym;

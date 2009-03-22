@@ -57,12 +57,16 @@ namespace TradeLink.Common
         public virtual void D(string msg) { SendDebug(DebugImpl.Create(msg)); }
         public virtual void O(Order o) { SendOrder(o); }
         public virtual void C(uint id) { SendCancel(id); }
-        public virtual void I(string indicators) { SendIndicators(indicators); }
+        public void I(string indicators) { SendIndicators(indicators); }
+        public void I(object[] indicators) { string[] s = new string[indicators.Length]; for (int i = 0; i < indicators.Length; i++) s[i] = indicators[i].ToString(); SendIndicators(string.Join(",", s)); }
+        public void I(string[] indicators) { SendIndicators(string.Join(",", indicators)); }
+
         public void sendorder(Order o) { SendOrder(o); }
         public void sendcancel(uint id) { SendCancel(id); }
+        public void sendindicators(object[] indicators) { string[] s = new string[indicators.Length]; for (int i = 0; i < indicators.Length; i++) s[i] = indicators[i].ToString(); SendIndicators(string.Join(",", s)); }
+        public void sendindicators(string[] indicators) { SendIndicators(string.Join(",", indicators)); }
         public void sendindicators(string indicators) { sendindicators(indicators); }
         public void senddebug(string msg) { SendDebug(DebugImpl.Create(msg)); }
-
         public virtual void GotPosition(Position p) { }
 
         string[] _inds = new string[0];

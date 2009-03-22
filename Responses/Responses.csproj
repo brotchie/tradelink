@@ -54,20 +54,16 @@
     <Compile Include="BigTradeUI.Designer.cs">
       <DependentUpon>BigTradeUI.cs</DependentUpon>
     </Compile>
-    <Compile Include="BlackBoxEasy.cs" />
     <Compile Include="Blade.cs" />
     <Compile Include="Bollinger.cs" />
     <Compile Include="AlwaysEnterSingle.cs" />
-    <Compile Include="DayTradeBox.cs" />
     <Compile Include="EmptyResponseTemplate.cs" />
     <Compile Include="GreyExit.cs" />
-    <Compile Include="MAbox.cs" />
-    <Compile Include="MarketBox.cs" />
     <Compile Include="OpenCancel.cs" />
     <Compile Include="PairsResponse.cs" />
     <Compile Include="PairsTracker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SMA.cs" />
+    <Compile Include="SMAResponse.cs" />
     <Compile Include="TestBlade.cs" />
     <Compile Include="TestBollinger.cs" />
   </ItemGroup>

@@ -8,6 +8,8 @@ namespace TradeLink.Common
     public class BarListTracker
     {
         public BarListTracker() : this(new string[0]) { }
+        BarInterval _default = BarInterval.FiveMin;
+        public BarInterval DefaultInterval { get { return _default; } set { _default = value; } }
         /// <summary>
         /// preinitialize a tracker with selected symbols
         /// </summary>
@@ -41,7 +43,7 @@ namespace TradeLink.Common
             BarListImpl bl;
             if (!_bdict.TryGetValue(k.symbol, out bl))
             {
-                bl = new BarListImpl(k.symbol);
+                bl = new BarListImpl(_default,k.symbol);
                 _bdict.Add(k.symbol, bl);
             }
             bl.newTick(k);

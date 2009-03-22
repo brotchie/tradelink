@@ -101,8 +101,8 @@ namespace TradeLink.Common
         {
             if (bl != null)
             {
-                highesth = BarMath.HH(bl);
-                lowestl = BarMath.LL(bl);
+                highesth = Calc.HH(bl);
+                lowestl = Calc.LL(bl);
                 barc = bl.Count;
             }
             if ((bl == null)||(bl.Count==0)) return;
@@ -148,9 +148,9 @@ namespace TradeLink.Common
                     }
                     else
                     {
-                        int[] date = BarMath.Date(bl[i].Bardate);
+                        int[] date = Calc.Date(bl[i].Bardate);
                         int[] lastbardate = date;
-                        if ((i - 1) > 0) lastbardate = BarMath.Date(bl[i-1].Bardate);
+                        if ((i - 1) > 0) lastbardate = Calc.Date(bl[i-1].Bardate);
                         if ((getX(lastlabelcoord) + minxlabelwidth) <= getX(i))
                         {
                             lastlabelcoord = i;

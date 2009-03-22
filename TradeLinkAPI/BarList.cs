@@ -9,6 +9,7 @@ namespace TradeLink.API
     public interface BarList
     {
         string Symbol { get; }
+        int First { get; }
         int Last { get; }
         int Count { get; }
         Bar RecentBar { get; }

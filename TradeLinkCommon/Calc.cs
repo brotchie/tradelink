@@ -1,6 +1,6 @@
 using System;
 using TradeLink.API;
-
+using System.Collections.Generic;
 
 namespace TradeLink.Common
 {
@@ -644,6 +644,222 @@ namespace TradeLink.Common
             decimal sumvar = Sum(varsq);
             decimal stdev = (decimal)Math.Pow((double)sumvar / (array.Length-1),.5);
             return stdev;
+        }
+
+        /// <summary>
+        /// Returns a bardate as an array of ints in the form [year,month,day]
+        /// </summary>
+        /// <param name="bardate">The bardate.</param>
+        /// <returns></returns>
+        public static int[] Date(int bardate)
+        {
+            int day = bardate % 100;
+            int month = ((bardate - day) / 100) % 100;
+            int year = (bardate - (month * 100) - day) / 10000;
+            return new int[] { year, month, day };
+        }
+        public static int[] Date(Bar bar) { return Date(bar.Bardate); }
+        /// <summary>
+        /// Returns the highest-high of the barlist, for so many bars back.
+        /// </summary>
+        /// <param name="b">The barlist.</param>
+        /// <param name="barsback">The barsback to consider.</param>
+        /// <returns></returns>
+        public static decimal HH(BarList b, int barsback)
+        {// gets highest high
+            if (barsback > b.Count) barsback = b.Count;
+            decimal hh = decimal.MinValue;
+            for (int i = b.Last; i >= (b.Count - barsback); i--)
+            {
+                decimal high = b[i].High;
+                if (high > hh) hh = high;
+            }
+            if (hh == decimal.MinValue) hh = 0;
+            return hh;
+        }
+        /// <summary>
+        /// Returns the highest high for the entire barlist.
+        /// </summary>
+        /// <param name="b">The b.</param>
+        /// <returns></returns>
+        public static decimal HH(BarList b) { return HH(b, b.Count); }
+        /// <summary>
+        /// The lowest low for the barlist, considering so many bars back.
+        /// </summary>
+        /// <param name="b">The barlist.</param>
+        /// <param name="barsback">The barsback to consider.</param>
+        /// <returns></returns>
+        public static decimal LL(BarList b, int barsback)
+        { // gets lowest low
+            if (barsback > b.Count) barsback = b.Count;
+            decimal ll = decimal.MaxValue;
+            for (int i = b.Last; i >= (b.Count - barsback); i--)
+            {
+                decimal low = b[i].Low;
+                if (low < ll) ll = low;
+            }
+            if (ll == decimal.MaxValue) ll = 0;
+            return ll;
+        }
+        /// <summary>
+        /// Lowest low for the entire barlist.
+        /// </summary>
+        /// <param name="b">The barlist.</param>
+        /// <returns></returns>
+        public static decimal LL(BarList b) { return LL(b, b.Count); }
+
+
+        /// <summary>
+        /// gets most recent number of highs from a barlist
+        /// </summary>
+        /// <param name="chart"></param>
+        /// <param name="bars"></param>
+        /// <returns></returns>
+        public static decimal[] Highs(BarList chart, int bars)
+        {
+            List<decimal> l = new List<decimal>();
+            for (int i = chart.Count - bars; i < chart.Count; i++)
+                l.Add(chart[i].High);
+            return l.ToArray();
+        }
+        public static decimal[] Highs(BarList chart) { return Highs(chart, chart.Count); }
+        /// <summary>
+        /// gets most recent lows from barlist, for certain number of bars
+        /// (default is entire list)
+        /// </summary>
+        /// <param name="chart"></param>
+        /// <param name="bars"></param>
+        /// <returns></returns>
+        public static decimal[] Lows(BarList chart, int bars)
+        {
+            List<decimal> l = new List<decimal>();
+            for (int i = chart.Count - bars; i < chart.Count; i++)
+                l.Add(chart[i].Low);
+            return l.ToArray();
+        }
+        /// <summary>
+        /// gets ALL lows from barlist, at default bar interval
+        /// </summary>
+        /// <param name="chart"></param>
+        /// <returns></returns>
+        public static decimal[] Lows(BarList chart) { return Lows(chart, chart.Count); }
+        /// <summary>
+        /// gets opening prices for most recent bars, at default bar interval
+        /// </summary>
+        /// <param name="chart"></param>
+        /// <param name="bars"></param>
+        /// <returns></returns>
+        public static decimal[] Opens(BarList chart, int bars)
+        {
+            List<decimal> l = new List<decimal>();
+            for (int i = chart.Count - bars; i < chart.Count; i++)
+                l.Add(chart[i].Open);
+            return l.ToArray();
+        }
+        /// <summary>
+        /// gets opening prices for ALL bars, at the default bar interval
+        /// </summary>
+        /// <param name="chart"></param>
+        /// <returns></returns>
+        public static decimal[] Opens(BarList chart) { return Opens(chart, chart.Count); }
+        /// <summary>
+        /// gets the most recent closing prices for a certain number of bars
+        /// </summary>
+        /// <param name="chart"></param>
+        /// <param name="bars"></param>
+        /// <returns></returns>
+        public static decimal[] Closes(BarList chart, int bars)
+        {
+            List<decimal> l = new List<decimal>();
+            for (int i = chart.Count - bars; i < chart.Count; i++)
+                l.Add(chart[i].Close);
+            return l.ToArray();
+        }
+        /// <summary>
+        /// gets most recent closing prices for ALL bars, default bar interval
+        /// </summary>
+        /// <param name="chart"></param>
+        /// <returns></returns>
+        public static decimal[] Closes(BarList chart) { return Closes(chart, chart.Count); }
+        /// <summary>
+        /// gets the most recent volumes from a barlist, given a certain number of bars back
+        /// </summary>
+        /// <param name="chart"></param>
+        /// <param name="bars"></param>
+        /// <returns></returns>
+        public static int[] Volumes(BarList chart, int bars)
+        {
+            List<int> l = new List<int>();
+            for (int i = chart.Count - bars; i < chart.Count; i++)
+                l.Add(chart[i].Volume);
+            return l.ToArray();
+        }
+        /// <summary>
+        /// gets volumes for ALL bars, with default bar interval
+        /// </summary>
+        /// <param name="chart"></param>
+        /// <returns></returns>
+        public static int[] Volumes(BarList chart) { return Volumes(chart, chart.Count); }
+
+        /// <summary>
+        /// gets the high to low range of a barlist, for the default interval
+        /// </summary>
+        /// <param name="chart"></param>
+        /// <returns></returns>
+        public static decimal[] HLRange(BarList chart)
+        {
+            List<decimal> l = new List<decimal>();
+            foreach (BarImpl b in chart)
+                l.Add(b.High - b.Low);
+            return l.ToArray();
+        }
+        /// <summary>
+        /// gets array of close to open ranges for default interval of a barlist
+        /// </summary>
+        /// <param name="chart"></param>
+        /// <returns></returns>
+        public static decimal[] CORange(BarList chart)
+        {
+            List<decimal> l = new List<decimal>();
+            foreach (BarImpl b in chart)
+                l.Add(b.Close - b.Open);
+            return l.ToArray();
+        }
+        /// <summary>
+        /// gets an array of true range values representing each bar in chart
+        /// (uses default bar interval)
+        /// </summary>
+        /// <param name="chart"></param>
+        /// <returns></returns>
+        public static decimal[] TrueRange(BarList chart)
+        {
+            List<decimal> l = new List<decimal>();
+            for (int i = chart.Last; i > 0; i--)
+            {
+                Bar t = chart[i];
+                Bar p = chart[i - 1];
+                decimal max = t.High > p.Close ? t.High : p.Close;
+                decimal min = t.Low < p.Close ? t.Low : p.Close;
+                l.Add(max - min);
+            }
+            return l.ToArray();
+        }
+        /// <summary>
+        /// downloads yearly charts for a list of symbols
+        /// (source: google finance)
+        /// </summary>
+        /// <param name="symbols"></param>
+        /// <returns></returns>
+        public static BarList[] FetchCharts(string[] symbols)
+        {
+            List<BarList> l = new List<BarList>();
+            foreach (string sym in symbols)
+            {
+                BarListImpl bl = new BarListImpl(BarInterval.Day, sym);
+                if (bl.DayFromGoogle())
+                    l.Add(bl);
+            }
+            return l.ToArray();
         }
 
     }

@@ -54,7 +54,6 @@
     <Compile Include="BarImpl.cs" />
     <Compile Include="BarListImpl.cs" />
     <Compile Include="BarListTracker.cs" />
-    <Compile Include="BarMath.cs" />
     <Compile Include="Calc.cs" />
     <Compile Include="Broker.cs" />
     <Compile Include="ChartImpl.cs">

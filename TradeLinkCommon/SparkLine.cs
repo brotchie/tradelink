@@ -23,8 +23,8 @@ namespace TradeLink.Common
             bl.Int = bi;
             Bitmap sl = new Bitmap(w, h);
             Graphics g = Graphics.FromImage(sl);
-            high = BarMath.HH(bl);
-            low = BarMath.LL(bl);
+            high = Calc.HH(bl);
+            low = Calc.LL(bl);
             decimal range = high - low;
             int pixperdollar = range != 0 ? (int)(h / range) : 0;
             int pixperbar = bl.Count != 0 ? (int)(w / (decimal)bl.Count) : 0;
