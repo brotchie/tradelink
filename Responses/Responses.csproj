@@ -34,15 +34,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=2.4.7.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Program Files\NUnit 2.4.7\bin\nunit.framework.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="A.cs" />
@@ -64,8 +59,6 @@
     <Compile Include="PairsTracker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SMAResponse.cs" />
-    <Compile Include="TestBlade.cs" />
-    <Compile Include="TestBollinger.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TradeLinkAPI\TradeLink.API.csproj">
@@ -91,6 +84,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>CALL "$(ProjectDir)runtests.cmd" $(ConfigurationName) "$(TargetPath)"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>
