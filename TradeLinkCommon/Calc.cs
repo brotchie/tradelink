@@ -139,7 +139,7 @@ namespace TradeLink.Common
         /// <param name="p">your position</param>
         /// <param name="offset">how far away stop is</param>
         /// <returns></returns>
-        public static Order PositionStop(PositionImpl p, decimal offset) { return PositionStop(p,offset,1,false,1); }
+        public static Order PositionStop(Position p, decimal offset) { return PositionStop(p,offset,1,false,1); }
         /// <summary>
         /// Generate a stop order for a position, at a specified per-share/contract price
         /// </summary>
@@ -147,7 +147,7 @@ namespace TradeLink.Common
         /// <param name="offset">how far away stop is</param>
         /// <param name="percent">what percent of position to close</param>
         /// <returns></returns>
-        public static Order PositionStop(PositionImpl p, decimal offset, decimal percent) { return PositionStop(p, offset, percent, false, 1); }
+        public static Order PositionStop(Position p, decimal offset, decimal percent) { return PositionStop(p, offset, percent, false, 1); }
         /// <summary>
         /// Generate a stop order for a position, at a specified per-share/contract price
         /// </summary>
@@ -157,7 +157,7 @@ namespace TradeLink.Common
         /// <param name="normalizesize">whether to normalize size to even-lots</param>
         /// <param name="MINSIZE">size of an even lot</param>
         /// <returns></returns>
-        public static Order PositionStop(PositionImpl p, decimal offset, decimal percent, bool normalizesize, int MINSIZE)
+        public static Order PositionStop(Position p, decimal offset, decimal percent, bool normalizesize, int MINSIZE)
         {
             Order o = new OrderImpl();
             if (!p.isValid || p.isFlat) return o;
