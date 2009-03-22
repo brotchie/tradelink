@@ -13,7 +13,7 @@ namespace TradeLink.Common
         Dictionary<string, decimal> _profitdist = new Dictionary<string, decimal>();
         Dictionary<string, decimal> _stopdist = new Dictionary<string, decimal>();
         public event OrderDelegate SentOffset;
-        public void OffsetTracker()
+        public OffsetTracker()
         {
         }
 
