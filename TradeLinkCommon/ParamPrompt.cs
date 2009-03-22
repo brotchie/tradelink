@@ -46,20 +46,21 @@ namespace TradeLink.Common
             // propertyGrid1
             // 
             this.propertyGrid1.CommandsVisibleIfAvailable = false;
-            this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.propertyGrid1.Location = new System.Drawing.Point(0, 0);
             this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(292, 225);
+            this.propertyGrid1.Size = new System.Drawing.Size(292, 261);
             this.propertyGrid1.TabIndex = 0;
             this.propertyGrid1.ToolbarVisible = false;
             // 
             // applyoptionsbut
             // 
-            this.applyoptionsbut.Location = new System.Drawing.Point(114, 231);
+            this.applyoptionsbut.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.applyoptionsbut.Location = new System.Drawing.Point(0, 231);
             this.applyoptionsbut.Name = "applyoptionsbut";
-            this.applyoptionsbut.Size = new System.Drawing.Size(75, 23);
+            this.applyoptionsbut.Size = new System.Drawing.Size(292, 30);
             this.applyoptionsbut.TabIndex = 1;
-            this.applyoptionsbut.Text = "Apply";
+            this.applyoptionsbut.Text = "Accept";
             this.applyoptionsbut.UseVisualStyleBackColor = true;
             this.applyoptionsbut.Click += new System.EventHandler(this.ApplybutClick);
             // 

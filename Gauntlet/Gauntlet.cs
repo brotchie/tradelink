@@ -97,8 +97,6 @@ namespace WinGauntlet
             ProgressBar1.Enabled = true;
             // disable more than one simulation at once
             queuebut.Enabled = false;
-            // enable canceling
-            _stopbut.Enabled = true;
 
             // start the run in the background
             bw.RunWorkerAsync(args);
@@ -106,7 +104,7 @@ namespace WinGauntlet
         }
         string uniquen { get { return DateTime.Now.ToString(".yyyMMdd.HHmm"); } }
 
-        string LogFile(string logtype) { return OUTFOLD+args.Response.Name+(_unique.Checked ? uniquen:"")+ "."+logtype+".csv"; }
+        string LogFile(string logtype) { return OUTFOLD+args.Response.FullName+(_unique.Checked ? uniquen:"")+ "."+logtype+".csv"; }
 
         // runs the simulation in background
         void bw_DoWork(object sender, DoWorkEventArgs e)
@@ -138,13 +136,14 @@ namespace WinGauntlet
 
                 if (gargs.Trades)
                 {
-                    debug("writing trades...");
-                    Util.ClosedPLToText(h.SimBroker.GetTradeList(), ',', LogFile("Trades"));
+                    List<Trade> list = h.SimBroker.GetTradeList();
+                    debug("writing "+list.Count+" trades...");
+                    Util.ClosedPLToText(list, ',', LogFile("Trades"));
                 }
                 if (gargs.Orders)
                 {
                     List<Order> olist = h.SimBroker.GetOrderList();
-                    debug("writing orders...");
+                    debug("writing "+olist.Count+" orders...");
                     StreamWriter sw = new StreamWriter(LogFile("Orders"), false);
                     string[] cols = Enum.GetNames(typeof(OrderField));
                     sw.WriteLine(string.Join(",", cols));
@@ -175,7 +174,6 @@ namespace WinGauntlet
             ProgressBar1.Enabled = false;
             ProgressBar1.Value = 0;
             queuebut.Enabled = true;
-            _stopbut.Enabled = false;
             Invalidate(true);
         }
 

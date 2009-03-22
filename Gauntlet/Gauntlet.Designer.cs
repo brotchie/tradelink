@@ -33,7 +33,6 @@ namespace WinGauntlet
             this.button1 = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.studypage = new System.Windows.Forms.TabPage();
-            this._stopbut = new System.Windows.Forms.Button();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.ProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.lastmessage = new System.Windows.Forms.ToolStripStatusLabel();
@@ -91,7 +90,6 @@ namespace WinGauntlet
             // 
             // studypage
             // 
-            this.studypage.Controls.Add(this._stopbut);
             this.studypage.Controls.Add(this.statusStrip1);
             this.studypage.Controls.Add(this.label7);
             this.studypage.Controls.Add(this.queuebut);
@@ -105,17 +103,6 @@ namespace WinGauntlet
             this.studypage.TabIndex = 0;
             this.studypage.Text = "Studies";
             this.studypage.UseVisualStyleBackColor = true;
-            // 
-            // _stopbut
-            // 
-            this._stopbut.Enabled = false;
-            this._stopbut.Location = new System.Drawing.Point(534, 300);
-            this._stopbut.Name = "_stopbut";
-            this._stopbut.Size = new System.Drawing.Size(78, 31);
-            this._stopbut.TabIndex = 17;
-            this._stopbut.Text = "Stop";
-            this._stopbut.UseVisualStyleBackColor = true;
-            this._stopbut.Click += new System.EventHandler(this._stopbut_Click);
             // 
             // statusStrip1
             // 
@@ -156,7 +143,7 @@ namespace WinGauntlet
             this.queuebut.Location = new System.Drawing.Point(106, 300);
             this.queuebut.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.queuebut.Name = "queuebut";
-            this.queuebut.Size = new System.Drawing.Size(421, 31);
+            this.queuebut.Size = new System.Drawing.Size(506, 31);
             this.queuebut.TabIndex = 4;
             this.queuebut.Text = "Run the Gauntlet";
             this.toolTip1.SetToolTip(this.queuebut, "start the backtesting run");
@@ -460,7 +447,6 @@ namespace WinGauntlet
         private System.Windows.Forms.CheckBox ordersincsv;
         private System.Windows.Forms.CheckBox _unique;
         private System.Windows.Forms.ToolTip toolTip1;
-        private System.Windows.Forms.Button _stopbut;
         private System.Windows.Forms.CheckBox _debugfile;
         private System.Windows.Forms.CheckBox _indicatcsv;
         private TradeLink.Common.TickFileFilterControl tickFileFilterControl1;
