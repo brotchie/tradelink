@@ -65,6 +65,7 @@ namespace ServerMB
         void m_ComMgr_OnLogonSucceed()
         {
             debug("login successful");
+            BackColor = Color.Green;
         }
 
 
@@ -142,7 +143,7 @@ namespace ServerMB
             o.date = Util.ToTLDate(pOrd.UTCDateTime);
             o.sec = pOrd.UTCDateTime.Second;
             o.trail = (decimal)pOrd.TrailingOffset;
-            o.ex = pOrd.Route;
+            //o.ex = pOrd.Route;
             o.id = Convert.ToUInt32(pOrd.OrderNumber);
             tl.newOrder(o);
 
@@ -221,7 +222,6 @@ namespace ServerMB
             int otype = MBConst.VALUE_MARKET;
             if (o.isLimit) otype = MBConst.VALUE_LIMIT;
             string route = "MBTX";
-            if (o.ex!="") route = o.ex;
             int voltype = MBConst.VALUE_NORMAL;
             DateTime dt = new DateTime(0);
             string res = null;

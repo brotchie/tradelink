@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ServerMBMain));
             this._msg = new System.Windows.Forms.ListBox();
             this._user = new System.Windows.Forms.TextBox();
@@ -37,6 +38,7 @@
             this._loginbut = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this._id = new System.Windows.Forms.NumericUpDown();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this._id)).BeginInit();
             this.SuspendLayout();
             // 
@@ -47,7 +49,7 @@
             this._msg.ItemHeight = 20;
             this._msg.Location = new System.Drawing.Point(0, 0);
             this._msg.Name = "_msg";
-            this._msg.Size = new System.Drawing.Size(278, 244);
+            this._msg.Size = new System.Drawing.Size(346, 184);
             this._msg.TabIndex = 0;
             this._msg.Visible = false;
             // 
@@ -96,6 +98,8 @@
             this._loginbut.Size = new System.Drawing.Size(92, 29);
             this._loginbut.TabIndex = 5;
             this._loginbut.Text = "login";
+            this.toolTip1.SetToolTip(this._loginbut, "if you experience problems using MBTrading, please email tradelink-users@googlegr" +
+                    "oups.com");
             this._loginbut.UseVisualStyleBackColor = true;
             this._loginbut.Click += new System.EventHandler(this._loginbut_Click);
             // 
@@ -127,7 +131,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(278, 248);
+            this.ClientSize = new System.Drawing.Size(346, 186);
             this.Controls.Add(this._id);
             this.Controls.Add(this.label3);
             this.Controls.Add(this._loginbut);
@@ -138,7 +142,7 @@
             this.Controls.Add(this._msg);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ServerMBMain";
-            this.Text = "ServerMB";
+            this.Text = "ServerMB BETA";
             this.WindowState = System.Windows.Forms.FormWindowState.Minimized;
             ((System.ComponentModel.ISupportInitialize)(this._id)).EndInit();
             this.ResumeLayout(false);
@@ -156,6 +160,7 @@
         private System.Windows.Forms.Button _loginbut;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.NumericUpDown _id;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }
 
