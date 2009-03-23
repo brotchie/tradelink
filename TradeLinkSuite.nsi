@@ -58,6 +58,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\Update TradeLink.lnk" "$INSTDIR\Update.EXE" "" "$INSTDIR\Update.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\Sterling+BrokerServer.lnk" "$INSTDIR\SterServer.EXE" "" "$INSTDIR\SterServer.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\TD+BrokerServer.lnk" "$INSTDIR\TDServer.EXE" "" "$INSTDIR\TDServer.EXE" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink\MB+BrokerServer.lnk" "$INSTDIR\ServerMB.EXE" "" "$INSTDIR\ServerMB.EXE" 0  
   
   
   ; Put file there
@@ -147,6 +148,7 @@ Section "Uninstall"
   Delete "$SMPROGRAMS\TradeLink\Tript.lnk"
   Delete "$SMPROGRAMS\TradeLink\TDServer.lnk"
   Delete "$SMPROGRAMS\TradeLink\Uninstall TradeLinkSuite"
+  Delete "$SMPROGRAMS\TradeLink\MB+BrokerServer.lnk"
 
   ; Remove directories used
   RMDir "$SMPROGRAMS\TradeLink"
