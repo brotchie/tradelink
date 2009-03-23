@@ -115,6 +115,7 @@ namespace TDServer
                 {
                     string service = GetExchange(s.Symbol);
                     api.TD_RequestAsyncLevel1QuoteStreaming(s.Symbol, service, this);
+
                 }
             }
 
@@ -176,6 +177,7 @@ namespace TDServer
 
             string action = o.side ? "buy" : "sell";
             string otype = o.isLimit ? "limit" : "market";
+            
             AmeritradeBrokerAPI.ATradeArgument brokerReplyargs  = new AmeritradeBrokerAPI.ATradeArgument();
             string cResultMessage                               = string.Empty;
             string cEnteredOrderID                              = string.Empty;

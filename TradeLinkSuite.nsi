@@ -57,6 +57,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\Record.lnk" "$INSTDIR\Record.EXE" "" "$INSTDIR\Record.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\Update TradeLink.lnk" "$INSTDIR\Update.EXE" "" "$INSTDIR\Update.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\Sterling+BrokerServer.lnk" "$INSTDIR\SterServer.EXE" "" "$INSTDIR\SterServer.EXE" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink\TD+BrokerServer.lnk" "$INSTDIR\TDServer.EXE" "" "$INSTDIR\TDServer.EXE" 0  
   
   
   ; Put file there
@@ -67,6 +68,7 @@ Section "TradeLinkSuite"
   File "Replay\bin\release\Replay.exe"
   File "SterServer\bin\release\SterServer.exe"
   File "SterServer\Interop.SterlingLib.dll"
+  File "ServerTD\bin\release\TDServer.exe.config"
   File "ServerTD\bin\release\TDServer.exe"
   File "ServerTD\bin\release\Interop.MSXML2.dll"
   File "ServerTD\bin\release\NZipLib.dll"
@@ -143,6 +145,7 @@ Section "Uninstall"
   Delete "$SMPROGRAMS\TradeLink\SplitEPF.lnk"
   Delete "$SMPROGRAMS\TradeLink\Tattle.lnk"
   Delete "$SMPROGRAMS\TradeLink\Tript.lnk"
+  Delete "$SMPROGRAMS\TradeLink\TDServer.lnk"
   Delete "$SMPROGRAMS\TradeLink\Uninstall TradeLinkSuite"
 
   ; Remove directories used
