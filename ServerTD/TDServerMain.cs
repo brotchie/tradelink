@@ -43,17 +43,7 @@ namespace TDServer
         void rs_ActivesStreaming_TickWithArgs(DateTime time, AmeritradeBrokerAPI.ATradeArgument args)
         {
             if (args.FunctionType != AmeritradeBrokerAPI.RequestState.AsyncType.ActivesStreaming) return;
-            // not sure if this is for orders or trades yet
-            Order o = new OrderImpl();
-            o.symbol = args.oStockTradeDetails.cStockSymbol;
-            o.side = args.oStockTradeDetails.TradeType.ToLower() == "buy";
-            o.size = Math.Abs(Convert.ToInt32(args.oStockTradeDetails.OrderShares)) * (o.side ? 1 : -1);
-            o.ex = args.oStockTradeDetails.OrderRouting;
-            o.price = Convert.ToDecimal(args.oStockTradeDetails.OrderPrice);
-            o.id = Convert.ToUInt32(args.oStockTradeDetails.OrderID);
-            o.TIF = args.oStockTradeDetails.OrderTimeInForce;
-            o.Account = api._accountid;
-            tl.newOrder(o);
+            // not sure how to activate this yet
             
         }
 
@@ -144,9 +134,13 @@ namespace TDServer
 
         void tl_newOrderCancelRequest(uint number)
         {
-            string result = "";
-            api.TD_CancelOrder(api._accountid, number.ToString(), _user.Text, _pass.Text, _sourceid.Text, APIVER, ref result);
-            if (result=="")
+            string result ="error";
+            long id;
+            string orderid = "";
+            if (idmap.TryGetValue(number, out id))
+                orderid = id.ToString();
+            api.TD_CancelOrder(api._accountid, orderid, _user.Text, _pass.Text, _sourceid.Text, APIVER, ref result);
+            if (result==string.Empty)
                 tl.newOrderCancel(number);
         }
 
@@ -171,12 +165,20 @@ namespace TDServer
             return (ok ? api._accountid : "");
         }
         bool ok { get { return api.TD_loginStatus; } }
+        Dictionary<uint, long> idmap = new Dictionary<uint, long>();
         void tl_gotSrvFillRequest(Order o)
         {
             if (!ok) { debug("not logged in."); return; }
 
             string action = o.side ? "buy" : "sell";
             string otype = o.isLimit ? "limit" : "market";
+            if (o.id == 0)
+                o.id = OrderImpl.Unique;
+            string route = "auto";
+            if (o.ex.ToUpper().Contains("ARCA"))
+                route = "ecn_arca";
+            else if (o.ex.ToUpper().Contains("INET"))
+                route = "inet";
             
             AmeritradeBrokerAPI.ATradeArgument brokerReplyargs  = new AmeritradeBrokerAPI.ATradeArgument();
             string cResultMessage                               = string.Empty;
@@ -193,7 +195,7 @@ namespace TDServer
             cOrderString.Append("~quantity="        + api.Encode_URL(o.size.ToString()));
             cOrderString.Append("~spinstructions="  + api.Encode_URL("none"));
             cOrderString.Append("~symbol="          + api.Encode_URL(o.symbol));
-            cOrderString.Append("~routing="         + api.Encode_URL(o.ex));
+            cOrderString.Append("~routing="         + api.Encode_URL(route));
 
             cOrderString.Append("~tsparam="         + api.Encode_URL(string.Empty));
             cOrderString.Append("~exmonth="         + api.Encode_URL(string.Empty));
@@ -203,10 +205,20 @@ namespace TDServer
             brokerReplyargs.ResultsCode = 
                 api.TD_sendOrder(_user.Text, _pass.Text, _sourceid.Text, APIVER, cOrderString.ToString(), ref cResultMessage, ref cEnteredOrderID);
 
+            if (brokerReplyargs.ResultsCode != OK)
+                debug(cResultMessage);
+            else
+            {
+                long tdid = 0;
+                if (long.TryParse(cEnteredOrderID, out tdid))
+                    idmap.Add(o.id, tdid);
+                tl.newOrder(o);
+            }
+
 
             
         }
-
+        const string OK = "OK";
 
         void TDServerMain_FormClosing(object sender, FormClosingEventArgs e)
         {
