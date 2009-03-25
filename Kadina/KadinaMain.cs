@@ -163,7 +163,7 @@ namespace Kadina
             loadfile(responsedll);
             loadboxname(resname);
             if (myres!=null) myres.Reset();
-            status("Reset box " + myres.Name + " for stock " + sec.Symbol);
+            status("Reset box " + myres.Name + " "+PrettyEPF());
         }
 
         bool igridinit = false;
@@ -538,7 +538,7 @@ namespace Kadina
             {
 
                 if (System.IO.File.Exists(f))
-                    if (!isRecent(f) && sec.isValid)
+                    if (!isRecent(f) && Util.SecurityFromFileName(f).isValid)
                         recent.DropDownItems.Add(f);
                 epffiles.Add(f);
                 h = new HistSim(epffiles.ToArray());
