@@ -117,6 +117,6 @@
   -->
   <PropertyGroup>
     <PostBuildEvent>call "$(ProjectDir)..\InstallSuite\vsvars32.bat"
-editbin.exe /NXCOMPAT:NO $(TargetPath)</PostBuildEvent>
+$(ProjectDir)..\InstallSuite\editbin.exe /NXCOMPAT:NO $(TargetPath)</PostBuildEvent>
   </PropertyGroup>
 </Project>
