@@ -20,7 +20,8 @@ namespace Responses
 
         // this function is called the constructor, because it sets up the response
         // it is run before all the other functions, and has same name as my response.
-        public SMAResponse()
+        public SMAResponse() : this(true) { }
+        public SMAResponse(bool prompt)
         {
             // enable prompting of system parameters to user,
             // so they do not have to recompile to change things
@@ -106,5 +107,13 @@ namespace Responses
         BarInterval _barinterval = BarInterval.FiveMin;
         int _entrysize = 100;
         decimal _totalprofit = 200;
+    }
+
+    /// <summary>
+    /// this is the same as SMAResponse, except it runs without prompting user
+    /// </summary>
+    public class SMAResponseAuto : SMAResponse
+    {
+        public SMAResponseAuto() : base(false) { }
     }
 }
