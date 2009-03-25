@@ -23,14 +23,18 @@ namespace Responses
         public SMAResponse() : this(true) { }
         public SMAResponse(bool prompt)
         {
-            // enable prompting of system parameters to user,
-            // so they do not have to recompile to change things
-            ParamPrompt pp = new ParamPrompt(this);
-            // show prompt to user
-            pp.ShowDialog();
+            if (prompt)
+            {
+                // enable prompting of system parameters to user,
+                // so they do not have to recompile to change things
+                ParamPrompt pp = new ParamPrompt(this);
+                // show prompt to user
+                pp.ShowDialog();
+            }
 
             // make sure default interval is used when tracking bars
             blt.DefaultInterval = Interval;
+
 
             // set our indicator names, in case we import indicators into R
             // or excel, or we want to view them in gauntlet or kadina
