@@ -65,7 +65,7 @@ namespace TradeLink.Common
         public void sendcancel(uint id) { SendCancel(id); }
         public void sendindicators(object[] indicators) { string[] s = new string[indicators.Length]; for (int i = 0; i < indicators.Length; i++) s[i] = indicators[i].ToString(); SendIndicators(string.Join(",", s)); }
         public void sendindicators(string[] indicators) { SendIndicators(string.Join(",", indicators)); }
-        public void sendindicators(string indicators) { sendindicators(indicators); }
+        public void sendindicators(string indicators) { SendIndicators(indicators); }
         public void senddebug(string msg) { SendDebug(DebugImpl.Create(msg)); }
         public virtual void GotPosition(Position p) { }
 
