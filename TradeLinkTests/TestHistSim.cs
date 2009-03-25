@@ -11,9 +11,9 @@ namespace TestTradeLink
     {
         public TestHistSim() { }
 
-        const double EXPECTRAW = .6;
-        const double EXPECTEX = .8;
-        const double EXPECTBARS = .9;
+        double EXPECTRAW = .6;
+        double EXPECTEX = .8;
+        double EXPECTBARS = .9;
 
         [Test]
         public void RawPerformance()
@@ -30,6 +30,7 @@ namespace TestTradeLink
             Assert.AreEqual(0, syms.Count);
             Assert.AreEqual(0, lasttime);
             Assert.Greater(h.TicksPresent, 0);
+            if (Environment.ProcessorCount == 1) EXPECTRAW *= 2.5;
 
             DateTime start = DateTime.Now;
 
@@ -85,6 +86,7 @@ namespace TestTradeLink
 
             Assert.AreEqual(0, lasttime);
             Assert.Greater(execute.TicksPresent, 0);
+            if (Environment.ProcessorCount == 1) EXPECTEX *= 2.5;
 
             DateTime start = DateTime.Now;
 
@@ -129,6 +131,7 @@ namespace TestTradeLink
 
             Assert.AreEqual(0, lasttime);
             Assert.Greater(h.TicksPresent, 0);
+            if (Environment.ProcessorCount == 1) EXPECTBARS *= 2.5;
 
             DateTime start = DateTime.Now;
 

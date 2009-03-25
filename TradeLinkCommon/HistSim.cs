@@ -166,17 +166,29 @@ namespace TradeLink.Common
             else throw new Exception("Histsim was unable to initialize");
         }
 
+        int YIELDTIME = 5;
         private void SecurityPlayTo(long ftime)
         {
-            // start all the workers reading files in background
-            FillCache(int.MaxValue);
-            // wait a moment to allow tick reading to start
-            System.Threading.Thread.Sleep(5);
-            // continuously loop through next ticks, playing most
-            // recent ones, until simulation end is reached.
-            FlushCache(ftime);
-            // when we end simulation, stop reading but don't touch buffer
-            CancelWorkers();
+            // see if we can truely thread or not
+            if (Environment.ProcessorCount > 1)
+            {
+                // start all the workers reading files in background
+                FillCache(int.MaxValue);
+                // wait a moment to allow tick reading to start
+                System.Threading.Thread.Sleep(10);
+                // continuously loop through next ticks, playing most
+                // recent ones, until simulation end is reached.
+                FlushCache(ftime);
+                // when we end simulation, stop reading but don't touch buffer
+                CancelWorkers();
+            }
+            else // if we're a single core machine, add some delays
+            {
+                // continuously loop through next ticks sequentially, playing most
+                // recent ones, until simulation end is reached.
+                FlushCacheSingleCore(ftime);
+            }
+
             // set next tick time as hint to user
             setnexttime();
         }
@@ -192,37 +204,92 @@ namespace TradeLink.Common
 
         }
 
-
         void FlushCache(long endsim)
         {
             bool simrunning = true;
             while (simrunning)
             {
+                // get next times of ticks in cache
                 long[] times = nexttimes();
+                // copy our master index list into a temporary for sorting
                 Buffer.BlockCopy(idx,0,cidx, 0,idx.Length*4);
+                // sort loaded instruments by time
                 Array.Sort(times, cidx);
                 int nextidx = 0;
+                // get next time from all instruments we have loaded
                 while ((nextidx<times.Length) && (times[nextidx] == -1))
                     nextidx++;
+                // test to see if ticks left in simulation
                 simrunning = (nextidx<times.Length) && (times[nextidx]<=endsim);
+                // if no ticks left or we exceeded simulation time, quit
                 if (!simrunning) break;
+                // get next tick
                 Tick k = Workers[cidx[nextidx]].NextTick();
+                // process pending orders
                 _executions += SimBroker.Execute(k);
+                // notify tick
                 GotTick(k);
+                // count tick
                 _tickcount++;
             }
         }
+
+        void FillCacheSingleCore(int readhead)
+        {
+            // loop through instruments and read 'readadhead' ticks in advance
+            for (int i = 0; i < Workers.Count; i++)
+                Workers[i].SingleCoreFillCache(readhead);
+        }
+
+        void FlushCacheSingleCore(long endsim)
+        {
+            bool simrunning = true;
+            while (simrunning)
+            {
+                // get next ticks
+                FillCacheSingleCore(1);
+                // get next times of ticks in cache
+                long[] times = nexttimes();
+                // copy our master index list into a temporary for sorting
+                Buffer.BlockCopy(idx, 0, cidx, 0, idx.Length * 4);
+                // sort loaded instruments by time
+                Array.Sort(times, cidx);
+                int nextidx = 0;
+                // get next time from all instruments we have loaded
+                while ((nextidx < times.Length) && (times[nextidx] == -1))
+                    nextidx++;
+                // test to see if ticks left in simulation
+                simrunning = (nextidx < times.Length) && (times[nextidx] <= endsim);
+                // if no ticks left or we exceeded simulation time, quit
+                if (!simrunning) break;
+                // get next tick
+                Tick k = Workers[cidx[nextidx]].NextTick();
+                // process pending orders
+                _executions += SimBroker.Execute(k);
+                // notify tick
+                GotTick(k);
+                // count tick
+                _tickcount++;
+            }
+           
+        }
+
         void setnexttime()
         {
+            // get next times of ticks in cache
             long[] times = nexttimes();
             int i = 0;
+            // get first one available
             while ((i<times.Length) && (times[i] == -1))
                 i++;
+            // set next time to first available time, or end of simulation if none available
             _nextticktime = i==times.Length ? HistSim.ENDSIM : times[i];
         }
         long[] nexttimes()
         {
+            // setup a next entry for every instrument
             long[] times = new long[Workers.Count];
+            // loop through instrument's next time, set flag if no more ticks left in cache
             for (int i = 0; i < times.Length; i++)
                 times[i] = Workers[i].hasUnread ? Workers[i].NextTime() : -1;
             return times;
@@ -242,13 +309,26 @@ namespace TradeLink.Common
         volatile int readcount = 0;
         public bool hasUnread { get { lock (Ticks) { return Ticks.Count>0; } } }
         public Tick NextTick() { lock (Ticks) { return Ticks.Dequeue(); } } 
-        public long NextTime() { return Ticks.Peek().datetime; } 
+        public long NextTime() { return Ticks.Peek().datetime; }
+        const int YIELDTIME = 5;
         public simworker(SecurityImpl sec)
         {
             workersec = sec;
-            DoWork += new DoWorkEventHandler(simworker_DoWork);
             WorkerSupportsCancellation = true;
             RunWorkerCompleted += new RunWorkerCompletedEventHandler(simworker_RunWorkerCompleted);
+            // if we're multi-core start reading into cache immediately in background
+            if (Environment.ProcessorCount>1)
+                DoWork += new DoWorkEventHandler(simworker_DoWork);
+ 
+        }
+
+
+        // here is cache filling for single core
+        public void SingleCoreFillCache(int readahead)
+        {
+            readcount = 0;
+            while (!CancellationPending && workersec.hasHistorical && (readcount++ < readahead))
+                Ticks.Enqueue(workersec.NextTick());
         }
 
         void simworker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -257,15 +337,16 @@ namespace TradeLink.Common
             readcount = 0;
         }
 
+        // fill cache for multi-core
         void simworker_DoWork(object sender, DoWorkEventArgs e)
         {
             int readahead = (int)e.Argument;
+            // while simulation hasn't been canceled, we still have historical ticks to read and we haven't read too many, cache a tick
             while (!e.Cancel && workersec.hasHistorical && (readcount++ < readahead))
                 lock (Ticks)
                 {
                     Ticks.Enqueue(workersec.NextTick());
                 }
-           
         }
 
 

@@ -152,7 +152,8 @@ namespace TestTradeLink
             DateTime start = DateTime.Now;
             const int SIZE = 250;
             const int REPS = 250;
-            const double EXPECT = .5;
+            double EXPECT = .5;
+            if (Environment.ProcessorCount == 1) EXPECT = .8;
             decimal[] a = new decimal[SIZE];
             decimal[] b = new decimal[SIZE];
             decimal[] c = new decimal[SIZE];
