@@ -647,6 +647,37 @@ namespace TradeLink.Common
         }
 
         /// <summary>
+        /// Takes slice of last N elements of an array
+        /// </summary>
+        /// <param name="inputarray"></param>
+        /// <param name="lastNumElements"></param>
+        /// <returns></returns>
+        public static decimal[] EndSlice(decimal[] inputarray, int lastNumElements)
+        {
+            decimal[] output = new decimal[lastNumElements];
+            int count = lastNumElements - 1;
+            int end = inputarray.Length > lastNumElements ? inputarray.Length - lastNumElements : inputarray.Length;
+            for (int i = inputarray.Length - 1; i >= end; i--)
+                output[count--] = inputarray[i];
+            return output;
+        }
+        /// <summary>
+        /// Takes slice of last N elements of an array
+        /// </summary>
+        /// <param name="inputarray"></param>
+        /// <param name="lastNumElements"></param>
+        /// <returns></returns>
+        public static int[] EndSlice(int[] inputarray, int lastNumElements)
+        {
+            int[] output = new int[lastNumElements];
+            int count = lastNumElements-1;
+            int end = inputarray.Length > lastNumElements ? inputarray.Length - lastNumElements : inputarray.Length;
+            for (int i = inputarray.Length - 1; i >= end; i--)
+                output[count--] = inputarray[i];
+            return output;
+        }
+
+        /// <summary>
         /// Returns a bardate as an array of ints in the form [year,month,day]
         /// </summary>
         /// <param name="bardate">The bardate.</param>

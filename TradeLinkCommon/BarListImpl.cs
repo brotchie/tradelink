@@ -142,7 +142,6 @@ namespace TradeLink.Common
             if ((i < 0) || (i >= bars.Count)) return new BarImpl();
             return bars[i];
         }
-        public void AddTick(Tick t) { newTick(t); }
         /// <summary>
         /// Adds the tick to the barlist, creates other bars if needed.
         /// </summary>
@@ -175,7 +174,7 @@ namespace TradeLink.Common
                 // if we have at least a bar, get most current bar
                 foreach (BarInterval inv in Enum.GetValues(typeof(BarInterval)))
                 {
-                    BarImpl cbar = (BarImpl)this[this.Last, inv];
+                    BarImpl cbar = (BarImpl)this[intervallast(inv), inv];
                     // if tick fits in current bar, then we're done for this interval
                     if (cbar.newTick(t)) continue;
                     else // otherwise we need another bar in this interval
@@ -184,6 +183,20 @@ namespace TradeLink.Common
                }
             }
             return;
+        }
+
+        int intervallast(BarInterval interval)
+        {
+            switch (interval)
+            {
+                case BarInterval.Day: return daylist.Count-1;
+                case BarInterval.FifteenMin: return fifteenlist.Count - 1;
+                case BarInterval.FiveMin: return fivelist.Count - 1;
+                case BarInterval.Hour: return hourlist.Count - 1;
+                case BarInterval.Minute: return minlist.Count - 1;
+                case BarInterval.ThirtyMin: return thirtylist.Count - 1;
+            }
+            return 0;
         }
 
         bool AddBar(BarInterval bint)
@@ -266,7 +279,7 @@ namespace TradeLink.Common
             SecurityImpl s = eSigTick.InitEpf(sr);
             BarListImpl b = new BarListImpl(BarInterval.FiveMin, s.Symbol);
             while (!sr.EndOfStream)
-                b.AddTick(eSigTick.FromStream(s.Symbol, sr));
+                b.newTick(eSigTick.FromStream(s.Symbol, sr));
             return b;
         }
 

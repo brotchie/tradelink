@@ -147,6 +147,28 @@ namespace TestTradeLink
         }
 
         [Test]
+        public void ArraySlices()
+        {
+            // get input arrays
+            int[] a1 = new int[] { 6, 10, 33, 2, -50, 7, 8 };
+            decimal[] b1 = new decimal[] { 6.4m, 10.1m, 33.33m, 2.7m, -50, 7.1m, 8 };
+            // get length of slice
+            const int len = 5;
+            // get slices
+            int[] a2 = Calc.EndSlice(a1, len);
+            decimal[] b2 = Calc.EndSlice(b1,len);
+            // verify lengths
+            Assert.AreEqual(len, a2.Length);
+            Assert.AreEqual(len, b2.Length);
+            // verify last elements match
+            Assert.AreEqual(a1[a1.Length - 1], a2[len - 1]);
+            Assert.AreEqual(b1[b1.Length - 1], b2[len - 1]);
+            // verify start elements match
+            Assert.AreEqual(a1[a1.Length - len], a2[0]);
+            Assert.AreEqual(b1[b1.Length - len], b2[0]);
+        }
+
+        [Test]
         public void DecimalPerformance()
         {
             DateTime start = DateTime.Now;

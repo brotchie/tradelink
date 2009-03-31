@@ -13,6 +13,7 @@ namespace TradeLink.API
         int Last { get; }
         int Count { get; }
         Bar RecentBar { get; }
+        void newTick(Tick k);
         Bar this[int index] { get; }
         Bar this[int index, BarInterval interval] { get; }
         BarInterval Int { get; set; } // default interval
