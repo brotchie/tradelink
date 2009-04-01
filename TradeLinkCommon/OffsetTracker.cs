@@ -4,6 +4,9 @@ using TradeLink.API;
 
 namespace TradeLink.Common
 {
+    /// <summary>
+    /// allows 
+    /// </summary>
     public class OffsetTracker
     {
         OffsetInfo _default = new OffsetInfo();
@@ -15,7 +18,7 @@ namespace TradeLink.Common
         public event UIntDelegate SendCancel;
         PositionTracker _pt = new PositionTracker();
         uint _nextid = OrderImpl.Unique;
-
+        public PositionTracker PositionTracker { get { return _pt; } set { _pt = value; } }
         public OffsetTracker() { }
         public OffsetTracker(uint InitialOffsetId)
         {
