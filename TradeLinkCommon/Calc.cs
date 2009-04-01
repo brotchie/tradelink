@@ -133,6 +133,7 @@ namespace TradeLink.Common
             o = new LimitOrder(p.Symbol, !p.isLong, size, price);
             return o;
         }
+        public static Order PositionProfit(Position p, OffsetInfo offset) { return PositionProfit(p, offset.ProfitDist, offset.ProfitPercent); }
         /// <summary>
         /// Generate a stop order for a position, at a specified per-share/contract price.  Defaults to 100% of position.
         /// </summary>
@@ -166,6 +167,7 @@ namespace TradeLink.Common
             o = new StopOrder(p.Symbol, !p.isLong, size, price);
             return o;
         }
+        public static Order PositionStop(Position p, OffsetInfo offset) { return PositionStop(p, offset.ProfitDist, offset.ProfitPercent); }
         /// <summary>
         /// sum last elements of array
         /// </summary>
