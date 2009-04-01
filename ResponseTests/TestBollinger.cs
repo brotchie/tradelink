@@ -97,7 +97,7 @@ namespace Responses
             Bollinger bbb = new Bollinger(2, BarInterval.Minute, 10);
             foreach (TickImpl t in ticklist)
             {
-                bl.AddTick(t);
+                bl.newTick(t);
                 bbb.newBar(bl);
             }
 
@@ -115,7 +115,7 @@ namespace Responses
             Bollinger bbb = new Bollinger(2, BarInterval.Minute, 4);
             foreach (TickImpl t in ticklist)
             {
-                bl.AddTick(t);
+                bl.newTick(t);
                 bbb.newBar(bl);
             }
 

@@ -44,7 +44,7 @@ namespace Responses
 
             foreach (TickImpl k in ticklist)
             {
-                bl.AddTick(k);
+                bl.newTick(k);
                 b.newBar(bl);
                 if (bl.NewBar) newbar++;
                 if (b.isBladeUP) up++;
