@@ -62,7 +62,107 @@ namespace TradeLink.Common
 
         }
 
+        void cancel(OffsetInfo offset) { cancel(offset.ProfitId); cancel(offset.StopId); }
         void cancel(uint id) { if (id != 0) SendCancel(id); }
+        /// <summary>
+        /// cancels all offsets (profit+stops) for given side
+        /// </summary>
+        /// <param name="side"></param>
+        public void CancelAll(bool side)
+        {
+            foreach (Position p in _pt)
+            {
+                // make sure we're not flat
+                if (p.isFlat) continue;
+                // if side matches, cancel all offsets for side
+                if (p.isLong==side)
+                    cancel(GetOffset(p.Symbol));
+            }
+        }
+        /// <summary>
+        /// cancels all offsets for symbol
+        /// </summary>
+        /// <param name="sym"></param>
+        public void CancelAll(string sym)
+        {
+            foreach (Position p in _pt)
+            {
+                // if sym matches, cancel all offsets
+                if (p.Symbol==sym)
+                    cancel(GetOffset(sym));
+            }
+            
+        }
+
+        /// <summary>
+        /// cancels only profit orders for symbol
+        /// </summary>
+        /// <param name="sym"></param>
+        public void CancelProfit(string sym)
+        {
+            foreach (Position p in _pt)
+            {
+                // if sym matches, cancel all offsets
+                if (p.Symbol == sym)
+                    cancel(GetOffset(sym).ProfitId);
+            }
+        }
+
+        /// <summary>
+        /// cancels only stops for symbol
+        /// </summary>
+        /// <param name="sym"></param>
+        public void CancelStop(string sym)
+        {
+            foreach (Position p in _pt)
+            {
+                // if sym matches, cancel all offsets
+                if (p.Symbol == sym)
+                    cancel(GetOffset(sym).StopId);
+            }
+        }
+
+        /// <summary>
+        /// cancel profits for side (long is true, false is short)
+        /// </summary>
+        /// <param name="side"></param>
+        public void CancelProfit(bool side)
+        {
+            foreach (Position p in _pt)
+            {
+                // make sure we're not flat
+                if (p.isFlat) continue;
+                // if side matches, cancel profits for side
+                if (p.isLong == side)
+                    cancel(GetOffset(p.Symbol).ProfitId);
+            }
+        }
+
+        /// <summary>
+        /// cancel stops for a side (long is true, false is short)
+        /// </summary>
+        /// <param name="side"></param>
+        public void CancelStop(bool side)
+        {
+            foreach (Position p in _pt)
+            {
+                // make sure we're not flat
+                if (p.isFlat) continue;
+                // if side matches, cancel stops for side
+                if (p.isLong == side)
+                    cancel(GetOffset(p.Symbol).StopId);
+            }
+        }
+
+        /// <summary>
+        /// cancels all tracked offsets
+        /// </summary>
+        public void CancelAll()
+        {
+            foreach (string sym in _offvals.Keys)
+                cancel(GetOffset(sym));
+        }
+
 
         bool HasEvents()
         {
