@@ -96,7 +96,7 @@ namespace TradeLink.Common
         /// Gets the title of this chart.
         /// </summary>
         /// <value>The title.</value>
-        public string Title { get { if (bl==null) return ""; return Symbol + " " + Enum.GetName(typeof(BarInterval), bl.Int).ToString(); } }
+        public string Title { get { if (bl==null) return ""; return Symbol + " " + Enum.GetName(typeof(BarInterval), bl.DefaultInterval).ToString(); } }
         void Chart_Paint(object sender, PaintEventArgs e)
         {
             if (bl != null)
@@ -141,7 +141,7 @@ namespace TradeLink.Common
                     g.DrawLine(p, getX(i), getY(bl[i].Close), getX(i) + (int)(pixperbar / 3), getY(bl[i].Close));
                     // draw time labels (time @30min and date@noon)
 
-                    if (bl.Int != BarInterval.Day)
+                    if (bl.DefaultInterval != BarInterval.Day)
                     {
                         if ((i % 6) == 0) g.DrawString(bl[i].Bartime.ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (f.Font.GetHeight() * 3));
                         if (bl[i].Bartime == 1200) g.DrawString(bl[i].Bardate.ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (float)(f.Font.GetHeight() * 1.5));
@@ -273,20 +273,20 @@ namespace TradeLink.Common
         public void Chart_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Delta == 0) return;
-            BarInterval old = bl.Int;
+            BarInterval old = bl.DefaultInterval;
             BarInterval [] v = (BarInterval [])Enum.GetValues(typeof(BarInterval));
             int biord = 0;
             for (int i = 0;i<v.Length;i++) if (old==v[i]) biord = i;
 
             if (e.Delta > 0)
             {
-                bl.Int = (biord + 1 < v.Length) ? v[biord + 1] : v[0];
+                bl.DefaultInterval = (biord + 1 < v.Length) ? v[biord + 1] : v[0];
             }
             else
             {
-                bl.Int = (biord - 1 < 0) ? v[v.Length - 1] : v[biord - 1];
+                bl.DefaultInterval = (biord - 1 < 0) ? v[v.Length - 1] : v[biord - 1];
             }
-            if ((bl.Int != old) && bl.Has(1,bl.Int)) Bars = this.bl;
+            if ((bl.DefaultInterval != old) && bl.Has(1,bl.DefaultInterval)) Bars = this.bl;
         }
     }
     public class TextLabel

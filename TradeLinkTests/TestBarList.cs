@@ -122,7 +122,7 @@ namespace TestTradeLink
             // make sure we have 2 hour bars
             Assert.AreEqual(2, bl.Count);
             // switch default
-            bl.Int = BarInterval.FiveMin;
+            bl.DefaultInterval = BarInterval.FiveMin;
             // make sure we have 3 5min bars
             Assert.AreEqual(3, bl.Count);
             // reset it

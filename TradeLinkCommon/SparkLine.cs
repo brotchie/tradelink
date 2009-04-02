@@ -20,7 +20,7 @@ namespace TradeLink.Common
         public Image DrawBarList(BarListImpl bl, BarInterval bi) { return DrawBarList(bl, bi, Color.Green, Color.Red); }
         public Image DrawBarList(BarListImpl bl, BarInterval bi,Color up, Color down)
         {
-            bl.Int = bi;
+            bl.DefaultInterval = bi;
             Bitmap sl = new Bitmap(w, h);
             Graphics g = Graphics.FromImage(sl);
             high = Calc.HH(bl);

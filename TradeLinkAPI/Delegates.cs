@@ -22,4 +22,5 @@ namespace TradeLink.API
     public delegate void OrderCancelDelegate(string sym, bool side, uint id);
     public delegate MessageTypes[] MessageArrayDelegate();
     public delegate long UnknownMessageDelegate(MessageTypes t, string msg);
+    public delegate void SymBarIntervalDelegate(string symbol, BarInterval interval);
 }

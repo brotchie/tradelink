@@ -10,210 +10,201 @@ namespace TradeLink.Common
     /// </summary>
     public class BarListImpl : TradeLink.API.BarList
     {
-        public IEnumerator GetEnumerator() { foreach (BarImpl b in DefaultBar) yield return b; }
-        public Bar this[int index, BarInterval bint]
-        {
-            get { return Get(index, bint); }
-        }
-
-    
-        public Bar this[int index]
-        {
-            get { return Get(index); }
-        }
-        public int First { get { return 0; } }
-        public BarListImpl(string symbol) : this(BarInterval.FiveMin, symbol) { }
-        public BarListImpl() : this(BarInterval.FiveMin, "") { }
-        string sym = "";
-        public BarListImpl(BarInterval PreferredInt) : this(PreferredInt, "") { }
+        // holds all raw data
+        IntervalData[] _intdata = new IntervalData[0];
+        // holds index into raw data using interval type
+        Dictionary<BarInterval, int> _intdataidx = new Dictionary<BarInterval, int>();
         /// <summary>
-        /// Initializes a new instance of the <see cref="BarList"/> class.
+        /// creates barlist with defined symbol and requests all intervals
         /// </summary>
-        /// <param name="PreferredInterval">The preferred time-interval on requests if none is specified.</param>
-        /// <param name="stock">The stock.</param>
-        public BarListImpl(BarInterval PreferredInterval, string stock)
-        {
-            Int = PreferredInterval;
-            sym = stock;
-        }
-        public bool isValid { get { return Has(1); } }
-        public bool HasBar() { return Count > 0; }
-        public bool Has(int MinimumBars) { return Count >= MinimumBars; }
-        public bool Has(int MinimumBars, BarInterval interval)
-        {
-            switch (interval)
-            {
-                case BarInterval.Day: return daylist.Count >= MinimumBars; 
-                case BarInterval.FifteenMin: return fifteenlist.Count >= MinimumBars; 
-                case BarInterval.ThirtyMin: return thirtylist.Count >= MinimumBars; 
-                case BarInterval.FiveMin: return fivelist.Count >= MinimumBars; 
-                case BarInterval.Hour: return hourlist.Count >= MinimumBars; 
-                case BarInterval.Minute: return minlist.Count >= MinimumBars;
-            }
-            return false;
-        }
+        /// <param name="symbol"></param>
+        public BarListImpl(string symbol) : this(symbol, new BarInterval[] { BarInterval.FiveMin, BarInterval.Minute, BarInterval.Hour, BarInterval.ThirtyMin, BarInterval.FifteenMin, BarInterval.Day }) { }
         /// <summary>
-        /// Resets this instance.  Clears all the bars for all time intervals.
+        /// creates a barlist with requested interval and defined symbol
         /// </summary>
-        public void Reset()
-        {
-            minlist.Clear();
-            fivelist.Clear();
-            thirtylist.Clear();
-            fifteenlist.Clear();
-            hourlist.Clear();
-            daylist.Clear();
-        }
-        protected List<BarImpl> minlist = new List<BarImpl>();
-        protected List<BarImpl> fivelist = new List<BarImpl>();
-        protected List<BarImpl> fifteenlist = new List<BarImpl>();
-        protected List<BarImpl> thirtylist = new List<BarImpl>();
-        protected List<BarImpl> hourlist = new List<BarImpl>();
-        protected List<BarImpl> daylist = new List<BarImpl>();
-        public string Symbol { get { return sym; } }
-        public int Count { get { return DefaultBar.Count; } }
-        public int Last { get { return Count - 1; } }
+        /// <param name="interval"></param>
+        /// <param name="symbol"></param>
+        public BarListImpl(BarInterval interval, string symbol) : this(symbol, new BarInterval[] { interval }) { }
         /// <summary>
-        /// Returns most recent bar, or an invalid bar if no bars have been received
+        /// creates a barlist with requested interval.  symbol will be defined by first tick received
         /// </summary>
-        public Bar RecentBar
+        /// <param name="interval"></param>
+        public BarListImpl(BarInterval interval) : this(string.Empty, new BarInterval[] { interval }) { }
+        /// <summary>
+        /// creates barlist with no symbol defined and requests 5min bars
+        /// </summary>
+        public BarListImpl() : this(string.Empty,new BarInterval[] { BarInterval.FiveMin,BarInterval.Minute,BarInterval.Hour,BarInterval.ThirtyMin,BarInterval.FifteenMin, BarInterval.Day }) { }
+        /// <summary>
+        /// creates barlist with specified symbol and requested intervals
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <param name="intervals"></param>
+        public BarListImpl(string symbol, BarInterval[] intervals)
         {
-            get
+            // set symbol
+            _sym = symbol;
+            // size length of interval data to # of requested intervals
+            _intdata = new IntervalData[intervals.Length];
+            // create interval data object for each interval
+            for (int i = 0; i < intervals.Length; i++)
             {
                 try
                 {
-                    return this[Last];
+                    // save index to this data for the interval
+                    _intdataidx.Add(intervals[i], i);
                 }
-                catch (Exception) { return new BarImpl(); }
+                // if key was already present, already had this interval
+                catch (Exception) { continue; }
+                // set default interval to first one
+                if (i==0)
+                    _defaultint = intervals[0];
+                // create data object
+                _intdata[i] = new IntervalData(intervals[i]);
+                // subscribe to bar events
+                _intdata[i].NewBar += new SymBarIntervalDelegate(BarListImpl_NewBar);
             }
         }
+        BarInterval _defaultint = BarInterval.FiveMin;
+        // array functions
+        public decimal[] Open() { return _intdata[_intdataidx[_defaultint]].opens.ToArray(); }
+        public decimal[] High() { return _intdata[_intdataidx[_defaultint]].highs.ToArray(); }
+        public decimal[] Low() { return _intdata[_intdataidx[_defaultint]].lows.ToArray(); }
+        public decimal[] Close() { return _intdata[_intdataidx[_defaultint]].closes.ToArray(); }
+        public int[] Vol() { return _intdata[_intdataidx[_defaultint]].vols.ToArray(); }
+        public int[] Date() { return _intdata[_intdataidx[_defaultint]].dates.ToArray(); }
+        public int[] Time() { return _intdata[_intdataidx[_defaultint]].times.ToArray(); }
+        public decimal[] Open(BarInterval interval) { return _intdata[_intdataidx[interval]].opens.ToArray(); }
+        public decimal[] High(BarInterval interval) { return _intdata[_intdataidx[interval]].highs.ToArray(); }
+        public decimal[] Low(BarInterval interval) { return _intdata[_intdataidx[interval]].lows.ToArray(); }
+        public decimal[] Close(BarInterval interval) { return _intdata[_intdataidx[interval]].closes.ToArray(); }
+        public int[] Date(BarInterval interval) { return _intdata[_intdataidx[interval]].dates.ToArray(); }
+        public int[] Time(BarInterval interval) { return _intdata[_intdataidx[interval]].times.ToArray(); }
+
+        // standard accessors
         /// <summary>
-        /// Gets a value indicating whether most recently added bar is a [new bar].
+        /// symbol for bar
         /// </summary>
-        /// <value><c>true</c> if [new bar]; otherwise, <c>false</c>.</value>
-        public bool NewBar { get { return this.HasBar() && RecentBar.isNew; } }
-        protected BarInterval interval = BarInterval.FiveMin;
-        protected List<BarImpl> DefaultBar
-        {
-            get
-            {
-                List<BarImpl> bars = new List<BarImpl>();
-                switch (Int)
-                {
-                    case BarInterval.FiveMin: bars = fivelist; break;
-                    case BarInterval.Minute: bars = minlist; break;
-                    case BarInterval.FifteenMin: bars = fifteenlist; break;
-                    case BarInterval.ThirtyMin: bars = thirtylist; break;
-                    case BarInterval.Hour: bars = hourlist; break;
-                    case BarInterval.Day: bars = daylist; break;
-                }
-                return bars;
-            }
-        }
+        public string Symbol { get { return _sym; } set { _sym = value; } }
         /// <summary>
-        /// Gets or sets the preferred interval.  This applies to reads of a particular bar when no bar is provided.  Does not affect writing new bars or ticks; ticks are always added to every bar.
+        /// returns true if bar has symbol and has requested intervals
         /// </summary>
-        /// <value>The int.</value>
-        public BarInterval Int { get { return interval; } set { interval = value; } }
+        public bool isValid { get { return (_sym != string.Empty) && (_intdata.Length>0); } }
+        public IEnumerator GetEnumerator() { int idx = _intdataidx[_defaultint]; int max = _intdata[idx].Count; for (int i = 0; i < max; i++) yield return _intdata[idx].GetBar(); }
         /// <summary>
-        /// Gets the specified bar num, with the default preferred interval.
+        /// gets first bar in any interval
         /// </summary>
-        /// <param name="BarNum">The bar num.</param>
+        public int First { get { return 0; } }
+        /// <summary>
+        /// gets or sets the default interval
+        /// </summary>
+        public BarInterval DefaultInterval { get { return _defaultint; } set { _defaultint = value; } }
+        /// <summary>
+        /// gets specific bar in specified interval
+        /// </summary>
+        /// <param name="barnumber"></param>
         /// <returns></returns>
-        public BarImpl Get(int BarNum) { return Get(BarNum, Int); }
+        public Bar this[int barnumber] { get { return _intdata[_intdataidx[_defaultint]].GetBar(barnumber); } }
         /// <summary>
-        /// Gets the specified bar number, with the specified bar interval.
+        /// gets a specific bar in specified interval
         /// </summary>
-        /// <param name="i">The barnumber.</param>
-        /// <param name="barinterval">The barinterval.</param>
+        /// <param name="barnumber"></param>
+        /// <param name="interval"></param>
         /// <returns></returns>
-        public BarImpl Get(int i, BarInterval barinterval)
+        public Bar this[int barnumber,BarInterval interval] { get { return _intdata[_intdataidx[interval]].GetBar(barnumber); } }
+        /// <summary>
+        /// gets the last bar in default interval
+        /// </summary>
+        public int Last { get { return _intdata[_intdataidx[_defaultint]].Last; } }
+        /// <summary>
+        /// gets the # of bars in default interval
+        /// </summary>
+        public int Count { get { return _intdata[_intdataidx[_defaultint]].Last; } }
+        /// <summary>
+        /// gets the last bar in specified interval
+        /// </summary>
+        /// <param name="interval"></param>
+        /// <returns></returns>
+        public int LastInterval(BarInterval interval) { return _intdata[_intdataidx[interval]].Last; }
+        /// <summary>
+        /// gets count of bars in specified interval
+        /// </summary>
+        /// <param name="interval"></param>
+        /// <returns></returns>
+        public int CountInterval(BarInterval interval) { return _intdata[_intdataidx[interval]].Count; }
+        /// <summary>
+        /// gets most recent bar from default interval
+        /// </summary>
+        public Bar RecentBar { get { return this[Last]; } }
+        /// <summary>
+        /// gets most recent bar from specified interval
+        /// </summary>
+        /// <param name="interval"></param>
+        /// <returns></returns>
+        public Bar RecentBarInterval(BarInterval interval) { return this[LastInterval(interval), interval]; }
+        /// <summary>
+        /// returns true if barslist has at least minimum # of bars for specified interval
+        /// </summary>
+        /// <param name="minBars"></param>
+        /// <param name="interval"></param>
+        /// <returns></returns>
+        public bool Has(int minBars, BarInterval interval) { return minBars>=CountInterval(interval); }
+        /// <summary>
+        /// returns true if barlist has at least minimum # of bars for default interval
+        /// </summary>
+        /// <param name="minBars"></param>
+        /// <returns></returns>
+        public bool Has(int minBars) { return Has(minBars, _defaultint); }
+        
+        /// <summary>
+        /// this event is thrown when a new bar arrives
+        /// </summary>
+        public event SymBarIntervalDelegate GotNewBar;
+        void BarListImpl_NewBar(string symbol, BarInterval interval)
         {
-            List<BarImpl> bars = new List<BarImpl>();
-            switch (barinterval)
-            {
-                case BarInterval.FiveMin: bars = fivelist; break;
-                case BarInterval.Minute: bars = minlist; break;
-                case BarInterval.FifteenMin: bars = fifteenlist; break;
-                case BarInterval.ThirtyMin: bars = thirtylist; break;
-                case BarInterval.Hour: bars = hourlist; break;
-                case BarInterval.Day: bars = daylist; break;
-            }
-            if ((i < 0) || (i >= bars.Count)) return new BarImpl();
-            return bars[i];
+            // if event is handled by user, pass the event
+            if (GotNewBar != null)
+                GotNewBar(symbol, interval);
         }
         /// <summary>
-        /// Adds the tick to the barlist, creates other bars if needed.
+        /// erases all bar data
         /// </summary>
-        /// <param name="t">The tick to add.</param>
-        public void newTick(Tick t)
+        public void Reset()
         {
-            if ((t.symbol != Symbol) && (Symbol == ""))
-                this.sym = t.symbol; // if we have no symbol, take ticks symbol
-            else if ((t.symbol != Symbol) && (Symbol != ""))
-                return; //don't process ticks for other stocks
-            if (!t.isTrade && !t.isIndex) return; // don't process quotes
-            // if we have no bars, add bar with a tick
-            if (Count == 0)
+            foreach (IntervalData id in _intdata)
             {
-                minlist.Add(new BarImpl(BarInterval.Minute));
-                fivelist.Add(new BarImpl(BarInterval.FiveMin));
-                fifteenlist.Add(new BarImpl(BarInterval.FifteenMin));
-                thirtylist.Add(new BarImpl(BarInterval.ThirtyMin));
-                hourlist.Add(new BarImpl(BarInterval.Hour));
-                daylist.Add(new BarImpl(BarInterval.Day));
-                minlist[minlist.Count - 1].newTick(t);
-                fivelist[fivelist.Count - 1].newTick(t);
-                fifteenlist[fifteenlist.Count - 1].newTick(t);
-                thirtylist[thirtylist.Count - 1].newTick(t);
-                hourlist[hourlist.Count - 1].newTick(t);
-                daylist[daylist.Count - 1].newTick(t);
+                id.opens.Clear();
+                id.highs.Clear();
+                id.lows.Clear();
+                id.closes.Clear();
+                id.dates.Clear();
+                id.times.Clear();
+                id.vols.Clear();
+                id.Last = -1;
+                id.Count = 0;
             }
-            else
-            {
-                // if we have at least a bar, get most current bar
-                foreach (BarInterval inv in Enum.GetValues(typeof(BarInterval)))
-                {
-                    BarImpl cbar = (BarImpl)this[intervallast(inv), inv];
-                    // if tick fits in current bar, then we're done for this interval
-                    if (cbar.newTick(t)) continue;
-                    else // otherwise we need another bar in this interval
-                        if (AddBar(inv))
-                            ((BarImpl)this[this.Last,inv]).newTick(t);
-               }
-            }
-            return;
         }
 
-        int intervallast(BarInterval interval)
+        string _sym = string.Empty;
+        int _symh = 0;
+        bool _valid = false;
+        public void newTick(Tick k)
         {
-            switch (interval)
+            // only pay attention to trades and indicies
+            if (k.trade == 0) return;
+            // make sure we have a symbol defined 
+            if (!_valid)
             {
-                case BarInterval.Day: return daylist.Count-1;
-                case BarInterval.FifteenMin: return fifteenlist.Count - 1;
-                case BarInterval.FiveMin: return fivelist.Count - 1;
-                case BarInterval.Hour: return hourlist.Count - 1;
-                case BarInterval.Minute: return minlist.Count - 1;
-                case BarInterval.ThirtyMin: return thirtylist.Count - 1;
+                _symh = k.symbol.GetHashCode();
+                _sym = k.symbol;
+                _valid = true;
             }
-            return 0;
+            // make sure tick is from our symbol
+            if (_symh != k.symbol.GetHashCode()) return;
+            // add tick to every requested bar interval
+            for (int i = 0; i < _intdata.Length; i++)
+                _intdata[i].newTick(k);
         }
 
-        bool AddBar(BarInterval bint)
-        {
-            switch (bint)
-            {
-                case BarInterval.Day: daylist.Add(new BarImpl(BarInterval.Day)); break;
-                case BarInterval.FifteenMin: fifteenlist.Add(new BarImpl(BarInterval.FifteenMin)); break;
-                case BarInterval.FiveMin: fivelist.Add(new BarImpl(BarInterval.FiveMin)); break;
-                case BarInterval.Hour: hourlist.Add(new BarImpl(BarInterval.Hour)); break;
-                case BarInterval.Minute: minlist.Add(new BarImpl(BarInterval.Minute)); break;
-                case BarInterval.ThirtyMin: thirtylist.Add(new BarImpl(BarInterval.ThirtyMin)); break;
-                default: return false;
-            }
-            return true;
-        }
-    
         /// <summary>
         /// Create a barlist from a succession of bar records provided as comma-delimited OHLC+volume data.
         /// </summary>
@@ -283,6 +274,96 @@ namespace TradeLink.Common
             return b;
         }
 
+
     }
+
+    internal class IntervalData
+    {
+        internal event SymBarIntervalDelegate NewBar;
+        public IntervalData(BarInterval type)
+        {
+            intervaltype = type;
+        }
+        void newbar()
+        {
+            opens.Add(0);
+            closes.Add(0);
+            highs.Add(0);
+            lows.Add(decimal.MaxValue);
+            vols.Add(0);
+            times.Add(0);
+            dates.Add(0);
+        }
+        long curr_barid = -1;
+        BarInterval intervaltype = BarInterval.Minute;
+        internal List<decimal> opens = new List<decimal>();
+        internal List<decimal> closes = new List<decimal>();
+        internal List<decimal> highs = new List<decimal>();
+        internal List<decimal> lows = new List<decimal>();
+        internal List<int> vols = new List<int>();
+        internal List<int> dates = new List<int>();
+        internal List<int> times = new List<int>();
+        internal int Last = -1;
+        internal int Count = 0;
+        internal Bar GetBar(int index)
+        {
+            if (Last == -1) return new BarImpl();
+            return new BarImpl(opens[Last], highs[Last], lows[Last], closes[Last], vols[Last], dates[Last]);
+        }
+        internal Bar GetBar() { return GetBar(Last); }
+        internal void newTick(Tick k)
+        {
+            // only pay attention to trades and indicies
+            if (k.trade==0) return;
+            // get the barcount
+            long barid = getbarid(k);
+            // if not current bar
+            if (barid != curr_barid)
+            {
+                // create a new one
+                newbar();
+                // count it
+                Count++;
+                // make it current
+                curr_barid = barid;
+                // set time
+                times[times.Count-1] = k.time;
+                // set date
+                dates[dates.Count-1] = k.date;
+                // notify barlist
+                NewBar(k.symbol, intervaltype);
+            }
+            // blend tick into bar
+            // first get end of bar
+            Last = opens.Count-1;
+            // open
+            if (opens[Last] == 0) opens[Last] = k.trade;
+            // high
+            if (k.trade > highs[Last]) highs[Last] = k.trade;
+            // low
+            if (k.trade < lows[Last]) lows[Last] = k.trade;
+            // close
+            closes[Last] = k.trade;
+            // don't set volume for index
+            if (k.isIndex) return;
+            // volume
+            vols[Last] += k.size;
+        }
+
+        private long getbarid(Tick k)
+        {
+            // get time elapsed to this point
+            int elap = Util.FT2FTS(k.time);
+            // get seconds per bar
+            int secperbar = (int)intervaltype * 60;
+            // get number of this bar in the day for this interval
+            long bcount = (int)((double)elap / secperbar);
+            // add the date to the front of number to make it unique
+            bcount += k.date * 10000;
+            return bcount;
+        }
+
+    }
+
 
 }

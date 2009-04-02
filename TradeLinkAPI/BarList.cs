@@ -16,7 +16,7 @@ namespace TradeLink.API
         void newTick(Tick k);
         Bar this[int index] { get; }
         Bar this[int index, BarInterval interval] { get; }
-        BarInterval Int { get; set; } // default interval
+        BarInterval DefaultInterval { get; set; } // default interval
         bool Has(int MinBars, BarInterval interval);
         bool Has(int MinBars);
         void Reset();

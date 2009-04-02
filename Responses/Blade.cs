@@ -21,7 +21,7 @@ namespace Responses
         public Blade(decimal BladePercent, decimal BigVolPercent) { _percent = BladePercent; _bigvolper = BigVolPercent; }
         public decimal AvgVol(BarList bl) // gets the average volume across all bars
         {
-            if (!bl.Has(MinimumBarsToAvg,bl.Int)) return 0; // if we don't have a bar yet we can't have an avg bar volume
+            if (!bl.Has(MinimumBarsToAvg,bl.DefaultInterval)) return 0; // if we don't have a bar yet we can't have an avg bar volume
             int sum = 0;
             for (int i = 0; i < bl.Count; i++)
                 sum += bl[i].Volume;
