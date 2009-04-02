@@ -115,7 +115,8 @@ namespace TestTradeLink
             // get some data
             Tick[] tape = SampleData();
             // setup an hour barlist
-            BarList bl = new BarListImpl(BarInterval.Hour, sym);
+            BarList bl = new BarListImpl();
+            bl.DefaultInterval = BarInterval.Hour;
             // build the barlist
             foreach (Tick k in tape)
                 bl.newTick(k);
@@ -132,24 +133,26 @@ namespace TestTradeLink
         }
 
 
-
+        int newbarevents = 0;
         [Test]
         public void NewBarEvent()
         {
             Tick[] tape = SampleData();
-            int newbars = 0;
+            
 
             BarList bl = new BarListImpl(BarInterval.Hour, sym);
+            bl.GotNewBar += new SymBarIntervalDelegate(bl_GotNewBar);
 
 
             foreach (TickImpl k in tape)
-            {
                 bl.newTick(k);
-                if (bl.RecentBar.isNew)
-                    newbars++;
-            }
 
-            Assert.AreEqual(2, newbars);
+            Assert.AreEqual(2, newbarevents);
+        }
+
+        void bl_GotNewBar(string symbol, BarInterval interval)
+        {
+            newbarevents++;
         }
 
         [Test]
@@ -165,10 +168,10 @@ namespace TestTradeLink
         [Test]
         public void FromGoogle()
         {
-            // prepare bar
-            BarListImpl bl = new BarListImpl(BarInterval.Day, "IBM");
             // get a year chart
-            Assert.IsTrue(bl.DayFromGoogle());
+            BarList bl = BarListImpl.DayFromGoogle("IBM");
+            // make sure it's there
+            Assert.IsTrue(bl.isValid);
             // verify we have at least a year of bar data
             Assert.GreaterOrEqual(bl.Count,250);
         }

@@ -80,6 +80,12 @@ namespace TradeLink.Common
         public int[] Date(BarInterval interval) { return _intdata[_intdataidx[interval]].dates.ToArray(); }
         public int[] Time(BarInterval interval) { return _intdata[_intdataidx[interval]].times.ToArray(); }
 
+        /// <summary>
+        /// set true for new bar.  don't use this, use GotNewBar event as it's faster.
+        /// </summary>
+        [Obsolete("this is deprecated method.  use GotNewBar event")]
+        public bool NewBar { get { return _intdata[_intdataidx[_defaultint]].isRecentNew; } }
+
         // standard accessors
         /// <summary>
         /// symbol for bar
@@ -89,7 +95,7 @@ namespace TradeLink.Common
         /// returns true if bar has symbol and has requested intervals
         /// </summary>
         public bool isValid { get { return (_sym != string.Empty) && (_intdata.Length>0); } }
-        public IEnumerator GetEnumerator() { int idx = _intdataidx[_defaultint]; int max = _intdata[idx].Count; for (int i = 0; i < max; i++) yield return _intdata[idx].GetBar(); }
+        public IEnumerator GetEnumerator() { int idx = _intdataidx[_defaultint]; int max = _intdata[idx].Count; for (int i = 0; i < max; i++) yield return _intdata[idx].GetBar(Symbol); }
         /// <summary>
         /// gets first bar in any interval
         /// </summary>
@@ -103,14 +109,14 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="barnumber"></param>
         /// <returns></returns>
-        public Bar this[int barnumber] { get { return _intdata[_intdataidx[_defaultint]].GetBar(barnumber); } }
+        public Bar this[int barnumber] { get { return _intdata[_intdataidx[_defaultint]].GetBar(barnumber,Symbol); } }
         /// <summary>
         /// gets a specific bar in specified interval
         /// </summary>
         /// <param name="barnumber"></param>
         /// <param name="interval"></param>
         /// <returns></returns>
-        public Bar this[int barnumber,BarInterval interval] { get { return _intdata[_intdataidx[interval]].GetBar(barnumber); } }
+        public Bar this[int barnumber,BarInterval interval] { get { return _intdata[_intdataidx[interval]].GetBar(barnumber,Symbol); } }
         /// <summary>
         /// gets the last bar in default interval
         /// </summary>
@@ -118,7 +124,7 @@ namespace TradeLink.Common
         /// <summary>
         /// gets the # of bars in default interval
         /// </summary>
-        public int Count { get { return _intdata[_intdataidx[_defaultint]].Last; } }
+        public int Count { get { return _intdata[_intdataidx[_defaultint]].Count; } }
         /// <summary>
         /// gets the last bar in specified interval
         /// </summary>
@@ -179,7 +185,6 @@ namespace TradeLink.Common
                 id.dates.Clear();
                 id.times.Clear();
                 id.vols.Clear();
-                id.Last = -1;
                 id.Count = 0;
             }
         }
@@ -217,46 +222,54 @@ namespace TradeLink.Common
             string[] line = file.Split(Environment.NewLine.ToCharArray());
             for (int i = line.Length - 1; i > 0; i--)
             {
-                BarImpl mybar = null;
-                if (line[i] != "") mybar = BarImpl.FromCSV(line[i]);
-                if (mybar != null) b.daylist.Add(mybar);
+                if (line[i] != string.Empty)
+                    addbar(b,BarImpl.FromCSV(line[i]),0);
             }
             return b;
-
+        }
+        internal static void addbar(BarListImpl b, Bar mybar, int instdataidx)
+        {
+            b._intdata[instdataidx].Count++;
+            b._intdata[instdataidx].closes.Add(mybar.Close);
+            b._intdata[instdataidx].opens.Add(mybar.Open);
+            b._intdata[instdataidx].dates.Add(mybar.Bardate);
+            b._intdata[instdataidx].highs.Add(mybar.High);
+            b._intdata[instdataidx].lows.Add(mybar.Close);
+            b._intdata[instdataidx].vols.Add(mybar.Volume);
         }
         /// <summary>
         /// Populate the day-interval barlist of this instance from a URL, where the results are returned as a CSV file.  URL should accept requests in the form of http://url/get.py?sym=IBM
         /// </summary>
         /// <param name="url">The URL.</param>
         /// <returns></returns>
-        private bool DayFromURL(string url)
+        private static BarList DayFromURL(string url,string Symbol)
         {
-            if (Symbol == "") return false;
+            BarListImpl bl = new BarListImpl(BarInterval.Day,Symbol);
+            if (Symbol == "") return bl;
             System.Net.WebClient wc = new System.Net.WebClient();
             string res = "";
             try
             {
                 res = wc.DownloadString(url + Symbol);
             }
-            catch (System.Net.WebException) { return false; }
+            catch (System.Net.WebException) { return bl; }
             string[] line = res.Split(Environment.NewLine.ToCharArray());
             for (int i = line.Length - 1; i > 0; i--)
             {
-                BarImpl mybar = null;
-                if (line[i] != "") mybar = BarImpl.FromCSV(line[i]);
-                if (mybar != null) daylist.Add(mybar);
+                if (line[i] != "") 
+                    addbar(bl,BarImpl.FromCSV(line[i]),0);
             }
-            return true;
+            return bl;
         }
 
         /// <summary>
         /// Populate the day-interval barlist using google finance as the source.
         /// </summary>
         /// <returns></returns>
-        public bool DayFromGoogle()
+        public static BarList DayFromGoogle(string symbol)
         {
             const string GOOGURL = @"http://finance.google.com/finance/historical?histperiod=daily&start=250&num=25&output=csv&q=";
-            return DayFromURL(GOOGURL);
+            return DayFromURL(GOOGURL,symbol);
         }
 
         /// <summary>
@@ -303,14 +316,19 @@ namespace TradeLink.Common
         internal List<int> vols = new List<int>();
         internal List<int> dates = new List<int>();
         internal List<int> times = new List<int>();
-        internal int Last = -1;
+        internal int Last { get { return Count - 1; } }
         internal int Count = 0;
-        internal Bar GetBar(int index)
+        internal bool isRecentNew = false;
+        internal Bar GetBar(int index,string symbol)
         {
-            if (Last == -1) return new BarImpl();
-            return new BarImpl(opens[Last], highs[Last], lows[Last], closes[Last], vols[Last], dates[Last]);
+            Bar b = new BarImpl();
+            if ((index<0) || (index>=Count)) return b;
+            b = new BarImpl(opens[index], highs[index], lows[index], closes[index], vols[index], dates[index]);
+            b.Symbol = symbol;
+            if (index == Last) b.isNew = isRecentNew;
+            return b;
         }
-        internal Bar GetBar() { return GetBar(Last); }
+        internal Bar GetBar(string symbol) { return GetBar(Last,symbol); }
         internal void newTick(Tick k)
         {
             // only pay attention to trades and indicies
@@ -322,20 +340,21 @@ namespace TradeLink.Common
             {
                 // create a new one
                 newbar();
+                // mark it
+                isRecentNew = true;
                 // count it
                 Count++;
                 // make it current
                 curr_barid = barid;
                 // set time
-                times[times.Count-1] = k.time;
+                times[times.Count - 1] = k.time;
                 // set date
-                dates[dates.Count-1] = k.date;
+                dates[dates.Count - 1] = k.date;
                 // notify barlist
                 NewBar(k.symbol, intervaltype);
             }
+            else isRecentNew = false;
             // blend tick into bar
-            // first get end of bar
-            Last = opens.Count-1;
             // open
             if (opens[Last] == 0) opens[Last] = k.trade;
             // high
@@ -359,7 +378,7 @@ namespace TradeLink.Common
             // get number of this bar in the day for this interval
             long bcount = (int)((double)elap / secperbar);
             // add the date to the front of number to make it unique
-            bcount += k.date * 10000;
+            bcount += (long)k.date * 10000;
             return bcount;
         }
 

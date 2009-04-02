@@ -7,14 +7,14 @@ namespace TradeLink.API
 {
     public interface Bar
     {
-        string Symbol { get; }
+        string Symbol { get; set; }
         decimal High { get; }
-        decimal Low { get; }
-        decimal Open { get; }
-        decimal Close { get; }
-        int Volume { get; }
-        bool isNew { get; }
-        int Bartime { get; }
+        decimal Low { get;  }
+        decimal Open { get;  }
+        decimal Close { get;  }
+        int Volume { get;  }
+        bool isNew { get; set;}
+        int Bartime { get;  }
         int Bardate { get; }
         bool isValid { get; }
     }

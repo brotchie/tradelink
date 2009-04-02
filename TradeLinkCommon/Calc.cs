@@ -888,8 +888,8 @@ namespace TradeLink.Common
             List<BarList> l = new List<BarList>();
             foreach (string sym in symbols)
             {
-                BarListImpl bl = new BarListImpl(BarInterval.Day, sym);
-                if (bl.DayFromGoogle())
+                BarList bl = BarListImpl.DayFromGoogle(sym);
+                if (bl.isValid)
                     l.Add(bl);
             }
             return l.ToArray();

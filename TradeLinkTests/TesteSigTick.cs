@@ -42,7 +42,7 @@ namespace TestTradeLink
                 bl.newTick(k);
             }
             // hour is what we asked for
-            Assert.AreEqual(BarInterval.Hour,bl.Int);
+            Assert.AreEqual(BarInterval.Hour,bl.DefaultInterval);
             // there are 4 trades on hour intervals, 6/7/8/9
             Assert.AreEqual(4,bl.Count);
 

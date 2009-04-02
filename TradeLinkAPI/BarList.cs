@@ -22,5 +22,6 @@ namespace TradeLink.API
         void Reset();
         bool isValid { get; }
         IEnumerator GetEnumerator();
+        event SymBarIntervalDelegate GotNewBar;
     }
 }

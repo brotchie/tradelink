@@ -19,6 +19,7 @@ namespace TradeLink.Common
         private decimal c = 0;
         private int v = 0;
         private int tradesinbar = 0;
+        private bool _new = false;
         private BarInterval tunits = BarInterval.FiveMin; //5min bar default
         private int bartime = 0;
         private int bardate = 0;
@@ -29,7 +30,7 @@ namespace TradeLink.Common
         public decimal Open { get { return o; } }
         public decimal Close { get { return c; } }
         public int Volume { get { return v; } }
-        public bool isNew { get { return tradesinbar==1; } }
+        public bool isNew { get { return _new; } set { _new = value; } }
         public bool isValid { get { return (h >= l) && (o != 0) && (c != 0); } }
         public int TradeCount { get { return tradesinbar; } }
 
@@ -99,6 +100,7 @@ namespace TradeLink.Common
             // if tick doesn't have trade or index, ignore
             if (!t.isTrade && !t.isIndex) return true; 
             tradesinbar++; // count it
+            _new = tradesinbar == 1;
             // only count volume on trades, not indicies
             if (!t.isIndex) v += t.size; // add trade size to bar volume
             if (o == 0) o = t.trade;
