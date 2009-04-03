@@ -58,7 +58,8 @@ enum HistoricalOrderType
 	LP_CANCEL	 = 3,
 	LP_BULLET	 = 4,
 	LP_STAGING_ORDER = 5,
-	LP_OPTION_ORDER = 6,
+	LP_LOCATE = 6,
+	LP_OPTION_ORDER = 7,
 };
 
 enum TransactionSide
@@ -200,7 +201,7 @@ enum
 	TRADE_Exch_PHS = 0x01000000,
     TRADE_Exch_ISLD = 0x02000000,
     TRADE_Exch_ARCA = 0x04000000,
-//    TRADE_Exch_BRUT = 0x08000000,
+    TRADE_Exch_BAT = 0x08000000,
 //    TRADE_Exch_INCA = 0x10000000,
 	TRADE_Exch_ISE = 0x20000000,
 	TRADE_Exch_ADF = 0x40000000,
@@ -248,7 +249,7 @@ enum ExecExchange
 
 	ExecExch_NotUsed1,
 	ExecExch_NotUsed2,
-	ExecExch_NotUsed3,
+	ExecExch_BAT,
 	ExecExch_NotUsed4,
 
 	ExecExch_ISE,
@@ -305,6 +306,12 @@ enum RMarketStatus
 {
 	MARKET_OPEN,
 	MARKET_CLOSE
+};
+
+enum NyseImbalanceFlags
+{
+	NYSE_IMBALANCE_OPEN				= 1,
+	NYSE_IMBALANCE_REGULATORY		= 2,
 };
 
 enum TImbalanceFlags

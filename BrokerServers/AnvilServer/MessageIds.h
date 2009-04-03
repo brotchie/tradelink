@@ -165,6 +165,9 @@ enum MessageIds
 // Market Session Open & Close message 
 // from NQDS.
 
+	M_NYSE_IMBALANCE							= 4101,
+	M_NYSE_IMBALANCE_NONE						= 4102,
+
     M_MARKET_CLOSE                              = 5001,
     M_MARKET_OPEN,
     M_NQDS_SEQUENCE,
@@ -273,6 +276,8 @@ enum MessageIds
 	M_REQ_NEW_OPTION_ORDER =					11085,
 	M_UPDATE_OPTION_ORDER =						11086,
     M_POOL_ASSIGN_OPTION_ORDER_ID =             11087,
+
+	M_POOL_LOCATE =								11088,
 
 ///////////////    
     M_REQ_STOCK_CACHE_STATUS =                  20001,
@@ -398,6 +403,10 @@ enum MessageIds
 
 	MS_RESP_SYMBOL_SORTABLE_CLOSEQUOTE,
 	MS_RESP_SYMBOL_SORTABLE_PRINT_REMOVED,
+
+	M_MS_NYSE_IMBALANCE,
+	M_MS_NYSE_IMBALANCE_NONE,
+
 };
 
 

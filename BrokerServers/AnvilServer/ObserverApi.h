@@ -8,7 +8,7 @@
 #define OBSERVER_API __declspec(dllimport)
 #endif
 
-const char* const ObserverHeaderVersion = "2.6.8.10";
+const char* const ObserverHeaderVersion = "2.7.0.5";
 
 class Observable;
 class Observer;
@@ -61,6 +61,7 @@ public:
 	bool hasIdleJob() const;
     bool HasOnlyThisObserverOrNone(Observer* o) const{return m_observers.empty() || m_observers.size() == 1 && isObserverAttached(o);}
 private:
+//	virtual void EraseObserver(Observer* o);
 	Observers m_observers;
     std::list<ObserverNotification*> m_notifications;
 //	Observers toRemove;

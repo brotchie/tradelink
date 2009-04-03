@@ -8,7 +8,7 @@
 #include "MessageIds.h"
 #include "ObserverApi.h"
 
-const char* const ReceiverHeaderVersion = "2.6.7.75";
+const char* const ReceiverHeaderVersion = "2.7.4.3";
 
 const unsigned int totallyVisibleSizeHundreds = 999;
 
@@ -59,23 +59,31 @@ class MsgSubscription : public Message
 {
 public:
     unsigned int m_subscriptionId;
+    unsigned __int64 m_subscriptionName;
+	bool m_autoSubscribe;
 protected:
-    MsgSubscription(unsigned int subscriptionId, const char* subscriptionName, unsigned short type):
-        Message(type, sizeof(MsgSubscription) + (subscriptionName ? (unsigned short)strlen(subscriptionName) : 0)),
-        m_subscriptionId(subscriptionId)
+//    MsgSubscription(unsigned int subscriptionId, const char* subscriptionName, unsigned short type):
+    MsgSubscription(unsigned int subscriptionId, unsigned __int64 subscriptionName, unsigned short type, bool autoSubscribe):
+//        Message(type, sizeof(MsgSubscription) + (subscriptionName ? (unsigned short)strlen(subscriptionName) : 0)),
+        Message(type, sizeof(MsgSubscription)),
+        m_subscriptionId(subscriptionId),
+		m_subscriptionName(subscriptionName),
+		m_autoSubscribe(autoSubscribe)
         {}
 };
 
 class MsgSubscribe : public MsgSubscription
 {
 public:
-    MsgSubscribe(unsigned int subscriptionId, const char* subscriptionName):MsgSubscription(subscriptionId, subscriptionName, MSGID_SUBSCRIBE){}
+//    MsgSubscribe(unsigned int subscriptionId, const char* subscriptionName):MsgSubscription(subscriptionId, subscriptionName, MSGID_SUBSCRIBE){}
+    MsgSubscribe(unsigned int subscriptionId, unsigned __int64 subscriptionName, bool autoSubscribe):MsgSubscription(subscriptionId, subscriptionName, MSGID_SUBSCRIBE, autoSubscribe){}
 };
 
 class MsgUnsubscribe : public MsgSubscription
 {
 public:
-    MsgUnsubscribe(unsigned int subscriptionId, const char* subscriptionName):MsgSubscription(subscriptionId, subscriptionName, MSGID_UNSUBSCRIBE){}
+//    MsgUnsubscribe(unsigned int subscriptionId, const char* subscriptionName):MsgSubscription(subscriptionId, subscriptionName, MSGID_UNSUBSCRIBE){}
+    MsgUnsubscribe(unsigned int subscriptionId, unsigned __int64 subscriptionName, bool autoSubscribe):MsgSubscription(subscriptionId, subscriptionName, MSGID_UNSUBSCRIBE, autoSubscribe){}
 };
 
 class MsgConnectionMade : public Message
@@ -213,6 +221,42 @@ public:
 
 };
 
+class MsgPoolLocate : public Message
+{
+public:
+	MsgPoolLocate():
+        Message(M_POOL_LOCATE, sizeof(MsgPoolLocate)),
+        x_ExecutionPrice(0),
+        x_NumberOfShares(0),
+        x_NumberOfSharesLeft(0),
+        x_bMoreShares(false),
+        x_Time(0),
+        x_OrderId(0),
+        x_executionId(0),
+        m_bDecimal(1)
+    {
+        memset(x_UserId, 0, sizeof(x_UserId));
+        memset(x_Symbol, 0, sizeof(x_Symbol));
+        memset(x_CounterParty, 0, sizeof(x_CounterParty));
+        memset(x_ExecutionType, 0, sizeof(x_ExecutionType));
+        memset(m_achReference, 0, sizeof(m_achReference));
+    }
+
+	int 		    x_ExecutionPrice;
+	long		    x_NumberOfShares;
+	long		    x_NumberOfSharesLeft;
+	bool		    x_bMoreShares;
+	unsigned int    x_Time;
+    char		    x_UserId[LENGTH_SYMBOL];
+	char		    x_Symbol[LENGTH_SYMBOL];
+	unsigned int	x_OrderId;
+	char		    x_CounterParty[LENGTH_SYMBOL];
+	char		    x_ExecutionType[4]; // SOEE for SOES, EEXO for Selectnet.
+	unsigned long   x_executionId;
+	char		    m_achReference[15];
+	char		    m_bDecimal;
+
+};
 
 class MsgLoadOrderPoolCompleted : public UserIdMessage
 {
@@ -1756,7 +1800,9 @@ public:
  
     enum TFlags2
     { 
-        RESP_TRADE_DESK_ABLE    = 0x00000001
+        RESP_TRADE_DESK_ABLE    = 0x00000001,
+        TE_MARKS_SIDE_IN_EXEC_MESSAGE = 0x00000002,
+        RESP_COMPRESSION_FORCED = 0x00000004
     };
  
     unsigned int x_RespFlags1;
@@ -2200,6 +2246,30 @@ public:
     char m_priceVariationIndicator;
 };
 
+class MsgNyseImbalance : public SymbolMessage
+{
+public:
+    MsgNyseImbalance():
+        SymbolMessage(M_NYSE_IMBALANCE, sizeof(MsgNyseImbalance)),
+        m_matchedShares(0),
+        m_imbalance(0),
+        m_referencePrice(0),
+        m_flags(0)
+    {
+    }
+ 
+    unsigned int m_matchedShares;     
+    int m_imbalance;     
+    unsigned int m_referencePrice;
+    unsigned int m_flags;
+};
+
+class MsgNyseImbalanceNone : public SymbolMessage
+{
+public:
+    MsgNyseImbalanceNone():SymbolMessage(M_NYSE_IMBALANCE_NONE, sizeof(MsgNyseImbalanceNone)){}
+ };
+
 class MsgLRP : public SymbolMessage
 {
 public:
@@ -2428,99 +2498,11 @@ public:
 	unsigned int m_toFound;
 };
 
-class ReqMsRefreshSymbolChart : public SymbolMessage
-{
-public:
-	ReqMsRefreshSymbolChart() : SymbolMessage(MS_REFRESH_SYMBOL_CHART, sizeof(ReqMsRefreshSymbolChart)){}
-};
-/*
-class ReqMsRefreshIndexChart : public SymbolMessage
-{
-public:
-	ReqMsRefreshIndexChart() : SymbolMessage(MS_REFRESH_INDEX_CHART, sizeof(ReqMsRefreshIndexChart)){}
-};
-*/
-class MsgMsRefreshChart : public SymbolMessage
-{
-public:
-    unsigned short m_minutesChartStart;//7 am = 420 minutes
-    //Follows : (m_size - sizeof(MsgMsRefreshChart)) / 8   *   (unsigned int price, unsigned int volume)
-protected:
-	MsgMsRefreshChart(unsigned short type, unsigned short size) : SymbolMessage(type, size){}
-};
-
-class MsgMsRefreshSymbolChart : public MsgMsRefreshChart
-{
-public:
-	MsgMsRefreshSymbolChart() : MsgMsRefreshChart(MS_REFRESH_SYMBOL_CHART, sizeof(MsgMsRefreshSymbolChart)){}
-};
-/*
-class MsgMsRefreshIndexChart : public MsgMsRefreshChart
-{
-public:
-	MsgMsRefreshIndexChart() : MsgMsRefreshChart(MS_REFRESH_INDEX_CHART, sizeof(MsgMsRefreshIndexChart)){}
-};
-*/
-
-class ReqMsPopulateSymbolSortable : public SymbolMessage
-{
-public:
-	bool m_chart;
-protected:
-	ReqMsPopulateSymbolSortable(unsigned short type, bool chart = false) : SymbolMessage(type, sizeof(ReqMsPopulateSymbolSortable)), m_chart(chart){}
-};
-
-class ReqMsPopulateFirstSymbolSortable : public ReqMsPopulateSymbolSortable
-{
-public:
-	ReqMsPopulateFirstSymbolSortable(bool chart = false) : ReqMsPopulateSymbolSortable(MS_REQ_POPULATE_FIRST_SYMBOL_SORTABLE, chart){}
-};
-
-class ReqMsPopulateNextSymbolSortable : public ReqMsPopulateSymbolSortable
-{
-public:
-	ReqMsPopulateNextSymbolSortable(bool chart = false) : ReqMsPopulateSymbolSortable(MS_REQ_POPULATE_NEXT_SYMBOL_SORTABLE, chart){}
-};
-
-class MsgPrintRemoved : public SymbolMessage
-{
-public:
-	MsgPrintRemoved(const char* symbol):
-		SymbolMessage(MS_RESP_SYMBOL_SORTABLE_PRINT_REMOVED, sizeof(MsgPrintRemoved), symbol),
-		m_vwap(0),
-		m_moneyTraded(0),
-		m_priceStart(0),
-		m_priceMin(0),
-		m_priceMax(0),
-		m_priceEnd(0),
-		m_volume(0),
-		m_ordinal(0),
-		m_second(0),
-		m_price(0),
-		m_size(0),
-		m_saleCondition(0),
-		m_hidden(0)
-	{}
-    unsigned int m_vwap;
-    __int64 m_moneyTraded;
-    unsigned int m_priceStart;
-    unsigned int m_priceMin;
-    unsigned int m_priceMax;
-    unsigned int m_priceEnd;
-	unsigned int m_volume;
-
-	unsigned int m_ordinal;
-	unsigned int m_second;
-	unsigned int m_price;
-	unsigned int m_size;
-	char m_saleCondition;
-	char m_hidden;
-};
 
 class SymbolSortableSnapshot
 {
 public:
-	SymbolSortableSnapshot():
+	SymbolSortableSnapshot(unsigned short numericCode):
         m_chartSize(0),
         m_bid(0),
         m_ask(0),
@@ -2601,7 +2583,10 @@ public:
 		m_nasdaqImbalanceMatchedShares(0),
 		m_nasdaqImbalanceTime(0),
 		m_nasdaqPreviousImbalanceTime(0),
-		m_nasdaqImbalanceType(-1)
+		m_nasdaqImbalanceType(-1),
+
+		m_numericCode(numericCode),
+		m_nyseInformationalImbalance(0)
     {
         *m_symbol = '\0';
         *m_description = '\0';
@@ -2706,6 +2691,10 @@ public:
 	unsigned int m_nasdaqImbalanceTime;
 	unsigned int m_nasdaqPreviousImbalanceTime;
     char m_nasdaqImbalanceType;
+
+	unsigned short m_numericCode;
+
+	int m_nyseInformationalImbalance;
 };
 
 class MsgMsRefreshSymbolSortablePack : public Message
@@ -2715,10 +2704,11 @@ public:
     unsigned char m_packSize;
 };
 
-class MsgMsSymbolSortablePopulationDone : public SymbolMessage
+class MsgMsSymbolSortablePopulationDone : public Message//SymbolMessage
 {
 public:
-	MsgMsSymbolSortablePopulationDone() : SymbolMessage(MS_RESP_SYMBOL_SORTABLE_POPULATION_DONE, sizeof(MsgMsSymbolSortablePopulationDone)){}
+//	MsgMsSymbolSortablePopulationDone() : SymbolMessage(MS_RESP_SYMBOL_SORTABLE_POPULATION_DONE, sizeof(MsgMsSymbolSortablePopulationDone)){}
+	MsgMsSymbolSortablePopulationDone() : Message(MS_RESP_SYMBOL_SORTABLE_POPULATION_DONE, sizeof(MsgMsSymbolSortablePopulationDone)){}
 };
 
 
@@ -2768,17 +2758,18 @@ public:
 	unsigned char m_marketStatus;
 };
 
-class ReqMsPopulateFirstIndexSortable : public SymbolMessage
+class ReqMsPopulateFirstIndexSortable : public Message//SymbolMessage
 {
 public:
-	ReqMsPopulateFirstIndexSortable() : SymbolMessage(MS_REQ_POPULATE_FIRST_INDEX_SORTABLE, sizeof(ReqMsPopulateFirstIndexSortable)){}
+//	ReqMsPopulateFirstIndexSortable() : SymbolMessage(MS_REQ_POPULATE_FIRST_INDEX_SORTABLE, sizeof(ReqMsPopulateFirstIndexSortable)){}
+	ReqMsPopulateFirstIndexSortable() : Message(MS_REQ_POPULATE_FIRST_INDEX_SORTABLE, sizeof(ReqMsPopulateFirstIndexSortable)){}
 };
 
-class ReqMsPopulateNextIndexSortable : public SymbolMessage
+class ReqMsPopulateNextIndexSortable : public Message//SymbolMessage
 {
 public:
-	ReqMsPopulateNextIndexSortable() : SymbolMessage(MS_REQ_POPULATE_NEXT_INDEX_SORTABLE, sizeof(ReqMsPopulateNextIndexSortable)){}
-};
+//	ReqMsPopulateNextIndexSortable() : SymbolMessage(MS_REQ_POPULATE_NEXT_INDEX_SORTABLE, sizeof(ReqMsPopulateNextIndexSortable)){}
+	ReqMsPopulateNextIndexSortable() : Message(MS_REQ_POPULATE_NEXT_INDEX_SORTABLE, sizeof(ReqMsPopulateNextIndexSortable)){}};
 
 const int indexInvalidValue = -2147483647;
 
@@ -2813,10 +2804,385 @@ public:
     char m_description[LENGTH_SEQURITYNAME];
 };
 
-class MsgMsIndexSortablePopulationDone : public SymbolMessage
+class MsgMsIndexSortablePopulationDone : public Message//SymbolMessage
 {
 public:
-	MsgMsIndexSortablePopulationDone() : SymbolMessage(MS_RESP_INDEX_SORTABLE_POPULATION_DONE, sizeof(MsgMsIndexSortablePopulationDone)){}
+//	MsgMsIndexSortablePopulationDone() : SymbolMessage(MS_RESP_INDEX_SORTABLE_POPULATION_DONE, sizeof(MsgMsIndexSortablePopulationDone)){}
+	MsgMsIndexSortablePopulationDone() : Message(MS_RESP_INDEX_SORTABLE_POPULATION_DONE, sizeof(MsgMsIndexSortablePopulationDone)){}
+};
+
+class ReqMsPopulateSymbolSortable : public Message//SymbolMessage
+{
+public:
+	bool m_chart;
+protected:
+//	ReqMsPopulateSymbolSortable(unsigned short type, bool chart = false) : SymbolMessage(type, sizeof(ReqMsPopulateSymbolSortable)), m_chart(chart){}
+	ReqMsPopulateSymbolSortable(unsigned short type, bool chart = false) : Message(type, sizeof(ReqMsPopulateSymbolSortable)), m_chart(chart){}
+};
+
+class ReqMsPopulateFirstSymbolSortable : public ReqMsPopulateSymbolSortable
+{
+public:
+	ReqMsPopulateFirstSymbolSortable(bool chart = false) : ReqMsPopulateSymbolSortable(MS_REQ_POPULATE_FIRST_SYMBOL_SORTABLE, chart){}
+};
+
+class ReqMsPopulateNextSymbolSortable : public ReqMsPopulateSymbolSortable
+{
+public:
+	ReqMsPopulateNextSymbolSortable(bool chart = false) : ReqMsPopulateSymbolSortable(MS_REQ_POPULATE_NEXT_SYMBOL_SORTABLE, chart){}
+};
+
+class MsgMsAdminMessage : public Message
+{
+public:
+	MsgMsAdminMessage(unsigned int time, unsigned short textLen) : Message(MS_RESP_ADMIN_MESSAGE, sizeof(MsgMsAdminMessage) + textLen), m_time(time){}
+    unsigned int m_time;
+};
+
+class MsgMsAdminMessageDone : public Message
+{
+public:
+	MsgMsAdminMessageDone() : Message(MS_RESP_ADMIN_MESSAGE_DONE, sizeof(MsgMsAdminMessageDone)){}
+};
+
+class PrintStructure
+{
+public:
+	PrintStructure(unsigned int price,
+		unsigned int size,
+//		unsigned short secondsFrom4AM,
+//		char primaryExchange,
+		char executionExchange,
+		char saleCondition,
+		char status,
+		char hidden):
+		m_price(price),
+		m_size(size),
+//		m_secondsFrom4AM(secondsFrom4AM),
+//		m_PrimaryExchange(primaryExchange),
+		m_ExecutionExchange(executionExchange),
+		m_saleCondition(saleCondition),
+		m_status(status),
+		m_hidden(hidden)
+		{}
+	unsigned int m_price;
+	unsigned int m_size;
+//	unsigned short m_secondsFrom4AM;
+//	char m_PrimaryExchange;
+	char m_ExecutionExchange;
+	char m_saleCondition;
+	char m_status;
+	char m_hidden;
+};
+
+#define MS_NUMERIC_CODE
+
+#ifdef MS_NUMERIC_CODE
+
+class MsNumericCode : public Message
+{
+public:
+	unsigned short m_numericCode;
+protected:
+	MsNumericCode(unsigned short code, unsigned short type, unsigned short size):Message(type, size),m_numericCode(code){}
+};
+
+class ReqMsRefreshSymbolChart : public MsNumericCode
+{
+public:
+	ReqMsRefreshSymbolChart(unsigned short code) : MsNumericCode(code, MS_REFRESH_SYMBOL_CHART, sizeof(ReqMsRefreshSymbolChart)){}
+};
+
+class MsgMsRefreshChart : public MsNumericCode
+{
+public:
+    unsigned short m_minutesChartStart;//7 am = 420 minutes
+    //Follows : (m_size - sizeof(MsgMsRefreshChart)) / 8   *   (unsigned int price, unsigned int volume)
+protected:
+	MsgMsRefreshChart(unsigned short code, unsigned short type, unsigned short size) : MsNumericCode(code, type, size){}
+};
+
+class MsgMsRefreshSymbolChart : public MsgMsRefreshChart
+{
+public:
+	MsgMsRefreshSymbolChart(unsigned short code) : MsgMsRefreshChart(code, MS_REFRESH_SYMBOL_CHART, sizeof(MsgMsRefreshSymbolChart)){}
+};
+
+class MsgPrintRemoved : public MsNumericCode
+{
+public:
+	MsgPrintRemoved(unsigned short code):
+		MsNumericCode(code, MS_RESP_SYMBOL_SORTABLE_PRINT_REMOVED, sizeof(MsgPrintRemoved)),
+		m_vwap(0),
+		m_moneyTraded(0),
+		m_priceStart(0),
+		m_priceMin(0),
+		m_priceMax(0),
+		m_priceEnd(0),
+		m_volume(0),
+		m_ordinal(0),
+		m_second(0),
+		m_price(0),
+		m_size(0),
+		m_saleCondition(0),
+		m_hidden(0)
+	{}
+    unsigned int m_vwap;
+    __int64 m_moneyTraded;
+    unsigned int m_priceStart;
+    unsigned int m_priceMin;
+    unsigned int m_priceMax;
+    unsigned int m_priceEnd;
+	unsigned int m_volume;
+
+	unsigned int m_ordinal;
+	unsigned int m_second;
+	unsigned int m_price;
+	unsigned int m_size;
+	char m_saleCondition;
+	char m_hidden;
+};
+
+class MsgMsSymbolSortableLevel1 : public MsNumericCode
+{
+public:
+    MsgMsSymbolSortableLevel1(unsigned short code) : MsNumericCode(code, MS_RESP_SYMBOL_SORTABLE_LEVEL1, sizeof(MsgMsSymbolSortableLevel1)){}
+    enum
+    {
+        BID = 1 << 0,
+        ASK = 1 << 1,
+        BIDSIZE = 1 << 2,
+        ASKSIZE = 1 << 3,
+        NONE
+    };
+};
+
+class MsgMsSymbolSortablePreMarketIndicator : public MsNumericCode
+{
+public:
+    MsgMsSymbolSortablePreMarketIndicator(unsigned short code) : MsNumericCode(code, MS_RESP_SYMBOL_SORTABLE_PRE_MARKET_INDICATOR, sizeof(MsgMsSymbolSortablePreMarketIndicator)){}
+    enum
+    {
+        BID = 1 << 0,
+        ASK = 1 << 1,
+        NONE
+    };
+};
+
+class MsgMsNyseImbalance : public MsNumericCode
+{
+public:
+    MsgMsNyseImbalance(unsigned short code):
+        MsNumericCode(code, M_MS_NYSE_IMBALANCE, sizeof(MsgMsNyseImbalance)),
+        m_matchedShares(0),
+        m_imbalance(0),
+        m_referencePrice(0),
+        m_flags(0)
+    {
+    }
+ 
+    unsigned int m_matchedShares;     
+    int m_imbalance;     
+    unsigned int m_referencePrice;
+    unsigned int m_flags;
+};
+
+class MsgMsNyseImbalanceNone : public MsNumericCode
+{
+public:
+    MsgMsNyseImbalanceNone(unsigned short code):MsNumericCode(code, M_MS_NYSE_IMBALANCE_NONE, sizeof(MsgMsNyseImbalanceNone)){}
+};
+
+class MsgMsSymbolSortableNysBid : public MsNumericCode
+{
+public:
+    MsgMsSymbolSortableNysBid(unsigned short code) : MsNumericCode(code, MS_RESP_SYMBOL_SORTABLE_NYS_BID, sizeof(MsgMsSymbolSortableNysBid)){}
+};
+
+class MsgMsSymbolSortableNysAsk : public MsNumericCode
+{
+public:
+    MsgMsSymbolSortableNysAsk(unsigned short code) : MsNumericCode(code, MS_RESP_SYMBOL_SORTABLE_NYS_ASK, sizeof(MsgMsSymbolSortableNysAsk)){}
+};
+
+class MsgMsSymbolSortableNysBidSize : public MsNumericCode
+{
+public:
+    MsgMsSymbolSortableNysBidSize(unsigned short code) : MsNumericCode(code, MS_RESP_SYMBOL_SORTABLE_NYS_BIDSIZE, sizeof(MsgMsSymbolSortableNysBidSize)){}
+};
+
+class MsgMsSymbolSortableNysAskSize : public MsNumericCode
+{
+public:
+    MsgMsSymbolSortableNysAskSize(unsigned short code) : MsNumericCode(code, MS_RESP_SYMBOL_SORTABLE_NYS_ASKSIZE, sizeof(MsgMsSymbolSortableNysAskSize)){}
+};
+
+class MsgMsSymbolSortableNysBidQuote : public MsNumericCode
+{
+public:
+    MsgMsSymbolSortableNysBidQuote(unsigned short code) : MsNumericCode(code, MS_RESP_SYMBOL_SORTABLE_NYS_BIDQUOTE, sizeof(MsgMsSymbolSortableNysBidQuote)){}
+};
+
+class MsgMsSymbolSortableNysAskQuote : public MsNumericCode
+{
+public:
+    MsgMsSymbolSortableNysAskQuote(unsigned short code) : MsNumericCode(code, MS_RESP_SYMBOL_SORTABLE_NYS_ASKQUOTE, sizeof(MsgMsSymbolSortableNysAskQuote)){}
+};
+
+class MsgMsSymbolSortableBidLRP : public MsNumericCode
+{
+public:
+    MsgMsSymbolSortableBidLRP(unsigned short code) : MsNumericCode(code, MS_RESP_SYMBOL_SORTABLE_BID_LRP, sizeof(MsgMsSymbolSortableBidLRP)){}
+};
+
+class MsgMsSymbolSortableAskLRP : public MsNumericCode
+{
+public:
+    MsgMsSymbolSortableAskLRP(unsigned short code) : MsNumericCode(code, MS_RESP_SYMBOL_SORTABLE_ASK_LRP, sizeof(MsgMsSymbolSortableAskLRP)){}
+};
+
+class MsgMsSymbolSortableBidAskLRP : public MsNumericCode
+{
+public:
+    MsgMsSymbolSortableBidAskLRP(unsigned short code) : MsNumericCode(code, MS_RESP_SYMBOL_SORTABLE_BIDASK_LRP, sizeof(MsgMsSymbolSortableBidAskLRP)){}
+};
+
+class MsgMsSymbolSortableNysBidCondition : public MsNumericCode
+{
+public:
+    MsgMsSymbolSortableNysBidCondition(unsigned short code) : MsNumericCode(code, MS_RESP_SYMBOL_SORTABLE_NYS_BIDCONDITION, sizeof(MsgMsSymbolSortableNysBidCondition)){}
+};
+
+class MsgMsSymbolSortableNysAskCondition : public MsNumericCode
+{
+public:
+    MsgMsSymbolSortableNysAskCondition(unsigned short code) : MsNumericCode(code, MS_RESP_SYMBOL_SORTABLE_NYS_ASKCONDITION, sizeof(MsgMsSymbolSortableNysAskCondition)){}
+};
+
+class MsgMsSymbolSortableTrade : public MsNumericCode
+{
+public:
+	MsgMsSymbolSortableTrade(unsigned short code) : MsNumericCode(code, MS_RESP_SYMBOL_SORTABLE_TRADE, sizeof(MsgMsSymbolSortableTrade)){}
+};
+
+class MsgMsSymbolSortableEcnTrade : public MsNumericCode
+{
+public:
+	MsgMsSymbolSortableEcnTrade(unsigned short code) : MsNumericCode(code, MS_RESP_SYMBOL_SORTABLE_ECNTRADE, sizeof(MsgMsSymbolSortableEcnTrade)){}
+};
+
+class MsgMsSymbolSortableClosePrice : public MsNumericCode
+{
+public:
+	MsgMsSymbolSortableClosePrice(unsigned short code) : MsNumericCode(code, MS_RESP_SYMBOL_SORTABLE_CLOSEPRICE, sizeof(MsgMsSymbolSortableClosePrice)){}
+};
+
+class MsgMsSymbolSortableL2LargeQuote : public MsNumericCode
+{
+public:
+	MsgMsSymbolSortableL2LargeQuote(unsigned short code) : MsNumericCode(code, MS_RESP_SYMBOL_SORTABLE_L2_LARGE_QUOTE, sizeof(MsgMsSymbolSortableL2LargeQuote)){}
+};
+
+class ReqMsHistoryPrints : public MsNumericCode
+{
+public:
+	ReqMsHistoryPrints(unsigned short code, unsigned short daysAgo, unsigned int printOrdinalFrom):
+		MsNumericCode(code, MS_REQ_HISTORY_PRINTS, sizeof(ReqMsHistoryPrints)),
+		m_daysAgo(daysAgo),
+		m_printOrdinalFrom(printOrdinalFrom)
+	{}
+	unsigned short m_daysAgo;
+	unsigned int m_printOrdinalFrom;
+};
+
+class MsgMsHistoryPrints : public MsNumericCode
+{
+public:
+	MsgMsHistoryPrints(unsigned short code, unsigned  char structureSize):
+		MsNumericCode(code, MS_RESP_HISTORY_PRINTS, sizeof(MsgMsHistoryPrints)),
+		m_structureSize(structureSize)
+	{}
+	unsigned char m_structureSize;
+	void SetMessageSize(unsigned short size){m_size = size;}
+};
+
+class MsgMsHistoryPrintsLoadingDone : public MsNumericCode
+{
+public:
+	MsgMsHistoryPrintsLoadingDone(unsigned short code):
+		MsNumericCode(code, MS_RESP_HISTORY_PRINTS_LOADING_DONE, sizeof(MsgMsHistoryPrintsLoadingDone))
+	{}
+};
+
+#else
+
+class ReqMsRefreshSymbolChart : public SymbolMessage
+{
+public:
+	ReqMsRefreshSymbolChart() : SymbolMessage(MS_REFRESH_SYMBOL_CHART, sizeof(ReqMsRefreshSymbolChart)){}
+};
+/*
+class ReqMsRefreshIndexChart : public SymbolMessage
+{
+public:
+	ReqMsRefreshIndexChart() : SymbolMessage(MS_REFRESH_INDEX_CHART, sizeof(ReqMsRefreshIndexChart)){}
+};
+*/
+class MsgMsRefreshChart : public SymbolMessage
+{
+public:
+    unsigned short m_minutesChartStart;//7 am = 420 minutes
+    //Follows : (m_size - sizeof(MsgMsRefreshChart)) / 8   *   (unsigned int price, unsigned int volume)
+protected:
+	MsgMsRefreshChart(unsigned short type, unsigned short size) : SymbolMessage(type, size){}
+};
+
+class MsgMsRefreshSymbolChart : public MsgMsRefreshChart
+{
+public:
+	MsgMsRefreshSymbolChart() : MsgMsRefreshChart(MS_REFRESH_SYMBOL_CHART, sizeof(MsgMsRefreshSymbolChart)){}
+};
+/*
+class MsgMsRefreshIndexChart : public MsgMsRefreshChart
+{
+public:
+	MsgMsRefreshIndexChart() : MsgMsRefreshChart(MS_REFRESH_INDEX_CHART, sizeof(MsgMsRefreshIndexChart)){}
+};
+*/
+
+class MsgPrintRemoved : public SymbolMessage
+{
+public:
+	MsgPrintRemoved(const char* symbol):
+		SymbolMessage(MS_RESP_SYMBOL_SORTABLE_PRINT_REMOVED, sizeof(MsgPrintRemoved), symbol),
+		m_vwap(0),
+		m_moneyTraded(0),
+		m_priceStart(0),
+		m_priceMin(0),
+		m_priceMax(0),
+		m_priceEnd(0),
+		m_volume(0),
+		m_ordinal(0),
+		m_second(0),
+		m_price(0),
+		m_size(0),
+		m_saleCondition(0),
+		m_hidden(0)
+	{}
+    unsigned int m_vwap;
+    __int64 m_moneyTraded;
+    unsigned int m_priceStart;
+    unsigned int m_priceMin;
+    unsigned int m_priceMax;
+    unsigned int m_priceEnd;
+	unsigned int m_volume;
+
+	unsigned int m_ordinal;
+	unsigned int m_second;
+	unsigned int m_price;
+	unsigned int m_size;
+	char m_saleCondition;
+	char m_hidden;
 };
 
 class MsgMsSymbolSortableLevel1 : public Message
@@ -2911,20 +3277,6 @@ public:
     MsgMsSymbolSortableNysAskCondition() : Message(MS_RESP_SYMBOL_SORTABLE_NYS_ASKCONDITION, sizeof(MsgMsSymbolSortableNysAskCondition)){}
 };
 
-class MsgMsAdminMessage : public Message
-{
-public:
-	MsgMsAdminMessage(unsigned int time, unsigned short textLen) : Message(MS_RESP_ADMIN_MESSAGE, sizeof(MsgMsAdminMessage) + textLen), m_time(time){}
-    unsigned int m_time;
-};
-
-class MsgMsAdminMessageDone : public Message
-{
-public:
-	MsgMsAdminMessageDone() : Message(MS_RESP_ADMIN_MESSAGE_DONE, sizeof(MsgMsAdminMessageDone)){}
-};
-
-
 class MsgMsSymbolSortableTrade : public Message
 {
 public:
@@ -2949,6 +3301,45 @@ public:
 	MsgMsSymbolSortableClosePrice() : Message(MS_RESP_SYMBOL_SORTABLE_CLOSEPRICE, sizeof(MsgMsSymbolSortableClosePrice)){}
 };
 
+class MsgMsSymbolSortableL2LargeQuote : public Message
+{
+public:
+	MsgMsSymbolSortableL2LargeQuote() : Message(MS_RESP_SYMBOL_SORTABLE_L2_LARGE_QUOTE, sizeof(MsgMsSymbolSortableL2LargeQuote)){}
+};
+
+class ReqMsHistoryPrints : public SymbolMessage
+{
+public:
+	ReqMsHistoryPrints(const char* symbol, unsigned short daysAgo, unsigned int printOrdinalFrom):
+		SymbolMessage(MS_REQ_HISTORY_PRINTS, sizeof(ReqMsHistoryPrints), symbol),
+		m_daysAgo(daysAgo),
+		m_printOrdinalFrom(printOrdinalFrom)
+	{}
+	unsigned short m_daysAgo;
+	unsigned int m_printOrdinalFrom;
+};
+
+class MsgMsHistoryPrints : public SymbolMessage
+{
+public:
+	MsgMsHistoryPrints(const char* symbol, unsigned  char structureSize):
+		SymbolMessage(MS_RESP_HISTORY_PRINTS, sizeof(MsgMsHistoryPrints), symbol),
+		m_structureSize(structureSize)
+	{}
+	unsigned char m_structureSize;
+	void SetMessageSize(unsigned short size){m_size = size;}
+};
+
+class MsgMsHistoryPrintsLoadingDone : public SymbolMessage
+{
+public:
+	MsgMsHistoryPrintsLoadingDone(const char* symbol):
+		SymbolMessage(MS_RESP_HISTORY_PRINTS_LOADING_DONE, sizeof(MsgMsHistoryPrintsLoadingDone), symbol)
+	{}
+};
+
+#endif
+
 class MsgMsNextMinute : public Message
 {
 public:
@@ -2967,12 +3358,6 @@ class MsgMarketDisconnected : public Message
 {
 public:
 	MsgMarketDisconnected():Message(MS_RESP_MARKET_DISCONNECTED, sizeof(MsgMarketDisconnected)){}
-};
-
-class MsgMsSymbolSortableL2LargeQuote : public Message
-{
-public:
-	MsgMsSymbolSortableL2LargeQuote() : Message(MS_RESP_SYMBOL_SORTABLE_L2_LARGE_QUOTE, sizeof(MsgMsSymbolSortableL2LargeQuote)){}
 };
 
 class MsgReconnect : public Message
@@ -3061,67 +3446,6 @@ class MsgLegacyVersion : public MsgMsUpgradeVersion
 public:
 	MsgLegacyVersion(unsigned int version, unsigned int legacyVersion):MsgMsUpgradeVersion(version, MS_LEGACY_VERSION, sizeof(MsgLegacyVersion)), m_legacyVersion(legacyVersion){}
 	unsigned int m_legacyVersion;
-};
-
-class ReqMsHistoryPrints : public SymbolMessage
-{
-public:
-	ReqMsHistoryPrints(const char* symbol, unsigned short daysAgo, unsigned int printOrdinalFrom):
-		SymbolMessage(MS_REQ_HISTORY_PRINTS, sizeof(ReqMsHistoryPrints), symbol),
-		m_daysAgo(daysAgo),
-		m_printOrdinalFrom(printOrdinalFrom)
-	{}
-	unsigned short m_daysAgo;
-	unsigned int m_printOrdinalFrom;
-};
-
-class PrintStructure
-{
-public:
-	PrintStructure(unsigned int price,
-		unsigned int size,
-//		unsigned short secondsFrom4AM,
-//		char primaryExchange,
-		char executionExchange,
-		char saleCondition,
-		char status,
-		char hidden):
-		m_price(price),
-		m_size(size),
-//		m_secondsFrom4AM(secondsFrom4AM),
-//		m_PrimaryExchange(primaryExchange),
-		m_ExecutionExchange(executionExchange),
-		m_saleCondition(saleCondition),
-		m_status(status),
-		m_hidden(hidden)
-		{}
-	unsigned int m_price;
-	unsigned int m_size;
-//	unsigned short m_secondsFrom4AM;
-//	char m_PrimaryExchange;
-	char m_ExecutionExchange;
-	char m_saleCondition;
-	char m_status;
-	char m_hidden;
-};
-
-class MsgMsHistoryPrints : public SymbolMessage
-{
-public:
-	MsgMsHistoryPrints(const char* symbol, unsigned  char structureSize):
-		SymbolMessage(MS_RESP_HISTORY_PRINTS, sizeof(MsgMsHistoryPrints), symbol),
-		m_structureSize(structureSize)
-	{}
-	unsigned char m_structureSize;
-	void SetMessageSize(unsigned short size){m_size = size;}
-};
-
-class MsgMsHistoryPrintsLoadingDone : public SymbolMessage
-{
-public:
-	MsgMsHistoryPrintsLoadingDone(const char* symbol):
-		SymbolMessage(MS_RESP_HISTORY_PRINTS_LOADING_DONE, sizeof(MsgMsHistoryPrintsLoadingDone), symbol)
-	{}
 };
 
 #endif
