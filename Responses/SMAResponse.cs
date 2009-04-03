@@ -15,8 +15,6 @@ namespace Responses
         public int EntrySize { get { return _entrysize; } set { _entrysize = value; } }
         [Description("Default bar interval for this response.")]
         public BarInterval Interval { get { return _barinterval; } set { _barinterval = value; } }
-        [Description("Bars to use in calculating simple moving average (SMA).")]
-        public int BarsBack { get { return _barsback; } set { _barsback = value; } }
 
         // this function is called the constructor, because it sets up the response
         // it is run before all the other functions, and has same name as my response.
@@ -32,13 +30,35 @@ namespace Responses
                 pp.ShowDialog();
             }
 
-            // make sure default interval is used when tracking bars
-            blt.DefaultInterval = Interval;
+            // only build bars for user's interval
+            blt = new BarListTracker(Interval);
+
+            // only calculate on new bars
+            blt.GotNewBar += new SymBarIntervalDelegate(blt_GotNewBar);
 
 
             // set our indicator names, in case we import indicators into R
             // or excel, or we want to view them in gauntlet or kadina
             Indicators = new string[] { "SMA" };
+        }
+
+        void blt_GotNewBar(string symbol, BarInterval interval)
+        {
+            // lets do our entries.  
+
+            // calculate the SMA using closign prices
+            decimal SMA = Calc.Avg(blt[symbol].Close());
+
+            // if our current price is above SMA, buy
+            if (blt[symbol].RecentBar.Close > SMA)
+                sendorder(new BuyMarket(symbol, EntrySize));
+            // otherwise if it's less than SMA, sell
+            if (blt[symbol].RecentBar.Close < SMA)
+                sendorder(new SellMarket(symbol, EntrySize));
+
+            // this way we can debug our indicators during development
+            // indicators are sent in the same order as they are named above
+            sendindicators(SMA.ToString());
         }
 
         // turn on bar tracking
@@ -51,9 +71,6 @@ namespace Responses
         {
             // apply bar tracking to all ticks that enter
             blt.newTick(tick);
-            // make sure we have minimum number of bars,
-            // otherwise just wait for next tick before going forward
-            if (!blt[tick.symbol].Has(BarsBack)) return;
 
             // ignore anything that is not a trade
             if (!tick.isTrade) return;
@@ -65,31 +82,11 @@ namespace Responses
             {
                 // if we hit our target, flat our position
                 sendorder(new MarketOrderFlat(pt[tick.symbol]));
+                // shut us down
+                isValid = false;
                 // don't process anything else after this (entries, etc)
                 return;
             }
-            
-            // if we are here, we haven't hit our profit target.
-            // lets do our entries.  
-
-            // first lets calculate the moving average.
-
-            // we need the closing prices for the requested # of bars
-            decimal[] prices = Calc.Closes(blt[tick.symbol], BarsBack);
-
-            // then lets calculate the SMA
-            decimal SMA = Calc.Avg(prices);
-
-            // if our current price is above SMA, buy
-            if (tick.trade > SMA)
-                sendorder(new BuyMarket(tick.symbol, EntrySize));
-            // otherwise if it's less than SMA, sell
-            if (tick.trade < SMA)
-                sendorder(new SellMarket(tick.symbol, EntrySize));
-
-            // this way we can debug our indicators during development
-            // indicators are sent in the same order as they are named above
-            sendindicators(SMA.ToString());
 
         }
 

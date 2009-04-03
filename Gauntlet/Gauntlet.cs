@@ -151,7 +151,7 @@ namespace WinGauntlet
                         sw.WriteLine(OrderImpl.Serialize(olist[i]));
                     sw.Close();
                 }
-                debug("Completed. Ticks: " + gargs.TicksProcessed + " Speed:" + gargs.TicksSecond.ToString("N0") + " t/s  Fills: " + gargs.Executions.ToString());
+                debug("Done.  Ticks: " + gargs.TicksProcessed + " Speed:" + gargs.TicksSecond.ToString("N0") + " t/s  Fills: " + gargs.Executions.ToString());
             }
             else debug("Canceled.");
             // close indicators
@@ -183,10 +183,14 @@ namespace WinGauntlet
         {
             if (args.Response == null) return;
             count++;
-            args.Response.GotTick(t);
+            try
+            {
+                args.Response.GotTick(t);
+            }
+            catch (Exception ex) { debug("response threw exception: " + ex.Message); }
             if (background) return;
             uint percent = (uint)((double)count*100 / h.TicksPresent);
-            if (percent != lastp)
+            if ((percent!=lastp) && (percent % 5 == 0))
             {
                 updatepercent(percent);
                 lastp = percent;
@@ -328,6 +332,7 @@ namespace WinGauntlet
             catch (Exception ex) { status("Response failed to load, quitting... (" + ex.Message + (ex.InnerException != null ? ex.InnerException.Message.ToString() : "") + ")"); }
             if (!args.Response.isValid) { status("Response did not load or loaded in a shutdown state. "+args.Response.Name+ " "+args.Response.FullName); return; }
             args.ResponseName = args.Response.FullName;
+            _boundonce = false;
             bindresponseevents();
         }
 

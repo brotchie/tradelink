@@ -50,6 +50,7 @@
     <Compile Include="TestAccount.cs" />
     <Compile Include="TestBar.cs" />
     <Compile Include="TestBarList.cs" />
+    <Compile Include="TestBarListTracker.cs" />
     <Compile Include="TestImbalance.cs" />
     <Compile Include="TestOffsetTracker.cs" />
     <Compile Include="TestPositionTracker.cs" />

@@ -10,6 +10,7 @@ namespace TradeLink.Common
     /// </summary>
     public class BarListImpl : TradeLink.API.BarList
     {
+        public static BarInterval[] ALLINTERVALS { get { return new BarInterval[] { BarInterval.FiveMin, BarInterval.Minute, BarInterval.Hour, BarInterval.ThirtyMin, BarInterval.FifteenMin, BarInterval.Day }; } }
         // holds available intervals
         BarInterval[] _availint = new BarInterval[0];
         // holds all raw data
@@ -20,7 +21,7 @@ namespace TradeLink.Common
         /// creates barlist with defined symbol and requests all intervals
         /// </summary>
         /// <param name="symbol"></param>
-        public BarListImpl(string symbol) : this(symbol, new BarInterval[] { BarInterval.FiveMin, BarInterval.Minute, BarInterval.Hour, BarInterval.ThirtyMin, BarInterval.FifteenMin, BarInterval.Day }) { }
+        public BarListImpl(string symbol) : this(symbol, ALLINTERVALS) { }
         /// <summary>
         /// creates a barlist with requested interval and defined symbol
         /// </summary>
