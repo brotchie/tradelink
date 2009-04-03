@@ -7,7 +7,7 @@ namespace TradeLink.API
 {
     public interface Bar
     {
-        string Symbol { get; set; }
+        string Symbol { get; }
         decimal High { get; }
         decimal Low { get;  }
         decimal Open { get;  }

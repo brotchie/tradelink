@@ -34,7 +34,7 @@ namespace TradeLink.Common
         decimal lowestl = 10000000000000000000;
         int barc = 0;
         Rectangle r;
-        const int border = 40;
+        const int border = 60;
         decimal pixperbar = 0;
         decimal  pixperdollar = 0;
         string newstock = "";
@@ -106,15 +106,31 @@ namespace TradeLink.Common
                 barc = bl.Count;
             }
             if ((bl == null)||(bl.Count==0)) return;
-            Text = Title;
-            r = ClientRectangle;
-            pixperbar = (((decimal)r.Width - (decimal)border - ((decimal)border/3)) / (decimal)barc);
-            decimal range = (highesth - lowestl);
-            pixperdollar = range == 0 ? 0 : (((decimal)r.Height - (decimal)border * 2) / range);
+            // setup to draw
             Pen p = new Pen(Color.Black);
             g = e.Graphics;
             Form f = (Form)sender;
             g.Clear(f.BackColor);
+            // get title
+            Text = Title;
+            // get window
+            r = ClientRectangle;
+            // get number of pixels available for each bar, based on screensize and barcount
+            pixperbar = (((decimal)r.Width - (decimal)border - ((decimal)border/3)) / (decimal)barc);
+            // pixels for each time stamp
+            const int pixperbarlabel = 60;
+            // number of labels we have room to draw
+            int numbarlabels = (int)((double)(r.Width - border - ((double)border / 3)) / pixperbarlabel);
+            // draw a label every so many bars (assume every bar to star)
+            int labeleveryX = 1;
+            // if there's more bars than space
+            if (barc>numbarlabels)
+                labeleveryX = (int)Math.Round(((double)barc / numbarlabels));
+            // get dollar range for chart
+            decimal range = (highesth - lowestl);
+            // get pixels available for each dollar of movement
+            pixperdollar = range == 0 ? 0 : (((decimal)r.Height - (decimal)border * 2) / range);
+
 
             Color fgcol = (f.BackColor == Color.Black) ? Color.White : Color.Black;
 
@@ -123,12 +139,13 @@ namespace TradeLink.Common
             // y-axis
             g.DrawLine(new Pen(fgcol), r.Width - border, r.Y + border, r.Width-border, r.Height - border);
 
-            const int minxlabelwidth = 15;
+            const int minxlabelwidth = 30;
 
             int lastlabelcoord = -500;
 
             for (int i = 0; i < barc; i++)
             {
+                // get bar color
                 Color bcolor = (bl[i].Close > bl[i].Open) ? Color.Green : Color.Red;
                 p = new Pen(bcolor);
                 try
@@ -141,25 +158,37 @@ namespace TradeLink.Common
                     g.DrawLine(p, getX(i), getY(bl[i].Close), getX(i) + (int)(pixperbar / 3), getY(bl[i].Close));
                     // draw time labels (time @30min and date@noon)
 
+                    // if interval is intra-day
                     if (bl.DefaultInterval != BarInterval.Day)
                     {
-                        if ((i % 6) == 0) g.DrawString(bl[i].Bartime.ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (f.Font.GetHeight() * 3));
+                        // every 6 bars draw the bartime
+                        if ((i % labeleveryX) == 0) g.DrawString(bl[i].Bartime.ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (f.Font.GetHeight() * 3));
+                        // if it's noon, draw the date
                         if (bl[i].Bartime == 1200) g.DrawString(bl[i].Bardate.ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (float)(f.Font.GetHeight() * 1.5));
                     }
-                    else
+                    else // otherwise it's daily data
                     {
+                        // get date
                         int[] date = Calc.Date(bl[i].Bardate);
                         int[] lastbardate = date;
+                        // get previous bar date if we have one
                         if ((i - 1) > 0) lastbardate = Calc.Date(bl[i-1].Bardate);
+                        // if we have room since last time we drew the year
                         if ((getX(lastlabelcoord) + minxlabelwidth) <= getX(i))
                         {
+                            // get coordinate for present days label
                             lastlabelcoord = i;
+                            // draw day
                             g.DrawString(date[2].ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (f.Font.GetHeight() * 3));
                         }
+                        // if it's first bar or a new month
                         if ((i == 0) || (lastbardate[1] != date[1]))
                         {
+                            // get the month
                             string ds = date[1].ToString();
+                            // if it sfirst bar or the year has changed, add year to month
                             if ((i == 0) || (lastbardate[0] != date[0])) ds += '/' + date[0].ToString();
+                            // draw the month
                             g.DrawString(ds, f.Font, new SolidBrush(fgcol), getX(i), r.Height - (float)(f.Font.GetHeight() * 1.5));
                         }
                     }
@@ -274,7 +303,7 @@ namespace TradeLink.Common
         {
             if (e.Delta == 0) return;
             BarInterval old = bl.DefaultInterval;
-            BarInterval [] v = (BarInterval [])Enum.GetValues(typeof(BarInterval));
+            BarInterval [] v = bl.Intervals;
             int biord = 0;
             for (int i = 0;i<v.Length;i++) if (old==v[i]) biord = i;
 

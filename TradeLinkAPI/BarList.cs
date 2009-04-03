@@ -23,5 +23,14 @@ namespace TradeLink.API
         bool isValid { get; }
         IEnumerator GetEnumerator();
         event SymBarIntervalDelegate GotNewBar;
+        decimal[] Open();
+        decimal[] Close();
+        decimal[] High();
+        decimal[] Low();
+        int[] Date();
+        int[] Time();
+        int[] Vol();
+        BarInterval[] Intervals { get; }
+
     }
 }

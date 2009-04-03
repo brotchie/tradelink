@@ -1,6 +1,6 @@
 namespace Chartographer
 {
-    partial class Form1
+    partial class ChartMain
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@ namespace Chartographer
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ChartMain));
             this.chartsymbolbox = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.blackbackground = new System.Windows.Forms.CheckBox();

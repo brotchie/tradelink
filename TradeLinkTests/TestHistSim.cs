@@ -13,7 +13,7 @@ namespace TestTradeLink
 
         double EXPECTRAW = .6;
         double EXPECTEX = .8;
-        double EXPECTBARS = .9;
+        double EXPECTBARS = .6;
 
         [Test]
         public void RawPerformance()
@@ -138,6 +138,7 @@ namespace TestTradeLink
             h.PlayTo(HistSim.ENDSIM);
 
             double time = DateTime.Now.Subtract(start).TotalSeconds;
+            Assert.GreaterOrEqual(tickcount, 50000);
             Assert.AreEqual(3, bt.SymbolCount);
             Assert.LessOrEqual(time, EXPECTBARS);
             Console.WriteLine("BarList runtime: " + time.ToString("N2") + "sec, versus: " + EXPECTBARS + "sec expected.");

@@ -12,7 +12,7 @@ namespace TradeLink.Common
     public class BarImpl : TickIndicator, TradeLink.API.Bar
     {
         string _sym = "";
-        public string Symbol { get { return _sym; } set { _sym = value; } }
+        public string Symbol { get { return _sym; } }
         private decimal h = decimal.MinValue;
         private decimal l = decimal.MaxValue;
         private decimal o = 0;
@@ -45,7 +45,7 @@ namespace TradeLink.Common
             bardate = date;
             bartime = time;
         }
-        public BarImpl(decimal open, decimal high, decimal low, decimal close, int vol, int date)
+        public BarImpl(decimal open, decimal high, decimal low, decimal close, int vol, int date, int time, string symbol)
         {
             h = high;
             o = open;
@@ -53,9 +53,15 @@ namespace TradeLink.Common
             c = close;
             v = vol;
             bardate = date;
+            bartime = time;
+            // check for fast time including seconds
+            if (time > 2500)
+                bartime = (bartime - (time % 100))/100;
+            _sym = symbol;
         }
         public BarImpl(BarImpl b)
         {
+            v = b.Volume;
             h = b.High;
             l = b.Low;
             o = b.Open;
@@ -115,7 +121,8 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="record">The record in comma-delimited format.</param>
         /// <returns>The equivalent Bar</returns>
-        public static BarImpl FromCSV(string record)
+        public static Bar FromCSV(string record) { return FromCSV(record, string.Empty); }
+        public static Bar FromCSV(string record,string symbol)
         {
             // google used as example
             string[] r = record.Split(',');
@@ -132,7 +139,7 @@ namespace TradeLink.Common
             decimal low = Convert.ToDecimal(r[3]);
             decimal close = Convert.ToDecimal(r[4]);
             int vol = Convert.ToInt32(r[5]);
-            return new BarImpl(open,high,low,close,vol,date);
+            return new BarImpl(open,high,low,close,vol,date,0,symbol);
         }
 
     }

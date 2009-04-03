@@ -10,6 +10,8 @@ namespace TradeLink.Common
     /// </summary>
     public class BarListImpl : TradeLink.API.BarList
     {
+        // holds available intervals
+        BarInterval[] _availint = new BarInterval[0];
         // holds all raw data
         IntervalData[] _intdata = new IntervalData[0];
         // holds index into raw data using interval type
@@ -43,6 +45,8 @@ namespace TradeLink.Common
         {
             // set symbol
             _sym = symbol;
+            // set intervals requested
+            _availint = intervals;
             // size length of interval data to # of requested intervals
             _intdata = new IntervalData[intervals.Length];
             // create interval data object for each interval
@@ -79,6 +83,11 @@ namespace TradeLink.Common
         public decimal[] Close(BarInterval interval) { return _intdata[_intdataidx[interval]].closes.ToArray(); }
         public int[] Date(BarInterval interval) { return _intdata[_intdataidx[interval]].dates.ToArray(); }
         public int[] Time(BarInterval interval) { return _intdata[_intdataidx[interval]].times.ToArray(); }
+
+        /// <summary>
+        /// gets intervals available/requested by this barlist when it was created
+        /// </summary>
+        public BarInterval[] Intervals { get { return  _availint; } }
 
         /// <summary>
         /// set true for new bar.  don't use this, use GotNewBar event as it's faster.
@@ -153,7 +162,7 @@ namespace TradeLink.Common
         /// <param name="minBars"></param>
         /// <param name="interval"></param>
         /// <returns></returns>
-        public bool Has(int minBars, BarInterval interval) { return minBars>=CountInterval(interval); }
+        public bool Has(int minBars, BarInterval interval) { return minBars<=CountInterval(interval); }
         /// <summary>
         /// returns true if barlist has at least minimum # of bars for default interval
         /// </summary>
@@ -236,6 +245,7 @@ namespace TradeLink.Common
             b._intdata[instdataidx].highs.Add(mybar.High);
             b._intdata[instdataidx].lows.Add(mybar.Close);
             b._intdata[instdataidx].vols.Add(mybar.Volume);
+            b._intdata[instdataidx].times.Add(mybar.Bartime);
         }
         /// <summary>
         /// Populate the day-interval barlist of this instance from a URL, where the results are returned as a CSV file.  URL should accept requests in the form of http://url/get.py?sym=IBM
@@ -277,11 +287,11 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="filename">The filename.</param>
         /// <returns>barlist</returns>
-        public static BarListImpl FromEPF(string filename)
+        public static BarList FromEPF(string filename)
         {
             System.IO.StreamReader sr = new System.IO.StreamReader(filename);
             SecurityImpl s = eSigTick.InitEpf(sr);
-            BarListImpl b = new BarListImpl(BarInterval.FiveMin, s.Symbol);
+            BarList b = new BarListImpl(s.Symbol);
             while (!sr.EndOfStream)
                 b.newTick(eSigTick.FromStream(s.Symbol, sr));
             return b;
@@ -323,8 +333,7 @@ namespace TradeLink.Common
         {
             Bar b = new BarImpl();
             if ((index<0) || (index>=Count)) return b;
-            b = new BarImpl(opens[index], highs[index], lows[index], closes[index], vols[index], dates[index]);
-            b.Symbol = symbol;
+            b = new BarImpl(opens[index], highs[index], lows[index], closes[index], vols[index], dates[index],times[index],symbol);
             if (index == Last) b.isNew = isRecentNew;
             return b;
         }

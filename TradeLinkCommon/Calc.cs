@@ -700,22 +700,14 @@ namespace TradeLink.Common
         /// <returns></returns>
         public static decimal HH(BarList b, int barsback)
         {// gets highest high
-            if (barsback > b.Count) barsback = b.Count;
-            decimal hh = decimal.MinValue;
-            for (int i = b.Last; i >= (b.Count - barsback); i--)
-            {
-                decimal high = b[i].High;
-                if (high > hh) hh = high;
-            }
-            if (hh == decimal.MinValue) hh = 0;
-            return hh;
+            return Max(EndSlice(b.High(), barsback));
         }
         /// <summary>
         /// Returns the highest high for the entire barlist.
         /// </summary>
         /// <param name="b">The b.</param>
         /// <returns></returns>
-        public static decimal HH(BarList b) { return HH(b, b.Count); }
+        public static decimal HH(BarList b) { return Max(b.High()); }
         /// <summary>
         /// The lowest low for the barlist, considering so many bars back.
         /// </summary>
@@ -724,22 +716,66 @@ namespace TradeLink.Common
         /// <returns></returns>
         public static decimal LL(BarList b, int barsback)
         { // gets lowest low
-            if (barsback > b.Count) barsback = b.Count;
-            decimal ll = decimal.MaxValue;
-            for (int i = b.Last; i >= (b.Count - barsback); i--)
-            {
-                decimal low = b[i].Low;
-                if (low < ll) ll = low;
-            }
-            if (ll == decimal.MaxValue) ll = 0;
-            return ll;
+            return Min(EndSlice(b.Low(), barsback));
         }
         /// <summary>
         /// Lowest low for the entire barlist.
         /// </summary>
         /// <param name="b">The barlist.</param>
         /// <returns></returns>
-        public static decimal LL(BarList b) { return LL(b, b.Count); }
+        public static decimal LL(BarList b) { return Min(b.Low()); }
+
+        /// <summary>
+        /// gets minum of an array (will return MinValue if array has no elements)
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static decimal Min(decimal[] array)
+        {
+            decimal low = decimal.MaxValue;
+            for (int i = 0; i < array.Length; i++)
+                if (array[i] < low) low = array[i];
+            return low;
+        }
+        /// <summary>
+        /// gets minimum of an array (will return MinValue if array has no elements)
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static int Min(int[] array)
+        {
+            int low = int.MaxValue;
+            for (int i = 0; i < array.Length; i++)
+                if (array[i] < low) low = array[i];
+            return low;
+
+        }
+
+        /// <summary>
+        /// gets maximum in an array (will return MaxValue if array has no elements)
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static decimal Max(decimal[] array)
+        {
+            decimal max = decimal.MinValue;
+            for (int i = 0; i < array.Length; i++)
+                if (array[i] > max) max= array[i];
+            return max;
+        }
+
+        /// <summary>
+        /// gets maximum in an array (will return MaxValue if array has no elements)
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static int Max(int[] array)
+        {
+            int max = int.MaxValue;
+            for (int i = 0; i < array.Length; i++)
+                if (array[i] > max) max = array[i];
+            return max;
+        }
 
 
         /// <summary>
@@ -750,12 +786,9 @@ namespace TradeLink.Common
         /// <returns></returns>
         public static decimal[] Highs(BarList chart, int bars)
         {
-            List<decimal> l = new List<decimal>();
-            for (int i = chart.Count - bars; i < chart.Count; i++)
-                l.Add(chart[i].High);
-            return l.ToArray();
+            return EndSlice(chart.High(), bars);
         }
-        public static decimal[] Highs(BarList chart) { return Highs(chart, chart.Count); }
+        public static decimal[] Highs(BarList chart) { return chart.High(); }
         /// <summary>
         /// gets most recent lows from barlist, for certain number of bars
         /// (default is entire list)
@@ -765,17 +798,14 @@ namespace TradeLink.Common
         /// <returns></returns>
         public static decimal[] Lows(BarList chart, int bars)
         {
-            List<decimal> l = new List<decimal>();
-            for (int i = chart.Count - bars; i < chart.Count; i++)
-                l.Add(chart[i].Low);
-            return l.ToArray();
+            return EndSlice(chart.Low(), bars);
         }
         /// <summary>
         /// gets ALL lows from barlist, at default bar interval
         /// </summary>
         /// <param name="chart"></param>
         /// <returns></returns>
-        public static decimal[] Lows(BarList chart) { return Lows(chart, chart.Count); }
+        public static decimal[] Lows(BarList chart) { return chart.Low(); }
         /// <summary>
         /// gets opening prices for most recent bars, at default bar interval
         /// </summary>
@@ -784,17 +814,14 @@ namespace TradeLink.Common
         /// <returns></returns>
         public static decimal[] Opens(BarList chart, int bars)
         {
-            List<decimal> l = new List<decimal>();
-            for (int i = chart.Count - bars; i < chart.Count; i++)
-                l.Add(chart[i].Open);
-            return l.ToArray();
+            return EndSlice(chart.Open(), bars);
         }
         /// <summary>
         /// gets opening prices for ALL bars, at the default bar interval
         /// </summary>
         /// <param name="chart"></param>
         /// <returns></returns>
-        public static decimal[] Opens(BarList chart) { return Opens(chart, chart.Count); }
+        public static decimal[] Opens(BarList chart) { return chart.Open(); }
         /// <summary>
         /// gets the most recent closing prices for a certain number of bars
         /// </summary>
@@ -803,17 +830,14 @@ namespace TradeLink.Common
         /// <returns></returns>
         public static decimal[] Closes(BarList chart, int bars)
         {
-            List<decimal> l = new List<decimal>();
-            for (int i = chart.Count - bars; i < chart.Count; i++)
-                l.Add(chart[i].Close);
-            return l.ToArray();
+            return EndSlice(chart.Close(), bars);
         }
         /// <summary>
         /// gets most recent closing prices for ALL bars, default bar interval
         /// </summary>
         /// <param name="chart"></param>
         /// <returns></returns>
-        public static decimal[] Closes(BarList chart) { return Closes(chart, chart.Count); }
+        public static decimal[] Closes(BarList chart) { return chart.Close(); }
         /// <summary>
         /// gets the most recent volumes from a barlist, given a certain number of bars back
         /// </summary>
@@ -893,6 +917,51 @@ namespace TradeLink.Common
                     l.Add(bl);
             }
             return l.ToArray();
+        }
+
+        /// <summary>
+        /// calculates upper bollinger using default # stdev of 2.5 and opening prices.
+        /// Note, for speed it's faster to calculate these yourself.
+        /// </summary>
+        /// <param name="bl"></param>
+        /// <returns></returns>
+        public static decimal BollingerUpper(BarList bl) { return BollingerUpper(bl, 2.5m, true); }
+        public static decimal BollingerUpper(BarList bl, decimal numStdDevs) { return BollingerUpper(bl, numStdDevs, true); }
+        public static decimal BollingerUpper(BarList bl, decimal numStdDevs, bool useOpens)
+        {
+            decimal[] prices = useOpens ? bl.Open() : bl.Close();
+            decimal mean = Avg(prices);
+            decimal stdev = StdDev(prices);
+            return mean + stdev * numStdDevs;
+        }
+
+        /// <summary>
+        /// calculates lower bollinger using default # stdev of 2.5 and opening prices.
+        /// Note, for speed it's faster to calculate these yourself.
+        /// </summary>
+        /// <param name="bl"></param>
+        /// <returns></returns>
+        public static decimal BollingerLower(BarList bl) { return BollingerUpper(bl, 2.5m, true); }
+        /// <summary>
+        /// calculates lower bollinger using opening prices.  calculate yourself for faster speed
+        /// </summary>
+        /// <param name="bl"></param>
+        /// <param name="numStdDevs"></param>
+        /// <returns></returns>
+        public static decimal BollingerLower(BarList bl, decimal numStdDevs) { return BollingerUpper(bl, numStdDevs, true); }
+        /// <summary>
+        /// calculates lower bollinger using open (true) or closing (false) prices, at specified # of standard deviations
+        /// </summary>
+        /// <param name="bl"></param>
+        /// <param name="numStdDevs"></param>
+        /// <param name="useOpens"></param>
+        /// <returns></returns>
+        public static decimal BollingerLower(BarList bl, decimal numStdDevs, bool useOpens)
+        {
+            decimal[] prices = useOpens ? bl.Open() : bl.Close();
+            decimal mean = Avg(prices);
+            decimal stdev = StdDev(prices);
+            return mean - stdev * numStdDevs;
         }
 
     }

@@ -32,7 +32,7 @@ namespace Responses
             if (!bl.isValid) return false;
             Bar c = bl.RecentBar;
             if (!c.isValid) return false;
-            decimal avgvol = AvgVol(bl);
+            decimal avgvol = Calc.Avg(bl.Vol());
             decimal moverequired = c.Open * _percent;
             bool voltest = (c.Volume - avgvol) > (avgvol * _bigvolper);
             isBigVolume = (ZeroAvgVolIsBig && voltest) || (!ZeroAvgVolIsBig && (avgvol != 0) && voltest);

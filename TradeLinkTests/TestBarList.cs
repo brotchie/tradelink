@@ -10,7 +10,7 @@ namespace TestTradeLink
     [TestFixture]
     public class TestBarList
     {
-
+        int newbars = 0;
         [Test]
         public void FiveMin()
         {
@@ -18,16 +18,14 @@ namespace TestTradeLink
             Tick[] ticklist = SampleData();
             // prepare barlist
             BarListImpl bl = new BarListImpl(BarInterval.FiveMin);
+            bl.GotNewBar+=new SymBarIntervalDelegate(bl_GotNewBar);
             // reset count
-            int newbars = 0;
+            newbars = 0;
             // create bars from all ticks available
             foreach (TickImpl k in ticklist)
             {
                 /// add tick to bar
                 bl.newTick(k);
-                // count if it's a new bar
-                if (bl.NewBar)
-                    newbars++;
             }
 
             // verify we had expected number of bars
@@ -86,27 +84,45 @@ namespace TestTradeLink
         }
 
         [Test]
+        public void BarMath()
+        {
+            // get tickdata
+            Tick[] tape = SampleData();
+            // create bar
+            BarList bl = new BarListImpl(BarInterval.Minute);
+            // pass ticks to bar
+            foreach (Tick k in tape)
+                bl.newTick(k);
+            // verify HH
+            Assert.AreEqual(16, Calc.HH(bl));
+            // verify LL
+            Assert.AreEqual(10, Calc.LL(bl));
+            // verify average
+            Assert.AreEqual(11.888888888888888888888888889m, Calc.Avg(bl.Open()));
+        }
+
+        [Test]
         public void HourTest()
         {
             // get data
             Tick[] tape = SampleData();
             // count new hour bars
-            int newbars = 0;
+            newbars = 0;
             // setup hour bar barlist
             BarListImpl bl = new BarListImpl(BarInterval.Hour, sym);
+            // handle new bar events
+            bl.GotNewBar+=new SymBarIntervalDelegate(bl_GotNewBar);
             // add ticks to bar
             foreach (Tick k in tape)
             {
                 // add ticks
                 bl.newTick(k);
-                // count newbars
-                if (bl.NewBar)
-                    newbars++;
             }
-            // make sure we have at least 2 bars
-            Assert.IsTrue(bl.Has(2));
-            // make sure we have
+            // make sure we have at least 1 bars
+            Assert.IsTrue(bl.Has(1));
+            // make sure we actually have two bars
             Assert.AreEqual(2, newbars);
+            Assert.AreEqual(bl.Count, newbars);
         }
 
         [Test]
@@ -133,26 +149,28 @@ namespace TestTradeLink
         }
 
 
-        int newbarevents = 0;
         [Test]
         public void NewBarEvent()
         {
+            // get tickdata
             Tick[] tape = SampleData();
-            
-
+            // reset bar count
+            newbars = 0;
+            // request hour interval
             BarList bl = new BarListImpl(BarInterval.Hour, sym);
+            // handle new bars
             bl.GotNewBar += new SymBarIntervalDelegate(bl_GotNewBar);
 
 
             foreach (TickImpl k in tape)
                 bl.newTick(k);
 
-            Assert.AreEqual(2, newbarevents);
+            Assert.AreEqual(2, newbars);
         }
 
         void bl_GotNewBar(string symbol, BarInterval interval)
         {
-            newbarevents++;
+            newbars++;
         }
 
         [Test]

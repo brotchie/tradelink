@@ -10,12 +10,12 @@ using TradeLink.API;
 
 namespace Chartographer
 {
-    public partial class Form1 : Form
+    public partial class ChartMain : Form
     {
         public event BarListUpdated newChartData;
         WebClient client = new WebClient();
         Dictionary<string, BarListImpl> blbox = new Dictionary<string, BarListImpl>();
-        public Form1()
+        public ChartMain()
         {
             InitializeComponent();
             stickychartsbox.Checked = Chartographer.Properties.Settings.Default.stickychartson;
@@ -149,7 +149,7 @@ namespace Chartographer
             od.InitialDirectory = "c:\\program files\\tradelink\\tickdata\\";
             od.Multiselect = false;
             od.ShowDialog();
-            BarListImpl bl = BarListImpl.FromEPF(od.FileName);
+            BarList bl = BarListImpl.FromEPF(od.FileName);
             ChartImpl c = new ChartImpl(bl, false);
             c.Symbol = bl.Symbol;
             try
