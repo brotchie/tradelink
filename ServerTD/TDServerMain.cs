@@ -154,6 +154,8 @@ namespace TDServer
             f.Add(MessageTypes.ORDERCANCELRESPONSE);
             f.Add(MessageTypes.ISSHORTABLE);
             f.Add(MessageTypes.TICKNOTIFY);
+            f.Add(MessageTypes.SENDORDERLIMIT);
+            f.Add(MessageTypes.SENDORDERMARKET);
 
 
             return f.ToArray();

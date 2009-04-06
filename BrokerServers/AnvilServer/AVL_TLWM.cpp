@@ -410,7 +410,7 @@ namespace TradeLibFast
 		uint error = 0;
 
 		// anvil has seperate call for trailing stop orders
-		if (!o.isTrail())
+		if (!o.isTrail() && (o.isLimit() || o.isMarket()))
 		{
 
 		// send the order (next line is from SendOrderDlg.cpp)
@@ -435,19 +435,61 @@ namespace TradeLibFast
 				0,
 				false,
 				101, o.comment);	
+
 		}
-		else 
+		else if (o.isStop())
+		{
+			Money insideMarketQuote;
+			if (B_GetSafeInsidePrice(Stock,o.side,!o.side,false,insideMarketQuote))
+			{
+				Money stopPriceOffset;
+				if (o.side) stopPriceOffset = stopm - insideMarketQuote;
+				else stopPriceOffset = insideMarketQuote - stopm;
+				Observable* stopOrder = B_SendSmartStopOrder(Stock,
+					side,
+					o.size,
+					NULL,//const Money* priceOffset,//NULL for Stop Market
+					stopPriceOffset,
+					true, // price 2 decimal places
+					true,//bool ecnsOnlyBeforeAfterMarket,
+					false,//bool mmsBasedForNyse,
+					TIF_DAY,//unsigned int stopTimeInForce,
+					TIFId(o.TIF),//unsigned int timeInForceAfterStopReached,
+					"ISLD",
+					NULL,//const char* redirection,
+					false,//bool proactive,
+					true,//bool principalOrAgency, //principal - true, agency - false
+					SUMO_ALG_UNKNOWN,//char superMontageAlgorithm,
+					OS_RESIZE,
+		//            false,//bool delayShortTillUptick,
+					DE_DEFAULT,//unsigned int destinationExchange,
+					TT_PRICE,//StopTriggerType triggerType,
+					false,
+					0,
+					o.comment,
+					NULL,//const char* regionalProactiveDestination,
+					STPT_ALL,
+					Money(0, 200),
+					false,
+					&orderSent,
+					m_account);
+				if(!stopOrder)
+					error = SO_INCORRECT_PRICE;
+			}
+
+		}
+		else if (o.isTrail())
 		{
 			Observable* stopOrder = B_SendSmartStopOrder(Stock,
 				side,
 				o.size,
-				&pricem,//const Money* priceOffset,//NULL for Stop Market
+				NULL,//const Money* priceOffset,//NULL for Stop Market
 				trailm,//trail by this amount
-				true, // price to decimal places
+				true, // price 2 decimal places
 				true,//bool ecnsOnlyBeforeAfterMarket,
 				false,//bool mmsBasedForNyse,
 				TIF_DAY,//unsigned int stopTimeInForce,
-				0,//unsigned int timeInForceAfterStopReached,
+				TIFId(o.TIF),//unsigned int timeInForceAfterStopReached,
 				"ISLD", //post quote dest
 				NULL,//const char* redirection,
 				false,//bool proactive,
@@ -619,7 +661,7 @@ namespace TradeLibFast
 						qyi.ThisTime = sm->GetNasdaqImbalanceTime();
 						qyi.PrevTime = sm->GetNasdaqPreviousImbalanceTime();
 						if (qyi.hasImbalance()||qyi.hadImbalance())
-							TLSend(IMBALANCERESPONSE,TLImbalance::Serialize(nyi),client[imbalance_client]);
+							TLSend(IMBALANCERESPONSE,TLImbalance::Serialize(qyi),client[imbalance_client]);
 					}
 
 					break;
@@ -657,21 +699,23 @@ namespace TradeLibFast
 		f.push_back(ORDERNOTIFY);
 		f.push_back(IMBALANCEREQUEST);
 		f.push_back(IMBALANCERESPONSE);
-
-		// added 2009.01.17
-		f.push_back(VWAP);	// GetVwap
-		f.push_back(LASTTRADESIZE);	// GetLastTradeSize
-		f.push_back(LASTTRADEPRICE);	// GetLastTradePrice
-		f.push_back(LASTBID);			// GetBid
-		f.push_back(LASTASK);			// GetAsk
-		f.push_back(BIDSIZE);		// GetBidSize
-		f.push_back(ASKSIZE);		// GetAskSize
-		f.push_back(DAYLOW);			// GetDayLow
-		f.push_back(DAYHIGH);		// GetDayHigh
-		f.push_back(OPENPRICE);		// GetOpenPrice
-		f.push_back(CLOSEPRICE);		// GetClosePrice - yesterday
-		f.push_back(LRPBUY);			// GetLRP - both sides
+		f.push_back(VWAP);	
+		f.push_back(LASTTRADESIZE);	
+		f.push_back(LASTTRADEPRICE);	
+		f.push_back(LASTBID);			
+		f.push_back(LASTASK);			
+		f.push_back(BIDSIZE);
+		f.push_back(ASKSIZE);
+		f.push_back(DAYLOW);
+		f.push_back(DAYHIGH);		
+		f.push_back(OPENPRICE);		
+		f.push_back(CLOSEPRICE);	
+		f.push_back(LRPBUY);		
 		f.push_back(LRPSELL);
+		f.push_back(SENDORDERMARKET);
+		f.push_back(SENDORDERLIMIT);
+		f.push_back(SENDORDERSTOP);
+		f.push_back(SENDORDERTRAIL);
 		return f;
 	}
 

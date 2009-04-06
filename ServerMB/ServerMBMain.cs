@@ -243,6 +243,9 @@ namespace ServerMB
             f.Add(MessageTypes.POSITIONREQUEST);
             f.Add(MessageTypes.POSITIONRESPONSE);
             f.Add(MessageTypes.TICKNOTIFY);
+            f.Add(MessageTypes.SENDORDERMARKET);
+            f.Add(MessageTypes.SENDORDERLIMIT);
+            f.Add(MessageTypes.SENDORDERSTOP);
             return f.ToArray();
         }
 

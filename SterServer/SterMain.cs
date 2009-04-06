@@ -100,6 +100,9 @@ namespace SterServer
             f.Add(MessageTypes.POSITIONRESPONSE);
             f.Add(MessageTypes.ACCOUNTREQUEST);
             f.Add(MessageTypes.ACCOUNTRESPONSE);
+            f.Add(MessageTypes.SENDORDERSTOP);
+            f.Add(MessageTypes.SENDORDERMARKET);
+            f.Add(MessageTypes.SENDORDERLIMIT);
             return f.ToArray();
         }
 

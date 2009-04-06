@@ -117,6 +117,10 @@ namespace TradeLibFast
 		f.push_back(ORDERNOTIFY);
 		f.push_back(EXECUTENOTIFY);
 		f.push_back(TICKNOTIFY);
+		f.push_back(SENDORDERMARKET);
+		f.push_back(SENDORDERLIMIT);
+		f.push_back(SENDORDERSTOP);
+		f.push_back(SENDORDERTRAIL);
 		return f;
 	}
 
