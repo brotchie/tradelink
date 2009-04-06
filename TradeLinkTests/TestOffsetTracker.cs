@@ -21,18 +21,94 @@ namespace TestTradeLink
         List<Order> stops = new List<Order>();
 
         [Test]
+        public void IgnoreByDefault()
+        {
+            // ignore all symbols by default, unless custom defined
+            ot.IgnoreDefault = true;
+            // reset "book"
+            profits.Clear();
+            stops.Clear();
+            // reset offsets
+            ot.ClearCustom();
+            // make sure offsets don't exist
+            Assert.AreEqual(0, profits.Count);
+            Assert.AreEqual(0, stops.Count);
+            // send position update to generate offsets
+            ot.UpdatePosition(new PositionImpl(SYM, PRICE, SIZE));
+            // make sure offsets don't exist
+            Assert.AreEqual(0, profits.Count);
+            Assert.AreEqual(0, stops.Count);
+            // add a custom offset 
+            ot[SYMB] = SampleOffset();
+            // send position update to generate offsets
+            ot.UpdatePosition(new PositionImpl(SYMB, PRICE, SIZE));
+            // verify orders exist
+            Assert.AreEqual(1, profits.Count);
+            Assert.AreEqual(1, stops.Count);
+            // get orders
+            Order profit = profits[0];
+            Order stop = stops[0];
+            // verify profit offset
+            Assert.IsTrue(profit.isValid);
+            Assert.AreEqual(PRICE + POFFSET, profit.price);
+            Assert.AreEqual(SIZE, profit.UnsignedSize);
+            // verify stop offset
+            Assert.IsTrue(stop.isValid);
+            Assert.AreEqual(PRICE - SOFFSET, stop.stopp);
+            Assert.AreEqual(SIZE, stop.UnsignedSize);
+
+        }
+
+        [Test]
+        public void CustomOffsets()
+        {
+
+            // get default offset
+            ot.DefaultOffset = SampleOffset();
+            // verify that random symbol has default values
+            Assert.AreEqual(ot.DefaultOffset.ProfitPercent, ot[SYMB].ProfitPercent);
+            Assert.AreEqual(ot.DefaultOffset.StopPercent, ot[SYMB].StopPercent);
+            Assert.AreEqual(ot.DefaultOffset.ProfitDist, ot[SYMB].ProfitDist);
+            Assert.AreEqual(ot.DefaultOffset.StopDist, ot[SYMB].StopDist);
+            // add custom offset different than default
+            ot[SYMB] = new OffsetInfo(POFFSET * 2, SOFFSET * 2, .5m, .5m);
+            // verify custom has taken effect
+            Assert.AreEqual(ot.DefaultOffset.ProfitPercent/2, ot[SYMB].ProfitPercent);
+            Assert.AreEqual(ot.DefaultOffset.StopPercent/2, ot[SYMB].StopPercent);
+            Assert.AreEqual(ot.DefaultOffset.ProfitDist*2, ot[SYMB].ProfitDist);
+            Assert.AreEqual(ot.DefaultOffset.StopDist*2, ot[SYMB].StopDist);
+            // verify another symbol still has default
+            Assert.AreEqual(ot.DefaultOffset.ProfitPercent, ot[SYMC].ProfitPercent);
+            Assert.AreEqual(ot.DefaultOffset.StopPercent, ot[SYMC].StopPercent);
+            Assert.AreEqual(ot.DefaultOffset.ProfitDist, ot[SYMC].ProfitDist);
+            Assert.AreEqual(ot.DefaultOffset.StopDist, ot[SYMC].StopDist);
+
+
+        }
+
+        public static OffsetInfo SampleOffset()
+        {
+            return new OffsetInfo(POFFSET, SOFFSET);
+        }
+        const string SYMB = "TST2";
+        const string SYMC = "TST3";
+        const string SYM = "TST";
+        const decimal PRICE = 100;
+        const decimal POFFSET = .2m;
+        const decimal SOFFSET = .1m;
+        const int SIZE = 300;
+
+        [Test]
         public void Basics()
         {
-            const string SYM = "TST";
-            const decimal PRICE = 100;
-            const decimal POFFSET = .2m;
-            const decimal SOFFSET = .1m;
-            const int SIZE = 300;
+            // reset "book"
+            profits.Clear();
+            stops.Clear();
             // make sure offsets don't exist
             Assert.AreEqual(0,profits.Count);
             Assert.AreEqual(0,stops.Count);
             // setup offset defaults
-            ot.DefaultOffset = new OffsetInfo(POFFSET,SOFFSET);
+            ot.DefaultOffset = SampleOffset();
             // send position update to generate offsets
             ot.UpdatePosition(new PositionImpl(SYM, PRICE,SIZE));
             // verify orders exist

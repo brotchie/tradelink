@@ -12,6 +12,14 @@ namespace TradeLink.Common
         OffsetInfo _default = new OffsetInfo();
         string[] _ignore = new string[0];
         public OffsetInfo DefaultOffset { get { return _default; } set { _default = value; } }
+        bool _ignoredefault = false;
+        /// <summary>
+        /// ignore symbols by default.   if true... a symbol has no custom offset defined will be ignored (regardless of ignore list).  the default is false.
+        /// </summary>
+        public bool IgnoreDefault { get { return _ignoredefault; } set { _ignoredefault = value; } }
+        /// <summary>
+        /// always ignore these symbols.   this list is only in affect when IgnoreDefault is false.
+        /// </summary>
         public string[] IgnoreSyms { get { return _ignore; } set { _ignore = value; } }
         bool _hasevents = false;
         public event OrderDelegate SendOffset;
@@ -25,7 +33,15 @@ namespace TradeLink.Common
             _nextid = InitialOffsetId;
         }
 
-
+        /// <summary>
+        /// clear single custom offset
+        /// </summary>
+        /// <param name="sym"></param>
+        public void ClearCustom(string sym) { _offvals.Remove(sym); }
+        /// <summary>
+        /// clear all custom offsets
+        /// </summary>
+        public void ClearCustom() { _offvals.Clear(); }
 
 
         void doupdate(string sym)
@@ -61,6 +77,8 @@ namespace TradeLink.Common
 
 
         }
+
+        bool hascustom(string symbol) { OffsetInfo oi; return _offvals.TryGetValue(symbol, out oi); }
 
         void cancel(OffsetInfo offset) { cancel(offset.ProfitId); cancel(offset.StopId); }
         void cancel(uint id) { if (id != 0) SendCancel(id); }
@@ -174,7 +192,11 @@ namespace TradeLink.Common
         }
 
         bool IgnoreUpdate(string sym) 
-        { 
+        {
+            // if updates are ignored by default
+            if (_ignoredefault) // see if we have custom offset
+                return !hascustom(sym);
+            // otherwise see if it's specifically ignored
             foreach (string isym in _ignore) 
                 if (sym == isym) 
                     return true; 
@@ -230,6 +252,14 @@ namespace TradeLink.Common
 
         }
 
+        /// <summary>
+        /// obtain curretn offset information for a symbol.
+        /// if no custom value has been set, use default
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <returns></returns>
+        public OffsetInfo this[string symbol] { get { return GetOffset(symbol); } set { SetOffset(symbol, value); } }
+
         OffsetInfo GetOffset(string sym)
         {
             OffsetInfo val;
@@ -281,11 +311,11 @@ namespace TradeLink.Common
         }
         public OffsetInfo(decimal profitdist, decimal stopdist) : this(profitdist,stopdist,1,1) {}
         public OffsetInfo() : this(0,0,1,1) {}
-        public uint ProfitId;
-        public uint StopId;
-        public decimal ProfitDist;
-        public decimal StopDist;
-        public decimal ProfitPercent;
-        public decimal StopPercent;
+        public uint ProfitId = 0;
+        public uint StopId = 0;
+        public decimal ProfitDist = 0;
+        public decimal StopDist = 0;
+        public decimal ProfitPercent = 1;
+        public decimal StopPercent = 1;
     }
 }
