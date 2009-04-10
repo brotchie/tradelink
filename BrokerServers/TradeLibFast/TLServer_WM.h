@@ -6,9 +6,6 @@ using namespace std;
 namespace TradeLibFast
 {
 
-
-
-
 	// TLServer_WM
 
 	[event_source(native)]
@@ -57,7 +54,7 @@ namespace TradeLibFast
 		virtual std::vector<int> GetFeatures();
 		virtual int ClearClient(CString client);
 		virtual int ClearStocks(CString client);
-		virtual void CancelRequest(long order);
+		virtual int CancelRequest(long order);
 		virtual void Start(bool live = true);
 
 		void D(const CString & message);

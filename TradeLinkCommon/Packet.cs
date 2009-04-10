@@ -32,6 +32,7 @@ namespace TradeLink.Common
         public static Packet Decode(byte[] message, int length)
         {
             Packet lp = new Packet();
+            if (length == 0) return lp;
             try
             {
                 lp.From = BitConverter.ToInt32(message, (int)PacketOffset.source);

@@ -6,7 +6,7 @@
 #include <vector>
 #include "orderstate.h"
 #include "Contract.h"
-#include "TLServer_WM.h"
+#include "TLServer_IP.h"
 
 
 
@@ -14,7 +14,7 @@ namespace TradeLibFast
 {
 
 	class TWS_TLServer :
-		public TLServer_WM ,
+		public TLServer_IP ,
 		public EWrapper
 	{
 	public:
@@ -24,7 +24,7 @@ namespace TradeLibFast
 		// these are the TradeLink methods we're overriding
 		int SendOrder(TLOrder o);
 		int BrokerName(void);
-		void CancelRequest(OrderId id);
+		int CancelRequest(OrderId id);
 		int AccountResponse(CString clientname);
 		int RegisterStocks(CString clientname);
 		std::vector<int> GetFeatures();

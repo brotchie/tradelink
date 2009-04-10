@@ -33,7 +33,7 @@ namespace TradeLibFast
 		int BrokerName(void);
 		int SendOrder(TLOrder order);
 		int UnknownMessage(int MessageType,CString msg);
-		void CancelRequest(long order);
+		int CancelRequest(long order);
 
 		// account monitoring stuff
 		Observable* imbalance;

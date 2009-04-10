@@ -12,6 +12,7 @@ using namespace std;
 namespace TradeLibFast
 {
 
+	[event_source(native)]
 	class AFX_EXT_CLASS TLServer_IP : public CWnd
 	{
 	// Construction
@@ -19,6 +20,9 @@ namespace TradeLibFast
 		   TLServer_IP();  // standard constructor
 		   // socket member that listens for new connections
 		   CListensoc m_listensoc;
+		   static const uint DEFAULTPORT = 3000;
+		   uint PORT;
+
 
 		   // tradelink functions
 			~TLServer_IP(void);
@@ -45,7 +49,7 @@ namespace TradeLibFast
 			virtual std::vector<int> GetFeatures();
 			virtual int ClearClient(CString client);
 			virtual int ClearStocks(CString client);
-			virtual void CancelRequest(long order);
+			virtual int CancelRequest(long order);
 			virtual void Start(bool live = true);
 
 			void D(const CString & message);
@@ -81,6 +85,7 @@ namespace TradeLibFast
 	// Dialog Data
 			//{{AFX_DATA(TLServer_IP)
 			enum { IDD = IDD_ASYNCSERVER_DIALOG };
+			/*
 			CStatic x_Port;
 			CButton c_Run;
 			CEdit   c_Port;
@@ -89,6 +94,7 @@ namespace TradeLibFast
 			CButton c_Close;
 			CEdit   c_LastString;
 			CLog        c_Record;
+			*/
 			//}}AFX_DATA
 
 

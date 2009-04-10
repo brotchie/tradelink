@@ -34,7 +34,7 @@ namespace TradeLibFast
 
 	void TWS_TLServer::Start(void)
 	{
-		TLServer_WM::Start();
+		TLServer_IP::Start();
 
 		std::ifstream file;
 		file.open(CONFIGFILE);
@@ -347,12 +347,14 @@ namespace TradeLibFast
 		m_nextorderids[0]++;
 	}
 
-	void TWS_TLServer::CancelRequest(OrderId orderid)
+	int TWS_TLServer::CancelRequest(OrderId orderid)
 	{
 		// gets mlink associated with order
 		int mlink = getMlinkId(orderid);
 		uint ibid = TL2IBID((uint)orderid);
+		if (ibid==0) return ORDER_NOT_FOUND;
 		m_link[this->validlinkids[mlink]]->cancelOrder(ibid);
+		return OK;
 	}
 
 	void TWS_TLServer::winError( const CString &str, int lastError)
@@ -406,7 +408,7 @@ namespace TradeLibFast
 
 	int TWS_TLServer::RegisterStocks(CString clientname)
 	{
-		TLServer_WM::RegisterStocks(clientname);
+		TLServer_IP::RegisterStocks(clientname);
 		int cid = this->FindClient(clientname);  // get client id so we can find his stocks
 		// loop through every stock for this client
 		for (unsigned int i = 0; i<stocks[cid].size(); i++)

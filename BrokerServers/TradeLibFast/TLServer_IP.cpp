@@ -42,6 +42,12 @@ namespace TradeLibFast
 					// NOTE: the ClassWizard will add member initialization here
 			//}}AFX_DATA_INIT
 			// Note that LoadIcon does not require a subsequent DestroyIcon in Win32
+			PORT = DEFAULTPORT;
+			MajorVer = 0.1;
+			MinorVer = 0;
+			TLDEBUG = true;
+			ENABLED = false;
+			debugbuffer = CString("");
 			m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	}
 	TLServer_IP::~TLServer_IP()
@@ -117,14 +123,14 @@ namespace TradeLibFast
 
 	BOOL TLServer_IP::CreateListener()
 		{
+		 if (!AfxSocketInit())
+		 {
+			 CString * s = new CString("IDP_SOCKETS_INIT_FAILED");
+			PostMessage(UWM_INFO, (WPARAM)s, ::GetCurrentThreadId());
+			 return FALSE;
+		 }
 		 // Create the listener socket
-		 CString port;
-		 c_Port.GetWindowText(port);
-		 UINT portnum = _tcstoul(port, NULL, 0);
-
-		 if(portnum == 0)
-			portnum = PORT_NUM;
-
+		 UINT portnum = PORT;
 		 if(!m_listensoc.Create(portnum))
 			{ /* failed to create */
 			 DWORD err = ::GetLastError();
@@ -253,7 +259,7 @@ namespace TradeLibFast
 		{
 		 CString s;
 		 s.Format(_T("%d"), m_open);
-		 c_OpenConnections.SetWindowText(s);
+		 D(s);
 		} // TLServer_IP::ShowOpenConnections
 	
 	/****************************************************************************
@@ -268,7 +274,7 @@ namespace TradeLibFast
 		{
 		 CString s;
 		 s.Format(_T("%d"), m_close);
-		 c_ClosedConnections.SetWindowText(s);
+		 D(s);
 		} // TLServer_IP::ShowClosedConnections
 	
 	/****************************************************************************
@@ -333,12 +339,12 @@ namespace TradeLibFast
 		CByteArray * data = (CByteArray *)wParam;
 	    
 		CString s = ConvertReceivedDataToString(*data);
-		c_LastString.SetWindowText(s);
+		D(s);
 
 		CString msg;
 	#define SERVER_STRING_INFO_LIMIT 63
 		msg.Format(_T("%x: => \"%-*s\""), (DWORD)lParam, SERVER_STRING_INFO_LIMIT, s);
-		c_Record.AddString(msg);
+		D(msg);
 		delete data;
 
 		return 0;
@@ -395,13 +401,10 @@ namespace TradeLibFast
 
 	void TLServer_IP::updateControls()
 		{
-		 CString port;
-		 c_Port.GetWindowText(port);
-		 UINT portnum = _tcstoul(port, NULL, 0);
-		 c_Run.EnableWindow(!m_running && portnum > 1023 && portnum <= 65535);
+		 //c_Run.EnableWindow(!m_running && portnum > 1023 && portnum <= 65535);
 
-		 c_Port.SetReadOnly(m_running);
-		 x_Port.EnableWindow(!m_running);
+		 //c_Port.SetReadOnly(m_running);
+		 //x_Port.EnableWindow(!m_running);
 		 // If we are shutting down, disable the entire dialog!
 		 EnableWindow(!m_MainWndIsClosing);
 		} // TLServer_IP::updateControls
@@ -436,16 +439,7 @@ namespace TradeLibFast
 	   {
 		CWnd::OnSize(nType, cx, cy);
 	        
-		if(c_Record.GetSafeHwnd() != NULL)
-		   { /* resize it */
-			CRect r;
-			c_Record.GetWindowRect(&r);
-			ScreenToClient(&r);
-			c_Record.SetWindowPos(NULL, 0, 0,
-								  cx - r.left,
-								  cy - r.top,
-								  SWP_NOMOVE | SWP_NOZORDER);
-		   } /* resize it */
+
 	   }
 	
 	/****************************************************************************
@@ -461,12 +455,12 @@ namespace TradeLibFast
 
 	LRESULT TLServer_IP::OnInfo(WPARAM wParam, LPARAM lParam)
 		{
-		 CString * s = (CString *)wParam;
+		 CString s = *((CString *)wParam);
 		 CString id;
 		 id.Format(_T("%x: "), (DWORD)lParam);
-		 *s = id + *s;
-		 c_Record.AddString(*s);
-		 delete s;
+		 CString msg;
+		 msg.Format("%s %s",id,s);
+		 D(msg);
 
 		 return 0;
 		} // TLServer_IP::OnInfo
@@ -515,7 +509,9 @@ namespace TradeLibFast
 		 CString msg = ErrorString(err);
 		 CString id;
 		 id.Format(_T("%x: "), (DWORD)lParam);
-		 c_Record.AddString(id + msg);
+		 CString m;
+		 m.Format("%s %s",id,msg);
+		 D(m);
 		 return 0;
 		} // TLServer_IP::OnNetworkError
 	
@@ -537,7 +533,7 @@ namespace TradeLibFast
 		 fmt.LoadString(IDS_DATA_SENT);
 		 CString s;
 		 s.Format(fmt, threadid);
-		 c_Record.AddString(s);
+		 D(s);
 		 return 0;
 		} // TLServer_IP::OnSendComplete
 
@@ -655,9 +651,9 @@ namespace TradeLibFast
 				TLSend(ORDERCANCELRESPONSE,id,client[i]);
 	}
 
-	void TLServer_IP::CancelRequest(long order)
+	int TLServer_IP::CancelRequest(long order)
 	{
-		return;
+		return FEATURE_NOT_IMPLEMENTED;
 	}
 
 	bool TLServer_IP::HaveSubscriber(CString stock)
@@ -677,6 +673,7 @@ namespace TradeLibFast
 			CString wind(live ? LIVEWINDOW : SIMWINDOW);
 			this->Create(NULL, wind, 0,CRect(0,0,20,20), CWnd::GetDesktopWindow(),NULL);
 			this->ShowWindow(SW_HIDE); // hide our window
+			OnRun();
 			CString msg;
 			msg.Format("Started TL BrokerServer %s [ %.1f.%i]",wind,MajorVer,MinorVer);
 			this->D(msg);

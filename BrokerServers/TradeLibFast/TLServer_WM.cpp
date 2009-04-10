@@ -119,8 +119,7 @@ namespace TradeLibFast
 		switch (MessageType)
 		{
 			case ORDERCANCELREQUEST :
-				CancelRequest((long)atoi(msg.GetBuffer()));
-				return OK;
+				return CancelRequest((long)atoi(msg.GetBuffer()));
 			case ACCOUNTREQUEST :
 				return AccountResponse(msg);
 			case CLEARCLIENT :
@@ -294,9 +293,9 @@ namespace TradeLibFast
 				TLSend(ORDERCANCELRESPONSE,id,client[i]);
 	}
 
-	void TLServer_WM::CancelRequest(long order)
+	int TLServer_WM::CancelRequest(long order)
 	{
-		return;
+		return FEATURE_NOT_IMPLEMENTED;
 	}
 
 	bool TLServer_WM::HaveSubscriber(CString stock)

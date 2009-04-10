@@ -672,7 +672,7 @@ namespace TradeLibFast
 	int AVL_TLWM::AnvilId(unsigned int TLOrderId)
 	{
 		for (uint i = 0; i<orderids.size(); i++)
-			if (orderids[i]==TLOrderId)
+			if ((orderids[i]==TLOrderId) && ordercache[i])
 				return ordercache[i]->GetId();
 		return -1;
 	}
@@ -719,10 +719,12 @@ namespace TradeLibFast
 		return f;
 	}
 
-	void AVL_TLWM::CancelRequest(long order)
+	int AVL_TLWM::CancelRequest(long tlsid)
 	{
 		// get current anvil id from tradelink id
-        unsigned int orderId = AnvilId(order); 
+        unsigned int orderId = AnvilId(tlsid); 
+		if (orderId==-1)
+			return ORDER_NOT_FOUND;
         void* iterator = B_CreateAccountIterator();
         B_StartIteration(iterator);
         Observable* acct;
@@ -740,6 +742,8 @@ namespace TradeLibFast
                 }
         }
         B_DestroyIterator(iterator);
+		if (continue_search_flag) return ORDER_NOT_FOUND;
+		return OK;
 	}
 
 	int AVL_TLWM::AccountResponse(CString client)

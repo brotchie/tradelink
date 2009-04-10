@@ -87,7 +87,7 @@ namespace TradeLink.Common
             if ((socket == null) || !socket.Connected) return;
             try
             {
-                socket.Send(Packet.Encode(lp));
+                socket.Send(Packet.Encode(lp),lp.EncodedData.Length, SocketFlags.None);
             }
             catch (Exception e)
             {
