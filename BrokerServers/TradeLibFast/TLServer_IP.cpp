@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "TLServer_IP.h"
 
+
 // AsyncServerDlg.cpp : implementation file
 // Rewritten to Best Practice by Joseph M. Newcomer, Mar 2007
 //
@@ -337,7 +338,7 @@ namespace TradeLibFast
 	   {
 		// a new message has been received. Update the UI
 		CByteArray * data = (CByteArray *)wParam;
-	    
+		
 		CString s = ConvertReceivedDataToString(*data);
 		D(s);
 
@@ -349,6 +350,81 @@ namespace TradeLibFast
 
 		return 0;
 	   }
+
+
+	void TLServer_IP::SrvGotPacket(TLPacket packet)
+	{
+		ServiceMessage(packet.Intention,packet.Data);
+	}
+
+
+
+	int TLServer_IP::ServiceMessage(int MessageType, CString msg)
+	{
+		switch (MessageType)
+		{
+			case ORDERCANCELREQUEST :
+				return CancelRequest((long)atoi(msg.GetBuffer()));
+			case ACCOUNTREQUEST :
+				return AccountResponse(msg);
+			case CLEARCLIENT :
+				return ClearClient(msg);
+			case CLEARSTOCKS :
+				return ClearStocks(msg);
+			case REGISTERSTOCK :
+				{
+				vector<CString> rec;
+				gsplit(msg,CString("+"),rec);
+				CString client = rec[0];
+				vector<CString> hisstocks;
+				// make sure client sent a basket, otherwise clear the basket
+				if (rec.size()!=2) return ClearStocks(client);
+				// get the basket
+				gsplit(rec[1],CString(","),hisstocks);
+				// make sure we have the client
+				unsigned int cid = FindClient(client); 
+				if (cid==-1) return CLIENTNOTREGISTERED; //client not registered
+				// save the basket
+				stocks[cid] = hisstocks; 
+				D(CString(_T("Client ")+client+_T(" registered: ")+gjoin(hisstocks,",")));
+				HeartBeat(client);
+				return RegisterStocks(client);
+				}
+			case POSITIONREQUEST :
+				{
+				vector<CString> r;
+				gsplit(msg,CString("+"),r);
+				if (r.size()!=2) return UNKNOWN_MESSAGE;
+				return PositionResponse(r[1],r[0]);
+				}
+			case REGISTERCLIENT :
+				return RegisterClient(msg);
+			case HEARTBEAT :
+				return HeartBeat(msg);
+			case BROKERNAME :
+				return BrokerName();
+			case SENDORDER :
+				return SendOrder(TLOrder::Deserialize(msg));
+			case FEATUREREQUEST:
+				{
+					// get features supported by child class
+					std::vector<int> stub = GetFeatures();
+					// append basic feature we provide as parent
+					stub.push_back(REGISTERCLIENT);
+					stub.push_back(HEARTBEAT);
+					stub.push_back(CLEARSTOCKS);
+					stub.push_back(CLEARCLIENT);
+					stub.push_back(VERSION);
+					// send entire feature set back to client
+					TLSend(FEATURERESPONSE,SerializeIntVec(stub),msg);
+					return OK;
+				}
+			case VERSION :
+					return MinorVer;
+		}
+
+		return UnknownMessage(MessageType,msg);
+	}
 	
 	/****************************************************************************
 	*                          TLServer_IP::OnClose

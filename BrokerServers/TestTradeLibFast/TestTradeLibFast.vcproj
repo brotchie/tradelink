@@ -244,6 +244,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\TestTLPacket.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\TestTLPosition.cpp"
 			>
 		</File>

@@ -14,7 +14,7 @@ namespace TradeLibFast
 {
 
 	class TWS_TLServer :
-		public TLServer_IP ,
+		public TLServer_WM ,
 		public EWrapper
 	{
 	public:

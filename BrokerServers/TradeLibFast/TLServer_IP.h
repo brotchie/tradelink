@@ -35,6 +35,7 @@ namespace TradeLibFast
 			void SrvGotFill(TLTrade trade);
 			void SrvGotTick(TLTick tick);
 			void SrvGotCancel(int orderid);
+			void SrvGotPacket(TLPacket packet);
 			CString Version();
 
 			int RegisterClient(CString  clientname);

@@ -221,7 +221,15 @@ void CConnectSoc::OnReceive(int nErrorCode)
         return;
        } /* had error */
 
-    int nRead = 0;
+	m_recvBuff.SetSize(1024);
+    int nRead = Receive(m_recvBuff.GetData(),1024);
+	if (nRead==SOCKET_ERROR)
+	{
+		AbortConnection(::GetLastError());
+		return;
+	}
+	NotifyOwnerAboutPacket();
+	return;
 
     switch(state)  
        { /* state */

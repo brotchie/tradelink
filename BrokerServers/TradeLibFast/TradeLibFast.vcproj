@@ -322,6 +322,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\TLPacket.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\TLPacket.h"
+			>
+		</File>
+		<File
 			RelativePath=".\TLPosition.cpp"
 			>
 		</File>

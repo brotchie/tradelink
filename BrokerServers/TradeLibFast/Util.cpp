@@ -59,3 +59,16 @@ char* cleansvnrev(const char * dirtyrev)
 	clean.TrimRight(" $");
 	return clean.GetBuffer();
 }
+
+	CString SerializeIntVec(std::vector<int> input)
+	{
+		std::vector<CString> tmp;
+		for (size_t i = 0; i<input.size(); i++)
+		{
+			CString t; // setup tmp string
+			t.Format("%i",input[i]); // convert integer into tmp string
+			tmp.push_back(t); // push converted string onto vector
+		}
+		// join vector and return serialized structure
+		return gjoin(tmp,",");
+	}

@@ -53,7 +53,7 @@ void CServerSocket::ProcessReceive(CByteArray & data)
      CString s = ConvertReceivedDataToString(data);
      s = _T(">>>") + s + _T("<<<");
 
-     CByteArray msg;
-     ConvertStringToSendData(s, msg);
-     Send(msg, ::GetCurrentThreadId());
+     //CByteArray msg;
+     //ConvertStringToSendData(s, msg);
+     //Send(msg, ::GetCurrentThreadId());
     } // CServerSocket::ProcessReceive
