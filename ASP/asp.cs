@@ -43,7 +43,7 @@ namespace ASP
             int selbox = boxcriteria.SelectedIndex;
             reslist[selbox].isValid = !reslist[selbox].isValid;
             if (!reslist[selbox].isValid)
-                status("Resonse " + reslist[selbox].Name + " is off.");
+                status("Response " + reslist[selbox].Name + " is off.");
             else
                 status("Response " + reslist[selbox].Name + " is on.");            
         }
@@ -52,7 +52,8 @@ namespace ASP
         {
             foreach (string sym in symidx.Keys)
                 foreach (int idx in symidx[sym])
-                    reslist[idx].GotOrderCancel(number);
+                    if (reslist[idx].isValid)
+                        reslist[idx].GotOrderCancel(number);
         }
 
         void tl_gotOrder(Order o)
@@ -61,7 +62,8 @@ namespace ASP
             if (!symidx.TryGetValue(o.Sec.FullName, out idxs))
                 return;
             foreach (int idx in idxs)
-                reslist[idx].GotOrder(o);
+                if (reslist[idx].isValid)
+                    reslist[idx].GotOrder(o);
         }
 
         void ASP_FormClosing(object sender, FormClosingEventArgs e)
@@ -93,7 +95,8 @@ namespace ASP
             if (!symidx.TryGetValue(t.Sec.FullName, out idxs))
                 return;
             foreach (int idx in idxs)
-                reslist[idx].GotTick(t);
+                if (reslist[idx].isValid) 
+                    reslist[idx].GotTick(t);
         }
 
         private int count = 0;
@@ -105,7 +108,8 @@ namespace ASP
             if (!symidx.TryGetValue(t.Sec.FullName, out idxs))
                 return;
             foreach (int idx in idxs)
-                reslist[idx].GotFill(t);
+                if (reslist[idx].isValid)
+                    reslist[idx].GotFill(t);
         }
 
         void Debug(string message)
@@ -176,7 +180,9 @@ namespace ASP
             o.Security = seclist[o.symbol].Type;
             o.Exchange = seclist[o.symbol].DestEx;
             o.LocalSymbol = o.symbol;
-            tl.SendOrder(o);
+            int res = tl.SendOrder(o);
+            if (res != (int)MessageTypes.OK)
+                Debug(Util.PrettyError(tl.BrokerName, res) + " " + o.ToString());
         }
 
         void workingres_CancelOrderSource(uint number)
