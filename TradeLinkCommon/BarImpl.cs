@@ -54,9 +54,6 @@ namespace TradeLink.Common
             v = vol;
             bardate = date;
             bartime = time;
-            // check for fast time including seconds
-            if (time > 2500)
-                bartime = (bartime - (time % 100))/100;
             _sym = symbol;
         }
         public BarImpl(BarImpl b)
