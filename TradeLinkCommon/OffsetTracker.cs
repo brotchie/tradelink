@@ -25,7 +25,7 @@ namespace TradeLink.Common
         public event OrderDelegate SendOffset;
         public event UIntDelegate SendCancel;
         PositionTracker _pt = new PositionTracker();
-        uint _nextid = OrderImpl.Unique;
+        uint _nextid = OrderImpl.Unique*2;
         public PositionTracker PositionTracker { get { return _pt; } set { _pt = value; } }
         public OffsetTracker() { }
         public OffsetTracker(uint InitialOffsetId)
