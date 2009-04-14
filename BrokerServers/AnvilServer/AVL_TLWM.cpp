@@ -464,7 +464,7 @@ namespace TradeLibFast
 		//            false,//bool delayShortTillUptick,
 					DE_DEFAULT,//unsigned int destinationExchange,
 					TT_PRICE,//StopTriggerType triggerType,
-					false,
+					false, // is trailing
 					0,
 					o.comment,
 					NULL,//const char* regionalProactiveDestination,
@@ -498,7 +498,7 @@ namespace TradeLibFast
 				OS_RESIZE,
 				DE_DEFAULT,//unsigned int destinationExchange,
 				TT_PRICE,//StopTriggerType triggerType,
-				true,
+				true, // is trailing
 				0,
 				o.comment,
 				NULL,//const char* regionalProactiveDestination,
@@ -669,12 +669,14 @@ namespace TradeLibFast
 		} // switchend
 	}
 
-	int AVL_TLWM::AnvilId(unsigned int TLOrderId)
+	unsigned int AVL_TLWM::AnvilId(unsigned int TLOrderId)
 	{
 		for (uint i = 0; i<orderids.size(); i++)
+		{
 			if ((orderids[i]==TLOrderId) && ordercache[i])
 				return ordercache[i]->GetId();
-		return -1;
+		}
+		return 0;
 	}
 
 	std::vector<int> AVL_TLWM::GetFeatures()
@@ -721,28 +723,18 @@ namespace TradeLibFast
 
 	int AVL_TLWM::CancelRequest(long tlsid)
 	{
+		bool found = false;
 		// get current anvil id from tradelink id
-        unsigned int orderId = AnvilId(tlsid); 
-		if (orderId==-1)
-			return ORDER_NOT_FOUND;
-        void* iterator = B_CreateAccountIterator();
-        B_StartIteration(iterator);
-        Observable* acct;
-
-		bool continue_search_flag = true ;
-        // loop through every available account, cancel any matching orders
-		// stop when order is found
-        while ((acct = B_GetNextAccount(iterator)) && (continue_search_flag == true ))
-        {
-                Order* order = B_FindOrder(orderId,acct);
-                if(order)
-                {
-                        order->Cancel();
-						continue_search_flag = false ;
-                }
-        }
-        B_DestroyIterator(iterator);
-		if (continue_search_flag) return ORDER_NOT_FOUND;
+		for (uint i = 0; i<orderids.size(); i++)
+		{
+			if ((orderids[i]==tlsid) && ordercache[i])
+			{
+				ordercache[i]->Cancel();
+				bool found = true;
+			}
+			if (found) break;
+		}
+		if (!found) return ORDER_NOT_FOUND;
 		return OK;
 	}
 

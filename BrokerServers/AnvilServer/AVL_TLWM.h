@@ -43,7 +43,7 @@ namespace TradeLibFast
 		uint fetchOrderId(Order * order);
 		bool IdIsUnique(uint id);
 		bool saveOrder(Order* o,uint id);
-		int AnvilId(unsigned int TLOrderId);
+		unsigned int AnvilId(unsigned int TLOrderId);
 
 		virtual void Process(const Message* message, Observable* from, const Message* additionalInfo);
 
