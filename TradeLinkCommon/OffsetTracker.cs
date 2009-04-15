@@ -55,7 +55,7 @@ namespace TradeLink.Common
             // cancel existing stops
             cancel(off.StopId);
             // get new profit
-            Order profit = Calc.PositionProfit(_pt[sym], off.ProfitDist, off.ProfitPercent);
+            Order profit = Calc.PositionProfit(_pt[sym], off.ProfitDist, off.ProfitPercent,off.NormalizeSize,off.MinimumLotSize);
             // if it's valid, send and track it
             if (profit.isValid)
             {
@@ -64,7 +64,7 @@ namespace TradeLink.Common
                 SendOffset(profit);
             }
             // get new stop
-            Order stop = Calc.PositionStop(_pt[sym], off.StopDist, off.StopPercent);
+            Order stop = Calc.PositionStop(_pt[sym], off.StopDist, off.StopPercent,off.NormalizeSize,off.MinimumLotSize);
             // if it's valid, send and track
             if (stop.isValid)
             {
@@ -302,15 +302,19 @@ namespace TradeLink.Common
 
     public class OffsetInfo
     {
-        public OffsetInfo(decimal profitdist, decimal stopdist, decimal profitpercent, decimal stoppercent)
+        public OffsetInfo(decimal profitdist, decimal stopdist, decimal profitpercent, decimal stoppercent, bool NormalizeSize, int MinSize)
         {
             ProfitDist = profitdist;
             StopDist = stopdist;
             ProfitPercent = profitpercent;
             StopPercent = stoppercent;
+            this.NormalizeSize = NormalizeSize;
+            MinimumLotSize = MinSize;
         }
-        public OffsetInfo(decimal profitdist, decimal stopdist) : this(profitdist,stopdist,1,1) {}
-        public OffsetInfo() : this(0,0,1,1) {}
+        public bool NormalizeSize = false;
+        public int MinimumLotSize = 1;
+        public OffsetInfo(decimal profitdist, decimal stopdist) : this(profitdist,stopdist,1,1,false, 1) {}
+        public OffsetInfo() : this(0,0,1,1,false,1) {}
         public uint ProfitId = 0;
         public uint StopId = 0;
         public decimal ProfitDist = 0;
