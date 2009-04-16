@@ -32,7 +32,7 @@ namespace TradeLink.Common
 
         public struct COPYDATASTRUCT
         {
-            public int dwData;
+            public IntPtr dwData;
             public int cbData;
             public IntPtr lpData;
         }
@@ -95,7 +95,7 @@ namespace TradeLink.Common
             if (cds.cbData > 0)
             {
                 m.body = Marshal.PtrToStringAnsi(cds.lpData);
-                m.type = (MessageTypes)cds.dwData;
+                m.type = (MessageTypes)(int)cds.dwData;
             }
             return m;
         }
@@ -112,7 +112,7 @@ namespace TradeLink.Common
         {
             if ((desthandle == IntPtr.Zero) || (sourcehandle == IntPtr.Zero)) return -1; // fail on invalid handles
             WMUtil.COPYDATASTRUCT cds = new WMUtil.COPYDATASTRUCT();
-            cds.dwData = type;
+            cds.dwData = (IntPtr)type;
             str = str + '\0';
             cds.cbData = str.Length + 1;
 
