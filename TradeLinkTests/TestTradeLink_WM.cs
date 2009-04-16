@@ -22,6 +22,7 @@ namespace TestTradeLink
         int fills;
         int orders;
         int fillrequest;
+        int imbalances;
 
         // 2nd client counters
         int copyticks;
@@ -44,11 +45,32 @@ namespace TestTradeLink
             c.gotFill += new FillDelegate(tlclient_gotFill);
             c.gotOrder += new OrderDelegate(tlclient_gotOrder);
             c.gotTick += new TickDelegate(tlclient_gotTick);
+            c.gotImbalance += new ImbalanceDelegate(c_gotImbalance);
             // setup second client events to check copying
             c2.gotFill += new FillDelegate(c2_gotFill);
             c2.gotOrder += new OrderDelegate(c2_gotOrder);
             c2.gotTick += new TickDelegate(c2_gotTick);
 
+        }
+
+        void c_gotImbalance(Imbalance imb)
+        {
+            imbalances++;
+        }
+
+        [Test]
+        public void Imbalance()
+        {
+            // make sure we have none sent
+            Assert.AreEqual(0, imbalances);
+
+            // send one
+            s.newImbalance(new ImbalanceImpl(SYM, "NYSE", 100000, 154000, 0, 0));
+
+            // make sure we got it
+            Assert.AreEqual(1, imbalances);
+
+            
         }
 
 

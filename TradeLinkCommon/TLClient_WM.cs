@@ -20,6 +20,7 @@ namespace TradeLink.Common
         public event UIntDelegate gotOrderCancel;
         public event MessageTypesMsgDelegate gotSupportedFeatures;
         public event PositionDelegate gotPosition;
+        public event ImbalanceDelegate gotImbalance;
 
         public TLClient_WM() : this("TradeLinkClient",true,true) { }
         public TLClient_WM(string clientname, bool showwarningonmissing) : this(clientname, showwarningonmissing, true) { }
@@ -371,6 +372,11 @@ namespace TradeLink.Common
                     }
                     if (gotSupportedFeatures != null) 
                         gotSupportedFeatures(f.ToArray());
+                    break;
+                case MessageTypes.IMBALANCERESPONSE:
+                    Imbalance i = ImbalanceImpl.Deserialize(msg);
+                    if (gotImbalance != null)
+                        gotImbalance(i);
                     break;
             }
             result = 0;

@@ -19,6 +19,7 @@ namespace TradeLink.Common
         public event DebugDelegate newRegisterStocks;
         public event MessageArrayDelegate newFeatureRequest;
         public event UnknownMessageDelegate newUnknownRequest;
+        public event VoidDelegate newImbalanceRequest;
 
         public string Version() { return Util.TLSIdentity(); }
         protected int MinorVer = 0;
@@ -195,6 +196,12 @@ namespace TradeLink.Common
                 WMUtil.SendMsg(orderid_being_cancled.ToString(), MessageTypes.ORDERCANCELRESPONSE, Handle, c);
         }
 
+        public void newImbalance(Imbalance imb)
+        {
+            for (int i = 0; i < client.Count; i++)
+                WMUtil.SendMsg(ImbalanceImpl.Serialize(imb), MessageTypes.IMBALANCERESPONSE, Handle, client[i]);
+        }
+
         public Providers newProviderName = Providers.TradeLink;
 
         protected override void WndProc(ref Message m)
@@ -249,6 +256,9 @@ namespace TradeLink.Common
                     break;
                 case MessageTypes.BROKERNAME :
                     result = (long)newProviderName;
+                    break;
+                case MessageTypes.IMBALANCEREQUEST:
+                    if (newImbalanceRequest != null) newImbalanceRequest();
                     break;
                 case MessageTypes.FEATUREREQUEST:
                     string msf = "";

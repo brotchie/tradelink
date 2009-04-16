@@ -21,7 +21,6 @@ namespace SterServer
         const string PROGRAM = "SterServer ";
         Timer tt = new Timer();
         bool imbalance = false;
-        string imbalance_client = "";
         PositionTracker pt = new PositionTracker();
 
         public SterMain()
@@ -49,9 +48,16 @@ namespace SterServer
             tl.newOrderCancelRequest += new UIntDelegate(tl_OrderCancelRequest);
             tl.newFeatureRequest += new MessageArrayDelegate(tl_newFeatureRequest);
             tl.newUnknownRequest += new UnknownMessageDelegate(tl_newUnknownRequest);
-
+            tl.newImbalanceRequest += new VoidDelegate(tl_newImbalanceRequest);
             debug(PROGRAM + Util.TLSIdentity());
             FormClosing += new FormClosingEventHandler(SterMain_FormClosing);
+        }
+
+        void tl_newImbalanceRequest()
+        {
+            // register for imbalance data
+            stiQuote.RegisterForMdx(true);
+            imbalance = true;
         }
 
         string tl_newAcctRequest()
@@ -61,17 +67,6 @@ namespace SterServer
 
         long tl_newUnknownRequest(MessageTypes t, string msg)
         {
-            switch (t)
-            {
-                case MessageTypes.IMBALANCEREQUEST:
-                    {
-                        // register for imbalance data
-                        stiQuote.RegisterForMdx(true);
-                        imbalance = true;
-                        imbalance_client = msg;
-                    }
-                    break;
-            }
             return (long)MessageTypes.UNKNOWN_MESSAGE;
         }
 
@@ -280,10 +275,9 @@ namespace SterServer
             k.trade = (decimal)q.fLastPrice;
             k.size = q.nLastSize;
             tl.newTick(k);
-            if (q.bValidMktImb==0) return;
-            ImbalanceImpl i = new ImbalanceImpl(k.symbol, k.ex, q.nMktImbalance, k.time, 0, 0);
-            tl.TLSend(ImbalanceImpl.Serialize(i), MessageTypes.IMBALANCERESPONSE, imbalance_client);
-            
+            if ((q.bValidMktImb==0)||!imbalance) return;
+            tl.newImbalance(new ImbalanceImpl(k.symbol, k.ex, q.nMktImbalance, k.time, 0, 0));
+           
         }
 
         void stiQuote_OnSTIQuoteSnap(ref structSTIQuoteSnap q)
