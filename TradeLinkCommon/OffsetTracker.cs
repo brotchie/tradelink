@@ -25,12 +25,14 @@ namespace TradeLink.Common
         public event OrderDelegate SendOffset;
         public event UIntDelegate SendCancel;
         PositionTracker _pt = new PositionTracker();
-        uint _nextid = OrderImpl.Unique*2;
         public PositionTracker PositionTracker { get { return _pt; } set { _pt = value; } }
         public OffsetTracker() { }
-        public OffsetTracker(uint InitialOffsetId)
+        public IdTracker _ids = new IdTracker();
+        public IdTracker Ids { get { return _ids; } set { _ids = value; } }
+        public OffsetTracker(uint initialid) : this(new IdTracker(initialid)) { }
+        public OffsetTracker(IdTracker tracker)
         {
-            _nextid = InitialOffsetId;
+            _ids = tracker;
         }
 
         /// <summary>
@@ -59,7 +61,7 @@ namespace TradeLink.Common
             // if it's valid, send and track it
             if (profit.isValid)
             {
-                profit.id = _nextid++;
+                profit.id = Ids.AssignId;
                 off.ProfitId = profit.id;
                 SendOffset(profit);
             }
@@ -68,7 +70,7 @@ namespace TradeLink.Common
             // if it's valid, send and track
             if (stop.isValid)
             {
-                stop.id = _nextid++;
+                stop.id = Ids.AssignId;
                 off.StopId = stop.id;
                 SendOffset(stop);
             }

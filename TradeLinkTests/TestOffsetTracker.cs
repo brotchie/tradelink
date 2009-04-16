@@ -71,7 +71,7 @@ namespace TestTradeLink
             Assert.AreEqual(ot.DefaultOffset.ProfitDist, ot[SYMB].ProfitDist);
             Assert.AreEqual(ot.DefaultOffset.StopDist, ot[SYMB].StopDist);
             // add custom offset different than default
-            ot[SYMB] = new OffsetInfo(POFFSET * 2, SOFFSET * 2, .5m, .5m);
+            ot[SYMB] = new OffsetInfo(POFFSET * 2, SOFFSET * 2, .5m, .5m,true,100);
             // verify custom has taken effect
             Assert.AreEqual(ot.DefaultOffset.ProfitPercent/2, ot[SYMB].ProfitPercent);
             Assert.AreEqual(ot.DefaultOffset.StopPercent/2, ot[SYMB].StopPercent);

@@ -69,6 +69,7 @@
     <Compile Include="HistSim.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="IdTracker.cs" />
     <Compile Include="ImbalanceImpl.cs" />
     <Compile Include="InvalidResponse.cs" />
     <Compile Include="LimitOrder.cs" />
