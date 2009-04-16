@@ -33,7 +33,7 @@
     SUCH DAMAGE.
 */
 
-
+#define SIGNED_TD_NDA
 
 using System;
 using System.Collections.Generic;
@@ -61,7 +61,7 @@ namespace AMTD_API
 
     public class AmeritradeBrokerAPI
     {
-
+        public static string SOURCEID = "JFR";
 
         #region Asyncronous Section
 

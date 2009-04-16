@@ -12,6 +12,9 @@ namespace TDServer
 {
     public partial class TDServerMain : Form
     {
+        // to build this project from source code, you need to sign the TD ameritrade NDA
+        // email apidev@tdameritrade.com and tell them you use tradelink and want to sign the NDA
+#if SIGNED_TD_NDA
         AmeritradeBrokerAPI api = new AmeritradeBrokerAPI();
         const string APIVER = "1";
         TLServer_WM tl = new TLServer_WM(TLTypes.LIVEBROKER);
@@ -78,7 +81,7 @@ namespace TDServer
         {
             AmeritradeBrokerAPI.ATradeArgument brokerAcctPosArgs = new AmeritradeBrokerAPI.ATradeArgument();
             brokerAcctPosArgs.oPositions = new List<AmeritradeBrokerAPI.Positions>();
-            api.TD_getAcctBalancesAndPositions(_user.Text, _pass.Text, _sourceid.Text, APIVER, ref brokerAcctPosArgs.oCashBalances, ref brokerAcctPosArgs.oPositions);
+            api.TD_getAcctBalancesAndPositions(_user.Text, _pass.Text, AmeritradeBrokerAPI.SOURCEID, APIVER, ref brokerAcctPosArgs.oCashBalances, ref brokerAcctPosArgs.oPositions);
             Position[] plist = new Position[brokerAcctPosArgs.oPositions.Count];
             int count = 0;
             foreach (AmeritradeBrokerAPI.Positions oPosition in brokerAcctPosArgs.oPositions)
@@ -139,7 +142,7 @@ namespace TDServer
             string orderid = "";
             if (idmap.TryGetValue(number, out id))
                 orderid = id.ToString();
-            api.TD_CancelOrder(api._accountid, orderid, _user.Text, _pass.Text, _sourceid.Text, APIVER, ref result);
+            api.TD_CancelOrder(api._accountid, orderid, _user.Text, _pass.Text, AmeritradeBrokerAPI.SOURCEID, APIVER, ref result);
             if (result==string.Empty)
                 tl.newOrderCancel(number);
         }
@@ -205,7 +208,7 @@ namespace TDServer
             cOrderString.Append("~exyear="          + api.Encode_URL(string.Empty));
             cOrderString.Append("~displaysize="     + api.Encode_URL(string.Empty));
             brokerReplyargs.ResultsCode = 
-                api.TD_sendOrder(_user.Text, _pass.Text, _sourceid.Text, APIVER, cOrderString.ToString(), ref cResultMessage, ref cEnteredOrderID);
+                api.TD_sendOrder(_user.Text, _pass.Text, AmeritradeBrokerAPI.SOURCEID, APIVER, cOrderString.ToString(), ref cResultMessage, ref cEnteredOrderID);
 
             if (brokerReplyargs.ResultsCode != OK)
                 debug(cResultMessage);
@@ -226,24 +229,24 @@ namespace TDServer
         {
             Properties.Settings.Default.Save();
             if (ok)
-                api.TD_Logout(_user.Text, _pass.Text, _sourceid.Text, APIVER);
+                api.TD_Logout(_user.Text, _pass.Text, AmeritradeBrokerAPI.SOURCEID, APIVER);
         }
         private void _login_Click(object sender, EventArgs e)
         {
             // see if we're already logged in
             if (api.loginStatus) return;
             // see if we have proper info
-            if (_user.Text.Length + _pass.Text.Length + _sourceid.Text.Length == 0)
+            if (_user.Text.Length + _pass.Text.Length + AmeritradeBrokerAPI.SOURCEID.Length == 0)
             {
                 MessageBox.Show("You must provide SourceID, username and password.");
                 return;
             }
-            bool yes = api.TD_brokerLogin(_user.Text, _pass.Text, _sourceid.Text, APIVER);
+            bool yes = api.TD_brokerLogin(_user.Text, _pass.Text, AmeritradeBrokerAPI.SOURCEID, APIVER);
             if (yes)
             {
                 // bind events
-                api.TD_GetStreamerInfo(_user.Text, _pass.Text, _sourceid.Text, APIVER);
-                api.TD_KeepAlive(_user.Text, _pass.Text, _sourceid.Text, APIVER);
+                api.TD_GetStreamerInfo(_user.Text, _pass.Text, AmeritradeBrokerAPI.SOURCEID, APIVER);
+                api.TD_KeepAlive(_user.Text, _pass.Text, AmeritradeBrokerAPI.SOURCEID, APIVER);
                 BackColor = Color.Green;
                 Invalidate(true);
                 debug("login succeeded");
@@ -386,7 +389,7 @@ namespace TDServer
 
         }
 
-
+#endif
     }
 
 }
