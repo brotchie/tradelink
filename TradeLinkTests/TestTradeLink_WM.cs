@@ -6,6 +6,7 @@ using TradeLink.Common;
 using System.Windows.Forms;
 using TradeLink.API;
 
+
 namespace TestTradeLink
 {
     [TestFixture]
@@ -26,6 +27,8 @@ namespace TestTradeLink
         int copyticks;
         int copyfills;
         int copyorders;
+
+        const string SYM = "TST";
 
         public TestTradeLink_WM() 
         {
@@ -71,10 +74,10 @@ namespace TestTradeLink
             Assert.That(ticks == 0, ticks.ToString());
 
             // have to subscribe to a stock to get notified on fills for said stock
-            c.Subscribe(new BasketImpl(new SecurityImpl("TST")));
+            c.Subscribe(new BasketImpl(new SecurityImpl(SYM)));
 
             //send a tick from the server
-            TickImpl t = TickImpl.NewTrade("TST", 10, 100);
+            TickImpl t = TickImpl.NewTrade(SYM, 10, 100);
             s.newTick(t);
 
             // make sure the client got it
@@ -93,7 +96,7 @@ namespace TestTradeLink
             Assert.That(fillrequest == 0, fillrequest.ToString());
 
             // client wants to buy 100 TST at market
-            OrderImpl o = new OrderImpl("TST", 100);
+            OrderImpl o = new OrderImpl(SYM, 100);
             // if it works it'll return zero
             int error = c.SendOrder(o);
             Assert.That(error==0,error.ToString());
@@ -112,10 +115,10 @@ namespace TestTradeLink
             Assert.That(fills == 0, fills.ToString());
 
             // have to subscribe to a stock to get notified on fills for said stock
-            c.Subscribe(new BasketImpl(new SecurityImpl("TST")));
+            c.Subscribe(new BasketImpl(new SecurityImpl(SYM)));
 
             // prepare and send an execution from client to server
-            TradeImpl t = new TradeImpl("TST", 100, 300, DateTime.Now);
+            TradeImpl t = new TradeImpl(SYM, 100, 300, DateTime.Now);
             s.newFill(t);
 
             // make sure client received and counted it
@@ -123,6 +126,42 @@ namespace TestTradeLink
 
             // make sure fill was copied
             Assert.AreEqual(fills, copyfills);
+        }
+
+        [Test]
+        public void PerformanceTests()
+        {
+            // expected performance
+            const decimal EXPECT = .10m;
+            // get ticks for test
+            const int TICKSENT = 1000;
+            Tick[] tick = TradeLink.Research.RandomTicks.GenerateSymbol(SYM, TICKSENT);
+            // subscribe to symbol
+            c.Unsubscribe();
+            c.Subscribe(new BasketImpl(SYM));
+            // reset ticks
+            int save = ticks;
+            ticks = 0;
+            // start clock
+            DateTime start = DateTime.Now;
+
+            // process ticks
+            for (int i = 0; i < tick.Length; i++)
+                s.newTick(tick[i]);
+
+            // stop clock
+            double time = DateTime.Now.Subtract(start).TotalSeconds;
+            // make sure time exists
+            Assert.Greater(time, 0);
+            // make sure it's less than expected
+            Assert.LessOrEqual(time, EXPECT);
+            // make sure we got all the ticks
+            Assert.AreEqual(TICKSENT, ticks);
+            decimal ticksec = TICKSENT/(decimal)time;
+            Console.WriteLine("protocol performance (tick/sec): " + ticksec.ToString("N0"));
+
+            // restore ticks
+            ticks = save;
         }
 
         // event handlers

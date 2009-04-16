@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Picker
+namespace TradeLink.Research
 {
     public class RandomSymbol
     {

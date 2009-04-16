@@ -67,6 +67,7 @@
     </Compile>
     <Compile Include="QuickQuote.cs" />
     <Compile Include="RandomSymbol.cs" />
+    <Compile Include="RandomTicks.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="FetchBasket.resx">
