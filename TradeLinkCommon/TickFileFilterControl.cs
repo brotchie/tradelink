@@ -69,7 +69,10 @@ namespace TradeLink.Common
 
             // build consolidated filter
             TickFileFilter tff = new TickFileFilter(symfilter, datefilter);
-            //return it
+            // set search options
+            tff.isDateMatchUnion = _dateor.Checked;
+            tff.isSymbolDateMatchUnion = !_symdateand.Checked;
+            //return filter
             return tff;
 
         }
@@ -189,6 +192,7 @@ namespace TradeLink.Common
                 SendDebug(DebugImpl.Create(msg, DebugLevel.Debug));
 
         }
+
 
 
 

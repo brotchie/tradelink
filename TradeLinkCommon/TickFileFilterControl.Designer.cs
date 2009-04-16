@@ -37,6 +37,14 @@
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
+            this._matchcond = new System.Windows.Forms.GroupBox();
+            this._datecond = new System.Windows.Forms.GroupBox();
+            this._dateor = new System.Windows.Forms.RadioButton();
+            this._dateand = new System.Windows.Forms.RadioButton();
+            this.radioButton1 = new System.Windows.Forms.RadioButton();
+            this._symdateand = new System.Windows.Forms.RadioButton();
+            this._matchcond.SuspendLayout();
+            this._datecond.SuspendLayout();
             this.SuspendLayout();
             // 
             // usedates
@@ -151,10 +159,80 @@
             this.label3.TabIndex = 20;
             this.label3.Text = "Year";
             // 
+            // _matchcond
+            // 
+            this._matchcond.Controls.Add(this._datecond);
+            this._matchcond.Controls.Add(this.radioButton1);
+            this._matchcond.Controls.Add(this._symdateand);
+            this._matchcond.Location = new System.Drawing.Point(336, 136);
+            this._matchcond.Name = "_matchcond";
+            this._matchcond.Size = new System.Drawing.Size(266, 148);
+            this._matchcond.TabIndex = 23;
+            this._matchcond.TabStop = false;
+            this._matchcond.Text = "Match On:";
+            // 
+            // _datecond
+            // 
+            this._datecond.BackColor = System.Drawing.Color.Transparent;
+            this._datecond.Controls.Add(this._dateor);
+            this._datecond.Controls.Add(this._dateand);
+            this._datecond.ForeColor = System.Drawing.SystemColors.ControlText;
+            this._datecond.Location = new System.Drawing.Point(0, 78);
+            this._datecond.Name = "_datecond";
+            this._datecond.Size = new System.Drawing.Size(281, 110);
+            this._datecond.TabIndex = 2;
+            this._datecond.TabStop = false;
+            // 
+            // _dateor
+            // 
+            this._dateor.AutoSize = true;
+            this._dateor.Location = new System.Drawing.Point(7, 45);
+            this._dateor.Name = "_dateor";
+            this._dateor.Size = new System.Drawing.Size(212, 24);
+            this._dateor.TabIndex = 1;
+            this._dateor.TabStop = true;
+            this._dateor.Text = "Dates matching any y/m/d";
+            this._dateor.UseVisualStyleBackColor = true;
+            // 
+            // _dateand
+            // 
+            this._dateand.AutoSize = true;
+            this._dateand.Checked = true;
+            this._dateand.Location = new System.Drawing.Point(7, 14);
+            this._dateand.Name = "_dateand";
+            this._dateand.Size = new System.Drawing.Size(194, 24);
+            this._dateand.TabIndex = 0;
+            this._dateand.TabStop = true;
+            this._dateand.Text = "Date matching all y/m/d";
+            this._dateand.UseVisualStyleBackColor = true;
+            // 
+            // radioButton1
+            // 
+            this.radioButton1.AutoSize = true;
+            this.radioButton1.Location = new System.Drawing.Point(7, 57);
+            this.radioButton1.Name = "radioButton1";
+            this.radioButton1.Size = new System.Drawing.Size(230, 24);
+            this.radioButton1.TabIndex = 1;
+            this.radioButton1.Text = "Any symbol or date matched";
+            this.radioButton1.UseVisualStyleBackColor = true;
+            // 
+            // _symdateand
+            // 
+            this._symdateand.AutoSize = true;
+            this._symdateand.Checked = true;
+            this._symdateand.Location = new System.Drawing.Point(7, 26);
+            this._symdateand.Name = "_symdateand";
+            this._symdateand.Size = new System.Drawing.Size(162, 24);
+            this._symdateand.TabIndex = 0;
+            this._symdateand.TabStop = true;
+            this._symdateand.Text = "All selected criteria";
+            this._symdateand.UseVisualStyleBackColor = true;
+            // 
             // TickFileFilterControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this._matchcond);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label3);
@@ -166,6 +244,10 @@
             this.Controls.Add(this.stocklist);
             this.Name = "TickFileFilterControl";
             this.Size = new System.Drawing.Size(607, 298);
+            this._matchcond.ResumeLayout(false);
+            this._matchcond.PerformLayout();
+            this._datecond.ResumeLayout(false);
+            this._datecond.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -182,6 +264,12 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.GroupBox _matchcond;
+        private System.Windows.Forms.RadioButton _symdateand;
+        private System.Windows.Forms.GroupBox _datecond;
+        private System.Windows.Forms.RadioButton radioButton1;
+        private System.Windows.Forms.RadioButton _dateor;
+        private System.Windows.Forms.RadioButton _dateand;
 
     }
 }

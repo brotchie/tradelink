@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Xml.Serialization;
 
 namespace TradeLink.Common
 {
     /// <summary>
     /// Filters tick files (EPF/IDX) based on symbol name and trading date.
     /// </summary>
+    [Serializable]
     public class TickFileFilter
     {
         bool _defallowed = false;
@@ -87,6 +89,16 @@ namespace TradeLink.Common
             datelist.Add(new TLDateFilter(date, type));
         }
 
+        bool _isDateMatchUnion = true;
+        bool _isSymDateMatchUnion = true;
+        /// <summary>
+        /// if true, any file that matches ANY date will be allowed.  If false, all dates must match before a tick file is allowed.  default is true.
+        /// </summary>
+        public bool isDateMatchUnion { get { return _isDateMatchUnion; } set { _isDateMatchUnion = value; } }
+        /// <summary>
+        /// if true, any file matching SymbolMatch OR DateMatch will be allowed.   Otherwise, it must be allowed by the Symbol filters AND the Date filters.  default is true.
+        /// </summary>
+        public bool isSymbolDateMatchUnion { get { return _isSymDateMatchUnion; } set { _isSymDateMatchUnion = value; } }
 
         /// <summary>
         /// Allows the specified filepath, if instructed by the filter.
@@ -97,11 +109,26 @@ namespace TradeLink.Common
         {
             TickFileInfo tfi = Util.ParseFile(filepath);
             if (tfi.type == TickFileType.Invalid) return _allowedinvalid;
-            bool allowed = _defallowed;
+            // make sure the default is consistent with the set intersection requested
+            bool symallowed = _defallowed;
+            // see if symbols match
             for (int i = 0; i < namelist.Count; i++)
-                allowed |= (tfi.symbol == namelist[i]);
-            for (int i = 0; i < datelist.Count; i++)
-                allowed |= Util.TLDateMatch(Util.ToTLDate(tfi.date), datelist[i].date,datelist[i].type);
+                symallowed |= (tfi.symbol == namelist[i]);
+
+            // make sure the default is consistent with the set intersection requested
+            bool dateallowed = _isDateMatchUnion ? _defallowed : !_defallowed;
+            if (_isDateMatchUnion)
+            {
+                for (int i = 0; i < datelist.Count; i++)
+                    dateallowed |= Util.TLDateMatch(Util.ToTLDate(tfi.date), datelist[i].date, datelist[i].type);
+            }
+            else
+            {
+                for (int i = 0; i < datelist.Count; i++)
+                    dateallowed &= Util.TLDateMatch(Util.ToTLDate(tfi.date), datelist[i].date, datelist[i].type);
+            }
+            // make sure intersection between dates and symbols is what is desired
+            bool allowed = _isSymDateMatchUnion ? symallowed || dateallowed : symallowed && dateallowed;
             return allowed;
 
         }
@@ -182,31 +209,47 @@ namespace TradeLink.Common
 
         public static string Serialize(TickFileFilter tff)
         {
-            string s = "";
-            string newl = Environment.NewLine;
-            // names
-            foreach (string sym in tff.namelist)
-                s += name.ToString() + d.ToString() + sym + newl;
-            foreach (TLDateFilter df in tff.datelist)
-                s += date.ToString() + d.ToString() + TLDateFilter.Serialize(df) + newl;
-            return s;
+            // save everything as xml
+            StringWriter fs;
+            try
+            {
+                XmlSerializer xs = new XmlSerializer(typeof(TickFileFilter));
+                fs = new StringWriter();
+                xs.Serialize(fs, tff);
+                fs.Close();
+            }
+            catch (FileNotFoundException ex)
+            {
+                return "";
+            }
+            catch (Exception ex)
+            {
+                return "";
+            }
+            if (fs == null) return "";
+            return fs.GetStringBuilder().ToString();
+
         }
 
         public static TickFileFilter Deserialize(string msg)
         {
-            string[] r = msg.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-            List<string> names = new List<string>();
-            List<TLDateFilter> dates = new List<TLDateFilter>();
-            foreach (string line in r)
+            StringReader fs;
+            TickFileFilter tf = null;
+            try
             {
-                string[] l = line.Split(d);
-                if (l[(int)MessageTickFileFilter.TFF_FILTERTYPE][0] == name)
-                    names.Add(l[(int)MessageTickFileFilter.TFF_FILTERCONTENT]);
-                else if (l[(int)MessageTickFileFilter.TFF_FILTERTYPE][0] == date)
-                    dates.Add(TLDateFilter.Deserialize(l[(int)MessageTickFileFilter.TFF_FILTERCONTENT]));
+                // prepare serializer
+                XmlSerializer xs = new XmlSerializer(typeof(TickFileFilter));
+                // read in message
+                fs = new StringReader(msg);
+                // deserialize message
+                tf = (TickFileFilter)xs.Deserialize(fs);
+                // close serializer
+                fs.Close();
             }
-            TickFileFilter tff = new TickFileFilter(names, dates);
-            return tff;
+            catch (FileNotFoundException fex) { }
+            catch (Exception ex) { }
+            return tf;
+
         }
 
         public static TickFileFilter FromFile(string filename)
