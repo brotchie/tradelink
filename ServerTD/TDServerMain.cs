@@ -8,13 +8,22 @@ using TradeLink.API;
 using TradeLink.Common;
 using AMTD_API;
 
+/*
+ * TO BUILD THIS PROJECT, you must email 
+ * 1) apidev@tdameritrade.com
+ * 2) request their NDA, sign and return it
+ * 3) login to their api site and look in the tradelink forum
+ * 4) first intro post contains a file, download it and put it in this directory
+ * 5) remove TXT extension from file name
+ * 
+ * You should then be able to build this project.
+ */
+
 namespace TDServer
 {
     public partial class TDServerMain : Form
     {
-        // to build this project from source code, you need to sign the TD ameritrade NDA
-        // email apidev@tdameritrade.com and tell them you use tradelink and want to sign the NDA
-#if SIGNED_TD_NDA
+
         AmeritradeBrokerAPI api = new AmeritradeBrokerAPI();
         const string APIVER = "1";
         TLServer_WM tl = new TLServer_WM(TLTypes.LIVEBROKER);
