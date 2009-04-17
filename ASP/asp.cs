@@ -29,7 +29,7 @@ namespace ASP
             catch (Exception ex) { Debug("unable to open log file"); }
             if (sw != null)
                 sw.AutoFlush = true;
-            tl = new TLClient_WM(PROGRAM, true);
+            tl = new TLClient_WM();
             // don't save ticks from replay since they're already saved
             archivetickbox.Checked = tl.LinkType != TLTypes.HISTORICALBROKER;
             tl.gotTick += new TickDelegate(tl_gotTick);
