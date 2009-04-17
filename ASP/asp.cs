@@ -17,10 +17,17 @@ namespace ASP
 {
     public partial class ASP : Form
     {
-        StreamWriter sw = new StreamWriter("ASPDebug." + Util.ToTLDate(DateTime.Now) + ".txt", true);
+        StreamWriter sw;
         public ASP()
         {
             InitializeComponent();
+            try
+            {
+                new StreamWriter("ASPDebug." + Util.ToTLDate(DateTime.Now) + ".txt", true);
+            }
+            catch (Exception ex) { Debug("unable to open log file"); }
+            TwitPopup tp = new TwitPopup();
+            tp.Show();
             if (sw != null)
                 sw.AutoFlush = true;
             tl = new TLClient_WM("ASPclient", true);
