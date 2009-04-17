@@ -1,8 +1,10 @@
 @echo off
+del /q VERSION.txt > NUL
+cls
 echo Getting latest version information, please wait...
 FOR /F "tokens=2 skip=4" %%G IN ('svn info --revision HEAD') DO ^
 IF NOT DEFINED REVISION SET REVISION=%%G
-echo %REVISION% >> VERSION.txt
+echo %REVISION% > VERSION.txt
 cls
 echo Checking for NSIS...
 if not exist "c:\progra~1\nsis\makensis.exe" (

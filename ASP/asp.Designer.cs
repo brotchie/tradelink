@@ -48,8 +48,8 @@ namespace ASP
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this._togglemsgs = new System.Windows.Forms.Button();
             this._account = new System.Windows.Forms.TextBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this._twithelp = new System.Windows.Forms.Button();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.statusStrip1.SuspendLayout();
             this._newrespbox.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -161,10 +161,10 @@ namespace ASP
             this.listBox1.FormattingEnabled = true;
             this.listBox1.HorizontalScrollbar = true;
             this.listBox1.ItemHeight = 20;
-            this.listBox1.Location = new System.Drawing.Point(425, 0);
+            this.listBox1.Location = new System.Drawing.Point(162, 0);
             this.listBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(55, 384);
+            this.listBox1.Size = new System.Drawing.Size(318, 384);
             this.listBox1.TabIndex = 12;
             this.listBox1.Visible = false;
             // 
@@ -242,6 +242,17 @@ namespace ASP
             this._account.Text = global::ASP.Properties.Settings.Default.accountname;
             this.toolTip1.SetToolTip(this._account, "specify trading account name/id where orders are sent");
             // 
+            // _twithelp
+            // 
+            this._twithelp.Location = new System.Drawing.Point(353, 71);
+            this._twithelp.Name = "_twithelp";
+            this._twithelp.Size = new System.Drawing.Size(33, 30);
+            this._twithelp.TabIndex = 19;
+            this._twithelp.Text = "?";
+            this.toolTip1.SetToolTip(this._twithelp, "twit for help");
+            this._twithelp.UseVisualStyleBackColor = true;
+            this._twithelp.Click += new System.EventHandler(this._twithelp_Click);
+            // 
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this._twithelp);
@@ -257,17 +268,6 @@ namespace ASP
             this.groupBox1.TabIndex = 19;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "ASP Options";
-            // 
-            // _twithelp
-            // 
-            this._twithelp.Location = new System.Drawing.Point(353, 71);
-            this._twithelp.Name = "_twithelp";
-            this._twithelp.Size = new System.Drawing.Size(33, 30);
-            this._twithelp.TabIndex = 19;
-            this._twithelp.Text = "?";
-            this.toolTip1.SetToolTip(this._twithelp, "twit for help");
-            this._twithelp.UseVisualStyleBackColor = true;
-            this._twithelp.Click += new System.EventHandler(this._twithelp_Click);
             // 
             // ASP
             // 
