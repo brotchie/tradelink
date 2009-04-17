@@ -59,6 +59,9 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\Sterling+BrokerServer.lnk" "$INSTDIR\SterServer.EXE" "" "$INSTDIR\SterServer.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\TD+BrokerServer.lnk" "$INSTDIR\TDServer.EXE" "" "$INSTDIR\TDServer.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\MB+BrokerServer.lnk" "$INSTDIR\ServerMB.EXE" "" "$INSTDIR\ServerMB.EXE" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink\TS2EPF.lnk" "$INSTDIR\TS2EPF.exe" "" "$INSTDIR\TS2EPF.exe" 0  
+  
+  
   
   
   ; Put file there
@@ -78,6 +81,7 @@ Section "TradeLinkSuite"
   File "Quotopia\bin\release\Quotopia.exe.config"
   File "Quotopia\bin\release\Multimedia.dll"
   File "TradeLinkCommon\bin\release\TradeLinkCommon.dll"
+  File "TradeLinkCommon\bin\release\TwitterooCore.dll"
   File "TradeLinkApi\bin\release\TradeLinkApi.dll"
   File "Gauntlet\bin\release\Gauntlet.exe"
   File "Gauntlet\bin\release\Gauntlet.exe.config"
@@ -99,6 +103,7 @@ Section "TradeLinkSuite"
   File "ServerMB\bin\release\Interop.MBTORDERSLib.dll"    
   File "ServerMB\bin\release\Interop.MBTQUOTELib.dll"    
   File "InstallSuite\VCRedistInstall.exe"
+  File "TS2EPF\bin\release\TS2EPF.exe"
   ; Write the installation path into the registry
   WriteRegStr HKLM SOFTWARE\TradeLinkSuite "Install_Dir" "$INSTDIR"
   
