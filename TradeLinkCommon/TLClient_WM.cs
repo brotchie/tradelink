@@ -250,6 +250,11 @@ namespace TradeLink.Common
         /// 
         public int RequestAccounts() { return (int)TLSend(MessageTypes.ACCOUNTREQUEST, Text); }
         /// <summary>
+        /// send a request so that imbalances are sent when received (via gotImbalance)
+        /// </summary>
+        /// <returns></returns>
+        public int RequestImbalances() { return (int)TLSend(MessageTypes.IMBALANCEREQUEST, Text); }
+        /// <summary>
         /// Sends a request for current positions.  gotPosition event will fire for each position record held by the broker.
         /// </summary>
         /// <param name="account">account to obtain position list for (required)</param>
