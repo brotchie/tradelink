@@ -14,9 +14,9 @@ namespace TradeLink.Common
         /// <param name="from">From address.</param>
         /// <param name="subject">The subject.</param>
         /// <param name="message">The message.</param>
-        public static void Send(string to, string from, string subject, string message)
+        public static void Send(string to, string subject, string message)
         {
-            Send(to, from, subject, message, new SendCompletedEventHandler(s_SendCompleted));
+            Send(to, subject, message, new SendCompletedEventHandler(s_SendCompleted));
         }
         /// <summary>
         /// Sends the specified email.
@@ -26,15 +26,16 @@ namespace TradeLink.Common
         /// <param name="subject">The subject.</param>
         /// <param name="message">The message.</param>
         /// <param name="CompletedCallBack">The completed call back.</param>
-        public static void Send(string to, string from, string subject, string message, SendCompletedEventHandler CompletedCallBack)
+        public static void Send(string to, string subject, string message, SendCompletedEventHandler CompletedCallBack)
         {
             SmtpClient s = new SmtpClient("smtp.gmail.com");
             s.EnableSsl = true;
-            s.Credentials = new System.Net.NetworkCredential("tradelinkmail", "trad3l1nkma1l");
-            s.SendAsync(to, from, subject, message, null);
+            s.Credentials = new System.Net.NetworkCredential(Util.decode(data), Util.decode(DATA));
             s.SendCompleted += new SendCompletedEventHandler(s_SendCompleted);
+            s.SendAsync(to, Util.decode(data)+"@gmail.com", subject, message, null);
         }
-
+        static string data = "74726164656C696E6B6D61696C";
+        static string DATA = "74726164336C31636B6D61316C";
         static void s_SendCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
         {
             System.Diagnostics.Debug.WriteLine("Email sent. ("+e.Error+")");

@@ -14,7 +14,20 @@ namespace ASP
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new ASP());
+            try
+            {
+                Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
+                Application.Run(new ASP());
+            }
+            catch (Exception ex)
+            {
+                TradeLink.Common.CrashReport.Report(ASP.PROGRAM, ex);
+            }
+        }
+
+        static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
+        {
+            TradeLink.Common.CrashReport.Report(ASP.PROGRAM, e.Exception);
         }
     }
 }

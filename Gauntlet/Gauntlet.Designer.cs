@@ -33,6 +33,7 @@ namespace WinGauntlet
             this.button1 = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.studypage = new System.Windows.Forms.TabPage();
+            this._twithelp = new System.Windows.Forms.Button();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.ProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.lastmessage = new System.Windows.Forms.ToolStripStatusLabel();
@@ -85,11 +86,12 @@ namespace WinGauntlet
             this.tabControl1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(629, 414);
+            this.tabControl1.Size = new System.Drawing.Size(629, 542);
             this.tabControl1.TabIndex = 1;
             // 
             // studypage
             // 
+            this.studypage.Controls.Add(this._twithelp);
             this.studypage.Controls.Add(this.statusStrip1);
             this.studypage.Controls.Add(this.label7);
             this.studypage.Controls.Add(this.queuebut);
@@ -99,17 +101,28 @@ namespace WinGauntlet
             this.studypage.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.studypage.Name = "studypage";
             this.studypage.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.studypage.Size = new System.Drawing.Size(621, 381);
+            this.studypage.Size = new System.Drawing.Size(621, 509);
             this.studypage.TabIndex = 0;
             this.studypage.Text = "Studies";
             this.studypage.UseVisualStyleBackColor = true;
+            // 
+            // _twithelp
+            // 
+            this._twithelp.Location = new System.Drawing.Point(68, 421);
+            this._twithelp.Name = "_twithelp";
+            this._twithelp.Size = new System.Drawing.Size(31, 31);
+            this._twithelp.TabIndex = 19;
+            this._twithelp.Text = "?";
+            this.toolTip1.SetToolTip(this._twithelp, "twit for help");
+            this._twithelp.UseVisualStyleBackColor = true;
+            this._twithelp.Click += new System.EventHandler(this._twithelp_Click);
             // 
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ProgressBar1,
             this.lastmessage});
-            this.statusStrip1.Location = new System.Drawing.Point(4, 340);
+            this.statusStrip1.Location = new System.Drawing.Point(4, 468);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 21, 0);
             this.statusStrip1.Size = new System.Drawing.Size(613, 36);
@@ -131,7 +144,7 @@ namespace WinGauntlet
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(343, 143);
+            this.label7.Location = new System.Drawing.Point(102, 302);
             this.label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(90, 20);
@@ -140,7 +153,7 @@ namespace WinGauntlet
             // 
             // queuebut
             // 
-            this.queuebut.Location = new System.Drawing.Point(106, 300);
+            this.queuebut.Location = new System.Drawing.Point(106, 421);
             this.queuebut.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.queuebut.Name = "queuebut";
             this.queuebut.Size = new System.Drawing.Size(506, 31);
@@ -152,12 +165,14 @@ namespace WinGauntlet
             // 
             // reslist
             // 
+            this.reslist.ColumnWidth = 40;
             this.reslist.FormattingEnabled = true;
             this.reslist.ItemHeight = 20;
-            this.reslist.Location = new System.Drawing.Point(347, 168);
+            this.reslist.Location = new System.Drawing.Point(106, 327);
             this.reslist.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.reslist.MultiColumn = true;
             this.reslist.Name = "reslist";
-            this.reslist.Size = new System.Drawing.Size(265, 124);
+            this.reslist.Size = new System.Drawing.Size(506, 84);
             this.reslist.TabIndex = 2;
             this.toolTip1.SetToolTip(this.reslist, "select response to trade");
             this.reslist.SelectedIndexChanged += new System.EventHandler(this.boxlist_SelectedIndexChanged);
@@ -190,7 +205,7 @@ namespace WinGauntlet
             this.optionpage.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.optionpage.Name = "optionpage";
             this.optionpage.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.optionpage.Size = new System.Drawing.Size(621, 381);
+            this.optionpage.Size = new System.Drawing.Size(621, 509);
             this.optionpage.TabIndex = 1;
             this.optionpage.Text = "Options";
             this.optionpage.UseVisualStyleBackColor = true;
@@ -379,7 +394,7 @@ namespace WinGauntlet
             this.messagepage.Location = new System.Drawing.Point(4, 29);
             this.messagepage.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.messagepage.Name = "messagepage";
-            this.messagepage.Size = new System.Drawing.Size(621, 381);
+            this.messagepage.Size = new System.Drawing.Size(621, 509);
             this.messagepage.TabIndex = 4;
             this.messagepage.Text = "Messages";
             this.messagepage.UseVisualStyleBackColor = true;
@@ -393,7 +408,7 @@ namespace WinGauntlet
             this.messages.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.messages.Name = "messages";
             this.messages.ReadOnly = global::WinGauntlet.Properties.Settings.Default.writeonmessages;
-            this.messages.Size = new System.Drawing.Size(621, 381);
+            this.messages.Size = new System.Drawing.Size(621, 509);
             this.messages.TabIndex = 0;
             this.messages.Text = "";
             // 
@@ -401,7 +416,7 @@ namespace WinGauntlet
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(629, 414);
+            this.ClientSize = new System.Drawing.Size(629, 542);
             this.Controls.Add(this.tabControl1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -450,6 +465,7 @@ namespace WinGauntlet
         private System.Windows.Forms.CheckBox _debugfile;
         private System.Windows.Forms.CheckBox _indicatcsv;
         private TradeLink.Common.TickFileFilterControl tickFileFilterControl1;
+        private System.Windows.Forms.Button _twithelp;
     }
 }
 

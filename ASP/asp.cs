@@ -18,19 +18,18 @@ namespace ASP
     public partial class ASP : Form
     {
         StreamWriter sw;
+        public const string PROGRAM = "ASP";
         public ASP()
         {
             InitializeComponent();
             try
             {
-                new StreamWriter("ASPDebug." + Util.ToTLDate(DateTime.Now) + ".txt", true);
+                new StreamWriter(PROGRAM + Util.ToTLDate(DateTime.Now) + ".txt", true);
             }
             catch (Exception ex) { Debug("unable to open log file"); }
-            TwitPopup tp = new TwitPopup();
-            tp.Show();
             if (sw != null)
                 sw.AutoFlush = true;
-            tl = new TLClient_WM("ASPclient", true);
+            tl = new TLClient_WM(PROGRAM, true);
             // don't save ticks from replay since they're already saved
             archivetickbox.Checked = tl.LinkType != TLTypes.HISTORICALBROKER;
             tl.gotTick += new TickDelegate(tl_gotTick);
@@ -299,6 +298,11 @@ namespace ASP
         private void _togglemsgs_Click(object sender, EventArgs e)
         {
             listBox1.Visible = !listBox1.Visible;
+        }
+
+        private void _twithelp_Click(object sender, EventArgs e)
+        {
+            TwitPopup.Twit();
         }                                            
     }
 }

@@ -23,7 +23,17 @@ namespace WinGauntlet
             AttachConsole(ATTACH_PARENT_PROCESS);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Gauntlet());
+            Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
+            try
+            {
+                Application.Run(new Gauntlet());
+            }
+            catch (Exception ex) { TradeLink.Common.CrashReport.Report(Gauntlet.PROGRAM, ex); }
+        }
+
+        static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
+        {
+            TradeLink.Common.CrashReport.Report(Gauntlet.PROGRAM, e.Exception);
         }
     }
 }

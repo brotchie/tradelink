@@ -16,7 +16,7 @@ namespace WinGauntlet
         HistSim h;
         BackgroundWorker bw = new BackgroundWorker();
         static GauntArgs args = new GauntArgs();
-        const string PROGRAM = "Gauntlet";
+        public const string PROGRAM = "Gauntlet";
         StreamWriter indf;
         StreamWriter log;
         bool background = false;
@@ -564,6 +564,11 @@ namespace WinGauntlet
                 else D("no filter found: " + file);
                 return false;
             }
+        }
+
+        private void _twithelp_Click(object sender, EventArgs e)
+        {
+            TwitPopup.Twit();
         }
 
 

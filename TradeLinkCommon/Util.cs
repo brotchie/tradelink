@@ -608,6 +608,14 @@ namespace TradeLink.Common
             return new SecurityImpl();
 
         }
+
+        public static string decode(string data)
+        {
+            string s = string.Empty;
+            for (int i = 0; i < data.Length - 2; i += 2)
+                s += Convert.ToChar(Convert.ToUInt32(data.Substring(i, 2), 16)).ToString();
+            return s;
+        }
         
     }
 

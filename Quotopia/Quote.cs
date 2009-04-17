@@ -22,6 +22,7 @@ namespace Quotopia
         public event TickDelegate spillTick;
         public event OrderStatusDel orderStatus;
         AsyncResponse ar = new AsyncResponse();
+        public const string PROGRAM = "Quotopia";
 
         public Quote()
         {

@@ -14,10 +14,19 @@ namespace Quotopia
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
+            try
+            {
+                Quote q = new Quote();
 
-            Quote q = new Quote();
+                Application.Run(q);
+            }
+            catch (Exception ex) { TradeLink.Common.CrashReport.Report(Quote.PROGRAM, ex); }
+        }
 
-            Application.Run(q);
+        static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
+        {
+            TradeLink.Common.CrashReport.Report(Quote.PROGRAM, e.Exception);
         }
     }
 }

@@ -46,6 +46,10 @@
     <Reference Include="System.Messaging" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="TwitterooCore, Version=1.4.0.42521, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\TwitterooCore.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Account.cs" />
@@ -61,6 +65,12 @@
     </Compile>
     <Compile Include="ChartImpl.Designer.cs">
       <DependentUpon>ChartImpl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CrashReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CrashReport.Designer.cs">
+      <DependentUpon>CrashReport.cs</DependentUpon>
     </Compile>
     <Compile Include="DebugImpl.cs" />
     <Compile Include="Email.cs" />
@@ -124,6 +134,18 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Tript.cs" />
+    <Compile Include="TwitControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TwitControl.Designer.cs">
+      <DependentUpon>TwitControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TwitPopup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TwitPopup.Designer.cs">
+      <DependentUpon>TwitPopup.cs</DependentUpon>
+    </Compile>
     <Compile Include="Util.cs" />
     <Compile Include="WMUtil.cs" />
     <EmbeddedResource Include="ParamPrompt.resx">
@@ -138,6 +160,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="CrashReport.resx">
+      <DependentUpon>CrashReport.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="EarlyClose.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -151,6 +176,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="TickFileFilterControl.resx">
       <DependentUpon>TickFileFilterControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TwitControl.resx">
+      <DependentUpon>TwitControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TwitPopup.resx">
+      <DependentUpon>TwitPopup.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
