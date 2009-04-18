@@ -105,7 +105,7 @@ Section "TradeLinkSuite"
   File "ServerMB\bin\release\Interop.MBTQUOTELib.dll"    
   File "InstallSuite\VCRedistInstall.exe"
   File "TS2EPF\bin\release\TS2EPF.exe"
-  File "TS2EPF\bin\release\CQG2EPF.exe"
+  File "CQG2EPF\bin\release\CQG2EPF.exe"
   ; Write the installation path into the registry
   WriteRegStr HKLM SOFTWARE\TradeLinkSuite "Install_Dir" "$INSTDIR"
   
