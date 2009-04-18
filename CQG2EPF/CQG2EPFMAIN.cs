@@ -11,14 +11,12 @@ using TradeLink.Common;
 using TradeLink.API;
 using System.ComponentModel;
 
-namespace TS2EPF
+namespace CQG2EPF
 {
-    public partial class TS2EPFMain : Form
+    public partial class CQG2EPFMAIN : Form
     {
-
-
         BackgroundWorker bw = new BackgroundWorker();
-        public TS2EPFMain()
+        public CQG2EPFMAIN()
         {
             InitializeComponent();
             bw.WorkerReportsProgress = true;
@@ -49,10 +47,6 @@ namespace TS2EPF
                     // get size of current file and append to total size
                     FileInfo fi = new FileInfo(file);
                     bytes += fi.Length;
-                    // ask user to provide symbol name 
-                    string sym = Microsoft.VisualBasic.Interaction.InputBox("What symbol is represented by this file?"+Environment.NewLine+Path.GetFileNameWithoutExtension(file), "Identify symbol", Path.GetFileNameWithoutExtension(file), 0, 0);
-                    // keep track of relationship
-                    _filesyms.Add(file, sym);
                 }
                 // estimate total ticks
                 _approxtotal = (int)((double)bytes / 51);
@@ -73,7 +67,7 @@ namespace TS2EPF
             {
                 debug("input file: " + Path.GetFileNameWithoutExtension(file));
                 // convert file
-                bool fg = convert(file, _filesyms[file], (int)_defaultsize.Value);
+                bool fg = convert(file, (int)_defaultsize.Value);
                 // report progress
                 if (!fg) debug("error converting file: " + file);
                 g &= fg;
@@ -97,7 +91,7 @@ namespace TS2EPF
 
         int _ticksprocessed = 0;
         int _approxtotal = 0;
-        bool convert(string filename,string sym,int tradesize)
+        bool convert(string filename,int tradesize)
         {
             bool g = true;
             // get output filename
@@ -110,8 +104,6 @@ namespace TS2EPF
             {
                 // open input file
                 infile = new StreamReader(filename);
-                // read in and ignore header of input file
-                infile.ReadLine();
             }
             catch (Exception ex) { debug("error reading input header:" + ex.Message); g = false; }
             // setup previous tick
@@ -119,7 +111,7 @@ namespace TS2EPF
             do
             {
                 // get next tick from the file
-                TickImpl k = parseline(infile.ReadLine(), sym, tradesize);
+                TickImpl k = parseline(infile.ReadLine(), tradesize);
                 // if dates don't match, we need to write new output file
                 if (k.date != pk.date)
                 {
@@ -128,11 +120,11 @@ namespace TS2EPF
                     try
                     {
                         // get file name
-                        string fn = _path+"//"+sym + k.date + ".EPF";
+                        string fn = _path+"//"+k.symbol + k.date + ".EPF";
                         // setup new file
                         outfile = new StreamWriter(fn, false);
                         // write file header
-                        outfile.Write(eSigTick.EPFheader(sym, k.date));
+                        outfile.Write(eSigTick.EPFheader(k.symbol, k.date));
                         // report progress
                         progress((double)_ticksprocessed / _approxtotal);
                     }
@@ -158,35 +150,31 @@ namespace TS2EPF
         }
 
         // fields of tradestation files
-        const int DATE = 0;
-        const int TIME = 1;
-        const int OPEN = 2;
-        const int HIGH = 3;
-        const int LOW = 4;
-        const int CLOSE = 5;
-        const int UP = 6;
-        const int DOWN = 7;
+        const int SYM = 0;
+        const int DATE = 1;
+        const int TIME = 3;
+        const int TRADE = 4;
+
         // here is where a line is converted
-        TickImpl parseline(string line, string sym, int defaultsize)
+        TickImpl parseline(string line, int defaultsize)
         {
             // split line
             string[] r = line.Split(',');
             // create tick for this symbol
-            TickImpl k = new TickImpl(sym);
+            TickImpl k = new TickImpl(r[SYM]);
             // setup temp vars
             int iv = 0;
             decimal dv = 0;
-            DateTime date;
             // parse date
-            if (DateTime.TryParse(r[DATE], out date))
-                k.date = Util.ToTLDate(date);
+            if (int.TryParse(r[DATE], out iv))
+                k.date = iv;
             // parse time
             if (int.TryParse(r[TIME], out iv))
                 k.time = iv * 100;
             // parse close as trade price
-            if (decimal.TryParse(r[CLOSE], out dv))
+            if (decimal.TryParse(r[TRADE], out dv))
             {
-                k.trade = dv;
+                k.trade = (decimal)dv/100;
                 k.size = defaultsize;
             }
             // return tick

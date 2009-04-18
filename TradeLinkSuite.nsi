@@ -60,6 +60,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\TD+BrokerServer.lnk" "$INSTDIR\TDServer.EXE" "" "$INSTDIR\TDServer.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\MB+BrokerServer.lnk" "$INSTDIR\ServerMB.EXE" "" "$INSTDIR\ServerMB.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\TS2EPF.lnk" "$INSTDIR\TS2EPF.exe" "" "$INSTDIR\TS2EPF.exe" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink\CQG2EPF.lnk" "$INSTDIR\CQG2EPF.exe" "" "$INSTDIR\CQG2EPF.exe" 0  
   
   
   
@@ -104,6 +105,7 @@ Section "TradeLinkSuite"
   File "ServerMB\bin\release\Interop.MBTQUOTELib.dll"    
   File "InstallSuite\VCRedistInstall.exe"
   File "TS2EPF\bin\release\TS2EPF.exe"
+  File "TS2EPF\bin\release\CQG2EPF.exe"
   ; Write the installation path into the registry
   WriteRegStr HKLM SOFTWARE\TradeLinkSuite "Install_Dir" "$INSTDIR"
   
@@ -154,6 +156,8 @@ Section "Uninstall"
   Delete "$SMPROGRAMS\TradeLink\TDServer.lnk"
   Delete "$SMPROGRAMS\TradeLink\Uninstall TradeLinkSuite"
   Delete "$SMPROGRAMS\TradeLink\MB+BrokerServer.lnk"
+  Delete "$SMPROGRAMS\TradeLink\CQG2EPF.lnk"
+  Delete "$SMPROGRAMS\TradeLink\TS2EPF.lnk"
 
   ; Remove directories used
   RMDir "$SMPROGRAMS\TradeLink"
