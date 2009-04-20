@@ -11,7 +11,10 @@ namespace TradeLink.Common
     {
         OffsetInfo _default = new OffsetInfo();
         string[] _ignore = new string[0];
-        public OffsetInfo DefaultOffset { get { return _default; } set { _default = value; } }
+        /// <summary>
+        /// default offset used by the tracker, in the event no custom offset is set. eg ot["IBM"] = new OffsetInfo();
+        /// </summary>
+        public OffsetInfo DefaultOffset { get { return new OffsetInfo(_default); } set { value.ProfitId = 0; value.StopId = 0; _default = value; } }
         bool _ignoredefault = false;
         /// <summary>
         /// ignore symbols by default.   if true... a symbol has no custom offset defined will be ignored (regardless of ignore list).  the default is false.
@@ -25,9 +28,15 @@ namespace TradeLink.Common
         public event OrderDelegate SendOffset;
         public event UIntDelegate SendCancel;
         PositionTracker _pt = new PositionTracker();
+        /// <summary>
+        /// a position tracker you can reuse 
+        /// </summary>
         public PositionTracker PositionTracker { get { return _pt; } set { _pt = value; } }
         public OffsetTracker() { }
         public IdTracker _ids = new IdTracker();
+        /// <summary>
+        /// id tracker used by offsettracker, you can reuse in other apps you use OT.
+        /// </summary>
         public IdTracker Ids { get { return _ids; } set { _ids = value; } }
         public OffsetTracker(uint initialid) : this(new IdTracker(initialid)) { }
         public OffsetTracker(IdTracker tracker)
@@ -229,7 +238,7 @@ namespace TradeLink.Common
         /// must send new positions here (eg from GotPosition on Response)
         /// </summary>
         /// <param name="p"></param>
-        public void UpdatePosition(Position p)
+        public void Adjust(Position p)
         {
             // update position
             _pt.Adjust(p);
@@ -243,7 +252,7 @@ namespace TradeLink.Common
         /// must send new fills here (eg call from Response.GotFill)
         /// </summary>
         /// <param name="t"></param>
-        public void UpdatePosition(Trade t)
+        public void Adjust(Trade t)
         {
             // update position
             _pt.Adjust(t);
@@ -269,7 +278,7 @@ namespace TradeLink.Common
             if (_offvals.TryGetValue(sym, out val))
                 return val;
             // otherwise use default
-            return _default;
+            return DefaultOffset;
         }
 
         void SetOffset(string sym, OffsetInfo off)
@@ -280,7 +289,10 @@ namespace TradeLink.Common
             else
                 _offvals.Add(sym, off);
         }
-
+        /// <summary>
+        /// should be called from GotCancel, when cancels arrive from broker.
+        /// </summary>
+        /// <param name="id"></param>
         public void GotCancel(uint id)
         {
             // find any matching orders and reflect them as canceled
@@ -302,8 +314,25 @@ namespace TradeLink.Common
 
     }
 
+    /// <summary>
+    /// instructions used to control offset amounts and distances.
+    /// </summary>
     public class OffsetInfo
     {
+        /// <summary>
+        /// copy an existing offset to this one
+        /// </summary>
+        /// <param name="copy"></param>
+        public OffsetInfo(OffsetInfo copy) : this(copy.ProfitDist, copy.StopDist, copy.ProfitPercent, copy.StopPercent, copy.NormalizeSize, copy.MinimumLotSize) { }
+        /// <summary>
+        /// create an offset instruction
+        /// </summary>
+        /// <param name="profitdist">in cents</param>
+        /// <param name="stopdist">in cents</param>
+        /// <param name="profitpercent">in percent (eg .1 = 10%)</param>
+        /// <param name="stoppercent">in percent (eg .1 = 10%)</param>
+        /// <param name="NormalizeSize">true or false</param>
+        /// <param name="MinSize">minimum lot size when normalize size is true</param>
         public OffsetInfo(decimal profitdist, decimal stopdist, decimal profitpercent, decimal stoppercent, bool NormalizeSize, int MinSize)
         {
             ProfitDist = profitdist;

@@ -34,14 +34,14 @@ namespace TestTradeLink
             Assert.AreEqual(0, profits.Count);
             Assert.AreEqual(0, stops.Count);
             // send position update to generate offsets
-            ot.UpdatePosition(new PositionImpl(SYM, PRICE, SIZE));
+            ot.Adjust(new PositionImpl(SYM, PRICE, SIZE));
             // make sure offsets don't exist
             Assert.AreEqual(0, profits.Count);
             Assert.AreEqual(0, stops.Count);
             // add a custom offset 
             ot[SYMB] = SampleOffset();
             // send position update to generate offsets
-            ot.UpdatePosition(new PositionImpl(SYMB, PRICE, SIZE));
+            ot.Adjust(new PositionImpl(SYMB, PRICE, SIZE));
             // verify orders exist
             Assert.AreEqual(1, profits.Count);
             Assert.AreEqual(1, stops.Count);
@@ -110,7 +110,7 @@ namespace TestTradeLink
             // setup offset defaults
             ot.DefaultOffset = SampleOffset();
             // send position update to generate offsets
-            ot.UpdatePosition(new PositionImpl(SYM, PRICE,SIZE));
+            ot.Adjust(new PositionImpl(SYM, PRICE,SIZE));
             // verify orders exist
             Assert.AreEqual(1, profits.Count);
             Assert.AreEqual(1, stops.Count);
@@ -129,7 +129,7 @@ namespace TestTradeLink
 
 
             // send position update
-            ot.UpdatePosition(new TradeImpl(SYM, PRICE+2, SIZE));
+            ot.Adjust(new TradeImpl(SYM, PRICE+2, SIZE));
             // verify only one order exists
             Assert.AreEqual(1, profits.Count);
             Assert.AreEqual(1, stops.Count);
@@ -146,7 +146,7 @@ namespace TestTradeLink
             Assert.AreEqual(SIZE*2, stop.UnsignedSize);
 
             // partial hit the profit order
-            ot.UpdatePosition(new TradeImpl(SYM, PRICE + 1, -1 * SIZE));
+            ot.Adjust(new TradeImpl(SYM, PRICE + 1, -1 * SIZE));
             // verify only one order exists on each side
             Assert.AreEqual(1, profits.Count);
             Assert.AreEqual(1, stops.Count);
