@@ -4,8 +4,16 @@ using System.Text.RegularExpressions;
 
 namespace TradeLink.Research
 {
+    /// <summary>
+    /// parse symbols (most likely to be stocks) from a string
+    /// </summary>
     public class ParseStocks
     {
+        /// <summary>
+        /// gets nyse symbols
+        /// </summary>
+        /// <param name="ParseStocks"></param>
+        /// <returns></returns>
         public static BasketImpl NYSE(string ParseStocks)
         {
             BasketImpl mb = new BasketImpl();
@@ -14,7 +22,11 @@ namespace TradeLink.Research
                 mb.Add(new SecurityImpl(mc[i].Value.ToUpper()));
             return mb;
         }
-
+        /// <summary>
+        /// gets nasdaq symbols
+        /// </summary>
+        /// <param name="ParseStocks"></param>
+        /// <returns></returns>
         public static BasketImpl NASDAQ(string ParseStocks)
         {
             BasketImpl mb = new BasketImpl();
@@ -24,7 +36,11 @@ namespace TradeLink.Research
                 mb.Add(new SecurityImpl(mc[i].Value.ToUpper()));
             return mb;
         }
-
+        /// <summary>
+        /// gets clickable symbols found in a string (eg html)
+        /// </summary>
+        /// <param name="parsestring"></param>
+        /// <returns></returns>
         public static BasketImpl LinkedOnlyNYSE(string parsestring)
         {
             BasketImpl mb = new BasketImpl();
@@ -39,7 +55,11 @@ namespace TradeLink.Research
             }
             return mb;
         }
-
+        /// <summary>
+        /// gets clickable nasdaq symbols found in a string (eg html)
+        /// </summary>
+        /// <param name="parsestring"></param>
+        /// <returns></returns>
         public static BasketImpl LinkedOnlyNASDAQ(string parsestring)
         {
             BasketImpl mb = new BasketImpl();

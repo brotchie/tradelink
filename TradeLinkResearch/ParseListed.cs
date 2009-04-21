@@ -5,7 +5,10 @@ using System.Linq;
 
 namespace TradeLink.Research
 {
-
+    /// <summary>
+    /// get a list of verified NASDAQ or NYSE symbols.
+    /// (not guaranteed to be current, static list is distributed with Research components)
+    /// </summary>
     public class SymbolList 
     {
         public const int SYM = 0;

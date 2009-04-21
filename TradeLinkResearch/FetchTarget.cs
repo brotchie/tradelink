@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.Text;
 using TradeLink.Common;
 using System.Web;
+using TradeLink.API;
 
 namespace TradeLink.Research
 {
+    /// <summary>
+    /// used to serialize and store parameters selected in a FetchBasket popup.
+    /// </summary>
     public class FetchTarget
     {
         public FetchTarget() 
@@ -26,18 +30,31 @@ namespace TradeLink.Research
         public bool ParseNYSE { get { return _nyse; } set { _nyse = value; } }
         public bool ParseNASD { get { return _nasd; } set { _nasd = value; } }
         public bool RemoveDupes { get { return _xdupe; } set { _xdupe = value; } }
-        public BasketImpl Go()
+        /// <summary>
+        /// fetches the basket
+        /// </summary>
+        /// <returns></returns>
+        public Basket Go()
         {
             if (_file != "") return FILE();
             return URL();
         }
-        public BasketImpl Go(string username)
+        /// <summary>
+        /// unused.
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        public Basket Go(string username)
         {
             return Go();
         }
-        public BasketImpl URL()
+        /// <summary>
+        /// gets a basket from a url
+        /// </summary>
+        /// <returns></returns>
+        public Basket URL()
         {
-            BasketImpl mb = new BasketImpl();
+            Basket mb = new BasketImpl();
             if (!Uri.IsWellFormedUriString(_url, UriKind.RelativeOrAbsolute)) return mb;
             if (_nyse && _linkedonly) mb.Add(Fetch.LinkedNYSEFromURL(_url));
             else if (_nyse) mb.Add(Fetch.NYSEFromURL(_url));
@@ -46,9 +63,13 @@ namespace TradeLink.Research
             if (_xdupe) mb = Fetch.RemoveDupe(mb);
             return mb;
         }
-        public BasketImpl FILE()
+        /// <summary>
+        /// gets a basket from a file
+        /// </summary>
+        /// <returns></returns>
+        public Basket FILE()
         {
-            BasketImpl mb = new BasketImpl();
+            Basket mb = new BasketImpl();
             if ((_file == "") || (_file == null)) return mb;
             System.IO.StreamReader sr = null;
             try
@@ -66,11 +87,20 @@ namespace TradeLink.Research
             
             
         }
+        /// <summary>
+        /// serialize these parameters for later use
+        /// </summary>
+        /// <returns></returns>
         public string Serialize()
         {
             string[] s = new string[] { _url, _name, _nyse.ToString(), _nasd.ToString(),_xdupe.ToString(),_linkedonly.ToString() };
             return string.Join(",", s);
         }
+        /// <summary>
+        /// restore parameters from file or network location.
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <returns></returns>
         public static FetchTarget Deserialize(string msg)
         {
             string[] r = msg.Split(',');

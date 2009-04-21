@@ -6,8 +6,15 @@ using System.Net;
 
 namespace TradeLink.Research
 {
+    /// <summary>
+    /// obtain a realtime quote from yahoo.
+    /// (take caution not to overuse this.  yahoo will rate limit you.)
+    /// </summary>
     public class QuickQuote
     {
+        /// <summary>
+        /// base url for service
+        /// </summary>
         const string baseurl = "http://download.finance.yahoo.com/d/quotes.csv?f=sl1d1t1c1ohgvj1pp2wern&s=";
         public string Symbol = "";
         public decimal price;
@@ -20,7 +27,11 @@ namespace TradeLink.Research
         public string Company = "";
 
         public bool isValid { get { return (Symbol != "") && (price != 0); } }
-
+        /// <summary>
+        /// fetch a quick quote from the yahoo service. returns a quick quote object.
+        /// </summary>
+        /// <param name="sym"></param>
+        /// <returns></returns>
         public static QuickQuote Fetch(string sym)
         {
             QuickQuote qq = new QuickQuote();

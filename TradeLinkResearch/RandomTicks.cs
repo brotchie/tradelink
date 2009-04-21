@@ -7,14 +7,35 @@ using TradeLink.Common;
 
 namespace TradeLink.Research
 {
+    /// <summary>
+    /// create an array of ticks that is a random walk from an initial set of ticks.
+    /// walk varies between +MaxMoveCents and -MaxMoveCents.
+    /// at present no quotes are generated, only trades.
+    /// </summary>
     public class RandomTicks
     {
+        /// <summary>
+        /// create random ticks for desired number of symbols
+        /// </summary>
+        /// <param name="symcount"></param>
         public RandomTicks(int symcount) : this(RandomSymbol.GetSymbols((int)DateTime.Now.Ticks, 4, symcount)) { }
         Tick[][] _feed = new Tick[0][];
         string[] _syms = new string[0];
         decimal[] _iprice = new decimal[0];
+        /// <summary>
+        /// obtain list of symbols
+        /// </summary>
         public string[] Symbols { get { return _syms; } }
+        /// <summary>
+        /// obtain randomized ticks.  each 1st dimension array corresponds to Symbol in same-position of this.Symbols[]
+        /// Ticks are listed sequentionally in the 2nd dimension.
+        /// </summary>
         public Tick[][] Ticks { get { return _feed; } }
+        /// <summary>
+        /// gets desired number of random [initial] prices.
+        /// </summary>
+        /// <param name="pricecount"></param>
+        /// <returns></returns>
         public static decimal[] RandomPrices(int pricecount) { return RandomPrices(pricecount,(int)DateTime.Now.Ticks); }
         /// <summary>
         /// provides a group of random prices
@@ -50,7 +71,13 @@ namespace TradeLink.Research
         }
         int _maxmove = 3;
         int _volpertrade = 100;
+        /// <summary>
+        /// random walk varies between +MaxMoveCents and -MaxMoveCents
+        /// </summary>
         public int MaxMoveCents { get { return _maxmove; } set { _maxmove = Math.Abs(value); } }
+        /// <summary>
+        /// volume to use on each tick
+        /// </summary>
         public int VolPerTrade { get { return _volpertrade; } set { _volpertrade = value; } }
         /// <summary>
         /// generate Ticks per symbol using a random walk from initial prices

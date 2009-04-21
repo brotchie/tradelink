@@ -6,9 +6,13 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using TradeLink.Common;
+using TradeLink.API;
 
 namespace TradeLink.Research
 {
+    /// <summary>
+    /// a handy popup box that lets a user fetch symbols from URL, using the Fetch class.
+    /// </summary>
     public partial class FetchBasket : Form
     {
         public delegate string FetchUsernameDelegate();
@@ -44,9 +48,9 @@ namespace TradeLink.Research
             Target = ft;
 
         }
-        BasketImpl _basket = new BasketImpl();
+        Basket _basket = new BasketImpl();
 
-        public BasketImpl Basket { get { return _basket; }  }
+        public Basket Basket { get { return _basket; }  }
         public FetchTarget Target 
         { 
             get { return _ft; }
@@ -71,7 +75,7 @@ namespace TradeLink.Research
             string username = "";
             if (FetchUsername != null) username = FetchUsername();
             _basket = _ft.Go(username);
-            if (_basket.hasStock)
+            if (_basket.Count>0)
                 DialogResult = DialogResult.OK;
             else
                 DialogResult = DialogResult.Abort;

@@ -4,9 +4,27 @@ using System.Text;
 
 namespace TradeLink.Research
 {
+    /// <summary>
+    /// used for generating random symbol names in studies.
+    /// (eg if you want to randomly walk the security space)
+    /// Whenever 'seed' is specified, use a randomized value... eg
+    /// (int)DateTime.Now.Ticks or likewise
+    /// </summary>
     public class RandomSymbol
     {
+        /// <summary>
+        /// gets a single random symbol.
+        /// 
+        /// </summary>
+        /// <param name="seed"></param>
+        /// <returns></returns>
         public static string GetSymbol(int seed) { return GetSymbol(seed, 4); }
+        /// <summary>
+        /// gets a single random symbol with a specified maximum length
+        /// </summary>
+        /// <param name="seed"></param>
+        /// <param name="maxlength"></param>
+        /// <returns></returns>
         public static string GetSymbol(int seed,int maxlength)
         {
             Random r = new Random(seed + DateTime.Now.DayOfYear+ DateTime.Now.Hour + DateTime.Now.Minute + DateTime.Now.Second+ DateTime.Now.Millisecond);
@@ -17,6 +35,11 @@ namespace TradeLink.Research
             return sym;
         }
 
+        /// <summary>
+        /// convert a list of ASCII integers to corresponding string
+        /// </summary>
+        /// <param name="codes"></param>
+        /// <returns></returns>
         public static string Alphacodes2string(int[] codes)
         {
             string s = "";
@@ -24,7 +47,12 @@ namespace TradeLink.Research
                 s += (char)(c+64);
             return s;
         }
-
+        /// <summary>
+        /// convert from base ten to another number system
+        /// </summary>
+        /// <param name="num"></param>
+        /// <param name="destbase"></param>
+        /// <returns></returns>
         public static int[] BaseTenConvert(int num, int destbase)
         {
             List<int> ordinals = new List<int>();
@@ -40,13 +68,24 @@ namespace TradeLink.Research
             ordinals.Add(rem);
             return ordinals.ToArray();
         }
-
+        /// <summary>
+        /// get a random list of symbols of a random length, given seed. (eg (int)DateTime.Now.Ticks
+        /// </summary>
+        /// <param name="seed"></param>
+        /// <returns></returns>
         public static string[] GetSymbols(int seed)
         {
             Random r = new Random(seed);
             int symbolcount = r.Next();
             return GetSymbols(seed, 4,symbolcount);
         }
+        /// <summary>
+        /// get a random list of symbols, given seed, maximum symbol length and desired number of symbols. (seed eg (int)DateTime.Now.Ticks
+        /// </summary>
+        /// <param name="seed"></param>
+        /// <param name="symlength"></param>
+        /// <param name="symbolcount"></param>
+        /// <returns></returns>
         public static string[] GetSymbols(int seed, int symlength, int symbolcount)
         {
 
