@@ -13,8 +13,6 @@ namespace Replay
         public Playback(HistSim simulator) 
         { 
             h = simulator;
-            h.Reset();
-            h.Initialize();
             WorkerSupportsCancellation = true;
             WorkerReportsProgress = true;
         }

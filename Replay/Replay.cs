@@ -32,6 +32,12 @@ namespace Replay
             h.SimBroker.GotOrder += new OrderDelegate(SimBroker_GotOrder);
             h.SimBroker.GotFill += new FillDelegate(SimBroker_GotFill);
             h.SimBroker.GotOrderCancel += new OrderCancelDelegate(SimBroker_GotOrderCancel);
+            h.CacheWait = 500;
+            // setup playback
+            _playback = new Playback(h);
+            _playback.RunWorkerCompleted += new RunWorkerCompletedEventHandler(_playback_RunWorkerCompleted);
+            _playback.ProgressChanged += new ProgressChangedEventHandler(_playback_ProgressChanged);
+
 
             status(Util.TLSIdentity());
 
@@ -182,7 +188,15 @@ namespace Replay
             fd.Description = "Choose folder containing tick or index archive files...";
             if (fd.ShowDialog() == DialogResult.OK)
             {
+                // verify user's tick folder exists
+                if (!Directory.Exists(fd.SelectedPath))
+                {
+                    status("Tick folder " + tickfolder + " doesn't exist,  stopping.");
+                    return;
+                }
                 tickfolder = fd.SelectedPath;
+                // set the user's tick folder
+                h.Folder = tickfolder;
             }
 
         }
@@ -197,27 +211,10 @@ namespace Replay
 
         private void playbut_Click(object sender, EventArgs e)
         {
-            // verify user's tick folder exists
-            if (!Directory.Exists(tickfolder))
-            {
-                status("Tick folder " + tickfolder + " doesn't exist,  stopping.");
-                return;
-            }
+            status("preparing simulation");
             // clear highs and lows
             highs = new Dictionary<string, decimal>();
             lows = new Dictionary<string, decimal>();
-            // set the user's tick folder
-            h.Folder = tickfolder;
-            // create a new filter
-            TickFileFilter tff = new TickFileFilter();
-            // populate the filter from user's calendar
-            tff.DateFilter(Util.ToTLDate(monthCalendar1.SelectionEnd),DateMatchType.Day|DateMatchType.Month|DateMatchType.Year);
-            // set the filter on the simulator
-            h.FileFilter = tff;
-            // setup playback
-            _playback = new Playback(h);
-            _playback.RunWorkerCompleted += new RunWorkerCompletedEventHandler(_playback_RunWorkerCompleted);
-            _playback.ProgressChanged+=new ProgressChangedEventHandler(_playback_ProgressChanged);
             // start playback
             _playback.RunWorkerAsync(new PlayBackArgs((int)trackBar1.Value/5,Util.DT2FT(daystartpicker.Value)));
             // notify user
@@ -274,7 +271,7 @@ namespace Replay
         {
             progressbar.Value = (e.ProgressPercentage < 101) && (e.ProgressPercentage>=0) ? e.ProgressPercentage : 0;
             int ctime = (int)(h.NextTickTime % 1000000) / 100;
-            string time = (h != null) ? ctime.ToString("N0") : "";
+            string time = (h != null) ? string.Format("{0:####:##}",ctime) : "";
             status("Playing: " +time+ " ("+e.ProgressPercentage + "%)");
         }
 
@@ -432,6 +429,16 @@ namespace Replay
             stopbut.Enabled = false;
             playbut.Enabled = true;
             trackBar1.Enabled = true;
+        }
+
+        private void monthCalendar1_DateSelected(object sender, DateRangeEventArgs e)
+        {
+            // create a new filter
+            TickFileFilter tff = new TickFileFilter();
+            // populate the filter from user's calendar
+            tff.DateFilter(Util.ToTLDate(monthCalendar1.SelectionEnd), DateMatchType.Day | DateMatchType.Month | DateMatchType.Year);
+            // set the filter on the simulator
+            h.FileFilter = tff;
         }
 
 
