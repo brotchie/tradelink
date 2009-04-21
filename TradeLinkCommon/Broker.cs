@@ -8,6 +8,7 @@ namespace TradeLink.Common
 
     /// <summary>
     /// A simulated broker class for TradeLink.
+    /// Processes orders and fills them against external tick feed. (live or historical)
     /// </summary>
     public class Broker
     {

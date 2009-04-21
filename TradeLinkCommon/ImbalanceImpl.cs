@@ -5,6 +5,9 @@ using TradeLink.API;
 
 namespace TradeLink.Common
 {
+    /// <summary>
+    /// receive imbalance information via tradelink
+    /// </summary>
     public class ImbalanceImpl : Imbalance
     {
         public ImbalanceImpl() { }

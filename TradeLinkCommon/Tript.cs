@@ -3,6 +3,13 @@ using System;
 // this namespace is intentionally different from the rest of TradeLink.Common
 namespace Tript // a special class/namespace for use only with Tript
 {
+    /// <summary>
+    /// a class to access certain features of tript quickly.
+    /// eg type 
+    /// q.help - to get list of help
+    /// q.o - to print a line in tript output window
+    /// q.o - to print a line with return in tript output window
+    /// </summary>
     public static class q
     {
         public static void  help()

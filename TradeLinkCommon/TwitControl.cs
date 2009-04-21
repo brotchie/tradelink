@@ -24,6 +24,10 @@ using TradeLink.API;
 
 namespace TradeLink.Common
 {
+    /// <summary>
+    /// allows user to communicate with other tradelink users via twitter
+    /// (public communications only)
+    /// </summary>
     public partial class TwitControl : UserControl
     {
         Timer _t = new Timer();

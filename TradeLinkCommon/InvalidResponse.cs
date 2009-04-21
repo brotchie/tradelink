@@ -5,6 +5,9 @@ using System.Text;
 
 namespace TradeLink.Common
 {
+    /// <summary>
+    /// used to signify a response was invalid, an incompatible version or otherwise unloadable.
+    /// </summary>
     public class InvalidResponse : Response
     {
 

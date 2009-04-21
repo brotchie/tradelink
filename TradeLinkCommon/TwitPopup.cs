@@ -8,6 +8,9 @@ using System.Windows.Forms;
 
 namespace TradeLink.Common
 {
+    /// <summary>
+    /// popup window that allows users to communicate with other tradleink users via twitter in real time.
+    /// </summary>
     public partial class TwitPopup : Form
     {
         public TwitPopup()

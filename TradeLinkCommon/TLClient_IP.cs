@@ -6,6 +6,11 @@ using System.Net.Sockets;
 
 namespace TradeLink.Common
 {
+    /// <summary>
+    /// TradeLink Clients can connect to any supported tradelink broker.
+    /// version of the tradelink protocol using IP as transport.
+    /// (in development)
+    /// </summary>
     public class TLClient_IP
     {
         const int DEFAULTPORT = 3000;

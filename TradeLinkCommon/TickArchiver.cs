@@ -6,6 +6,9 @@ using TradeLink.API;
 
 namespace TradeLink.Common
 {
+    /// <summary>
+    /// archive ticks as they arrive.   Once archived, ticks can be replayed, viewed or analyzed in any of the tradelink programs.
+    /// </summary>
     public class TickArchiver
     {
         string _path;

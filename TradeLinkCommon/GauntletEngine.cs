@@ -2,6 +2,9 @@ using TradeLink.API;
 
 namespace TradeLink.Common
 {
+    /// <summary>
+    /// lightweight backtesting class that includes binding of data and simulation components.
+    /// </summary>
     public class GauntletEngine
     {
         TradeLink.API.Response _r;

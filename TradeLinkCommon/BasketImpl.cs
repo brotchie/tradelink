@@ -7,7 +7,7 @@ using System.IO;
 namespace TradeLink.Common
 {
     /// <summary>
-    /// Holds collections of stock instances.
+    /// Holds collections of securities.
     /// </summary>
     [Serializable]
     public class BasketImpl : TradeLink.API.Basket

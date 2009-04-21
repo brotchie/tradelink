@@ -10,6 +10,10 @@ using TradeLink.API;
 
 namespace TradeLink.Common
 {
+    /// <summary>
+    /// a GUI for building tick file filters easily.
+    /// useful for selecting a backtesting run.
+    /// </summary>
     public partial class TickFileFilterControl : UserControl
     {
         /// <summary>

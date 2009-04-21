@@ -6,6 +6,9 @@ using TradeLink.API;
 
 namespace TradeLink.Common
 {
+    /// <summary>
+    /// utility class to support windows messaging transport for tradelink clients.
+    /// </summary>
     public static class WMUtil
     {
         // used to unpack an lparam to a decimal

@@ -6,7 +6,7 @@ using TradeLink.API;
 namespace TradeLink.Common
 {
     /// <summary>
-    /// Create debug messages
+    /// Create and send debug messages
     /// </summary>
     [Serializable]
     public class DebugImpl : Debug

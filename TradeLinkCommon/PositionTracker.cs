@@ -6,7 +6,10 @@ using TradeLink.API;
 
 namespace TradeLink.Common
 {
-
+    /// <summary>
+    /// easily trade positions for a collection of securities.
+    /// automatically builds positions from existing positions and new trades.
+    /// </summary>
     public class PositionTracker
     {
         public PositionTracker() { }

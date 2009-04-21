@@ -6,6 +6,10 @@ using TradeLink.API;
 
 namespace TradeLink.Common
 {
+    /// <summary>
+    /// represent barlists as an efficiently sized graphic called a sparkline.
+    /// see wikipedia for definition of a sparkline
+    /// </summary>
     public class SparkLine
     {
         int h = 0;

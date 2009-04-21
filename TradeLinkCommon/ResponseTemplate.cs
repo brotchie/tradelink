@@ -6,8 +6,13 @@ using TradeLink.API;
 
 namespace TradeLink.Common
 {
-    // A response is the most generic type of response you can have
-    // responses will work in all the TradeLink programs (gauntlet/asp/kadina)
+    /// <summary>
+    /// Template for most typical response.  Inherit from this to create a symbol grey or black strategy.
+    /// eg:
+    /// public class MyStrategy : ResponseTemplate
+    /// {
+    /// }
+    /// </summary>
     public class ResponseTemplate : Response
     {
         /// <summary>
@@ -53,20 +58,70 @@ namespace TradeLink.Common
         public virtual void Reset()
         {
         }
-
+        /// <summary>
+        /// short form of senddebug
+        /// </summary>
+        /// <param name="msg"></param>
         public virtual void D(string msg) { SendDebug(DebugImpl.Create(msg)); }
+        /// <summary>
+        /// short form of sendorder
+        /// </summary>
+        /// <param name="o"></param>
         public virtual void O(Order o) { SendOrder(o); }
+        /// <summary>
+        /// short form of sendcancel
+        /// </summary>
+        /// <param name="id"></param>
         public virtual void C(uint id) { SendCancel(id); }
+        /// <summary>
+        /// short form of sendindicator
+        /// </summary>
+        /// <param name="indicators"></param>
         public void I(string indicators) { SendIndicators(indicators); }
+        /// <summary>
+        /// short form of sendindicator
+        /// </summary>
+        /// <param name="indicators"></param>
         public void I(object[] indicators) { string[] s = new string[indicators.Length]; for (int i = 0; i < indicators.Length; i++) s[i] = indicators[i].ToString(); SendIndicators(string.Join(",", s)); }
+        /// <summary>
+        /// short form of sendindicator
+        /// </summary>
+        /// <param name="indicators"></param>
         public void I(string[] indicators) { SendIndicators(string.Join(",", indicators)); }
-
+        /// <summary>
+        /// sends an order
+        /// </summary>
+        /// <param name="o"></param>
         public void sendorder(Order o) { SendOrder(o); }
+        /// <summary>
+        /// cancels an order (must have the id)
+        /// </summary>
+        /// <param name="id"></param>
         public void sendcancel(uint id) { SendCancel(id); }
+        /// <summary>
+        /// sends indicators as array of objects for later analysis
+        /// </summary>
+        /// <param name="indicators"></param>
         public void sendindicators(object[] indicators) { string[] s = new string[indicators.Length]; for (int i = 0; i < indicators.Length; i++) s[i] = indicators[i].ToString(); SendIndicators(string.Join(",", s)); }
+        /// <summary>
+        /// send indicators as array of strings for later analysis
+        /// </summary>
+        /// <param name="indicators"></param>
         public void sendindicators(string[] indicators) { SendIndicators(string.Join(",", indicators)); }
+        /// <summary>
+        /// sends indicators as a comma seperated string (for later analsis)
+        /// </summary>
+        /// <param name="indicators"></param>
         public void sendindicators(string indicators) { SendIndicators(indicators); }
+        /// <summary>
+        /// sends a debug message about what your response is doing at the moment.
+        /// </summary>
+        /// <param name="msg"></param>
         public void senddebug(string msg) { SendDebug(DebugImpl.Create(msg)); }
+        /// <summary>
+        /// called when a position update is received (usually only when the response is initially loaded)
+        /// </summary>
+        /// <param name="p"></param>
         public virtual void GotPosition(Position p) { }
 
         string[] _inds = new string[0];
@@ -91,7 +146,6 @@ namespace TradeLink.Common
         /// Full name of this response set by programs (includes namespace)
         /// </summary>
         public string FullName { get { return _full; } set { _full = value; } }
-
         public event DebugFullDelegate SendDebug;
         public event OrderDelegate SendOrder;
         public event UIntDelegate SendCancel;

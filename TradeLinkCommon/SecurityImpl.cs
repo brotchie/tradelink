@@ -5,6 +5,11 @@ using TradeLink.API;
 
 namespace TradeLink.Common
 {
+    /// <summary>
+    /// used to hold and work with securities.
+    /// Supported Securities : Stocks, Futures, Forex.
+    /// Options, Bonds, Swaps, etc are supported on certain brokers.
+    /// </summary>
     public class SecurityImpl : Security
     {
         public SecurityImpl(string sym, string exchange, SecurityType type)

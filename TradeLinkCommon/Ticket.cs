@@ -10,10 +10,21 @@ using TradeLink.API;
 
 namespace TradeLink.Common
 {
+    /// <summary>
+    /// create a order ticket to prompt user for sending an order.
+    /// returns an order that can be easily sent with SendOrder fuctions.
+    /// </summary>
     public partial class Ticket : Form
     {
         Order work = new OrderImpl();
+        /// <summary>
+        /// gets the current value of the working order for the ticket
+        /// </summary>
         public Order WorkingOrder { get { return work; } set { work = value; } }
+        /// <summary>
+        /// creates ticket with default order
+        /// </summary>
+        /// <param name="working"></param>
         public Ticket(Order working)
         {
             InitializeComponent();
@@ -35,7 +46,10 @@ namespace TradeLink.Common
             oprice.MouseWheel += new MouseEventHandler(order_MouseWheel);
             osize.MouseWheel += new MouseEventHandler(osize_MouseWheel);
         }
-
+        /// <summary>
+        /// if new ticks are passed to this ticket, ticket will automatically update the price of limit and stops orders for opposing side.
+        /// </summary>
+        /// <param name="tick"></param>
         public void newTick(Tick tick)
         {
             if (this.InvokeRequired)
@@ -62,7 +76,11 @@ namespace TradeLink.Common
                 }
             }
         }
-
+        /// <summary>
+        /// called by external programs to report status of an order back to the ticket
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <param name="error"></param>
         public void orderStatus(string symbol, int error)
         {
             if (symbol != work.symbol) return; // not for us
@@ -74,7 +92,9 @@ namespace TradeLink.Common
         {
             if (e.Button == MouseButtons.Middle) osize.Value = isize; 
         }
-
+        /// <summary>
+        /// called when the Send button is pressed.   Working Order is automatically sent to the handler of this event
+        /// </summary>
         public event OrderDelegate SendOrder;
 
         void order_MouseWheel(object sender, MouseEventArgs e)

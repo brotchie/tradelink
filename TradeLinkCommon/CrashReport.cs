@@ -8,6 +8,9 @@ using System.Windows.Forms;
 
 namespace TradeLink.Common
 {
+    /// <summary>
+    /// display a tradelink crash window rather than standard windows form.
+    /// </summary>
     public partial class CrashReport : Form
     {
         string PROGRAM = string.Empty;

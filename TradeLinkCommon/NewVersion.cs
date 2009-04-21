@@ -8,6 +8,9 @@ using System.Windows.Forms;
 
 namespace TradeLink.Common
 {
+    /// <summary>
+    /// display a new version popup in tradelink, which allows user to download newer version easily.
+    /// </summary>
     public partial class NewVersion : Form
     {
         public NewVersion(string ProgramName, string ProgramUrl) : this(ProgramName, ProgramUrl, "") { }

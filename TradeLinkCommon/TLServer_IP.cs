@@ -9,6 +9,11 @@ using System.Text;
 namespace TradeLink.Common
 {
     public delegate void PacketDelgate(Packet lp);
+    /// <summary>
+    /// TradeLink servers provide common interface for clients to communicate with all brokers.
+    /// This version supports the tradelink protocol over IP transport.
+    /// (in development)
+    /// </summary>
     public class TLServer_IP
     {
         Socket sock;

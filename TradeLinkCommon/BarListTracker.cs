@@ -5,6 +5,11 @@ using TradeLink.API;
 
 namespace TradeLink.Common
 {
+    /// <summary>
+    /// used to track lists of bars for MANY symbols.
+    /// BarListTracker (blt) will accept ticks and auto-create bars as barlists as needed.
+    /// Access bars via blt["IBM"].RecentBar.Close
+    /// </summary>
     public class BarListTracker
     {
         public event SymBarIntervalDelegate GotNewBar;

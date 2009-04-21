@@ -6,6 +6,10 @@ using TradeLink.API;
 
 namespace TradeLink.Common
 {
+    /// <summary>
+    /// TradeLink clients can connect to any supported TradeLink broker.
+    /// version of the client that supports the tradelink protocol via windows messaging transport.
+    /// </summary>
     public class TLClient_WM : Form , TradeLinkClient
     {
 

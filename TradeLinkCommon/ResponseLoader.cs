@@ -5,7 +5,9 @@ using TradeLink.API;
 
 namespace TradeLink.Common
 {
-
+    /// <summary>
+    /// used for loading responses from disk (via DLL) or from already loaded assemblies.
+    /// </summary>
     public static class ResponseLoader
     {
 

@@ -5,6 +5,9 @@ using System.Net.Mail;
 
 namespace TradeLink.Common
 {
+    /// <summary>
+    /// email from tradelink
+    /// </summary>
     public static class Email
     {
         /// <summary>

@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 namespace TradeLink.Common
 {
+    /// <summary>
+    /// collection of calculations available in tradelink
+    /// </summary>
     public static class Calc
     {
         /// <summary>

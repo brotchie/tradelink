@@ -6,6 +6,10 @@ using TradeLink.API;
 
 namespace TradeLink.Common
 {
+    /// <summary>
+    /// used to provide ultra-fast tick processing on machines with multiple cores.
+    /// takes ticks immediately on main thread, processes them on a seperate thread.
+    /// </summary>
     public class AsyncResponse
     {
         const uint MAXTICK = 10000;

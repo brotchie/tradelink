@@ -5,7 +5,8 @@ using TradeLink.API;
 namespace TradeLink.Common
 {
     /// <summary>
-    /// allows 
+    /// allows automatic sending of profit targets and stop orders for a set of positions.
+    /// automatically manages partial fills.
     /// </summary>
     public class OffsetTracker
     {

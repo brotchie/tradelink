@@ -4,7 +4,7 @@ using TradeLink.API;
 namespace TradeLink.Common
 {
     /// <summary>
-    /// Specify an order to buy or sell a quantity of stock.
+    /// Specify an order to buy or sell a quantity of a security.
     /// </summary>
     [Serializable]
     public class OrderImpl : TradeImpl, Order
