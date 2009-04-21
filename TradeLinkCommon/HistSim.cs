@@ -7,6 +7,11 @@ using System.ComponentModel;
 
 namespace TradeLink.Common
 {
+    /// <summary>
+    /// historical simulation component.
+    /// plays back many tickfiles insequence over time.
+    /// also processes orders and executions against same tickfiles (via embedded Broker component).
+    /// </summary>
     public class HistSim 
     {
         // working variables
@@ -179,7 +184,7 @@ namespace TradeLink.Common
                 // start all the workers reading files in background
                 FillCache(int.MaxValue);
                 // wait a moment to allow tick reading to start
-                System.Threading.Thread.Sleep(10);
+                System.Threading.Thread.Sleep(_cachepause);
                 // continuously loop through next ticks, playing most
                 // recent ones, until simulation end is reached.
                 FlushCache(ftime);
@@ -196,6 +201,13 @@ namespace TradeLink.Common
             // set next tick time as hint to user
             setnexttime();
         }
+
+        int _cachepause = 10;
+        /// <summary>
+        /// milliseconds to wait between starting I/O threads and trying to access data.
+        /// is used only on multi processor machines.
+        /// </summary>
+        public int CacheWait { get { return _cachepause; } set { _cachepause = value; } }
 
 
         void FillCache(int readahead)
