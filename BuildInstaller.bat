@@ -42,7 +42,12 @@ echo Build complete.
 echo.
 )
 
-if exist TradeLinkSuite.exe (
+if not exist TradeLinkSuite.exe (
+echo Installer not found, please see error messages above...
+pause
+goto :eof
+)
+
 ren TradeLinkSuite.exe TLS.tmp > NUL
 echo Removing working files...
 del VERSION.txt > NUL
@@ -61,9 +66,17 @@ echo .\Responses\*.cmd >> _pat.txt
 zip -R Responses-%REVISION%.zip .\Responses -i@_pat.txt > NUL
 del _pat.txt
 )
+
+if exist InstallSuite\_gendocs (
+echo Generating documentation from source code... (may take a moment)
+if exist "c:\progra~1\doxygen\bin\doxygen.exe" (
+del /q /s html > NUL
+c:\progra~1\doxygen\bin\doxygen.exe InstallSuite\Doxyfile > NUL 2>&1
 ) else (
-echo Installer not found, please see error messages above...
+echo Doxygen not installed, skipping documentation...
 )
+)
+
 
 
 echo.
