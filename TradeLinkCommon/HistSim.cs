@@ -80,6 +80,10 @@ namespace TradeLink.Common
             }
         }
         /// <summary>
+        /// change the tickfolder histsim scans for historical data
+        /// </summary>
+        public string Folder { get { return _folder; } set { _folder = value; D("Restarting simulator with " + _filter.ToString()); Reset(); Initialize(); } }
+        /// <summary>
         /// Create a historical simulator
         /// </summary>
         /// <param name="filenames">list of tick files to use</param>

@@ -197,21 +197,32 @@ namespace Replay
 
         private void playbut_Click(object sender, EventArgs e)
         {
+            // verify user's tick folder exists
             if (!Directory.Exists(tickfolder))
             {
                 status("Tick folder " + tickfolder + " doesn't exist,  stopping.");
                 return;
             }
+            // clear highs and lows
             highs = new Dictionary<string, decimal>();
             lows = new Dictionary<string, decimal>();
+            // set the user's tick folder
+            h.Folder = tickfolder;
+            // create a new filter
             TickFileFilter tff = new TickFileFilter();
+            // populate the filter from user's calendar
             tff.DateFilter(Util.ToTLDate(monthCalendar1.SelectionEnd),DateMatchType.Day|DateMatchType.Month|DateMatchType.Year);
+            // set the filter on the simulator
             h.FileFilter = tff;
+            // setup playback
             _playback = new Playback(h);
             _playback.RunWorkerCompleted += new RunWorkerCompletedEventHandler(_playback_RunWorkerCompleted);
             _playback.ProgressChanged+=new ProgressChangedEventHandler(_playback_ProgressChanged);
+            // start playback
             _playback.RunWorkerAsync(new PlayBackArgs((int)trackBar1.Value/5,Util.DT2FT(daystartpicker.Value)));
+            // notify user
             status("Playback started...");
+            // update user interface options
             playbut.Enabled = false;
             stopbut.Enabled = true;
             trackBar1.Enabled = false;
