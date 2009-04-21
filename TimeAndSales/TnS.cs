@@ -32,6 +32,7 @@ namespace TimeSales
             tsgrid.Columns.Add("AExch", "AExch");
             SetColumnContext();
             bw.DoWork += new DoWorkEventHandler(bw_DoWork);
+            bw.WorkerSupportsCancellation = true;
             bw.WorkerReportsProgress = true;
             bw.ProgressChanged += new ProgressChangedEventHandler(bw_ProgressChanged);
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_RunWorkerCompleted);
@@ -68,11 +69,8 @@ namespace TimeSales
                 status("Resizing columns, please wait...");
                 tsgrid.AutoResizeColumns();
             }
-            if (e.Error != null)
-                status(headline + e.Error.ToString());
-            else if (e.Cancelled)
-                status(headline + " (load canceled)");
-            else
+            if (e.Error != null) ;
+            else if (!e.Cancelled)
                 status(headline);
         }
         string symbol = "";
@@ -83,6 +81,11 @@ namespace TimeSales
 
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
+            if (bw.IsBusy)
+            {
+                status("close or wait till load complete.");
+                return;
+            }
             OpenFileDialog od = new OpenFileDialog();
             od.Title = "Select the tick file you wish to view";
             if (Directory.Exists(Util.TLTickDir))
@@ -96,6 +99,7 @@ namespace TimeSales
             {
                 this.Refresh();
                 LoadEPF(od.FileName);
+                
                 od.Dispose();
             }
 
@@ -110,7 +114,10 @@ namespace TimeSales
             date = s.Date;
             FileInfo fi = new FileInfo(file);
             total = (int)Math.Ceiling((decimal)fi.Length / 39);
-            bw.RunWorkerAsync(sr);
+            if (!bw.IsBusy)
+                bw.RunWorkerAsync(sr);
+            else 
+                status("try again.");
 
 
         }
@@ -120,7 +127,10 @@ namespace TimeSales
             if (toolStrip1.InvokeRequired)
                 toolStrip1.Invoke(new DebugDelegate(status), new object[] { message });
             else
+            {
                 selected.Text = message;
+                selected.Invalidate();
+            }
         }
 
         void bw_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -133,7 +143,6 @@ namespace TimeSales
         void bw_DoWork(object sender, DoWorkEventArgs e)
         {
             StreamReader sr = (StreamReader)e.Argument;
-            tsgrid.Rows.Clear();
             int line = 0;
             while (!sr.EndOfStream)
             {
@@ -141,7 +150,9 @@ namespace TimeSales
                     break;
                 line++;
                 NewTick(eSigTick.FromStream(symbol,sr));
-                bw.ReportProgress((int)(100*line / (decimal)total));
+                int per = (int)(100 * line / (decimal)total);
+                if (per % 5 == 0)
+                    bw.ReportProgress(per);
             }
             status(headline + " (cleaning up)");
             sr.Close();
