@@ -8,6 +8,8 @@ using System.Windows.Forms;
 using TradeLink.Common;
 using System.IO;
 using TradeLink.API;
+using System.Xml.Serialization;
+using Microsoft.VisualBasic;
 
 
 
@@ -17,75 +19,201 @@ namespace ASP
 {
     public partial class ASP : Form
     {
-        StreamWriter sw;
         public const string PROGRAM = "ASP";
+        const string SKINEXT = ".skn";
+
+        // working variables
+        TLClient_WM tl = new TLClient_WM();
+        Dictionary<string, SecurityImpl> _seclist = new Dictionary<string, SecurityImpl>();
+        Dictionary<string, int[]> _symidx = new Dictionary<string, int[]>();
+        List<Response> _reslist = new List<Response>();
+        TickArchiver _ta = new TickArchiver();
+        BasketImpl _mb = new BasketImpl();
+        Response _workingres = new InvalidResponse();
+        StreamWriter _log;
+
+
         public ASP()
         {
+            // read designer options for gui
             InitializeComponent();
+            // try to open log file
             try
             {
                 new StreamWriter(PROGRAM + Util.ToTLDate(DateTime.Now) + ".txt", true);
             }
-            catch (Exception ex) { Debug("unable to open log file"); }
-            if (sw != null)
-                sw.AutoFlush = true;
-            tl = new TLClient_WM();
+            catch (Exception ex) { debug("unable to open log file"); }
+            // if log file opened, set it to write contents to disk immediately
+            if (_log != null)
+                _log.AutoFlush = true;
             // don't save ticks from replay since they're already saved
             archivetickbox.Checked = tl.LinkType != TLTypes.HISTORICALBROKER;
+            // handle tradelink events
             tl.gotTick += new TickDelegate(tl_gotTick);
             tl.gotFill += new FillDelegate(tl_gotFill);
             tl.gotOrder += new OrderDelegate(tl_gotOrder);
             tl.gotOrderCancel += new UIntDelegate(tl_gotOrderCancel);
-            boxcriteria.ContextMenu = new ContextMenu();
-            boxcriteria.ContextMenu.MenuItems.Add("Activate/Shutdown", new EventHandler(toggleresponse));
+            // setup right click menu
+            _resnames.ContextMenu= new ContextMenu();
+            _resnames.ContextMenu.Popup += new EventHandler(ContextMenu_Popup);
+            _resnames.ContextMenu.MenuItems.Add("isValid", new EventHandler(toggleresponse));
+            _resnames.ContextMenu.MenuItems.Add("SaveSkin", new EventHandler(saveskin));
+            // make sure we exit properly
             this.FormClosing += new FormClosingEventHandler(ASP_FormClosing);
+            // show version to user
             status(Util.TLSIdentity());
+            // check for new versions
             Util.ExistsNewVersions(tl);
+            // get last loaded response library
             LoadResponseDLL(Properties.Settings.Default.boxdll);
+            // load any skins we can find
+            findskins();
+        }
+
+        void ContextMenu_Popup(object sender, EventArgs e)
+        {
+            // make sure a response is selected
+            if (_resnames.SelectedIndices.Count == 0) return;
+            const int VALID = 0;
+            // update check to reflect validity of response
+            foreach (int index in _resnames.SelectedIndices)
+                _resnames.ContextMenu.MenuItems[VALID].Checked = _reslist[index].isValid;
+
+        }
+
+
+        void findskins()
+        {
+            // clear existing skins
+            _skins.Items.Clear();
+            // get info for this directory
+            DirectoryInfo di = new DirectoryInfo(Environment.CurrentDirectory);
+            // find all skins in this directory
+            FileInfo[] skins = di.GetFiles("*" + SKINEXT);
+            foreach (FileInfo skin in skins)
+                _skins.Items.Add(Path.GetFileNameWithoutExtension(skin.Name));
+            // refresh screen
+            _skins.Invalidate(true);
+        }
+
+        private void _skins_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // user has selected a new skin
+
+            // get the name
+            string skin = _skins.SelectedItem.ToString();
+            //confirm loading
+            if (MessageBox.Show("Load skin " + skin + "?", "confirm skin load", MessageBoxButtons.YesNo) != DialogResult.Yes)
+                return;
+            try
+            {
+                // load it
+                TextReader tr = new StreamReader(skin + SKINEXT);
+                // prepare to deserialize it
+                XmlSerializer xs = new XmlSerializer(typeof(List<Response>));
+                // get list of responses
+                List<Response> load = (List<Response>)xs.Deserialize(tr);
+                // add each response to existing list
+                _reslist.AddRange(load);
+            }
+            catch (Exception ex) { debug(ex.Message); return; }
+            // notify user
+            status("loaded skin: " + skin);
+        }   
+
+
+        void saveskin(object sender, EventArgs e)
+        {
+            // don't bother if nothing selected
+            if (_resnames.SelectedItems.Count == 0) return;
+            // prompt for a skin name
+            string name = Interaction.InputBox("name to save this skin?", "Skin Name", "Skin" + DateTime.Now.Ticks.ToString(), 0, 0);
+            // prepare a list of responses to serialize
+            List<Response> skins = new List<Response>();
+            // process each selected response
+            foreach (int selbox in _resnames.SelectedIndices)
+            {
+                // add it
+                skins.Add(_reslist[selbox]);
+            }
+            try
+            {
+                // serialize the list
+                XmlSerializer xs = new XmlSerializer(typeof(List<Response>));
+                // get file to save skin
+                TextWriter tw = new StreamWriter(name + SKINEXT);
+                // save it
+                xs.Serialize(tw, skins);
+                // close file
+                tw.Close();
+            }
+            catch (Exception ex) { debug(ex.Message); return; }
+            // notify user
+            status("saved skin: " + name);
+            // list skin
+            findskins();
         }
 
         void toggleresponse(object sender, EventArgs e)
         {
-            int selbox = boxcriteria.SelectedIndex;
-            reslist[selbox].isValid = !reslist[selbox].isValid;
-            if (!reslist[selbox].isValid)
-                status("Response " + reslist[selbox].Name + " is off.");
-            else
-                status("Response " + reslist[selbox].Name + " is on.");            
+            // process each selected response
+            foreach (int selbox in _resnames.SelectedIndices)
+            {
+                // invert current response's validity
+                bool valid = !_reslist[selbox].isValid;
+                // save it back
+                _reslist[selbox].isValid = valid;
+                // notify
+                debug(_reslist[selbox].FullName + " " + (valid ? "set valid." : "set invalid."));
+            }
+            // update display
+            _resnames.Invalidate(true);
         }
 
         void tl_gotOrderCancel(uint number)
         {
-            foreach (string sym in symidx.Keys)
-                foreach (int idx in symidx[sym])
-                    if (reslist[idx].isValid)
-                        reslist[idx].GotOrderCancel(number);
+            // send order cancel notification to every valid box
+            foreach (string sym in _symidx.Keys)
+                foreach (int idx in _symidx[sym])
+                    if (_reslist[idx].isValid)
+                        _reslist[idx].GotOrderCancel(number);
         }
 
         void tl_gotOrder(Order o)
         {
+            // make sure we are tracking this notifications symbol somewhere
             int[] idxs = new int[0];
-            if (!symidx.TryGetValue(o.Sec.FullName, out idxs))
+            if (!_symidx.TryGetValue(o.Sec.FullName, out idxs))
                 return;
+            // send order notification to every valid box
             foreach (int idx in idxs)
-                if (reslist[idx].isValid)
-                    reslist[idx].GotOrder(o);
+                if (_reslist[idx].isValid)
+                    _reslist[idx].GotOrder(o);
         }
 
         void ASP_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (sw != null)
+            // stop archiving ticks
+            _ta.CloseArchive();
+            // if log file exists, close it
+            if (_log != null)
             {
-                sw.Close();
-                sw = null;
+                _log.Close();
+                _log = null;
             }
+            // save ASP properties
             Properties.Settings.Default.Save();
-            if (tl != null)
+
+            // shut down tradelink client
+            try
+            {
                 tl.Disconnect();
-            ta.CloseArchive();
+            }
+            catch (TLServerNotFound) { }
+            
         }
 
-        TickArchiver ta = new TickArchiver();
+
 
 
 
@@ -93,216 +221,269 @@ namespace ASP
        
         void tl_gotTick(Tick t)
         {
-
-            if (archivetickbox.Checked)
-                ta.Save(t);
-
+            // see if we are tracking this symbol
             int[] idxs = new int[0];
-            if (!symidx.TryGetValue(t.Sec.FullName, out idxs))
+            if (!_symidx.TryGetValue(t.Sec.FullName, out idxs))
                 return;
+
+            // see if we should save this tick
+            if (archivetickbox.Checked)
+                _ta.Save(t);
+
+            // send tick to any valid requesting responses
             foreach (int idx in idxs)
-                if (reslist[idx].isValid) 
-                    reslist[idx].GotTick(t);
+                if (_reslist[idx].isValid) 
+                    _reslist[idx].GotTick(t);
         }
 
-        private int count = 0;
+
 
         void tl_gotFill(Trade t)
         {
-            count++;
+            // get requesting responses if any
             int[] idxs = new int[0];
-            if (!symidx.TryGetValue(t.Sec.FullName, out idxs))
+            // if no requestors, ignore symbol
+            if (!_symidx.TryGetValue(t.Sec.FullName, out idxs))
                 return;
+            // send trade notification to any valid requesting responses
             foreach (int idx in idxs)
-                if (reslist[idx].isValid)
-                    reslist[idx].GotFill(t);
+                if (_reslist[idx].isValid)
+                    _reslist[idx].GotFill(t);
         }
 
-        void Debug(string message)
+        void debug(string message)
         {
-            if (listBox1.InvokeRequired)
-                listBox1.Invoke(new DebugDelegate(Debug), new object[] { message });
+            // get a timestamp
+            string stamp = DateTime.Now.ToShortTimeString()+ " ";
+            // if we have a logfile, log the debug
+            if (_log != null)
+                _log.WriteLine(stamp+message);
+
+            // if we're running from a background thread, invoke GUI thread to update screen
+            if (_msg.InvokeRequired)
+                _msg.Invoke(new DebugDelegate(debug), new object[] { message });
             else
             {
-                listBox1.Items.Add(message);
-                listBox1.SelectedIndex = listBox1.Items.Count - 1;
+                // add debug msg
+                _msg.Items.Add(stamp+message);
+                // select it
+                _msg.SelectedIndex = _msg.Items.Count - 1;
+                // refresh display
+                _msg.Invalidate(true);
             }
         }
 
 
-        BasketImpl mb = new BasketImpl();
-        Response workingres = new InvalidResponse();
 
-        // name of dll of response names
+
 
         void LoadResponseDLL(string filename)
         {
+            // make sure response library exists
             if (!System.IO.File.Exists(filename))
             {
                 status("file does not exist: " + filename);
                 return;
             }
 
+            // set response library to current library
             Properties.Settings.Default.boxdll = filename;
 
+            // get names of responses in library
             List<string> list = Util.GetResponseList(filename);
-            Responses.Items.Clear();
+            // clear list of available responses
+            _availresponses.Items.Clear();
+            // add each response to user
             foreach (string res in list)
-            {
-                Responses.Items.Add(res);
-            }
+                _availresponses.Items.Add(res);
+            // update display
+            _availresponses.Invalidate(true);
         }
 
         private void LoadDLL_Click(object sender, EventArgs e)
         {
+            // get a dialog box to load a DLL
             OpenFileDialog of = new OpenFileDialog();
             of.DefaultExt = ".dll";
             of.Filter = "Response DLL|*.dll|All Files|*.*";
+            // one dll at a time
             of.Multiselect = false;
+            // if they choose one
             if(of.ShowDialog() == DialogResult.OK) 
-            {
-                LoadResponseDLL(of.FileName);
-
-            }
-
-            reslist.Clear();
+                LoadResponseDLL(of.FileName); // load it
         }
 
-        TLClient_WM tl;
+
 
 
         private void Boxes_SelectedIndexChanged(object sender, EventArgs e)
         {
-            string resname = (string)Responses.SelectedItem;
-            workingres = ResponseLoader.FromDLL(resname, Properties.Settings.Default.boxdll);
-            workingres.SendOrder += new OrderDelegate(workingbox_SendOrder);
-            workingres.SendDebug+= new DebugFullDelegate(workingres_GotDebug);
-            workingres.SendCancel+= new UIntDelegate(workingres_CancelOrderSource);
+            // get selected response
+            string resname = (string)_availresponses.SelectedItem;
+            // load it into working response
+            _workingres = ResponseLoader.FromDLL(resname, Properties.Settings.Default.boxdll);
+            // handle all the outgoing events from the response
+            _workingres.SendOrder += new OrderDelegate(workingres_SendOrder);
+            _workingres.SendDebug+= new DebugFullDelegate(workingres_GotDebug);
+            _workingres.SendCancel+= new UIntDelegate(workingres_CancelOrderSource);
         }
 
-        void workingbox_SendOrder(Order o)
+        void workingres_SendOrder(Order o)
         {
+            // process order coming from a response
+
+            // set account on order
             o.Account = _account.Text;
-            o.Security = seclist[o.symbol].Type;
-            o.Exchange = seclist[o.symbol].DestEx;
+            // set the security
+            o.Security = _seclist[o.symbol].Type;
+            // set the exchange
+            o.Exchange = _seclist[o.symbol].DestEx;
+            // set the local symbol
             o.LocalSymbol = o.symbol;
+            // send order and get error message
             int res = tl.SendOrder(o);
+            // if error, display it
             if (res != (int)MessageTypes.OK)
-                Debug(Util.PrettyError(tl.BrokerName, res) + " " + o.ToString());
+                debug(Util.PrettyError(tl.BrokerName, res) + " " + o.ToString());
         }
 
         void workingres_CancelOrderSource(uint number)
         {
+            // pass cancels along to tradelink
             tl.CancelOrder((long)number);
         }
 
-        void workingres_GotDebug(Debug debug)
+        void workingres_GotDebug(Debug d)
         {
+            // see if we are processing debugs
             if (!debugon.Checked) return;
-            if (sw != null)
-                sw.WriteLine(debug.Msg);
-            Debug(debug.Msg);
+            // display to screen
+            debug(d.Msg);
         }
 
         private void Trade_Click(object sender, EventArgs e)
         {
-            string[] syms = stock.Text.Split(',');
+            // user clicks on trade button
+
+            // make sure a response is selected
+            if (_availresponses.SelectedIndex == -1)
+            {
+                status("Please select a response.");
+                return;
+            }
+
+
+            // get all the provided symbols
+            string[] syms = _symstraded.Text.Split(',');
+            // prepare a list of valid symbols
             List<string> valid = new List<string>();
+            // process every provided symbol
             foreach (string symt in syms)
             {
+                // make it uppercase
                 string sym = symt.ToUpper();
+                // parse out security information
                 SecurityImpl sec = SecurityImpl.Parse(sym);
+                // if it's an invalid security, ignore it
                 if (!sec.isValid)
                 {
                     status("Security invalid: " + sec.ToString());
-                    return;
+                    continue;
                 }
-                if (Responses.SelectedIndex == -1)
-                {
-                    status("Please select a box.");
-                    return;
-                }
-                mb.Add(sec);
+                // otherwise add the security
+                _mb.Add(sec);
+                // save simple symbol as valid
                 valid.Add(sec.Symbol);
-                if (!seclist.ContainsKey(sec.Symbol))
+                // if we don't have this security
+                if (!_seclist.ContainsKey(sec.Symbol))
                 {
-                    lock (seclist) // potentially used by other threads, so we lock it
+                    // lock so other threads don't modify seclist at same time
+                    lock (_seclist) 
                     {
-                        seclist.Add(sec.Symbol,sec);
+                        // add security to our list
+                        _seclist.Add(sec.Symbol,sec);
                     }
                 }
 
             }
-            lock (reslist) // potentially used by other threads
+            // add working response to response list after obtaining a lock
+            lock (_reslist) 
             {
-                reslist.Add(workingres);
+                _reslist.Add(_workingres);
             }
-            int idx = reslist.Count -1;
-            tl.Subscribe(mb);
-            boxcriteria.Items.Add(workingres.Name+" ["+string.Join(",",valid.ToArray())+"]");
-            foreach (SecurityImpl sec in seclist.Values)
-                if (symidx.ContainsKey(sec.FullName))
+            // get index to this response
+            int idx = _reslist.Count -1;
+            try
+            {
+                // subscribe to whatever symbols were added
+                tl.Subscribe(_mb);
+            }
+            catch (TLServerNotFound) { debug("subscribe failed because no TL server is running."); }
+            // add name to user's screen
+            _resnames.Items.Add(_workingres.FullName+" ["+string.Join(",",valid.ToArray())+"]");
+            // update their screen
+            _resnames.Invalidate(true);
+            // process all securities and build  a quick index for a security's name to the response that requests it
+            foreach (SecurityImpl sec in _seclist.Values)
+                if (_symidx.ContainsKey(sec.FullName)) // we already had one requestor
                 {
-                    // add this boxes' index to subscriptions for this symbol
-                    int len = symidx[sec.FullName].Length;
+                    // get current length of request list for security
+                    int len = _symidx[sec.FullName].Length;
+                    // add one to it for our new requestor
                     int[] a = new int[len + 1];
+                    // add our new requestor's index at the end
                     a[len] = idx;
                 }
-                else symidx.Add(sec.FullName, new int[] { idx });
-            stock.Text = "";
-            status("");
-            Responses.SelectedIndex = -1;
+                else // otherwise it's just this guy so add him 
+                    _symidx.Add(sec.FullName, new int[] { idx });
+            // clear the symbol list
+            _symstraded.Clear();
+            // show we added response
+            status(_workingres.Name+" ["+string.Join(",",valid.ToArray())+"]");
+            // unselect response
+            _availresponses.SelectedIndex = -1;
             
         }
 
-        Dictionary<string,SecurityImpl> seclist = new Dictionary<string,SecurityImpl>();
-        Dictionary<string, int[]> symidx = new Dictionary<string, int[]>();
-        List<Response> reslist = new List<Response>();
         
         
-
-        private void boxcriteria_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            int selbox = boxcriteria.SelectedIndex;
-            if (!reslist[selbox].isValid)
-                status("Resonse " + reslist[selbox].Name + " is off.");
-            else
-                status("Response " + reslist[selbox].Name +  " is on.");
-
-        }
 
         private void status(string msg)
         {
+            // if called from background thread, invoke UI thread to perform update to screen
             if (InvokeRequired)
                 Invoke(new DebugDelegate(status), new object[] { msg });
-            else 
+            else
+            {
+                // update status field
                 toolStripStatusLabel1.Text = msg;
+                // refresh screen area
+                toolStripStatusLabel1.Invalidate();
+            }
         }
-
-        private void fillstatus(string msg)
-        {
-            if (InvokeRequired)
-                Invoke(new DebugDelegate(fillstatus), new object[] { msg});
-            else 
-                toolStripStatusLabel2.Text = msg;
-        }
-
 
 
         private void stock_KeyUp(object sender, KeyEventArgs e)
         {
+            // in case they don't click trade, click  it for them when they press enter
             if (e.KeyData == Keys.Enter)
                 Trade_Click(null, null);
         }
 
         private void _togglemsgs_Click(object sender, EventArgs e)
         {
-            listBox1.Visible = !listBox1.Visible;
+            // toggle debug msg box
+            _msg.Visible = !_msg.Visible;
+            // refresh screen
+            _msg.Invalidate();
         }
 
         private void _twithelp_Click(object sender, EventArgs e)
         {
+            // popup twitter window
             TwitPopup.Twit();
-        }                                            
+        }
+
+                                         
     }
 }
