@@ -119,7 +119,11 @@ namespace TradeLibFast
 		switch (MessageType)
 		{
 			case ORDERCANCELREQUEST :
-				return CancelRequest((long)atoi(msg.GetBuffer()));
+				{
+					const char * ch = msg.GetBuffer();
+					long id = (long)atoi(ch);
+					return CancelRequest(id);
+				}
 			case ACCOUNTREQUEST :
 				return AccountResponse(msg);
 			case CLEARCLIENT :

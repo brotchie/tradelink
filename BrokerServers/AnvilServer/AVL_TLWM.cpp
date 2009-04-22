@@ -727,13 +727,26 @@ namespace TradeLibFast
 		// get current anvil id from tradelink id
 		for (uint i = 0; i<orderids.size(); i++)
 		{
-			if ((orderids[i]==tlsid) && ordercache[i])
+			// make sure it's our order and order isn't NULL
+			if ((orderids[i]==tlsid) && (ordercache[i]!=NULL))
 			{
-				ordercache[i]->Cancel();
-				bool found = true;
+				__try 
+				{
+					// try to cancel it
+					ordercache[i]->Cancel();
+					// mark it as found
+					bool found = true;
+				} 
+				__except (EXCEPTION_EXECUTE_HANDLER) // catch errors
+				{
+					// mark this order as null
+					ordercache[i] = NULL;
+				}
 			}
+			// stop searching if we found our order
 			if (found) break;
 		}
+		// return
 		if (!found) return ORDER_NOT_FOUND;
 		return OK;
 	}
