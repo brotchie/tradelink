@@ -10,10 +10,7 @@ using System.IO;
 using TradeLink.API;
 using System.Xml.Serialization;
 using Microsoft.VisualBasic;
-
-
-
-
+using System.Reflection;
 
 namespace ASP
 {
@@ -31,6 +28,10 @@ namespace ASP
         BasketImpl _mb = new BasketImpl();
         Response _workingres = new InvalidResponse();
         StreamWriter _log;
+        Dictionary<int, string> _resskinidx = new Dictionary<int, string>();
+        PositionTracker _pt = new PositionTracker();
+        string[] _acct = new string[0];
+        AsyncResponse _ar = new AsyncResponse();
 
 
         public ASP()
@@ -48,16 +49,34 @@ namespace ASP
                 _log.AutoFlush = true;
             // don't save ticks from replay since they're already saved
             archivetickbox.Checked = tl.LinkType != TLTypes.HISTORICALBROKER;
-            // handle tradelink events
-            tl.gotTick += new TickDelegate(tl_gotTick);
+            // if our machine is multi-core we use seperate thread to process ticks
+            if (Environment.ProcessorCount == 1)
+                tl.gotTick += new TickDelegate(tl_gotTick);
+            else
+            {
+                tl.gotTick += new TickDelegate(tl_gotTickasync);
+                _ar.GotTick+=new TickDelegate(tl_gotTick);
+            }
+            // handle other tradelink events
             tl.gotFill += new FillDelegate(tl_gotFill);
             tl.gotOrder += new OrderDelegate(tl_gotOrder);
             tl.gotOrderCancel += new UIntDelegate(tl_gotOrderCancel);
+            tl.gotPosition += new PositionDelegate(tl_gotPosition);
+            tl.gotAccounts += new DebugDelegate(tl_gotAccounts);
+            // if we have a server
+            if (tl.LinkType != TLTypes.NONE)
+            {
+                // get accounts
+                tl.RequestAccounts();
+                // request positions
+                foreach (string acct in _acct)
+                    tl.RequestPositions(acct);
+            }
             // setup right click menu
             _resnames.ContextMenu= new ContextMenu();
             _resnames.ContextMenu.Popup += new EventHandler(ContextMenu_Popup);
             _resnames.ContextMenu.MenuItems.Add("isValid", new EventHandler(toggleresponse));
-            _resnames.ContextMenu.MenuItems.Add("SaveSkin", new EventHandler(saveskin));
+            _resnames.ContextMenu.MenuItems.Add("SaveToSkin", new EventHandler(saveskin));
             // make sure we exit properly
             this.FormClosing += new FormClosingEventHandler(ASP_FormClosing);
             // show version to user
@@ -69,6 +88,23 @@ namespace ASP
             // load any skins we can find
             findskins();
         }
+
+
+        void tl_gotTickasync(Tick t)
+        {
+            // on multi-core machines, this will be invoked to write ticks
+            // to a cache where they will be processed by a seperate thread
+            // asynchronously
+            _ar.WriteIt(t);
+        }
+
+        void tl_gotAccounts(string msg)
+        {
+            // save accounts found connected
+            _acct = msg.Split(',');
+        }
+
+
 
         void ContextMenu_Popup(object sender, EventArgs e)
         {
@@ -114,13 +150,26 @@ namespace ASP
                 // get list of responses
                 List<Response> load = (List<Response>)xs.Deserialize(tr);
                 // add each response to existing list
-                _reslist.AddRange(load);
+                foreach (Response r in load)
+                {
+                    // add response
+                    _reslist.Add(r);
+                    // add index to the skin name
+                    _resskinidx.Add(_reslist.Count - 1, skin);
+                }
             }
             catch (Exception ex) { debug(ex.Message); return; }
             // notify user
             status("loaded skin: " + skin);
-        }   
+        }
 
+        void saveskins(int[] indicies)
+        {
+            foreach (int selbox in indicies)
+            {
+
+            }
+        }
 
         void saveskin(object sender, EventArgs e)
         {
@@ -193,6 +242,9 @@ namespace ASP
 
         void ASP_FormClosing(object sender, FormClosingEventArgs e)
         {
+            // if we're using another thread to process ticks, stop it
+            if (Environment.ProcessorCount>1)
+                _ar.Stop();
             // stop archiving ticks
             _ta.CloseArchive();
             // if log file exists, close it
@@ -240,6 +292,8 @@ namespace ASP
 
         void tl_gotFill(Trade t)
         {
+            // keep track of position
+            _pt.Adjust(t);
             // get requesting responses if any
             int[] idxs = new int[0];
             // if no requestors, ignore symbol
@@ -249,6 +303,12 @@ namespace ASP
             foreach (int idx in idxs)
                 if (_reslist[idx].isValid)
                     _reslist[idx].GotFill(t);
+        }
+
+        void tl_gotPosition(Position pos)
+        {
+            // keep track of position
+            _pt.Adjust(pos);
         }
 
         void debug(string message)
@@ -413,9 +473,12 @@ namespace ASP
             }
             // get index to this response
             int idx = _reslist.Count -1;
+            // send response current positions
+            foreach (Position p in _pt)
+                _reslist[idx].GotPosition(p);
+            // subscribe to whatever symbols were requested
             try
             {
-                // subscribe to whatever symbols were added
                 tl.Subscribe(_mb);
             }
             catch (TLServerNotFound) { debug("subscribe failed because no TL server is running."); }
@@ -439,7 +502,7 @@ namespace ASP
             // clear the symbol list
             _symstraded.Clear();
             // show we added response
-            status(_workingres.Name+" ["+string.Join(",",valid.ToArray())+"]");
+            status(_workingres.FullName+" ["+string.Join(",",valid.ToArray())+"]");
             // unselect response
             _availresponses.SelectedIndex = -1;
             
