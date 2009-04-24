@@ -55,34 +55,59 @@ namespace TradeLink.Common
         /// </summary>
         public void ClearCustom() { _offvals.Clear(); }
 
+        int _cancelpause = 10;
+        /// <summary>
+        /// sleep briefly after sending cancel orders to allow them to process.
+        /// </summary>
+        public int CancelSleep { get { return _cancelpause; } set { _cancelpause = value; } }
 
-        void doupdate(string sym)
+        void doupdate(string sym) { doupdate(sym, false); }
+        void doupdate(string sym, bool poschange)
         {
             // is update ignored?
             if (IgnoreUpdate(sym)) return;
             // get our offset values
             OffsetInfo off = GetOffset(sym);
-            // cancel existing profits
-            cancel(off.ProfitId);
-            // cancel existing stops
-            cancel(off.StopId);
-            // get new profit
-            Order profit = Calc.PositionProfit(_pt[sym], off.ProfitDist, off.ProfitPercent,off.NormalizeSize,off.MinimumLotSize);
-            // if it's valid, send and track it
-            if (profit.isValid)
+            // see if we have profit
+            if (off.hasProfit)
             {
-                profit.id = Ids.AssignId;
-                off.ProfitId = profit.id;
-                SendOffset(profit);
+                // cancel existing profits
+                cancel(off.ProfitId);
+                // wait a moment to allow cancel to be received
+                System.Threading.Thread.Sleep(_cancelpause);
             }
-            // get new stop
-            Order stop = Calc.PositionStop(_pt[sym], off.StopDist, off.StopPercent,off.NormalizeSize,off.MinimumLotSize);
-            // if it's valid, send and track
-            if (stop.isValid)
+            // see if we have stop
+            if (off.hasStop)
             {
-                stop.id = Ids.AssignId;
-                off.StopId = stop.id;
-                SendOffset(stop);
+                // cancel existing stops
+                cancel(off.StopId);
+                // wait a moment to allow cancel to be received
+                System.Threading.Thread.Sleep(_cancelpause);
+            }
+
+            if (!off.hasProfit)
+            {
+                // get new profit
+                Order profit = Calc.PositionProfit(_pt[sym], off.ProfitDist, off.ProfitPercent, off.NormalizeSize, off.MinimumLotSize);
+                // if it's valid, send and track it
+                if (profit.isValid)
+                {
+                    profit.id = Ids.AssignId;
+                    off.ProfitId = profit.id;
+                    SendOffset(profit);
+                }
+            }
+            if (!off.hasStop)
+            {
+                // get new stop
+                Order stop = Calc.PositionStop(_pt[sym], off.StopDist, off.StopPercent, off.NormalizeSize, off.MinimumLotSize);
+                // if it's valid, send and track
+                if (stop.isValid)
+                {
+                    stop.id = Ids.AssignId;
+                    off.StopId = stop.id;
+                    SendOffset(stop);
+                }
             }
             // make sure new offset info is reflected
             SetOffset(sym, off);
@@ -246,7 +271,7 @@ namespace TradeLink.Common
             // do we have events?
             if (!HasEvents()) return;
             // do update
-            doupdate(p.Symbol);
+            doupdate(p.Symbol,true);
         }
 
         /// <summary>
@@ -260,7 +285,7 @@ namespace TradeLink.Common
             // do we have events?
             if (!HasEvents()) return;
             // do update
-            doupdate(t.symbol);
+            doupdate(t.symbol,true);
 
         }
 
@@ -306,6 +331,17 @@ namespace TradeLink.Common
             }
 
         }
+        /// <summary>
+        /// should be called from GotTick, when ticks arrive.
+        /// If cancels are not processed on fill updates, they will be resent each tick until they are processed.
+        /// </summary>
+        /// <param name="k"></param>
+        public void GotTick(Tick k)
+        {
+            // update the offsets for this tick's symbol
+            doupdate(k.symbol);
+        }
+
         // track offset ids
         Dictionary<string, uint> _profitids = new Dictionary<string, uint>();
         Dictionary<string, uint> _stopids = new Dictionary<string, uint>();
@@ -353,5 +389,8 @@ namespace TradeLink.Common
         public decimal StopDist = 0;
         public decimal ProfitPercent = 1;
         public decimal StopPercent = 1;
+        public bool hasProfit { get { return ProfitId != 0; } }
+        public bool hasStop { get { return StopId != 0; } }
+
     }
 }

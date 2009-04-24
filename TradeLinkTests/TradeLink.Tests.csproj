@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{293780F0-4BE5-49F9-8720-CFD5F79EC77D}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -51,6 +51,7 @@
     <Compile Include="TestBar.cs" />
     <Compile Include="TestBarList.cs" />
     <Compile Include="TestBarListTracker.cs" />
+    <Compile Include="TestGZip.cs" />
     <Compile Include="TestIdTracker.cs" />
     <Compile Include="TestImbalance.cs" />
     <Compile Include="TestOffsetTracker.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="TestOrder.cs" />
     <Compile Include="TestPosition.cs" />
     <Compile Include="TestSecurity.cs" />
+    <Compile Include="TestSkin.cs" />
     <Compile Include="TestStock.cs" />
     <Compile Include="TestTick.cs" />
     <Compile Include="TestTickFileFilter.cs" />
@@ -82,10 +84,6 @@
     <ProjectReference Include="..\TradeLinkCommon\TradeLink.Common.csproj">
       <Project>{A0FE06A2-F31B-49DE-8901-917B5D593E43}</Project>
       <Name>TradeLink.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\TradeLinkResearch\TradeLink.Research.csproj">
-      <Project>{BBDF2EFE-BFE6-4880-977B-4724C3A67D76}</Project>
-      <Name>TradeLink.Research</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

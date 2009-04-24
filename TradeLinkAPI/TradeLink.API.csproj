@@ -60,6 +60,7 @@
     <Compile Include="Response.cs" />
     <Compile Include="Security.cs" />
     <Compile Include="SecurityType.cs" />
+    <Compile Include="Skin.cs" />
     <Compile Include="Tick.cs" />
     <Compile Include="Trade.cs" />
     <Compile Include="TradeLinkClient.cs" />

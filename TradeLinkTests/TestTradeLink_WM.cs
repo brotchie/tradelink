@@ -149,7 +149,7 @@ namespace TestTradeLink
             // make sure fill was copied
             Assert.AreEqual(fills, copyfills);
         }
-
+        /*
         [Test]
         public void PerformanceTests()
         {
@@ -184,7 +184,7 @@ namespace TestTradeLink
 
             // restore ticks
             ticks = save;
-        }
+        }*/
 
         // event handlers
 

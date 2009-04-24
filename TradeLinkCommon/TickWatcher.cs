@@ -21,8 +21,8 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="tick">The tick.</param>
         /// <returns></returns>
-        public bool Watch(TickImpl tick) { return Watch(tick, _defaultwait); }
-        public bool Watch(TickImpl tick, int NoTicksAlertWait) 
+        public bool Watch(Tick tick) { return Watch(tick, _defaultwait); }
+        public bool Watch(Tick tick, int NoTicksAlertWait) 
         {
             int last = tick.time;
             if (!_last.ContainsKey(tick.symbol))

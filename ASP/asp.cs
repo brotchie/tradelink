@@ -29,6 +29,7 @@ namespace ASP
         Response _workingres = new InvalidResponse();
         StreamWriter _log;
         Dictionary<int, string> _resskinidx = new Dictionary<int, string>();
+        Dictionary<string, string> _class2dll = new Dictionary<string, string>();
         PositionTracker _pt = new PositionTracker();
         string[] _acct = new string[0];
         AsyncResponse _ar = new AsyncResponse();
@@ -76,7 +77,7 @@ namespace ASP
             _resnames.ContextMenu= new ContextMenu();
             _resnames.ContextMenu.Popup += new EventHandler(ContextMenu_Popup);
             _resnames.ContextMenu.MenuItems.Add("isValid", new EventHandler(toggleresponse));
-            _resnames.ContextMenu.MenuItems.Add("SaveToSkin", new EventHandler(saveskin));
+            _resnames.ContextMenu.MenuItems.Add("+Skin", new EventHandler(add2skin));
             // make sure we exit properly
             this.FormClosing += new FormClosingEventHandler(ASP_FormClosing);
             // show version to user
@@ -117,20 +118,83 @@ namespace ASP
 
         }
 
+        void add2skin(object sender, EventArgs e)
+        {
+            // make sure something is selected
+            if (_resnames.SelectedIndices.Count == 0) return;
+            // get name
+            string name = Interaction.InputBox("What is the skin name for these responses?", "Skin name", "Skin" + DateTime.Now.Ticks.ToString(), 0, 0);
+            // get next available index for this name
+            int startidx = nextskinidx(Environment.CurrentDirectory,name);
+            // go through all selected responses
+            foreach (int idx in _resnames.SelectedIndices)
+            {
+                // save them as skin
+                SkinImpl.SkinFile(_reslist[idx], _reslist[idx].FullName, _class2dll[_reslist[idx].FullName], name + "." + startidx.ToString() + SKINEXT);
+                // increment next filename index
+                startidx++;
+            }
+            // find any new names
+            findskins();
+        }
+
+
 
         void findskins()
         {
             // clear existing skins
             _skins.Items.Clear();
+
+            // go through every skin file
+            foreach (string fn in skinfiles(Environment.CurrentDirectory))
+            {
+                // get skin name
+                string sk = skinfromfile(fn);
+                // if we don't have it, display as an option
+                if (!_skins.Items.Contains(sk))
+                    _skins.Items.Add(sk);
+            }
+            // refresh screen
+            _skins.Invalidate(true);
+        }
+
+        string[] skinfiles(string path)
+        {
+            List<string> files = new List<string>();
             // get info for this directory
             DirectoryInfo di = new DirectoryInfo(Environment.CurrentDirectory);
             // find all skins in this directory
             FileInfo[] skins = di.GetFiles("*" + SKINEXT);
+            // build list of their names
             foreach (FileInfo skin in skins)
-                _skins.Items.Add(Path.GetFileNameWithoutExtension(skin.Name));
-            // refresh screen
-            _skins.Invalidate(true);
+                files.Add(skin.Name);
+            // return results
+            return files.ToArray();
         }
+
+        int nextskinidx(string path, string skinname)
+        {
+            // no matching skins
+            int count = 0;
+            // get all skins 
+            string[] files = skinfiles(path);
+            // go through and find only skins with matching name
+            foreach (string fn in files)
+                if (skinfromfile(fn) == skinname)
+                    count++; // count matches
+            // return total matches
+            return count;
+        }
+
+        string skinfromfile(string filename)
+        {
+            string name = Path.GetFileNameWithoutExtension(filename);
+            string[] r = name.Split('.');
+            return r[0];
+        }
+
+
+
 
         private void _skins_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -141,67 +205,51 @@ namespace ASP
             //confirm loading
             if (MessageBox.Show("Load skin " + skin + "?", "confirm skin load", MessageBoxButtons.YesNo) != DialogResult.Yes)
                 return;
+
+            // try to set it up for trading
+            if (tradeskins(skin))
+            {
+                // update screen
+                _resnames.Invalidate(true);
+                // notify user
+                status("loaded skin: " + skin);
+            }
+        }
+
+        bool tradeskins(string name)
+        {
+            // get skin files available
+            string[] files = skinfiles(Environment.CurrentDirectory);
+            // set status variable
+            bool worked = true;
             try
             {
-                // load it
-                TextReader tr = new StreamReader(skin + SKINEXT);
-                // prepare to deserialize it
-                XmlSerializer xs = new XmlSerializer(typeof(List<Response>));
-                // get list of responses
-                List<Response> load = (List<Response>)xs.Deserialize(tr);
-                // add each response to existing list
-                foreach (Response r in load)
+                // loop through every file
+                foreach (string fn in files)
                 {
-                    // add response
-                    _reslist.Add(r);
-                    // add index to the skin name
-                    _resskinidx.Add(_reslist.Count - 1, skin);
+                    // if it's the skin we want to trade
+                    if (skinfromfile(fn) == name)
+                    {
+                        // get it along with it's persisted settings
+                        Response r = (Response)SkinImpl.DeskinFile(fn);
+                        // add it to trade list
+                        _reslist.Add(r);
+                        // show it to user
+                        _resnames.Items.Add(r.FullName);
+                        // route symbols to it?
+
+                        // update status
+                        worked &= true;
+                    }
                 }
+                return true;
             }
-            catch (Exception ex) { debug(ex.Message); return; }
-            // notify user
-            status("loaded skin: " + skin);
+            catch (Exception) { }
+            return false;
         }
 
-        void saveskins(int[] indicies)
-        {
-            foreach (int selbox in indicies)
-            {
 
-            }
-        }
 
-        void saveskin(object sender, EventArgs e)
-        {
-            // don't bother if nothing selected
-            if (_resnames.SelectedItems.Count == 0) return;
-            // prompt for a skin name
-            string name = Interaction.InputBox("name to save this skin?", "Skin Name", "Skin" + DateTime.Now.Ticks.ToString(), 0, 0);
-            // prepare a list of responses to serialize
-            List<Response> skins = new List<Response>();
-            // process each selected response
-            foreach (int selbox in _resnames.SelectedIndices)
-            {
-                // add it
-                skins.Add(_reslist[selbox]);
-            }
-            try
-            {
-                // serialize the list
-                XmlSerializer xs = new XmlSerializer(typeof(List<Response>));
-                // get file to save skin
-                TextWriter tw = new StreamWriter(name + SKINEXT);
-                // save it
-                xs.Serialize(tw, skins);
-                // close file
-                tw.Close();
-            }
-            catch (Exception ex) { debug(ex.Message); return; }
-            // notify user
-            status("saved skin: " + name);
-            // list skin
-            findskins();
-        }
 
         void toggleresponse(object sender, EventArgs e)
         {
@@ -378,6 +426,8 @@ namespace ASP
 
         private void Boxes_SelectedIndexChanged(object sender, EventArgs e)
         {
+            // make sure something is selected
+            if (_availresponses.SelectedIndex == -1) return;
             // get selected response
             string resname = (string)_availresponses.SelectedItem;
             // load it into working response
@@ -386,6 +436,15 @@ namespace ASP
             _workingres.SendOrder += new OrderDelegate(workingres_SendOrder);
             _workingres.SendDebug+= new DebugFullDelegate(workingres_GotDebug);
             _workingres.SendCancel+= new UIntDelegate(workingres_CancelOrderSource);
+
+            // save the dll that contains the class for use with skins
+            string dll = string.Empty;
+            // if we don't have this class, add it
+            if (!_class2dll.TryGetValue(resname, out dll))
+                _class2dll.Add(resname, Properties.Settings.Default.boxdll);
+            else // otherwise replace current dll as providing this class
+                _class2dll[resname] = Properties.Settings.Default.boxdll;
+
         }
 
         void workingres_SendOrder(Order o)
@@ -545,6 +604,32 @@ namespace ASP
         {
             // popup twitter window
             TwitPopup.Twit();
+        }
+
+        private void _remskin_Click(object sender, EventArgs e)
+        {
+            // make sure something is selected
+            if (_skins.SelectedIndex == -1) return;
+            // get name
+            string name = _skins.SelectedItem.ToString();
+            // confirm removal
+            if (MessageBox.Show("remove skin " + name + "?", "confirm skin deletion", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                // get number of repsonses in skin
+                int count = nextskinidx(Environment.CurrentDirectory, name);
+                // remove file names
+                for (int i = 0; i < count; i++)
+                {
+                    try
+                    {
+                        // remove skin file
+                        File.Delete(Environment.CurrentDirectory + "\\" + name + "." + i.ToString() + SKINEXT);
+                    }
+                    catch (Exception) { continue; }
+                }
+                // when done, update avail skins
+                findskins();
+            }
         }
 
                                          
