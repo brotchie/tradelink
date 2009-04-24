@@ -29,9 +29,7 @@ namespace Responses
         public OpenCancel() 
         {
             // enable feature to prompt user
-            ParamPrompt pp = new ParamPrompt(this);
-            // show the prompt
-            pp.ShowDialog();
+            ParamPrompt.Popup(this);
         }
 
         public override void GotFill(Trade fill)

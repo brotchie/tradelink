@@ -12,7 +12,7 @@ namespace Responses
         [Description("Total Profit Target")]
         public decimal TotalProfitTarget { get { return _totalprofit; } set { _totalprofit = value; } }
         [Description("Entry size when signal is found")]
-        public int EntrySize { get { return _entrysize; } set { _entrysize = value; } }
+        public int EntrySize { get { return _entrysize; } set { _entrysize= value; } }
         [Description("Default bar interval for this response.")]
         public BarInterval Interval { get { return _barinterval; } set { _barinterval = value; } }
 
@@ -21,14 +21,9 @@ namespace Responses
         public SMAResponse() : this(true) { }
         public SMAResponse(bool prompt)
         {
-            if (prompt)
-            {
-                // enable prompting of system parameters to user,
-                // so they do not have to recompile to change things
-                ParamPrompt pp = new ParamPrompt(this);
-                // show prompt to user
-                pp.ShowDialog();
-            }
+            // enable prompting of system parameters to user,
+            // so they do not have to recompile to change things
+            ParamPrompt.Popup(this,!prompt);
 
             // only build bars for user's interval
             blt = new BarListTracker(Interval);

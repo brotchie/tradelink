@@ -28,9 +28,7 @@ namespace Responses
         {
 
             // here's how we prompt for parameters
-            ParamPrompt param = new ParamPrompt(this); 
-            // display the prompt
-            param.ShowDialog();
+            ParamPrompt.Popup(this);
             
             // set default bar interval based on user's selection
             blt.DefaultInterval = Interval;

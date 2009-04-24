@@ -17,9 +17,7 @@ namespace Responses
         public OpenAsymetry()
         {
             // enable prompting of user for parameters
-            ParamPrompt pp = new ParamPrompt(this);
-            // show the prompt
-            pp.ShowDialog();
+            ParamPrompt.Popup(this);
         }
 
         // here are parameters to prompt for and their descriptions

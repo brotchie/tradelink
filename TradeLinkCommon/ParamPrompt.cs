@@ -19,19 +19,34 @@ namespace TradeLink.Common
         /// <param name="DisplayParamsOfObject">The Response for which you want the user to specify or alter the properties for.</param>
 		public ParamPrompt(Response DisplayParamsOfObject)
 		{
-			//
-			// The InitializeComponent() call is required for Windows Forms designer support.
-			//
+
 			InitializeComponent();
 			this.Text = DisplayParamsOfObject.Name + " Options";
             propertyGrid1.PropertySort = PropertySort.Categorized;
 			propertyGrid1.SelectedObject = (object)DisplayParamsOfObject;
-		
-			//
-			// TODO: Add constructor code after the InitializeComponent() call.
-			//
+
 		}
-		
+        /// <summary>
+        /// popup the parameters for selected response
+        /// </summary>
+        public static void Popup(Response displayParamsAvail) { Popup(displayParamsAvail, false,false); }
+        public static void Popup(Response displayParamsAvail, bool skip) { Popup(displayParamsAvail, false, skip); }
+        /// <summary>
+        /// pop up the parameters, allows you to pausing the application to do so (also can skip prompt)
+        /// </summary>
+        /// <param name="pauseapp"></param>
+        public static void Popup(Response displayParamsAvail, bool pauseapp, bool skip)
+        {
+            if (skip) return;
+            ParamPrompt p = new ParamPrompt(displayParamsAvail);
+
+            p.Invalidate(true);
+            if (pauseapp)
+                p.ShowDialog();
+            else
+                p.Show();
+            p.Invalidate(true);
+        }
 		void ApplybutClick(object sender, EventArgs e)
 		{
 			this.Close();

@@ -134,6 +134,7 @@ namespace ASP
                 // increment next filename index
                 startidx++;
             }
+            status("added " + _resnames.SelectedIndices.Count + " responses to " + name);
             // find any new names
             findskins();
         }
