@@ -131,6 +131,14 @@ namespace ASP
             {
                 // save them as skin
                 SkinImpl.SkinFile(_reslist[idx], _reslist[idx].FullName, _class2dll[_reslist[idx].FullName], name + "." + startidx.ToString() + SKINEXT);
+                // add index as part of skin
+                string sn = string.Empty;
+                if (_resskinidx.TryGetValue(idx, out sn))
+                    if (sn != name)
+                        _resskinidx[idx] = sn + " " + name;
+                    else ;
+                else
+                    _resskinidx.Add(idx, name);
                 // increment next filename index
                 startidx++;
             }
@@ -237,6 +245,8 @@ namespace ASP
                         _reslist.Add(r);
                         // show it to user
                         _resnames.Items.Add(r.FullName);
+                        // mark it as loaded
+                        _resskinidx.Add(_reslist.Count - 1, name);
                         // route symbols to it?
 
                         // update status
@@ -291,6 +301,8 @@ namespace ASP
 
         void ASP_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if (MessageBox.Show("Save skins before quiting?", "Save skins", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                _saveskins_Click(null, null);
             // if we're using another thread to process ticks, stop it
             if (Environment.ProcessorCount>1)
                 _ar.Stop();
@@ -314,7 +326,10 @@ namespace ASP
             
         }
 
+        void skinexit()
+        {
 
+        }
 
 
 
@@ -616,21 +631,69 @@ namespace ASP
             // confirm removal
             if (MessageBox.Show("remove skin " + name + "?", "confirm skin deletion", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                // get number of repsonses in skin
-                int count = nextskinidx(Environment.CurrentDirectory, name);
-                // remove file names
-                for (int i = 0; i < count; i++)
-                {
-                    try
-                    {
-                        // remove skin file
-                        File.Delete(Environment.CurrentDirectory + "\\" + name + "." + i.ToString() + SKINEXT);
-                    }
-                    catch (Exception) { continue; }
-                }
+                // remove skin and references
+                remskin(name,false);
                 // when done, update avail skins
                 findskins();
             }
+        }
+        void remskin(string name) { remskin(name, true); }
+        void remskin(string name, bool filesonly)
+        {
+            // get number of repsonses in skin
+            int count = nextskinidx(Environment.CurrentDirectory, name);
+            // remove file names
+            for (int i = 0; i < count; i++)
+            {
+                try
+                {
+                    // remove skin file
+                    File.Delete(Environment.CurrentDirectory + "\\" + name + "." + i.ToString() + SKINEXT);
+                }
+                catch (Exception) { continue; }
+            }
+            // if not processing references, quit
+            if (filesonly) return;
+            // remove references from loaded responses
+            Dictionary<int, string> final = new Dictionary<int, string>();
+            foreach (int idx in _resskinidx.Keys)
+            {
+                // get skins on response
+                string[] names = _resskinidx[idx].Split(' ');
+                // prepare final name list
+                List<string> fnames = new List<string>();
+                // go through each name
+                for (int i = 0; i < names.Length; i++)
+                    if (names[i] != name) // if it doesn't match
+                        fnames.Add(names[i]); // add it
+                // update the skin list for response, if we have any skins
+                if (fnames.Count>0)
+                    final.Add(idx,string.Join(" ", names));
+            }
+            // save final as our index
+            _resskinidx = final;
+                
+        }
+
+        private void _saveskins_Click(object sender, EventArgs e)
+        {
+            foreach (int idx in _resskinidx.Keys)
+            {
+                // get all skins this response is part of
+                string[] names = _resskinidx[idx].Split(' ');
+                // get response
+                Response r = _reslist[idx];
+                // save status
+                bool worked = true;
+                foreach (string name in names)
+                {
+                    // remove skin first
+                    remskin(name);
+                    // then re-add it
+                    worked &= SkinImpl.SkinFile(r, r.FullName, _class2dll[r.FullName], name + "." + nextskinidx(Environment.CurrentDirectory, name).ToString() + SKINEXT);
+                }
+            }
+            status("saved loaded skins");
         }
 
                                          

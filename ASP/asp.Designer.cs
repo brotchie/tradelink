@@ -49,9 +49,10 @@ namespace ASP
             this._account = new System.Windows.Forms.TextBox();
             this._twithelp = new System.Windows.Forms.Button();
             this._skins = new System.Windows.Forms.ComboBox();
+            this._remskin = new System.Windows.Forms.Button();
+            this._saveskins = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.label4 = new System.Windows.Forms.Label();
-            this._remskin = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this._newrespbox.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -163,10 +164,10 @@ namespace ASP
             this._msg.FormattingEnabled = true;
             this._msg.HorizontalScrollbar = true;
             this._msg.ItemHeight = 20;
-            this._msg.Location = new System.Drawing.Point(111, 0);
+            this._msg.Location = new System.Drawing.Point(112, 0);
             this._msg.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this._msg.Name = "_msg";
-            this._msg.Size = new System.Drawing.Size(357, 384);
+            this._msg.Size = new System.Drawing.Size(356, 384);
             this._msg.TabIndex = 12;
             this._msg.Visible = false;
             // 
@@ -250,15 +251,38 @@ namespace ASP
             // 
             this._skins.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._skins.FormattingEnabled = true;
-            this._skins.Location = new System.Drawing.Point(175, 31);
+            this._skins.Location = new System.Drawing.Point(174, 32);
             this._skins.Name = "_skins";
-            this._skins.Size = new System.Drawing.Size(211, 28);
+            this._skins.Size = new System.Drawing.Size(180, 28);
             this._skins.TabIndex = 20;
             this.toolTip1.SetToolTip(this._skins, "skins found");
             this._skins.SelectedIndexChanged += new System.EventHandler(this._skins_SelectedIndexChanged);
             // 
+            // _remskin
+            // 
+            this._remskin.Location = new System.Drawing.Point(360, 33);
+            this._remskin.Name = "_remskin";
+            this._remskin.Size = new System.Drawing.Size(29, 28);
+            this._remskin.TabIndex = 21;
+            this._remskin.Text = "-";
+            this.toolTip1.SetToolTip(this._remskin, "remove selected skin");
+            this._remskin.UseVisualStyleBackColor = true;
+            this._remskin.Click += new System.EventHandler(this._remskin_Click);
+            // 
+            // _saveskins
+            // 
+            this._saveskins.Location = new System.Drawing.Point(395, 32);
+            this._saveskins.Name = "_saveskins";
+            this._saveskins.Size = new System.Drawing.Size(31, 29);
+            this._saveskins.TabIndex = 22;
+            this._saveskins.Text = "S";
+            this.toolTip1.SetToolTip(this._saveskins, "save all loaded skins");
+            this._saveskins.UseVisualStyleBackColor = true;
+            this._saveskins.Click += new System.EventHandler(this._saveskins_Click);
+            // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this._saveskins);
             this.groupBox1.Controls.Add(this._remskin);
             this.groupBox1.Controls.Add(this._skins);
             this.groupBox1.Controls.Add(this._twithelp);
@@ -283,17 +307,6 @@ namespace ASP
             this.label4.Size = new System.Drawing.Size(72, 20);
             this.label4.TabIndex = 17;
             this.label4.Text = "Account:";
-            // 
-            // _remskin
-            // 
-            this._remskin.Location = new System.Drawing.Point(393, 31);
-            this._remskin.Name = "_remskin";
-            this._remskin.Size = new System.Drawing.Size(30, 28);
-            this._remskin.TabIndex = 21;
-            this._remskin.Text = "-";
-            this.toolTip1.SetToolTip(this._remskin, "remove selected skin");
-            this._remskin.UseVisualStyleBackColor = true;
-            this._remskin.Click += new System.EventHandler(this._remskin_Click);
             // 
             // ASP
             // 
@@ -344,6 +357,7 @@ namespace ASP
         private System.Windows.Forms.ComboBox _skins;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button _remskin;
+        private System.Windows.Forms.Button _saveskins;
     }
 }
 
