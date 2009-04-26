@@ -98,6 +98,7 @@ namespace SterServer
             f.Add(MessageTypes.SENDORDERSTOP);
             f.Add(MessageTypes.SENDORDERMARKET);
             f.Add(MessageTypes.SENDORDERLIMIT);
+            f.Add(MessageTypes.EXECUTENOTIFY);
             return f.ToArray();
         }
 

@@ -59,6 +59,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\Sterling+BrokerServer.lnk" "$INSTDIR\SterServer.EXE" "" "$INSTDIR\SterServer.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\TD+BrokerServer.lnk" "$INSTDIR\TDServer.EXE" "" "$INSTDIR\TDServer.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\MB+BrokerServer.lnk" "$INSTDIR\ServerMB.EXE" "" "$INSTDIR\ServerMB.EXE" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink\Genesis+BrokerServer.lnk" "$INSTDIR\ServerGenesis.EXE" "" "$INSTDIR\ServerGenesis.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\TS2EPF.lnk" "$INSTDIR\TS2EPF.exe" "" "$INSTDIR\TS2EPF.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\CQG2EPF.lnk" "$INSTDIR\CQG2EPF.exe" "" "$INSTDIR\CQG2EPF.exe" 0  
   
@@ -102,7 +103,14 @@ Section "TradeLinkSuite"
   File "ServerMB\bin\release\Interop.MBTCOMLib.dll"  
   File "ServerMB\bin\release\Interop.MBTHISTLib.dll"    
   File "ServerMB\bin\release\Interop.MBTORDERSLib.dll"    
-  File "ServerMB\bin\release\Interop.MBTQUOTELib.dll"    
+  File "ServerMB\bin\release\Interop.MBTQUOTELib.dll"   
+  File "ServerGenesis\bin\release\ServerGenesis.exe"  
+  File "ServerGenesis\bin\release\ServerGenesis.exe.config"
+  File "ServerGenesis\bin\release\dbghelp.lib"
+  File "ServerGenesis\bin\release\dbghelp.dll"
+  File "ServerGenesis\bin\release\GTAPI32.dll"
+  File "ServerGenesis\bin\release\GTAPI32.lib"
+  File "ServerGenesis\bin\release\GTAPINet.dll"
   File "InstallSuite\VCRedistInstall.exe"
   File "TS2EPF\bin\release\TS2EPF.exe"
   File "CQG2EPF\bin\release\CQG2EPF.exe"
