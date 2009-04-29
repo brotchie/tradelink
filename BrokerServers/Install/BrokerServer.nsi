@@ -74,11 +74,11 @@ SectionEnd
 Section "AnvilServer"
 
 
-  CreateShortCut "$SMPROGRAMS\TradeLink\Anvil+BrokerServer.lnk" "$INSTDIR\AnvilRelease_x32_2_7_5_0\Anvil.exe" "" "$INSTDIR\AnvilRelease_x32_2_7_5_0\Anvil.exe" 0
+  CreateShortCut "$SMPROGRAMS\TradeLink\Anvil+BrokerServer.lnk" "$INSTDIR\AnvilRelease_x32_2_7_7_2\Anvil.exe" "" "$INSTDIR\AnvilRelease_x32_2_7_7_2\Anvil.exe" 0
   ; Put file there
  
   
-  File /r "AnvilRelease_x32_2_7_5_0"
+  File /r "AnvilRelease_x32_2_7_7_2"
 
 
 SectionEnd
@@ -105,7 +105,7 @@ Section "Uninstall"
 
   ; Remove files and uninstaller
   Delete $INSTDIR\uninstall.exe
-  Delete "$INSTDIR\AnvilRelease_x32_2_7_5_0\*.*"
+  Delete "$INSTDIR\AnvilRelease_x32_2_7_7_2\*.*"
   Delete "$INSTDIR\*.*"
   ; Remove shortcuts, if any
   Delete "$SMPROGRAMS\TradeLink\*BrokerServer.lnk"

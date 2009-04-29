@@ -17,7 +17,7 @@
 #define BUSINESS_API __declspec(dllimport)
 #endif
 
-const char* const BusinessHeaderVersion = "2.7.4.3";
+const char* const BusinessHeaderVersion = "2.7.6.5";
 
 #include "ObserverApi.h"
 #include "CommonIds.h"
@@ -1493,7 +1493,10 @@ public:
     static bool isSmallCap(const char* securityName){return *(unsigned int*)securityName == smallCapInt;}
     bool isNNM() const{return *(unsigned int*)m_securityName == NNMInt;}
 
-    char GetNyseImbalanceType() const{return m_nyseImbalanceType;}
+	virtual const Observable* RequestChart(){return NULL;}
+	virtual unsigned short GetNumericCode() const{return 0xFFFF;}
+
+	char GetNyseImbalanceType() const{return m_nyseImbalanceType;}
 	unsigned int GetNyseImbalanceTime() const{return m_nyseImbalanceTime;}
 	unsigned int GetNysePreviousImbalanceTime() const{return m_nysePreviousImbalanceTime;}
     int GetNyseImbalance() const{return m_nyseImbalance;}
@@ -2000,6 +2003,10 @@ public:
 
     virtual unsigned int CancelStockBestWorstOrder(unsigned int flags, const char* destination, bool worst, bool includeChildOrders) = 0;
     virtual unsigned int CancelAllButBestWorstOrder(unsigned int flags, const char* destination, bool worst, bool includeChildOrders) = 0;
+	//ADR:799 START
+	virtual void CancelLimitMarketOrders(bool limit, unsigned int entryFlags, unsigned int sideFlags, unsigned int tifFlags, const char* destination, bool includeChildOrders) = 0;
+	virtual void CancelAllOrderTypes(unsigned int entryFlags, unsigned int sideFlags, unsigned int tifFlags, const char* destination, bool includeChildOrders) = 0;
+	//ADR:799 END
 /*NXDELAY
     virtual unsigned int GetSecondsToNxAvailability(bool side) const = 0;
 */
@@ -3999,7 +4006,39 @@ enum PositionFlags
     POSITION_SHORTPHANTOM = 32,
     POSITION_INVENTORY = 64,
 };
+//ADR:799 START
+enum CustomCancelOrderFlags
+{
+	CCO_BUY = 1,
+	CCO_SELL = 2,
+	CCO_SHORT = 4,
+	CCO_ALL
+};
+enum CustomCancelOrderTifFlags
+{
+	CCOTIF_DAY = 1,
+	CCOTIF_NONDAY = 2,
+	CCOTIF_ALL
+};
+enum CustomCancelOrderEntryFlags
+{
+	CCOE_FIRST = 1,
+	CCOE_LAST = 2,
+	CCOE_ALL_BUT_FIRST = 4,
+	CCOE_ALL_BUT_LAST = 8,
+	CCOE_ALL
+};
+enum CancelCustomOrderType
+{
+	CCOT_MARKET = 1,
+	CCOT_LIMIT = 2,
+	CCOT_STOP = 4,
+	CCOT_PASSIVE = 8,
+	CCOT_CUSTOM = 16,
+	CCOT_ALL,
+};
 
+//ADR:799 END
 
 enum CancelOrderFlags
 {
@@ -4781,6 +4820,47 @@ Observable* WINAPI B_SendPeggedOrder(const StockBase* stockHandle,
 	OptionTraderStatus otStatus = OTS_DEFAULT,
 	const StagingOrder* stagingOrder = NULL);
 
+Observable* WINAPI B_SendSmartBracketOrder(const StockBase* stockHandle,
+    char side,
+    unsigned int size,
+    const Money* priceOffset,//0 for Stop Market
+    bool price2DecPlaces,
+    bool ecnsOnlyBeforeAfterMarket,
+    bool mmsBasedForNyse,
+    unsigned int TimeInForce,
+    const char* redirection,
+    bool proactive,
+    bool principalOrAgency, //principal - true, agency - false
+    char superMontageAlgorithm,
+    char oversellHandling,
+    unsigned int destinationExchange,
+    StopTriggerType triggerType,
+    unsigned int userType,
+    const char* userDescription,
+	const char* regionalProactiveDestination,
+	unsigned int triggerPrintType,
+	const Money& triggerPrintOffset,
+	Order** orderSent,
+    Observable* account,
+    unsigned int block,
+    const Money* from,
+	unsigned __int64 cmta,
+	Money& LowerBracketLimitPrice,
+	Money& UpperBracketLimitPrice,
+	const char* destination,
+	unsigned int orderIdToReplace,
+	const Money* discretionPrice,
+	const Money& Price,
+	unsigned int visibilityMode,
+	int displayQuantity,
+	const char* commandName,
+	const char* commandComment,
+	bool institutionalDisclaimerVisible,
+	OptionOrderStatus ooStatus,
+	OptionTraderStatus otStatus,
+	const StagingOrder* stagingOrder);
+
+
 enum TvolCurve
 {
 	CURVE_TVOL,
@@ -5068,6 +5148,7 @@ const StockBase* WINAPI B_GetNextStock(void* iteratorHandle);
 void* WINAPI B_CreateStockMovementIterator();
 const StockMovement* WINAPI B_GetNextStockMovement(void* iteratorHandle);
 const StockMovement* WINAPI B_FindStockMovement(const char* symbol);
+const StockMovement* WINAPI B_GetStockMovementByNumericCode(unsigned short numericCode);
 
 bool WINAPI B_IsDaylightSavingsTimeOn();
 
@@ -5098,6 +5179,9 @@ bool WINAPI B_IsMmidCaes(const char* mmid);
 
 //void WINAPI B_SendInitialRequests();
 void WINAPI B_CancelSmartOrders(unsigned int flags, const char* destination, const char* symbol, Observable* account = NULL);//destination = NULL - all destinations, symbol = NULL - all symbols
+//ADR:799 START
+void WINAPI B_CancelCustomOrders(const char* symbol, unsigned int entryFlags, unsigned int sideFlags, unsigned int orderTypes, /*unsigned int tifFlags,*/ Observable* account = NULL);
+//ADR:799 END
 unsigned int WINAPI B_CancelStockBestWorstOrder(Position* pos, unsigned int flags, const char* destination, bool worst, bool includeChildOrders);
 unsigned int WINAPI B_CancelStockAllButBestWorstOrder(Position* pos, unsigned int flags, const char* destination, bool worst, bool includeChildOrders);
 
@@ -6120,6 +6204,7 @@ bool WINAPI B_IsAllowArcaOddLotOrders();
 void WINAPI B_SetAllowArcaOddLotOrders(bool allow);
 
 bool WINAPI B_IsSuperUser();
+bool WINAPI B_IsSuperMonitor();
 
 bool WINAPI B_SetLogPath(const char* path);//Should be called before trader logon, if ever.
 const char* WINAPI B_GetLogPath();

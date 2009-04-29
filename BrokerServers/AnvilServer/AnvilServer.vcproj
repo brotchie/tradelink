@@ -487,7 +487,6 @@
 					Optimization="2"
 					AdditionalIncludeDirectories=""
 					PreprocessorDefinitions=""
-					ExceptionHandling="1"
 					CompileAsManaged="0"
 				/>
 			</FileConfiguration>

@@ -8,7 +8,7 @@
 #define OBSERVER_API __declspec(dllimport)
 #endif
 
-const char* const ObserverHeaderVersion = "2.7.0.5";
+const char* const ObserverHeaderVersion = "2.7.5.4";
 
 class Observable;
 class Observer;
@@ -55,11 +55,13 @@ public:
     void AfterObserverRemoved();
     void AfterObserversCleared();
 
-    size_t GetObserverCount() const{return m_observers.size();}
-    bool HasObservers() const{return !m_observers.empty();}
+	unsigned int GetObserverCount() const{return (unsigned int)m_observerCount;}//m_observers.size();}
+	bool HasObservers() const{return m_observerCount != 0;}//!m_observers.empty();}
     bool isObserverAttached(Observer* o) const{return m_observers.find(o) != m_observers.end();}
 	bool hasIdleJob() const;
     bool HasOnlyThisObserverOrNone(Observer* o) const{return m_observers.empty() || m_observers.size() == 1 && isObserverAttached(o);}
+protected:
+	volatile LONG m_observerCount;
 private:
 //	virtual void EraseObserver(Observer* o);
 	Observers m_observers;

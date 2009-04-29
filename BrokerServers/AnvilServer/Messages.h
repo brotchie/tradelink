@@ -8,7 +8,7 @@
 #include "MessageIds.h"
 #include "ObserverApi.h"
 
-const char* const ReceiverHeaderVersion = "2.7.4.3";
+const char* const ReceiverHeaderVersion = "2.7.6.5";
 
 const unsigned int totallyVisibleSizeHundreds = 999;
 
@@ -262,6 +262,36 @@ class MsgLoadOrderPoolCompleted : public UserIdMessage
 {
 public:
     MsgLoadOrderPoolCompleted() : UserIdMessage(M_RESP_LOAD_POOL_COMPLETED, sizeof(MsgLoadOrderPoolCompleted)){}
+};
+
+class ReqLoadLoggedAccountFirst : public Message
+{
+public:
+    ReqLoadLoggedAccountFirst() : Message(M_REQ_LOAD_LOGGED_ACCOUNT_FIRST, sizeof(ReqLoadLoggedAccountFirst)){}
+};
+
+class ReqLoadLoggedAccountNext : public Message
+{
+public:
+    ReqLoadLoggedAccountNext() : Message(M_REQ_LOAD_LOGGED_ACCOUNT_NEXT, sizeof(ReqLoadLoggedAccountNext)){}
+};
+
+class RespLoadLoggedAccountNext : public UserIdMessage
+{
+public:
+    RespLoadLoggedAccountNext(const char* userId) : UserIdMessage(M_RESP_LOAD_LOGGED_ACCOUNT_NEXT, sizeof(RespLoadLoggedAccountNext), userId){}
+};
+
+class RespLoadLoggedAccountCompleted : public Message
+{
+public:
+    RespLoadLoggedAccountCompleted() : Message(M_RESP_LOAD_LOGGED_ACCOUNT_COMPLETED, sizeof(RespLoadLoggedAccountCompleted)){}
+};
+
+class RespLoadLoggedAccount : public UserIdMessage
+{
+public:
+    RespLoadLoggedAccount(const char* userId) : UserIdMessage(M_RESP_LOAD_LOGGED_ACCOUNT, sizeof(RespLoadLoggedAccount), userId){}
 };
 
 class R_Order
@@ -1414,6 +1444,66 @@ public:
 };
 
 
+class FeedMessage : public Message
+{
+public:
+	unsigned short m_feed;
+	unsigned short m_reservedFeedMessage;
+	unsigned __int64 m_symbol;
+protected:
+    FeedMessage(unsigned short type, unsigned short size, unsigned __int64 symbol = 0, unsigned short feed = 0, unsigned short reserved = 0) : Message(type, size),m_symbol(symbol), m_feed(feed), m_reservedFeedMessage(reserved){}
+};
+
+enum RefreshFlags
+{
+    REFRESHFLAG_LEVEL1 =    0x00000001,
+	REFRESHFLAG_LEVEL2 =    0x00000002,
+	REFRESHFLAG_BOOK =      0x00000004,
+	REFRESHFLAG_MMINFO =    0x00000008,
+	REFRESHFLAG_SOES =      0x00000010,
+	REFRESHFLAG_ATTRIB =    0x00000020,
+	REFRESHFLAG_END =		0x00000040,
+	REFRESHFLAG_LRP =		0x00000080,
+};
+
+
+class ReqRefreshFeed : public FeedMessage 
+{
+public:
+	ReqRefreshFeed(unsigned __int64 symbol = 0, unsigned short feed = 0):FeedMessage(M_REQ_REFRESH_FEED, sizeof(ReqRefreshFeed), symbol, feed){}
+};
+
+class ReqUnsubscribeFeed : public FeedMessage 
+{
+public:
+	ReqUnsubscribeFeed(unsigned __int64 symbol = 0, unsigned short feed = 0):FeedMessage(M_REQ_UNSUBSCRIBE_FEED, sizeof(ReqUnsubscribeFeed), symbol, feed){}
+};
+
+class MsgRefreshFeed : public FeedMessage
+{
+public:
+    MsgRefreshFeed(unsigned __int64 symbol = 0, unsigned short feed = 0, unsigned int refreshFlags = 0):FeedMessage(M_RESP_REFRESH_FEED, sizeof(MsgRefreshFeed), symbol, feed),m_refreshFlags(refreshFlags){}
+	unsigned int m_refreshFlags;
+	unsigned int m_reservedFlags;
+};
+
+class MsgRefreshFeedFailed : public FeedMessage
+{
+public:
+	MsgRefreshFeedFailed(unsigned __int64 symbol = 0, unsigned short feed = 0):FeedMessage(M_RESP_REFRESH_FEED_FAILED, sizeof(MsgRefreshFeedFailed), symbol, feed){}
+};
+
+class MsgFeedUnsubscribed : public FeedMessage
+{
+public:
+	MsgFeedUnsubscribed(unsigned __int64 symbol = 0, unsigned short feed = 0):FeedMessage(M_RESP_UNSUBSCRIBE_FEED, sizeof(MsgFeedUnsubscribed), symbol, feed){}
+};
+
+class MsgFeedUnsubscribeFailed : public FeedMessage
+{
+public:
+	MsgFeedUnsubscribeFailed(unsigned __int64 symbol = 0, unsigned short feed = 0):FeedMessage(M_RESP_UNSUBSCRIBE_FEED_FAILED, sizeof(MsgFeedUnsubscribeFailed), symbol, feed){}
+};
 
 class ReqRefreshSymbol : public SymbolMessage
 {
@@ -1541,18 +1631,6 @@ public:
 	unsigned int m_refreshFlags;		// A bit field representing
 										// all the steps that have
 										// contributed for this message.
-    enum
-    {
-	    REFRESHFLAG_LEVEL1 =    0x00000001,
-    	REFRESHFLAG_LEVEL2 =    0x00000002,
-    	REFRESHFLAG_BOOK =      0x00000004,
-    	REFRESHFLAG_MMINFO =    0x00000008,
-    	REFRESHFLAG_SOES =      0x00000010,
-    	REFRESHFLAG_ATTRIB =    0x00000020,
-    	REFRESHFLAG_END =		0x00000040,
-		REFRESHFLAG_LRP =		0x00000080,
-    };
-
 };
 //Option messages
 class SymbolAsUIntMessage : public Message
@@ -1568,6 +1646,7 @@ class MsgRefreshOption : public SymbolAsUIntMessage
 {
 public:
     MsgRefreshOption(unsigned short aSize, unsigned __int64 symbol = 0, unsigned int flags = 0) : SymbolAsUIntMessage(M_RESP_REFRESH_OPTION, aSize, symbol, flags){}
+/*
     enum
     {
 	    REFRESHFLAG_LEVEL1 =    0x00000001,
@@ -1579,7 +1658,7 @@ public:
     	REFRESHFLAG_END =		0x00000040,
 		REFRESHFLAG_LRP =		0x00000080,
     };
-
+*/
 };
 class MsgRefreshOptionFailed : public SymbolAsUIntMessage
 {
@@ -1701,6 +1780,8 @@ public:
 	}
 };
 
+const unsigned int MAX_FIRM = 8;
+
 class MsgLogon : public Message
 {
 public:
@@ -1721,21 +1802,7 @@ public:
 		FillStrBufferAndPad(m_FirmID, sizeof(m_FirmID), FirmID);
 	}
 
-	enum
-	{ 
-		RESP_INSTITUTIONAL		= 0x00000001,
-		RESP_RETAIL				= 0x00000002,
-		RESP_RESTRICT_NASDAQ_MD	= 0x00000100,
-		RESP_RESTRICT_NASDAQ_OE	= 0x00000200,
-		RESP_RESTRICT_NYSE_MD	= 0x00000400,
-		RESP_RESTRICT_NYSE_OE	= 0x00000800,
-		RESP_RESTRICT_AMEX_MD	= 0x00001000,
-		RESP_RESTRICT_AMEX_OE	= 0x00002000,
-		RESP_RESTRICT_NYSE_OB	= 0x00004000,
-		RESP_FAILED			    = 0x80000000
-	};
-
-    enum{ MAX_FIRM = 8 };
+//    enum{ MAX_FIRM = 8 };
 	
 	unsigned x_RespFlags;
 	unsigned x_Version;
@@ -1782,8 +1849,8 @@ public:
 		FillStrBufferAndPad(m_FirmID, sizeof(m_FirmID), FirmID);
 	}
 
-    enum{ MAX_FIRM = 8 };
-
+//    enum{ MAX_FIRM = 8 };
+/*
     enum TFlags1
     { 
         RESP_INSTITUTIONAL      = 0x00000001,
@@ -1804,7 +1871,7 @@ public:
         TE_MARKS_SIDE_IN_EXEC_MESSAGE = 0x00000002,
         RESP_COMPRESSION_FORCED = 0x00000004
     };
- 
+ */
     unsigned int x_RespFlags1;
     unsigned int x_Version;
     unsigned int x_BuyingPower;
@@ -2459,6 +2526,24 @@ public:
 	{}
 	unsigned short m_anvilServerMessageType;
 	unsigned short m_reserved;
+};
+
+class MessageFeedId : public Message 
+{
+protected:
+	MessageFeedId(unsigned short type, unsigned short size):Message(type, size){}
+};
+
+class MessageFeedIdAdd : public MessageFeedId 
+{
+public:
+	MessageFeedIdAdd(unsigned short size):MessageFeedId(M_FEED_ID_ADD, sizeof(MessageFeedIdAdd) + size){}
+};
+
+class MessageFeedIdRemove : public MessageFeedId 
+{
+public:
+	MessageFeedIdRemove(unsigned short size):MessageFeedId(M_FEED_ID_REMOVE, sizeof(MessageFeedIdRemove) + size){}
 };
 
 class MsHistoryChart : public SymbolMessage
