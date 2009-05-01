@@ -40,7 +40,6 @@ namespace WinGauntlet
             this.label7 = new System.Windows.Forms.Label();
             this.queuebut = new System.Windows.Forms.Button();
             this.reslist = new System.Windows.Forms.ListBox();
-            this.tickFileFilterControl1 = new TradeLink.Common.TickFileFilterControl();
             this.optionpage = new System.Windows.Forms.TabPage();
             this._indicatcsv = new System.Windows.Forms.CheckBox();
             this._debugfile = new System.Windows.Forms.CheckBox();
@@ -59,6 +58,7 @@ namespace WinGauntlet
             this.messagepage = new System.Windows.Forms.TabPage();
             this.messages = new System.Windows.Forms.RichTextBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.tickFileFilterControl1 = new TradeLink.Common.TickFileFilterControl();
             this.tabControl1.SuspendLayout();
             this.studypage.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -165,7 +165,7 @@ namespace WinGauntlet
             // 
             // reslist
             // 
-            this.reslist.ColumnWidth = 40;
+            this.reslist.ColumnWidth = 300;
             this.reslist.FormattingEnabled = true;
             this.reslist.ItemHeight = 20;
             this.reslist.Location = new System.Drawing.Point(106, 327);
@@ -176,13 +176,6 @@ namespace WinGauntlet
             this.reslist.TabIndex = 2;
             this.toolTip1.SetToolTip(this.reslist, "select response to trade");
             this.reslist.SelectedIndexChanged += new System.EventHandler(this.boxlist_SelectedIndexChanged);
-            // 
-            // tickFileFilterControl1
-            // 
-            this.tickFileFilterControl1.Location = new System.Drawing.Point(9, 9);
-            this.tickFileFilterControl1.Name = "tickFileFilterControl1";
-            this.tickFileFilterControl1.Size = new System.Drawing.Size(607, 298);
-            this.tickFileFilterControl1.TabIndex = 18;
             // 
             // optionpage
             // 
@@ -411,6 +404,13 @@ namespace WinGauntlet
             this.messages.Size = new System.Drawing.Size(621, 509);
             this.messages.TabIndex = 0;
             this.messages.Text = "";
+            // 
+            // tickFileFilterControl1
+            // 
+            this.tickFileFilterControl1.Location = new System.Drawing.Point(9, 9);
+            this.tickFileFilterControl1.Name = "tickFileFilterControl1";
+            this.tickFileFilterControl1.Size = new System.Drawing.Size(607, 298);
+            this.tickFileFilterControl1.TabIndex = 18;
             // 
             // Gauntlet
             // 
