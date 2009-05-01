@@ -277,7 +277,7 @@ namespace SterServer
             k.size = q.nLastSize;
             tl.newTick(k);
             if ((q.bValidMktImb==0)||!imbalance) return;
-            tl.newImbalance(new ImbalanceImpl(k.symbol, k.ex, q.nMktImbalance, k.time, 0, 0));
+            tl.newImbalance(new ImbalanceImpl(k.symbol, k.ex, q.nMktImbalance, k.time, 0, 0,0));
            
         }
 
