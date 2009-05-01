@@ -15,6 +15,7 @@ namespace TradeLink.API
         int PrevImbalance { get; }
         int ThisTime { get; }
         int PrevTime { get; }
+        int InfoImbalance { get; }
         string Exchange { get; }
     }
 }

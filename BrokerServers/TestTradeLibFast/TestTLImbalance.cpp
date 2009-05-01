@@ -14,6 +14,7 @@ static void __stdcall SerializeDeserialize()
 	ib.ThisTime = 1550;
 	ib.PrevImbalance = 400000;
 	ib.PrevTime = 1540;
+	ib.InfoImbalance = 11500;
 	
 	// serialize it
 	CString msg = TLImbalance::Serialize(ib);
@@ -26,6 +27,7 @@ static void __stdcall SerializeDeserialize()
 	CFIX_ASSERT(ni.PrevImbalance==ib.PrevImbalance);
 	CFIX_ASSERT(ni.ThisTime==ib.ThisTime);
 	CFIX_ASSERT(ni.PrevTime == ib.PrevTime);
+	CFIX_ASSERT(ni.InfoImbalance == ib.InfoImbalance);
 }
 
 

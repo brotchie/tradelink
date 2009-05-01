@@ -9,5 +9,6 @@ namespace TradeLink.API
         IF_TIME,
         IF_PSIZE,
         IF_PTIME,
+        IF_INFO,
     }
 }

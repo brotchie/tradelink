@@ -65,7 +65,7 @@ namespace TestTradeLink
             Assert.AreEqual(0, imbalances);
 
             // send one
-            s.newImbalance(new ImbalanceImpl(SYM, "NYSE", 100000, 154000, 0, 0));
+            s.newImbalance(new ImbalanceImpl(SYM, "NYSE", 100000, 154000, 0, 0,0));
 
             // make sure we got it
             Assert.AreEqual(1, imbalances);

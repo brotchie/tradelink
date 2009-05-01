@@ -12,6 +12,7 @@ namespace TradeLibFast
 		PrevImbalance = 0;
 		ThisTime = 0;
 		PrevTime = 0;
+		InfoImbalance = 0;
 	}
 	TLImbalance::~TLImbalance()
 	{
@@ -19,7 +20,7 @@ namespace TradeLibFast
 
 	bool TLImbalance::hasImbalance()
 	{
-		return ThisImbalance!=0;
+		return (ThisImbalance!=0) || (InfoImbalance!=0);
 	}
 
 	bool TLImbalance::hadImbalance()
@@ -30,7 +31,7 @@ namespace TradeLibFast
 	CString TLImbalance::Serialize(TLImbalance i)
 	{
 		CString msg;
-		msg.Format("%s,%s,%i,%i,%i,%i",i.Symbol,i.Ex,i.ThisImbalance,i.ThisTime,i.PrevImbalance,i.PrevTime);
+		msg.Format("%s,%s,%i,%i,%i,%i,%i",i.Symbol,i.Ex,i.ThisImbalance,i.ThisTime,i.PrevImbalance,i.PrevTime,i.InfoImbalance);
 		return msg;
 	}
 
@@ -45,6 +46,7 @@ namespace TradeLibFast
 		i.PrevImbalance= atoi(r[IF_PSIZE].GetBuffer());
 		i.PrevTime = atoi(r[IF_PTIME].GetBuffer());
 		i.ThisTime = atoi(r[IF_TIME].GetBuffer());
+		i.InfoImbalance = atoi(r[IF_INFO].GetBuffer());
 		return i;
 	}
 }

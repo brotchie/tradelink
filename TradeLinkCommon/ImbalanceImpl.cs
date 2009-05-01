@@ -11,7 +11,7 @@ namespace TradeLink.Common
     public class ImbalanceImpl : Imbalance
     {
         public ImbalanceImpl() { }
-        public ImbalanceImpl(string sym, string ex, int size, int time, int psize, int ptime)
+        public ImbalanceImpl(string sym, string ex, int size, int time, int psize, int ptime, int info)
         {
             _time = time;
             _size = size;
@@ -19,6 +19,7 @@ namespace TradeLink.Common
             _ex = ex;
             _ptime = ptime;
             _psize = psize;
+            _info = info;
         }
         string _sym = "";
         string _ex = "NYSE";
@@ -26,11 +27,13 @@ namespace TradeLink.Common
         int _psize = 0;
         int _time = 0;
         int _ptime = 0;
+        int _info = 0;
         public bool isValid { get { return (_sym != ""); } }
         public bool hasImbalance { get { return _size != 0; } }
         public bool hadImbalance { get { return _psize != 0; } }
         public string Symbol { get { return _sym; } }
         public string Exchange { get { return _ex; } }
+        public int InfoImbalance { get { return _info; } }
         public int ThisImbalance { get { return _size; } }
         public int PrevImbalance { get { return _psize; } }
         public int ThisTime { get { return _time; } }
@@ -46,13 +49,19 @@ namespace TradeLink.Common
             i._ptime= Convert.ToInt32(r[(int)ImbalanceField.IF_PTIME]);
             i._sym= r[(int)ImbalanceField.IF_SYM];
             i._ex= r[(int)ImbalanceField.IF_EX];
+            i._info = Convert.ToInt32(r[(int)ImbalanceField.IF_INFO]);
             return i;
         }
 
         public static string Serialize(Imbalance i)
         {
-            string[] r = new string[] { i.Symbol, i.Exchange, i.ThisImbalance.ToString(), i.ThisTime.ToString(), i.PrevImbalance.ToString(), i.PrevTime.ToString() };
+            string[] r = new string[] { i.Symbol, i.Exchange, i.ThisImbalance.ToString(), i.ThisTime.ToString(), i.PrevImbalance.ToString(), i.PrevTime.ToString(),i.InfoImbalance.ToString() };
             return string.Join(",", r);
+        }
+
+        public override string ToString()
+        {
+            return Serialize(this);
         }
     }
 }

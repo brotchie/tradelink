@@ -22,7 +22,7 @@ namespace TestTradeLink
             const int t = 1550;
             const int p = 1540;
             const int px = 400000;
-            Imbalance i = new ImbalanceImpl(s, e, x, t, px, p);
+            Imbalance i = new ImbalanceImpl(s, e, x, t, px, p,999);
 
             // verify it's valid
             Assert.IsTrue(i.isValid);
@@ -42,6 +42,7 @@ namespace TestTradeLink
             Assert.AreEqual(i.PrevTime, ni.PrevTime);
             Assert.AreEqual(i.ThisImbalance, ni.ThisImbalance);
             Assert.AreEqual(i.ThisTime, ni.ThisTime);
+            Assert.AreEqual(i.InfoImbalance, ni.InfoImbalance);
         }
 
 

@@ -15,6 +15,7 @@ namespace TradeLibFast
 		int ThisTime;
 		int PrevImbalance;
 		int PrevTime;
+		int InfoImbalance;
 		static CString Serialize(TLImbalance imbal);
 		static TLImbalance Deserialize(CString msg);
 		bool hasImbalance();
@@ -29,5 +30,6 @@ namespace TradeLibFast
         IF_TIME,
         IF_PSIZE,
         IF_PTIME,
+		IF_INFO,
     };
 }
