@@ -42,12 +42,11 @@ namespace ASP
             // try to open log file
             try
             {
-                new StreamWriter(PROGRAM + Util.ToTLDate(DateTime.Now) + ".txt", true);
+                _log = new StreamWriter(PROGRAM + Util.ToTLDate(DateTime.Now) + ".txt", true);
+                _log.AutoFlush = true;
             }
             catch (Exception ex) { debug("unable to open log file"); }
-            // if log file opened, set it to write contents to disk immediately
-            if (_log != null)
-                _log.AutoFlush = true;
+                
             // don't save ticks from replay since they're already saved
             archivetickbox.Checked = tl.LinkType != TLTypes.HISTORICALBROKER;
             // if our machine is multi-core we use seperate thread to process ticks
