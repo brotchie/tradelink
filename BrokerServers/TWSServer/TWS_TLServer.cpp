@@ -421,10 +421,9 @@ namespace TradeLibFast
 			contract.localSymbol = sec.sym;
 			if (sec.hasDest())
 				contract.exchange = sec.dest;
-			else if ((sec.type==STK) && (sec.sym.GetLength()>3))
+			else if ((sec.type==STK))
 				contract.exchange = "SMART";
-			else if (sec.type==STK)
-				contract.exchange = "NYSE";
+			contract.currency = "USD";
 			contract.secType = TLSecurity::SecurityTypeName(sec.type);
 			this->m_link[this->validlinkids[0]]->reqMktData((TickerId)stockticks.size(),contract,"",false);
 			TLTick k; // create blank tick
