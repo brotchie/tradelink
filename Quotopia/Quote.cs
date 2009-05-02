@@ -35,9 +35,8 @@ namespace Quotopia
             }
             
             Size = Quotopia.Properties.Settings.Default.wsize;
-            show(Util.TLSIdentity());
+            debug(Util.TLSIdentity());
             QuoteGridSetup();
-            FetchTLServer();
             statfade.Interval = 3000;
             statfade.Tick += new EventHandler(statfade_Tick);
             statfade.Start();
@@ -51,9 +50,18 @@ namespace Quotopia
             ordergrid.ContextMenuStrip = new ContextMenuStrip();
             ordergrid.ContextMenuStrip.Items.Add("Cancel", null, new EventHandler(cancelorder));
             FormClosing += new FormClosingEventHandler(Quote_FormClosing);
+            Resize += new EventHandler(Quote_Resize);
             if (tl.LinkType!= TLTypes.NONE)
                 tl.RequestAccounts();
+            else
+                
             Util.ExistsNewVersions(tl);
+
+        }
+
+        void Quote_Resize(object sender, EventArgs e)
+        {
+            Quotopia.Properties.Settings.Default.wsize = Size;
 
         }
 
@@ -68,11 +76,7 @@ namespace Quotopia
 
         void tl_gotPosition(Position pos)
         {
-            Position p = null;
-            if (posdict.TryGetValue(pos.Symbol, out p))
-                posdict[pos.Symbol] = pos;
-            else
-                posdict.Add(pos.Symbol, pos);
+            pt.Adjust(pos);
             int[] rows = new int[0];
             if (symidx.TryGetValue(pos.Symbol, out rows))
             {
@@ -80,6 +84,7 @@ namespace Quotopia
                 {
                     qt.Rows[r]["AvgPrice"] = pos.AvgPrice.ToString("N2");
                     qt.Rows[r]["PosSize"] = pos.Size.ToString();
+                    qt.Rows[r]["ClosedPL"] = pos.ClosedPL.ToString("N2");
                 }
 
             }
@@ -120,7 +125,7 @@ namespace Quotopia
             {
                 uint oid = (uint)ordergrid["oid", ordergrid.SelectedRows[i].Index].Value;
                 tl.CancelOrder((long)oid);
-                show("Sending cancel for " + oid.ToString());
+                debug("Sending cancel for " + oid.ToString());
             }
         }
 
@@ -150,18 +155,6 @@ namespace Quotopia
             catch (TLServerNotFound) { }
         }
 
-        void FetchTLServer()
-        {
-            TLTypes servers = tl.TLFound();
-            if (tl.Mode(servers, true))
-            {
-                string name = tl.BrokerName.ToString();
-                status("Found TradeLink broker server: " + name);
-                show("Found TradeLink broker server: " + name);
-            }
-            else status("Unable to find any broker instance.  Do you have one running?");
-        }
-
         Timer statfade = new Timer();
         Multimedia.Timer ticker = new Multimedia.Timer();
         DataGridView qg = new DataGridView();
@@ -179,6 +172,7 @@ namespace Quotopia
             qt.Columns.Add("Sizes");
             qt.Columns.Add("AvgPrice");
             qt.Columns.Add("PosSize");
+            qt.Columns.Add("ClosedPL");
             qt.Columns.Add("High");
             qt.Columns.Add("Low");
             qt.Columns.Add("Exch");
@@ -198,6 +192,7 @@ namespace Quotopia
             qg.ContextMenuStrip.Items.Add("Ticket", null,new EventHandler(rightticket));
             qg.ContextMenuStrip.Items.Add("Import Basket", null,new EventHandler(importbasketbut_Click));
             qg.ContextMenuStrip.Items.Add("Export Basket", null, new EventHandler(exportbasket));
+            qg.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
             qg.BackgroundColor = Quotopia.Properties.Settings.Default.marketbgcolor;
             qg.ForeColor = Quotopia.Properties.Settings.Default.marketfontcolor;
             qg.DefaultCellStyle.BackColor = qg.BackgroundColor;
@@ -213,6 +208,7 @@ namespace Quotopia
             qg.DataSource = qt;
             qg.Parent = Markets;
             qg.Dock = DockStyle.Fill;
+            qg.ColumnHeadersHeight = qg.ColumnHeadersDefaultCellStyle.Font.Height*2;
             qg.DoubleClick += new EventHandler(qg_DoubleClick);
             quoteTab.KeyUp +=new KeyEventHandler(qg_KeyUp);
             this.KeyUp += new KeyEventHandler(qg_KeyUp);
@@ -269,7 +265,7 @@ namespace Quotopia
             {
                 string err = Util.PrettyError(tl.BrokerName,res);
                 status(err);
-                show(sendOrder.ToString() + "( " + err + " )");
+                debug(sendOrder.ToString() + "( " + err + " )");
             }
         }
 
@@ -317,6 +313,8 @@ namespace Quotopia
         string newsymbol = "";
         void qg_KeyUp(object sender, KeyEventArgs e)
         {
+            // only pay attention when market tab is selected
+            if (quoteTab.SelectedTab.Name != "Markets") return;
             string preface = "Adding symbol: ";
             if (newsymbol.Contains("$") || newsymbol.Contains("/")) 
                 preface = "Adding index: ";
@@ -388,7 +386,6 @@ namespace Quotopia
                 bardict.Add(sym, new BarListImpl(BarInterval.FiveMin, sym));
             status("Added " + sym);
             symindex();
-            tl.RequestPositions(accts!=null ? accts[0] : "");
         }
 
         
@@ -516,24 +513,18 @@ namespace Quotopia
                 }
                 
                 int[] rows = GetSymbolRows(t.Sec.FullName);
-                Position p = null;
-                if (posdict.TryGetValue(t.symbol, out p))
-                {
-                    p.Adjust(t);
-                    posdict[t.symbol] = p;
-                }
-                else 
-                    posdict.Add(t.symbol, new PositionImpl(t));
-                int size = posdict[t.symbol].Size;
-                decimal price = posdict[t.symbol].AvgPrice;
+                pt.Adjust(t);
                 for (int i = 0; i < rows.Length; i++)
                 {
-                    qt.Rows[rows[i]]["PosSize"] = size.ToString();
-                    qt.Rows[rows[i]]["AvgPrice"] = price.ToString("N2");
+                    qt.Rows[rows[i]]["PosSize"] = pt[t.symbol].Size.ToString();
+                    qt.Rows[rows[i]]["AvgPrice"] = pt[t.symbol].AvgPrice.ToString("N2");
+                    qt.Rows[rows[i]]["ClosedPL"] = pt[t.symbol].ClosedPL.ToString("N2");
                 }
                 TradesView.Rows.Add(t.xdate, t.xtime, t.symbol, (t.side ? "BUY" : "SELL"), t.xsize, t.xprice.ToString("N2"), t.comment, t.Account.ToString()); // if we accept trade, add it to list
             }
         }
+
+        PositionTracker pt = new PositionTracker();
 
         void ar_GotTick(Tick t)
         {
@@ -560,27 +551,10 @@ namespace Quotopia
             tl.Disconnect(); // unregister all stocks and this client
         }
 
-
-        void news_NewsEventSubscribers(Debug news)
-        {
-            showc(news.Msg, Color.Blue);
-        }
-        delegate void SetTextCallback(string text);
-        delegate void SetTextCallbackColor(string text, Color color);
-        public void showc(string s, Color c)
-        {
-            statusWindow.SelectionColor = c;
-            statusWindow.SelectedText = s + Environment.NewLine;
-            statusWindow.SelectionColor = statusWindow.ForeColor;
-
-        }
-        public void show(string s)
+        public void debug(string s)
         {
             if (this.statusWindow.InvokeRequired)
-            {
-                SetTextCallback d = new SetTextCallback(show);
-                this.Invoke(d, new object[] { s });
-            }
+                this.Invoke(new DebugDelegate(debug), new object[] { s });
             else
             {
                 statusWindow.AppendText(s + Environment.NewLine);

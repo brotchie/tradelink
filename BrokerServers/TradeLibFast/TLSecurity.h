@@ -16,6 +16,7 @@ namespace TradeLibFast
 		bool isValid();
 		CString Serialize(void);
 		bool hasDest();
+		bool hasType();
 		static TLSecurity Deserialize(CString msg);
 		static LPCTSTR SecurityTypeName(int SecurityTypeID);
 		static int SecurityID(CString SecurityTypeName);
@@ -25,6 +26,7 @@ namespace TradeLibFast
 
 	enum TLSecurityID
     {
+		NIL = -1,
         STK = 0,
         OPT,
         FUT,

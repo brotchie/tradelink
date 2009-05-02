@@ -6,6 +6,7 @@ namespace TradeLink.API
     /// </summary>
     public enum SecurityType
     {
+        NIL = -1,
         STK,
         OPT,
         FUT,

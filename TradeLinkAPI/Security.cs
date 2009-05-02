@@ -12,6 +12,8 @@ namespace TradeLink.API
         string DestEx { get; set; }
         SecurityType Type { get; set; }
         bool isValid { get; }
+        bool hasDest { get; }
+        bool hasType { get; }
     }
 
     public class InvalidSecurity : Exception { }

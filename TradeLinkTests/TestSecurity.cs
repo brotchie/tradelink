@@ -28,7 +28,6 @@ namespace TestTradeLink
             Assert.That(crude.Symbol == "CLV8", crude.Symbol);
             Assert.That(crude.hasDest, crude.DestEx);
             Assert.That(crude.Type == SecurityType.FUT, crude.Type.ToString());
-            Assert.AreEqual("CLV8 FUT GLOBEX", crude.FullName);
             SecurityImpl goog = SecurityImpl.Parse("GOOG");
             Assert.AreEqual("GOOG", goog.FullName);
 

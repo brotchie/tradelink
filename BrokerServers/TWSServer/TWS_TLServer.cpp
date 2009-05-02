@@ -406,6 +406,17 @@ namespace TradeLibFast
 		return false;
 	}
 
+	int TypeFromExchange(CString ex)
+	{
+		if ((ex=="GLOBEX")|| (ex=="NYMEX")||(ex="CFE"))
+			return FUT;
+		else if ((ex=="NYSE")||(ex=="NASDAQ")||(ex=="ARCA"))
+			return STK;
+		// default to STK if not sure
+		return 0;
+
+	}
+
 	int TWS_TLServer::RegisterStocks(CString clientname)
 	{
 		TLServer_WM::RegisterStocks(clientname);
@@ -418,11 +429,21 @@ namespace TradeLibFast
 			if (hasTicker(sec.sym)) continue;
 			// otherwise, subscribe to this stock and save it to subscribed list of tickers
 			Contract contract;
+			// set local symbol to symbol
 			contract.localSymbol = sec.sym;
+			// if destination specified use it
 			if (sec.hasDest())
 				contract.exchange = sec.dest;
-			else if ((sec.type==STK))
+			// if we have a destination but no type, try to guess type
+			if (!sec.hasType() && sec.hasDest())
+				sec.type = TypeFromExchange(contract.exchange);
+			// if we still don't have a type, use stock
+			if (!sec.hasType())
+				sec.type = STK;
+			// if we have a stock and it has no destination, use default
+			if ((sec.type==STK) && !sec.hasDest())
 				contract.exchange = "SMART";
+			// assume USD
 			contract.currency = "USD";
 			contract.secType = TLSecurity::SecurityTypeName(sec.type);
 			this->m_link[this->validlinkids[0]]->reqMktData((TickerId)stockticks.size(),contract,"",false);

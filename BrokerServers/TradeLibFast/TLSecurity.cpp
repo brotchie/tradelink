@@ -8,7 +8,7 @@ namespace TradeLibFast
 	TLSecurity::TLSecurity()
 	{
 		this->sym = CString("");
-		this->type = 0;
+		this->type = -1;
 		this->date = 0;
 		this->dest = CString("");
 	}
@@ -16,7 +16,7 @@ namespace TradeLibFast
 	TLSecurity::TLSecurity(CString symbol)
 	{
 		this->sym = symbol;
-		this->type = 0;
+		this->type = -1;
 		this->date = 0;
 		this->dest = CString("");
 	}
@@ -24,6 +24,8 @@ namespace TradeLibFast
 	TLSecurity::~TLSecurity()
 	{
 	}
+
+	bool TLSecurity::hasType() { return type!=-1; }
 
 	bool TLSecurity::hasDest()
 	{
@@ -46,10 +48,14 @@ namespace TradeLibFast
 			rec.push_back(msg);
 		TLSecurity sec;
 		sec.sym = rec[SecSym];
+		// see if both type and destination were specified
 		if (rec.size()>2)
 		{
+			// try to get type from both parameters
 			int f2id = SecurityID(rec[2]);
 			int f1id = SecurityID(rec[1]);
+			// whichever one works, use type for that one and assume destination 
+			// is other parameter
 			if (f1id!=-1)
 			{
 				sec.type = f1id;
@@ -61,11 +67,17 @@ namespace TradeLibFast
 				sec.dest = rec[1];
 			}
 		}
+		// otherwise if we only ahve one extra parameters
 		else if (rec.size()>1)
 		{
+			// try to get it's type
 			int id = SecurityID(rec[1]);
+			// if it works assume it's type
 			if (id!=-1)
 				sec.type = id;
+			else // otherwise it's exchange
+				sec.dest = rec[1];
+
 		}
 		return sec;
 	}

@@ -19,6 +19,7 @@ CTWSServerDlg::CTWSServerDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CTWSServerDlg::IDD, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	deblines = 0;
 }
 
 void CTWSServerDlg::DoDataExchange(CDataExchange* pDX)
@@ -124,4 +125,6 @@ void CTWSServerDlg::status(LPCTSTR m)
 	m_status.GetWindowTextA(stat);
 	stat.Append(msg);
 	m_status.SetWindowTextA(stat);
+	deblines++;
+	m_status.LineScroll(deblines);
 }

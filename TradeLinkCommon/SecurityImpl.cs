@@ -18,12 +18,13 @@ namespace TradeLink.Common
             _destex = exchange;
             _type = type;
         }
-        public SecurityImpl() : this("", "", SecurityType.STK) { }
+        public SecurityImpl() : this("", "", SecurityType.NIL) { }
         public SecurityImpl(string sym) : this(sym, "", SecurityType.STK) { }
         public SecurityImpl(string sym, SecurityType type) : this(sym, "", type) { }
         protected string _sym = "";
-        protected SecurityType _type = SecurityType.STK;
+        protected SecurityType _type = SecurityType.NIL;
         protected string _destex = "";
+        public bool hasType { get { return _type != SecurityType.NIL; } }
         public virtual string Symbol { get { return _sym; } set { _sym = value; } }
         public virtual string Name { get { return _sym; } set { } }
         public string DestEx { get { return _destex; } set { _destex = value; } }
@@ -31,17 +32,19 @@ namespace TradeLink.Common
         public virtual bool isValid { get { return _sym != ""; } }
         public bool hasDest { get { return _destex != ""; } }
         public string FullName { get { return ToString(); } }
+        string ts { get { return _type == SecurityType.NIL ? "" : _type.ToString(); } }
         public override string ToString()
         {
-            string[] r = { _sym, _type.ToString(), _destex };
-            if (_type!= SecurityType.STK) return string.Join(" ", r);
-            return _sym;
+            return Serialize(this);
         }
-        public string Serialize()
+        public static string Serialize(Security sec)
         {
-            int t = (int)_type;
-            string[] r = { _sym, t.ToString(), _destex };
-            return string.Join(" ", r);
+            List<string> p = new List<string>();
+            p.Add(sec.Symbol);
+            if (sec.hasDest) p.Add(sec.DestEx);
+            if ((sec.Type!= SecurityType.NIL) && (sec.Type!= SecurityType.STK))
+                p.Add(sec.Type.ToString());
+            return string.Join(" ", p.ToArray());
         }
         public static SecurityImpl Parse(string msg) { return Parse(msg, 0); }
         public static SecurityImpl Parse(string msg, int date)
@@ -67,8 +70,12 @@ namespace TradeLink.Common
             else if (r.Length > 1)
             {
                 int f1id = SecurityID(r[1]);
-                if (f1id != -1) sec.Type = (SecurityType)f1id;
+                if (f1id != -1)
+                    sec.Type = (SecurityType)f1id;
+                else sec.DestEx = r[1];
             }
+            else
+                sec.Type = SecurityType.STK;
             sec.Date = date;
             return sec;
         }

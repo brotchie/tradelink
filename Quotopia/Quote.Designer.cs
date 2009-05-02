@@ -52,6 +52,14 @@ namespace Quotopia
             this.oaccount = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.TradeTab = new System.Windows.Forms.TabPage();
             this.TradesView = new System.Windows.Forms.DataGridView();
+            this.Date = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Symbol = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Side = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.xSize = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.xPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Comment = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ColAccount = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Settings = new System.Windows.Forms.TabPage();
             this.label2 = new System.Windows.Forms.Label();
             this.exchdest = new System.Windows.Forms.TextBox();
@@ -70,14 +78,6 @@ namespace Quotopia
             this.OrderTimeCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.OrderDateCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.Date = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Symbol = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Side = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.xSize = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.xPrice = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Comment = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColAccount = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.quoteTab.SuspendLayout();
             this.Markets.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -104,39 +104,38 @@ namespace Quotopia
             this.quoteTab.Name = "quoteTab";
             this.quoteTab.SelectedIndex = 0;
             this.quoteTab.ShowToolTips = true;
-            this.quoteTab.Size = new System.Drawing.Size(940, 709);
+            this.quoteTab.Size = new System.Drawing.Size(808, 379);
             this.quoteTab.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.quoteTab.TabIndex = 0;
             // 
             // Markets
             // 
-            this.Markets.BackColor = System.Drawing.Color.Black;
+            this.Markets.BackColor = System.Drawing.Color.White;
             this.Markets.Controls.Add(this.statusStrip1);
             this.Markets.ForeColor = System.Drawing.Color.White;
             this.Markets.Location = new System.Drawing.Point(4, 4);
             this.Markets.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Markets.Name = "Markets";
             this.Markets.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.Markets.Size = new System.Drawing.Size(932, 676);
+            this.Markets.Size = new System.Drawing.Size(800, 346);
             this.Markets.TabIndex = 0;
             this.Markets.Text = "Markets";
-            this.Markets.UseVisualStyleBackColor = true;
             // 
             // statusStrip1
             // 
             this.statusStrip1.BackColor = System.Drawing.Color.Transparent;
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.statuslab});
-            this.statusStrip1.Location = new System.Drawing.Point(4, 641);
+            this.statusStrip1.Location = new System.Drawing.Point(4, 311);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(924, 30);
+            this.statusStrip1.Size = new System.Drawing.Size(792, 30);
             this.statusStrip1.TabIndex = 0;
             this.statusStrip1.Text = "statusStrip1";
             // 
             // statuslab
             // 
             this.statuslab.BackColor = System.Drawing.Color.Transparent;
-            this.statuslab.ForeColor = System.Drawing.Color.LightGray;
+            this.statuslab.ForeColor = System.Drawing.Color.Black;
             this.statuslab.Name = "statuslab";
             this.statuslab.Size = new System.Drawing.Size(208, 25);
             this.statuslab.Text = "Enter symbols to begin...";
@@ -315,6 +314,57 @@ namespace Quotopia
             this.TradesView.Size = new System.Drawing.Size(924, 666);
             this.TradesView.TabIndex = 0;
             // 
+            // Date
+            // 
+            this.Date.HeaderText = "Date";
+            this.Date.Name = "Date";
+            this.Date.ReadOnly = true;
+            // 
+            // Time
+            // 
+            this.Time.HeaderText = "Time";
+            this.Time.Name = "Time";
+            this.Time.ReadOnly = true;
+            // 
+            // Symbol
+            // 
+            this.Symbol.HeaderText = "Symbol";
+            this.Symbol.Name = "Symbol";
+            this.Symbol.ReadOnly = true;
+            // 
+            // Side
+            // 
+            this.Side.HeaderText = "Side";
+            this.Side.Name = "Side";
+            this.Side.ReadOnly = true;
+            // 
+            // xSize
+            // 
+            this.xSize.HeaderText = "Size";
+            this.xSize.Name = "xSize";
+            this.xSize.ReadOnly = true;
+            // 
+            // xPrice
+            // 
+            dataGridViewCellStyle6.Format = "N2";
+            dataGridViewCellStyle6.NullValue = null;
+            this.xPrice.DefaultCellStyle = dataGridViewCellStyle6;
+            this.xPrice.HeaderText = "Price";
+            this.xPrice.Name = "xPrice";
+            this.xPrice.ReadOnly = true;
+            // 
+            // Comment
+            // 
+            this.Comment.HeaderText = "Comment";
+            this.Comment.Name = "Comment";
+            this.Comment.ReadOnly = true;
+            // 
+            // ColAccount
+            // 
+            this.ColAccount.HeaderText = "Account";
+            this.ColAccount.Name = "ColAccount";
+            this.ColAccount.ReadOnly = true;
+            // 
             // Settings
             // 
             this.Settings.BackColor = System.Drawing.Color.Transparent;
@@ -475,63 +525,12 @@ namespace Quotopia
             this.OrderDateCol.Name = "OrderDateCol";
             this.OrderDateCol.ReadOnly = true;
             // 
-            // Date
-            // 
-            this.Date.HeaderText = "Date";
-            this.Date.Name = "Date";
-            this.Date.ReadOnly = true;
-            // 
-            // Time
-            // 
-            this.Time.HeaderText = "Time";
-            this.Time.Name = "Time";
-            this.Time.ReadOnly = true;
-            // 
-            // Symbol
-            // 
-            this.Symbol.HeaderText = "Symbol";
-            this.Symbol.Name = "Symbol";
-            this.Symbol.ReadOnly = true;
-            // 
-            // Side
-            // 
-            this.Side.HeaderText = "Side";
-            this.Side.Name = "Side";
-            this.Side.ReadOnly = true;
-            // 
-            // xSize
-            // 
-            this.xSize.HeaderText = "Size";
-            this.xSize.Name = "xSize";
-            this.xSize.ReadOnly = true;
-            // 
-            // xPrice
-            // 
-            dataGridViewCellStyle6.Format = "N2";
-            dataGridViewCellStyle6.NullValue = null;
-            this.xPrice.DefaultCellStyle = dataGridViewCellStyle6;
-            this.xPrice.HeaderText = "Price";
-            this.xPrice.Name = "xPrice";
-            this.xPrice.ReadOnly = true;
-            // 
-            // Comment
-            // 
-            this.Comment.HeaderText = "Comment";
-            this.Comment.Name = "Comment";
-            this.Comment.ReadOnly = true;
-            // 
-            // ColAccount
-            // 
-            this.ColAccount.HeaderText = "Account";
-            this.ColAccount.Name = "ColAccount";
-            this.ColAccount.ReadOnly = true;
-            // 
             // Quote
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.SystemColors.WindowFrame;
-            this.ClientSize = new System.Drawing.Size(940, 709);
+            this.BackColor = System.Drawing.SystemColors.Window;
+            this.ClientSize = new System.Drawing.Size(808, 379);
             this.Controls.Add(this.quoteTab);
             this.DataBindings.Add(new System.Windows.Forms.Binding("Location", global::Quotopia.Properties.Settings.Default, "location", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.ForeColor = System.Drawing.SystemColors.Window;

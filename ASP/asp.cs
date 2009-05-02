@@ -301,7 +301,8 @@ namespace ASP
 
         void ASP_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (MessageBox.Show("Save skins before quiting?", "Save skins", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            if ((_resskinidx.Count>0) &&
+                (MessageBox.Show("Save skins before quiting?", "Save skins", MessageBoxButtons.YesNo) == DialogResult.Yes))
                 _saveskins_Click(null, null);
             // if we're using another thread to process ticks, stop it
             if (Environment.ProcessorCount>1)

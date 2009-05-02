@@ -35,6 +35,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 	CEdit m_status;
 	TradeLibFast::TWS_TLServer* tl;
+	int deblines;
 public:
 	void cstat(CString msg);
 	void status(LPCTSTR msg);
