@@ -157,9 +157,11 @@ namespace TestTradeLink
             // get slices
             int[] a2 = Calc.EndSlice(a1, len);
             decimal[] b2 = Calc.EndSlice(b1,len);
+            decimal[] b3 = Calc.EndSlice(b1, 200);
             // verify lengths
             Assert.AreEqual(len, a2.Length);
             Assert.AreEqual(len, b2.Length);
+            Assert.AreEqual(b1.Length, b3.Length);
             // verify last elements match
             Assert.AreEqual(a1[a1.Length - 1], a2[len - 1]);
             Assert.AreEqual(b1[b1.Length - 1], b2[len - 1]);

@@ -659,9 +659,9 @@ namespace TradeLink.Common
         /// <returns></returns>
         public static decimal[] EndSlice(decimal[] inputarray, int lastNumElements)
         {
-            decimal[] output = new decimal[lastNumElements];
-            int count = lastNumElements - 1;
-            int end = inputarray.Length > lastNumElements ? inputarray.Length - lastNumElements : inputarray.Length;
+            int end = inputarray.Length >= lastNumElements ? inputarray.Length - lastNumElements : 0;
+            decimal[] output = new decimal[inputarray.Length-end];
+            int count = output.Length - 1;
             for (int i = inputarray.Length - 1; i >= end; i--)
                 output[count--] = inputarray[i];
             return output;
@@ -676,7 +676,7 @@ namespace TradeLink.Common
         {
             int[] output = new int[lastNumElements];
             int count = lastNumElements-1;
-            int end = inputarray.Length > lastNumElements ? inputarray.Length - lastNumElements : inputarray.Length;
+            int end = inputarray.Length >= lastNumElements ? inputarray.Length - lastNumElements : 0;
             for (int i = inputarray.Length - 1; i >= end; i--)
                 output[count--] = inputarray[i];
             return output;
