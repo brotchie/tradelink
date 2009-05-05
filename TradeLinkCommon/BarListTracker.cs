@@ -54,7 +54,7 @@ namespace TradeLink.Common
         }
 
         // pass bar events out of the barlist tracker
-        void bl_GotNewBar(string symbol, BarInterval interval)
+        void bl_GotNewBar(string symbol, int interval)
         {
             if (GotNewBar != null)
                 GotNewBar(symbol, interval);

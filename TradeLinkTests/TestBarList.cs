@@ -168,7 +168,7 @@ namespace TestTradeLink
             Assert.AreEqual(2, newbars);
         }
 
-        void bl_GotNewBar(string symbol, BarInterval interval)
+        void bl_GotNewBar(string symbol, int interval)
         {
             newbars++;
         }

@@ -38,7 +38,7 @@ namespace TestTradeLink
         }
 
         List<string> syms = new List<string>();
-        void  blt_GotNewBar(string symbol, BarInterval interval)
+        void  blt_GotNewBar(string symbol, int interval)
         {
             if (!syms.Contains(symbol))
                 syms.Add(symbol);
