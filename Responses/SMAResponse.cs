@@ -37,7 +37,7 @@ namespace Responses
             Indicators = new string[] { "SMA" };
         }
 
-        void blt_GotNewBar(string symbol, BarInterval interval)
+        void blt_GotNewBar(string symbol, int interval)
         {
             // lets do our entries.  
 

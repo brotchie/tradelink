@@ -968,7 +968,7 @@ namespace TradeLink.Common
         }
 
         /// <summary>
-        /// computes sharpe ratio for a constant rate of risk free returns
+        /// computes sharpe ratio for a constant rate of risk free returns, give portfolio rate of return and portfolio volatility
         /// </summary>
         /// <param name="ratereturn"></param>
         /// <param name="stdevRate"></param>
@@ -977,6 +977,18 @@ namespace TradeLink.Common
         public static decimal SharpeRatio(decimal ratereturn, decimal stdevRate, decimal riskFreeRate)
         {
             return (ratereturn - riskFreeRate) / stdevRate;
+        }
+
+        /// <summary>
+        /// computes sortinio ratio for constant rate of risk free return, give portfolio rate of return and downside volatility
+        /// </summary>
+        /// <param name="ratereturn"></param>
+        /// <param name="stdevRateDownside"></param>
+        /// <param name="riskFreeRate"></param>
+        /// <returns></returns>
+        public static decimal SortinoRatio(decimal ratereturn, decimal stdevRateDownside, decimal riskFreeRate)
+        {
+            return (ratereturn - riskFreeRate) / stdevRateDownside;
         }
 
     }
