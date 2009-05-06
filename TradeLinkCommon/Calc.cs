@@ -991,5 +991,23 @@ namespace TradeLink.Common
             return (ratereturn - riskFreeRate) / stdevRateDownside;
         }
 
+        /// <summary>
+        /// computes cost of a current position without taking into account side of position
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        public static decimal PositionCost(Position p) { return PositionCost(p, true); }
+        /// <summary>
+        /// computes cost of current position without taking into account side
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="absolutecost"></param>
+        /// <returns></returns>
+        public static decimal PositionCost(Position p, bool absolutecost)
+        {
+            decimal calc = p.AvgPrice*p.Size;
+            return absolutecost ? Math.Abs(calc) : calc;
+        }
+
     }
 }
