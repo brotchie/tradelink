@@ -16,6 +16,7 @@ namespace TradeLink.API
         void newTick(Tick k);
         Bar this[int index] { get; }
         Bar this[int index, BarInterval interval] { get; }
+        int DefaultCustomInterval { get; set; } // custom intervals
         BarInterval DefaultInterval { get; set; } // default interval
         bool Has(int MinBars, BarInterval interval);
         bool Has(int MinBars);
@@ -31,6 +32,7 @@ namespace TradeLink.API
         int[] Time();
         int[] Vol();
         BarInterval[] Intervals { get; }
+        int[] CustomIntervals { get; }
 
     }
 }

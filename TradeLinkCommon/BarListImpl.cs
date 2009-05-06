@@ -10,9 +10,24 @@ namespace TradeLink.Common
     /// </summary>
     public class BarListImpl : TradeLink.API.BarList
     {
+        /// <summary>
+        /// converts integer array of intervals to BarIntervals... supplying custom interval for any unrecognized interval types.
+        /// </summary>
+        /// <param name="intervals"></param>
+        /// <returns></returns>
+        public static BarInterval[] Int2BarInterval(int[] intervals) { List<BarInterval> o = new List<BarInterval>(); foreach (int i in intervals) { try { BarInterval bi = (BarInterval)i; o.Add(bi); } catch (Exception) { o.Add(BarInterval.Custom); } } return o.ToArray(); }
+        /// <summary>
+        /// converts array of BarIntervals to integer intervals.
+        /// </summary>
+        /// <param name="ints"></param>
+        /// <returns></returns>
+        public static int[] BarInterval2Int(BarInterval[] ints) { List<int> o = new List<int>(); foreach (BarInterval bi in ints) o.Add((int)bi); return o.ToArray(); }
+        /// <summary>
+        /// gets array of all possible non custom bar intevals
+        /// </summary>
         public static BarInterval[] ALLINTERVALS { get { return new BarInterval[] { BarInterval.FiveMin, BarInterval.Minute, BarInterval.Hour, BarInterval.ThirtyMin, BarInterval.FifteenMin, BarInterval.Day }; } }
         // holds available intervals
-        BarInterval[] _availint = new BarInterval[0];
+        int[] _availint = new int[0];
         // holds all raw data
         IntervalData[] _intdata = new IntervalData[0];
         // holds index into raw data using interval type
@@ -29,6 +44,12 @@ namespace TradeLink.Common
         /// <param name="symbol"></param>
         public BarListImpl(BarInterval interval, string symbol) : this(symbol, new BarInterval[] { interval }) { }
         /// <summary>
+        /// creates a barlist with requested custom interval and defined symbol
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <param name="interval"></param>
+        public BarListImpl(string symbol, int interval) : this(symbol, new int[] { interval }) { }
+        /// <summary>
         /// creates a barlist with requested interval.  symbol will be defined by first tick received
         /// </summary>
         /// <param name="interval"></param>
@@ -42,9 +63,15 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="symbol"></param>
         /// <param name="intervals"></param>
-        public BarListImpl(string symbol, BarInterval[] intervals)
-        {
-            // set symbol
+        public BarListImpl(string symbol, BarInterval[] intervals) : this(symbol,BarInterval2Int(intervals)) {}
+
+        /// <summary>
+        /// creates a barlist with array of custom intervals
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <param name="intervals"></param>
+        public BarListImpl(string symbol, int[] intervals)
+        {            // set symbol
             _sym = symbol;
             // set intervals requested
             _availint = intervals;
@@ -56,19 +83,20 @@ namespace TradeLink.Common
                 try
                 {
                     // save index to this data for the interval
-                    _intdataidx.Add((int)intervals[i], i);
+                    _intdataidx.Add(intervals[i], i);
                 }
                 // if key was already present, already had this interval
                 catch (Exception) { continue; }
                 // set default interval to first one
-                if (i==0)
-                    _defaultint = (int)intervals[0];
+                if (i == 0)
+                    _defaultint = intervals[0];
                 // create data object
-                _intdata[i] = new IntervalData((int)intervals[i]);
+                _intdata[i] = new IntervalData(intervals[i]);
                 // subscribe to bar events
                 _intdata[i].NewBar += new SymBarIntervalDelegate(BarListImpl_NewBar);
             }
         }
+
         int _defaultint = (int)BarInterval.FiveMin;
         // array functions
         public decimal[] Open() { return _intdata[_intdataidx[_defaultint]].opens.ToArray(); }
@@ -95,7 +123,11 @@ namespace TradeLink.Common
         /// <summary>
         /// gets intervals available/requested by this barlist when it was created
         /// </summary>
-        public BarInterval[] Intervals { get { return  _availint; } }
+        public BarInterval[] Intervals { get { return  Int2BarInterval(_availint); } }
+        /// <summary>
+        /// gets all available/requested intervals as a custom array of integers
+        /// </summary>
+        public int[] CustomIntervals { get { return _availint; } }
 
         /// <summary>
         /// set true for new bar.  don't use this, use GotNewBar event as it's faster.
@@ -120,11 +152,11 @@ namespace TradeLink.Common
         /// <summary>
         /// gets or sets the default interval in seconds
         /// </summary>
-        public int DefaultSecondsInterval { get { return _defaultint; } set { _defaultint = value; } }
+        public int DefaultCustomInterval { get { return _defaultint; } set { _defaultint = value; } }
         /// <summary>
         /// gets or sets the default interval in bar intervals
         /// </summary>
-        public BarInterval DefaultInterval { get { return (BarInterval)_defaultint; } set { _defaultint = (int)value; } }
+        public BarInterval DefaultInterval { get { return Int2BarInterval(new int[] { _defaultint })[0]; } set { _defaultint = (int)value; } }
         /// <summary>
         /// gets specific bar in specified interval
         /// </summary>
@@ -416,6 +448,7 @@ namespace TradeLink.Common
             // notify barlist
             if (isRecentNew)
                 NewBar(k.symbol, intervallength);
+
         }
 
         private long getbarid(Tick k)

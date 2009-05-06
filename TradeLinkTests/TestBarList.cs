@@ -194,6 +194,23 @@ namespace TestTradeLink
             Assert.GreaterOrEqual(bl.Count,250);
         }
 
+        [Test]
+        public void CustomInterval()
+        {
+            // request 5 second bars
+            const int MYINTERVAL = 5;
+            BarList bl = new BarListImpl(sym, MYINTERVAL);
+            // verify custom interval
+            Assert.AreEqual(MYINTERVAL, bl.DefaultCustomInterval);
+            Assert.AreEqual(MYINTERVAL, bl.CustomIntervals[0]);
+            // iterate ticks
+            foreach (Tick k in SampleData())
+                bl.newTick(k);
+            // count em
+            Assert.AreEqual(10, bl.Count);
+
+        }
+
 
     }
 }

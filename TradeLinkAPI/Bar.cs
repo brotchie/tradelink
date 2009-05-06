@@ -25,28 +25,32 @@ namespace TradeLink.API
     public enum BarInterval
     {
         /// <summary>
+        /// custom interval length
+        /// </summary>
+        Custom = -1,
+        /// <summary>
         /// One-minute intervals
         /// </summary>
-        Minute = 1,
+        Minute = 60,
         /// <summary>
         /// Five-minute interval
         /// </summary>
-        FiveMin = 5,
+        FiveMin = 300,
         /// <summary>
         /// FifteenMinute intervals
         /// </summary>
-        FifteenMin = 15,
+        FifteenMin = 900,
         /// <summary>
         /// Hour-long intervals
         /// </summary>
-        ThirtyMin = 30,
+        ThirtyMin = 1800,
         /// <summary>
         /// Hour-long intervals
         /// </summary>
-        Hour = 60,
+        Hour = 3600,
         /// <summary>
         /// Day-long intervals
         /// </summary>
-        Day = 450
+        Day = 86400,
     }
 }

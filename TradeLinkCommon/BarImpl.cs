@@ -80,7 +80,7 @@ namespace TradeLink.Common
             // get time elapsed to this point
             int elap = Util.FT2FTS(time);
             // get seconds per bar
-            int secperbar = (int)tunits * 60;
+            int secperbar = (int)tunits;
             // get number of this bar in the day for this interval
             int bcount = (int)((double)elap / secperbar);
             return bcount;
