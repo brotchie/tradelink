@@ -967,5 +967,17 @@ namespace TradeLink.Common
             return mean - stdev * numStdDevs;
         }
 
+        /// <summary>
+        /// computes sharpe ratio for a constant rate of risk free returns
+        /// </summary>
+        /// <param name="ratereturn"></param>
+        /// <param name="stdevRate"></param>
+        /// <param name="riskFreeRate"></param>
+        /// <returns></returns>
+        public static decimal SharpeRatio(decimal ratereturn, decimal stdevRate, decimal riskFreeRate)
+        {
+            return (ratereturn - riskFreeRate) / stdevRate;
+        }
+
     }
 }
