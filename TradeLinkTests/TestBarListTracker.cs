@@ -35,6 +35,19 @@ namespace TestTradeLink
             // make sure our symbols matched barlist count
             Assert.AreEqual(blt.SymbolCount, syms.Count);
 
+            int secondcount = 0;
+            string symstring = string.Empty;
+            foreach (string sym in blt)
+            {
+                secondcount++;
+                symstring += sym;
+            }
+
+            // make sure enumeration equals symbol count
+            Assert.AreEqual(syms.Count, secondcount);
+            // make sure symbols are there
+            Assert.IsTrue(symstring.Contains("TST") && symstring.Contains("TST2"));
+
         }
 
         List<string> syms = new List<string>();

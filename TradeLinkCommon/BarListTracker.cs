@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.Text;
 using TradeLink.API;
 
@@ -52,6 +53,8 @@ namespace TradeLink.Common
                 return bl;
             }
         }
+
+        public IEnumerator GetEnumerator() { foreach (string sym in _bdict.Keys) yield return sym; }
 
         // pass bar events out of the barlist tracker
         void bl_GotNewBar(string symbol, int interval)
