@@ -135,6 +135,7 @@
     <Compile Include="TLServer_WM.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="TrailTracker.cs" />
     <Compile Include="Tript.cs" />
     <Compile Include="TwitControl.cs">
       <SubType>UserControl</SubType>

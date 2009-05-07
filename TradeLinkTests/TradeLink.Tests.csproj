@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{293780F0-4BE5-49F9-8720-CFD5F79EC77D}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -73,6 +73,7 @@
     <Compile Include="TestTrade.cs" />
     <Compile Include="TestTradeLink_WM.cs">
     </Compile>
+    <Compile Include="TestTrailTracker.cs" />
     <Compile Include="TestUtil.cs" />
     <Compile Include="TestWMUtil.cs" />
   </ItemGroup>
