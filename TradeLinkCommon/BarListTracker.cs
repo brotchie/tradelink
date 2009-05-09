@@ -20,16 +20,34 @@ namespace TradeLink.Common
         /// </summary>
         public BarListTracker() : this(BarListImpl.ALLINTERVALS) { }
         public BarListTracker(BarInterval interval) : this(new BarInterval[] { interval }) { }
-        BarInterval _default = BarInterval.FiveMin;
-        BarInterval[] _requested = new BarInterval[0];
-        public BarInterval DefaultInterval { get { return _default; } set { _default = value; } }
+        int _default = (int)BarInterval.FiveMin;
+        int[] _requested = new int[0];
+        public BarInterval DefaultInterval { get { return BarListImpl.Int2BarInterval(new int[] {_default})[0]; } set { _default = BarListImpl.BarInterval2Int(new BarInterval[] { value })[0]; } }
         /// <summary>
         /// intervals requested when tracker was created
         /// </summary>
-        public BarInterval[] Intervals { get { return _requested; } }
+        public BarInterval[] Intervals { get { return BarListImpl.Int2BarInterval(_requested); } }
+        /// <summary>
+        /// creates tracker for single custom interval
+        /// </summary>
+        /// <param name="custominterval"></param>
+        public BarListTracker(int custominterval) : this(new int[] { custominterval }) { }
+        /// <summary>
+        /// creates tracker for number of custom intervals.
+        /// (use this if you want to mix standard and custom intervals)
+        /// </summary>
+        /// <param name="customintervals"></param>
+        public BarListTracker(int[] customintervals)
+        {
+            _requested = customintervals;
+        }
+        /// <summary>
+        /// creates tracker for specified number of standard intervals
+        /// </summary>
+        /// <param name="intervals"></param>
         public BarListTracker(BarInterval[] intervals)
         {
-            _requested = intervals;
+            _requested = BarListImpl.BarInterval2Int(intervals);
         }
         Dictionary<string, BarListImpl> _bdict = new Dictionary<string, BarListImpl>();
         public int SymbolCount { get { return _bdict.Count; } }
@@ -47,7 +65,7 @@ namespace TradeLink.Common
                 if (_bdict.TryGetValue(sym, out bl))
                     return (BarList)bl;
                 bl = new BarListImpl(sym,_requested);
-                bl.DefaultInterval = _default;
+                bl.DefaultCustomInterval = _default;
                 bl.GotNewBar += new SymBarIntervalDelegate(bl_GotNewBar);
                 _bdict.Add(sym, bl);
                 return bl;
@@ -72,7 +90,7 @@ namespace TradeLink.Common
             if (!_bdict.TryGetValue(k.symbol, out bl))
             {
                 bl = new BarListImpl(k.symbol,_requested);
-                bl.DefaultInterval = _default;
+                bl.DefaultCustomInterval = _default;
                 bl.GotNewBar+=new SymBarIntervalDelegate(bl_GotNewBar);
                 _bdict.Add(k.symbol, bl);
             }
