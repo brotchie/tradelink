@@ -16,7 +16,7 @@ namespace Tattle
     {
         DataTable dt = new DataTable("results");
         DataGrid dg = new DataGrid();
-        const string fid = "Gauntlet.Trades";
+        const string fid = "Responses";
         FileSystemWatcher fw;
         public MainForm()
         {
@@ -45,7 +45,7 @@ namespace Tattle
         void WatchPath() { WatchPath(Environment.GetFolderPath(Environment.SpecialFolder.Personal)); }
         void WatchPath(string path)
         {
-            fw = new FileSystemWatcher(path, fid+"*.csv");
+            fw = new FileSystemWatcher(path, fid+"*Trades.csv");
             fw.IncludeSubdirectories = false;
             fw.EnableRaisingEvents = true;
             fw.Created += new FileSystemEventHandler(fw_Created);
@@ -59,7 +59,7 @@ namespace Tattle
         void ResetFiles(string path)
         {
             DirectoryInfo di = new DirectoryInfo(path);
-            FileInfo[] fis = di.GetFiles("*.csv");
+            FileInfo[] fis = di.GetFiles("*Trades.csv");
             tradefiles.Items.Clear();
             int newest = 0;
             foreach (FileInfo fi in fis)
@@ -136,8 +136,16 @@ namespace Tattle
 
         Results FetchResults(string name)
         {
+            StreamReader sr;
             if (name == null) return new Results();
-            StreamReader sr = new StreamReader(fw.Path +@"\"+ name);
+            try
+            {
+                sr = new StreamReader(fw.Path + @"\" + name);
+            }
+            catch
+            {
+                return new Results();
+            }
             sr.ReadLine();
             Results r = new Results();
             while (!sr.EndOfStream)
