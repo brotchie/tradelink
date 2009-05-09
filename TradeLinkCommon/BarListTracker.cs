@@ -22,6 +22,14 @@ namespace TradeLink.Common
         public BarListTracker(BarInterval interval) : this(new BarInterval[] { interval }) { }
         int _default = (int)BarInterval.FiveMin;
         int[] _requested = new int[0];
+        /// <summary>
+        /// default custom interval used by this tracker
+        /// </summary>
+        int DefaultCustomInterval { get { return _default; } }
+        /// <summary>
+        /// custom bar intervals used by this tracker
+        /// </summary>
+        public int[] CustomIntervals { get { return _requested; } }
         public BarInterval DefaultInterval { get { return BarListImpl.Int2BarInterval(new int[] {_default})[0]; } set { _default = BarListImpl.BarInterval2Int(new BarInterval[] { value })[0]; } }
         /// <summary>
         /// intervals requested when tracker was created
