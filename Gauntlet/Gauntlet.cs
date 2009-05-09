@@ -117,6 +117,9 @@ namespace WinGauntlet
             h = new HistSim(ga.Folder,ga.Filter);
             h.GotDebug += new DebugDelegate(h_GotDebug);
             h.GotTick += new TickDelegate(h_GotTick);
+            h.SimBroker.GotFill+=new FillDelegate(args.Response.GotFill);
+            h.SimBroker.GotOrder+=new OrderDelegate(args.Response.GotOrder);
+            h.SimBroker.GotOrderCancel += new OrderCancelDelegate(SimBroker_GotOrderCancel);
             // start simulation
             h.PlayTo(ga.PlayTo);
             // end simulation
@@ -125,6 +128,11 @@ namespace WinGauntlet
             ga.Executions = h.FillCount;
             // save result
             e.Result = ga;
+        }
+
+        void SimBroker_GotOrderCancel(string sym, bool side, uint id)
+        {
+            args.Response.GotOrderCancel(id);
         }
 
         // runs after simulation is complete
