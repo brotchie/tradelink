@@ -26,7 +26,7 @@ namespace TestTradeLink
             // create a test response
             MyResponse rt = new MyResponse();
             // our test response is located here
-            const string dll = "TestTradeLink.dll";
+            const string dll = "TestTradeLink.exe";
             // change a property on the test
             rt.Name = "testing123";
             // change custom value

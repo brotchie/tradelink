@@ -180,7 +180,6 @@ namespace TradeLink.Common
         public static Type GetType(string responsename, string dll)
         {
             bool fe = File.Exists(dll);
-            Console.Write(dll+fe);
             
             // get assembly represented by this DLL
             Assembly asm = Assembly.LoadFrom(dll);
