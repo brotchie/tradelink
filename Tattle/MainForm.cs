@@ -16,8 +16,9 @@ namespace Tattle
     {
         DataTable dt = new DataTable("results");
         DataGrid dg = new DataGrid();
-        const string fid = "Responses";
+
         FileSystemWatcher fw;
+        const string FID = "Trades.csv";
         public MainForm()
         {
             InitializeComponent();
@@ -45,7 +46,7 @@ namespace Tattle
         void WatchPath() { WatchPath(Environment.GetFolderPath(Environment.SpecialFolder.Personal)); }
         void WatchPath(string path)
         {
-            fw = new FileSystemWatcher(path, fid+"*Trades.csv");
+            fw = new FileSystemWatcher(path, "*"+FID);
             fw.IncludeSubdirectories = false;
             fw.EnableRaisingEvents = true;
             fw.Created += new FileSystemEventHandler(fw_Created);
@@ -59,27 +60,26 @@ namespace Tattle
         void ResetFiles(string path)
         {
             DirectoryInfo di = new DirectoryInfo(path);
-            FileInfo[] fis = di.GetFiles("*Trades.csv");
+            FileInfo[] fis = di.GetFiles("*" + FID);
             tradefiles.Items.Clear();
             int newest = 0;
             foreach (FileInfo fi in fis)
             {
-                if (fi.Name.Contains(fid))
+
+                tradefiles.Items.Add(fi.Name);
+                System.Text.RegularExpressions.Match datepart =
+                    System.Text.RegularExpressions.Regex.Match(fi.Name, "[0-9]{8}", System.Text.RegularExpressions.RegexOptions.None);
+                if (datepart.Success)
                 {
-                    tradefiles.Items.Add(fi.Name);
-                    System.Text.RegularExpressions.Match datepart =
-                        System.Text.RegularExpressions.Regex.Match(fi.Name, "[0-9]{8}", System.Text.RegularExpressions.RegexOptions.None);
-                    if (datepart.Success)
+                    int thisdate = Convert.ToInt32(datepart.ToString());
+                    if (thisdate > newest)
                     {
-                        int thisdate = Convert.ToInt32(datepart.ToString());
-                        if (thisdate > newest)
-                        {
-                            newest = thisdate;
-                            tradefiles.SelectedIndex = tradefiles.Items.Count - 1;
-                        }
+                        newest = thisdate;
+                        tradefiles.SelectedIndex = tradefiles.Items.Count - 1;
                     }
-                    else tradefiles.SelectedIndex = tradefiles.Items.Count - 1;
                 }
+                else tradefiles.SelectedIndex = tradefiles.Items.Count - 1;
+
             }
             tradefiles_SelectedIndexChanged(null, null);
         }
@@ -109,7 +109,7 @@ namespace Tattle
         {
             if (tradefiles.InvokeRequired)
                 Invoke(new DebugDelegate(remresult), new object[] { name });
-            else if (name.Contains(fid))
+            else if (name.Contains(FID))
             {
                 tradefiles.Items.Remove(name);
             }
@@ -121,7 +121,7 @@ namespace Tattle
                 Invoke(new DebugDelegate(newresult), new object[] { name });
             else
             {
-                if (!name.Contains(fid)) return;
+                if (!name.Contains(FID)) return;
                 tradefiles.Items.Add(name);
                 tradefiles.SelectedIndex = tradefiles.Items.Count - 1;
                 DisplayResults(FetchResults((string)tradefiles.SelectedItem));
@@ -136,35 +136,40 @@ namespace Tattle
 
         Results FetchResults(string name)
         {
-            StreamReader sr;
             if (name == null) return new Results();
+            StreamReader sr ;
+
+
+
+
+
+
+
+
+            Results r = new Results();
             try
             {
                 sr = new StreamReader(fw.Path + @"\" + name);
+                sr.ReadLine();
+                while (!sr.EndOfStream)
+                {
+                    TradeResult tr = TradeResult.Init(sr.ReadLine());
+                    if (!r.SymbolsTraded.Contains(tr.Source.symbol))
+                        r.SymbolsTraded += tr.Source.symbol + ",";
+                    r.Trades++;
+                    r.HundredLots += (int)(tr.Source.xsize / 100);
+                    r.GrossPL += tr.ClosedPL;
+                    if (tr.ClosedPL > 0) r.Winners++;
+                    if (tr.ClosedPL < 0) r.Losers++;
+                    if ((tr.OpenSize == 0) && (tr.ClosedPL == 0)) r.Flats++;
+                    if (tr.ClosedPL > r.MaxWin) r.MaxWin = tr.ClosedPL;
+                    if (tr.ClosedPL < r.MaxLoss) r.MaxLoss = tr.ClosedPL;
+                    if (tr.OpenPL > r.MaxOpenWin) r.MaxOpenWin = tr.OpenPL;
+                    if (tr.OpenPL < r.MaxOpenLoss) r.MaxOpenLoss = tr.OpenPL;
+                }
+                sr.Close();
             }
-            catch
-            {
-                return new Results();
-            }
-            sr.ReadLine();
-            Results r = new Results();
-            while (!sr.EndOfStream)
-            {
-                TradeResult tr = TradeResult.Init(sr.ReadLine());
-                if (!r.SymbolsTraded.Contains(tr.Source.symbol))
-                    r.SymbolsTraded += tr.Source.symbol + ",";
-                r.Trades++;
-                r.HundredLots += (int)(tr.Source.xsize / 100);
-                r.GrossPL += tr.ClosedPL;
-                if (tr.ClosedPL>0) r.Winners++;
-                if (tr.ClosedPL < 0) r.Losers++;
-                if ((tr.OpenSize == 0) && (tr.ClosedPL == 0)) r.Flats++;
-                if (tr.ClosedPL > r.MaxWin) r.MaxWin = tr.ClosedPL;
-                if (tr.ClosedPL < r.MaxLoss) r.MaxLoss = tr.ClosedPL;
-                if (tr.OpenPL > r.MaxOpenWin) r.MaxOpenWin = tr.OpenPL;
-                if (tr.OpenPL < r.MaxOpenLoss) r.MaxOpenLoss = tr.OpenPL;
-            }
-            sr.Close();
+            catch (Exception) {  }
             return r;
 
         }
