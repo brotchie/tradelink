@@ -32,6 +32,7 @@ namespace TradeLink.Common
                 line = sr.ReadLine();
             }
             catch (Exception) { return t; }
+            if (line == null) return t; // blank line
             string[] r = line.Split(',');
             if (r.Length < 6) return t;
             decimal td = 0;
@@ -91,11 +92,30 @@ namespace TradeLink.Common
         /// <param name="stock">The securities symbol</param>
         /// <param name="date">The date</param>
         /// <returns></returns>
-        public static string EPFheader(string symbol, int date)
+        public static string EPFheader(string symbol, int date1)
         {
+            Regex dse = new Regex("20([0-9][0-9])([0-9][0-9])([0-9][0-9])");
             string s = "";
+            string date = dse.Replace(date1.ToString(), "$2/$3/$1");
             s += "; Symbol=" + symbol + Environment.NewLine;
-            s += "; Date=" + date.ToString() + Environment.NewLine;
+            s += "; Date=" + date + "-" + date + Environment.NewLine;
+            return s;
+        }
+        /// <summary>
+        /// Create an epf file header for a range of dates.
+        /// </summary>
+        /// <param name="stock">The securities symbol</param>
+        /// <param name="date1">The opening date</param>
+        /// <param name="date2">The closing date</param>
+        /// <returns></returns>
+        public static string EPFheader(string symbol, int date1, int date2)
+        {
+            Regex dse = new Regex("20([0-9][0-9])([0-9][0-9])([0-9][0-9])");
+            string s = "";
+            string date1s = dse.Replace(date1.ToString(), "$2/$3/$1");
+            string date2s = dse.Replace(date2.ToString(), "$2/$3/$1");
+            s += "; Symbol=" + symbol + Environment.NewLine;
+            s += "; Date=" + date1s + "-" + date2s + Environment.NewLine;
             return s;
         }
         /// <summary>
