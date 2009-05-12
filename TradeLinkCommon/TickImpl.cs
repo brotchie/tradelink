@@ -13,6 +13,7 @@ namespace TradeLink.Common
         public string symbol { get { return _sym; } set { _sym = value; } }
         public Security Sec { get { return _Sec; } set { _Sec = value; } }
         public int size { get { return _size; } set { _size = value; } }
+        public int depth { get { return _depth; } set { _depth = value; } }
         public int date { get { return _date; } set { _date = value; } }
         public int time { get { return _time; } set { _time = value; } }
         public long datetime { get { return _datetime; } set { _datetime = value; } }
@@ -47,6 +48,7 @@ namespace TradeLink.Common
         int _bs;
         int _os;
         int _size;
+        int _depth;
         int _sec;
         int _date;
         int _time;
@@ -64,6 +66,7 @@ namespace TradeLink.Common
             _bs = 0;
             _os = 0;
             _size = 0;
+            _depth = 0;
             _date = 0;
             _time = 0;
             _sec = 0;
@@ -80,6 +83,7 @@ namespace TradeLink.Common
             k.date = c.date;
             k.datetime = c.datetime;
             k.size = c.size;
+            k.depth = c.depth;
             k.trade = c.trade;
             k.bid = c.bid;
             k.ask = c.ask;
@@ -105,6 +109,7 @@ namespace TradeLink.Common
             k.date = b.date;
             k.datetime = b.datetime;
             k.symbol = b.symbol;
+            k.depth = b.depth;
 
             if (b.isTrade)
             {
@@ -171,7 +176,7 @@ namespace TradeLink.Common
         public static string Serialize(Tick t)
         {
             const char d = ',';
-            string s = t.symbol + d + t.date + d + t.time + d + d + t.trade + d + t.size + d + t.ex + d + t.bid + d + t.ask + d + t.bs + d + t.os + d + t.be + d + t.oe + d;
+            string s = t.symbol + d + t.date + d + t.time + d + d + t.trade + d + t.size + d + t.ex + d + t.bid + d + t.ask + d + t.bs + d + t.os + d + t.be + d + t.oe + d + t.depth + d;
             return s;
         }
 
@@ -193,6 +198,7 @@ namespace TradeLink.Common
             t.time = Convert.ToInt32(r[(int)TickField.time]);
             t.date = Convert.ToInt32(r[(int)TickField.date]);
             t.datetime = t.date * 1000000 + t.time;
+            t.depth = Convert.ToInt32(r[(int)TickField.tdepth]);
             return t;
         }
 
@@ -208,6 +214,22 @@ namespace TradeLink.Common
         	this.oe = askex;
         	this.trade =0;
         	this.size = 0;
+            this.depth = 0;
+        }
+        //overload with depth field
+        public void SetQuote(int date, int time, int sec, decimal bid, decimal ask, int bidsize, int asksize, string bidex, string askex, int depth)
+        {
+            this.date = date;
+            this.time = time;
+            this.bid = bid;
+            this.ask = ask;
+            this.bs = bidsize;
+            this.os = asksize;
+            this.be = bidex;
+            this.oe = askex;
+            this.trade = 0;
+            this.size = 0;
+            this.depth = depth;
         }
         //date, time, sec, Convert.ToDecimal(r[(int)T.PRICE]), isize, r[(int)T.EXCH]
         public void SetTrade(int date, int time, int sec, decimal price, int size, string exch)
@@ -239,6 +261,26 @@ namespace TradeLink.Common
             q.BidSize= bidsize;
             q.trade = 0;
             q.size = 0;
+            q.depth = 0;
+            return q;
+        }
+        //methods overloaded with depth field
+        public static TickImpl NewBid(string sym, decimal bid, int bidsize, int depth) { return NewQuote(sym, 0, 0, 0, bid, 0, bidsize, 0, "", "",depth); }
+        public static TickImpl NewAsk(string sym, decimal ask, int asksize, int depth) { return NewQuote(sym, 0, 0, 0, 0, ask, 0, asksize, "", "",depth); }
+        public static TickImpl NewQuote(string sym, int date, int time, int sec, decimal bid, decimal ask, int bidsize, int asksize, string be, string oe, int depth)
+        {
+            TickImpl q = new TickImpl(sym);
+            q.date = date;
+            q.time = time;
+            q.bid = bid;
+            q.ask = ask;
+            q.be = be.Trim();
+            q.oe = oe.Trim();
+            q.AskSize = asksize;
+            q.BidSize = bidsize;
+            q.trade = 0;
+            q.size = 0;
+            q.depth = depth;
             return q;
         }
 
@@ -274,5 +316,6 @@ namespace TradeLink.Common
         asksize,
         bidex,
         askex,
+        tdepth,
     }
 }

@@ -32,6 +32,8 @@ namespace TradeLibFast
 			accounts.push_back(acct); // save the account
 		}
 		B_DestroyIterator(iterator);
+
+		depth = 0;
 	}
 
 	AVL_TLWM::~AVL_TLWM(void)
@@ -644,24 +646,34 @@ namespace TradeLibFast
 					if (additionalInfo && (additionalInfo->GetType()==M_AI_STOCK_MOVEMENT))
 					{
 						const StockMovement* sm = ((MsgStockMovement*)additionalInfo)->m_stock;
-						TLImbalance nyi;
-						nyi.Symbol = CString(sm->GetSymbol());
-						nyi.ThisImbalance = sm->GetNyseImbalance();
-						nyi.PrevImbalance = sm->GetNysePreviousImbalance();
-						nyi.Ex = CString("NYSE");
-						nyi.ThisTime = sm->GetNyseImbalanceTime();
-						nyi.PrevTime = sm->GetNysePreviousImbalanceTime();
-						if (nyi.hasImbalance()||nyi.hadImbalance())
-							TLSend(IMBALANCERESPONSE,TLImbalance::Serialize(nyi),client[imbalance_client]);
-						TLImbalance qyi;
-						qyi.Symbol = CString(sm->GetSymbol());
-						qyi.ThisImbalance = sm->GetNasdaqImbalance();
-						qyi.PrevImbalance = sm->GetNasdaqPreviousImbalance();
-						qyi.Ex = CString("NASDAQ");
-						qyi.ThisTime = sm->GetNasdaqImbalanceTime();
-						qyi.PrevTime = sm->GetNasdaqPreviousImbalanceTime();
-						if (qyi.hasImbalance()||qyi.hadImbalance())
-							TLSend(IMBALANCERESPONSE,TLImbalance::Serialize(qyi),client[imbalance_client]);
+						// get new york imbalance to see what type it is
+						int ni = sm->GetNyseImbalance();
+						int pi = sm->GetNysePreviousImbalance();
+						// if we have new york data, assume new york imbalance
+						if (ni+pi!=0) 
+						{
+							TLImbalance nyi;
+							nyi.Symbol = CString(sm->GetSymbol());
+							nyi.ThisImbalance = ni;
+							nyi.PrevImbalance = pi;
+							nyi.Ex = CString("NYSE");
+							nyi.ThisTime = sm->GetNyseImbalanceTime();
+							nyi.PrevTime = sm->GetNysePreviousImbalanceTime();
+							if (nyi.hasImbalance()||nyi.hadImbalance())
+								TLSend(IMBALANCERESPONSE,TLImbalance::Serialize(nyi),client[imbalance_client]);
+						}
+						else // otherwise it's nasdaq
+						{
+							TLImbalance qyi;
+							qyi.Symbol = CString(sm->GetSymbol());
+							qyi.ThisImbalance = sm->GetNasdaqImbalance();
+							qyi.PrevImbalance = sm->GetNasdaqPreviousImbalance();
+							qyi.Ex = CString("NASDAQ");
+							qyi.ThisTime = sm->GetNasdaqImbalanceTime();
+							qyi.PrevTime = sm->GetNasdaqPreviousImbalanceTime();
+							if (qyi.hasImbalance()||qyi.hadImbalance())
+								TLSend(IMBALANCERESPONSE,TLImbalance::Serialize(qyi),client[imbalance_client]);
+						}
 					}
 
 					break;
@@ -851,7 +863,8 @@ namespace TradeLibFast
 				sec = new AVLIndex(my[i],this);
 			else
 			{
-				AVLStock *stk = new AVLStock(my[i],this); // create new stock instance
+				//AVLStock *stk = new AVLStock(my[i],this); // create new stock instance
+				AVLStock *stk = new AVLStock(my[i],this,true,depth); // create new stock instance with added depth param
 				sec = stk;
 			}
 			subs.push_back(sec);
@@ -859,6 +872,13 @@ namespace TradeLibFast
 		}
 		stocks[cid] = my; // index the array by the client's id
 		HeartBeat(clientname); // update the heartbeat
+		return 0;
+	}
+
+	int AVL_TLWM::DOMRequest(int depth)
+	{ 
+		this->depth = depth;
+		//ClearStocks();
 		return 0;
 	}
 
@@ -877,6 +897,20 @@ namespace TradeLibFast
 		TLServer_WM::ClearStocks(client);
 		// remove anvil subs
 		RemoveUnused();
+		return OK;
+	}
+
+	int AVL_TLWM::ClearStocks()
+	{
+		//clear stocks for all clients
+		size_t len = client.size();
+		for (size_t i = 0; i<len; i++)
+		{
+			// remove record of stocks
+			TLServer_WM::ClearStocks(client[i]);
+		}
+		// remove anvil subs
+		//RemoveUnused();
 		return OK;
 	}
 

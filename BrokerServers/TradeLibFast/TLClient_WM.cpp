@@ -121,6 +121,13 @@ namespace TradeLibFast
 		TLSend(REGISTERSTOCK,m,_him);
 	}
 
+	void TLClient_WM::RequestDOM(int depth)
+	{
+		CString m;
+		m.Format("%s+%i",_me,depth);
+		TLSend(DOMREQUEST,_me,_him);
+	}
+
 	long TLClient_WM::TLSend(int type,LPCTSTR msg,CString windname) 
 	{
 		LRESULT result = BROKERSERVER_NOT_FOUND;

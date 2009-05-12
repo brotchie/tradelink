@@ -24,6 +24,7 @@ namespace TradeLibFast
 		void Subscribe(TLMarketBasket mb);
 		int SendOrder(TLOrder o);
 		void CancelOrder(long id);
+		void RequestDOM(int depth = 4);
 
 		// handle these events
 		virtual void gotOrder(TLOrder o) {};

@@ -19,6 +19,7 @@ namespace TradeLink.API
         void Unsubscribe();
         long TLSend(MessageTypes type, string message);
         int HeartBeat();
+        void RequestDOM();
     }
 
     /// <summary>

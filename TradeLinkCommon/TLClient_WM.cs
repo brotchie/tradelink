@@ -305,6 +305,16 @@ namespace TradeLink.Common
             return (int)TLSend(MessageTypes.HEARTBEAT, Text);
         }
 
+        public void RequestDOM()
+        {
+            int depth = 4; //default depth
+            TLSend(MessageTypes.DOMREQUEST, Text + "+" + depth);
+        }
+        
+        public void RequestDOM(int depth)
+        {
+            TLSend(MessageTypes.DOMREQUEST, Text + "+" + depth);
+        }
 
 
         public TLTypes TLFound()

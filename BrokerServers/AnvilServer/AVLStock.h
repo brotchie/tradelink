@@ -11,7 +11,7 @@ class AVLStock : public Observer
     //every Observer must have function virtual void Process(const Message* message, Observable* from, const Message* additionalInfo); which will be called when a stock update is received from the server.
 {
 public:
-	AVLStock(const char* symbol, TradeLibFast::TLServer_WM* tl, bool load = true);
+	AVLStock(const char* symbol, TradeLibFast::TLServer_WM* tl, bool load = true, int depth = 0);
 
     virtual ~AVLStock();
 
@@ -44,6 +44,8 @@ protected:
 	void* aski;
 	void* pnti;
 	uint booki[MAX_BOOKS];
+
+	int depth;
 
 
 };

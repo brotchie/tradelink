@@ -20,6 +20,7 @@ namespace TradeLibFast
 		int AccountResponse(CString clientname);
 		int PositionResponse(CString account,CString clientname);
 		int RegisterStocks(CString clientname);
+		int DOMRequest(int depth);
 		static AVL_TLWM* GetInstance() { return instance; };
 		
 
@@ -54,6 +55,9 @@ namespace TradeLibFast
 		int SubIdx(CString symbol);
 		int ClearClient(CString client);
 		int ClearStocks(CString client);
+		int ClearStocks(void);
+
+		int depth;
 
 
 	};

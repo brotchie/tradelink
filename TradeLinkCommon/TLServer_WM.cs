@@ -24,6 +24,7 @@ namespace TradeLink.Common
         public event MessageArrayDelegate newFeatureRequest;
         public event UnknownMessageDelegate newUnknownRequest;
         public event VoidDelegate newImbalanceRequest;
+        public event IntDelegate DOMRequest;
 
         public string Version() { return Util.TLSIdentity(); }
         protected int MinorVer = 0;
@@ -194,6 +195,14 @@ namespace TradeLink.Common
             heart[cid] = DateTime.Now;
         }
 
+        void SrvDOMReq(string cname, int depth)
+        {
+            int cid = client.IndexOf(cname);
+            if (cid == -1) return;
+            SrvBeatHeart(cname);
+            DOMRequest(depth);
+        }
+
         public void newOrderCancel(long orderid_being_cancled)
         {
             foreach (string c in client) // send order cancel notifcation to clients
@@ -296,6 +305,10 @@ namespace TradeLink.Common
                     break;
                 case MessageTypes.VERSION :
                     result = (long)MinorVer;
+                    break;
+                case MessageTypes.DOMREQUEST:
+                    string[] dom = msg.Split('+');
+                    SrvDOMReq(dom[0], int.Parse(dom[1]) );
                     break;
                 default:
                     if (newUnknownRequest != null)

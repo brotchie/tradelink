@@ -92,6 +92,7 @@ namespace TestTradeLink
             pre.ex = t;
             pre.be = t;
             pre.oe = t;
+            pre.depth = 5;
             string serialize = TickImpl.Serialize(pre);
             Tick post = TickImpl.Deserialize(serialize);
             Assert.That(post.time == pre.time, post.time.ToString());
@@ -103,6 +104,7 @@ namespace TestTradeLink
             Assert.That(post.ex == pre.ex);
             Assert.That(post.be == pre.be);
             Assert.That(post.oe == pre.oe);
+            Assert.That(post.depth == pre.depth);
         }
 
 

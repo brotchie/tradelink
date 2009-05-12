@@ -51,6 +51,7 @@ namespace TradeLibFast
 		virtual int AccountResponse(CString clientname);
 		virtual int PositionResponse(CString account, CString clientname);
 		virtual int RegisterStocks(CString clientname);
+		virtual int DOMRequest(int depth);
 		virtual std::vector<int> GetFeatures();
 		virtual int ClearClient(CString client);
 		virtual int ClearStocks(CString client);

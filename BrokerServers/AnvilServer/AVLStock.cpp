@@ -16,7 +16,7 @@ using namespace TradeLibFast;
 #pragma warning (disable:4355)
 
 
-AVLStock::AVLStock(const char* symbol, TradeLibFast::TLServer_WM* tlinst, bool load):
+AVLStock::AVLStock(const char* symbol, TradeLibFast::TLServer_WM* tlinst, bool load, int dep):
     m_symbol(symbol),
     m_stockHandle(NULL),
     m_level1(NULL),
@@ -24,7 +24,8 @@ AVLStock::AVLStock(const char* symbol, TradeLibFast::TLServer_WM* tlinst, bool l
     m_prints(NULL),
 	bidi(NULL),
 	aski(NULL),
-	pnti(B_CreatePrintsAndBookExecutionsIterator(NULL, (1 << PS_LAST) - 1, 0, false, NULL, true))
+	pnti(B_CreatePrintsAndBookExecutionsIterator(NULL, (1 << PS_LAST) - 1, 0, false, NULL, true)),
+	depth(dep)
 {
 	tl = tlinst;
     if(load)
@@ -99,8 +100,8 @@ void AVLStock::Load()
 	    m_level2->Add(this);
 		m_account->Add(this);
 		// setup book iterators which are used to get top of book and t&s when updates come in
-		bidi = B_CreateLevel2AndBookIterator(m_stockHandle, true, false,false, booki, 1, this);
-		aski = B_CreateLevel2AndBookIterator(m_stockHandle, false, false,false, booki, 1, this);
+		bidi = B_CreateLevel2AndBookIterator(m_stockHandle, true, false,false, booki, (depth + 1), this);
+		aski = B_CreateLevel2AndBookIterator(m_stockHandle, false, false,false, booki, (depth + 1), this);
 		B_TransactionIteratorSetStock(pnti, m_stockHandle, this);
 		if (isLoaded())
 		{
@@ -124,20 +125,31 @@ void AVLStock::QuoteNotify()
 			k.sym = CString(m_symbol.c_str());
 			// get bid
 			B_StartIteration(bidi);
-			const BookEntry* be = B_GetNextBookEntry(bidi);
-			if (be==NULL) return;
-			k.bid = be->toDouble();
-			k.bs = be->GetSize()/m_stockHandle->GetRoundLot();
-			k.be = be->GetMmid();
-			// get ask
+			//const BookEntry* be = B_GetNextBookEntry(bidi);
+			const BookEntry* be;
 			B_StartIteration(aski);
-			const BookEntry* ae = B_GetNextBookEntry(aski);
-			if (ae==NULL) return;
-			k.ask = ae->toDouble();
-			k.os = ae->GetSize()/m_stockHandle->GetRoundLot();
-			k.oe = ae->GetMmid();
-			// send tick
-			tl->SrvGotTick(k);
+			//const BookEntry* ae = B_GetNextBookEntry(aski);
+			const BookEntry* ae;
+			for (int i = 0; i <= depth; i++) //report a tick, depth times
+			{
+				be = B_GetNextBookEntry(bidi);
+				if (be==NULL) return;
+				k.bid = be->toDouble();
+				k.bs = be->GetSize()/m_stockHandle->GetRoundLot();
+				k.be = be->GetMmid();
+				// get ask
+				//B_StartIteration(aski);
+				//const BookEntry* ae = B_GetNextBookEntry(aski);
+				ae = B_GetNextBookEntry(aski);
+				if (ae==NULL) return;
+				k.ask = ae->toDouble();
+				k.os = ae->GetSize()/m_stockHandle->GetRoundLot();
+				k.oe = ae->GetMmid();
+				//set depth
+				k.depth = i;
+				// send tick
+				tl->SrvGotTick(k);
+			}
 	}
 
 }

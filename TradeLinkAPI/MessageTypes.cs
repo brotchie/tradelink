@@ -92,6 +92,8 @@ namespace TradeLink.API
         SENDORDERSTOP,
         SENDORDERTRAIL,
         SENDORDERMARKETONCLOSE,
+        DOMREQUEST,
+        DOMRESPONSE,
         // END TRADELINK MESSAGES
 
     }

@@ -39,6 +39,7 @@ static void __stdcall SerializeDeserialize()
 	t.trade = 10;
 	t.size =100;
 	t.ex = ex;
+	t.depth = 4;
 	CString m = t.Serialize();
 
 	// go back to object
@@ -48,6 +49,7 @@ static void __stdcall SerializeDeserialize()
 	CFIX_ASSERT(k.isValid());
 	CFIX_ASSERT(k.size==t.size);
 	CFIX_ASSERT(k.ex==t.ex);
+	CFIX_ASSERT(k.depth==t.depth);
 }
 
 CFIX_BEGIN_FIXTURE( TestTLTick )

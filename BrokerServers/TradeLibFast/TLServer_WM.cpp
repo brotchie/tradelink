@@ -180,6 +180,18 @@ namespace TradeLibFast
 				}
 			case VERSION :
 					return MinorVer;
+			case DOMREQUEST :
+				{
+				vector<CString> rec;
+				gsplit(msg,CString("+"),rec);
+				CString client = rec[0];
+				// make sure we have the client
+				unsigned int cid = FindClient(client); 
+				if (cid==-1) return CLIENTNOTREGISTERED; //client not registered
+				D(CString(_T("Client ")+client+_T(" registered: ")));
+				HeartBeat(client);
+				return DOMRequest(atoi(rec[1]));
+				}
 		}
 
 		return UnknownMessage(MessageType,msg);
@@ -203,6 +215,7 @@ namespace TradeLibFast
 	}
 
 	int TLServer_WM::RegisterStocks(CString clientname) { return OK; }
+	int TLServer_WM::DOMRequest(int depth) { return OK; }
 	std::vector<int> TLServer_WM::GetFeatures() { std::vector<int> blank; return blank; } 
 
 	int TLServer_WM::AccountResponse(CString clientname)

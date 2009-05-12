@@ -11,6 +11,7 @@ namespace TradeLibFast
 		int date;
 		int time;
 		int size;
+		int depth;
 		double trade;
 		double bid;
 		double ask;
@@ -42,6 +43,7 @@ namespace TradeLibFast
         kasksize,
         kbidex,
         kaskex,
+		ktdepth,
     };
 
 }
