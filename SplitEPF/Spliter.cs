@@ -28,11 +28,9 @@ namespace SplitEPF
             for (int file = 1; file <= files.Count; file++)
             {
                 lastdate = 0;
-                show("Before Tickfile list");
                 TickFile((string)files[file-1]); // set current file
                 string ofile = "";
                 bool SAME = false;
-                show("Date: " + t.date + " Ticks: " + t.hasTick);
 
                 while (!SAME && !inf.EndOfStream  && t.hasTick) // while we have ticks in this file,
                 {
@@ -46,7 +44,6 @@ namespace SplitEPF
                     ofile = symbol + t.date+ ".EPF";
                     this.of = new StreamWriter(PATH + ofile);
                     of.Write(eSigTick.EPFheader(symbol, t.date));
-                    //SHOW(ofile + " ");
                     if (firstFile == true)
                     {
                         firstFile = false;
@@ -57,7 +54,7 @@ namespace SplitEPF
                         t = (TickImpl)eSigTick.FromStream(symbol,inf);
                     }
                     lastdate = t.date;
-                    //show("Date: " + t.date);
+                    show(t.date);
                     of.Flush();
                     of.Close();
                 }
