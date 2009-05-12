@@ -54,7 +54,7 @@ namespace SplitEPF
                         t = (TickImpl)eSigTick.FromStream(symbol,inf);
                     }
                     lastdate = t.date;
-                    show(t.date);
+                    show(symbol + t.date + ".EPF");
                     of.Flush();
                     of.Close();
                 }
