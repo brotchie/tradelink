@@ -377,17 +377,16 @@ namespace ASP
 
         void debug(string message)
         {
-            // get a timestamp
-            string stamp = DateTime.Now.ToShortTimeString()+ " ";
-            // if we have a logfile, log the debug
-            if (_log != null)
-                _log.WriteLine(stamp+message);
-
             // if we're running from a background thread, invoke GUI thread to update screen
             if (_msg.InvokeRequired)
                 _msg.Invoke(new DebugDelegate(debug), new object[] { message });
             else
             {
+                // get a timestamp
+                string stamp = DateTime.Now.ToShortTimeString() + " ";
+                // if we have a logfile, log the debug
+                if (_log != null)
+                    _log.WriteLine(stamp + message);
                 // add debug msg
                 _msg.Items.Add(stamp+message);
                 // select it
