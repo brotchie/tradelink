@@ -17,42 +17,50 @@ namespace SplitEPF
         TickImpl t = new TickImpl();
         string symbol = "";
         int lastdate = 0;
+        bool firstFile = true;
+
         public void Reduce()
         {
             show("Starting scan of: " + PATH);
+            if (PATH.Length != PATH.LastIndexOf("\\")) PATH = PATH + "\\";
+
             ArrayList files = TickFiles();
             for (int file = 1; file <= files.Count; file++)
             {
                 lastdate = 0;
-                int subfiles = 1;
+                show("Before Tickfile list");
                 TickFile((string)files[file-1]); // set current file
                 string ofile = "";
                 bool SAME = false;
+                show("Date: " + t.date + " Ticks: " + t.hasTick);
 
                 while (!SAME && !inf.EndOfStream  && t.hasTick) // while we have ticks in this file,
                 {
-                    if (fname.Equals(symbol + t.date + ".epf", StringComparison.CurrentCultureIgnoreCase)) { SAME = true; continue; }
-                    if (of == null)  // our first day in this input file, open new output file
-                    {
-                        ofile = symbol + t.date+ ".EPF";
-                        this.of = new StreamWriter(PATH + ofile);
-                        of.Write(eSigTick.EPFheader(symbol, t.date));
-                        SHOW(fname + " ");
+
+                    if (fname.Equals(symbol + t.date + ".epf", StringComparison.CurrentCultureIgnoreCase)) 
+                    { 
+                        SAME = true;
+                        show("Input file is the same name as the output file: " + symbol + t.date + ".epf");
+                        continue; 
                     }
-                    if (lastdate == 0) lastdate = t.date;
-                    if (lastdate == t.date) { of.WriteLine(eSigTick.ToEPF(t)); continue; }// save first tick
-                    subfiles++;
+                    ofile = symbol + t.date+ ".EPF";
+                    this.of = new StreamWriter(PATH + ofile);
+                    of.Write(eSigTick.EPFheader(symbol, t.date));
+                    //SHOW(ofile + " ");
+                    if (firstFile == true)
+                    {
+                        firstFile = false;
+                        lastdate = t.date;
+                    }
+                    while( lastdate == t.date) {
+                        of.WriteLine(eSigTick.ToEPF(t));
+                        t = (TickImpl)eSigTick.FromStream(symbol,inf);
+                    }
                     lastdate = t.date;
-                    // otherwise we gotta close first output file and open new one
+                    //show("Date: " + t.date);
                     of.Flush();
                     of.Close();
-                    ofile = symbol+t.date+".EPF";
-                    SHOW(".");
-                    of = new StreamWriter(PATH+ofile);
-                    of.Write(eSigTick.EPFheader(symbol, t.date)); // write the header
-                    of.WriteLine(eSigTick.ToEPF(t)); // save the 2nd tick and continue processing input ticks
                 }
-                if (subfiles!=1){ show(" into " + subfiles + " files."); of.Flush(); of.Close(); } // otherwise save and flush it
                 inf.Close();
             }
 
@@ -70,7 +78,7 @@ namespace SplitEPF
         void TickFile(string filename)
         {
             this.inf = new StreamReader(PATH + filename);
-            of = null;
+            this.of = null;
             fname = filename;
             string symline = this.inf.ReadLine();
             string dateline = this.inf.ReadLine();
@@ -78,14 +86,15 @@ namespace SplitEPF
             Regex dse = new Regex("=[0-9V]+");
             Regex dee = new Regex("-[0-9V]+");
             MatchCollection r = se.Matches(symline, 0);
-            string t = r[0].Value;
-            this.symbol = t.Substring(1, t.Length - 1);
+            string l = r[0].Value;
+            this.symbol = l.Substring(1, l.Length - 1);
             int rem = symbol.IndexOf(' ');
             if (rem!=-1) symbol = symbol.Remove(rem, 1);
             Regex sm = new Regex("[a-z\\#]{1,4}", RegexOptions.IgnoreCase);
             Match m = sm.Match(filename);
             this.symbol = this.symbol.ToUpper();
             if (!this.symbol.Equals(m.Value.ToUpper())) show(filename + " has symbol name " + m.Value + " but contains ticks for " + symbol);
+            this.t = (TickImpl)eSigTick.FromStream(this.symbol,this.inf);
         }
 
 
