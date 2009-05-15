@@ -143,6 +143,11 @@ namespace TradeLink.Common
             catch (Exception) { }
             return s;
         }
+
+        public override bool Equals(object obj)
+        {
+            return ToString() == obj.ToString();
+        }
     }
 
     public class EndSecurityTicks : Exception {}
