@@ -10,6 +10,8 @@ namespace TradeLink.Common
     /// </summary>
     public class OffsetTracker
     {
+        public event DebugFullDelegate SendDebug;
+        void debug(string msg) { if (SendDebug != null) SendDebug(DebugImpl.Create(msg)); }
         OffsetInfo _default = new OffsetInfo();
         string[] _ignore = new string[0];
         /// <summary>
@@ -61,8 +63,7 @@ namespace TradeLink.Common
         /// </summary>
         public int CancelSleep { get { return _cancelpause; } set { _cancelpause = value; } }
 
-        void doupdate(string sym) { doupdate(sym, false); }
-        void doupdate(string sym, bool poschange)
+        void doupdate(string sym)
         {
             // is update ignored?
             if (IgnoreUpdate(sym)) return;
@@ -73,20 +74,30 @@ namespace TradeLink.Common
             {
                 // cancel existing profits
                 cancel(off.ProfitId);
+                // mark cancel pending
+                off.ProfitcancelPending = true;
                 // wait a moment to allow cancel to be received
                 System.Threading.Thread.Sleep(_cancelpause);
+                // notify
+                debug("found and canceled profit: " + off.ProfitId);
             }
             // see if we have stop
             if (off.hasStop)
             {
                 // cancel existing stops
                 cancel(off.StopId);
+                // mark cancel pending
+                off.StopcancelPending = true;
                 // wait a moment to allow cancel to be received
                 System.Threading.Thread.Sleep(_cancelpause);
+                // notify
+                debug("found and canceled stop: " + off.StopId);
             }
 
             if (!off.hasProfit)
             {
+                // since we have no stop, it's cancel can't be pending
+                off.ProfitcancelPending = false;
                 // get new profit
                 Order profit = Calc.PositionProfit(_pt[sym], off.ProfitDist, off.ProfitPercent, off.NormalizeSize, off.MinimumLotSize);
                 // if it's valid, send and track it
@@ -95,10 +106,14 @@ namespace TradeLink.Common
                     profit.id = Ids.AssignId;
                     off.ProfitId = profit.id;
                     SendOffset(profit);
+                    // notify
+                    debug(string.Format("sent new profit: {0} {1}", profit.id, profit.ToString()));
                 }
             }
             if (!off.hasStop)
             {
+                // since we have no stop, it's cancel can't be pending
+                off.StopcancelPending = false;
                 // get new stop
                 Order stop = Calc.PositionStop(_pt[sym], off.StopDist, off.StopPercent, off.NormalizeSize, off.MinimumLotSize);
                 // if it's valid, send and track
@@ -107,6 +122,8 @@ namespace TradeLink.Common
                     stop.id = Ids.AssignId;
                     off.StopId = stop.id;
                     SendOffset(stop);
+                    // notify
+                    debug(string.Format("sent new profit: {0} {1}", stop.id, stop.ToString()));
                 }
             }
             // make sure new offset info is reflected
@@ -125,6 +142,7 @@ namespace TradeLink.Common
         /// <param name="side"></param>
         public void CancelAll(bool side)
         {
+            debug("canceling offsets for: " + (side ? "long" : "short"));
             foreach (Position p in _pt)
             {
                 // make sure we're not flat
@@ -140,6 +158,7 @@ namespace TradeLink.Common
         /// <param name="sym"></param>
         public void CancelAll(string sym)
         {
+            debug("canceling offsets for: " + sym);
             foreach (Position p in _pt)
             {
                 // if sym matches, cancel all offsets
@@ -155,6 +174,7 @@ namespace TradeLink.Common
         /// <param name="sym"></param>
         public void CancelProfit(string sym)
         {
+            debug("canceling profits for: " + sym);
             foreach (Position p in _pt)
             {
                 // if sym matches, cancel all offsets
@@ -169,6 +189,7 @@ namespace TradeLink.Common
         /// <param name="sym"></param>
         public void CancelStop(string sym)
         {
+            debug("canceling stops for: " + sym);
             foreach (Position p in _pt)
             {
                 // if sym matches, cancel all offsets
@@ -183,6 +204,7 @@ namespace TradeLink.Common
         /// <param name="side"></param>
         public void CancelProfit(bool side)
         {
+            debug("canceling profits for: " + (side ? "long" : "short"));
             foreach (Position p in _pt)
             {
                 // make sure we're not flat
@@ -199,6 +221,7 @@ namespace TradeLink.Common
         /// <param name="side"></param>
         public void CancelStop(bool side)
         {
+            debug("canceling stops for: " + (side ? "long" : "short"));
             foreach (Position p in _pt)
             {
                 // make sure we're not flat
@@ -214,6 +237,7 @@ namespace TradeLink.Common
         /// </summary>
         public void CancelAll()
         {
+            debug("canceling all pending offsets");
             foreach (string sym in _offvals.Keys)
                 cancel(GetOffset(sym));
         }
@@ -271,7 +295,7 @@ namespace TradeLink.Common
             // do we have events?
             if (!HasEvents()) return;
             // do update
-            doupdate(p.Symbol,true);
+            doupdate(p.Symbol);
         }
 
         /// <summary>
@@ -285,7 +309,7 @@ namespace TradeLink.Common
             // do we have events?
             if (!HasEvents()) return;
             // do update
-            doupdate(t.symbol,true);
+            doupdate(t.symbol);
 
         }
 
@@ -325,9 +349,15 @@ namespace TradeLink.Common
             foreach (string sym in _offvals.Keys)
             {
                 if (_offvals[sym].StopId == id)
+                {
+                    debug("cancel received: " + id.ToString());
                     _offvals[sym].StopId = 0;
+               }
                 else if (_offvals[sym].ProfitId == id)
+                {
+                    debug("cancel received: " + id.ToString());
                     _offvals[sym].ProfitId = 0;
+                }
             }
 
         }
@@ -338,7 +368,11 @@ namespace TradeLink.Common
         /// <param name="k"></param>
         public void GotTick(Tick k)
         {
-            // update the offsets for this tick's symbol
+            // if there are no cancels pending on either side, we're done
+            OffsetInfo oi;
+            if (_offvals.TryGetValue(k.symbol, out oi))
+                if (!oi.StopcancelPending && !oi.ProfitcancelPending) return;
+            // otherwise update the offsets for this tick's symbol
             doupdate(k.symbol);
         }
 
@@ -391,6 +425,8 @@ namespace TradeLink.Common
         public decimal StopPercent = 1;
         public bool hasProfit { get { return ProfitId != 0; } }
         public bool hasStop { get { return StopId != 0; } }
+        public bool StopcancelPending = false;
+        public bool ProfitcancelPending = false;
 
     }
 }
