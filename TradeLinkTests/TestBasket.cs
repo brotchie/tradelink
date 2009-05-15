@@ -36,12 +36,32 @@ namespace TestTradeLink
         [Test]
         public void Multiple()
         {
-            BasketImpl mb = new BasketImpl(new string[] { "IBM","LVS","T","GS","MHS" } );
-            BasketImpl rem = new BasketImpl(new string[] { "LVS", "MHS" });
-            Assert.That(mb.Count == 5);
-            Assert.That(rem.Count == 2);
+            // setup some symbols
+            string[] ab = new string[] { "IBM", "LVS", "T", "GS", "MHS" };
+            string[] bb = new string[] { "LVS", "MHS" };
+            // create baskets from our symbols
+            Basket mb = new BasketImpl( ab);
+            Basket rem = new BasketImpl(bb);
+            // verify symbol counts of our baskets
+            Assert.That(mb.Count == ab.Length);
+            Assert.That(rem.Count == bb.Length);
+            // remove one basket from another
             mb.Remove(rem);
+            // verify count matches
             Assert.That(mb.Count == 3,mb.Count.ToString());
+
+            // add single symbol
+            Basket cb = new BasketImpl("GM");
+            // add another symbol
+            cb.Add("GOOG");
+            // verify we have two
+            Assert.AreEqual(2, cb.Count);
+            // attempt to add dupplicate
+            cb.Add("GM");
+            // verify we have two
+            Assert.AreEqual(2, cb.Count);
+
+
         }
 
         [Test]

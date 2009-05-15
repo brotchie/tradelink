@@ -9,6 +9,8 @@ namespace TradeLink.API
         string Name { get; set; }
         Security this[int index] { get; set; }
         int Count { get; }
+        void Add(string symbol);
+        void Add(string[] symbols);
         void Add(Security newsecurity);
         void Add(Basket newbasket);
         void Remove(Basket subtractbasket);

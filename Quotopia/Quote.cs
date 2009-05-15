@@ -276,6 +276,8 @@ namespace Quotopia
             {
                 //remove the row
                 qt.Rows.RemoveAt(CurrentRow);
+                // accept changes
+                qt.AcceptChanges();
                 // clear current index
                 symidx.Clear();
                 // reget index
@@ -386,6 +388,7 @@ namespace Quotopia
                 bardict.Add(sym, new BarListImpl(BarInterval.FiveMin, sym));
             status("Added " + sym);
             symindex();
+            mb.Add(sym);
         }
 
         
@@ -602,12 +605,17 @@ namespace Quotopia
                 foreach (string f in od.FileNames)
                 {
                     Basket nb = BasketImpl.FromFile(f);
-                    mb.Add(nb);
+                    addbasket(nb);
                     count += nb.Count;
                 }
                 status("Imported " + count + " instruments.");
             }
-            tl.Subscribe(mb);
+            else return;
+            if (tl.LinkType != TLTypes.NONE)
+                tl.Subscribe(mb);
+            else
+                status("no server running to obtain quotes from.");
+            Invalidate(true);
         }
 
         void addbasket(Basket b)

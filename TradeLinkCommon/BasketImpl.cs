@@ -50,12 +50,38 @@ namespace TradeLink.Common
         public string Name { get { return _name; } set { _name = value; } }
         public int Count { get { return symbols.Count; } }
         public bool hasStock { get { return symbols.Count >0; } }
-        public void Add(Security s) { if (s.isValid) symbols.Add(s); }
+        /// <summary>
+        /// adds a security if not already present
+        /// </summary>
+        /// <param name="sym"></param>
+        public void Add(string sym) { Add(new SecurityImpl(sym)); }
+        /// <summary>
+        /// adds a security if not already present
+        /// </summary>
+        /// <param name="s"></param>
+        public void Add(Security s) { if (s.isValid && !contains(s)) symbols.Add(s); }
+        bool contains(string sym) { foreach (Security s in symbols) if (s.Symbol == sym) return true; return false; }
+        bool contains(Security sec) { return symbols.Contains(sec); }
+        /// <summary>
+        /// adds contents of another basket to this one.
+        /// will not result in duplicate symbols
+        /// </summary>
+        /// <param name="mb"></param>
         public void Add(Basket mb)
         {
             for (int i = 0; i < mb.Count; i++)
                 this.Add(mb[i]);
         }
+        public void Add(string[] syms)
+        {
+            for (int i = 0; i < syms.Length; i++)
+                this.Add(syms[i]);
+        }
+        /// <summary>
+        /// removes all elements of baskets that match.
+        /// unmatching elements are ignored
+        /// </summary>
+        /// <param name="mb"></param>
         public void Remove(Basket mb)
         {
             List<int> remove = new List<int>();
