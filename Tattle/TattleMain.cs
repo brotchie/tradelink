@@ -12,14 +12,15 @@ using TradeLink.API;
 
 namespace Tattle
 {
-    public partial class MainForm : Form
+    public partial class TattleMain : Form
     {
         DataTable dt = new DataTable("results");
         DataGrid dg = new DataGrid();
 
         FileSystemWatcher fw;
         const string FID = "Trades.csv";
-        public MainForm()
+        public const string PROGRAM = "Tattle";
+        public TattleMain()
         {
             InitializeComponent();
 

@@ -1,6 +1,6 @@
 namespace Tattle
 {
-    partial class MainForm
+    partial class TattleMain
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@ namespace Tattle
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TattleMain));
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tradefiles = new System.Windows.Forms.ListBox();
             this.splitContainer1.Panel1.SuspendLayout();
