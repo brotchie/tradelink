@@ -18,7 +18,6 @@ namespace Quotopia
             try
             {
                 Quote q = new Quote();
-
                 Application.Run(q);
             }
             catch (Exception ex) { TradeLink.Common.CrashReport.Report(Quote.PROGRAM, ex); }
@@ -26,7 +25,7 @@ namespace Quotopia
 
         static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
-            TradeLink.Common.CrashReport.Report(Quote.PROGRAM, e.Exception);
+            TradeLink.Common.CrashReport.Report(Quote.PROGRAM, e);
         }
     }
 }

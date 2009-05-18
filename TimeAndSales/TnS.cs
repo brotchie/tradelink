@@ -12,6 +12,7 @@ namespace TimeSales
 {
     public partial class TnS : Form
     {
+        public const string PROGRAM = "Time&Sales";
         public TnS()
         {
             

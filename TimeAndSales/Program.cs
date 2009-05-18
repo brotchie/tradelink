@@ -14,11 +14,20 @@ namespace TimeSales
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
             try
             {
                 Application.Run(new TnS());
             }
-            catch (Exception) { }
+            catch (Exception e) 
+            {
+                TradeLink.Common.CrashReport.Report(TnS.PROGRAM, e);
+            }
+        }
+
+        static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
+        {
+            TradeLink.Common.CrashReport.Report(TnS.PROGRAM, e);            
         }
     }
 }

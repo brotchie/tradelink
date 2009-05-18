@@ -14,7 +14,20 @@ namespace Tattle
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
+            Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
+            try
+            {
+                Application.Run(new TattleMain());
+            }
+            catch (Exception e)
+            {
+                TradeLink.Common.CrashReport.Report(TattleMain.PROGRAM, e);
+            }
+        }
+
+        static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
+        {
+            TradeLink.Common.CrashReport.Report(TattleMain.PROGRAM, e);
         }
     }
 }

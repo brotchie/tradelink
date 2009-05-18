@@ -46,7 +46,7 @@
             this.Controls.Add(this.twitControl1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "TwitPopup";
-            this.Text = "TradeLink Twit";
+            this.Text = "type your question...";
             this.TopMost = true;
             this.ResumeLayout(false);
 

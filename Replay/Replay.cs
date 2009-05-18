@@ -18,6 +18,7 @@ namespace Replay
         HistSim h = new HistSim();
         string tickfolder = Util.TLTickDir;
         static Account HISTBOOK = new Account("_HISTBOOK");
+        public const string PROGRAM = "Replay";
         public Replay()
         {
             InitializeComponent();

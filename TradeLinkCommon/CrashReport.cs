@@ -18,16 +18,23 @@ namespace TradeLink.Common
         public CrashReport(string program, Exception ex)
         {
             PROGRAM = program;
-            string[] r = new string[] { "APP", ex.Message, ex.StackTrace, Environment.CommandLine, "SYSTEM", Environment.OSVersion.VersionString, Environment.Version.ToString(4), Environment.WorkingSet.ToString(), Environment.ProcessorCount.ToString() };
+            string[] r = new string[] { "Product:"+program, "Exception:"+ex.Message, "StackTrace:"+ex.StackTrace, "CommandLine:"+Environment.CommandLine, "OS:"+Environment.OSVersion.VersionString, "CLR:"+Environment.Version.ToString(4), "TradeLink:"+Util.TLSIdentity(),"Memory:"+Environment.WorkingSet.ToString(), "Processors:"+Environment.ProcessorCount.ToString() };
             BODY = string.Join(Environment.NewLine, r);
             InitializeComponent();
             ShowDialog();
         }
         const string email = "tradelink-contribute@googlegroups.com";
+        const string webase = "http://groups.google.com/group/tradelink-contribute/post?";
         private void _email_Click(object sender, EventArgs e)
         {
-            if (BODY!=string.Empty)
-                Email.Send(email, PROGRAM + "." + Util.ToTLDate(DateTime.Now), BODY);
+            if (BODY != string.Empty)
+            {
+                BODY = "what steps led to seeing this error?" + Environment.NewLine + Environment.NewLine+"1. " + Environment.NewLine + "2." + Environment.NewLine +"3."+Environment.NewLine+ Environment.NewLine + "---------------------------------------------------------"+Environment.NewLine+BODY;
+                string bodystring = Uri.EscapeUriString(BODY);
+                string url = webase + string.Format("subject={0}&body={1}", PROGRAM + " Crash ("+Util.ToTLDate(DateTime.Now).ToString()+")", bodystring);
+                System.Diagnostics.Process.Start(url);
+            }
+                //Email.Send(email, PROGRAM + "." + Util.ToTLDate(DateTime.Now), BODY);
             Close();
         }
 
@@ -35,6 +42,7 @@ namespace TradeLink.Common
         {
             Close();
         }
+        public static void Report(string PROGRAM, System.Threading.ThreadExceptionEventArgs e) { Report(PROGRAM, e.Exception); }
         public static void Report(string PROGRAM, Exception ex)
         {
             CrashReport cr = new CrashReport(PROGRAM, ex);

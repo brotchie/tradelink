@@ -38,7 +38,7 @@
             this._email.Name = "_email";
             this._email.Size = new System.Drawing.Size(245, 40);
             this._email.TabIndex = 0;
-            this._email.Text = "Email crash info to TradeLink";
+            this._email.Text = "Send crash info to TradeLink";
             this._email.UseVisualStyleBackColor = true;
             this._email.Click += new System.EventHandler(this._email_Click);
             // 

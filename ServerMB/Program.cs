@@ -15,7 +15,20 @@ namespace ServerMB
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new ServerMBMain());
+            Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
+            try
+            {
+                Application.Run(new ServerMBMain());
+            }
+            catch (Exception e)
+            {
+                TradeLink.Common.CrashReport.Report(ServerMBMain.PROGRAM, e);
+            }
+        }
+
+        static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
+        {
+            TradeLink.Common.CrashReport.Report(ServerMBMain.PROGRAM, e);
         }
     }
 }

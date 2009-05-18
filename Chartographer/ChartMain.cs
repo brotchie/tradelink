@@ -15,6 +15,7 @@ namespace Chartographer
         public event BarListUpdated newChartData;
         WebClient client = new WebClient();
         Dictionary<string, BarListImpl> blbox = new Dictionary<string, BarListImpl>();
+        public const string PROGRAM = "Chartographer";
         public ChartMain()
         {
             InitializeComponent();

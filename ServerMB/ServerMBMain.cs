@@ -23,6 +23,7 @@ namespace ServerMB
         static MbtQuotes m_Quotes;
         PositionTracker pt = new PositionTracker();
         bool showmessage = false;
+        public const string PROGRAM = "ServerMB BETA"; 
         public ServerMBMain()
         {
             InitializeComponent();

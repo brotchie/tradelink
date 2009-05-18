@@ -33,11 +33,12 @@ namespace Kadina
         List<string> exfilter = new List<string>();
         BackgroundWorker bw = new BackgroundWorker();
         HistSim h = new HistSim();
-
+        public const string PROGRAM = "Kadina";
        
 
         public kadinamain()
         {
+
             InitializeComponent();
             reslist.DropDownItemClicked += new ToolStripItemClickedEventHandler(boxlist_DropDownItemClicked);
             playtobut.DropDownItemClicked += new ToolStripItemClickedEventHandler(playtobut_DropDownItemClicked);

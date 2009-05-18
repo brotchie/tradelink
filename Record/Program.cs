@@ -14,7 +14,20 @@ namespace Record
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new RecordMain());
+            Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
+            try
+            {
+                Application.Run(new RecordMain());
+            }
+            catch (Exception e)
+            {
+                TradeLink.Common.CrashReport.Report(RecordMain.PROGRAM, e);
+            }
+        }
+
+        static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
+        {
+            TradeLink.Common.CrashReport.Report(RecordMain.PROGRAM, e);
         }
     }
 }

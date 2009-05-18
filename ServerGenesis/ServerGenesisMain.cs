@@ -18,6 +18,7 @@ namespace ServerGenesis
         TLServer_WM tl = new TLServer_WM(TLTypes.LIVEBROKER);
         string[] _sym = new string[0];
         List<GTStock> _stk = new List<GTStock>();
+        public const string PROGRAM = "GenesisServer BETA";
 
         public ServerGenesisMain()
         {

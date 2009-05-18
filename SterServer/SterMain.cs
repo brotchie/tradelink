@@ -18,7 +18,7 @@ namespace SterServer
         STIQuote stiQuote = new STIQuote();
         STIBook stiBook = new STIBook();
         TLServer_WM tl = new TLServer_WM(TLTypes.LIVEBROKER);
-        const string PROGRAM = "SterServer ";
+        public const string PROGRAM = "SterServer ";
         Timer tt = new Timer();
         bool imbalance = false;
         PositionTracker pt = new PositionTracker();

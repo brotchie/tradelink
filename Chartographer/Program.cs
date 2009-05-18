@@ -14,7 +14,20 @@ namespace Chartographer
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new ChartMain());
+            Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
+            try
+            {
+                Application.Run(new ChartMain());
+            }
+            catch (Exception e)
+            {
+                TradeLink.Common.CrashReport.Report(ChartMain.PROGRAM, e);
+            }
+        }
+
+        static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
+        {
+            TradeLink.Common.CrashReport.Report(ChartMain.PROGRAM, e);
         }
     }
 }

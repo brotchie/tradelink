@@ -16,7 +16,7 @@ namespace Record
         TickWatcher tw = new TickWatcher();
         TLClient_WM tl = new TLClient_WM();
         BasketImpl mb = new BasketImpl();
-
+        public const string PROGRAM = "Record";
         public RecordMain()
         {
             InitializeComponent();
