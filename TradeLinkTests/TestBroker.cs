@@ -173,15 +173,17 @@ namespace TestTradeLink
 
             const string me = "tester";
             const string other = "anotherguy";
+            const int od = 20070926;
+            const int ot = 95400;
             Account a = new Account(me);
             Account b = new Account(other);
             Account c = new Account("sleeper");
             OrderImpl oa = new BuyMarket(sym,100);
             OrderImpl ob = new BuyMarket(sym, 100);
-            oa.time = Util.ToTLTime(DateTime.Now);
-            oa.date = Util.ToTLDate(DateTime.Now);
-            ob.time = Util.ToTLTime(DateTime.Now);
-            ob.date = Util.ToTLDate(DateTime.Now);
+            oa.time = ot;
+            oa.date = od;
+            ob.time = ot;
+            ob.date = od;
 
             oa.Account = me;
             ob.Account = other;
@@ -191,8 +193,8 @@ namespace TestTradeLink
             TickImpl t = new TickImpl(sym);
             t.trade = 100m;
             t.size = 200;
-            t.date = Util.ToTLDate(DateTime.Now);
-            t.time = Util.ToTLTime(DateTime.Now);
+            t.date = od;
+            t.time = ot;
             Assert.AreEqual(2,broker.Execute(t));
             Position apos = broker.GetOpenPosition(sym,a);
             Position bpos = broker.GetOpenPosition(sym,b);

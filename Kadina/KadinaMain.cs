@@ -33,7 +33,6 @@ namespace Kadina
         List<string> exfilter = new List<string>();
         BackgroundWorker bw = new BackgroundWorker();
         HistSim h = new HistSim();
-        public const string PROGRAM = "Kadina";
        
 
         public kadinamain()
@@ -463,7 +462,7 @@ namespace Kadina
             else status("Response did not load.");
 
         }
-        const string PROGRAM = "Kadina";
+        public const string PROGRAM = "Kadina";
         void updatetitle() { Text = PROGRAM + " - Study: " + resname + " " + PrettyEPF(); Invalidate(); }
 
         void myres_SendIndicators(string param)

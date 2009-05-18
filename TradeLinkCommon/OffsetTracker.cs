@@ -427,6 +427,10 @@ namespace TradeLink.Common
         public bool hasStop { get { return StopId != 0; } }
         public bool StopcancelPending = false;
         public bool ProfitcancelPending = false;
+        public override string ToString()
+        {
+            return string.Format("p{0:n2}/{1:p0} s{2:n2}/{3:p0}", ProfitDist, ProfitPercent, StopDist, StopPercent);
+        }
 
     }
 }

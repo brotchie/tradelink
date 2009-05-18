@@ -29,6 +29,9 @@ namespace TradeLink.Common
             _pt = pt;
         }
         bool _trailbydefault = true;
+
+        public event DebugFullDelegate SendDebug;
+        void D(string msg) { if (SendDebug != null) SendDebug(DebugImpl.Create(msg)); }
         /// <summary>
         /// gets or sets the trail amount for a given symbol
         /// </summary>
@@ -55,9 +58,11 @@ namespace TradeLink.Common
                     _symidx.Add(sym, _trail.Count);
                     _trail.Add(value);
                     _ref.Add(0);
+                    _pendingfill.Add(false);
                 }
                 else // save it
                     _trail[idx] = value;
+                D("trail changed: " + sym + " " + value.ToString());
 
             } 
         }
@@ -73,6 +78,7 @@ namespace TradeLink.Common
         Dictionary<string, int> _symidx = new Dictionary<string, int>();
         List<OffsetInfo> _trail = new List<OffsetInfo>();
         List<decimal> _ref = new List<decimal>();
+        List<bool> _pendingfill = new List<bool>();
         const int NOSYM = -1;
         int symidx(string sym)
         {
@@ -115,11 +121,13 @@ namespace TradeLink.Common
                 // save them
                 _symidx.Add(k.symbol, idx);
                 _ref.Add(refp);
+                _pendingfill.Add(false);
                 // just in case user is modifying on seperate thread
                 lock (_trail)
                 {
                     _trail.Add(trail);
                 }
+                D("trail tracking: " + k.symbol + " " + trail.ToString());
             }
             else if ((idx == NOSYM) && !_trailbydefault)
                 return;
@@ -146,8 +154,12 @@ namespace TradeLink.Common
             }
 
             // see if we broke our trail
-            if (Math.Abs(refp - k.trade) > trail.StopDist)
+            if (!_pendingfill[idx] && (Math.Abs(refp - k.trade) > trail.StopDist))
             {
+                // notify
+                D("hit trailing stop at: " + k.trade.ToString("n2"));
+                // mark pending order
+                _pendingfill[idx] = true;
                 // send flat order
                 SendOrder(new MarketOrderFlat(_pt[k.symbol], trail.StopPercent, trail.NormalizeSize, trail.MinimumLotSize));
             }
@@ -179,6 +191,28 @@ namespace TradeLink.Common
         /// <param name="fill"></param>
         public void Adjust(Trade fill)
         {
+            // get index for symbol
+            int idx = symidx(fill.symbol);
+            // only do following if we're tracking trail for this symbol
+            if (idx != NOSYM)
+            {
+                // get current position size
+                int psize = _pt[fill.symbol].UnsignedSize;
+                // get trailing information
+                OffsetInfo trail = _trail[idx];
+                // get expected position size
+                int esize = psize - Calc.Norm2Min(psize * trail.StopPercent, trail.MinimumLotSize);
+                // get actual position size after change
+                int asize = psize - fill.UnsignedSize;
+                // if expected and actual match, mark pending as false
+                if (esize == asize)
+                {
+                    D("filled trailing stop for: " + fill.symbol);
+                    _pendingfill[idx] = false;
+                }
+
+            }
+
             _pt.Adjust(fill);
         }
     }

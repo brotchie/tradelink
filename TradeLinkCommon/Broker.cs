@@ -173,6 +173,14 @@ namespace TradeLink.Common
             return true;
         }
         /// <summary>
+        /// send order that is compatible with OrderDelegate events
+        /// </summary>
+        /// <param name="o"></param>
+        public void SendOrder(Order o)
+        {
+            sendOrder(o);
+        }
+        /// <summary>
         /// Sends the order to the broker. (uses the default account)
         /// </summary>
         /// <param name="o">The order to be send.</param>
@@ -224,6 +232,9 @@ namespace TradeLink.Common
             { // go through each account
                 // if account has requested no executions, skip it
                 if (!a.Execute) continue;
+                // make sure we have a record for this account
+                if (!MasterTrades.ContainsKey(a.ID))
+                    MasterTrades.Add(a.ID, new List<Trade>());
                 // track orders being removed and trades that need notification
                 List<int> notifytrade = new List<int>();
                 List<int> remove = new List<int>();
@@ -252,13 +263,21 @@ namespace TradeLink.Common
                         filled = o.Fill(tick); // fill our trade
                     if (filled)
                     {
-                        remove.Add(i);
+                        // remove filled size from size available in trade
                         tick.size -= o.UnsignedSize;
-                        if (!MasterTrades.ContainsKey(a.ID)) MasterTrades.Add(a.ID, new List<Trade>());
-                        MasterTrades[a.ID].Add((Trade)o); // record trade
-                        // market it for notification
+                        // get copy of trade for recording
+                        Trade trade = new TradeImpl((Trade)o);
+                        // if trade represents entire requested order, mark order for removal
+                        if (trade.UnsignedSize == o.UnsignedSize)
+                            remove.Add(i);
+                        else // otherwise reflect order's remaining size
+                            o.size = (o.UnsignedSize - trade.UnsignedSize) * (o.side ? 1 : -1);
+                        // record trade
+                        MasterTrades[a.ID].Add(trade); 
+                        // mark it for notification
                         notifytrade.Add(MasterTrades[a.ID].Count-1);
-                        filledorders++; // count the trade
+                        // count the trade
+                        filledorders++; 
                     }
                 }
                 // remove the filled orders

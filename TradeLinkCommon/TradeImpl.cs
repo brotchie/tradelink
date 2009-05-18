@@ -41,14 +41,14 @@ namespace TradeLink.Common
         public bool isFilled { get { return (xprice * xsize) != 0; } }
         public bool Side { get { return side; } }
         public int Size { get { return xsize; } }
-        public TradeImpl(TradeImpl copytrade)
+        public TradeImpl(Trade copytrade)
         {
             // copy constructor, for copying using by-value (rather than by default of by-reference)
             id = copytrade.id;
-            cur = copytrade.cur;
-            type = copytrade.type;
+            cur = copytrade.Currency;
+            type = copytrade.Security;
             ex = copytrade.ex;
-            accountid = copytrade.accountid;
+            accountid = copytrade.Account;
             symbol = copytrade.symbol;
             side = copytrade.side;
             comment = copytrade.comment;

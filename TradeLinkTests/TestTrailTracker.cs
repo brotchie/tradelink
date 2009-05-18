@@ -15,12 +15,19 @@ namespace TestTradeLink
         public Tick[] SampleData()
         {
             return new Tick[] {
+                TickImpl.NewTrade(SYM,10,100), // get fill for initial position
+                TickImpl.NewTrade(SYM,10,100), 
                 TickImpl.NewTrade(SYM,10,100),
                 TickImpl.NewTrade(SYM,10,100),
                 TickImpl.NewTrade(SYM,10,100), 
                 TickImpl.NewTrade(SYM,11,100),  // new high
-                TickImpl.NewTrade(SYM,10.50m,100), // retrace
-
+                TickImpl.NewTrade(SYM,10.50m,100), // retrace... FLAT!
+                TickImpl.NewTrade(SYM,10.50m,1), // not enough to fill flat order
+                TickImpl.NewTrade(SYM,10.50m,100), // flat order should be completely filled here
+                TickImpl.NewTrade(SYM,10.50m,100),
+                TickImpl.NewTrade(SYM,10.50m,100), // want to make sure we are not oversold
+                TickImpl.NewTrade(SYM,10.50m,100),
+                TickImpl.NewTrade(SYM,10.50m,100),
             };
         }
 
@@ -36,32 +43,35 @@ namespace TestTradeLink
             Assert.AreEqual(.15m,tt.DefaultTrail.StopDist);
             // get feed
             Tick [] tape = SampleData();
-            // test position
-            Position tp = new PositionImpl(SYM, 10, 100);
+            // test broker
+            Broker b = new Broker();
+            // get fills over to trail tracker
+            b.GotFill += new FillDelegate(tt.Adjust);
+            // take initial position
+            b.sendOrder(new MarketOrder(SYM, 100));
+            // get orders from trail tracker
+            tt.SendOrder += new OrderDelegate(b.SendOrder);
             // no orders to start
             oc = 0;
             // iterate through feed
             for (int i = 0; i < tape.Length; i++ )
             {
                 Tick k = tape[i];
-                // nothing to do on first two ticks
-                if (i==2)
-                {
-                    // position established on third tick
-                    tt.Adjust(tp);
-                }
-                // no orders sent until retrace happens
-                Assert.AreEqual(0, oc);
-
+                // set a date and time
+                k.date = 20070926;
+                k.time = 95500;
+                // execute orders, nothing to do on first two ticks
+                b.Execute(k);
                 // pass every tick to tracker
                 tt.GotTick(k);
 
             }
+            // get position
+            Position p = b.GetOpenPosition(SYM);
+            // verify position is flat
+            Assert.IsTrue(p.isFlat,p.ToString());
             // one retrace sent at the end
             Assert.AreEqual(1, oc);
-            // verify it offsets position
-            Assert.AreEqual(trail.UnsignedSize,tp.UnsignedSize);
-            Assert.AreEqual(trail.side, !tp.isLong);
             
         }
 
@@ -71,6 +81,7 @@ namespace TestTradeLink
         {
             oc++;
             trail = o;
+            Console.WriteLine(o);
         }
     }
 }
