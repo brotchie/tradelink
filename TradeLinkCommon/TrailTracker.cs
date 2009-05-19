@@ -12,21 +12,24 @@ namespace TradeLink.Common
     public class TrailTracker
     {
         PositionTracker _pt = null;
+        IdTracker _id = null;
         /// <summary>
         /// position tracker used by this component
         /// </summary>
         public PositionTracker pt { get { return _pt; } set { _pt = value; } }
+        public IdTracker Id { get { return _id; } set { _id = value; } }
         /// <summary>
         /// creates trail tracker (with it's own position tracker)
         /// </summary>
-        public TrailTracker() : this(new PositionTracker()) { }
+        public TrailTracker() : this(new PositionTracker(), new IdTracker()) { }
         /// <summary>
         /// creates a trail tracker from an existing position tracker component
         /// </summary>
         /// <param name="pt"></param>
-        public TrailTracker(PositionTracker pt)
+        public TrailTracker(PositionTracker pt, IdTracker id)
         {
             _pt = pt;
+            _id = id;
         }
         bool _trailbydefault = true;
 
@@ -154,14 +157,20 @@ namespace TradeLink.Common
             }
 
             // see if we broke our trail
-            if (!_pendingfill[idx] && (Math.Abs(refp - k.trade) > trail.StopDist))
+            if (!_pendingfill[idx] && (trail.StopDist!=0) && (Math.Abs(refp - k.trade) > trail.StopDist))
             {
                 // notify
                 D("hit trailing stop at: " + k.trade.ToString("n2"));
                 // mark pending order
                 _pendingfill[idx] = true;
+                // get order
+                Order flat = new MarketOrderFlat(_pt[k.symbol], trail.StopPercent, trail.NormalizeSize, trail.MinimumLotSize);
+                // get order id
+                flat.id = _id.AssignId;
                 // send flat order
-                SendOrder(new MarketOrderFlat(_pt[k.symbol], trail.StopPercent, trail.NormalizeSize, trail.MinimumLotSize));
+                SendOrder(flat);
+                // notify
+                D("enforcing trail with: " + flat.ToString());
             }
 
 
@@ -214,6 +223,10 @@ namespace TradeLink.Common
             }
 
             _pt.Adjust(fill);
+            // if we're flat now, make sure ref price is reset
+            if (_pt[fill.symbol].isFlat)
+                _ref[idx] = 0;
+
         }
     }
 }
