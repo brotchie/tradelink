@@ -176,29 +176,67 @@ namespace TradeLink.Common
         public static string Serialize(Tick t)
         {
             const char d = ',';
-            string s = t.symbol + d + t.date + d + t.time + d + d + t.trade + d + t.size + d + t.ex + d + t.bid + d + t.ask + d + t.bs + d + t.os + d + t.be + d + t.oe + d + t.depth + d;
-            return s;
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            sb.Append(t.symbol);
+            sb.Append(d);
+            sb.Append(t.date);
+            sb.Append(d);
+            sb.Append(t.time);
+            sb.Append(d);
+            // unused field
+            sb.Append(d);
+            sb.Append(t.trade);
+            sb.Append(d);
+            sb.Append(t.size); 
+            sb.Append(d);
+            sb.Append(t.ex);
+            sb.Append(d);
+            sb.Append(t.bid);
+            sb.Append(d);
+            sb.Append(t.ask);
+            sb.Append(d);
+            sb.Append(t.bs);
+            sb.Append(d);
+            sb.Append(t.os);
+            sb.Append(d);
+            sb.Append(t.be);
+            sb.Append(d);
+            sb.Append(t.oe);
+            sb.Append(d);
+            sb.Append(t.depth);
+            return sb.ToString();
         }
 
         public static Tick Deserialize(string msg)
         {
             string [] r = msg.Split(',');
             Tick t = new TickImpl();
+            decimal d = 0;
+            int i = 0;
             t.Sec = SecurityImpl.Parse(r[(int)TickField.symbol]);
             t.symbol = t.Sec.Symbol;
-            t.trade = Convert.ToDecimal(r[(int)TickField.trade]);
-            t.size = Convert.ToInt32(r[(int)TickField.tsize]);
-            t.bid = Convert.ToDecimal(r[(int)TickField.bid]);
-            t.ask = Convert.ToDecimal(r[(int)TickField.ask]);
-            t.os = Convert.ToInt32(r[(int)TickField.asksize]);
-            t.bs = Convert.ToInt32(r[(int)TickField.bidsize]);
+            if (decimal.TryParse(r[(int)TickField.trade], out d))
+                t.trade = d;
+            if (decimal.TryParse(r[(int)TickField.bid], out d))
+                t.bid = d;
+            if (decimal.TryParse(r[(int)TickField.ask], out d))
+                t.ask = d;
+            if (int.TryParse(r[(int)TickField.tsize], out i))
+                t.size = i;
+            if (int.TryParse(r[(int)TickField.asksize], out i))
+                t.os= i;
+            if (int.TryParse(r[(int)TickField.bidsize], out i))
+                t.bs = i;
+            if (int.TryParse(r[(int)TickField.time], out i))
+                t.time = i;
+            if (int.TryParse(r[(int)TickField.date], out i))
+                t.date = i;
+            if (int.TryParse(r[(int)TickField.tdepth], out i))
+                t.depth = i;
             t.ex = r[(int)TickField.tex];
             t.be = r[(int)TickField.bidex];
             t.oe = r[(int)TickField.askex];
-            t.time = Convert.ToInt32(r[(int)TickField.time]);
-            t.date = Convert.ToInt32(r[(int)TickField.date]);
             t.datetime = t.date * 1000000 + t.time;
-            t.depth = Convert.ToInt32(r[(int)TickField.tdepth]);
             return t;
         }
 

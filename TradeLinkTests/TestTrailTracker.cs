@@ -81,7 +81,6 @@ namespace TestTradeLink
         {
             oc++;
             trail = o;
-            Console.WriteLine(o);
         }
     }
 }

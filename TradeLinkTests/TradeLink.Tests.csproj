@@ -119,6 +119,10 @@
       <Project>{A0FE06A2-F31B-49DE-8901-917B5D593E43}</Project>
       <Name>TradeLink.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TradeLinkResearch\TradeLink.Research.csproj">
+      <Project>{BBDF2EFE-BFE6-4880-977B-4724C3A67D76}</Project>
+      <Name>TradeLink.Research</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

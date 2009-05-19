@@ -107,6 +107,28 @@ namespace TestTradeLink
             Assert.That(post.depth == pre.depth);
         }
 
+        [Test]
+        public void SerializationPerformance()
+        {
+            const int OPS = 10000;
+            const string SYM = "TST";
+            Tick [] attempts = TradeLink.Research.RandomTicks.GenerateSymbol(SYM, OPS);
+            bool v = true;
+            DateTime start = DateTime.Now;
+            for (int i = 0; i<attempts.Length; i++)
+            {
+                Tick k = attempts[i];
+                Tick m = TickImpl.Deserialize(TickImpl.Serialize(k));
+                v &= m.trade == k.trade;
+            }
+            double time = DateTime.Now.Subtract(start).TotalSeconds;
+            Assert.IsTrue(v);
+            Assert.LessOrEqual(time, .20);
+            Console.WriteLine(string.Format("Tick serialization: {0:n2} {1:n0}t/s", time, OPS / time));
+ 
+
+        }
+
 
     }
 }

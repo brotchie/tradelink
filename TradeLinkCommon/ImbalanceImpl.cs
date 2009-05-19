@@ -8,9 +8,8 @@ namespace TradeLink.Common
     /// <summary>
     /// receive imbalance information via tradelink
     /// </summary>
-    public class ImbalanceImpl : Imbalance
+    public struct ImbalanceImpl : Imbalance
     {
-        public ImbalanceImpl() { }
         public ImbalanceImpl(string sym, string ex, int size, int time, int psize, int ptime, int info)
         {
             _time = time;
@@ -21,13 +20,13 @@ namespace TradeLink.Common
             _psize = psize;
             _info = info;
         }
-        string _sym = "";
-        string _ex = "NYSE";
-        int _size = 0;
-        int _psize = 0;
-        int _time = 0;
-        int _ptime = 0;
-        int _info = 0;
+        string _sym;
+        string _ex;
+        int _size;
+        int _psize;
+        int _time;
+        int _ptime;
+        int _info;
         public bool isValid { get { return (_sym != ""); } }
         public bool hasImbalance { get { return _size != 0; } }
         public bool hadImbalance { get { return _psize != 0; } }
@@ -43,20 +42,40 @@ namespace TradeLink.Common
         {
             ImbalanceImpl i = new ImbalanceImpl();
             string[] r = msg.Split(',');
-            i._size= Convert.ToInt32(r[(int)ImbalanceField.IF_SIZE]);
-            i._time= Convert.ToInt32(r[(int)ImbalanceField.IF_TIME]);
-            i._psize= Convert.ToInt32(r[(int)ImbalanceField.IF_PSIZE]);
-            i._ptime= Convert.ToInt32(r[(int)ImbalanceField.IF_PTIME]);
+            int v = 0;
+            if (int.TryParse(r[(int)ImbalanceField.IF_SIZE], out v))
+                i._size = v;
+            if (int.TryParse(r[(int)ImbalanceField.IF_TIME], out v))
+                i._time = v;
+            if (int.TryParse(r[(int)ImbalanceField.IF_PSIZE], out v))
+                i._psize = v;
+            if (int.TryParse(r[(int)ImbalanceField.IF_PTIME], out v))
+                i._ptime = v;
+            if (int.TryParse(r[(int)ImbalanceField.IF_INFO], out v))
+                i._info = v;
             i._sym= r[(int)ImbalanceField.IF_SYM];
             i._ex= r[(int)ImbalanceField.IF_EX];
-            i._info = Convert.ToInt32(r[(int)ImbalanceField.IF_INFO]);
             return i;
         }
 
         public static string Serialize(Imbalance i)
         {
-            string[] r = new string[] { i.Symbol, i.Exchange, i.ThisImbalance.ToString(), i.ThisTime.ToString(), i.PrevImbalance.ToString(), i.PrevTime.ToString(),i.InfoImbalance.ToString() };
-            return string.Join(",", r);
+            char d = ',';
+            StringBuilder sb = new StringBuilder();
+            sb.Append(i.Symbol);
+            sb.Append(d);
+            sb.Append(i.Exchange);
+            sb.Append(d);
+            sb.Append(i.ThisImbalance);
+            sb.Append(d);
+            sb.Append(i.ThisTime);
+            sb.Append(d);
+            sb.Append(i.PrevImbalance);
+            sb.Append(d);
+            sb.Append(i.PrevTime);
+            sb.Append(d);
+            sb.Append(i.InfoImbalance);
+            return sb.ToString();
         }
 
         public override string ToString()

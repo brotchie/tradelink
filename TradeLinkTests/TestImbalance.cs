@@ -45,6 +45,40 @@ namespace TestTradeLink
             Assert.AreEqual(i.InfoImbalance, ni.InfoImbalance);
         }
 
+        public static Imbalance[] SampleImbalanceData(int count)
+        {
+            Random r = new Random((int)DateTime.Now.Ticks);
+            string[] syms = TradeLink.Research.RandomSymbol.GetSymbols((int)DateTime.Now.Ticks, 4,count);
+            Imbalance[] imbs = new Imbalance[syms.Length];
+            for (int j = 0; j < syms.Length; j++)
+            {
+                imbs[j] = new ImbalanceImpl(syms[j], "NYSE", r.Next(-1000, 1000) * r.Next(1000), 1550, r.Next(-1000, 1000) * r.Next(1000), 1540, 0);
+            }
+            return imbs;
+
+        }
+
+        [Test]
+        public void Performance()
+        {
+            
+            const int OPS = 10000;
+
+            Imbalance[] imbs = SampleImbalanceData(OPS);
+            DateTime start = DateTime.Now;
+            bool v = true;
+            for (int i = 0; i < OPS; i++)
+            {
+                Imbalance im = ImbalanceImpl.Deserialize(ImbalanceImpl.Serialize(imbs[i]));
+                v &= im.ThisImbalance == imbs[i].ThisImbalance;
+            }
+
+            double time = DateTime.Now.Subtract(start).TotalSeconds;
+            Assert.IsTrue(v);
+            Assert.LessOrEqual(time,.15);
+            Console.WriteLine(string.Format("Imbalance performance: {0:n2} {1:n0}i/s",time,OPS/time));
+        }
+
 
 
     }

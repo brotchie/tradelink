@@ -53,10 +53,7 @@ namespace TestTradeLink
 
         }
 
-        void c_gotImbalance(Imbalance imb)
-        {
-            imbalances++;
-        }
+
 
         [Test]
         public void Imbalance()
@@ -149,9 +146,33 @@ namespace TestTradeLink
             // make sure fill was copied
             Assert.AreEqual(fills, copyfills);
         }
-        /*
+
         [Test]
-        public void PerformanceTests()
+        public void ImbalancePerformance()
+        {
+            const int OPS = 1000;
+            // reset count
+            imbalances = 0;
+            // get imbalances
+            Imbalance[] imbs = TestImbalance.SampleImbalanceData(OPS);
+            // start clock
+            DateTime start = DateTime.Now;
+            // send imbalances
+            for (int i = 0; i < OPS; i++)
+                s.newImbalance(imbs[i]);
+            // stop clock
+            double time = DateTime.Now.Subtract(start).TotalSeconds;
+            // verify time
+            Assert.LessOrEqual(time, .05);
+            // verify imbalance count
+            Assert.AreEqual(OPS,imbalances);
+            Console.WriteLine(string.Format("Protocol performance: {0:n2}s {1:n0}i/s", time, OPS / time));
+
+
+        }
+        
+        [Test]
+        public void TickPerformance()
         {
             // expected performance
             const decimal EXPECT = .10m;
@@ -184,7 +205,7 @@ namespace TestTradeLink
 
             // restore ticks
             ticks = save;
-        }*/
+        }
 
         // event handlers
 
@@ -224,6 +245,11 @@ namespace TestTradeLink
         void c2_gotFill(Trade t)
         {
             copyfills++;
+        }
+
+        void c_gotImbalance(Imbalance imb)
+        {
+            imbalances++;
         }
     }
 }

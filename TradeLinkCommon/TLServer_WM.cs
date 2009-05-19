@@ -89,7 +89,7 @@ namespace TradeLink.Common
                 if (!tick.isValid) return; // need a valid tick
                 for (int i = 0; i < client.Count; i++) // send tick to each client that has subscribed to tick's stock
                     if ((client[i] != null) && (stocks[i].Contains(tick.symbol)))
-                        WMUtil.SendMsg(TickImpl.Serialize(tick), MessageTypes.TICKNOTIFY, Handle, client[i]);
+                        WMUtil.SendMsg(TickImpl.Serialize(tick), hims[i],Handle, (int)MessageTypes.TICKNOTIFY );
             }
         }
 
@@ -126,6 +126,7 @@ namespace TradeLink.Common
         private List<DateTime> heart = new List<DateTime>();
         private List<string> stocks = new List<string>();
         private List<string> index = new List<string>();
+        private List<IntPtr> hims = new List<IntPtr>();
 
         private string SrvStocks(string him)
         {
@@ -149,6 +150,7 @@ namespace TradeLink.Common
             heart.Add(DateTime.Now);
             stocks.Add("");
             index.Add("");
+            hims.Add(WMUtil.HisHandle(cname));
             SrvBeatHeart(cname);
         }
         
@@ -185,6 +187,7 @@ namespace TradeLink.Common
             stocks.RemoveAt(cid);
             heart.RemoveAt(cid);
             index.RemoveAt(cid);
+            hims.RemoveAt(cid);
         }
 
         void SrvBeatHeart(string cname)
@@ -212,7 +215,7 @@ namespace TradeLink.Common
         public void newImbalance(Imbalance imb)
         {
             for (int i = 0; i < client.Count; i++)
-                WMUtil.SendMsg(ImbalanceImpl.Serialize(imb), MessageTypes.IMBALANCERESPONSE, Handle, client[i]);
+                WMUtil.SendMsg(ImbalanceImpl.Serialize(imb), hims[i],Handle, (int)MessageTypes.IMBALANCERESPONSE );
         }
 
         public Providers newProviderName = Providers.TradeLink;
