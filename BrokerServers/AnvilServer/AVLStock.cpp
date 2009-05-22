@@ -34,7 +34,7 @@ AVLStock::AVLStock(const char* symbol, TradeLibFast::TLServer_WM* tlinst, bool l
     }
 	for(unsigned int i = 0; i < MAX_BOOKS; i++)
     {
-        booki[i] = 1;//number of book lines integrated in Level2
+        booki[i] = dep;//number of book lines integrated in Level2
     }
 }
 
@@ -100,8 +100,8 @@ void AVLStock::Load()
 	    m_level2->Add(this);
 		m_account->Add(this);
 		// setup book iterators which are used to get top of book and t&s when updates come in
-		bidi = B_CreateLevel2AndBookIterator(m_stockHandle, true, false,false, booki, (depth + 1), this);
-		aski = B_CreateLevel2AndBookIterator(m_stockHandle, false, false,false, booki, (depth + 1), this);
+		bidi = B_CreateLevel2AndBookIterator(m_stockHandle, true, false,false, booki, 0xFFFFFFFF, this);
+		aski = B_CreateLevel2AndBookIterator(m_stockHandle, false, false,false, booki, 0xFFFFFFFF, this);
 		B_TransactionIteratorSetStock(pnti, m_stockHandle, this);
 		if (isLoaded())
 		{

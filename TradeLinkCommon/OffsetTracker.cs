@@ -57,16 +57,12 @@ namespace TradeLink.Common
         /// </summary>
         public void ClearCustom() { _offvals.Clear(); }
 
-        int _cancelpause = 10;
-        /// <summary>
-        /// sleep briefly after sending cancel orders to allow them to process.
-        /// </summary>
-        public int CancelSleep { get { return _cancelpause; } set { _cancelpause = value; } }
-
         void doupdate(string sym)
         {
             // is update ignored?
             if (IgnoreUpdate(sym)) return;
+            // get thread id
+            int thd = System.Threading.Thread.CurrentThread.ManagedThreadId;
             // get our offset values
             OffsetInfo off = GetOffset(sym);
             // see if we have profit
@@ -76,10 +72,8 @@ namespace TradeLink.Common
                 cancel(off.ProfitId);
                 // mark cancel pending
                 off.ProfitcancelPending = true;
-                // wait a moment to allow cancel to be received
-                System.Threading.Thread.Sleep(_cancelpause);
                 // notify
-                debug("found and canceled profit: " + off.ProfitId);
+                debug(string.Format("found and canceled profit: {0} {1} [{2}] ",sym,off.ProfitId,thd));
             }
             // see if we have stop
             if (off.hasStop)
@@ -88,10 +82,8 @@ namespace TradeLink.Common
                 cancel(off.StopId);
                 // mark cancel pending
                 off.StopcancelPending = true;
-                // wait a moment to allow cancel to be received
-                System.Threading.Thread.Sleep(_cancelpause);
                 // notify
-                debug("found and canceled stop: " + off.StopId);
+                debug(string.Format("found and canceled stop: {0} {1} [{2}] ", sym, off.StopId, thd));
             }
 
             if (!off.hasProfit)
@@ -345,17 +337,19 @@ namespace TradeLink.Common
         /// <param name="id"></param>
         public void GotCancel(uint id)
         {
+            // get thread id
+            int thd = System.Threading.Thread.CurrentThread.ManagedThreadId;
             // find any matching orders and reflect them as canceled
             foreach (string sym in _offvals.Keys)
             {
                 if (_offvals[sym].StopId == id)
                 {
-                    debug("cancel received: " + id.ToString());
+                    debug(string.Format("cancel received: {0} {1} [{2}]",sym,id.ToString(),thd));
                     _offvals[sym].StopId = 0;
                }
                 else if (_offvals[sym].ProfitId == id)
                 {
-                    debug("cancel received: " + id.ToString());
+                    debug(string.Format("cancel received: {0} {1} [{2}]", sym, id.ToString(), thd));
                     _offvals[sym].ProfitId = 0;
                 }
             }
