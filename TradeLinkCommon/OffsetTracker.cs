@@ -123,7 +123,7 @@ namespace TradeLink.Common
                     off.StopId = stop.id;
                     SendOffset(stop);
                     // notify
-                    debug(string.Format("sent new profit: {0} {1}", stop.id, stop.ToString()));
+                    debug(string.Format("sent new stop: {0} {1}", stop.id, stop.ToString()));
                 }
             }
             // make sure new offset info is reflected
