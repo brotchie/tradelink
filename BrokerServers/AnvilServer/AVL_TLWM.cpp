@@ -2,6 +2,7 @@
 #include "AVL_TLWM.h"
 #include "Util.h"
 #include "Messages.h"
+#include "MessageIds.h"
 
 
 namespace TradeLibFast
@@ -639,45 +640,44 @@ namespace TradeLibFast
 
 			}
 			break;
-			case M_MARKET_IMBALANCE:
+			case M_MS_NYSE_IMBALANCE: 
+			case M_MS_NYSE_IMBALANCE_NONE:
+				{
+					if ((imbalance_client == -1)|| (client[imbalance_client]=="")) return;
+					if (additionalInfo && (additionalInfo->GetType()==M_AI_STOCK_MOVEMENT))
+					{
+						const StockMovement* sm = ((MsgStockMovement*)additionalInfo)->m_stock;
+						TLImbalance imb;
+						imb.Symbol = CString(sm->GetSymbol());
+						imb.ThisImbalance = sm->GetNyseImbalance();
+						imb.PrevImbalance = sm->GetNysePreviousImbalance();
+						imb.Ex = CString("NYSE");
+						imb.ThisTime = sm->GetNyseImbalanceTime();
+						imb.PrevTime = sm->GetNysePreviousImbalanceTime();
+						TLSend(IMBALANCERESPONSE,TLImbalance::Serialize(imb),client[imbalance_client]);
+
+					}
+
+					break;
+				}
 			case M_NEW_MARKET_IMBALANCE:
 				{
 					if ((imbalance_client == -1)|| (client[imbalance_client]=="")) return;
 					if (additionalInfo && (additionalInfo->GetType()==M_AI_STOCK_MOVEMENT))
 					{
 						const StockMovement* sm = ((MsgStockMovement*)additionalInfo)->m_stock;
-						// get new york imbalance to see what type it is
-						int ni = sm->GetNyseImbalance();
-						int pi = sm->GetNysePreviousImbalance();
-						// if we have new york data, assume new york imbalance
-						if (ni+pi!=0) 
-						{
-							TLImbalance nyi;
-							nyi.Symbol = CString(sm->GetSymbol());
-							nyi.ThisImbalance = ni;
-							nyi.PrevImbalance = pi;
-							nyi.Ex = CString("NYSE");
-							nyi.ThisTime = sm->GetNyseImbalanceTime();
-							nyi.PrevTime = sm->GetNysePreviousImbalanceTime();
-							if (nyi.hasImbalance()||nyi.hadImbalance())
-								TLSend(IMBALANCERESPONSE,TLImbalance::Serialize(nyi),client[imbalance_client]);
-						}
-						else // otherwise it's nasdaq
-						{
-							TLImbalance qyi;
-							qyi.Symbol = CString(sm->GetSymbol());
-							qyi.ThisImbalance = sm->GetNasdaqImbalance();
-							qyi.PrevImbalance = sm->GetNasdaqPreviousImbalance();
-							qyi.Ex = CString("NASDAQ");
-							qyi.ThisTime = sm->GetNasdaqImbalanceTime();
-							qyi.PrevTime = sm->GetNasdaqPreviousImbalanceTime();
-							if (qyi.hasImbalance()||qyi.hadImbalance())
-								TLSend(IMBALANCERESPONSE,TLImbalance::Serialize(qyi),client[imbalance_client]);
-						}
+						TLImbalance imb;
+						imb.Symbol = CString(sm->GetSymbol());
+						imb.ThisImbalance = sm->GetNasdaqImbalance();
+						imb.PrevImbalance = sm->GetNasdaqPreviousImbalance();
+						imb.Ex = CString("NASDAQ");
+						imb.ThisTime = sm->GetNasdaqImbalanceTime();
+						imb.PrevTime = sm->GetNasdaqPreviousImbalanceTime();
+						TLSend(IMBALANCERESPONSE,TLImbalance::Serialize(imb),client[imbalance_client]);
 					}
 
-					break;
 				}
+				break;
 		} // switchend
 	}
 
