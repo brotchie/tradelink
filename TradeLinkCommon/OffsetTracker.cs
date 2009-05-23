@@ -57,69 +57,75 @@ namespace TradeLink.Common
         /// </summary>
         public void ClearCustom() { _offvals.Clear(); }
 
+        object _lock = new object();
+
         void doupdate(string sym)
         {
             // is update ignored?
             if (IgnoreUpdate(sym)) return;
             // get thread id
             int thd = System.Threading.Thread.CurrentThread.ManagedThreadId;
-            // get our offset values
-            OffsetInfo off = GetOffset(sym);
-            // see if we have profit
-            if (off.hasProfit)
+            // make sure we're only running one thread through this section
+            lock (_lock)
             {
-                // cancel existing profits
-                cancel(off.ProfitId);
-                // mark cancel pending
-                off.ProfitcancelPending = true;
-                // notify
-                debug(string.Format("found and canceled profit: {0} {1} [{2}] ",sym,off.ProfitId,thd));
-            }
-            // see if we have stop
-            if (off.hasStop)
-            {
-                // cancel existing stops
-                cancel(off.StopId);
-                // mark cancel pending
-                off.StopcancelPending = true;
-                // notify
-                debug(string.Format("found and canceled stop: {0} {1} [{2}] ", sym, off.StopId, thd));
-            }
+                // get our offset values
+                OffsetInfo off = GetOffset(sym);
+                // see if we have profit
+                if (off.hasProfit)
+                {
+                    // cancel existing profits
+                    cancel(off.ProfitId);
+                    // mark cancel pending
+                    off.ProfitcancelPending = true;
+                    // notify
+                    debug(string.Format("found and canceled profit: {0} {1} [{2}] ", sym, off.ProfitId, thd));
+                }
+                // see if we have stop
+                if (off.hasStop)
+                {
+                    // cancel existing stops
+                    cancel(off.StopId);
+                    // mark cancel pending
+                    off.StopcancelPending = true;
+                    // notify
+                    debug(string.Format("found and canceled stop: {0} {1} [{2}] ", sym, off.StopId, thd));
+                }
 
-            if (!off.hasProfit)
-            {
-                // since we have no stop, it's cancel can't be pending
-                off.ProfitcancelPending = false;
-                // get new profit
-                Order profit = Calc.PositionProfit(_pt[sym], off.ProfitDist, off.ProfitPercent, off.NormalizeSize, off.MinimumLotSize);
-                // if it's valid, send and track it
-                if (profit.isValid)
+                if (!off.hasProfit)
                 {
-                    profit.id = Ids.AssignId;
-                    off.ProfitId = profit.id;
-                    SendOffset(profit);
-                    // notify
-                    debug(string.Format("sent new profit: {0} {1}", profit.id, profit.ToString()));
+                    // since we have no stop, it's cancel can't be pending
+                    off.ProfitcancelPending = false;
+                    // get new profit
+                    Order profit = Calc.PositionProfit(_pt[sym], off.ProfitDist, off.ProfitPercent, off.NormalizeSize, off.MinimumLotSize);
+                    // if it's valid, send and track it
+                    if (profit.isValid)
+                    {
+                        profit.id = Ids.AssignId;
+                        off.ProfitId = profit.id;
+                        SendOffset(profit);
+                        // notify
+                        debug(string.Format("sent new profit: {0} {1}", profit.id, profit.ToString()));
+                    }
                 }
-            }
-            if (!off.hasStop)
-            {
-                // since we have no stop, it's cancel can't be pending
-                off.StopcancelPending = false;
-                // get new stop
-                Order stop = Calc.PositionStop(_pt[sym], off.StopDist, off.StopPercent, off.NormalizeSize, off.MinimumLotSize);
-                // if it's valid, send and track
-                if (stop.isValid)
+                if (!off.hasStop)
                 {
-                    stop.id = Ids.AssignId;
-                    off.StopId = stop.id;
-                    SendOffset(stop);
-                    // notify
-                    debug(string.Format("sent new stop: {0} {1}", stop.id, stop.ToString()));
+                    // since we have no stop, it's cancel can't be pending
+                    off.StopcancelPending = false;
+                    // get new stop
+                    Order stop = Calc.PositionStop(_pt[sym], off.StopDist, off.StopPercent, off.NormalizeSize, off.MinimumLotSize);
+                    // if it's valid, send and track
+                    if (stop.isValid)
+                    {
+                        stop.id = Ids.AssignId;
+                        off.StopId = stop.id;
+                        SendOffset(stop);
+                        // notify
+                        debug(string.Format("sent new stop: {0} {1}", stop.id, stop.ToString()));
+                    }
                 }
+                // make sure new offset info is reflected
+                SetOffset(sym, off);
             }
-            // make sure new offset info is reflected
-            SetOffset(sym, off);
 
 
         }
@@ -339,18 +345,22 @@ namespace TradeLink.Common
         {
             // get thread id
             int thd = System.Threading.Thread.CurrentThread.ManagedThreadId;
-            // find any matching orders and reflect them as canceled
-            foreach (string sym in _offvals.Keys)
+            // one thread at a time
+            lock (_lock)
             {
-                if (_offvals[sym].StopId == id)
+                // find any matching orders and reflect them as canceled
+                foreach (string sym in _offvals.Keys)
                 {
-                    debug(string.Format("cancel received: {0} {1} [{2}]",sym,id.ToString(),thd));
-                    _offvals[sym].StopId = 0;
-               }
-                else if (_offvals[sym].ProfitId == id)
-                {
-                    debug(string.Format("cancel received: {0} {1} [{2}]", sym, id.ToString(), thd));
-                    _offvals[sym].ProfitId = 0;
+                    if (_offvals[sym].StopId == id)
+                    {
+                        debug(string.Format("cancel received: {0} {1} [{2}]", sym, id.ToString(), thd));
+                        _offvals[sym].StopId = 0;
+                    }
+                    else if (_offvals[sym].ProfitId == id)
+                    {
+                        debug(string.Format("cancel received: {0} {1} [{2}]", sym, id.ToString(), thd));
+                        _offvals[sym].ProfitId = 0;
+                    }
                 }
             }
 

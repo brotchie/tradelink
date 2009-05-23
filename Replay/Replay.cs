@@ -213,6 +213,11 @@ namespace Replay
         private void playbut_Click(object sender, EventArgs e)
         {
             status("preparing simulation");
+            if (_playback.IsBusy)
+            {
+                status("simulation already in progress");
+                return;
+            }
             // clear highs and lows
             highs = new Dictionary<string, decimal>();
             lows = new Dictionary<string, decimal>();
