@@ -452,7 +452,8 @@ namespace Kadina
                 myres.SendDebug += new DebugFullDelegate(myres_GotDebug);
                 myres.SendCancel += new UIntDelegate(myres_CancelOrderSource);
                 myres.SendOrder += new OrderDelegate(myres_SendOrder);
-                myres.SendIndicators += new StringParamDelegate(myres_SendIndicators); 
+                myres.SendIndicators += new StringParamDelegate(myres_SendIndicators);
+                myres.SendMessage += new MessageDelegate(myres_SendMessage);
                 h.SimBroker.GotOrder += new OrderDelegate(myres.GotOrder);
                 h.SimBroker.GotFill += new FillDelegate(myres.GotFill);
                 h.GotTick += new TickDelegate(myres.GotTick);
@@ -461,6 +462,11 @@ namespace Kadina
             }
             else status("Response did not load.");
 
+        }
+
+        void myres_SendMessage(MessageTypes type, uint id, string data)
+        {
+            status("SendMessage command not supported in kadina.");
         }
         public const string PROGRAM = "Kadina";
         void updatetitle() { Text = PROGRAM + " - Study: " + resname + " " + PrettyEPF(); Invalidate(); }

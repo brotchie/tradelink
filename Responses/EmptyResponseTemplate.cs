@@ -26,6 +26,7 @@ namespace Responses
         public void GotOrderCancel(uint cancelid)
         {
         }
+        public void GotMessage(MessageTypes type, uint id, string data) { }
         public void Reset() { }
         public void GotPosition(Position p) { }
         public bool isValid { get { return true; } set { } }
@@ -36,5 +37,6 @@ namespace Responses
         public event OrderDelegate SendOrder;
         public event UIntDelegate SendCancel;
         public event StringParamDelegate SendIndicators;
+        public event MessageDelegate SendMessage;
     }
 }

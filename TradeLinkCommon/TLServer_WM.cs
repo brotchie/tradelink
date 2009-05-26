@@ -315,8 +315,8 @@ namespace TradeLink.Common
                     break;
                 default:
                     if (newUnknownRequest != null)
-                        result = newUnknownRequest(tlm.type,msg);
-                    else 
+                        newUnknownRequest(tlm.type,msg);
+                    else
                         result = (long)MessageTypes.FEATURE_NOT_IMPLEMENTED;
                     break;
             }

@@ -25,6 +25,7 @@ namespace TradeLink.Common
         public event MessageTypesMsgDelegate gotSupportedFeatures;
         public event PositionDelegate gotPosition;
         public event ImbalanceDelegate gotImbalance;
+        public event MessageDelegate gotUnknownMessage;
 
         public TLClient_WM() : this("TradeLinkClient",true,true) { }
         public TLClient_WM(string clientname, bool showwarningonmissing) : this(clientname, showwarningonmissing, true) { }
@@ -396,6 +397,10 @@ namespace TradeLink.Common
                     Imbalance i = ImbalanceImpl.Deserialize(msg);
                     if (gotImbalance != null)
                         gotImbalance(i);
+                    break;
+                default:
+                    if (gotUnknownMessage != null)
+                        gotUnknownMessage(tlm.type, 0, tlm.body);
                     break;
             }
             result = 0;

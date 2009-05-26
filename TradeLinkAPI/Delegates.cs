@@ -3,7 +3,6 @@
 namespace TradeLink.API
 {
     public delegate void StringParamDelegate(string param);
-    public delegate void MessageDelegate(MessageTypes msgid, string source);
     public delegate void TickDelegate(Tick t);
     public delegate void FillDelegate(Trade t);
     public delegate void OrderDelegate(Order o);
@@ -25,4 +24,5 @@ namespace TradeLink.API
     public delegate void SymBarIntervalDelegate(string symbol, int interval);
     public delegate void ImbalanceDelegate(Imbalance imb);
     public delegate void VoidDelegate();
+    public delegate void MessageDelegate(MessageTypes type, uint id, string data);
 }

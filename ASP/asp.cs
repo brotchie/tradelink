@@ -63,6 +63,7 @@ namespace ASP
             tl.gotOrderCancel += new UIntDelegate(tl_gotOrderCancel);
             tl.gotPosition += new PositionDelegate(tl_gotPosition);
             tl.gotAccounts += new DebugDelegate(tl_gotAccounts);
+            tl.gotUnknownMessage += new MessageDelegate(tl_gotUnknownMessage);
             // if we have a server
             if (tl.LinkType != TLTypes.NONE)
             {
@@ -87,6 +88,15 @@ namespace ASP
             LoadResponseDLL(Properties.Settings.Default.boxdll);
             // load any skins we can find
             findskins();
+        }
+
+        void tl_gotUnknownMessage(MessageTypes type, uint id, string data)
+        {
+            // send unknown messages to valid responses
+            foreach (string sym in _symidx.Keys)
+                foreach (int idx in _symidx[sym])
+                    if (_reslist[idx].isValid)
+                        _reslist[idx].GotMessage(type, id, data);
         }
 
 
@@ -451,6 +461,7 @@ namespace ASP
             _workingres.SendOrder += new OrderDelegate(workingres_SendOrder);
             _workingres.SendDebug+= new DebugFullDelegate(workingres_GotDebug);
             _workingres.SendCancel+= new UIntDelegate(workingres_CancelOrderSource);
+            _workingres.SendMessage += new MessageDelegate(_workingres_SendMessage);
 
             // save the dll that contains the class for use with skins
             string dll = string.Empty;
@@ -460,6 +471,11 @@ namespace ASP
             else // otherwise replace current dll as providing this class
                 _class2dll[resname] = Properties.Settings.Default.boxdll;
 
+        }
+
+        void _workingres_SendMessage(MessageTypes type, uint id, string data)
+        {
+            tl.TLSend(type, data);
         }
 
         void workingres_SendOrder(Order o)

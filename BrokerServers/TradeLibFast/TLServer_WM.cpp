@@ -194,7 +194,14 @@ namespace TradeLibFast
 				}
 		}
 
-		return UnknownMessage(MessageType,msg);
+		int um = UnknownMessage(MessageType,msg);
+		// issue #141
+		CString data;
+		data.Format("%i",um);
+		for (uint i = 0; i<client.size(); i++)
+			TLSend(MessageType,data,client[i]);
+		// this will go away soon
+		return um;
 	}
 
 	int TLServer_WM::UnknownMessage(int MessageType, CString msg)

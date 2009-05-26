@@ -51,6 +51,15 @@ namespace TradeLink.Common
 
         }
         /// <summary>
+        /// called when unknown message arrives.   
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="id"></param>
+        /// <param name="data"></param>
+        public virtual void GotMessage(MessageTypes type, uint id, string data)
+        {
+        }
+        /// <summary>
         /// Call this to reset your response parameters.
         /// You might need to reset groups of indicators or internal counters.
         /// eg : MovingAverage = 0;
@@ -114,6 +123,13 @@ namespace TradeLink.Common
         /// <param name="indicators"></param>
         public void sendindicators(string indicators) { SendIndicators(indicators); }
         /// <summary>
+        /// sends a message
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="id"></param>
+        /// <param name="data"></param>
+        public void sendmessage(MessageTypes type, uint id, string data) { sendmessage(type, id, data); }
+        /// <summary>
         /// sends a debug message about what your response is doing at the moment.
         /// </summary>
         /// <param name="msg"></param>
@@ -150,5 +166,6 @@ namespace TradeLink.Common
         public event OrderDelegate SendOrder;
         public event UIntDelegate SendCancel;
         public event StringParamDelegate SendIndicators;
+        public event MessageDelegate SendMessage;
     }
 }

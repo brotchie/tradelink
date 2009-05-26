@@ -80,6 +80,8 @@ namespace Responses
         {
         }
 
+        public void GotMessage(MessageTypes t, uint id, string data) { }
+
         public void GotPosition(Position p) { }
 
         string[] _inds = new string[0];
@@ -95,5 +97,6 @@ namespace Responses
         public event OrderDelegate SendOrder;
         public event UIntDelegate SendCancel;
         public event StringParamDelegate SendIndicators;
+        public event MessageDelegate SendMessage;
     }
 }

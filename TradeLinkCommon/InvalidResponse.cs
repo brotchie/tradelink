@@ -26,6 +26,7 @@ namespace TradeLink.Common
         string _name = "";
         string _fn = "InvalidResponse";
         public void Reset() { }
+        public void GotMessage(MessageTypes t, uint id, string data) { }
         public void GotPosition(Position p) { }
         public bool isValid { get { return false; } set { } }
         public string[] Indicators { get { return new string[0]; } set { } }
@@ -35,5 +36,6 @@ namespace TradeLink.Common
         public event OrderDelegate SendOrder;
         public event UIntDelegate SendCancel;
         public event StringParamDelegate SendIndicators;
+        public event MessageDelegate SendMessage;
     }
 }

@@ -350,12 +350,18 @@ namespace WinGauntlet
             if ((args.Response== null) || !args.Response.isValid)
                 return false;
             if (_boundonce) return true;
+            args.Response.SendMessage += new MessageDelegate(Response_SendMessage);
             args.Response.SendIndicators += new StringParamDelegate(Response_SendIndicators);
             args.Response.SendDebug += new DebugFullDelegate(Response_GotDebug);
             args.Response.SendCancel += new UIntDelegate(Response_CancelOrderSource);
             args.Response.SendOrder += new OrderDelegate(Response_SendOrder);
             _boundonce = true;
             return true;
+        }
+
+        void Response_SendMessage(MessageTypes type, uint id, string data)
+        {
+            
         }
 
         void Response_SendIndicators(string param)

@@ -12,12 +12,14 @@ namespace TradeLink.API
         void GotFill(Trade fill);
         void GotOrderCancel(uint orderid);
         void GotPosition(Position pos);
+        void GotMessage(MessageTypes type, uint id, string data);
 
         // Response output
         event StringParamDelegate SendIndicators;
         event OrderDelegate SendOrder;
         event UIntDelegate SendCancel;
         event DebugFullDelegate SendDebug;
+        event MessageDelegate SendMessage;
 
         // response control
         void Reset();
