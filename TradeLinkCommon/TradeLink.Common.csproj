@@ -56,8 +56,12 @@
     <Compile Include="AsyncResponse.cs" />
     <Compile Include="Auth.cs" />
     <Compile Include="BarImpl.cs" />
+    <Compile Include="BarIntervalData.cs" />
     <Compile Include="BarListImpl.cs" />
     <Compile Include="BarListTracker.cs" />
+    <Compile Include="BarTickIntervalData.cs" />
+    <Compile Include="BarTimeIntervalData.cs" />
+    <Compile Include="BarVolIntervalData.cs" />
     <Compile Include="Calc.cs" />
     <Compile Include="Broker.cs" />
     <Compile Include="ChartImpl.cs">

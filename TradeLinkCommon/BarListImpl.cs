@@ -15,7 +15,7 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="intervals"></param>
         /// <returns></returns>
-        public static BarInterval[] Int2BarInterval(int[] intervals) { List<BarInterval> o = new List<BarInterval>(); foreach (int i in intervals) { try { BarInterval bi = (BarInterval)i; o.Add(bi); } catch (Exception) { o.Add(BarInterval.Custom); } } return o.ToArray(); }
+        public static BarInterval[] Int2BarInterval(int[] intervals) { List<BarInterval> o = new List<BarInterval>(); foreach (int i in intervals) { try { BarInterval bi = (BarInterval)i; o.Add(bi); } catch (Exception) { o.Add(BarInterval.CustomTime); } } return o.ToArray(); }
         /// <summary>
         /// converts array of BarIntervals to integer intervals.
         /// </summary>
@@ -48,7 +48,14 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="symbol"></param>
         /// <param name="interval"></param>
-        public BarListImpl(string symbol, int interval) : this(symbol, new int[] { interval }) { }
+        public BarListImpl(string symbol, int interval) : this(symbol, interval, BarInterval.CustomTime) { }
+        /// <summary>
+        /// creates a barlist with custom interval and a custom type (tick/vol)
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <param name="interval"></param>
+        /// <param name="type"></param>
+        public BarListImpl(string symbol, int interval, BarInterval type) : this(symbol, new int[] { interval }, new BarInterval[] { type }) { }
         /// <summary>
         /// creates a barlist with requested interval.  symbol will be defined by first tick received
         /// </summary>
@@ -63,14 +70,14 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="symbol"></param>
         /// <param name="intervals"></param>
-        public BarListImpl(string symbol, BarInterval[] intervals) : this(symbol,BarInterval2Int(intervals)) {}
+        public BarListImpl(string symbol, BarInterval[] intervals) : this(symbol,BarInterval2Int(intervals), intervals) {}
 
         /// <summary>
         /// creates a barlist with array of custom intervals
         /// </summary>
         /// <param name="symbol"></param>
         /// <param name="intervals"></param>
-        public BarListImpl(string symbol, int[] intervals)
+        public BarListImpl(string symbol, int[] intervals, BarInterval[] types)
         {            // set symbol
             _sym = symbol;
             // set intervals requested
@@ -90,8 +97,20 @@ namespace TradeLink.Common
                 // set default interval to first one
                 if (i == 0)
                     _defaultint = intervals[0];
-                // create data object
-                _intdata[i] = new IntervalData(intervals[i]);
+                // create data object appropriate for type of interval
+                switch (types[i])
+                {
+                    case BarInterval.CustomTicks:
+                        _intdata[i] = new TickIntervalData(intervals[i]);
+                        break;
+                    case BarInterval.CustomVol:
+                        _intdata[i] = new VolIntervalData(intervals[i]);
+                        break;
+                    default:
+                        _intdata[i] = new TimeIntervalData(intervals[i]);
+                        break;
+                }
+            
                 // subscribe to bar events
                 _intdata[i].NewBar += new SymBarIntervalDelegate(BarListImpl_NewBar);
             }
@@ -99,26 +118,26 @@ namespace TradeLink.Common
 
         int _defaultint = (int)BarInterval.FiveMin;
         // array functions
-        public decimal[] Open() { return _intdata[_intdataidx[_defaultint]].opens.ToArray(); }
-        public decimal[] High() { return _intdata[_intdataidx[_defaultint]].highs.ToArray(); }
-        public decimal[] Low() { return _intdata[_intdataidx[_defaultint]].lows.ToArray(); }
-        public decimal[] Close() { return _intdata[_intdataidx[_defaultint]].closes.ToArray(); }
-        public int[] Vol() { return _intdata[_intdataidx[_defaultint]].vols.ToArray(); }
-        public int[] Date() { return _intdata[_intdataidx[_defaultint]].dates.ToArray(); }
-        public int[] Time() { return _intdata[_intdataidx[_defaultint]].times.ToArray(); }
-        public decimal[] Open(int interval) { return _intdata[_intdataidx[interval]].opens.ToArray(); }
-        public decimal[] High(int interval) { return _intdata[_intdataidx[interval]].highs.ToArray(); }
-        public decimal[] Low(int interval) { return _intdata[_intdataidx[interval]].lows.ToArray(); }
-        public decimal[] Close(int interval) { return _intdata[_intdataidx[interval]].closes.ToArray(); }
-        public int[] Date(int interval) { return _intdata[_intdataidx[interval]].dates.ToArray(); }
-        public int[] Time(int interval) { return _intdata[_intdataidx[interval]].times.ToArray(); }
+        public decimal[] Open() { return _intdata[_intdataidx[_defaultint]].open().ToArray(); }
+        public decimal[] High() { return _intdata[_intdataidx[_defaultint]].high().ToArray(); }
+        public decimal[] Low() { return _intdata[_intdataidx[_defaultint]].low().ToArray(); }
+        public decimal[] Close() { return _intdata[_intdataidx[_defaultint]].close().ToArray(); }
+        public int[] Vol() { return _intdata[_intdataidx[_defaultint]].vol().ToArray(); }
+        public int[] Date() { return _intdata[_intdataidx[_defaultint]].date().ToArray(); }
+        public int[] Time() { return _intdata[_intdataidx[_defaultint]].time().ToArray(); }
+        public decimal[] Open(int interval) { return _intdata[_intdataidx[interval]].open().ToArray(); }
+        public decimal[] High(int interval) { return _intdata[_intdataidx[interval]].high().ToArray(); }
+        public decimal[] Low(int interval) { return _intdata[_intdataidx[interval]].low().ToArray(); }
+        public decimal[] Close(int interval) { return _intdata[_intdataidx[interval]].close().ToArray(); }
+        public int[] Date(int interval) { return _intdata[_intdataidx[interval]].date().ToArray(); }
+        public int[] Time(int interval) { return _intdata[_intdataidx[interval]].time().ToArray(); }
 
-        public decimal[] Open(BarInterval interval) { return _intdata[_intdataidx[(int)interval]].opens.ToArray(); }
-        public decimal[] High(BarInterval interval) { return _intdata[_intdataidx[(int)interval]].highs.ToArray(); }
-        public decimal[] Low(BarInterval interval) { return _intdata[_intdataidx[(int)interval]].lows.ToArray(); }
-        public decimal[] Close(BarInterval interval) { return _intdata[_intdataidx[(int)interval]].closes.ToArray(); }
-        public int[] Date(BarInterval interval) { return _intdata[_intdataidx[(int)interval]].dates.ToArray(); }
-        public int[] Time(BarInterval interval) { return _intdata[_intdataidx[(int)interval]].times.ToArray(); }
+        public decimal[] Open(BarInterval interval) { return _intdata[_intdataidx[(int)interval]].open().ToArray(); }
+        public decimal[] High(BarInterval interval) { return _intdata[_intdataidx[(int)interval]].high().ToArray(); }
+        public decimal[] Low(BarInterval interval) { return _intdata[_intdataidx[(int)interval]].low().ToArray(); }
+        public decimal[] Close(BarInterval interval) { return _intdata[_intdataidx[(int)interval]].close().ToArray(); }
+        public int[] Date(BarInterval interval) { return _intdata[_intdataidx[(int)interval]].date().ToArray(); }
+        public int[] Time(BarInterval interval) { return _intdata[_intdataidx[(int)interval]].time().ToArray(); }
 
         /// <summary>
         /// gets intervals available/requested by this barlist when it was created
@@ -133,7 +152,7 @@ namespace TradeLink.Common
         /// set true for new bar.  don't use this, use GotNewBar event as it's faster.
         /// </summary>
         [Obsolete("this is deprecated method.  use GotNewBar event")]
-        public bool NewBar { get { return _intdata[_intdataidx[_defaultint]].isRecentNew; } }
+        public bool NewBar { get { return _intdata[_intdataidx[_defaultint]].isRecentNew(); } }
 
         // standard accessors
         /// <summary>
@@ -144,7 +163,7 @@ namespace TradeLink.Common
         /// returns true if bar has symbol and has requested intervals
         /// </summary>
         public bool isValid { get { return (_sym != string.Empty) && (_intdata.Length>0); } }
-        public IEnumerator GetEnumerator() { int idx = _intdataidx[_defaultint]; int max = _intdata[idx].Count; for (int i = 0; i < max; i++) yield return _intdata[idx].GetBar(Symbol); }
+        public IEnumerator GetEnumerator() { int idx = _intdataidx[_defaultint]; int max = _intdata[idx].Count(); for (int i = 0; i < max; i++) yield return _intdata[idx].GetBar(Symbol); }
         /// <summary>
         /// gets first bar in any interval
         /// </summary>
@@ -180,35 +199,35 @@ namespace TradeLink.Common
         /// <summary>
         /// gets the last bar in default interval
         /// </summary>
-        public int Last { get { return _intdata[_intdataidx[_defaultint]].Last; } }
+        public int Last { get { return _intdata[_intdataidx[_defaultint]].Last(); } }
         /// <summary>
         /// gets the # of bars in default interval
         /// </summary>
-        public int Count { get { return _intdata[_intdataidx[_defaultint]].Count; } }
+        public int Count { get { return _intdata[_intdataidx[_defaultint]].Count(); } }
         /// <summary>
         /// gets the last bar in specified interval
         /// </summary>
         /// <param name="interval"></param>
         /// <returns></returns>
-        public int LastInterval(BarInterval interval) { return _intdata[_intdataidx[(int)interval]].Last; }
+        public int LastInterval(BarInterval interval) { return _intdata[_intdataidx[(int)interval]].Last(); }
         /// <summary>
         /// gets the last bar for a specified seconds interval
         /// </summary>
         /// <param name="interval"></param>
         /// <returns></returns>
-        public int LastInterval(int interval) { return _intdata[_intdataidx[interval]].Last; }
+        public int LastInterval(int interval) { return _intdata[_intdataidx[interval]].Last(); }
         /// <summary>
         /// gets count of bars in specified interval
         /// </summary>
         /// <param name="interval"></param>
         /// <returns></returns>
-        public int CountInterval(BarInterval interval) { return _intdata[_intdataidx[(int)interval]].Count; }
+        public int CountInterval(BarInterval interval) { return _intdata[_intdataidx[(int)interval]].Count(); }
         /// <summary>
         /// gets the count of bars in a specified seconds interval
         /// </summary>
         /// <param name="interval"></param>
         /// <returns></returns>
-        public int CountInterval(int interval) { return _intdata[_intdataidx[interval]].Count; }
+        public int CountInterval(int interval) { return _intdata[_intdataidx[interval]].Count(); }
         /// <summary>
         /// gets most recent bar from default interval
         /// </summary>
@@ -257,14 +276,7 @@ namespace TradeLink.Common
         {
             foreach (IntervalData id in _intdata)
             {
-                id.opens.Clear();
-                id.highs.Clear();
-                id.lows.Clear();
-                id.closes.Clear();
-                id.dates.Clear();
-                id.times.Clear();
-                id.vols.Clear();
-                id.Count = 0;
+                id.Reset();
             }
         }
 
@@ -308,14 +320,7 @@ namespace TradeLink.Common
         }
         internal static void addbar(BarListImpl b, Bar mybar, int instdataidx)
         {
-            b._intdata[instdataidx].Count++;
-            b._intdata[instdataidx].closes.Add(mybar.Close);
-            b._intdata[instdataidx].opens.Add(mybar.Open);
-            b._intdata[instdataidx].dates.Add(mybar.Bardate);
-            b._intdata[instdataidx].highs.Add(mybar.High);
-            b._intdata[instdataidx].lows.Add(mybar.Close);
-            b._intdata[instdataidx].vols.Add(mybar.Volume);
-            b._intdata[instdataidx].times.Add(mybar.Bartime);
+            b._intdata[instdataidx].addbar(mybar);
         }
         /// <summary>
         /// Populate the day-interval barlist of this instance from a URL, where the results are returned as a CSV file.  URL should accept requests in the form of http://url/get.py?sym=IBM
@@ -370,99 +375,11 @@ namespace TradeLink.Common
 
     }
 
-    internal class IntervalData
-    {
-        internal event SymBarIntervalDelegate NewBar;
 
-        public IntervalData(int secondsPerInterval)
-        {
-            intervallength = secondsPerInterval;
-        }
-        void newbar()
-        {
-            opens.Add(0);
-            closes.Add(0);
-            highs.Add(0);
-            lows.Add(decimal.MaxValue);
-            vols.Add(0);
-            times.Add(0);
-            dates.Add(0);
-        }
-        long curr_barid = -1;
-        int intervallength = 60;
-        internal List<decimal> opens = new List<decimal>();
-        internal List<decimal> closes = new List<decimal>();
-        internal List<decimal> highs = new List<decimal>();
-        internal List<decimal> lows = new List<decimal>();
-        internal List<int> vols = new List<int>();
-        internal List<int> dates = new List<int>();
-        internal List<int> times = new List<int>();
-        internal int Last { get { return Count - 1; } }
-        internal int Count = 0;
-        internal bool isRecentNew = false;
-        internal Bar GetBar(int index,string symbol)
-        {
-            Bar b = new BarImpl();
-            if ((index<0) || (index>=Count)) return b;
-            b = new BarImpl(opens[index], highs[index], lows[index], closes[index], vols[index], dates[index],times[index],symbol);
-            if (index == Last) b.isNew = isRecentNew;
-            return b;
-        }
-        internal Bar GetBar(string symbol) { return GetBar(Last,symbol); }
-        internal void newTick(Tick k)
-        {
-            // only pay attention to trades and indicies
-            if (k.trade==0) return;
-            // get the barcount
-            long barid = getbarid(k);
-            // if not current bar
-            if (barid != curr_barid)
-            {
-                // create a new one
-                newbar();
-                // mark it
-                isRecentNew = true;
-                // count it
-                Count++;
-                // make it current
-                curr_barid = barid;
-                // set time
-                times[times.Count - 1] = k.time;
-                // set date
-                dates[dates.Count - 1] = k.date;
-            }
-            else isRecentNew = false;
-            // blend tick into bar
-            // open
-            if (opens[Last] == 0) opens[Last] = k.trade;
-            // high
-            if (k.trade > highs[Last]) highs[Last] = k.trade;
-            // low
-            if (k.trade < lows[Last]) lows[Last] = k.trade;
-            // close
-            closes[Last] = k.trade;
-            // don't set volume for index
-            if (k.isIndex) return;
-            // volume
-            vols[Last] += k.size;
-            // notify barlist
-            if (isRecentNew)
-                NewBar(k.symbol, intervallength);
 
-        }
 
-        private long getbarid(Tick k)
-        {
-            // get time elapsed to this point
-            int elap = Util.FT2FTS(k.time);
-            // get number of this bar in the day for this interval
-            long bcount = (int)((double)elap / intervallength);
-            // add the date to the front of number to make it unique
-            bcount += (long)k.date * 10000;
-            return bcount;
-        }
 
-    }
+
 
 
 }

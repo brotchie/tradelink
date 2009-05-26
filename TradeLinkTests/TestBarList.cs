@@ -211,6 +211,37 @@ namespace TestTradeLink
 
         }
 
+        [Test]
+        public void TickInterval()
+        {
+            // request 2 tick bars
+            const int MYINTERVAL = 2;
+            BarList bl = new BarListImpl(sym, MYINTERVAL, BarInterval.CustomTicks);
+            // verify custom interval
+            Assert.AreEqual(MYINTERVAL, bl.DefaultCustomInterval);
+            Assert.AreEqual(MYINTERVAL, bl.CustomIntervals[0]);
+            // iterate ticks
+            foreach (Tick k in SampleData())
+                bl.newTick(k);
+            // count em
+            Assert.AreEqual(5, bl.Count);
+        }
+
+        [Test]
+        public void VolInterval()
+        {            // request 300 volume bars
+            const int MYINTERVAL = 300;
+            BarList bl = new BarListImpl(sym, MYINTERVAL, BarInterval.CustomVol);
+            // verify custom interval
+            Assert.AreEqual(MYINTERVAL, bl.DefaultCustomInterval);
+            Assert.AreEqual(MYINTERVAL, bl.CustomIntervals[0]);
+            // iterate ticks
+            foreach (Tick k in SampleData())
+                bl.newTick(k);
+            // count em
+            Assert.AreEqual(4, bl.Count);
+        }
+
 
     }
 }

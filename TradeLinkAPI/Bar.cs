@@ -25,9 +25,17 @@ namespace TradeLink.API
     public enum BarInterval
     {
         /// <summary>
+        /// custom volume bars
+        /// </summary>
+        CustomVol = -3,
+        /// <summary>
+        /// custom tick bars
+        /// </summary>
+        CustomTicks = -2,
+        /// <summary>
         /// custom interval length
         /// </summary>
-        Custom = -1,
+        CustomTime = -1,
         /// <summary>
         /// One-minute intervals
         /// </summary>
