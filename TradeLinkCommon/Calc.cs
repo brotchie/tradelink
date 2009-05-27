@@ -233,7 +233,7 @@ namespace TradeLink.Common
         /// <param name="array"></param>
         /// <param name="barsback"></param>
         /// <returns></returns>
-        public static int Sum(int[] array, int barsback) { return Sum(array, array.Length - barsback, barsback); }
+        public static long Sum(int[] array, int barsback) { return Sum(array, array.Length - barsback, barsback); }
         /// <summary>
         /// sum part of an array
         /// </summary>
@@ -241,9 +241,9 @@ namespace TradeLink.Common
         /// <param name="startindex"></param>
         /// <param name="length"></param>
         /// <returns></returns>
-        public static int Sum(int[] array, int startindex, int length)
+        public static long Sum(int[] array, int startindex, int length)
         {
-            int sum = 0;
+            long sum = 0;
             for (int i = startindex; i < startindex + length; i++)
                 sum += array[i];
             return sum;
@@ -253,14 +253,14 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="array"></param>
         /// <returns></returns>
-        public static int Sum(int[] array) { return Sum(array, 0, array.Length); }
+        public static long Sum(int[] array) { return Sum(array, 0, array.Length); }
         /// <summary>
         /// gets sum of squares for end of an array
         /// </summary>
         /// <param name="array"></param>
         /// <param name="barsback"></param>
         /// <returns></returns>
-        public static int SumSquares(int[] array, int barsback) { return SumSquares(array, array.Length - barsback, barsback); }
+        public static long SumSquares(int[] array, int barsback) { return SumSquares(array, array.Length - barsback, barsback); }
         /// <summary>
         /// get sums of squares for part of an array
         /// </summary>
@@ -268,9 +268,9 @@ namespace TradeLink.Common
         /// <param name="startindex"></param>
         /// <param name="length"></param>
         /// <returns></returns>
-        public static int SumSquares(int[] array, int startindex, int length)
+        public static long SumSquares(int[] array, int startindex, int length)
         {
-            int sum = 0;
+            long sum = 0;
             for (int i = startindex; i < startindex + length; i++)
                 sum += array[i] * array[i];
             return sum;
@@ -282,7 +282,7 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="array"></param>
         /// <returns></returns>
-        public static int SumSquares(int[] array) { return SumSquares(array, 0, array.Length); }
+        public static long SumSquares(int[] array) { return SumSquares(array, 0, array.Length); }
 
         /// <summary>
         /// gets mean of an array
@@ -319,6 +319,27 @@ namespace TradeLink.Common
             for (int i = 0; i < s1.Length; i++)
                 s2[i] += s1[i];
             return s2;
+        }
+        /// <summary>
+        /// adds two arrays
+        /// </summary>
+        /// <param name="array1"></param>
+        /// <param name="array2"></param>
+        /// <returns></returns>
+        public static long[] AddBig(int[] array1, int[] array2)
+        {
+            // normalize sizes of arrays
+            bool a2bigger = array1.Length < array2.Length;
+            int max = a2bigger ? array2.Length : array1.Length;
+            int[] s1 = new int[max];
+            int[] s2 = new int[max];
+            long[] s3 = new long[max];
+            Buffer.BlockCopy(array1, 0, s1, 0, array1.Length * 4);
+            Buffer.BlockCopy(array2, 0, s2, 0, array2.Length * 4);
+            // calculate values
+            for (int i = 0; i < s1.Length; i++)
+                s3[i] = s1[i] + s2[i];
+            return s3;
         }
 
         /// <summary>
@@ -427,6 +448,27 @@ namespace TradeLink.Common
             for (int i = 0; i < s1.Length; i++)
                 s2[i] *= s1[i];
             return s2;
+        }
+        /// <summary>
+        /// multiplies two arrays
+        /// </summary>
+        /// <param name="array1"></param>
+        /// <param name="array2"></param>
+        /// <returns></returns>
+        public static long[] ProductBig(int[] array1, int[] array2)
+        {
+            // normalize sizes of arrays
+            bool a2bigger = array1.Length < array2.Length;
+            int max = a2bigger ? array2.Length : array1.Length;
+            int[] s1 = new int[max];
+            int[] s2 = new int[max];
+            long[] s3 = new long[max];
+            Buffer.BlockCopy(array1, 0, s1, 0, array1.Length * 4);
+            Buffer.BlockCopy(array2, 0, s2, 0, array2.Length * 4);
+            // calculate values
+            for (int i = 0; i < s1.Length; i++)
+                s3[i] = s2[i] * s1[i];
+            return s3;
         }
 
         /// <summary>

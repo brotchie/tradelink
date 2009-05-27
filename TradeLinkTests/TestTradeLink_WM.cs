@@ -166,7 +166,7 @@ namespace TestTradeLink
             Assert.LessOrEqual(time, .05);
             // verify imbalance count
             Assert.AreEqual(OPS,imbalances);
-            Console.WriteLine(string.Format("Protocol performance: {0:n2}s {1:n0}i/s", time, OPS / time));
+            Console.WriteLine(string.Format("Protocol performance (imbalance/sec): {0:n2}s {1:n0}", time, OPS / time));
 
 
         }

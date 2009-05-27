@@ -49,6 +49,10 @@ namespace TradeLibFast
 		}
 		B_DestroyIterator(iterator);
 		accounts.clear();
+		// remove all pointers to orders
+		for (uint i = 0; i<ordercache.size(); i++)
+			ordercache[i] = NULL;
+		// clear cache
 		ordercache.clear();
 
 		if (imbalance!=NULL)
@@ -479,6 +483,8 @@ namespace TradeLibFast
 				if(!stopOrder)
 					error = SO_INCORRECT_PRICE;
 			}
+			else
+				error = SO_INCORRECT_PRICE;
 
 		}
 		else if (o.isTrail())
@@ -515,8 +521,13 @@ namespace TradeLibFast
 				error = SO_INCORRECT_PRICE;
 			}
 		}
+		// make sure order sent is valid order
+		if (orderSent==NULL)
+			return EMPTY_ORDER;
+		// save order if it was accepted
 		if (error==0)
-			saveOrder(orderSent,o.id); // save order if it was accepted
+			error = saveOrder(orderSent,o.id) ? OK : DUPLICATE_ORDERID; 
+		// return result
 		return error;
 	}
 
@@ -530,6 +541,7 @@ namespace TradeLibFast
 	}
 	uint AVL_TLWM::fetchOrderId(Order* order)
 	{
+		if (order==NULL) return ORDER_NOT_FOUND;
 		for (uint i = 0; i<ordercache.size(); i++)
 			if (ordercache[i]==order) 
 				return orderids[i];
@@ -538,6 +550,8 @@ namespace TradeLibFast
 
 	bool AVL_TLWM::saveOrder(Order* o,uint id)
 	{
+		// fail if invalid order
+		if (o==NULL) return false;
 		if (id==0) // if id is zero, we auto-assign the id
 		{
 			vector<int> now;
@@ -595,53 +609,59 @@ namespace TradeLibFast
 
 			} // has additional info end
 			break;
+			case 41008: // undocumented- update order smart orders (stops)??
+			case 41025: // undocumented- assign id smart orders (stops)??
 			case M_POOL_ASSIGN_ORDER_ID://Original order sent has a unigue generated id. The server sends this message to notify you that the order was assigned a new id different from the original. Both ids are part of this notification structure. This message can come 1 or 2 times.
 			case M_POOL_UPDATE_ORDER:// Order status is modified
-			if(additionalInfo != NULL && additionalInfo->GetType() == M_AI_ORDER)
 			{
+				if(additionalInfo != NULL && additionalInfo->GetType() == M_AI_ORDER)
+				{
 
-				AIMsgOrder* info = (AIMsgOrder*)additionalInfo;
-				Order* order = info->m_order;
+					AIMsgOrder* info = (AIMsgOrder*)additionalInfo;
+					Order* order = info->m_order;
 
-				if ((order==NULL) || (info==NULL)) return; // don't process null orders
+					if ((order==NULL) || (info==NULL)) return; // don't process null orders
 
-				if (order->isDead()) return; // don't notify on dead orders
+					if (order->isDead()) return; // don't notify on dead orders
 
-				// try to save this order
-				bool isnew = saveOrder(order,0);
-				// if it fails, we already have it so get the id
-				// if it succeeds, we should be able to get the id anyways
-				uint id = fetchOrderId(order);
+					// try to save this order
+					bool isnew = saveOrder(order,0);
+					// if it fails, we already have it so get the id
+					// if it succeeds, we should be able to get the id anyways
+					uint id = fetchOrderId(order);
 
-				CTime ct = CTime::GetCurrentTime();
-				TLOrder o;
-				o.id = id;
-				o.price = order->isMarketOrder() ? 0: order->GetOrderPrice().toDouble();
-				o.stop = order->GetStopPrice()->toDouble();
-				o.time = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
-				o.date = (ct.GetYear()*10000)+(ct.GetMonth()*100)+ct.GetDay();
-				o.size = order->GetSize();
-				o.side = order->GetSide()=='B';
-				o.comment = order->GetUserDescription();
-				o.TIF = TIFName(order->GetTimeInForce());
-				o.account = CString(B_GetAccountName(order->GetAccount()));
-				o.symbol = CString(order->GetSymbol());
-				SrvGotOrder(o);
+					CTime ct = CTime::GetCurrentTime();
+					TLOrder o;
+					o.id = id;
+					o.price = order->isMarketOrder() ? 0: order->GetOrderPrice().toDouble();
+					o.stop = order->GetStopPrice()->toDouble();
+					o.time = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
+					o.date = (ct.GetYear()*10000)+(ct.GetMonth()*100)+ct.GetDay();
+					o.size = order->GetSize();
+					o.side = order->GetSide()=='B';
+					o.comment = order->GetUserDescription();
+					o.TIF = TIFName(order->GetTimeInForce());
+					o.account = CString(B_GetAccountName(order->GetAccount()));
+					o.symbol = CString(order->GetSymbol());
+					SrvGotOrder(o);
+				}
+			}
 				break;
-			} // has addt info / caseend
+			case 41027: // undocumented - cancel smart orders?? (stops?)
 			case M_REQ_CANCEL_ORDER:
 			{
 				AIMsgOrder* info = (AIMsgOrder*)additionalInfo;
 				Order* order = info->m_order;
 				unsigned int anvilid = order->GetId();
 				unsigned int id = fetchOrderId(order);
-				SrvGotCancel(id);
+				if (id>0)
+					SrvGotCancel(id);
 				break;
 
 			}
 			break;
 			case M_MS_NYSE_IMBALANCE: 
-			case M_MS_NYSE_IMBALANCE_NONE:
+			//case M_MS_NYSE_IMBALANCE_NONE:
 				{
 					if ((imbalance_client == -1)|| (client[imbalance_client]=="")) return;
 					if (additionalInfo && (additionalInfo->GetType()==M_AI_STOCK_MOVEMENT))
@@ -670,10 +690,13 @@ namespace TradeLibFast
 						imb.Symbol = CString(sm->GetSymbol());
 						imb.ThisImbalance = sm->GetNasdaqImbalance();
 						imb.PrevImbalance = sm->GetNasdaqPreviousImbalance();
-						imb.Ex = CString("NASDAQ");
-						imb.ThisTime = sm->GetNasdaqImbalanceTime();
-						imb.PrevTime = sm->GetNasdaqPreviousImbalanceTime();
-						TLSend(IMBALANCERESPONSE,TLImbalance::Serialize(imb),client[imbalance_client]);
+						if (imb.hasImbalance() || imb.hadImbalance()) 
+						{
+							imb.Ex = CString("NASDAQ");
+							imb.ThisTime = sm->GetNasdaqImbalanceTime();
+							imb.PrevTime = sm->GetNasdaqPreviousImbalanceTime();
+							TLSend(IMBALANCERESPONSE,TLImbalance::Serialize(imb),client[imbalance_client]);
+						}
 					}
 
 				}
@@ -730,6 +753,7 @@ namespace TradeLibFast
 		f.push_back(SENDORDERLIMIT);
 		f.push_back(SENDORDERSTOP);
 		f.push_back(SENDORDERTRAIL);
+		f.push_back(DOMREQUEST);
 		return f;
 	}
 
