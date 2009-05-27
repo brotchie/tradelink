@@ -300,8 +300,9 @@ namespace ASP
         {
             // make sure we are tracking this notifications symbol somewhere
             int[] idxs = new int[0];
-            if (!_symidx.TryGetValue(o.Sec.FullName, out idxs))
+            if (!_symidx.TryGetValue(o.Sec.Symbol, out idxs) && !_symidx.TryGetValue(o.Sec.FullName, out idxs))
                 return;
+
             // send order notification to every valid box
             foreach (int idx in idxs)
                 if (_reslist[idx].isValid)
@@ -349,7 +350,7 @@ namespace ASP
         {
             // see if we are tracking this symbol
             int[] idxs = new int[0];
-            if (!_symidx.TryGetValue(t.Sec.FullName, out idxs))
+            if (!_symidx.TryGetValue(t.Sec.Symbol, out idxs) && !_symidx.TryGetValue(t.Sec.FullName, out idxs))
                 return;
 
             // see if we should save this tick
@@ -371,7 +372,7 @@ namespace ASP
             // get requesting responses if any
             int[] idxs = new int[0];
             // if no requestors, ignore symbol
-            if (!_symidx.TryGetValue(t.Sec.FullName, out idxs))
+            if (!_symidx.TryGetValue(t.Sec.Symbol, out idxs) && !_symidx.TryGetValue(t.Sec.FullName, out idxs))
                 return;
             // send trade notification to any valid requesting responses
             foreach (int idx in idxs)
