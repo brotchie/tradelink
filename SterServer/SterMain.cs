@@ -17,7 +17,7 @@ namespace SterServer
         STIPosition stiPos = new STIPosition();
         STIQuote stiQuote = new STIQuote();
         STIBook stiBook = new STIBook();
-        TLServer_WM tl = new TLServer_WM(TLTypes.LIVEBROKER);
+        TLServer_WM tl = new TLServer_WM();
         public const string PROGRAM = "SterServer ";
         Timer tt = new Timer();
         bool imbalance = false;
@@ -73,6 +73,9 @@ namespace SterServer
         MessageTypes[] tl_newFeatureRequest()
         {
             List<MessageTypes> f = new List<MessageTypes>();
+            f.Add(MessageTypes.LIVEDATA);
+            f.Add(MessageTypes.LIVETRADING);
+            f.Add(MessageTypes.SIMTRADING);
             f.Add(MessageTypes.SENDORDER);
             f.Add(MessageTypes.ORDERCANCELREQUEST);
             f.Add(MessageTypes.ORDERCANCELRESPONSE);
