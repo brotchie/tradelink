@@ -22,7 +22,7 @@ namespace TradeLink.Common
         public event OrderDelegate gotOrder;
         public event DebugDelegate gotAccounts;
         public event UIntDelegate gotOrderCancel;
-        public event MessageTypesMsgDelegate gotSupportedFeatures;
+        public event MessageTypesMsgDelegate gotFeatures;
         public event PositionDelegate gotPosition;
         public event ImbalanceDelegate gotImbalance;
         public event MessageDelegate gotUnknownMessage;
@@ -36,11 +36,22 @@ namespace TradeLink.Common
             : base()
         {
             this.Text = WMUtil.GetUniqueWindow(clientname);
+            gotFeatures += new MessageTypesMsgDelegate(TLClient_WM_gotFeatures);
             this.WindowState = FormWindowState.Minimized;
             this.ShowInTaskbar = false;
             this.Hide();
             TLFound();
             this.Mode(ProviderIndex, handleexceptions, showarmingonmissingserver);
+        }
+
+        void TLClient_WM_gotFeatures(MessageTypes[] messages)
+        {
+            lock (RequestFeatureList)
+            {
+                RequestFeatureList.Clear();
+                foreach (MessageTypes mt in messages)
+                    RequestFeatureList.Add(mt);
+            }
         }
 
  
@@ -73,6 +84,7 @@ namespace TradeLink.Common
                     himh = WMUtil.HisHandle(srvrwin[ProviderIndex]);
                     LinkType = TLTypes.LIVEBROKER;
                     Register();
+                    RequestFeatures();
                     return true;
                 }
                 catch (TLServerNotFound)
@@ -96,6 +108,7 @@ namespace TradeLink.Common
             return false;
         }
 
+        [Obsolete("you should check RequestFeatures list instead for this information.",false)]
         public TLTypes LinkType = TLTypes.NONE;
 
         IntPtr himh = IntPtr.Zero;
@@ -126,7 +139,7 @@ namespace TradeLink.Common
         }
 
         public void RequestFeatures() { TLSend(MessageTypes.FEATUREREQUEST,Text); }
-
+        public List<MessageTypes> RequestFeatureList = new List<MessageTypes>();
         Dictionary<string, decimal> chighs = new Dictionary<string, decimal>();
         Dictionary<string, decimal> clows = new Dictionary<string, decimal>();
         Dictionary<string, PositionImpl> cpos = new Dictionary<string, PositionImpl>();
@@ -245,7 +258,6 @@ namespace TradeLink.Common
         {
             servers.Clear();
             srvrwin.Clear();
-            TLTypes f = TLTypes.NONE;
             string[] legacy = new string[] { WMUtil.SIMWINDOW, WMUtil.LIVEWINDOW, WMUtil.REPLAYWINDOW, WMUtil.TESTWINDOW, WMUtil.SERVERWINDOW };
             // see if we have a window running with this name and add it
             foreach (string name in legacy)
@@ -332,8 +344,8 @@ namespace TradeLink.Common
                         }
                         catch (Exception) { }
                     }
-                    if (gotSupportedFeatures != null) 
-                        gotSupportedFeatures(f.ToArray());
+                    if (gotFeatures != null) 
+                        gotFeatures(f.ToArray());
                     break;
                 case MessageTypes.IMBALANCERESPONSE:
                     Imbalance i = ImbalanceImpl.Deserialize(msg);

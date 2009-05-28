@@ -13,7 +13,7 @@ namespace Replay
 {
     public partial class Replay : Form
     {
-        TLServer_WM tl = new TLServer_WM(TLTypes.HISTORICALBROKER);
+        TLServer_WM tl = new TLServer_WM();
         Playback _playback = null;
         HistSim h = new HistSim();
         string tickfolder = Util.TLTickDir;
@@ -52,7 +52,9 @@ namespace Replay
         MessageTypes[] GetFeatures()
         {
             List<MessageTypes> f = new List<MessageTypes>();
-
+            f.Add(MessageTypes.SIMTRADING);
+            f.Add(MessageTypes.HISTORICALDATA);
+            f.Add(MessageTypes.HISTORICALTRADING);
             f.Add(MessageTypes.ACCOUNTREQUEST);
             f.Add(MessageTypes.ACCOUNTRESPONSE);
             f.Add(MessageTypes.EXECUTENOTIFY);

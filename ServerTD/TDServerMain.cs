@@ -26,7 +26,7 @@ namespace TDServer
 
         AmeritradeBrokerAPI api = new AmeritradeBrokerAPI();
         const string APIVER = "1";
-        TLServer_WM tl = new TLServer_WM(TLTypes.LIVEBROKER);
+        TLServer_WM tl = new TLServer_WM();
         public const string PROGRAM = "ServerTD BETA";
         public TDServerMain()
         {
@@ -169,6 +169,8 @@ namespace TDServer
             f.Add(MessageTypes.TICKNOTIFY);
             f.Add(MessageTypes.SENDORDERLIMIT);
             f.Add(MessageTypes.SENDORDERMARKET);
+            f.Add(MessageTypes.LIVETRADING);
+            f.Add(MessageTypes.LIVEDATA);
 
 
             return f.ToArray();

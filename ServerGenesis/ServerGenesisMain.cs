@@ -15,7 +15,7 @@ namespace ServerGenesis
     {
         public GTSession m_session;
         bool _ok = false;
-        TLServer_WM tl = new TLServer_WM(TLTypes.LIVEBROKER);
+        TLServer_WM tl = new TLServer_WM();
         string[] _sym = new string[0];
         List<GTStock> _stk = new List<GTStock>();
         public const string PROGRAM = "GenesisServer BETA";
@@ -139,6 +139,9 @@ namespace ServerGenesis
             f.Add(MessageTypes.FEATUREREQUEST);
             f.Add(MessageTypes.FEATURERESPONSE);
             f.Add(MessageTypes.VERSION);
+            f.Add(MessageTypes.LIVEDATA);
+            f.Add(MessageTypes.LIVETRADING);
+            f.Add(MessageTypes.SIMTRADING);
             return f.ToArray();
         }
 
