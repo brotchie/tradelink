@@ -19,6 +19,8 @@ namespace TradeLibFast
 		bool ENABLED;
 		__event void GotDebug(LPCTSTR msg);
 		CString debugbuffer;
+		long TLSend(int type,LPCTSTR msg, int clientid);
+		static long TLSend(int type,LPCTSTR msg, HWND dest);
 		static long TLSend(int type,LPCTSTR msg,CString windname);
 		void SrvGotOrder(TLOrder order);
 		void SrvGotFill(TLTrade trade);
@@ -33,6 +35,7 @@ namespace TradeLibFast
 		int MinorVer;
 
 		vector <CString>client; // map client ids to name
+		vector<HWND>hims; // store client handles
 		vector <time_t>heart; // map last contact to id
 		typedef vector <CString> clientstocklist; // hold a single clients stocks
 		vector < clientstocklist > stocks; // map stocklist to id
@@ -43,7 +46,6 @@ namespace TradeLibFast
 	public:
 		afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct);
 		int RegisterClient(CString  clientname);
-		int ServiceMessage(int MessageType, CString msg);
 		int HeartBeat(CString clientname);
 		virtual int UnknownMessage(int MessageType, CString msg);
 		virtual int BrokerName(void);
@@ -56,7 +58,8 @@ namespace TradeLibFast
 		virtual int ClearClient(CString client);
 		virtual int ClearStocks(CString client);
 		virtual int CancelRequest(long order);
-		virtual void Start(bool live = true);
+		virtual void Start();
+		virtual void Start(CString servername);
 
 		void D(const CString & message);
 

@@ -647,7 +647,7 @@ namespace TradeLibFast
 
 	int TLServer_IP::BrokerName(void)
 	{
-		return UnknownBroker;
+		return TradeLink;
 	}
 
 	int TLServer_IP::SendOrder(TLOrder order)

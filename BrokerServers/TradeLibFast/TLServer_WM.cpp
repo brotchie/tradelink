@@ -35,6 +35,7 @@ namespace TradeLibFast
 	TLServer_WM::~TLServer_WM()
 	{
 		debugbuffer = "";
+
 	}
 
 	CString TLServer_WM::Version()
@@ -97,26 +98,7 @@ namespace TradeLibFast
 	{
 		CString msg = (LPCTSTR)(pCopyDataStruct->lpData);
 		int type = (int)pCopyDataStruct->dwData;
-		return ServiceMessage(type,msg);
-	}
-
-
-	int TLServer_WM::RegisterClient(CString  clientname)
-	{
-		if (FindClient(clientname)!=-1) return OK;
-		client.push_back(clientname);
-		time_t now;
-		time(&now);
-		heart.push_back(now); // save heartbeat at client index
-		clientstocklist my = clientstocklist(0);
-		stocks.push_back(my);
-		D(CString(_T("Client ")+clientname+_T(" connected.")));
-		return OK;
-	}
-
-	int TLServer_WM::ServiceMessage(int MessageType, CString msg)
-	{
-		switch (MessageType)
+		switch (type)
 		{
 			case ORDERCANCELREQUEST :
 				{
@@ -192,16 +174,45 @@ namespace TradeLibFast
 				HeartBeat(client);
 				return DOMRequest(atoi(rec[1]));
 				}
+			default: // unknown messages
+				{
+					int um = UnknownMessage(type,msg);
+					// issue #141
+					CString data;
+					data.Format("%i",um);
+					for (uint i = 0; i<client.size(); i++)
+						TLSend(type,data,i);
+					// this will go away soon
+					return um;
+
+				}
 		}
 
-		int um = UnknownMessage(MessageType,msg);
-		// issue #141
-		CString data;
-		data.Format("%i",um);
-		for (uint i = 0; i<client.size(); i++)
-			TLSend(MessageType,data,client[i]);
-		// this will go away soon
-		return um;
+		return FEATURE_NOT_IMPLEMENTED;
+	}
+
+
+	int TLServer_WM::RegisterClient(CString  clientname)
+	{
+		// make sure client is unique
+		if (FindClient(clientname)!=-1) return OK;
+		// save client
+		client.push_back(clientname);
+		// get handle to client
+		HWND dest = FindWindowA(NULL,(LPCSTR)(LPCTSTR)clientname)->GetSafeHwnd();
+		// save client handle
+		hims.push_back(dest);
+		// get time
+		time_t now;
+		time(&now);
+		// save time as last heartbeat
+		heart.push_back(now); // save heartbeat at client index
+		// save empty list of symbols
+		clientstocklist my = clientstocklist(0);
+		stocks.push_back(my);
+		// notify users
+		D(CString(_T("Client ")+clientname+_T(" connected.")));
+		return OK;
 	}
 
 	int TLServer_WM::UnknownMessage(int MessageType, CString msg)
@@ -237,7 +248,7 @@ namespace TradeLibFast
 
 	int TLServer_WM::BrokerName(void)
 	{
-		return UnknownBroker;
+		return TradeLink;
 	}
 
 	int TLServer_WM::SendOrder(TLOrder order)
@@ -252,6 +263,7 @@ namespace TradeLibFast
 		client[cid] = "";
 		stocks[cid] = clientstocklist(0);
 		heart[cid] = NULL;
+		hims[cid] = NULL;
 		D(CString(_T("Client ")+clientname+_T(" disconnected.")));
 		return OK;
 	}
@@ -299,12 +311,12 @@ namespace TradeLibFast
 
 	void TLServer_WM::SrvGotTick(TLTick tick)
 	{
-		if (tick.sym=="") return;
+		//if (tick.sym=="") return;
 		for (uint i = 0; i<stocks.size(); i++)
 			for (uint j = 0; j<stocks[i].size(); j++)
 			{
 				if (stocks[i][j]==tick.sym)
-					TLSend(TICKNOTIFY,tick.Serialize(),client[i]);
+					TLSend(TICKNOTIFY,tick.Serialize(),i);
 			}
 	}
 
@@ -330,25 +342,45 @@ namespace TradeLibFast
 					return true;
 		return false;
 	}
-	void TLServer_WM::Start(bool live)
+	void TLServer_WM::Start() { Start("TradeLinkServer"); }
+	void TLServer_WM::Start(CString ServerName)
 	{
+		
 		if (!ENABLED)
 		{
-			CString wind(live ? LIVEWINDOW : SIMWINDOW);
-			this->Create(NULL, wind, 0,CRect(0,0,20,20), CWnd::GetDesktopWindow(),NULL);
-			this->ShowWindow(SW_HIDE); // hide our window
-			CString msg;
-			msg.Format("Started TL BrokerServer %s [ %.1f.%i]",wind,MajorVer,MinorVer);
-			this->D(msg);
 			ENABLED = true;
+			this->Create(NULL, ServerName, 0,CRect(0,0,20,20), CWnd::GetDesktopWindow(),NULL);
+			this->ShowWindow(SW_HIDE); // hide our window
+			CString servername = UniqueWindowName(ServerName);
+			SetWindowText((LPCTSTR)servername);
+			CString msg;
+			msg.Format("Started TL BrokerServer %s [ %.1f.%i]",ServerName,MajorVer,MinorVer);
+			this->D(msg);
+
 		}
+		
+					
 	}
 
 
+	
+	long TLServer_WM::TLSend(int type,LPCTSTR msg,int clientid) 
+	{
+		// make sure client exists
+		if ((clientid>=(int)hims.size()) || (clientid<0)) 
+			return (long)TLCLIENT_NOT_FOUND;
+		HWND dest = hims[clientid];
+		return TLSend(type,msg,dest);
+	}
 	long TLServer_WM::TLSend(int type,LPCTSTR msg,CString windname) 
 	{
-		LRESULT result = TLCLIENT_NOT_FOUND;
 		HWND dest = FindWindowA(NULL,(LPCSTR)(LPCTSTR)windname)->GetSafeHwnd();
+		return TLSend(type,msg,dest);
+	}
+	long TLServer_WM::TLSend(int type,LPCTSTR msg, HWND dest)
+	{
+		// set default result
+		LRESULT result = TLCLIENT_NOT_FOUND;
 		
 		if (dest) 
 		{

@@ -27,37 +27,23 @@ namespace TradeLink.Common
         public event ImbalanceDelegate gotImbalance;
         public event MessageDelegate gotUnknownMessage;
 
-        public TLClient_WM() : this("TradeLinkClient",true,true) { }
-        public TLClient_WM(string clientname, bool showwarningonmissing) : this(clientname, showwarningonmissing, true) { }
+        public TLClient_WM() : this(0,WMUtil.CLIENTWINDOW,true,true) { }
+        public TLClient_WM(int ProviderIndex) : this(ProviderIndex, WMUtil.CLIENTWINDOW, true, true) { }
+        public TLClient_WM(int ProviderIndex,string clientname) : this(ProviderIndex, clientname, true, true) { }
+        public TLClient_WM(string clientname, bool showwarningonmissing) : this(0,clientname, showwarningonmissing, true) { }
 
-        public TLClient_WM(string clientname, bool showarmingonmissingserver, bool handleexceptions)
+        public TLClient_WM(int ProviderIndex, string clientname, bool showarmingonmissingserver, bool handleexceptions)
             : base()
         {
             this.Text = WMUtil.GetUniqueWindow(clientname);
             this.WindowState = FormWindowState.Minimized;
             this.ShowInTaskbar = false;
             this.Hide();
-            this.Mode(this.TLFound(), handleexceptions, showarmingonmissingserver);
+            TLFound();
+            this.Mode(ProviderIndex, handleexceptions, showarmingonmissingserver);
         }
 
-        string _servername = WMUtil.SIMWINDOW;
-
-        /// <summary>
-        /// Gets or sets the other side of the link.  Him is a string that indicates the window name of the other guy.
-        /// </summary>
-        /// <value>His windowname.</value>
-        public string Him
-        {
-            get
-            {
-                return _servername;
-            }
-            set
-            {
-                _servername = value;
-            }
-        }
-
+ 
         /// <summary>
         /// Gets or sets my handle of the parent application or form.
         /// </summary>
@@ -66,116 +52,52 @@ namespace TradeLink.Common
 
         /// <summary>
         /// Sets the preferred communication channel of the link, if multiple channels are avaialble.
+        /// Defaults to first provider found.
         /// </summary>
         /// <param name="mode">The mode.</param>
         /// <returns></returns>
-        public bool Mode(TLTypes mode) { return Mode(mode, false, true); }
-        public bool Mode(TLTypes mode, bool showarning) { return Mode(mode, false, showarning); }
-        public bool Mode(TLTypes mode, bool throwexceptions, bool showwarning)
+        public bool Mode() { return Mode(0, true, true); }
+        public bool Mode(int ProviderIndex, bool showarning) { return Mode(ProviderIndex, true, showarning); }
+        public bool Mode(int ProviderIndex, bool HandleExceptions, bool showwarning)
         {
-            bool HandleExceptions = !throwexceptions;
+
             LinkType = TLTypes.NONE; // reset before changing link mode
-            switch (mode)
+            if ((ProviderIndex >= srvrwin.Count) || (ProviderIndex < 0))
+                if (showwarning)
+                    System.Windows.Forms.MessageBox.Show("Invalid broker specified or no brokers running.", "TradeLink server not found");
+            if (HandleExceptions)
             {
-                case TLTypes.LIVEBROKER:
-                    if (HandleExceptions)
-                    {
-                        try
-                        {
-                            GoLive();
-                            return true;
-                        }
-                        catch (TLServerNotFound)
-                        {
+                try
+                {
+                    Disconnect();
+                    himh = WMUtil.HisHandle(srvrwin[ProviderIndex]);
+                    LinkType = TLTypes.LIVEBROKER;
+                    Register();
+                    return true;
+                }
+                catch (TLServerNotFound)
+                {
 
-                            if (showwarning)
-                                System.Windows.Forms.MessageBox.Show("No Live broker instance was found.  Make sure broker application + TradeLink server is running.", "TradeLink server not found");
-                            return false;
-                        }
-                    }
-                    else GoLive();
-                    break;
-                case TLTypes.SIMBROKER:
-                    if (HandleExceptions)
-                    {
-                        try
-                        {
-
-                            GoSim();
-                            return true;
-                        }
-                        catch (TLServerNotFound)
-                        {
-                            if (showwarning)
-                                System.Windows.Forms.MessageBox.Show("No simulation broker instance was found.  Make sure broker application + TradeLink server is running.", "TradeLink server not found");
-                            return false;
-                        }
-                    }
-                    else GoSim();
-                    return true;
-                case TLTypes.HISTORICALBROKER:
-                    if (HandleExceptions)
-                    {
-                        try
-                        {
-                            GoHist();
-                            return true;
-                        }
-                        catch (TLServerNotFound)
-                        {
-                            if (showwarning)
-                                System.Windows.Forms.MessageBox.Show("No historical broker instance found.  Make sure Replay Server is running.");
-                            return false;
-                        }
-                    }
-                    else GoHist();
-                    return true;
-                case TLTypes.TESTBROKER:
-                    if (HandleExceptions)
-                    {
-                        try
-                        {
-                            GoTest();
-                            return true;
-                        }
-                        catch (TLServerNotFound)
-                        {
-                            if (showwarning)
-                                System.Windows.Forms.MessageBox.Show("No test broker instance found.  Make sure you started a TradeLink_Server object with TLType.TEST.");
-                            return false;
-                        }
-                    }
-                    else GoTest();
-                    return true;
-                default:
-                    if (showwarning) 
-                        System.Windows.Forms.MessageBox.Show("No valid broker instance was found.  Make sure broker application + TradeLink server is running.", "TradeLink server not found");
-                    break;
+                    if (showwarning)
+                        System.Windows.Forms.MessageBox.Show("No Live broker instance was found.  Make sure broker application + TradeLink server is running.", "TradeLink server not found");
+                    return false;
+                }
+            }
+            else
+            {
+                Disconnect();
+                
+                    return false;
+                himh = WMUtil.HisHandle(srvrwin[ProviderIndex]);
+                LinkType = TLTypes.LIVEBROKER;
+                Register();
+                return true;
             }
             return false;
         }
 
         public TLTypes LinkType = TLTypes.NONE;
 
-        /// <summary>
-        /// Makes TL client use Broker LIVE server (Broker must be logged in and TradeLink loaded)
-        /// </summary>
-        public void GoLive() { Disconnect(); himh = WMUtil.HisHandle(WMUtil.LIVEWINDOW); LinkType = TLTypes.LIVEBROKER; Register(); }
-
-        /// <summary>
-        /// Makes TL client use Broker Simulation mode (Broker must be logged in and TradeLink loaded)
-        /// </summary>
-        public void GoSim() { Disconnect(); himh = WMUtil.HisHandle(WMUtil.SIMWINDOW); LinkType = TLTypes.SIMBROKER;  Register(); }
-
-        /// <summary>
-        /// Attemptions connection to TL Replay Server
-        /// </summary>
-        public void GoHist() { Disconnect(); himh = WMUtil.HisHandle(WMUtil.REPLAYWINDOW); LinkType = TLTypes.HISTORICALBROKER; Register(); }
-
-        /// <summary>
-        /// Used for testing the TL-BROKER api (programmatically)
-        /// </summary>
-        public void GoTest() { Disconnect(); himh = WMUtil.HisHandle(WMUtil.TESTWINDOW); LinkType = TLTypes.TESTBROKER; Register(); }
         IntPtr himh = IntPtr.Zero;
         public long TLSend(MessageTypes type) { return TLSend(type, ""); }
         delegate long TLSendDelegate(MessageTypes type, string msg);
@@ -316,15 +238,35 @@ namespace TradeLink.Common
         {
             TLSend(MessageTypes.DOMREQUEST, Text + "+" + depth);
         }
-
-
-        public TLTypes TLFound()
+        List<Providers> servers = new List<Providers>();
+        List<string> srvrwin = new List<string>();
+        const int MAXSERVER = 10;
+        public Providers [] TLFound()
         {
+            servers.Clear();
+            srvrwin.Clear();
             TLTypes f = TLTypes.NONE;
-            if (WMUtil.Found(WMUtil.SIMWINDOW)) f |= TLTypes.SIMBROKER;
-            if (WMUtil.Found(WMUtil.LIVEWINDOW)) f |= TLTypes.LIVEBROKER;
-            if (WMUtil.Found(WMUtil.REPLAYWINDOW)) f |= TLTypes.HISTORICALBROKER;
-            return f;
+            string[] legacy = new string[] { WMUtil.SIMWINDOW, WMUtil.LIVEWINDOW, WMUtil.REPLAYWINDOW, WMUtil.TESTWINDOW, WMUtil.SERVERWINDOW };
+            // see if we have a window running with this name and add it
+            foreach (string name in legacy)
+                addserver(name);
+            for (int i = 0; i < MAXSERVER; i++)
+                addserver(WMUtil.SERVERWINDOW + i.ToString());
+            return servers.ToArray();
+        }
+
+        private bool addserver(string name)
+        {
+            // if server not running, don't add it
+            if (!WMUtil.Found(name)) return false;
+            // if it is running, get the handle
+            IntPtr hand = WMUtil.HisHandle(name);
+            // get broker name
+            Providers p = (Providers)WMUtil.SendMsg(string.Empty, hand, Handle, (int)MessageTypes.BROKERNAME);
+            if (p == Providers.Unknown) return false;
+            servers.Add(p);
+            srvrwin.Add(name);
+            return true;
         }
 
 

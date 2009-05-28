@@ -11,8 +11,6 @@ namespace TradeLink.API
     public interface TradeLinkClient
     {
         int SendOrder(Order order);
-        void GoLive();
-        void GoSim();
         void Disconnect();
         void Register();
         void Subscribe(Basket mb);

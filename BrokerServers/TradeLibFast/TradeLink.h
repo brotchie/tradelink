@@ -4,6 +4,8 @@
 	const CString SIMWINDOW = _T("TL-BROKER-SIMU");
 	const CString HISTWINDOW = _T("TL-BROKER-HIST");
 	const CString TESTWINDOW = _T("TL-BROKER-TEST");
+	const CString SERVERWINDOW = _T("TradeLinkServer");
+	const CString CLIENTWINDOW = _T("TradeLinkClient");
 
 	enum TLTypes
 	{
@@ -17,8 +19,8 @@
 
 	enum TL2 {
         // START TRADELINK STATUS MESSAGES
-		ORDER_NOT_FOUND = -112,
-		TLCLIENT_NOT_FOUND = -111,
+        ORDER_NOT_FOUND = -112,
+        TLCLIENT_NOT_FOUND = -111,
         INVALID_ACCOUNT = -110,
         UNKNOWN_ERROR = -109,
         FEATURE_NOT_IMPLEMENTED = -108,
@@ -43,6 +45,16 @@
         CUSTOM8,
         CUSTOM9,
         CUSTOM10,
+        CUSTOM11,
+        CUSTOM12,
+        CUSTOM13,
+        CUSTOM14,
+        CUSTOM15,
+        CUSTOM16,
+        CUSTOM17,
+        CUSTOM18,
+        CUSTOM19,
+        CUSTOM20,
         ISSHORTABLE,
         VWAP,
         LASTTRADESIZE,
@@ -102,18 +114,34 @@
         SENDORDERMARKETONCLOSE,
         DOMREQUEST,
         DOMRESPONSE,
-		// END TRADELINK MESSAGES
+        LIVEDATA,
+        LIVETRADING,
+        SIMTRADING,
+        HISTORICALDATA,
+        HISTORICALTRADING,
+        LOOPBACKSERVER,
+        LOOPBACKCLIENT,
+        STARTHISTORICALRUN,
+        ENDHISTORICALRUN,
+        // END TRADELINK MESSAGES
 	};
 
 	enum Brokers
 	{
-		UnknownBroker = -1,
-		TradeLinkSimulation = 0,
-		Assent,
-		InteractiveBrokers,
-		Genesis,
-		Bright,
-		Echo,
+        UnknownBroker = -1,
+        TradeLink = 0,
+        Assent,
+        InteractiveBrokers,
+        Genesis,
+        Bright,
+        Echo,
+        Sterling,
+        TDAmeritrade,
+        Blackwood,
+        MBTrading,
+        HUBB,
+        Tradespeed,
+        REDI,
 	};
 
 

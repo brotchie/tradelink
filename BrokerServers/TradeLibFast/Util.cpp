@@ -26,22 +26,25 @@ void TLTimeNow(std::vector<int> & nowtime)
 	nowtime.push_back(time);
 }
 
-
-
-void gsplit(CString msg, CString del, std::vector<CString>& rec)
+CString UniqueWindowName(CString rootname)
 {
-	while (msg.FindOneOf(del)!=-1)
+	HWND dest = FindWindow(NULL,(LPCSTR)(LPCTSTR)rootname);
+	int i = -1;
+	CString final(rootname);
+	while (!dest && (i<100))
 	{
-		int pos = msg.FindOneOf(del);
-		CString r = msg.Left(pos);
-		rec.push_back(r);
-		msg = msg.Right(msg.GetLength()-(pos+1));
-		if ((pos==0) && (msg.GetLength()==0))
-			rec.push_back("");
+		i++;
+		final = CString("");
+		final.Format("%s.%i",rootname,i);
+		dest = FindWindowA(NULL,(LPCSTR)(LPCTSTR)final);
 	}
-	if (msg.GetLength()>0)
-		rec.push_back(msg);
+	return final;
 }
+
+
+
+
+
 
 CString gjoin(std::vector<CString>& vec, CString del)
 {
@@ -60,15 +63,83 @@ char* cleansvnrev(const char * dirtyrev)
 	return clean.GetBuffer();
 }
 
-	CString SerializeIntVec(std::vector<int> input)
+CString SerializeIntVec(std::vector<int> input)
+{
+	std::vector<CString> tmp;
+	for (size_t i = 0; i<input.size(); i++)
 	{
-		std::vector<CString> tmp;
-		for (size_t i = 0; i<input.size(); i++)
-		{
-			CString t; // setup tmp string
-			t.Format("%i",input[i]); // convert integer into tmp string
-			tmp.push_back(t); // push converted string onto vector
-		}
-		// join vector and return serialized structure
-		return gjoin(tmp,",");
+		CString t; // setup tmp string
+		t.Format("%i",input[i]); // convert integer into tmp string
+		tmp.push_back(t); // push converted string onto vector
 	}
+	// join vector and return serialized structure
+	return gjoin(tmp,",");
+}
+
+// adapted from Eddie Velasquez article
+// http://www.codeproject.com/KB/string/tokenizer.aspx?display=PrintAll&fid=210&df=90&mpp=25&noise=3&sort=Position&view=Quick&fr=26
+
+CTokenizer::CTokenizer(const CString& cs, const CString& csDelim):
+	m_cs(cs),
+	m_nCurPos(0)
+{
+	SetDelimiters(csDelim);
+}
+
+void CTokenizer::SetDelimiters(const CString& csDelim)
+{
+	for(int i = 0; i < csDelim.GetLength(); ++i)
+		m_delim.set(static_cast<BYTE>(csDelim[i]));
+}
+
+bool CTokenizer::Next(CString& cs)
+{
+	cs.Empty();
+
+	int nStartPos = m_nCurPos;
+	while(m_nCurPos < m_cs.GetLength() && !m_delim[static_cast<BYTE>(m_cs[m_nCurPos])])
+		++m_nCurPos;
+
+	if(m_nCurPos >= m_cs.GetLength())
+	{
+		if (nStartPos<m_cs.GetLength())
+			cs = m_cs.Mid(nStartPos,m_cs.GetLength()-nStartPos);
+		return false;
+	}
+/*
+	int nStartPos = m_nCurPos;
+	while(m_nCurPos < m_cs.GetLength() && !m_delim[static_cast<BYTE>(m_cs[m_nCurPos])])
+		++m_nCurPos;
+*/	
+	cs = m_cs.Mid(nStartPos, m_nCurPos - nStartPos);
+	m_nCurPos++;
+
+	return true;
+}
+
+CString	CTokenizer::Tail() const
+{
+	int nCurPos = m_nCurPos;
+
+	while(nCurPos < m_cs.GetLength() && m_delim[static_cast<BYTE>(m_cs[nCurPos])])
+		++nCurPos;
+
+	CString csResult;
+
+	if(nCurPos < m_cs.GetLength())
+		csResult = m_cs.Mid(nCurPos);
+
+	return csResult;
+}
+
+void gsplit(CString msg, CString del, std::vector<CString>& rec)
+{
+	CTokenizer tok(msg,del);
+	CString m;
+	while (tok.Next(m))
+		rec.push_back(m);
+	if (m.GetLength()>0)
+		rec.push_back(m);
+
+}
+

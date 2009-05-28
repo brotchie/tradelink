@@ -40,6 +40,8 @@ namespace TradeLink.Common
             public IntPtr lpData;
         }
 
+        public const string CLIENTWINDOW = "TradeLinkClient";
+        public const string SERVERWINDOW = "TradeLinkServer";
         public const string SIMWINDOW = "TL-BROKER-SIMU";
         public const string LIVEWINDOW = "TL-BROKER-LIVE";
         public const string REPLAYWINDOW = "TL-BROKER-HIST";

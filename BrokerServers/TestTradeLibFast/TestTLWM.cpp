@@ -43,7 +43,7 @@ static void __stdcall Basics()
 
 	// setup our objects
 	TLServer_WM s;
-	s.Start(true);
+	s.Start();
 	TestClient c;
 	TestClient c2;
 	CString sym = "TST";
@@ -95,7 +95,39 @@ static void __stdcall Basics()
 	// make sure orders were copied to other clients
 	CFIX_ASSERT(c.orders==c2.orders);
 
+	// performance test ticks
 
+	// reset ticks
+	c.ticks = 0;
+	// get random ticks
+	const int MAXTICKS = 1000;
+	vector<TLTick> ticks;
+	for (int i = 0; i<MAXTICKS; i++)
+	{
+		TLTick k;
+		k.sym = sym;
+		k.size = size;
+		k.trade = rand();
+		ticks.push_back(k);
+	}
+	// start timer
+	unsigned long start = GetTickCount();
+	// send ticks to clients
+	for (unsigned int i =0; i<ticks.size(); i++)
+		s.SrvGotTick(ticks[i]);
+	// stop timer
+	unsigned long stop = GetTickCount();
+	// elapased time
+	int elap = (stop - start);
+	// ticks per second
+	int rate = (MAXTICKS / elap)*1000;
+	CFIX_LOG(L"Performance elap (ms): %i",elap);
+	CFIX_LOG(L"Performance (ticks/sec): %i",rate);
+	// make sure it took reasonable time
+	CFIX_ASSERT(elap<200);
+
+
+	
 }
 
 

@@ -121,6 +121,9 @@ namespace TradeLibFast
 		f.push_back(SENDORDERLIMIT);
 		f.push_back(SENDORDERSTOP);
 		f.push_back(SENDORDERTRAIL);
+		f.push_back(LIVEDATA);
+		f.push_back(LIVETRADING);
+		f.push_back(SIMTRADING);
 		return f;
 	}
 
@@ -408,7 +411,7 @@ namespace TradeLibFast
 
 	int TypeFromExchange(CString ex)
 	{
-		if ((ex=="GLOBEX")|| (ex=="NYMEX")||(ex="CFE"))
+		if ((ex=="GLOBEX")|| (ex=="NYMEX")||(ex=="CFE"))
 			return FUT;
 		else if ((ex=="NYSE")||(ex=="NASDAQ")||(ex=="ARCA"))
 			return STK;

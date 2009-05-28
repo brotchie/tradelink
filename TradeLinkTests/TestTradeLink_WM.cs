@@ -75,15 +75,10 @@ namespace TestTradeLink
         [Test]
         public void StartupTests()
         {
-            // we're expecting this server type
-            TLTypes expect = TLTypes.HISTORICALBROKER;
             // discover our states
-            TLTypes FOUND = c.TLFound();
-            bool CONNECTED = c.Mode(FOUND&expect,true,false);
-
-            // should be able to connect to whatever server we find
-            Assert.That(CONNECTED,"make sure you don't have TLServers running");
-
+            Providers[] p = c.TLFound();
+            Assert.Greater(p.Length, 0);
+            Assert.AreEqual(Providers.TradeLink, p[0]);
         }
 
         [Test]

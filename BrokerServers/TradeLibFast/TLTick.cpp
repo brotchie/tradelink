@@ -33,7 +33,25 @@ namespace TradeLibFast
 	CString TLTick::Serialize(void)
 	{
 		CString m;
-		m.Format(_T("%s,%i,%i,,%f,%i,%s,%f,%f,%i,%i,%s,%s,%i"),sym,date,time,trade,size,ex,bid,ask,bs,os,be,oe,depth);
+		char d = ',';
+		m.Append(sym);
+		m.AppendChar(d);
+		m.AppendFormat("%i,%i,,",date,time);
+		m.AppendFormat("%f",trade);
+		m.AppendChar(d);
+		m.AppendFormat("%i",size);
+		m.AppendChar(d);
+		m.Append(ex);
+		m.AppendChar(d);
+		m.AppendFormat("%f,%f,",bid,ask);
+		m.AppendFormat("%i,%i",bs,os);
+		m.AppendChar(d);
+		m.Append(be);
+		m.AppendChar(d);
+		m.Append(oe);
+		m.AppendChar(d);
+		m.AppendFormat("%i",depth);
+		//m.Format(_T("%s,%i,%i,,%f,%i,%s,%f,%f,%i,%i,%s,%s,%i"),sym,date,time,trade,size,ex,bid,ask,bs,os,be,oe,depth);
 		return m;
 	}
 	TLTick TLTick::Deserialize(CString message)

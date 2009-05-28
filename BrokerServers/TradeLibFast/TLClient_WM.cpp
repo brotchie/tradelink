@@ -18,6 +18,12 @@ namespace TradeLibFast
 		// and pass them along
 		switch (type)
 		{
+		case TICKNOTIFY :
+			{
+				TLTick t = TLTick::Deserialize(msg);
+				gotTick(t);
+			}
+			break;
 		case ORDERNOTIFY :
 			{
 				TLOrder o = TLOrder::Deserialize(msg);
@@ -30,26 +36,20 @@ namespace TradeLibFast
 				gotFill(f);
 			}
 			break;
-		case TICKNOTIFY :
-			{
-				TLTick t = TLTick::Deserialize(msg);
-				gotTick(t);
-			}
-			break;
 		}
 		return true;
 	}
 
 	int TLClient_WM::SendOrder(TLOrder o)
 	{
-		return TLSend(SENDORDER,o.Serialize(),_him);
+		return TLSend(SENDORDER,o.Serialize());
 	}
 
 	void TLClient_WM::CancelOrder(long id)
 	{
 		CString ids;
 		ids.Format("%i",id);
-		TLSend(ORDERCANCELREQUEST,ids,_him);
+		TLSend(ORDERCANCELREQUEST,ids);
 	}
 
 
@@ -67,7 +67,8 @@ namespace TradeLibFast
 		_me = name;
 		this->Create(NULL, name, 0,CRect(0,0,20,20), CWnd::GetDesktopWindow(),NULL);
 		this->ShowWindow(SW_HIDE); // hide our window
-		Mode(TLFound(ANYSERVER));
+		TLFound();
+		Mode();
 	}
 
 	TLClient_WM::~TLClient_WM()
@@ -83,34 +84,58 @@ namespace TradeLibFast
 		return false;
 	}
 
-	int TLClient_WM::TLFound(int mask)
+	vector<int> TLClient_WM::TLFound()
 	{
-		int fnd = NONE;
-		if (found(::SIMWINDOW)) fnd += (int)SIMBROKER;
-		if (found(::LIVEWINDOW)) fnd += (int)LIVEBROKER;
-		if (found(::HISTWINDOW)) fnd += (int)HISTORICALBROKER;
-		if (found(::TESTWINDOW)) fnd += (int)TESTBROKER;
-		return fnd & mask;
+		// clear initial lists
+		servers.clear();
+		srvrname.clear();
+		// prepare legacy name search
+		vector<CString> attempts;
+		attempts.push_back(::SIMWINDOW);
+		attempts.push_back(::LIVEWINDOW);
+		attempts.push_back(::TESTWINDOW);
+		attempts.push_back(::HISTWINDOW);
+		attempts.push_back(::SERVERWINDOW);
+		// prepare ordered name search 
+		const int MAXSERVERS = 10;
+		for (int i = 0; i<MAXSERVERS; i++)
+		{
+			CString m;
+			m.Format("%s.%i",::SERVERWINDOW,i);
+			attempts.push_back(m);
+		}
+		// see whats of our list is out there
+		for (int i =0; i<(int)attempts.size(); i++)
+		{
+			if (found(attempts[i]))
+			{
+				int id = TLSend(BROKERNAME,"",attempts[i]);
+				if (id!=-1)
+				{
+					servers.push_back(id);
+					srvrname.push_back(attempts[i]);
+				}
+			}
+		}
+		return servers;
 	}
 
-	void TLClient_WM::Mode(int mode)
+	void TLClient_WM::Mode() { Mode(0); }
+	void TLClient_WM::Mode(int ProviderId)
 	{
-		if (mode==SIMBROKER)
-			_him = ::SIMWINDOW;
-		else if (mode== LIVEBROKER)
-			_him = ::LIVEWINDOW;
-		else if (mode == HISTORICALBROKER)
-			_him = ::HISTWINDOW;
-		else if (mode == TESTBROKER)
-			_him = ::TESTWINDOW;
-		else 
-			_him = "TL-NOTFOUND";
+		if ((ProviderId<0) || (ProviderId>=(int)servers.size()))
+		{
+			return;
+		}
+		_him = srvrname[ProviderId];
 		Register();
 	}
 
 	void TLClient_WM::Register()
 	{
-		TLSend(REGISTERCLIENT,_me,_him);
+		HWND dest = FindWindowA(NULL,(LPCSTR)(LPCTSTR)_him)->GetSafeHwnd();
+		_himh = dest;
+		TLSend(REGISTERCLIENT,_me,_himh);
 	}
 
 	void TLClient_WM::Subscribe(TLMarketBasket mb)
@@ -118,20 +143,31 @@ namespace TradeLibFast
 		CString basket = mb.Serialize();
 		CString m;
 		m.Format("%s+%s",_me,basket);
-		TLSend(REGISTERSTOCK,m,_him);
+		TLSend(REGISTERSTOCK,m);
 	}
 
 	void TLClient_WM::RequestDOM(int depth)
 	{
 		CString m;
 		m.Format("%s+%i",_me,depth);
-		TLSend(DOMREQUEST,_me,_him);
+		TLSend(DOMREQUEST,_me);
 	}
 
+	long TLClient_WM::TLSend(int type,LPCTSTR msg) 
+	{
+		if (_himh)
+			return TLSend(type,msg,_himh);
+		return BROKERSERVER_NOT_FOUND;
+	}
 	long TLClient_WM::TLSend(int type,LPCTSTR msg,CString windname) 
 	{
-		LRESULT result = BROKERSERVER_NOT_FOUND;
 		HWND dest = FindWindowA(NULL,(LPCSTR)(LPCTSTR)windname)->GetSafeHwnd();
+		return TLSend(type,msg,dest);
+	}
+	long TLClient_WM::TLSend(int type,LPCTSTR msg, HWND dest)
+	{
+		// set default result
+		LRESULT result = BROKERSERVER_NOT_FOUND;
 		
 		if (dest) 
 		{
@@ -149,12 +185,12 @@ namespace TradeLibFast
 
 	void TLClient_WM::Unsubscribe()
 	{
-		TLSend(CLEARSTOCKS,"",_him);
+		TLSend(CLEARSTOCKS,"");
 	}
 
 	void TLClient_WM::Disconnect()
 	{
-		TLSend(CLEARCLIENT,"",_him);
+		TLSend(CLEARCLIENT,"");
 	}
 
 

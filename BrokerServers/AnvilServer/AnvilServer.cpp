@@ -102,7 +102,7 @@ void ShowMainWindow()
 		frame = new AVL_TLWM();
 		version += frame->Version();
 	}
-	frame->Start(!isSim);
+	frame->Start();
 }
 
 

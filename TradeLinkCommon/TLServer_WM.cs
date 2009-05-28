@@ -29,19 +29,16 @@ namespace TradeLink.Common
         public string Version() { return Util.TLSIdentity(); }
         protected int MinorVer = 0;
 
-        public TLServer_WM() : this(TLTypes.HISTORICALBROKER) { }
+        public TLServer_WM() : this(WMUtil.SERVERWINDOW) { }
         public TLServer_WM(string servername) : base()
         {
             MinorVer = Util.BuildFromFile(Util.TLProgramDir + @"\VERSION.txt");
-            this.Text = servername;
+            this.Text = WMUtil.GetUniqueWindow(servername);
             this.WindowState = FormWindowState.Minimized;
             this.Show();
             this.ShowInTaskbar = false;
             this.Hide();
         }
-        public TLServer_WM(TLTypes servertype) : 
-            this(servertype==TLTypes.LIVEBROKER? WMUtil.LIVEWINDOW :
-                (servertype == TLTypes.SIMBROKER ? WMUtil.SIMWINDOW : (servertype== TLTypes.HISTORICALBROKER? WMUtil.REPLAYWINDOW : WMUtil.TESTWINDOW))) { }
 
         private void SrvDoExecute(string msg) // handle an order (= execute request)
         {

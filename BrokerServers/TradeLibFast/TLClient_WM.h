@@ -15,9 +15,12 @@ namespace TradeLibFast
 	public:
 		TLClient_WM(char* client = "tlclient");
 		~TLClient_WM(void);
+		long TLSend(int type,LPCTSTR msg);
+		static long TLSend(int type,LPCTSTR msg, HWND dest);
 		static long TLSend(int type,LPCTSTR msg,CString windname);
-		int TLFound(int mask);
-		void Mode(int mode);
+		vector<int> TLFound();
+		void Mode();
+		void Mode(int ProviderId);
 		void Unsubscribe();
 		void Disconnect();
 		void Register();
@@ -33,7 +36,10 @@ namespace TradeLibFast
 
 
 	protected:
+		vector<int> servers;
+		vector<CString> srvrname;
 		afx_msg BOOL OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCopyDataStruct);
+		HWND _himh;
 		CString _him;
 		CString _me;
 		DECLARE_MESSAGE_MAP()

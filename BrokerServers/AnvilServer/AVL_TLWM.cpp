@@ -754,6 +754,12 @@ namespace TradeLibFast
 		f.push_back(SENDORDERSTOP);
 		f.push_back(SENDORDERTRAIL);
 		f.push_back(DOMREQUEST);
+		f.push_back(LIVEDATA);
+		bool sim = B_IsAccountSimulation();
+		if (sim)
+			f.push_back(SIMTRADING);
+		else 
+			f.push_back(LIVETRADING);
 		return f;
 	}
 

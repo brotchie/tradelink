@@ -77,7 +77,20 @@ namespace TradeLink.Common
             else
                 sec.Type = SecurityType.STK;
             sec.Date = date;
+            if (sec.hasDest && !sec.hasType)
+                sec.Type = TypeFromExchange(sec.DestEx);
             return sec;
+        }
+
+        static SecurityType TypeFromExchange(string ex)
+        {
+            if ((ex == "GLOBEX") || (ex == "NYMEX") || (ex == "CFE"))
+                return SecurityType.FUT;
+            else if ((ex == "NYSE") || (ex == "NASDAQ") || (ex == "ARCA"))
+                return SecurityType.STK;
+            // default to STK if not sure
+            return 0;
+
         }
 
         static int SecurityID(string type)
