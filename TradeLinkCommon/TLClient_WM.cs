@@ -74,8 +74,11 @@ namespace TradeLink.Common
 
             LinkType = TLTypes.NONE; // reset before changing link mode
             if ((ProviderIndex >= srvrwin.Count) || (ProviderIndex < 0))
+            {
                 if (showwarning)
                     System.Windows.Forms.MessageBox.Show("Invalid broker specified or no brokers running.", "TradeLink server not found");
+                return false;
+            }
             if (HandleExceptions)
             {
                 try
@@ -98,11 +101,10 @@ namespace TradeLink.Common
             else
             {
                 Disconnect();
-                
-                    return false;
                 himh = WMUtil.HisHandle(srvrwin[ProviderIndex]);
                 LinkType = TLTypes.LIVEBROKER;
                 Register();
+                RequestFeatures();
                 return true;
             }
             return false;
