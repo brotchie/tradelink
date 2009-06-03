@@ -12,7 +12,7 @@ using namespace std;
 namespace TradeLibFast
 {
 
-	const char* VERFILE = "c:\\progra~1\\tradelink\\brokerserver\\VERSION.txt";
+	const char* VERFILE = "\\tradelink\\brokerserver\\VERSION.txt";
 	TLServer_WM::TLServer_WM(void)
 	{
 		MajorVer = 0.1;
@@ -21,7 +21,11 @@ namespace TradeLibFast
 		ENABLED = false;
 		debugbuffer = CString("");
 		std::ifstream file;
-		file.open(VERFILE);
+		TCHAR path[MAX_PATH];
+		SHGetFolderPath(NULL,CSIDL_PROGRAM_FILES,NULL,0,path);
+		CString ver(path);
+		ver.Append(VERFILE);
+		file.open(ver.GetBuffer());
 		if (file.is_open())
 		{
 			char data[8];
