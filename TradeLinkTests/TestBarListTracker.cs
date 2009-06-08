@@ -12,7 +12,7 @@ namespace TestTradeLink
         public TestBarListTracker() { }
 
         [Test]
-        public void Basics()
+        public void DefaultInt()
         {
             BarListTracker blt = new BarListTracker();
             blt.GotNewBar+=new SymBarIntervalDelegate(blt_GotNewBar);
@@ -55,6 +55,19 @@ namespace TestTradeLink
         {
             if (!syms.Contains(symbol))
                 syms.Add(symbol);
+        }
+
+
+        [Test]
+        public void TickInt()
+        {
+            Tick[] tape = TestBarList.SampleData();
+            BarListTracker blt = new BarListTracker(new[] { 3 }, new BarInterval[] { BarInterval.CustomTicks });
+
+            foreach (Tick k in tape)
+                blt.newTick(k);
+
+            Assert.AreEqual(4,blt[tape[0].symbol].Count);
         }
 
 

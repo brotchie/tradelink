@@ -48,6 +48,7 @@ namespace TradeLink.Common
         /// <param name="customintervals"></param>
         public BarListTracker(int[] customintervals, BarInterval[] intervaltypes)
         {
+            _default = customintervals[0];
             _requested = customintervals;
             _reqtype = intervaltypes;
         }
