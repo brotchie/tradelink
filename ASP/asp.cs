@@ -5,9 +5,10 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using TradeLink.Common;
 using System.IO;
 using TradeLink.API;
+using TradeLink.AppKit;
+using TradeLink.Common;
 using System.Xml.Serialization;
 using Microsoft.VisualBasic;
 using System.Reflection;
@@ -27,26 +28,18 @@ namespace ASP
         TickArchiver _ta = new TickArchiver();
         BasketImpl _mb = new BasketImpl();
         Response _workingres = new InvalidResponse();
-        StreamWriter _log;
         Dictionary<int, string> _resskinidx = new Dictionary<int, string>();
         Dictionary<string, string> _class2dll = new Dictionary<string, string>();
         PositionTracker _pt = new PositionTracker();
         string[] _acct = new string[0];
         AsyncResponse _ar = new AsyncResponse();
+        Log _log = new Log(PROGRAM);
 
 
         public ASP()
         {
             // read designer options for gui
             InitializeComponent();
-            // try to open log file
-            try
-            {
-                _log = new StreamWriter(PROGRAM + Util.ToTLDate(DateTime.Now) + ".txt", true);
-                _log.AutoFlush = true;
-            }
-            catch (Exception ex) { debug("unable to open log file"); }
-                
             // don't save ticks from replay since they're already saved
             archivetickbox.Checked = tl.LinkType != TLTypes.HISTORICALBROKER;
             // if our machine is multi-core we use seperate thread to process ticks
@@ -76,14 +69,15 @@ namespace ASP
             // setup right click menu
             _resnames.ContextMenu= new ContextMenu();
             _resnames.ContextMenu.Popup += new EventHandler(ContextMenu_Popup);
-            _resnames.ContextMenu.MenuItems.Add("isValid", new EventHandler(toggleresponse));
-            _resnames.ContextMenu.MenuItems.Add("+Skin", new EventHandler(add2skin));
+            _resnames.ContextMenu.MenuItems.Add("remove response", new EventHandler(remresp));
+            _resnames.ContextMenu.MenuItems.Add("enabled", new EventHandler(toggleresponse));
+            _resnames.ContextMenu.MenuItems.Add("save to skin", new EventHandler(add2skin));
             // make sure we exit properly
             this.FormClosing += new FormClosingEventHandler(ASP_FormClosing);
             // show version to user
             status(Util.TLSIdentity());
             // check for new versions
-            Util.ExistsNewVersions(tl);
+            Versions.UpgradeAlert(tl);
             // get last loaded response library
             LoadResponseDLL(Properties.Settings.Default.boxdll);
             // load any skins we can find
@@ -120,7 +114,7 @@ namespace ASP
         {
             // make sure a response is selected
             if (_resnames.SelectedIndices.Count == 0) return;
-            const int VALID = 0;
+            const int VALID = 1;
             // update check to reflect validity of response
             foreach (int index in _resnames.SelectedIndices)
                 _resnames.ContextMenu.MenuItems[VALID].Checked = _reslist[index].isValid;
@@ -268,8 +262,72 @@ namespace ASP
             return false;
         }
 
+        void remresp(object sender, EventArgs e)
+        {
+            // mark empty symbols needed removal
+            List<string> remsym = new List<string>();
+            // mark UI entry for removal
+            List<int> remidx = new List<int>();
+            // process each selected response
+            foreach (int selbox in _resnames.SelectedIndices)
+            {
+                string name = _reslist[selbox].FullName;
+                List<string> syms = new List<string>();
+                string[] tmpsym = new string[_symidx.Keys.Count];
+                _symidx.Keys.CopyTo(tmpsym,0);
+                foreach (string sym in tmpsym)
+                {
+                    // build a new index
+                    List<int> newidx = new List<int>();
+                    // get current subscription count for this sym
+                    int orgsymcount = _symidx[sym].Length;
+                    // go through and add everything but our response
+                    for (int i = 0; i < orgsymcount ; i++)
+                        if (_symidx[sym][i] != selbox)
+                            newidx.Add(_symidx[sym][i]);
+                    // see if we did anything
+                    if (newidx.Count != orgsymcount)
+                    {
+                        // update result
+                        _symidx[sym] = newidx.ToArray();
+                        // mark symbol
+                        syms.Add(sym);
+                        // if no more subscribers, remove symbol
+                        if (newidx.Count==0)
+                            remsym.Add(sym);
+                    }
+                }
+                // remove the response
+                _reslist[selbox] = null;
+                // mark it's UI element for removal
+                remidx.Add(selbox);
+                debug("removed: "+name);
+            }
+            // remove response from screen
+            foreach (int i in remidx)
+                _resnames.Items.RemoveAt(i);
+            // remove any empty symbols
+            foreach (string sym in remsym)
+            {
+                _symidx.Remove(sym);
+                _mb.Remove(sym);
+            }
+            // resubscribe
+            tl.Subscribe(_mb);
+            // update display
+            _resnames.Invalidate(true);
+        }
 
+        int contains(string sym, int response)
+        {
+            int [] v;
+            if (!_symidx.TryGetValue(sym, out v))
+                return -1;
+            for (int i = 0; i<v.Length; i++)
+                if (v[i] == response) return i;
+            return -1;
 
+        }
 
         void toggleresponse(object sender, EventArgs e)
         {
@@ -319,12 +377,8 @@ namespace ASP
                 _ar.Stop();
             // stop archiving ticks
             _ta.CloseArchive();
-            // if log file exists, close it
-            if (_log != null)
-            {
-                _log.Close();
-                _log = null;
-            }
+            // stop logging
+            _log.Stop();
             // save ASP properties
             Properties.Settings.Default.Save();
 
@@ -393,12 +447,10 @@ namespace ASP
                 _msg.Invoke(new DebugDelegate(debug), new object[] { message });
             else
             {
+                _log.GotDebug(message);
                 // get a timestamp
                 string stamp = DateTime.Now.ToShortTimeString() + " ";
                 // if we have a logfile, log the debug
-                if (_log != null)
-                    _log.WriteLine(stamp + message);
-                // add debug msg
                 _msg.Items.Add(stamp+message);
                 // select it
                 _msg.SelectedIndex = _msg.Items.Count - 1;
