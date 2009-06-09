@@ -22,14 +22,14 @@ namespace ServerGenesis
             }
             catch (Exception e)
             {
-                TradeLink.Common.CrashReport.Report(ServerGenesisMain.PROGRAM, e); 
+                TradeLink.AppKit.CrashReport.Report(ServerGenesisMain.PROGRAM, e); 
 
             }
         }
 
         static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
-            TradeLink.Common.CrashReport.Report(ServerGenesisMain.PROGRAM, e); 
+            TradeLink.AppKit.CrashReport.Report(ServerGenesisMain.PROGRAM, e); 
         }
     }
 }

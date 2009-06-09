@@ -8,7 +8,7 @@ namespace TradeLink.API
     /// <summary>
     /// Generic interface for TradeLink Clients.  
     /// </summary>
-    public interface TradeLinkClient
+    public interface TLClient
     {
         int SendOrder(Order order);
         void Disconnect();
@@ -18,6 +18,18 @@ namespace TradeLink.API
         long TLSend(MessageTypes type, string message);
         int HeartBeat();
         void RequestDOM();
+        event TickDelegate gotTick;
+        event FillDelegate gotFill;
+        event OrderDelegate gotOrder;
+        event DebugDelegate gotAccounts;
+        event UIntDelegate gotOrderCancel;
+        void RequestFeatures();
+        event MessageTypesMsgDelegate gotFeatures;
+        event PositionDelegate gotPosition;
+        event ImbalanceDelegate gotImbalance;
+        event MessageDelegate gotUnknownMessage;
+        bool Mode(int ProviderIndex, bool showwarning);
+        bool Mode();
     }
 
     /// <summary>

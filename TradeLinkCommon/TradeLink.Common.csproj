@@ -42,19 +42,13 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Management" />
     <Reference Include="System.Messaging" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="TwitterooCore, Version=1.4.0.42521, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\TwitterooCore.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Account.cs" />
     <Compile Include="AsyncResponse.cs" />
-    <Compile Include="Auth.cs" />
     <Compile Include="BarImpl.cs" />
     <Compile Include="BarIntervalData.cs" />
     <Compile Include="BarListImpl.cs" />
@@ -69,12 +63,6 @@
     </Compile>
     <Compile Include="ChartImpl.Designer.cs">
       <DependentUpon>ChartImpl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="CrashReport.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="CrashReport.Designer.cs">
-      <DependentUpon>CrashReport.cs</DependentUpon>
     </Compile>
     <Compile Include="DebugImpl.cs" />
     <Compile Include="Email.cs" />
@@ -105,12 +93,6 @@
     <Compile Include="TLServer_IP.cs" />
     <Compile Include="Listener.cs" />
     <Compile Include="MarketOrder.cs" />
-    <Compile Include="NewVersion.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="NewVersion.Designer.cs">
-      <DependentUpon>NewVersion.cs</DependentUpon>
-    </Compile>
     <Compile Include="OrderImpl.cs" />
     <Compile Include="ParamPrompt.cs">
       <SubType>Form</SubType>
@@ -141,18 +123,6 @@
     </Compile>
     <Compile Include="TrailTracker.cs" />
     <Compile Include="Tript.cs" />
-    <Compile Include="TwitControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TwitControl.Designer.cs">
-      <DependentUpon>TwitControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="TwitPopup.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="TwitPopup.Designer.cs">
-      <DependentUpon>TwitPopup.cs</DependentUpon>
-    </Compile>
     <Compile Include="Util.cs" />
     <Compile Include="WMUtil.cs" />
     <EmbeddedResource Include="ParamPrompt.resx">
@@ -167,15 +137,8 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="CrashReport.resx">
-      <DependentUpon>CrashReport.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="EarlyClose.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="NewVersion.resx">
-      <DependentUpon>NewVersion.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Ticket.resx">
       <DependentUpon>Ticket.cs</DependentUpon>
@@ -183,12 +146,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="TickFileFilterControl.resx">
       <DependentUpon>TickFileFilterControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TwitControl.resx">
-      <DependentUpon>TwitControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TwitPopup.resx">
-      <DependentUpon>TwitPopup.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

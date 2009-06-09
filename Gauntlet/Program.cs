@@ -28,12 +28,12 @@ namespace WinGauntlet
             {
                 Application.Run(new Gauntlet());
             }
-            catch (Exception ex) { TradeLink.Common.CrashReport.Report(Gauntlet.PROGRAM, ex); }
+            catch (Exception ex) { TradeLink.AppKit.CrashReport.Report(Gauntlet.PROGRAM, ex); }
         }
 
         static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
-            TradeLink.Common.CrashReport.Report(Gauntlet.PROGRAM, e.Exception);
+            TradeLink.AppKit.CrashReport.Report(Gauntlet.PROGRAM, e.Exception);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace TradeLink.Common
+﻿namespace TradeLink.AppKit
 {
     partial class CrashReport
     {

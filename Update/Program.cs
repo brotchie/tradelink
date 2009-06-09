@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using TradeLink.Common;
+using TradeLink.AppKit;
 using System.Windows.Forms;
 using System.Net;
 using System.Diagnostics;
@@ -48,8 +49,8 @@ namespace Update
             var wc = new WebClient();
             // build filenames
             const string URL = "http://tradelink.googlecode.com/files/";
-            string bs = Util.BROKERSERVER+"-"+Util.LatestVersion(Util.BROKERSERVER).ToString()+".exe";
-            string tls = Util.TRADELINKSUITE + "-" + Util.LatestVersion(Util.TRADELINKSUITE).ToString() + ".exe";
+            string bs = Versions.BROKERSERVER + "-" + Versions.LatestVersion(Versions.BROKERSERVER).ToString() + ".exe";
+            string tls = Versions.TRADELINKSUITE + "-" + Versions.LatestVersion(Versions.TRADELINKSUITE).ToString() + ".exe";
             log("removing existing installers");
             try
             {
@@ -71,8 +72,8 @@ namespace Update
             catch (Exception ex) { log("error: " + ex.Message); return; }
 
             log("uninstalling existing versions");
-            string ubs = path + Util.BROKERSERVER + "\\uninstall.exe";
-            string utls = path + Util.TRADELINKSUITE + "\\uninstall.exe";
+            string ubs = path + Versions.BROKERSERVER + "\\uninstall.exe";
+            string utls = path + Versions.TRADELINKSUITE + "\\uninstall.exe";
             if (File.Exists(ubs))
                 Process.Start(ubs,"/S");
             if (File.Exists(tls))

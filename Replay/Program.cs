@@ -21,13 +21,13 @@ namespace Replay
             }
             catch (Exception e)
             {
-                TradeLink.Common.CrashReport.Report(Replay.PROGRAM, e);
+                TradeLink.AppKit.CrashReport.Report(Replay.PROGRAM, e);
             }
         }
 
         static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
-            TradeLink.Common.CrashReport.Report(Replay.PROGRAM, e);
+            TradeLink.AppKit.CrashReport.Report(Replay.PROGRAM, e);
         }
     }
 }

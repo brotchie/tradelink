@@ -16,6 +16,7 @@ namespace TradeLink.API
         void Remove(Basket subtractbasket);
         void Remove(int i);
         void Remove(Security s);
+        void Remove(string symbol);
         void Clear();
         IEnumerator GetEnumerator();
     }

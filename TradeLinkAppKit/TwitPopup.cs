@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
-namespace TradeLink.Common
+namespace TradeLink.AppKit
 {
     /// <summary>
     /// popup window that allows users to communicate with other tradleink users via twitter in real time.

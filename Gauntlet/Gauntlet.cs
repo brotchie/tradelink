@@ -582,7 +582,7 @@ namespace WinGauntlet
 
         private void _twithelp_Click(object sender, EventArgs e)
         {
-            TwitPopup.Twit();
+            TradeLink.AppKit.TwitPopup.Twit();
         }
 
 

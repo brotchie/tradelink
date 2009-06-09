@@ -5,17 +5,13 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{2F1D368C-358E-441B-908A-475DFAB87550}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{4581ADEF-B013-4EA9-90C5-D585637008CA}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Update</RootNamespace>
-    <AssemblyName>Update</AssemblyName>
+    <RootNamespace>TradeLink.AppKit</RootNamespace>
+    <AssemblyName>TradeLinkAppKit</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <ApplicationIcon>Update.ico</ApplicationIcon>
-    <TargetZone>LocalIntranet</TargetZone>
-    <GenerateManifests>false</GenerateManifests>
-    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,6 +35,8 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -48,21 +46,59 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="TwitterooCore, Version=1.4.0.42521, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\TwitterooCore.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="Auth.cs" />
+    <Compile Include="CrashReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CrashReport.Designer.cs">
+      <DependentUpon>CrashReport.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Log.cs" />
+    <Compile Include="Versions.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Versions.Designer.cs">
+      <DependentUpon>Versions.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TwitControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TwitControl.Designer.cs">
+      <DependentUpon>TwitControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TwitPopup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TwitPopup.Designer.cs">
+      <DependentUpon>TwitPopup.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Update.ico" />
+    <EmbeddedResource Include="CrashReport.resx">
+      <DependentUpon>CrashReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Versions.resx">
+      <DependentUpon>Versions.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TwitControl.resx">
+      <DependentUpon>TwitControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TwitPopup.resx">
+      <DependentUpon>TwitPopup.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Properties\app.manifest" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\TradeLinkAppKit\TradeLink.AppKit.csproj">
-      <Project>{4581ADEF-B013-4EA9-90C5-D585637008CA}</Project>
-      <Name>TradeLink.AppKit</Name>
+    <ProjectReference Include="..\TradeLinkAPI\TradeLink.API.csproj">
+      <Project>{1B99C9ED-7AF1-4D48-AC9D-A97CF30E1A82}</Project>
+      <Name>TradeLink.API</Name>
     </ProjectReference>
     <ProjectReference Include="..\TradeLinkCommon\TradeLink.Common.csproj">
       <Project>{A0FE06A2-F31B-49DE-8901-917B5D593E43}</Project>

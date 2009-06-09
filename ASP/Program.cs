@@ -21,13 +21,13 @@ namespace ASP
             }
             catch (Exception ex)
             {
-                TradeLink.Common.CrashReport.Report(ASP.PROGRAM, ex);
+                TradeLink.AppKit.CrashReport.Report(ASP.PROGRAM, ex);
             }
         }
 
         static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
-            TradeLink.Common.CrashReport.Report(ASP.PROGRAM, e.Exception);
+            TradeLink.AppKit.CrashReport.Report(ASP.PROGRAM, e.Exception);
         }
     }
 }

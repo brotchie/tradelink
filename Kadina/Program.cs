@@ -21,13 +21,13 @@ namespace Kadina
             }
             catch (Exception e)
             {
-                TradeLink.Common.CrashReport.Report(kadinamain.PROGRAM, e);
+                TradeLink.AppKit.CrashReport.Report(kadinamain.PROGRAM, e);
             }
         }
 
         static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
-            TradeLink.Common.CrashReport.Report(kadinamain.PROGRAM, e);
+            TradeLink.AppKit.CrashReport.Report(kadinamain.PROGRAM, e);
         }
     }
 }

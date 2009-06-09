@@ -1,4 +1,4 @@
-﻿namespace TradeLink.Common
+﻿namespace TradeLink.AppKit
 {
     partial class TwitPopup
     {
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.twitControl1 = new TradeLink.Common.TwitControl();
+            this.twitControl1 = new TwitControl();
             this.SuspendLayout();
             // 
             // twitControl1

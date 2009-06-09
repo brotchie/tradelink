@@ -20,12 +20,12 @@ namespace Quotopia
                 Quote q = new Quote();
                 Application.Run(q);
             }
-            catch (Exception ex) { TradeLink.Common.CrashReport.Report(Quote.PROGRAM, ex); }
+            catch (Exception ex) { TradeLink.AppKit.CrashReport.Report(Quote.PROGRAM, ex); }
         }
 
         static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
-            TradeLink.Common.CrashReport.Report(Quote.PROGRAM, e);
+            TradeLink.AppKit.CrashReport.Report(Quote.PROGRAM, e);
         }
     }
 }

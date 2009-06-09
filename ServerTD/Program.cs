@@ -23,13 +23,13 @@ namespace TDServer
             }
             catch (Exception e)
             {
-                TradeLink.Common.CrashReport.Report(TDServerMain.PROGRAM, e); 
+                TradeLink.AppKit.CrashReport.Report(TDServerMain.PROGRAM, e); 
             }
         }
 
         static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
-            TradeLink.Common.CrashReport.Report(TDServerMain.PROGRAM, e); 
+            TradeLink.AppKit.CrashReport.Report(TDServerMain.PROGRAM, e); 
         }
     }
 }

@@ -4,12 +4,13 @@ using System.Text;
 using System.Management;
 using System.Net;
 
-namespace TradeLink.Common
+namespace TradeLink.AppKit
 {
-    public class Auth
+    public class Auth 
     {
         public Auth(string authUrl) { url = authUrl; }
         string url = "";
+        public bool isAuthorized() { return isAuthorized(Auth.GetCPUId()); }
         public bool isAuthorized(string key)
         {
             return isAuthorized(key, true, false, true);

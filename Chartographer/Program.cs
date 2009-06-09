@@ -21,13 +21,13 @@ namespace Chartographer
             }
             catch (Exception e)
             {
-                TradeLink.Common.CrashReport.Report(ChartMain.PROGRAM, e);
+                TradeLink.AppKit.CrashReport.Report(ChartMain.PROGRAM, e);
             }
         }
 
         static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
-            TradeLink.Common.CrashReport.Report(ChartMain.PROGRAM, e);
+            TradeLink.AppKit.CrashReport.Report(ChartMain.PROGRAM, e);
         }
     }
 }

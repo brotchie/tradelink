@@ -55,7 +55,7 @@ namespace Quotopia
                 tl.RequestAccounts();
             else
                 
-            Util.ExistsNewVersions(tl);
+            TradeLink.AppKit.Versions.UpgradeAlert(tl);
 
         }
 

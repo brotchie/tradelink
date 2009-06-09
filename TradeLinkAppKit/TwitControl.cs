@@ -6,8 +6,8 @@ using System.Data;
 using System.Text;
 using System.Windows.Forms;
 using RareEdge.Twitteroo;
-
 using TradeLink.API;
+using TradeLink.Common;
 /*
  * to use this control it's recommended to add following to your application app.config file
  * 
@@ -22,7 +22,7 @@ using TradeLink.API;
  */
 
 
-namespace TradeLink.Common
+namespace TradeLink.AppKit
 {
     /// <summary>
     /// allows user to communicate with other tradelink users via twitter

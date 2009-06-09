@@ -21,13 +21,13 @@ namespace Tattle
             }
             catch (Exception e)
             {
-                TradeLink.Common.CrashReport.Report(TattleMain.PROGRAM, e);
+                TradeLink.AppKit.CrashReport.Report(TattleMain.PROGRAM, e);
             }
         }
 
         static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
-            TradeLink.Common.CrashReport.Report(TattleMain.PROGRAM, e);
+            TradeLink.AppKit.CrashReport.Report(TattleMain.PROGRAM, e);
         }
     }
 }

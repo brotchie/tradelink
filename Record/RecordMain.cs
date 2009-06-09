@@ -24,7 +24,7 @@ namespace Record
             {
                 tl.gotTick += new TickDelegate(tl_gotTick);
             }
-            Util.ExistsNewVersions(tl);
+            TradeLink.AppKit.Versions.UpgradeAlert(tl);
         }
 
 

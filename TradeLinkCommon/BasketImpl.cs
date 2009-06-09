@@ -92,6 +92,7 @@ namespace TradeLink.Common
             for (int i = remove.Count - 1; i >= 0; i--)
                 symbols.RemoveAt(remove[i]);
         }
+        public void Remove(string symbol) { int i = -1; for (int j = 0; j < symbols.Count; j++) if (symbols[j].Symbol == symbol) i = j; if (i != -1) symbols.RemoveAt(i); }
         public void Remove(int i) { symbols.RemoveAt(i); }
         public void Remove(Security s) { symbols.Remove(s); }
         public void Clear() { symbols.Clear(); }

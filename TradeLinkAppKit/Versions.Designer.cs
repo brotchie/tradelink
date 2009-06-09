@@ -1,6 +1,6 @@
-﻿namespace TradeLink.Common
+﻿namespace TradeLink.AppKit
 {
-    partial class NewVersion
+    partial class Versions
     {
         /// <summary>
         /// Required designer variable.

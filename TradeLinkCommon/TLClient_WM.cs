@@ -10,7 +10,7 @@ namespace TradeLink.Common
     /// TradeLink clients can connect to any supported TradeLink broker.
     /// version of the client that supports the tradelink protocol via windows messaging transport.
     /// </summary>
-    public class TLClient_WM : Form , TradeLinkClient
+    public class TLClient_WM : Form , TLClient
     {
 
         // clients that want notifications for subscribed stocks can override these methods
@@ -41,7 +41,7 @@ namespace TradeLink.Common
             this.ShowInTaskbar = false;
             this.Hide();
             TLFound();
-            this.Mode(ProviderIndex, handleexceptions, showarmingonmissingserver);
+            this.Mode(ProviderIndex, showarmingonmissingserver);
         }
 
         void TLClient_WM_gotFeatures(MessageTypes[] messages)
@@ -67,51 +67,42 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="mode">The mode.</param>
         /// <returns></returns>
-        public bool Mode() { return Mode(0, true, true); }
-        public bool Mode(int ProviderIndex, bool showarning) { return Mode(ProviderIndex, true, showarning); }
-        public bool Mode(int ProviderIndex, bool HandleExceptions, bool showwarning)
+        public bool Mode() { return Mode(0, true); }
+        public bool Mode(int ProviderIndex, bool showwarning)
         {
 
-            LinkType = TLTypes.NONE; // reset before changing link mode
+            _linktype = TLTypes.NONE; // reset before changing link mode
             if ((ProviderIndex >= srvrwin.Count) || (ProviderIndex < 0))
             {
                 if (showwarning)
                     System.Windows.Forms.MessageBox.Show("Invalid broker specified or no brokers running.", "TradeLink server not found");
                 return false;
             }
-            if (HandleExceptions)
-            {
-                try
-                {
-                    Disconnect();
-                    himh = WMUtil.HisHandle(srvrwin[ProviderIndex]);
-                    LinkType = TLTypes.LIVEBROKER;
-                    Register();
-                    RequestFeatures();
-                    return true;
-                }
-                catch (TLServerNotFound)
-                {
 
-                    if (showwarning)
-                        System.Windows.Forms.MessageBox.Show("No Live broker instance was found.  Make sure broker application + TradeLink server is running.", "TradeLink server not found");
-                    return false;
-                }
-            }
-            else
+            try
             {
                 Disconnect();
                 himh = WMUtil.HisHandle(srvrwin[ProviderIndex]);
-                LinkType = TLTypes.LIVEBROKER;
+                _linktype = TLTypes.LIVEBROKER;
                 Register();
                 RequestFeatures();
                 return true;
             }
-            return false;
+            catch (TLServerNotFound)
+            {
+
+                if (showwarning)
+                    System.Windows.Forms.MessageBox.Show("No Live broker instance was found.  Make sure broker application + TradeLink server is running.", "TradeLink server not found");
+                return false;
+            }
+            catch (Exception) { return false; }
+
         }
 
-        [Obsolete("you should check RequestFeatures list instead for this information.",false)]
-        public TLTypes LinkType = TLTypes.NONE;
+        TLTypes _linktype = TLTypes.NONE;
+
+        [Obsolete("you should check RequestFeatures list instead for this information.", false)]
+        public TLTypes LinkType { get { return _linktype; } }
 
         IntPtr himh = IntPtr.Zero;
         public long TLSend(MessageTypes type) { return TLSend(type, ""); }
