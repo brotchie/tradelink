@@ -123,6 +123,9 @@ Section "TradeLinkSuite"
   IntCmp $0 -1 finishinstall
   DetailPrint "VCRedistributable was installed."
   
+  ; make sure TickData folder is present
+  CreateDirectory $PROGRAMFILES\TradeLink\TickData
+  
 finishinstall:  
   ; Write the uninstall keys for Windows
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "DisplayName" "TradeLinkSuite"
