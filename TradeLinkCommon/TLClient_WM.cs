@@ -27,12 +27,13 @@ namespace TradeLink.Common
         public event ImbalanceDelegate gotImbalance;
         public event MessageDelegate gotUnknownMessage;
 
-        public TLClient_WM() : this(0,WMUtil.CLIENTWINDOW,true,true) { }
-        public TLClient_WM(int ProviderIndex) : this(ProviderIndex, WMUtil.CLIENTWINDOW, true, true) { }
-        public TLClient_WM(int ProviderIndex,string clientname) : this(ProviderIndex, clientname, true, true) { }
-        public TLClient_WM(string clientname, bool showwarningonmissing) : this(0,clientname, showwarningonmissing, true) { }
+        public TLClient_WM() : this(0,WMUtil.CLIENTWINDOW,true) { }
+        public TLClient_WM(bool showwarning) : this(0, WMUtil.CLIENTWINDOW, showwarning) { }
+        public TLClient_WM(int ProviderIndex) : this(ProviderIndex, WMUtil.CLIENTWINDOW, true ) { }
+        public TLClient_WM(int ProviderIndex,string clientname) : this(ProviderIndex, clientname, true) { }
+        public TLClient_WM(string clientname, bool showwarningonmissing) : this(0,clientname, showwarningonmissing) { }
 
-        public TLClient_WM(int ProviderIndex, string clientname, bool showarmingonmissingserver, bool handleexceptions)
+        public TLClient_WM(int ProviderIndex, string clientname, bool showarmingonmissingserver)
             : base()
         {
             this.Text = WMUtil.GetUniqueWindow(clientname);

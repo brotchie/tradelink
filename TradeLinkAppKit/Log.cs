@@ -16,10 +16,10 @@ namespace TradeLink.AppKit
         public Log(string name) : this(name, true, true, Environment.CurrentDirectory) { }
         public Log(string logname, bool dateinlogname,bool appendtolog,string path)
         {
-            string fn = path+"//"+logname+(dateinlogname ? "."+TradeLink.Common.Util.ToTLDate(DateTime.Now): "") + ".txt";
+            string fn = path+"\\"+logname+(dateinlogname ? "."+TradeLink.Common.Util.ToTLDate(DateTime.Now): "") + ".txt";
             try
             {
-                _log = new StreamWriter(path, appendtolog);
+                _log = new StreamWriter(fn, appendtolog);
                 _log.AutoFlush = true;
             }
             catch (Exception ex) { _log = null; }

@@ -40,77 +40,61 @@ namespace TradeLink.AppKit
         /// <param name="checkbrokerserver"></param>
         public static void UpgradeAlert(string Program, string ProgramUrl, string path, bool checktradelink, bool checkbrokerserver, TLClient_WM tl)
         {
-            
+ 
             if (Program != null)
             {
-                
-                int current = Util.BuildFromFile(path + "\\VERSION.txt");
-                verstate vs = new verstate(Program, ProgramUrl, current, checktradelink, checkbrokerserver, tl);
                 WebClient wc = new WebClient();
                 wc.DownloadStringCompleted += new DownloadStringCompletedEventHandler(wc_DownloadStringCompleted);
-                try
-                {
-                    wc.DownloadStringAsync(new Uri(ProgramUrl), vs);
 
-                }
-                catch { }
+                int current = Util.BuildFromFile(path + "\\VERSION.txt");
+                if (current != 0)
+                    wc.DownloadStringAsync(new Uri(ProgramUrl), new verstate(Program, ProgramUrl, current));
             }
-            else
+            if (checktradelink)
             {
-                verstate vs = new verstate(Program, ProgramUrl, 0, checktradelink, checkbrokerserver, tl);
-                processver(null, vs);
+                WebClient wc = new WebClient();
+                wc.DownloadStringCompleted += new DownloadStringCompletedEventHandler(wc_DownloadStringCompleted);
+
+                int current = Util.BuildFromFile(Util.TLProgramDir+ VERSIONFILE);
+                wc.DownloadStringAsync(new Uri(TLSITEURL), new verstate(TRADELINKSUITE,TLSITEURL, current));
             }
+            if (checkbrokerserver)
+            {
+                WebClient wc = new WebClient();
+                wc.DownloadStringCompleted += new DownloadStringCompletedEventHandler(wc_DownloadStringCompleted);
 
-
-
-
+                int current = ((tl == null) || (tl.LinkType == TLTypes.NONE)) ? 0 : tl.ServerVersion;
+                wc.DownloadStringAsync(new Uri(TLSITEURL), new verstate(BROKERSERVER, TLSITEURL, current));
+            }
         }
-
+        public const string VERSIONFILE = @"\VERSION.txt";
         internal struct verstate
         {
-            public TLClient_WM tl;
-            public bool ctl;
-            public bool cbs;
             public string program;
             public int current;
             public string url;
-            public verstate(string Program, string URL, int currentversion, bool TL, bool BS, TLClient_WM TLwm) { url = URL; program = Program; current = currentversion; ctl = TL; cbs = BS; tl = TLwm;}
+            public verstate(string Program, string URL, int currentversion) { url = URL; program = Program; current = currentversion; }
         }
-        private  static void processver(string res, verstate vs)
+
+        private static int latest(string res, string Program)
         {
-            if ((res != null) && (res != string.Empty))
+            MatchCollection mc = Regex.Matches(res, Program + @"-([0-9]+).exe");
+            int ver = 0;
+            foreach (Match m in mc)
             {
-                int current = vs.current;
-                string program = vs.program;
-                int ver = 0;
-
-                MatchCollection mc = Regex.Matches(res, program + @"-([0-9]+).exe");
-                foreach (Match m in mc)
-                {
-                    string r = m.Result("$1");
-                    int v = Convert.ToInt32(r);
-                    if (v > ver) ver = v;
-                }
-
-                if ((ver > current) && (current * ver != 0))
-                {
-                    Versions nv = new Versions(program, vs.url);
-                    nv.Show();
-                }
+                string r = m.Result("$1");
+                int v = Convert.ToInt32(r);
+                if (v > ver) ver = v;
             }
-            bool t = false;
-            bool b = false;
-            if (vs.ctl)
-                t = ExistsNewTLS();
-            if ((vs.cbs) && (vs.tl != null) && (vs.tl.LinkType != TLTypes.NONE))
-                b = ExistsNewBS(vs.tl);
-            if ((t || b))
-            {
-                string ps = (t ? "TradeLinkSuite" : " ") + (b ? "BrokerServer":"");
-                Versions nv = new Versions(ps, "http://tradelink.googlecode.com", "Grab new versions of: " + ps + Environment.NewLine + "Or run TradeLink Update.");
-                nv.Show();
-            }
+            return ver;
         }
+
+        public static void ExistsNewVersionsAsync(TLClient_WM tl)
+        {
+            int tlv = Util.BuildFromFile(Util.TLProgramDir + @"\VERSION.txt");
+            
+        }
+
         static void wc_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
         {
             // if we don't have arguments, quit
@@ -121,7 +105,15 @@ namespace TradeLink.AppKit
             // handle data
             verstate vs = (verstate)e.UserState;
             string res = e.Result;
-            processver(res, vs);
+            if ((res != null) && (res != string.Empty))
+            {
+                int ver = latest(res, vs.program);
+                if ((ver > vs.current) && (vs.current * ver != 0))
+                {
+                    Versions nv = new Versions(vs.program, vs.url);
+                    nv.Show();
+                }
+            }
         }
 
         void urlloclab_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -171,7 +163,7 @@ namespace TradeLink.AppKit
         public static bool ExistsNewTLS()
         {
             int latest = LatestVersion(TRADELINKSUITE);
-            int build = Util.BuildFromFile(Util.TLProgramDir + @"\VERSION.txt");
+            int build = Util.BuildFromFile(Util.TLProgramDir+@"\VERSION.txt");
             return latest > build;
         }
         /// <summary>

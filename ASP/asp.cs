@@ -21,7 +21,7 @@ namespace ASP
         const string SKINEXT = ".skn";
 
         // working variables
-        TLClient_WM tl = new TLClient_WM();
+        TLClient_WM tl = new TLClient_WM(false);
         Dictionary<string, SecurityImpl> _seclist = new Dictionary<string, SecurityImpl>();
         Dictionary<string, int[]> _symidx = new Dictionary<string, int[]>();
         List<Response> _reslist = new List<Response>();
@@ -57,6 +57,9 @@ namespace ASP
             tl.gotPosition += new PositionDelegate(tl_gotPosition);
             tl.gotAccounts += new DebugDelegate(tl_gotAccounts);
             tl.gotUnknownMessage += new MessageDelegate(tl_gotUnknownMessage);
+            // show status
+            status(Util.TLSIdentity());
+            debug(Util.TLSIdentity());
             // if we have a server
             if (tl.LinkType != TLTypes.NONE)
             {
@@ -65,6 +68,12 @@ namespace ASP
                 // request positions
                 foreach (string acct in _acct)
                     tl.RequestPositions(acct);
+                // show broker
+                debug("broker: " + tl.ServerVersion);
+            }
+            else
+            {
+                status("no broker found.  start broker, then restart ASP.");
             }
             // setup right click menu
             _resnames.ContextMenu= new ContextMenu();
@@ -75,7 +84,7 @@ namespace ASP
             // make sure we exit properly
             this.FormClosing += new FormClosingEventHandler(ASP_FormClosing);
             // show version to user
-            status(Util.TLSIdentity());
+            
             // check for new versions
             Versions.UpgradeAlert(tl);
             // get last loaded response library
