@@ -21,7 +21,7 @@ namespace Quotopia
         public int GetTime { get { DateTime d = DateTime.Now; int i = (d.Hour * 100) + (d.Minute); return i; } }
         public event TickDelegate spillTick;
         public event OrderStatusDel orderStatus;
-        AsyncResponse ar = new AsyncResponse();
+        AsyncResponse _ar = new AsyncResponse();
         public const string PROGRAM = "Quotopia";
 
         public Quote()
@@ -40,8 +40,14 @@ namespace Quotopia
             statfade.Interval = 3000;
             statfade.Tick += new EventHandler(statfade_Tick);
             statfade.Start();
-            ar.GotTick += new TickDelegate(ar_GotTick);
-            tl.gotTick += new TickDelegate(tl_gotTick);
+            // if our machine is multi-core we use seperate thread to process ticks
+            if (Environment.ProcessorCount == 1)
+                tl.gotTick += new TickDelegate(tl_gotTick);
+            else
+            {
+                tl.gotTick += new TickDelegate(tl_gotTickasync);
+                _ar.GotTick += new TickDelegate(tl_gotTick);
+            }
             tl.gotFill += new FillDelegate(tl_gotFill);
             tl.gotOrder += new OrderDelegate(tl_gotOrder);
             tl.gotOrderCancel += new UIntDelegate(tl_gotOrderCancel);
@@ -72,6 +78,14 @@ namespace Quotopia
         {
             accts = msg.Split(',');
             
+        }
+
+        void tl_gotTickasync(Tick t)
+        {
+            // on multi-core machines, this will be invoked to write ticks
+            // to a cache where they will be processed by a seperate thread
+            // asynchronously
+            _ar.WriteIt(t);
         }
 
         void tl_gotPosition(Position pos)
@@ -146,7 +160,7 @@ namespace Quotopia
         void Quote_FormClosing(object sender, FormClosingEventArgs e)
         {
             Properties.Settings.Default.Save();
-            ar.Stop();
+            _ar.Stop();
             try
             {
                 tl.Unsubscribe();
@@ -458,7 +472,7 @@ namespace Quotopia
                         if (t.size > 0) // make sure TSize is reported
                             qt.Rows[r]["TSize"] = t.size;
                     }
-                    else if (t.isFullQuote)
+                    if (t.isFullQuote)
                     {
 
                         qt.Rows[r]["Bid"] = t.bid.ToString("N2");
@@ -529,20 +543,14 @@ namespace Quotopia
 
         PositionTracker pt = new PositionTracker();
 
-        void ar_GotTick(Tick t)
+        void tl_gotTick(Tick t)
         {
-            if (spillTick != null) 
+            if (spillTick != null)
                 spillTick(t);
             RefreshRow(t);
             BarListImpl bl = null;
             if (bardict.TryGetValue(t.symbol, out bl))
                 bardict[t.symbol].newTick(t);
-
-        }
-
-        void tl_gotTick(Tick k)
-        {
-            ar.WriteIt(k);
         }
 
 
