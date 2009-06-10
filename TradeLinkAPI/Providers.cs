@@ -17,5 +17,13 @@ namespace TradeLink.API
         HUBB,
         Tradespeed,
         REDI,
+        eSignal,
+        IQFeed,
+        TrackData,
+        TradingTechnologies,
+        ZenFire,
+        GAINCapital,
+        FxCm,
+        OpenEcry,
     }
 }
