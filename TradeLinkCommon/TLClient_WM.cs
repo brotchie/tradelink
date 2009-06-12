@@ -257,7 +257,7 @@ namespace TradeLink.Common
             foreach (string name in legacy)
                 addserver(name);
             for (int i = 0; i < MAXSERVER; i++)
-                addserver(WMUtil.SERVERWINDOW + i.ToString());
+                addserver(WMUtil.SERVERWINDOW + "."+i.ToString());
             return servers.ToArray();
         }
 
