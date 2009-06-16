@@ -62,6 +62,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\Genesis+BrokerServer.lnk" "$INSTDIR\ServerGenesis.EXE" "" "$INSTDIR\ServerGenesis.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\TS2EPF.lnk" "$INSTDIR\TS2EPF.exe" "" "$INSTDIR\TS2EPF.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\CQG2EPF.lnk" "$INSTDIR\CQG2EPF.exe" "" "$INSTDIR\CQG2EPF.exe" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink\Esignal.lnk" "$INSTDIR\ServerEsignal.exe" "" "$INSTDIR\ServerEsignal.exe" 0  
   
   
   
@@ -115,6 +116,9 @@ Section "TradeLinkSuite"
   File "InstallSuite\VCRedistInstall.exe"
   File "TS2EPF\bin\release\TS2EPF.exe"
   File "CQG2EPF\bin\release\CQG2EPF.exe"
+  File "ServerEsignal\bin\release\Interop.IESignal.dll"
+  File "ServerEsignal\bin\release\ServerEsignal.exe"
+  File "ServerEsignal\bin\release\ServerEsignal.exe.config"
   ; Write the installation path into the registry
   WriteRegStr HKLM SOFTWARE\TradeLinkSuite "Install_Dir" "$INSTDIR"
   
