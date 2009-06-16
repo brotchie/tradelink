@@ -414,7 +414,7 @@ namespace ASP
         {
             // see if we are tracking this symbol
             int[] idxs = new int[0];
-            if (!_symidx.TryGetValue(t.Sec.Symbol, out idxs) && !_symidx.TryGetValue(t.Sec.FullName, out idxs))
+            if (!_symidx.TryGetValue(t.symbol, out idxs) )
                 return;
 
             // see if we should save this tick

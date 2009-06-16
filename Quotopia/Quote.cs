@@ -466,7 +466,7 @@ namespace Quotopia
             }
             else
             {
-                int[] rows = GetSymbolRows(t.Sec.FullName);
+                int[] rows = GetSymbolRows(t.symbol);
                 decimal high = tl.FastHigh(t.symbol);
                 decimal low = tl.FastLow(t.symbol);
                 for (int i = 0; i < rows.Length; i++)
@@ -476,7 +476,7 @@ namespace Quotopia
                     // fetch position from TL
                     int r = rows[i];
                     if (qt.Rows[r].RowState == DataRowState.Deleted) continue;
-                    if ((r < 0) || (r > qt.Rows.Count - 1)) continue;
+                    if ((r < 0) || (r >= qt.Rows.Count)) continue;
                     if (t.isTrade)
                     {
                         qt.Rows[r]["Last"] = t.trade.ToString("N2");

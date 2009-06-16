@@ -570,6 +570,14 @@ namespace TradeLibFast
 		return true; // didn't find order so we added it and returned index
 	}
 
+	vector<uint> sentids;
+	bool sent(uint id)
+	{
+		for (int i = 0; i<(int)sentids.size();i++)
+			if (sentids[i]==id) return true;
+		return false;
+	}
+
 	void AVL_TLWM::Process(const Message* message, Observable* from, const Message* additionalInfo)
 	{
 		switch(message->GetType())
@@ -586,6 +594,9 @@ namespace TradeLibFast
 				Order* order = info->m_order;
 				const Execution* exec = info->m_execution;
 				if ((order==NULL) || (exec==NULL)) return; // don't process null orders
+				uint xid = info->m_execution->GetUniqueExecutionId();
+				if (sent(xid)) return; // don't notify twice on same execution
+				else sentids.push_back(xid);
 
 				unsigned int thisid = this->fetchOrderId(order);
 				CString ac = CString(B_GetAccountName(order->GetAccount()));
@@ -609,8 +620,7 @@ namespace TradeLibFast
 
 			} // has additional info end
 			break;
-			//case 41008: // undocumented- update order smart orders (stops)??
-			//case 41025: // undocumented- assign id smart orders (stops)??
+			//case M_SMARTORDER_ADD: 
 			case M_POOL_ASSIGN_ORDER_ID://Original order sent has a unigue generated id. The server sends this message to notify you that the order was assigned a new id different from the original. Both ids are part of this notification structure. This message can come 1 or 2 times.
 			case M_POOL_UPDATE_ORDER:// Order status is modified
 			{
@@ -647,8 +657,17 @@ namespace TradeLibFast
 				}
 			}
 				break;
-			//case 41027: // undocumented - cancel smart orders?? (stops?)
-			case M_REQ_CANCEL_ORDER:
+			case M_SMARTORDER_REMOVE: // for smart cancels
+				{
+					MsgSmartOrderRemove* info = (MsgSmartOrderRemove*)additionalInfo;
+					Order* order = info->m_order;
+					unsigned int anvilid = order->GetId();
+					unsigned int id = fetchOrderId(order);
+					if (id>0)
+						SrvGotCancel(id);
+
+				}
+			case M_REQ_CANCEL_ORDER: // for regular cancels
 			{
 				AIMsgOrder* info = (AIMsgOrder*)additionalInfo;
 				Order* order = info->m_order;
@@ -667,7 +686,10 @@ namespace TradeLibFast
 					if (additionalInfo && (additionalInfo->GetType()==M_AI_STOCK_MOVEMENT))
 					{
 						const StockMovement* sm = ((MsgStockMovement*)additionalInfo)->m_stock;
+						const StockBase* stk = preload(sm->GetSymbol());
 						TLImbalance imb;
+						if ((stk!=NULL) && stk->isLoaded()) 
+							imb.InfoImbalance = stk->GetNyseInformationalImbalance();
 						imb.Symbol = CString(sm->GetSymbol());
 						imb.ThisImbalance = sm->GetNyseImbalance();
 						imb.PrevImbalance = sm->GetNysePreviousImbalance();

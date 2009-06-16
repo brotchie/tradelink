@@ -34,6 +34,7 @@ namespace TradeLibFast
 		double MajorVer;
 		int MinorVer;
 
+		vector<int> imbclient;
 		vector <CString>client; // map client ids to name
 		vector<HWND>hims; // store client handles
 		vector <time_t>heart; // map last contact to id
