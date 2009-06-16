@@ -213,8 +213,7 @@ namespace TradeLink.Common
             Tick t = new TickImpl();
             decimal d = 0;
             int i = 0;
-            t.Sec = SecurityImpl.Parse(r[(int)TickField.symbol]);
-            t.symbol = t.Sec.Symbol;
+            t.symbol = r[(int)TickField.symbol];
             if (decimal.TryParse(r[(int)TickField.trade], out d))
                 t.trade = d;
             if (decimal.TryParse(r[(int)TickField.bid], out d))
