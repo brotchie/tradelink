@@ -10,6 +10,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using TradeLink.Common;
 using TradeLink.API;
+using TradeLink.AppKit;
 
 namespace Quotopia
 {
@@ -23,6 +24,7 @@ namespace Quotopia
         public event OrderStatusDel orderStatus;
         AsyncResponse _ar = new AsyncResponse();
         public const string PROGRAM = "Quotopia";
+        DebugWindow _dw = new DebugWindow();
 
         public Quote()
         {
@@ -33,10 +35,10 @@ namespace Quotopia
                 Quotopia.Properties.Settings.Default.Save();
                 Refresh();
             }
-            
             Size = Quotopia.Properties.Settings.Default.wsize;
             debug(Util.TLSIdentity());
             QuoteGridSetup();
+
             statfade.Interval = 3000;
             statfade.Tick += new EventHandler(statfade_Tick);
             statfade.Start();
@@ -63,6 +65,11 @@ namespace Quotopia
                 
             TradeLink.AppKit.Versions.UpgradeAlert(tl);
 
+        }
+
+        void togdebug(object sender, EventArgs e)
+        {
+            _dw.Toggle();
         }
 
         void Quote_Resize(object sender, EventArgs e)
@@ -201,6 +208,7 @@ namespace Quotopia
             qg.ColumnHeadersVisible = true;
             qg.Capture = true;
             qg.ContextMenuStrip = new ContextMenuStrip();
+            qg.ContextMenuStrip.Items.Add("Messages", null, new EventHandler(togdebug));
             qg.ContextMenuStrip.Items.Add("Remove", null,new EventHandler(rightremove));
             qg.ContextMenuStrip.Items.Add("Chart", null,new EventHandler(rightchart));
             qg.ContextMenuStrip.Items.Add("Ticket", null,new EventHandler(rightticket));
@@ -342,7 +350,11 @@ namespace Quotopia
                     mb.Add(sec);
                     addsymbol(newsymbol);
                     newsymbol = "";
-                    tl.Subscribe(mb);
+                    try
+                    {
+                        tl.Subscribe(mb);
+                    }
+                    catch (TLServerNotFound) { debug("no broker or feed server running."); }
                 }
                 else
                 {
@@ -564,12 +576,7 @@ namespace Quotopia
 
         public void debug(string s)
         {
-            if (this.statusWindow.InvokeRequired)
-                this.Invoke(new DebugDelegate(debug), new object[] { s });
-            else
-            {
-                statusWindow.AppendText(s + Environment.NewLine);
-            }
+            _dw.GotDebug(s);
         }
 
         DateTime laststat = DateTime.Now;

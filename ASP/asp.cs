@@ -34,6 +34,7 @@ namespace ASP
         string[] _acct = new string[0];
         AsyncResponse _ar = new AsyncResponse();
         Log _log = new Log(PROGRAM);
+        DebugWindow _dw = new DebugWindow();
 
 
         public ASP()
@@ -451,21 +452,7 @@ namespace ASP
 
         void debug(string message)
         {
-            // if we're running from a background thread, invoke GUI thread to update screen
-            if (_msg.InvokeRequired)
-                _msg.Invoke(new DebugDelegate(debug), new object[] { message });
-            else
-            {
-                _log.GotDebug(message);
-                // get a timestamp
-                string stamp = DateTime.Now.ToShortTimeString() + " ";
-                // if we have a logfile, log the debug
-                _msg.Items.Add(stamp+message);
-                // select it
-                _msg.SelectedIndex = _msg.Items.Count - 1;
-                // refresh display
-                _msg.Invalidate(true);
-            }
+            _dw.GotDebug(message);
         }
 
 
@@ -688,9 +675,7 @@ namespace ASP
         private void _togglemsgs_Click(object sender, EventArgs e)
         {
             // toggle debug msg box
-            _msg.Visible = !_msg.Visible;
-            // refresh screen
-            _msg.Invalidate();
+            _dw.Toggle();
         }
 
         private void _twithelp_Click(object sender, EventArgs e)

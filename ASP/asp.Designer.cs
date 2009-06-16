@@ -40,7 +40,6 @@ namespace ASP
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
-            this._msg = new System.Windows.Forms.ListBox();
             this.debugon = new System.Windows.Forms.CheckBox();
             this.archivetickbox = new System.Windows.Forms.CheckBox();
             this._newrespbox = new System.Windows.Forms.GroupBox();
@@ -157,19 +156,6 @@ namespace ASP
             // 
             this.toolStripStatusLabel2.Name = "toolStripStatusLabel2";
             this.toolStripStatusLabel2.Size = new System.Drawing.Size(0, 17);
-            // 
-            // _msg
-            // 
-            this._msg.Dock = System.Windows.Forms.DockStyle.Right;
-            this._msg.FormattingEnabled = true;
-            this._msg.HorizontalScrollbar = true;
-            this._msg.ItemHeight = 20;
-            this._msg.Location = new System.Drawing.Point(112, 0);
-            this._msg.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this._msg.Name = "_msg";
-            this._msg.Size = new System.Drawing.Size(356, 384);
-            this._msg.TabIndex = 12;
-            this._msg.Visible = false;
             // 
             // debugon
             // 
@@ -313,7 +299,6 @@ namespace ASP
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(468, 415);
-            this.Controls.Add(this._msg);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this._newrespbox);
             this.Controls.Add(this.statusStrip1);
@@ -345,7 +330,6 @@ namespace ASP
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel2;
-        private System.Windows.Forms.ListBox _msg;
         private System.Windows.Forms.CheckBox debugon;
         private System.Windows.Forms.CheckBox archivetickbox;
         private System.Windows.Forms.TextBox _account;
