@@ -59,7 +59,25 @@
     <Compile Include="CrashReport.Designer.cs">
       <DependentUpon>CrashReport.cs</DependentUpon>
     </Compile>
+    <Compile Include="DebugControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DebugControl.designer.cs">
+      <DependentUpon>DebugControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DebugWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DebugWindow.designer.cs">
+      <DependentUpon>DebugWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="Log.cs" />
+    <Compile Include="PopupWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PopupWindow.designer.cs">
+      <DependentUpon>PopupWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="Versions.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -83,6 +101,15 @@
   <ItemGroup>
     <EmbeddedResource Include="CrashReport.resx">
       <DependentUpon>CrashReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DebugControl.resx">
+      <DependentUpon>DebugControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DebugWindow.resx">
+      <DependentUpon>DebugWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PopupWindow.resx">
+      <DependentUpon>PopupWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Versions.resx">
       <DependentUpon>Versions.cs</DependentUpon>

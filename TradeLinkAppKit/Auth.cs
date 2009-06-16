@@ -40,7 +40,7 @@ namespace TradeLink.AppKit
             if (throwexception && !reg)
                 throw new UnregisteredException(err);
             if (showerrorbox && !reg)
-                System.Windows.Forms.MessageBox.Show(err, "Registration Error");
+                PopupWindow.Show("Registration Error", err);
             return reg;
         }
 
