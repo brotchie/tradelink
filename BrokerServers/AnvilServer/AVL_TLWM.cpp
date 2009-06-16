@@ -609,8 +609,8 @@ namespace TradeLibFast
 
 			} // has additional info end
 			break;
-			case 41008: // undocumented- update order smart orders (stops)??
-			case 41025: // undocumented- assign id smart orders (stops)??
+			//case 41008: // undocumented- update order smart orders (stops)??
+			//case 41025: // undocumented- assign id smart orders (stops)??
 			case M_POOL_ASSIGN_ORDER_ID://Original order sent has a unigue generated id. The server sends this message to notify you that the order was assigned a new id different from the original. Both ids are part of this notification structure. This message can come 1 or 2 times.
 			case M_POOL_UPDATE_ORDER:// Order status is modified
 			{
@@ -647,7 +647,7 @@ namespace TradeLibFast
 				}
 			}
 				break;
-			case 41027: // undocumented - cancel smart orders?? (stops?)
+			//case 41027: // undocumented - cancel smart orders?? (stops?)
 			case M_REQ_CANCEL_ORDER:
 			{
 				AIMsgOrder* info = (AIMsgOrder*)additionalInfo;
