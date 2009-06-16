@@ -17,6 +17,10 @@ OutFile "BrokerServer.exe"
 ; The default installation directory
 InstallDir $PROGRAMFILES\TradeLink\BrokerServer\
 
+; anvil release
+!define ANVILDIRNAME "AnvilRelease_x32_2_7_7_2"
+
+
 ; Registry key to check for directory (so if you install again, it will 
 ; overwrite the old one automatically)
 InstallDirRegKey HKLM "Software\NSIS_TLBrokerServer" "Install_Dir"
@@ -78,7 +82,8 @@ Section "AnvilServer"
   ; Put file there
  
   
-  File /r "AnvilRelease_x32_2_7_7_2"
+  File /r "${ANVILDIRNAME}"
+  WriteINIStr "$INSTDIR\${ANVILDIRNAME}\Anvil.ini" Extension Path "$INSTDIR\${ANVILDIRNAME}\"
 
 
 SectionEnd
