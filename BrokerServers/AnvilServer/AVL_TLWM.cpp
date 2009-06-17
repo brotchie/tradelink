@@ -523,10 +523,16 @@ namespace TradeLibFast
 		}
 		// make sure order sent is valid order
 		if (orderSent==NULL)
-			return EMPTY_ORDER;
-		// save order if it was accepted
-		if (error==0)
-			error = saveOrder(orderSent,o.id) ? OK : DUPLICATE_ORDERID; 
+		{
+			if (error==0) // if no error, return empty order
+				return EMPTY_ORDER;
+		}
+		else // if order is good, save it
+		{
+			// save order if it was accepted
+			if (error==0)
+				error = saveOrder(orderSent,o.id) ? OK : DUPLICATE_ORDERID; 
+		}
 		// return result
 		return error;
 	}
