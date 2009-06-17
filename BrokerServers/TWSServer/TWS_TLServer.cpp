@@ -124,6 +124,8 @@ namespace TradeLibFast
 		f.push_back(LIVEDATA);
 		f.push_back(LIVETRADING);
 		f.push_back(SIMTRADING);
+		f.push_back(POSITIONRESPONSE);
+		f.push_back(POSITIONREQUEST);
 		return f;
 	}
 
@@ -158,6 +160,27 @@ namespace TradeLibFast
 		return ibid;
 	}
 
+	int TypeFromExchange(CString ex)
+	{
+		if ((ex=="GLOBEX")|| (ex=="NYMEX")||(ex=="CFE"))
+			return FUT;
+		else if ((ex=="NYSE")||(ex=="NASDAQ")||(ex=="ARCA"))
+			return STK;
+		// default to STK if not sure
+		return 0;
+
+	}
+
+	vector<int> specsymid;
+	vector<CString> specsym;
+	const int NOTSPECIAL = -1;
+	int specid(int id)
+	{
+		for (int i = 0; i<(int)specsymid.size(); i++)
+			if (specsymid[i]==id) return i;
+		return NOTSPECIAL;
+	}
+
 	int TWS_TLServer::SendOrder(TLOrder o)
 	{
 		// check our order
@@ -179,12 +202,28 @@ namespace TradeLibFast
 		order->transmit = true;
 
 		Contract* contract(new Contract);
+		TLSecurity tmpsec = TLSecurity::Deserialize(o.symbol);
 		contract->symbol = o.symbol;
-		contract->localSymbol = o.localsymbol!="" ? o.localsymbol : o.symbol;
-		if (o.exchange=="")
-			o.exchange = "SMART";
-		contract->exchange = o.exchange;
-		contract->secType = o.security;
+		if (o.symbol.FindOneOf(" ")!=-1)
+		{
+			contract->symbol = tmpsec.sym;
+			contract->localSymbol = o.localsymbol!="" ? o.localsymbol : tmpsec.sym;
+			if (tmpsec.hasDest())
+				contract->exchange = tmpsec.dest;
+			if (tmpsec.hasType())
+				contract->secType = tmpsec.SecurityTypeName(tmpsec.type);
+			else if (tmpsec.hasDest())
+				contract->secType = TLSecurity::SecurityTypeName(TypeFromExchange(tmpsec.dest));
+		}
+		else 
+		{
+			contract->localSymbol = o.localsymbol!="" ? o.localsymbol : o.symbol;
+			contract->exchange = o.exchange;
+			contract->secType = o.security;
+			if (o.exchange=="")
+				o.exchange = "SMART";
+		}
+		
 		contract->currency = o.currency;
 
 		// get the TWS session associated with our account
@@ -295,6 +334,7 @@ namespace TradeLibFast
 
 
 
+
 	std::vector<int> ordercache;
 
 	bool newOrder(OrderId id)
@@ -322,7 +362,7 @@ namespace TradeLibFast
 			o.id = IB2TLID(orderId);
 			o.side = (order.action=="BUY");
 			o.size = abs(order.totalQuantity) * ((o.side) ? 1 : -1);
-			o.symbol = contract.symbol;
+			o.symbol = contract.localSymbol;
 			o.price = (order.orderType=="LMT") ? order.lmtPrice : 0;
 			o.stop = (order.orderType=="STP") ? order.auxPrice : 0;
 			o.exchange = contract.exchange;
@@ -374,6 +414,8 @@ namespace TradeLibFast
 		else D(errorString); // print other errors
 	}
 
+
+
 	void TWS_TLServer::execDetails( OrderId orderId, const Contract& contract, const Execution& execution) 
 	{ 
 		// convert to a tradelink trade
@@ -409,16 +451,7 @@ namespace TradeLibFast
 		return false;
 	}
 
-	int TypeFromExchange(CString ex)
-	{
-		if ((ex=="GLOBEX")|| (ex=="NYMEX")||(ex=="CFE"))
-			return FUT;
-		else if ((ex=="NYSE")||(ex=="NASDAQ")||(ex=="ARCA"))
-			return STK;
-		// default to STK if not sure
-		return 0;
 
-	}
 
 	int TWS_TLServer::RegisterStocks(CString clientname)
 	{
@@ -532,6 +565,49 @@ namespace TradeLibFast
 
 
 	}
+
+	vector<TLPosition> poslist;
+
+	bool havepos(TLPosition pos)
+	{
+		for (int i = 0; i<(int)poslist.size(); i++)
+			if ((poslist[i].Symbol==pos.Symbol))
+				return true;
+		return false;
+	}
+
+	void TWS_TLServer::updatePortfolio( const Contract& contract, int position,
+		double marketPrice, double marketValue, double averageCost,
+		double unrealizedPNL, double realizedPNL, const CString &accountName) 
+	{ 
+		TLPosition pos;
+		pos.Symbol = contract.localSymbol;
+		pos.Size = position;
+		pos.AvgPrice = marketPrice;
+		pos.ClosedPL = realizedPNL;
+		if (!havepos(pos))
+			poslist.push_back(pos);
+
+	}
+
+	int TWS_TLServer::PositionResponse(CString account, CString clientname)
+	{
+		for (int i = 0; i<(int)poslist.size(); i++)
+				TLSend(POSITIONRESPONSE,poslist[i].Serialize(),clientname);
+		return OK;
+	}
+
+
+
+	void TWS_TLServer::updateMktDepthL2( TickerId id, int position, CString marketMaker, int operation, 
+			int side, double price, int size) 
+	{ 
+		// add DOM support here
+	}
+
+
+
+
 	void TWS_TLServer::tickOptionComputation( TickerId ddeId, TickType field, double impliedVol,
 		double delta, double modelPrice, double pvDividend) { }
 	void TWS_TLServer::tickGeneric(TickerId tickerId, TickType tickType, double value) { }
@@ -544,17 +620,12 @@ namespace TradeLibFast
 		int clientId, const CString& whyHeld) { }
 	void TWS_TLServer::connectionClosed() { D("TWS connection closed.");}
 
-	void TWS_TLServer::updatePortfolio( const Contract& contract, int position,
-		double marketPrice, double marketValue, double averageCost,
-		double unrealizedPNL, double realizedPNL, const CString &accountName) { }
 	void TWS_TLServer::updateAccountTime(const CString &timeStamp) { }
 	void TWS_TLServer::contractDetails( int reqId, const ContractDetails& contractDetails) {}
 	void TWS_TLServer::bondContractDetails( int reqId, const ContractDetails& contractDetails) {}
 	void TWS_TLServer::contractDetailsEnd( int reqId) {}
 	void TWS_TLServer::updateMktDepth( TickerId id, int position, int operation, int side, 
 			double price, int size) { }
-	void TWS_TLServer::updateMktDepthL2( TickerId id, int position, CString marketMaker, int operation, 
-			int side, double price, int size) { }
 	void TWS_TLServer::updateNewsBulletin(int msgId, int msgType, const CString& newsMessage, const CString& originExch) { }
 	void TWS_TLServer::receiveFA(faDataType pFaDataType, const CString& cxml) { }
 	void TWS_TLServer::historicalData(TickerId reqId, const CString& date, double open, double high, double low,
