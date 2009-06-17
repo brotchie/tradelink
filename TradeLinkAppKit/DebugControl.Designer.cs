@@ -41,7 +41,6 @@
             this._msg.Name = "_msg";
             this._msg.Size = new System.Drawing.Size(150, 144);
             this._msg.TabIndex = 0;
-            this._msg.SelectedIndexChanged += new System.EventHandler(this._msg_SelectedIndexChanged);
             // 
             // DebugControl
             // 

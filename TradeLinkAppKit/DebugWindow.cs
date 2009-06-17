@@ -14,8 +14,11 @@ namespace TradeLink.AppKit
         public DebugWindow()
         {
             InitializeComponent();
+
         }
+
         public bool isValid = true;
+        public bool TimeStamps { get { return debugControl1.TimeStamps; } set { debugControl1.TimeStamps = value; } }
         public void GotDebug(TradeLink.API.Debug deb)
         {
             debugControl1.GotDebug(deb);
@@ -31,5 +34,7 @@ namespace TradeLink.AppKit
             Visible = !Visible;
             Invalidate(true);
         }
+
+
     }
 }

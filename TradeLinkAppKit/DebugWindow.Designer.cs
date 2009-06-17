@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.debugControl1 = new DebugControl();
+            this.debugControl1 = new TradeLink.AppKit.DebugControl();
             this.SuspendLayout();
             // 
             // debugControl1
@@ -48,6 +48,7 @@
             this.Controls.Add(this.debugControl1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "DebugWindow";
+            this.ShowInTaskbar = false;
             this.Text = "Messages";
             this.ResumeLayout(false);
 

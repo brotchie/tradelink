@@ -13,7 +13,7 @@ namespace TradeLink.AppKit
     public partial class DebugControl : UserControl
     {
         bool _timestamp = true;
-        public bool TimeStamps { get { return _timestamp; } }
+        public bool TimeStamps { get { return _timestamp; } set { _timestamp = value; } }
         public DebugControl() : this(true) { }
         public DebugControl(bool timestamp)
         {
@@ -31,10 +31,6 @@ namespace TradeLink.AppKit
             debug(msg);
         }
 
-        private void _msg_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            Toggle();
-        }
         delegate void stringdel(string msg);
         void debug(string msg)
         {
@@ -51,10 +47,5 @@ namespace TradeLink.AppKit
             }
         }
 
-        public void Toggle()
-        {
-            Visible = !Visible;
-            Invalidate(true);
-        }
     }
 }
