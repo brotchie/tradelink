@@ -453,6 +453,7 @@ namespace ASP
         void debug(string message)
         {
             _dw.GotDebug(message);
+            _log.GotDebug(message);
         }
 
 
