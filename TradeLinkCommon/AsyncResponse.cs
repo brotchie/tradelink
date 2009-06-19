@@ -40,7 +40,10 @@ namespace TradeLink.Common
                         flipped = false;
                     }
                 }
-                mre.WaitOne(); // wait for a signal to continue reading
+                // clear current flag signal
+                mre.Reset();
+                // wait for a new signal to continue reading
+                mre.WaitOne(-1); 
                     
             }
         }

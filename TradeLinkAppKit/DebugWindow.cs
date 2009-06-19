@@ -35,6 +35,14 @@ namespace TradeLink.AppKit
             Invalidate(true);
         }
 
+        private void DebugWindow_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // hide window
+            Toggle();
+            // cancel the close
+            e.Cancel = true;
+        }
+
 
     }
 }

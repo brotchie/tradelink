@@ -38,18 +38,19 @@
             this.debugControl1.Name = "debugControl1";
             this.debugControl1.Size = new System.Drawing.Size(278, 248);
             this.debugControl1.TabIndex = 0;
+            this.debugControl1.TimeStamps = true;
             // 
             // DebugWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(278, 248);
-            this.ControlBox = false;
             this.Controls.Add(this.debugControl1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "DebugWindow";
             this.ShowInTaskbar = false;
             this.Text = "Messages";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.DebugWindow_FormClosing);
             this.ResumeLayout(false);
 
         }

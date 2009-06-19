@@ -31,8 +31,12 @@ namespace TradeLink.AppKit
             if (SendDebug != null)
                 SendDebug(msg);
             if (!isEnabled) return;
-            if (_log != null)
-                _log.WriteLine(DateTime.Now.ToString("HHmmss") + ": " + msg.Msg);
+            try
+            {
+                if (_log != null)
+                    _log.WriteLine(DateTime.Now.ToString("HHmmss") + ": " + msg.Msg);
+            }
+            catch { }
         }
         public void GotDebug(string msg)
         {
@@ -40,7 +44,11 @@ namespace TradeLink.AppKit
         }
         public void Stop()
         {
-            if (_log != null) _log.Close();
+            try
+            {
+                if (_log != null) _log.Close();
+            }
+            catch { }
         }
     }
 }
