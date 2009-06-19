@@ -109,7 +109,7 @@ namespace ASP
             // on multi-core machines, this will be invoked to write ticks
             // to a cache where they will be processed by a seperate thread
             // asynchronously
-            _ar.WriteIt(t);
+            _ar.newTick(t);
         }
 
         void tl_gotAccounts(string msg)

@@ -13,72 +13,140 @@ namespace TradeLink.Common
     public class AsyncResponse
     {
         const uint MAXTICK = 10000;
-        Tick[] tickcache = new Tick[MAXTICK];
-        uint readcounter = 0;
-        uint writecounter = 0;
+        Tick[] _tickcache = new Tick[MAXTICK];
+        uint _readticks = 0;
+        uint _writeticks = 0;
         public event TickDelegate GotTick;
-        volatile bool flipped = false;
+        volatile bool _tickflip = false;
+        static ManualResetEvent _tickswaiting = new ManualResetEvent(false);
+        Thread _readtickthread = null;
 
-        void ReadIt()
+
+
+        void ReadTick()
         {
 
             while (true)
             {
-                while (readcounter < tickcache.Length)
+                while (_readticks < _tickcache.Length)
                 {
-                    if (readthread.ThreadState == ThreadState.StopRequested)
+                    if (_readtickthread.ThreadState == ThreadState.StopRequested)
                         return;
-                    if ((readcounter>=writecounter) && !flipped)
+                    if ((_readticks>=_writeticks) && !_tickflip)
                         break;
-                    Tick k = tickcache[readcounter];
+                    Tick k = _tickcache[_readticks];
                     if (GotTick != null)
                         GotTick(k);
-                    readcounter++;
-                    if (readcounter >= tickcache.Length)
+                    _readticks++;
+                    if (_readticks >= _tickcache.Length)
                     {
-                        readcounter = 0;
-                        flipped = false;
+                        _readticks = 0;
+                        _tickflip = false;
                     }
                 }
                 // clear current flag signal
-                mre.Reset();
+                _tickswaiting.Reset();
                 // wait for a new signal to continue reading
-                mre.WaitOne(-1); 
+                _tickswaiting.WaitOne(-1); 
                     
             }
         }
-        static ManualResetEvent mre = new ManualResetEvent(false);
-        public void WriteIt(Tick k)
+        
+        public void newTick(Tick k)
         {
-            tickcache[writecounter] = k;
-            writecounter++;
-            if (writecounter >= tickcache.Length)
+            _tickcache[_writeticks] = k;
+            _writeticks++;
+            if (_writeticks >= _tickcache.Length)
             {
-                writecounter = 0;
-                flipped = true;
+                _writeticks = 0;
+                _tickflip = true;
             }
 
-            if ((readthread != null) && (readthread.ThreadState == ThreadState.Unstarted))
-                readthread.Start();
-            else if ((readthread != null) && (readthread.ThreadState == ThreadState.WaitSleepJoin))
+            if ((_readtickthread != null) && (_readtickthread.ThreadState == ThreadState.Unstarted))
+                _readtickthread.Start();
+            else if ((_readtickthread != null) && (_readtickthread.ThreadState == ThreadState.WaitSleepJoin))
             {
-                mre.Set(); // signal ReadIt thread to read now
+                _tickswaiting.Set(); // signal ReadIt thread to read now
             }
         }
-        Thread readthread = null;
+
+        const uint MAXIMB = 100000;
+        Imbalance[] _imbcache = new Imbalance[MAXIMB];
+        uint _readimbs = 0;
+        uint _writeimbs = 0;
+        public event ImbalanceDelegate GotImbalance;
+        volatile bool _imbflip = false;
+        static ManualResetEvent _imbswaiting = new ManualResetEvent(false);
+        Thread _readimbthread = null;
+
+        void ReadImbs()
+        {
+
+            while (true)
+            {
+                while (_readimbs < _imbcache.Length)
+                {
+                    if (_readimbthread.ThreadState == ThreadState.StopRequested)
+                        return;
+                    if ((_readimbs >= _writeimbs) && !_imbflip)
+                        break;
+                    Imbalance imb  = _imbcache[_readimbs];
+                    if (GotImbalance != null)
+                        GotImbalance(imb);
+                    _readimbs++;
+                    if (_readimbs >= _imbcache.Length)
+                    {
+                        _readimbs = 0;
+                        _imbflip = false;
+                    }
+                }
+                // clear current flag signal
+                _imbswaiting.Reset();
+                // wait for a new signal to continue reading
+                _imbswaiting.WaitOne(-1);
+
+            }
+        }
+
+        public void newImbalance(Imbalance imb)
+        {
+            _imbcache[_writeimbs] = imb;
+            _writeimbs++;
+            if (_writeimbs >= _imbcache.Length)
+            {
+                _writeimbs = 0;
+                _imbflip = true;
+            }
+
+            if ((_readimbthread != null) && (_readimbthread.ThreadState == ThreadState.Unstarted))
+                _readimbthread.Start();
+            else if ((_readimbthread != null) && (_readimbthread.ThreadState == ThreadState.WaitSleepJoin))
+            {
+                // signal ReadIt thread to read now
+                _imbswaiting.Set(); 
+            }
+        }
+
         public AsyncResponse()
         {
-            readthread = new Thread(this.ReadIt);
+            _readtickthread = new Thread(this.ReadTick);
+            _readimbthread = new Thread(this.ReadImbs);
         }
 
         public void Stop()
         {
-            if ((readthread!=null) && ((readthread.ThreadState != ThreadState.Stopped) && (readthread.ThreadState != ThreadState.StopRequested)))
-                readthread.Abort();
-            tickcache = new Tick[MAXTICK];
-            writecounter = 0;
-            readcounter = 0;
-            mre.Reset();
+            if ((_readtickthread!=null) && ((_readtickthread.ThreadState != ThreadState.Stopped) && (_readtickthread.ThreadState != ThreadState.StopRequested)))
+                _readtickthread.Abort();
+            if ((_readimbthread != null) && ((_readimbthread.ThreadState != ThreadState.Stopped) && (_readimbthread.ThreadState != ThreadState.StopRequested)))
+                _readimbthread.Abort();
+            _tickcache = new Tick[MAXTICK];
+            _imbcache = new Imbalance[MAXIMB];
+            _readimbs = 0;
+            _writeimbs = 0;
+            _imbswaiting.Reset();
+            _writeticks = 0;
+            _readticks = 0;
+            _tickswaiting.Reset();
         }
     }
 }

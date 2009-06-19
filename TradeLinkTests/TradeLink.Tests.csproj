@@ -81,6 +81,7 @@
     </Compile>
     <Compile Include="RunTests.cs" />
     <Compile Include="TestAccount.cs" />
+    <Compile Include="TestAsyncResponse.cs" />
     <Compile Include="TestBar.cs" />
     <Compile Include="TestBarList.cs" />
     <Compile Include="TestBarListTracker.cs" />
