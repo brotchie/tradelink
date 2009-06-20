@@ -25,4 +25,5 @@ namespace TradeLink.API
     public delegate void ImbalanceDelegate(Imbalance imb);
     public delegate void VoidDelegate();
     public delegate void MessageDelegate(MessageTypes type, uint id, string data);
+    public delegate void BasketDelegate(Basket b, int id);
 }

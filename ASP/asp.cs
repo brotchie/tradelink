@@ -512,6 +512,7 @@ namespace ASP
             _workingres.SendDebug+= new DebugFullDelegate(workingres_GotDebug);
             _workingres.SendCancel+= new UIntDelegate(workingres_CancelOrderSource);
             _workingres.SendMessage += new MessageDelegate(_workingres_SendMessage);
+            _workingres.SendBasket += new BasketDelegate(_workingres_SendBasket);
 
             // save the dll that contains the class for use with skins
             string dll = string.Empty;
@@ -521,6 +522,28 @@ namespace ASP
             else // otherwise replace current dll as providing this class
                 _class2dll[resname] = Properties.Settings.Default.boxdll;
 
+        }
+
+        void _workingres_SendBasket(Basket b, int id)
+        {
+            if (id == -1)
+            {
+                debug("can't subscribe to basket until response is traded.");
+                return;
+            }
+            bool resubscribe = false;
+            foreach (Security s in b)
+                resubscribe |= regsec(s, id);
+            if (resubscribe)
+            {
+                try
+                {
+                    tl.Subscribe(_mb);
+                }
+                catch (TLServerNotFound) { }
+            }
+
+            
         }
 
         void _workingres_SendMessage(MessageTypes type, uint id, string data)
@@ -590,12 +613,25 @@ namespace ASP
                 status("Please select a response.");
                 return;
             }
-
-
+            // get index to new response
+            int idx = _reslist.Count;
+            // add working response to response list after obtaining a lock
+            lock (_reslist)
+            {
+                // save it's id
+                _workingres.ID = idx;
+                // add it
+                _reslist.Add(_workingres);
+            }
+            // send response current positions
+            foreach (Position p in _pt)
+                _reslist[idx].GotPosition(p);
             // get all the provided symbols
             string[] syms = _symstraded.Text.Split(',');
             // prepare a list of valid symbols
             List<string> valid = new List<string>();
+            // see whether we need to resubscribe
+            bool resubscribe = false;
             // process every provided symbol
             foreach (string symt in syms)
             {
@@ -609,8 +645,8 @@ namespace ASP
                     status("Security invalid: " + sec.ToString());
                     continue;
                 }
-                // otherwise add the security
-                _mb.Add(sec);
+                // register security with ASP
+                resubscribe |= regsec(sec, idx);
                 // save simple symbol as valid
                 valid.Add(sec.Symbol);
                 // if we don't have this security
@@ -625,39 +661,18 @@ namespace ASP
                 }
 
             }
-            // add working response to response list after obtaining a lock
-            lock (_reslist) 
-            {
-                _reslist.Add(_workingres);
-            }
-            // get index to this response
-            int idx = _reslist.Count -1;
-            // send response current positions
-            foreach (Position p in _pt)
-                _reslist[idx].GotPosition(p);
             // subscribe to whatever symbols were requested
             try
             {
-                tl.Subscribe(_mb);
+                if (resubscribe)
+                    tl.Subscribe(_mb);
             }
             catch (TLServerNotFound) { debug("subscribe failed because no TL server is running."); }
             // add name to user's screen
-            _resnames.Items.Add(_workingres.FullName+" ["+string.Join(",",valid.ToArray())+"]");
+            _resnames.Items.Add(_workingres.FullName + " [" + string.Join(",", valid.ToArray()) + "]");
             // update their screen
             _resnames.Invalidate(true);
-            // process all securities and build  a quick index for a security's name to the response that requests it
-            foreach (SecurityImpl sec in _seclist.Values)
-                if (_symidx.ContainsKey(sec.FullName)) // we already had one requestor
-                {
-                    // get current length of request list for security
-                    int len = _symidx[sec.FullName].Length;
-                    // add one to it for our new requestor
-                    int[] a = new int[len + 1];
-                    // add our new requestor's index at the end
-                    a[len] = idx;
-                }
-                else // otherwise it's just this guy so add him 
-                    _symidx.Add(sec.FullName, new int[] { idx });
+
             // clear the symbol list
             _symstraded.Clear();
             // show we added response
@@ -667,7 +682,26 @@ namespace ASP
             
         }
 
-        
+        bool regsec(Security sec, int idx)
+        {
+            // process all securities and build  a quick index for a security's name to the response that requests it
+            if (_symidx.ContainsKey(sec.FullName)) // we already had one requestor
+            {
+                // get current length of request list for security
+                int len = _symidx[sec.FullName].Length;
+                // add one to it for our new requestor
+                int[] a = new int[len + 1];
+                // add our new requestor's index at the end
+                a[len] = idx;
+            }
+            else // otherwise it's just this guy so add him and request
+            {
+                _symidx.Add(sec.FullName, new int[] { idx });
+                _mb.Add(sec);
+                return true;
+            }
+            return false;
+        }
         
 
         private void status(string msg)

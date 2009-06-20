@@ -123,6 +123,16 @@ namespace TradeLink.Common
         /// <param name="indicators"></param>
         public void sendindicators(string indicators) { SendIndicators(indicators); }
         /// <summary>
+        /// requests ticks for a basket of securities
+        /// </summary>
+        /// <param name="syms"></param>
+        public void sendbasket(string[] syms) { if (SendBasket != null) SendBasket(new BasketImpl(syms), ID); else senddebug("SendBasket not supported in this application."); }
+        /// <summary>
+        /// requests ticks for basket of securities
+        /// </summary>
+        /// <param name="syms"></param>
+        public void SB(string[] syms) { sendbasket(syms); }
+        /// <summary>
         /// sends a message
         /// </summary>
         /// <param name="type"></param>
@@ -144,6 +154,12 @@ namespace TradeLink.Common
         string _name = "";
         string _full = "";
         bool _valid = true;
+        int _id = -1;
+
+        /// <summary>
+        /// numeric tag for this response used by programs that load responses
+        /// </summary>
+        public int ID { get { return _id; } set { _id = value; } }
 
         /// <summary>
         /// Whether response can be used or not
@@ -167,5 +183,6 @@ namespace TradeLink.Common
         public event UIntDelegate SendCancel;
         public event StringParamDelegate SendIndicators;
         public event MessageDelegate SendMessage;
+        public event BasketDelegate SendBasket;
     }
 }

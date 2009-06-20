@@ -38,5 +38,7 @@ namespace Responses
         public event UIntDelegate SendCancel;
         public event StringParamDelegate SendIndicators;
         public event MessageDelegate SendMessage;
+        public event BasketDelegate SendBasket;
+        public int ID { get; set; }
     }
 }

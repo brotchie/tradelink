@@ -20,6 +20,7 @@ namespace TradeLink.API
         event UIntDelegate SendCancel;
         event DebugFullDelegate SendDebug;
         event MessageDelegate SendMessage;
+        event BasketDelegate SendBasket;
 
         // response control
         void Reset();
@@ -29,5 +30,6 @@ namespace TradeLink.API
         string Name { get; set; }
         string FullName { get; set; }
         string[] Indicators { get; set; }
+        int ID { get; set; }
     }
 }
