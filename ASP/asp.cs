@@ -533,13 +533,32 @@ namespace ASP
             // process order coming from a response
 
             // set account on order
-            o.Account = _account.Text;
-            // set the security
-            o.Security = _seclist[o.symbol].Type;
-            // set the exchange
-            o.Exchange = _seclist[o.symbol].DestEx;
+            if (o.Account==string.Empty)
+                o.Account = _account.Text;
+            try
+            {
+                // set the security
+                if (o.Security== SecurityType.NIL)
+                    o.Security = _seclist[o.symbol].Type;
+                // set the exchange
+                if (o.Exchange== string.Empty)
+                    o.Exchange = _seclist[o.symbol].DestEx;
+            }
+            catch (KeyNotFoundException) 
+            {
+                string sym = SecurityImpl.Parse(o.symbol).Symbol;
+                SecurityImpl sec = null;
+                if (_seclist.TryGetValue(sym, out sec))
+                {
+                    o.Security = sec.Type;
+                    o.Exchange = sec.DestEx;
+                }
+                else
+                    debug("security and exchange missing on: " + o.symbol); 
+            }
             // set the local symbol
-            o.LocalSymbol = o.symbol;
+            if (o.LocalSymbol==string.Empty)
+                o.LocalSymbol = o.symbol;
             // send order and get error message
             int res = tl.SendOrder(o);
             // if error, display it

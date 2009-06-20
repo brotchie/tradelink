@@ -14,20 +14,11 @@ namespace Responses
     public class BigTrades : Response
     {
         BigTradeUI ui = new BigTradeUI();
-        DataTable dt = new DataTable();
+
         string sym = "";
         public BigTrades()
         {
             Name = "BigTrades";
-            // here our the columns we'll save for 10ten trades
-            dt.Columns.Add("Time", typeof(int));
-            dt.Columns.Add("Price", typeof(decimal));
-            dt.Columns.Add("TradeSize", typeof(int));
-            dt.Columns.Add("Exch");
-            // we'll bid the above columns to our grid
-            ui.dg.DataSource = dt;
-            // then the grid to the user
-            ui.Show();
             // also handle events from buy/sell buttons on grid
             ui.GotMarket += new BigTradeMarket(ui_GotMarket);
         }
@@ -48,22 +39,8 @@ namespace Responses
             // ignore it if it's not a trade
             if (!tick.isTrade) return;
 
-            // if we don't have 10 trades yet, add it
-            if (dt.Rows.Count < 10)
-            {
-                dt.Rows.Add(tick.time, tick.trade, tick.size, tick.ex);
-                ui.dg.Invalidate(true); // update the grid
-                return;
-            }
+            ui.GotTick(tick);
 
-            // otherwise, go through list and check to see if it's bigger
-            for (int i = 0; i < dt.Rows.Count; i++)
-                if ((int)dt.Rows[i]["TradeSize"] < tick.size)
-                {
-                    dt.Rows[i].ItemArray = new object[] { tick.time, tick.trade, tick.size, tick.ex };
-                    ui.dg.InvalidateRow(i); // update the grid
-                    return;
-                }
         }
 
         public void GotOrder(Order order) 

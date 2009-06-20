@@ -17,5 +17,6 @@ namespace TradeLink.API
         FOX,
         IDX,
         BND,
+        CASH,
     }
 }
