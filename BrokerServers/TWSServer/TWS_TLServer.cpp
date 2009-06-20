@@ -220,8 +220,8 @@ namespace TradeLibFast
 			contract->localSymbol = o.localsymbol!="" ? o.localsymbol : o.symbol;
 			contract->exchange = o.exchange;
 			contract->secType = o.security;
-			if (o.exchange=="")
-				o.exchange = "SMART";
+			if (contract->exchange=="")
+				contract->exchange= "SMART";
 		}
 		
 		contract->currency = o.currency;
@@ -266,6 +266,10 @@ namespace TradeLibFast
 		if (!hasAccount(accountName))
 		{
 			accts.push_back(accountName); // save the account name
+			// get socket for this account
+			EClient* socket = m_link[validlinkids[accts.size()-1]];
+			// request updates so we get portfolio data
+			socket->reqAccountUpdates(true,accountName);
 		}
 	}
 
@@ -566,9 +570,9 @@ namespace TradeLibFast
 
 	}
 
-	vector<TLPosition> poslist;
+	
 
-	bool havepos(TLPosition pos)
+	bool TWS_TLServer::havepos(TLPosition pos)
 	{
 		for (int i = 0; i<(int)poslist.size(); i++)
 			if ((poslist[i].Symbol==pos.Symbol))

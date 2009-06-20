@@ -33,6 +33,8 @@ namespace TradeLibFast
 
 
 	private:
+		vector<TLPosition> poslist;
+		bool havepos(TLPosition p);
 		int PositionResponse(CString account, CString client);
 		// here's a vector of pointers to our socket connections to IB
 		// (if we have more than one)
