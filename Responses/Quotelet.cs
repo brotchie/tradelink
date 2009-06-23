@@ -136,6 +136,7 @@ namespace Responses
         {
             // send order requested by the user
             sendorder(o);
+            senddebug("sent order: " + o.ToString());
         }
 
         public override void GotTick(Tick tick)

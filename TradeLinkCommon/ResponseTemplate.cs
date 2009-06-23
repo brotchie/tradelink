@@ -86,64 +86,64 @@ namespace TradeLink.Common
         /// short form of sendindicator
         /// </summary>
         /// <param name="indicators"></param>
-        public void I(string indicators) { SendIndicators(indicators); }
+        public virtual void I(string indicators) { SendIndicators(indicators); }
         /// <summary>
         /// short form of sendindicator
         /// </summary>
         /// <param name="indicators"></param>
-        public void I(object[] indicators) { string[] s = new string[indicators.Length]; for (int i = 0; i < indicators.Length; i++) s[i] = indicators[i].ToString(); SendIndicators(string.Join(",", s)); }
+        public virtual void I(object[] indicators) { string[] s = new string[indicators.Length]; for (int i = 0; i < indicators.Length; i++) s[i] = indicators[i].ToString(); SendIndicators(string.Join(",", s)); }
         /// <summary>
         /// short form of sendindicator
         /// </summary>
         /// <param name="indicators"></param>
-        public void I(string[] indicators) { SendIndicators(string.Join(",", indicators)); }
+        public virtual void I(string[] indicators) { SendIndicators(string.Join(",", indicators)); }
         /// <summary>
         /// sends an order
         /// </summary>
         /// <param name="o"></param>
-        public void sendorder(Order o) { SendOrder(o); }
+        public virtual void sendorder(Order o) { SendOrder(o); }
         /// <summary>
         /// cancels an order (must have the id)
         /// </summary>
         /// <param name="id"></param>
-        public void sendcancel(uint id) { SendCancel(id); }
+        public virtual void sendcancel(uint id) { SendCancel(id); }
         /// <summary>
         /// sends indicators as array of objects for later analysis
         /// </summary>
         /// <param name="indicators"></param>
-        public void sendindicators(object[] indicators) { string[] s = new string[indicators.Length]; for (int i = 0; i < indicators.Length; i++) s[i] = indicators[i].ToString(); SendIndicators(string.Join(",", s)); }
+        public virtual void sendindicators(object[] indicators) { string[] s = new string[indicators.Length]; for (int i = 0; i < indicators.Length; i++) s[i] = indicators[i].ToString(); SendIndicators(string.Join(",", s)); }
         /// <summary>
         /// send indicators as array of strings for later analysis
         /// </summary>
         /// <param name="indicators"></param>
-        public void sendindicators(string[] indicators) { SendIndicators(string.Join(",", indicators)); }
+        public virtual void sendindicators(string[] indicators) { SendIndicators(string.Join(",", indicators)); }
         /// <summary>
         /// sends indicators as a comma seperated string (for later analsis)
         /// </summary>
         /// <param name="indicators"></param>
-        public void sendindicators(string indicators) { SendIndicators(indicators); }
+        public virtual void sendindicators(string indicators) { SendIndicators(indicators); }
         /// <summary>
         /// requests ticks for a basket of securities
         /// </summary>
         /// <param name="syms"></param>
-        public void sendbasket(string[] syms) { if (SendBasket != null) SendBasket(new BasketImpl(syms), ID); else senddebug("SendBasket not supported in this application."); }
+        public virtual void sendbasket(string[] syms) { if (SendBasket != null) SendBasket(new BasketImpl(syms), ID); else senddebug("SendBasket not supported in this application."); }
         /// <summary>
         /// requests ticks for basket of securities
         /// </summary>
         /// <param name="syms"></param>
-        public void SB(string[] syms) { sendbasket(syms); }
+        public virtual void SB(string[] syms) { sendbasket(syms); }
         /// <summary>
         /// sends a message
         /// </summary>
         /// <param name="type"></param>
         /// <param name="id"></param>
         /// <param name="data"></param>
-        public void sendmessage(MessageTypes type, uint id, string data) { sendmessage(type, id, data); }
+        public virtual void sendmessage(MessageTypes type, uint id, string data) { sendmessage(type, id, data); }
         /// <summary>
         /// sends a debug message about what your response is doing at the moment.
         /// </summary>
         /// <param name="msg"></param>
-        public void senddebug(string msg) { SendDebug(DebugImpl.Create(msg)); }
+        public virtual void senddebug(string msg) { if (SendDebug!=null) SendDebug(DebugImpl.Create(msg)); }
         /// <summary>
         /// called when a position update is received (usually only when the response is initially loaded)
         /// </summary>
