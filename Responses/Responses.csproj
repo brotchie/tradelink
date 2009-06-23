@@ -58,11 +58,20 @@
     <Compile Include="PairsResponse.cs" />
     <Compile Include="PairsTracker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Quotelet.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Quotelet.Designer.cs">
+      <DependentUpon>Quotelet.cs</DependentUpon>
+    </Compile>
     <Compile Include="SMAResponse.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="BigTradeUI.resx">
       <DependentUpon>BigTradeUI.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Quotelet.resx">
+      <DependentUpon>Quotelet.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

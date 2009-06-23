@@ -528,7 +528,7 @@ namespace ASP
         {
             if (id == -1)
             {
-                debug("can't subscribe to basket until response is traded.");
+                status("must trade the response first");
                 return;
             }
             bool resubscribe = false;
@@ -684,21 +684,37 @@ namespace ASP
 
         bool regsec(Security sec, int idx)
         {
-            // process all securities and build  a quick index for a security's name to the response that requests it
-            if (_symidx.ContainsKey(sec.FullName)) // we already had one requestor
+            lock (_symidx)
             {
-                // get current length of request list for security
-                int len = _symidx[sec.FullName].Length;
-                // add one to it for our new requestor
-                int[] a = new int[len + 1];
-                // add our new requestor's index at the end
-                a[len] = idx;
-            }
-            else // otherwise it's just this guy so add him and request
-            {
-                _symidx.Add(sec.FullName, new int[] { idx });
-                _mb.Add(sec);
-                return true;
+                // process all securities and build  a quick index for a security's name to the response that requests it
+                if (_symidx.ContainsKey(sec.FullName)) // we already had one requestor
+                {
+                    // get current length of request list for security
+                    int len = _symidx[sec.FullName].Length;
+                    // mark it as not found
+                    bool found = false;
+                    // see if this guy already requested this symbol
+                    foreach (int tidx in _symidx[sec.FullName])
+                        found |= tidx == idx;
+                    // if he didn't, add him
+                    if (!found)
+                    {
+                        // add one to it for our new requestor
+                        int[] a = new int[len + 1];
+                        // copy existing into A
+                        Array.Copy(_symidx[sec.FullName], a, len);
+                        // add our new requestor's index at the end
+                        a[len] = idx;
+                        // save it back
+                        _symidx[sec.FullName] = a;
+                    }
+                }
+                else // otherwise it's just this guy so add him and request
+                {
+                    _symidx.Add(sec.FullName, new int[] { idx });
+                    _mb.Add(sec);
+                    return true;
+                }
             }
             return false;
         }
