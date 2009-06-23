@@ -127,7 +127,7 @@ namespace TradeLink.Common
         public int SendOrder(Order o)
         {
             if (o == null) return (int)MessageTypes.EMPTY_ORDER;
-            if (!o.isValid) return (int)MessageTypes.OK;
+            if (!o.isValid) return (int)MessageTypes.EMPTY_ORDER;
             string m = OrderImpl.Serialize(o);
             return (int)TLSend(MessageTypes.SENDORDER, m);
         }
