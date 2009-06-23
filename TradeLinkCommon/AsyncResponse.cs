@@ -17,6 +17,8 @@ namespace TradeLink.Common
         uint _readticks = 0;
         uint _writeticks = 0;
         public event TickDelegate GotTick;
+        public event VoidDelegate GotTickQueueEmpty;
+        public event VoidDelegate GotTickQueued;
         volatile bool _tickflip = false;
         static ManualResetEvent _tickswaiting = new ManualResetEvent(false);
         Thread _readtickthread = null;
@@ -28,6 +30,7 @@ namespace TradeLink.Common
 
             while (true)
             {
+                if (GotTickQueued != null) GotTickQueued();
                 while (_readticks < _tickcache.Length)
                 {
                     if (_readtickthread.ThreadState == ThreadState.StopRequested)
@@ -44,6 +47,8 @@ namespace TradeLink.Common
                         _tickflip = false;
                     }
                 }
+                // send event that queue is presently empty
+                if (GotTickQueueEmpty != null) GotTickQueueEmpty();
                 // clear current flag signal
                 _tickswaiting.Reset();
                 // wait for a new signal to continue reading
@@ -75,6 +80,8 @@ namespace TradeLink.Common
         uint _readimbs = 0;
         uint _writeimbs = 0;
         public event ImbalanceDelegate GotImbalance;
+        public event VoidDelegate GotImbalanceQueued;
+        public event VoidDelegate GotImbalanceQueueEmpty;
         volatile bool _imbflip = false;
         static ManualResetEvent _imbswaiting = new ManualResetEvent(false);
         Thread _readimbthread = null;
@@ -84,6 +91,7 @@ namespace TradeLink.Common
 
             while (true)
             {
+                if (GotImbalanceQueued != null) GotImbalanceQueued();
                 while (_readimbs < _imbcache.Length)
                 {
                     if (_readimbthread.ThreadState == ThreadState.StopRequested)
@@ -100,6 +108,8 @@ namespace TradeLink.Common
                         _imbflip = false;
                     }
                 }
+                // send event that queue is presently empty
+                if (GotImbalanceQueueEmpty != null) GotImbalanceQueueEmpty();
                 // clear current flag signal
                 _imbswaiting.Reset();
                 // wait for a new signal to continue reading
