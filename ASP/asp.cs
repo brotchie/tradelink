@@ -27,10 +27,10 @@ namespace ASP
         List<Response> _reslist = new List<Response>();
         TickArchiver _ta = new TickArchiver();
         BasketImpl _mb = new BasketImpl();
-        Response _workingres = new InvalidResponse();
+
         Dictionary<int, string> _resskinidx = new Dictionary<int, string>();
         Dictionary<string, string> _class2dll = new Dictionary<string, string>();
-        PositionTracker _pt = new PositionTracker();
+        PositionTracker _asppt = new PositionTracker();
         string[] _acct = new string[0];
         AsyncResponse _ar = new AsyncResponse();
         Log _log = new Log(PROGRAM);
@@ -70,7 +70,7 @@ namespace ASP
                 foreach (string acct in _acct)
                     tl.RequestPositions(acct);
                 // show broker
-                debug("broker: " + tl.ServerVersion);
+                debug("broker: " + tl.BrokerName.ToString()+" "+tl.ServerVersion);
             }
             else
             {
@@ -82,6 +82,7 @@ namespace ASP
             _resnames.ContextMenu.MenuItems.Add("remove response", new EventHandler(remresp));
             _resnames.ContextMenu.MenuItems.Add("enabled", new EventHandler(toggleresponse));
             _resnames.ContextMenu.MenuItems.Add("save to skin", new EventHandler(add2skin));
+            _resnames.ContextMenu.MenuItems.Add("edit symbols", new EventHandler(editsyms));
             // make sure we exit properly
             this.FormClosing += new FormClosingEventHandler(ASP_FormClosing);
             // show version to user
@@ -308,7 +309,7 @@ namespace ASP
                     }
                 }
                 // remove the response
-                _reslist[selbox] = null;
+                _reslist[selbox] = new InvalidResponse();
                 // mark it's UI element for removal
                 remidx.Add(selbox);
                 debug("removed: "+name);
@@ -366,15 +367,10 @@ namespace ASP
 
         void tl_gotOrder(Order o)
         {
-            // make sure we are tracking this notifications symbol somewhere
-            int[] idxs = new int[0];
-            if (!_symidx.TryGetValue(o.Sec.Symbol, out idxs) && !_symidx.TryGetValue(o.Sec.FullName, out idxs))
-                return;
-
-            // send order notification to every valid box
-            foreach (int idx in idxs)
-                if (_reslist[idx].isValid)
-                    _reslist[idx].GotOrder(o);
+            // send order notification to any valid responses
+            for (int i = 0; i < _reslist.Count; i++)
+                if (_reslist[i].isValid)
+                    _reslist[i].GotOrder(o);
         }
 
         void ASP_FormClosing(object sender, FormClosingEventArgs e)
@@ -432,22 +428,19 @@ namespace ASP
         void tl_gotFill(Trade t)
         {
             // keep track of position
-            _pt.Adjust(t);
-            // get requesting responses if any
-            int[] idxs = new int[0];
-            // if no requestors, ignore symbol
-            if (!_symidx.TryGetValue(t.Sec.Symbol, out idxs) && !_symidx.TryGetValue(t.Sec.FullName, out idxs))
-                return;
+            _asppt.Adjust(t);
             // send trade notification to any valid requesting responses
-            foreach (int idx in idxs)
-                if (_reslist[idx].isValid)
-                    _reslist[idx].GotFill(t);
+            for (int i = 0; i < _reslist.Count; i++ )
+                if (_reslist[i].isValid)
+                    _reslist[i].GotFill(t);
+            debug("update: "+_asppt[t.symbol].ToString());
         }
 
         void tl_gotPosition(Position pos)
         {
             // keep track of position
-            _pt.Adjust(pos);
+            _asppt.Adjust(pos);
+            debug("init: "+_asppt[pos.Symbol].ToString());
         }
 
         void debug(string message)
@@ -506,13 +499,13 @@ namespace ASP
             // get selected response
             string resname = (string)_availresponses.SelectedItem;
             // load it into working response
-            _workingres = ResponseLoader.FromDLL(resname, Properties.Settings.Default.boxdll);
+            Response tmp = ResponseLoader.FromDLL(resname, Properties.Settings.Default.boxdll);
             // handle all the outgoing events from the response
-            _workingres.SendOrder += new OrderDelegate(workingres_SendOrder);
-            _workingres.SendDebug+= new DebugFullDelegate(workingres_GotDebug);
-            _workingres.SendCancel+= new UIntDelegate(workingres_CancelOrderSource);
-            _workingres.SendMessage += new MessageDelegate(_workingres_SendMessage);
-            _workingres.SendBasket += new BasketDelegate(_workingres_SendBasket);
+            tmp.SendOrder += new OrderDelegate(workingres_SendOrder);
+            tmp.SendDebug += new DebugFullDelegate(workingres_GotDebug);
+            tmp.SendCancel += new UIntDelegate(workingres_CancelOrderSource);
+            tmp.SendMessage += new MessageDelegate(_workingres_SendMessage);
+            tmp.SendBasket += new BasketDelegate(_workingres_SendBasket);
 
             // save the dll that contains the class for use with skins
             string dll = string.Empty;
@@ -522,29 +515,118 @@ namespace ASP
             else // otherwise replace current dll as providing this class
                 _class2dll[resname] = Properties.Settings.Default.boxdll;
 
+            // get index to new response
+            int idx = _reslist.Count;
+            // save the id
+            tmp.ID = idx;
+            // add working response to response list after obtaining a lock
+            lock (_reslist)
+            {
+                // add it
+                _reslist.Add(tmp);
+            }
+            // send response current positions
+            foreach (Position p in _asppt)
+                _reslist[idx].GotPosition(p);
+            // add name to user's screen
+            _resnames.Items.Add(getrstat(idx));
+            // update their screen
+            _resnames.Invalidate(true);
+
+            // show we added response
+            status(tmp.FullName + " [" + getsyms(idx)+ "]");
+            // unselect response
+            _availresponses.SelectedIndex = -1;
+
+
         }
 
-        void _workingres_SendBasket(Basket b, int id)
+        string getrstat(int idx)
         {
-            if (id == -1)
+            Response tmp = _reslist[idx];
+            return tmp.FullName + " [" + getsyms(idx) + "]";
+        }
+
+        string getsyms(int idx)
+        {
+            string s = string.Empty;
+            if (_rsym.TryGetValue(idx, out s))
+                return s;
+            return string.Empty;
+        }
+
+        Dictionary<int, string> _rsym = new Dictionary<int, string>();
+
+        void editsyms(object sender, EventArgs e)
+        {
+            int idx = _resnames.SelectedIndex;
+            string rname = _reslist[idx].FullName;
+            string syms = Interaction.InputBox("Enter symbols seperated by commas", rname + " Symbols", getsyms(idx), 0, 0);
+            newsyms(syms.Split(','), idx);
+        }
+
+        void newsyms(string[] syms,int idx)
+        {
+            if (idx == -1)
             {
                 status("must trade the response first");
                 return;
             }
+            // prepare a list of valid symbols
+            List<string> valid = new List<string>();
+            // see whether we need to resubscribe
             bool resubscribe = false;
-            foreach (Security s in b)
-                resubscribe |= regsec(s, id);
-            if (resubscribe)
+            // process every provided symbol
+            foreach (string symt in syms)
             {
-                try
+                // make it uppercase
+                string sym = symt.ToUpper();
+                // parse out security information
+                SecurityImpl sec = SecurityImpl.Parse(sym);
+                // if it's an invalid security, ignore it
+                if (!sec.isValid)
                 {
-                    tl.Subscribe(_mb);
+                    status("Security invalid: " + sec.ToString());
+                    continue;
                 }
-                catch (TLServerNotFound) { }
-            }
+                // register security with ASP
+                resubscribe |= regsec(sec, idx);
+                // save simple symbol as valid
+                valid.Add(sec.Symbol);
+                // if we don't have this security
+                if (!_seclist.ContainsKey(sec.Symbol))
+                {
+                    // lock so other threads don't modify seclist at same time
+                    lock (_seclist)
+                    {
+                        // add security to our list
+                        _seclist.Add(sec.Symbol, sec);
+                    }
+                }
 
-            
+            }
+            // save symbols
+            _rsym[idx] = string.Join(",",syms);
+            // update screen
+            _resnames.Items[idx] = getrstat(idx);
+            Invalidate(true);
+            // subscribe to whatever symbols were requested
+            try
+            {
+                if (resubscribe)
+                    tl.Subscribe(_mb);
+            }
+            catch (TLServerNotFound) { debug("subscribe failed because no TL server is running."); }
+
         }
+
+        void _workingres_SendBasket(Basket b, int id)
+        {
+            debug("got basket request: " + b.ToString() + " from: " + _reslist[id].FullName);
+            newsyms(b.ToString().Split(','), id);
+        }
+
+        
 
         void _workingres_SendMessage(MessageTypes type, uint id, string data)
         {
@@ -603,91 +685,16 @@ namespace ASP
             debug(d.Msg);
         }
 
-        private void Trade_Click(object sender, EventArgs e)
-        {
-            // user clicks on trade button
-
-            // make sure a response is selected
-            if (_availresponses.SelectedIndex == -1)
-            {
-                status("Please select a response.");
-                return;
-            }
-            // get index to new response
-            int idx = _reslist.Count;
-            // add working response to response list after obtaining a lock
-            lock (_reslist)
-            {
-                // save it's id
-                _workingres.ID = idx;
-                // add it
-                _reslist.Add(_workingres);
-            }
-            // send response current positions
-            foreach (Position p in _pt)
-                _reslist[idx].GotPosition(p);
-            // get all the provided symbols
-            string[] syms = _symstraded.Text.Split(',');
-            // prepare a list of valid symbols
-            List<string> valid = new List<string>();
-            // see whether we need to resubscribe
-            bool resubscribe = false;
-            // process every provided symbol
-            foreach (string symt in syms)
-            {
-                // make it uppercase
-                string sym = symt.ToUpper();
-                // parse out security information
-                SecurityImpl sec = SecurityImpl.Parse(sym);
-                // if it's an invalid security, ignore it
-                if (!sec.isValid)
-                {
-                    status("Security invalid: " + sec.ToString());
-                    continue;
-                }
-                // register security with ASP
-                resubscribe |= regsec(sec, idx);
-                // save simple symbol as valid
-                valid.Add(sec.Symbol);
-                // if we don't have this security
-                if (!_seclist.ContainsKey(sec.Symbol))
-                {
-                    // lock so other threads don't modify seclist at same time
-                    lock (_seclist) 
-                    {
-                        // add security to our list
-                        _seclist.Add(sec.Symbol,sec);
-                    }
-                }
-
-            }
-            // subscribe to whatever symbols were requested
-            try
-            {
-                if (resubscribe)
-                    tl.Subscribe(_mb);
-            }
-            catch (TLServerNotFound) { debug("subscribe failed because no TL server is running."); }
-            // add name to user's screen
-            _resnames.Items.Add(_workingres.FullName + " [" + string.Join(",", valid.ToArray()) + "]");
-            // update their screen
-            _resnames.Invalidate(true);
-
-            // clear the symbol list
-            _symstraded.Clear();
-            // show we added response
-            status(_workingres.FullName+" ["+string.Join(",",valid.ToArray())+"]");
-            // unselect response
-            _availresponses.SelectedIndex = -1;
-            
-        }
-
         bool regsec(Security sec, int idx)
         {
             lock (_symidx)
             {
+                // get existing syms
+                string syms = string.Empty;
+                if (!_rsym.TryGetValue(idx,out syms))
+                    syms = string.Empty;
                 // process all securities and build  a quick index for a security's name to the response that requests it
-                if (_symidx.ContainsKey(sec.FullName)) // we already had one requestor
+                if (_symidx.ContainsKey(sec.FullName) && !syms.Contains(sec.Symbol)) // we already had one requestor
                 {
                     // get current length of request list for security
                     int len = _symidx[sec.FullName].Length;
@@ -709,7 +716,7 @@ namespace ASP
                         _symidx[sec.FullName] = a;
                     }
                 }
-                else // otherwise it's just this guy so add him and request
+                else if (!_symidx.ContainsKey(sec.FullName))// otherwise it's just this guy so add him and request
                 {
                     _symidx.Add(sec.FullName, new int[] { idx });
                     _mb.Add(sec);
@@ -734,13 +741,6 @@ namespace ASP
             }
         }
 
-
-        private void stock_KeyUp(object sender, KeyEventArgs e)
-        {
-            // in case they don't click trade, click  it for them when they press enter
-            if (e.KeyData == Keys.Enter)
-                Trade_Click(null, null);
-        }
 
         private void _togglemsgs_Click(object sender, EventArgs e)
         {

@@ -33,10 +33,7 @@ namespace ASP
             this.LoadDLL = new System.Windows.Forms.Button();
             this._availresponses = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.Trade = new System.Windows.Forms.Button();
             this._resnames = new System.Windows.Forms.ListBox();
-            this._symstraded = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
@@ -91,23 +88,12 @@ namespace ASP
             this.label1.TabIndex = 2;
             this.label1.Text = "New Response:";
             // 
-            // Trade
-            // 
-            this.Trade.Location = new System.Drawing.Point(331, 64);
-            this.Trade.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.Trade.Name = "Trade";
-            this.Trade.Size = new System.Drawing.Size(95, 26);
-            this.Trade.TabIndex = 3;
-            this.Trade.Text = "Trade";
-            this.Trade.UseVisualStyleBackColor = true;
-            this.Trade.Click += new System.EventHandler(this.Trade_Click);
-            // 
             // _resnames
             // 
             this._resnames.FormattingEnabled = true;
             this._resnames.HorizontalScrollbar = true;
             this._resnames.ItemHeight = 20;
-            this._resnames.Location = new System.Drawing.Point(14, 134);
+            this._resnames.Location = new System.Drawing.Point(13, 99);
             this._resnames.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this._resnames.Name = "_resnames";
             this._resnames.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
@@ -116,31 +102,12 @@ namespace ASP
             this._resnames.TabStop = false;
             this.toolTip1.SetToolTip(this._resnames, "Active Responses");
             // 
-            // _symstraded
-            // 
-            this._symstraded.Location = new System.Drawing.Point(136, 64);
-            this._symstraded.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this._symstraded.Name = "_symstraded";
-            this._symstraded.Size = new System.Drawing.Size(187, 26);
-            this._symstraded.TabIndex = 5;
-            this._symstraded.KeyUp += new System.Windows.Forms.KeyEventHandler(this.stock_KeyUp);
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(7, 70);
-            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(128, 20);
-            this.label2.TabIndex = 6;
-            this.label2.Text = "Trade on Symbol";
-            // 
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1,
             this.toolStripStatusLabel2});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 393);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 351);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 21, 0);
             this.statusStrip1.Size = new System.Drawing.Size(468, 22);
@@ -191,12 +158,9 @@ namespace ASP
             // 
             this._newrespbox.Controls.Add(this.label1);
             this._newrespbox.Controls.Add(this._availresponses);
-            this._newrespbox.Controls.Add(this.label2);
-            this._newrespbox.Controls.Add(this._symstraded);
-            this._newrespbox.Controls.Add(this.Trade);
             this._newrespbox.Location = new System.Drawing.Point(14, 12);
             this._newrespbox.Name = "_newrespbox";
-            this._newrespbox.Size = new System.Drawing.Size(435, 114);
+            this._newrespbox.Size = new System.Drawing.Size(435, 79);
             this._newrespbox.TabIndex = 16;
             this._newrespbox.TabStop = false;
             this._newrespbox.Text = "Trade a Respose";
@@ -278,7 +242,7 @@ namespace ASP
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.archivetickbox);
             this.groupBox1.Controls.Add(this._account);
-            this.groupBox1.Location = new System.Drawing.Point(14, 274);
+            this.groupBox1.Location = new System.Drawing.Point(13, 231);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(435, 109);
             this.groupBox1.TabIndex = 19;
@@ -298,7 +262,7 @@ namespace ASP
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(468, 415);
+            this.ClientSize = new System.Drawing.Size(468, 373);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this._newrespbox);
             this.Controls.Add(this.statusStrip1);
@@ -323,10 +287,7 @@ namespace ASP
         private System.Windows.Forms.Button LoadDLL;
         private System.Windows.Forms.ComboBox _availresponses;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button Trade;
         private System.Windows.Forms.ListBox _resnames;
-        private System.Windows.Forms.TextBox _symstraded;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel2;
