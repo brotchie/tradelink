@@ -43,9 +43,9 @@ namespace TradeLink.Common
             _totalclosedpl += newpos.ClosedPL;
             Position p;
             if (posdict.TryGetValue(newpos.Symbol, out p))
-                posdict[newpos.Symbol] = newpos;
+                posdict[newpos.Symbol] = new PositionImpl(newpos);
             else
-                posdict.Add(newpos.Symbol, newpos);
+                posdict.Add(newpos.Symbol, new PositionImpl(newpos));
         }
 
         /// <summary>

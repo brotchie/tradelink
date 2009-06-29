@@ -47,5 +47,25 @@ namespace TestTradeLink
 
 
         }
+
+        [Test]
+        public void InitAndAdjust()
+        {
+            const string sym = "IBM";
+            // startup position tracker
+            PositionTracker pt = new PositionTracker();
+            PositionTracker pt2 = new PositionTracker();
+            // give pt our initial position
+            Position init = new PositionImpl(sym, 0, 0);
+            pt.Adjust(init);
+            pt2.Adjust(init);
+            // fill a trade in both places
+            Trade fill = new TradeImpl(sym,100, 100);
+            pt.Adjust(fill);
+            pt2.Adjust(fill);
+            // make sure it's only 100 in both places
+            Assert.AreEqual(100, pt[sym].Size);
+            Assert.AreEqual(100, pt2[sym].Size);
+        }
     }
 }
