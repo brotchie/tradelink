@@ -118,9 +118,9 @@
             // 
             // _sym
             // 
-            this._sym.Location = new System.Drawing.Point(249, 89);
+            this._sym.Location = new System.Drawing.Point(202, 86);
             this._sym.Name = "_sym";
-            this._sym.Size = new System.Drawing.Size(75, 26);
+            this._sym.Size = new System.Drawing.Size(62, 26);
             this._sym.TabIndex = 8;
             this._sym.Text = "IBM";
             // 
@@ -144,16 +144,17 @@
             // 
             // _new
             // 
-            this._new.Location = new System.Drawing.Point(175, 84);
+            this._new.Location = new System.Drawing.Point(270, 84);
             this._new.Name = "_new";
-            this._new.Size = new System.Drawing.Size(68, 31);
+            this._new.Size = new System.Drawing.Size(52, 31);
             this._new.TabIndex = 11;
-            this._new.Text = "New";
+            this._new.Text = "ok";
             this._new.UseVisualStyleBackColor = true;
             this._new.Click += new System.EventHandler(this._new_Click);
             // 
             // Quotelet
             // 
+            this.AcceptButton = this._new;
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(336, 127);

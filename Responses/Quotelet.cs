@@ -23,6 +23,9 @@ namespace Responses
             InitializeComponent();
             // show the form by default
             Show();
+            // subscribe to initial symbol
+            if (NewSymbol != null) NewSymbol(_sym.Text);
+            // setup proper closing
             FormClosing += new FormClosingEventHandler(Quotelet_FormClosing);
         }
 
@@ -43,7 +46,13 @@ namespace Responses
             // windows makes us update GUI elements by 'invoking' 
             // from the GUI's thread.  so we test for this when performing the update.
             if (InvokeRequired)
-                Invoke(new TickDelegate(newTick), new object[] { k });
+            {
+                try
+                {
+                    Invoke(new TickDelegate(newTick), new object[] { k });
+                }
+                catch (ObjectDisposedException) { return; }
+            }
             else
             {
                 // make sure tick matches symbol we requested
