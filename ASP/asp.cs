@@ -30,7 +30,7 @@ namespace ASP
 
         Dictionary<int, string> _resskinidx = new Dictionary<int, string>();
         Dictionary<string, string> _class2dll = new Dictionary<string, string>();
-        PositionTracker _asppt = new PositionTracker();
+        PositionTracker _pt = new PositionTracker();
         string[] _acct = new string[0];
         AsyncResponse _ar = new AsyncResponse();
         Log _log = new Log(PROGRAM);
@@ -428,19 +428,17 @@ namespace ASP
         void tl_gotFill(Trade t)
         {
             // keep track of position
-            _asppt.Adjust(t);
+            _pt.Adjust(t);
             // send trade notification to any valid requesting responses
             for (int i = 0; i < _reslist.Count; i++ )
                 if (_reslist[i].isValid)
                     _reslist[i].GotFill(t);
-            debug("update: "+_asppt[t.symbol].ToString());
         }
 
         void tl_gotPosition(Position pos)
         {
             // keep track of position
-            _asppt.Adjust(pos);
-            debug("init: "+_asppt[pos.Symbol].ToString());
+            _pt.Adjust(pos);
         }
 
         void debug(string message)
@@ -526,7 +524,7 @@ namespace ASP
                 _reslist.Add(tmp);
             }
             // send response current positions
-            foreach (Position p in _asppt)
+            foreach (Position p in _pt)
                 _reslist[idx].GotPosition(p);
             // add name to user's screen
             _resnames.Items.Add(getrstat(idx));
