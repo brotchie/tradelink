@@ -316,7 +316,24 @@ namespace ASP
             }
             // remove response from screen
             foreach (int i in remidx)
+            {
+                // remove it
                 _resnames.Items.RemoveAt(i);
+                // remove name map
+                _name2r.Remove(i);
+                // prepare new response 2 name map
+                Dictionary<int, int> n2r = new Dictionary<int, int>();
+                foreach (int k in _name2r.Keys)
+                {
+                    // get new idx
+                    int newidx = k>i ? k - 1 : k;
+                    // if valid add back adjusted index
+                    if ((newidx>=0) && (newidx<_resnames.Items.Count))
+                        n2r.Add(k, newidx); 
+                }
+                _name2r = n2r;
+            }
+            
             // remove any empty symbols
             foreach (string sym in remsym)
             {
@@ -528,28 +545,48 @@ namespace ASP
                 _reslist[idx].GotPosition(p);
             // add name to user's screen
             _resnames.Items.Add(getrstat(idx));
+            // map name to response
+            _name2r.Add(_resnames.Items.Count - 1,idx);
             // update their screen
             _resnames.Invalidate(true);
 
             // show we added response
-            status(tmp.FullName + " [" + getsyms(idx)+ "]");
+            status(tmp.FullName +  getsyms(idx));
             // unselect response
             _availresponses.SelectedIndex = -1;
 
 
         }
 
+        Dictionary<int, int> _name2r = new Dictionary<int, int>();
+
+        int getrdidx(int idx)
+        {
+            foreach (int k in _name2r.Keys)
+                if (_name2r[k] == idx)
+                    return k;
+            return -1;
+        }
+
+        int getrindx(int nameidx)
+        {
+            if (_name2r.ContainsKey(nameidx))
+                return _name2r[nameidx];
+            return -1;
+        }
+
         string getrstat(int idx)
         {
             Response tmp = _reslist[idx];
-            return tmp.FullName + " [" + getsyms(idx) + "]";
+            return tmp.FullName + getsyms(idx);
         }
 
-        string getsyms(int idx)
+        string getsyms(int idx) { return getsyms(idx, true); }
+        string getsyms(int idx,bool brackets)
         {
             string s = string.Empty;
             if (_rsym.TryGetValue(idx, out s))
-                return s;
+                return brackets ? " [" +s+"] " : s;
             return string.Empty;
         }
 
@@ -558,9 +595,9 @@ namespace ASP
         void editsyms(object sender, EventArgs e)
         {
             int idx = _resnames.SelectedIndex;
-            string rname = _reslist[idx].FullName;
-            string syms = Interaction.InputBox("Enter symbols seperated by commas", rname + " Symbols", getsyms(idx), 0, 0);
-            newsyms(syms.Split(','), idx);
+            string rname = _reslist[getrindx(idx)].FullName;
+            string syms = Interaction.InputBox("Enter symbols seperated by commas", rname + " Symbols", getsyms(idx,false), 0, 0);
+            newsyms(syms.Split(','), getrindx(idx));
         }
 
         void newsyms(string[] syms,int idx)
@@ -570,6 +607,8 @@ namespace ASP
                 status("must trade the response first");
                 return;
             }
+            // ignore from invalid responses
+            if (_reslist[idx].FullName == new InvalidResponse().FullName) return;
             // prepare a list of valid symbols
             List<string> valid = new List<string>();
             // see whether we need to resubscribe
@@ -606,7 +645,7 @@ namespace ASP
             // save symbols
             _rsym[idx] = string.Join(",",syms);
             // update screen
-            _resnames.Items[idx] = getrstat(idx);
+            _resnames.Items[getrdidx(idx)] = getrstat(idx);
             Invalidate(true);
             // subscribe to whatever symbols were requested
             try
@@ -620,6 +659,9 @@ namespace ASP
 
         void _workingres_SendBasket(Basket b, int id)
         {
+            // ignore if response has been deleted
+            if (_reslist[id].FullName==new InvalidResponse().FullName) return;
+            // otherwise notify and subscribe
             debug("got basket request: " + b.ToString() + " from: " + _reslist[id].FullName);
             newsyms(b.ToString().Split(','), id);
         }
