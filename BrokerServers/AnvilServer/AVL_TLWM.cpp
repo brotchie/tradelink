@@ -39,15 +39,9 @@ namespace TradeLibFast
 
 	AVL_TLWM::~AVL_TLWM(void)
 	{
-		// account monitoring stuff
-		void* iterator = B_CreateAccountIterator();
-		B_StartIteration(iterator);
-		Observable* acct;
-		while (acct = B_GetNextAccount(iterator)) // loop through every available account
-		{
-			acct->Remove(this); // add this object to account as an observer
-		}
-		B_DestroyIterator(iterator);
+		// remove all account observables
+		for (uint i = 0; i<accounts.size(); i++)
+			accounts[i] = NULL;
 		accounts.clear();
 		// remove all pointers to orders
 		for (uint i = 0; i<ordercache.size(); i++)
@@ -525,7 +519,7 @@ namespace TradeLibFast
 		if (orderSent==NULL)
 		{
 			if (error==0) // if no error, return empty order
-				return EMPTY_ORDER;
+				error = EMPTY_ORDER;
 		}
 		else // if order is good, save it
 		{
@@ -626,19 +620,32 @@ namespace TradeLibFast
 
 			} // has additional info end
 			break;
-			//case M_SMARTORDER_ADD: 
+			case M_SMARTORDER_ADD: 
 			case M_POOL_ASSIGN_ORDER_ID://Original order sent has a unigue generated id. The server sends this message to notify you that the order was assigned a new id different from the original. Both ids are part of this notification structure. This message can come 1 or 2 times.
 			case M_POOL_UPDATE_ORDER:// Order status is modified
 			{
 				if(additionalInfo != NULL && additionalInfo->GetType() == M_AI_ORDER)
 				{
+					Order* order = NULL;
+					if (message->GetType()==M_SMARTORDER_ADD)
+					{
+						MsgOrderChange* info = (MsgOrderChange*)message;
+						if (info!=NULL)
+							order = info->m_order;
+					}
+					else 
+					{
 
-					AIMsgOrder* info = (AIMsgOrder*)additionalInfo;
-					Order* order = info->m_order;
+						AIMsgOrder* info = (AIMsgOrder*)additionalInfo;
+						if (info!=NULL)
+							order = info->m_order;
+					}
 
-					if ((order==NULL) || (info==NULL)) return; // don't process null orders
+					// don't process null orders
+					if (order==NULL) return; 
 
-					if (order->isDead()) return; // don't notify on dead orders
+					// don't notify on dead orders
+					if (order->isDead()) return; 
 
 					// try to save this order
 					bool isnew = saveOrder(order,0);
@@ -665,14 +672,17 @@ namespace TradeLibFast
 				break;
 			case M_SMARTORDER_REMOVE: // for smart cancels
 				{
-					MsgSmartOrderRemove* info = (MsgSmartOrderRemove*)additionalInfo;
-					Order* order = info->m_order;
-					unsigned int anvilid = order->GetId();
-					unsigned int id = fetchOrderId(order);
-					if (id>0)
-						SrvGotCancel(id);
+					MsgOrderChange* info = (MsgOrderChange*)message;
+					if (info->m_order!=NULL)
+					{
+						Order* order = info->m_order;
+						unsigned int id = fetchOrderId(order);
+						if (id>0)
+							SrvGotCancel(id);
+					}
 
 				}
+				break;
 			case M_REQ_CANCEL_ORDER: // for regular cancels
 			{
 				AIMsgOrder* info = (AIMsgOrder*)additionalInfo;
