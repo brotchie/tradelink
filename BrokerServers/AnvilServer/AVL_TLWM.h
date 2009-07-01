@@ -38,7 +38,7 @@ namespace TradeLibFast
 
 		// account monitoring stuff
 		Observable* imbalance;
-		int imbalance_client;
+		vector<int> imbalance_clients;
 		vector<Observable*> accounts;
 		vector<uint> orderids;
 		uint fetchOrderId(Order * order);

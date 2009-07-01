@@ -18,8 +18,6 @@ namespace TradeLibFast
 
 		// imbalances are off by default
 		imbalance = NULL;
-		// only one client can subscribe to imbalances
-		imbalance_client = -1;
 
 		// add this object as observer to every account,
 		// so we can get fill and order notifications
@@ -91,12 +89,20 @@ namespace TradeLibFast
 			break;
 		case IMBALANCEREQUEST :
 			{
-				// get an observable for imbalances, 
-				imbalance = B_GetMarketImbalanceObservable();
-				// make this object watch it
-				imbalance->Add(this);
+				// get client id
+				int id = FindClient(msg);
+				// ignore invalid clients
+				if (id<0) return OK;
+				// only request imbalances once on broker side
+				if (imbalance==NULL)
+				{
+					// get an observable for imbalances, 
+					imbalance = B_GetMarketImbalanceObservable();
+					// make this object watch it
+					imbalance->Add(this);
+				}
 				// set this client to receive imbalances
-				imbalance_client = FindClient(msg);
+				imbalance_clients.push_back(id);
 				return OK;
 			}
 			break;
@@ -698,7 +704,7 @@ namespace TradeLibFast
 			case M_MS_NYSE_IMBALANCE: 
 			//case M_MS_NYSE_IMBALANCE_NONE:
 				{
-					if ((imbalance_client == -1)|| (client[imbalance_client]=="")) return;
+					if (imbalance_clients.size()==0) return;
 					if (additionalInfo && (additionalInfo->GetType()==M_AI_STOCK_MOVEMENT))
 					{
 						const StockMovement* sm = ((MsgStockMovement*)additionalInfo)->m_stock;
@@ -712,7 +718,8 @@ namespace TradeLibFast
 						imb.Ex = CString("NYSE");
 						imb.ThisTime = sm->GetNyseImbalanceTime();
 						imb.PrevTime = sm->GetNysePreviousImbalanceTime();
-						TLSend(IMBALANCERESPONSE,TLImbalance::Serialize(imb),client[imbalance_client]);
+						for (uint i = 0; i<imbalance_clients.size(); i++)
+							TLSend(IMBALANCERESPONSE,TLImbalance::Serialize(imb),imbalance_clients[i]);
 
 					}
 
@@ -720,7 +727,7 @@ namespace TradeLibFast
 				}
 			case M_NEW_MARKET_IMBALANCE:
 				{
-					if ((imbalance_client == -1)|| (client[imbalance_client]=="")) return;
+					if (imbalance_clients.size() == 0) return;
 					if (additionalInfo && (additionalInfo->GetType()==M_AI_STOCK_MOVEMENT))
 					{
 						const StockMovement* sm = ((MsgStockMovement*)additionalInfo)->m_stock;
@@ -733,7 +740,8 @@ namespace TradeLibFast
 							imb.Ex = CString("NASDAQ");
 							imb.ThisTime = sm->GetNasdaqImbalanceTime();
 							imb.PrevTime = sm->GetNasdaqPreviousImbalanceTime();
-							TLSend(IMBALANCERESPONSE,TLImbalance::Serialize(imb),client[imbalance_client]);
+							for (uint i = 0; i<imbalance_clients.size(); i++)
+								TLSend(IMBALANCERESPONSE,TLImbalance::Serialize(imb),imbalance_clients[i]);
 						}
 					}
 
@@ -952,10 +960,20 @@ namespace TradeLibFast
 
 	int AVL_TLWM::ClearClient(CString client) 
 	{
+		// get id for this client
+		int id = FindClient(client);
+		// make sure client exists
+		if (id<0) return OK;
 		// call base clear
 		TLServer_WM::ClearClient(client);
 		// remove any subscriptions this stock has that aren't used by others
 		RemoveUnused(); 
+		// remove imbalance subscriptions if they exist
+		vector<int> newics;
+		for (uint i = 0; i<imbalance_clients.size(); i++)
+			if (imbalance_clients[i]!=id)
+				newics.push_back(imbalance_clients[i]);
+		imbalance_clients = newics;
 		return OK;
 	}
 
