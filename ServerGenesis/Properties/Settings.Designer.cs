@@ -46,5 +46,77 @@ namespace ServerGenesis.Properties {
                 this["pw"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("69.64.202.155")]
+        public string executeip {
+            get {
+                return ((string)(this["executeip"]));
+            }
+            set {
+                this["executeip"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("16888")]
+        public ushort executeport {
+            get {
+                return ((ushort)(this["executeport"]));
+            }
+            set {
+                this["executeport"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("69.64.202.155")]
+        public string quoteip {
+            get {
+                return ((string)(this["quoteip"]));
+            }
+            set {
+                this["quoteip"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("16811")]
+        public ushort quoteport {
+            get {
+                return ((ushort)(this["quoteport"]));
+            }
+            set {
+                this["quoteport"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("69.64.202.155")]
+        public string l2ip {
+            get {
+                return ((string)(this["l2ip"]));
+            }
+            set {
+                this["l2ip"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("16810")]
+        public ushort l2port {
+            get {
+                return ((ushort)(this["l2port"]));
+            }
+            set {
+                this["l2port"] = value;
+            }
+        }
     }
 }

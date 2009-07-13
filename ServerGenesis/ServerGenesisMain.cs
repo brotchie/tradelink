@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using GTAPINet;
 using TradeLink.Common;
 using TradeLink.API;
+using TradeLink.AppKit;
 
 namespace ServerGenesis
 {
@@ -18,7 +19,9 @@ namespace ServerGenesis
         TLServer_WM tl = new TLServer_WM();
         string[] _sym = new string[0];
         List<GTStock> _stk = new List<GTStock>();
-        public const string PROGRAM = "GenesisServer BETA";
+        public const string PROGRAM = "GenesisServer-BETA";
+        Log _log = new Log(PROGRAM);
+        DebugWindow _dw = new DebugWindow();
 
         public ServerGenesisMain()
         {
@@ -45,13 +48,7 @@ namespace ServerGenesis
 
         void togmessage(object sender, EventArgs e)
         {
-            _msg.Visible = !_msg.Visible;
-            if (_msg.Visible)
-                _msg.BringToFront();
-            else
-                _msg.SendToBack();
-            ContextMenu.MenuItems[0].Checked = _msg.Visible;
-            Invalidate(true);
+            _dw.Toggle();
         }
 
         bool login() { if (_ok) return true; debug("not logged in"); return false; }
@@ -153,7 +150,12 @@ namespace ServerGenesis
         
         void ServerGenesisMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            m_session.DestroySessionWindow();
+            try
+            {
+                m_session.DestroySessionWindow();
+            }
+            catch (Exception ex) { debug(ex.Message + ex.StackTrace); }
+            _log.Stop();
         }
 
         private void _login_Click(object sender, EventArgs e)
@@ -183,9 +185,9 @@ namespace ServerGenesis
                 GTSession.GTime32 time32 = m_session.GetTime32();
                 GTSession.GTSetting32 setting32 = m_session.GetSetting32();
 
-                GTSession.gtSetExecAddress(m_session, "10.1.12.3", 16805);
-                GTSession.gtSetQuoteAddress(m_session, "192.168.3.200", 16811);
-                GTSession.gtSetLevel2Address(m_session, "192.168.3.200", 16810);
+                GTSession.gtSetExecAddress(m_session, Properties.Settings.Default.executeip, Properties.Settings.Default.executeport);
+                GTSession.gtSetQuoteAddress(m_session, Properties.Settings.Default.quoteip,Properties.Settings.Default.quoteport);
+                GTSession.gtSetLevel2Address(m_session, Properties.Settings.Default.l2ip, Properties.Settings.Default.l2port);
 
                 int err = GTSession.gtLogin(m_session, _user.Text, _pass.Text);
                 if (err == 0)
@@ -215,15 +217,8 @@ namespace ServerGenesis
 
         void debug(string msg)
         {
-            if (InvokeRequired)
-                Invoke(new DebugDelegate(debug), new object[] { msg });
-            else
-            {
-                _msg.Items.Add(msg);
-                _msg.SelectedIndex = _msg.Items.Count - 1;
-                _msg.Invalidate(true);
-            }
-                
+            _dw.GotDebug(msg);
+            _log.GotDebug(msg);
         }
 
 
