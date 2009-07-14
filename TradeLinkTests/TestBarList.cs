@@ -191,7 +191,7 @@ namespace TestTradeLink
             // make sure it's there
             Assert.IsTrue(bl.isValid);
             // verify we have at least a year of bar data
-            Assert.GreaterOrEqual(bl.Count,250);
+            Assert.GreaterOrEqual(bl.Count,199);
         }
 
         [Test]
