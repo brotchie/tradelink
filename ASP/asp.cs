@@ -315,7 +315,7 @@ namespace ASP
                 debug("removed: "+name);
             }
             // remove response from screen
-            foreach (int i in remidx)
+            for (int i = remidx.Count -1; i>=0; i--)
             {
                 // remove it
                 _resnames.Items.RemoveAt(i);
@@ -607,6 +607,8 @@ namespace ASP
                 status("must trade the response first");
                 return;
             }
+            // ignore from invalid responses
+            if ((_reslist[idx] == null) || !_reslist[idx].isValid) return;
             // ignore from invalid responses
             if (_reslist[idx].FullName == new InvalidResponse().FullName) return;
             // prepare a list of valid symbols
