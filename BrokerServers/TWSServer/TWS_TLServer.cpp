@@ -412,10 +412,14 @@ namespace TradeLibFast
 	{
 		// for some reason IB sends order cancels as an error rather than
 		// as an order update message
+		int tlid = IB2TLID(id);
+		CString msg;
+		msg.Format("%s [err:%i] [ibid:%i] [tlid:%i]",errorString,errorCode,id,tlid);
 		if (errorCode==202) 
-			this->SrvGotCancel(IB2TLID(id)); // cancels
+			this->SrvGotCancel(tlid); // cancels
 		else if (IGNOREERRORS) return; // ignore errors during init
-		else D(errorString); // print other errors
+		else if (errorCode==2109) return; // ignore 'place outside of market hours' error as we set this on every order
+		else D(msg); // print other errors
 	}
 
 
