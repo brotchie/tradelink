@@ -8,7 +8,9 @@ using System.Text;
 using System.Windows.Forms;
 using TradeLink.API;
 using TradeLink.Common;
+using TradeLink.AppKit;
 using IESignal;
+
 
 namespace ServerEsignal
 {
@@ -16,15 +18,23 @@ namespace ServerEsignal
     {
 
         EsignalServer tl = new EsignalServer();
-
+        public const string PROGRAM = "ServerEsignal";
+        Log _log = new Log(PROGRAM);
         
         public EsignalMain()
         {
             InitializeComponent();
+            // send debug messages to log file
+            tl.GotDebug += new DebugFullDelegate(tl_GotDebug);
             // attempt to connect to esignal
             _ok_Click(null, null);
             // handle connector exits
             FormClosing += new FormClosingEventHandler(EsignalMain_FormClosing);
+        }
+
+        void tl_GotDebug(Debug debug)
+        {
+            _log.GotDebug(debug);
         }
 
         void EsignalMain_FormClosing(object sender, FormClosingEventArgs e)

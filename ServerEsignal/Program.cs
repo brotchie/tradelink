@@ -15,7 +15,21 @@ namespace ServerEsignal
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new EsignalMain());
+            Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
+            try
+            {
+                Application.Run(new EsignalMain());
+            }
+            catch (Exception ex)
+            {
+                TradeLink.AppKit.CrashReport.Report(EsignalMain.PROGRAM, ex);
+            }
+        }
+
+        static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
+        {
+            Exception ex = e.Exception;
+            TradeLink.AppKit.CrashReport.Report(EsignalMain.PROGRAM, ex);
         }
     }
 }

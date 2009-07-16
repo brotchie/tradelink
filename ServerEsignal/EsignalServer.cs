@@ -15,6 +15,7 @@ namespace ServerEsignal
         bool _valid = false;
 
         Basket _mb = new BasketImpl();
+        public event DebugFullDelegate GotDebug;
 
         public bool isValid { get { return _valid; } }
         public EsignalServer() :base()
@@ -47,23 +48,31 @@ namespace ServerEsignal
         {
             if (!_valid) return;
 
-            if (qc > qr)
+            try
             {
-                // get requested symbols
-                string[] syms = _tmpregister.Split(',');
-                // go through each one
-                foreach (string sym in syms)
+                if (qc > qr)
                 {
-                    // if we don't have subscription already
-                    if (!contains(sym))
+                    // get requested symbols
+                    string[] syms = _tmpregister.Split(',');
+                    // go through each one
+                    foreach (string sym in syms)
                     {
-                        // add it to list
-                        _mb.Add(sym);
-                        // request subscription
-                        esig.RequestSymbol(sym, 1);
+                        // if we don't have subscription already
+                        if (!contains(sym))
+                        {
+                            // add it to list
+                            _mb.Add(sym);
+                            // request subscription
+                            esig.RequestSymbol(sym, 1);
+                        }
                     }
+                    qr = qc;
                 }
-                qr = qc;
+            }
+            catch (Exception ex)
+            {
+                if (GotDebug != null)
+                    GotDebug(DebugImpl.Create(ex.Message + ex.StackTrace, DebugLevel.Debug));
             }
         }
 
@@ -78,27 +87,45 @@ namespace ServerEsignal
 
         void esig_OnQuoteChanged(string sSymbol)
         {
-            // get tick info
-            BasicQuote q = esig.get_GetBasicQuote(sSymbol);
-            // get our struct
-            Tick k = new TickImpl(sSymbol);
-            // convert it
-            k.ask = (decimal)q.dAsk;
-            k.bid = (decimal)q.dBid;
-            k.trade = (decimal)q.dLast;
-            k.bs = q.lBidSize;
-            k.os = q.lAskSize;
-            k.size = q.lLastSize;
-            // send it
-            newTick(k);
+            try
+            {
+                // get tick info
+                BasicQuote q = esig.get_GetBasicQuote(sSymbol);
+                // get our struct
+                Tick k = new TickImpl(sSymbol);
+                // convert it
+                k.ask = (decimal)q.dAsk;
+                k.bid = (decimal)q.dBid;
+                k.trade = (decimal)q.dLast;
+                k.bs = q.lBidSize;
+                k.os = q.lAskSize;
+                k.size = q.lLastSize;
+                // send it
+                newTick(k);
+            }
+            catch (Exception ex)
+            {
+                if (GotDebug != null)
+                    GotDebug(DebugImpl.Create(ex.Message + ex.StackTrace, DebugLevel.Debug));
+
+            }
         }
 
         public void Stop()
         {
             if (!_valid) return;
-            // release symbols
-            foreach (Security sec in _mb)
-                esig.ReleaseSymbol(sec.Symbol);
+            try
+            {
+                // release symbols
+                foreach (Security sec in _mb)
+                    esig.ReleaseSymbol(sec.Symbol);
+            }
+            catch (Exception ex)
+            {
+                if (GotDebug != null)
+                    GotDebug(DebugImpl.Create(ex.Message + ex.StackTrace, DebugLevel.Debug));
+
+            }
             // garbage collect esignal object
             esig = null;
         }
