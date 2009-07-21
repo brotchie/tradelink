@@ -340,8 +340,6 @@ namespace Quotopia
             // only pay attention when market tab is selected
             if (quoteTab.SelectedTab.Name != "Markets") return;
             string preface = "Adding symbol: ";
-            if (newsymbol.Contains("$") || newsymbol.Contains("/")) 
-                preface = "Adding index: ";
             if (e.KeyCode == Keys.Enter)
             {
                 Security sec = SecurityImpl.Parse(newsymbol);
@@ -382,8 +380,8 @@ namespace Quotopia
                 newsymbol = newsymbol.Substring(0, newsymbol.Length - 1);
                 status(preface + newsymbol);
             }
-            else if (((e.KeyValue>=(int)Keys.A) && (e.KeyValue<=(int)Keys.Z)) 
-                || ((e.KeyValue>=(int)Keys.D0) && (e.KeyValue<=(int)Keys.D9)) || e.Shift || (e.KeyData== Keys.Space))
+            else if (((e.KeyValue >= (int)Keys.A) && (e.KeyValue <= (int)Keys.Z))
+                || ((e.KeyValue >= (int)Keys.D0) && (e.KeyValue <= (int)Keys.D9)) || e.Shift || (e.KeyData == Keys.Space))
             {
                 string val = "";
                 if (e.Shift)
@@ -400,6 +398,21 @@ namespace Quotopia
                     val += v;
                 }
                 newsymbol += val;
+                status("Adding symbol: " + newsymbol);
+            }
+            else if (e.KeyData== Keys.OemPeriod)
+            {
+                newsymbol += ".";
+                status("Adding symbol: " + newsymbol);
+            }
+            else if (e.KeyData == Keys.Space)
+            {
+                newsymbol += " ";
+                status("Adding symbol: " + newsymbol);
+            }
+            else if (e.KeyData == Keys.OemMinus)
+            {
+                newsymbol += "-";
                 status("Adding symbol: " + newsymbol);
             }
         }

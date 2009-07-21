@@ -37,6 +37,7 @@ namespace TradeLibFast
         FOX,
         IDX,
         BND,
+		CASH,
     };
 
 	enum TLSecurityField

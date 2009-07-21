@@ -108,6 +108,7 @@ namespace TradeLibFast
 		case FOX : t = "FOX"; break;
 		case IDX : t = "IDX"; break;
 		case BND : t = "BND"; break;
+		case CASH: t = "CASH"; break;
 		}
 		return t;
 	}
@@ -123,6 +124,7 @@ namespace TradeLibFast
 		else if (TLSecurityName=="FOX") return FOX;
 		else if (TLSecurityName=="IDX") return IDX;
 		else if (TLSecurityName=="BND") return BND;
+		else if (TLSecurityName=="CASH") return CASH;
 		return -1;
 	}
 }
