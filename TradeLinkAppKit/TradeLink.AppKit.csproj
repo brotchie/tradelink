@@ -37,6 +37,10 @@
     </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
+    <Reference Include="System.ServiceModel.Web">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -52,6 +56,20 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblaDocument.cs" />
+    <Compile Include="AssemblaTicket.cs" />
+    <Compile Include="AssemblaTicketControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AssemblaTicketControl.Designer.cs">
+      <DependentUpon>AssemblaTicketControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AssemblaTicketWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AssemblaTicketWindow.Designer.cs">
+      <DependentUpon>AssemblaTicketWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="Auth.cs" />
     <Compile Include="CrashReport.cs">
       <SubType>Form</SubType>
@@ -99,6 +117,12 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="AssemblaTicketControl.resx">
+      <DependentUpon>AssemblaTicketControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AssemblaTicketWindow.resx">
+      <DependentUpon>AssemblaTicketWindow.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="CrashReport.resx">
       <DependentUpon>CrashReport.cs</DependentUpon>
     </EmbeddedResource>

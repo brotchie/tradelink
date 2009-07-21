@@ -8,15 +8,33 @@ using TradeLink.Common;
 
 namespace TradeLink.AppKit
 {
+    /// <summary>
+    /// TradeLink logging to a file
+    /// </summary>
     public class Log
     {
 
         StreamWriter _log = null;
         public bool isEnabled = true;
-        public Log(string name) : this(name, true, true, Environment.CurrentDirectory) { }
+        private string fn = string.Empty;
+        public string FullName { get { return fn; } }
+        public string Content
+        {
+            get
+            {
+                if (fn == string.Empty) return string.Empty;
+                try
+                {
+                    StreamReader sr = new StreamReader(fn);
+                    return sr.ReadToEnd();
+                }
+                catch { return string.Empty; }
+            }
+        }
+        public Log(string name) : this(name, true, true, Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)) { }
         public Log(string logname, bool dateinlogname,bool appendtolog,string path)
         {
-            string fn = path+"\\"+logname+(dateinlogname ? "."+TradeLink.Common.Util.ToTLDate(DateTime.Now): "") + ".txt";
+            fn = path+"\\"+logname+(dateinlogname ? "."+TradeLink.Common.Util.ToTLDate(DateTime.Now): "") + ".txt";
             try
             {
                 _log = new StreamWriter(fn, appendtolog);
