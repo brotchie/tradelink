@@ -35,7 +35,10 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="GTAPINet, Version=1.0.3370.19203, Culture=neutral" />
+    <Reference Include="GTAPINet, Version=1.0.3370.19203, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Release\GTAPINet.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
