@@ -175,7 +175,7 @@ namespace TradeLink.Common
             else throw new Exception("Histsim was unable to initialize");
         }
 
-        int YIELDTIME = 5;
+        int YIELDTIME = 1;
         private void SecurityPlayTo(long ftime)
         {
             // see if we can truely thread or not
@@ -290,24 +290,41 @@ namespace TradeLink.Common
            
         }
 
+        const int COMPLETED = -1;
+
         void setnexttime()
         {
             // get next times of ticks in cache
             long[] times = nexttimes();
             int i = 0;
             // get first one available
-            while ((i<times.Length) && (times[i] == -1))
+            while ((i<times.Length) && (times[i] == COMPLETED))
                 i++;
             // set next time to first available time, or end of simulation if none available
             _nextticktime = i==times.Length ? HistSim.ENDSIM : times[i];
         }
+
+
         long[] nexttimes()
         {
             // setup a next entry for every instrument
             long[] times = new long[Workers.Count];
             // loop through instrument's next time, set flag if no more ticks left in cache
             for (int i = 0; i < times.Length; i++)
-                times[i] = Workers[i].hasUnread ? Workers[i].NextTime() : -1;
+            {
+                // loop until worker has ticks
+                while (!Workers[i].hasTicks)
+                {
+                    // or the worker is done reading tick stream
+                    if (!Workers[i].isWorking) break;
+                    // if we're not done, wait for the I/O thread to catch up
+                    System.Threading.Thread.Sleep(YIELDTIME);
+                }
+                // we should either have ticks or be finished with this worker,
+                // set the value of this worker's next time value accordingly
+                times[i] = Workers[i].hasTicks ? Workers[i].NextTime() : COMPLETED;
+                
+            }
             return times;
         }
         void CancelWorkers() { for (int i = 0; i < Workers.Count; i++) Workers[i].CancelAsync(); } 
@@ -318,21 +335,24 @@ namespace TradeLink.Common
     }
 
     // reads ticks from file into queue
-    public class simworker : BackgroundWorker
+    internal class simworker : BackgroundWorker
     {
         Queue<Tick> Ticks = new Queue<Tick>(100000);
         SecurityImpl workersec = null;
         volatile int readcount = 0;
-        public bool hasUnread { get { lock (Ticks) { return Ticks.Count>0; } } }
+        const int YIELDTIME = 5;
+        public bool isWorking = false;
+
+        public bool hasTicks { get { lock (Ticks) { return (Ticks.Count > 0); } } }
         public Tick NextTick() { lock (Ticks) { return Ticks.Dequeue(); } } 
         public long NextTime() { return Ticks.Peek().datetime; }
-        const int YIELDTIME = 5;
+
         public simworker(SecurityImpl sec)
         {
             workersec = sec;
             WorkerSupportsCancellation = true;
             RunWorkerCompleted += new RunWorkerCompletedEventHandler(simworker_RunWorkerCompleted);
-            // if we're multi-core start reading into cache immediately in background
+            // if we're multi-core prepare to start I/O thread for this security
             if (Environment.ProcessorCount>1)
                 DoWork += new DoWorkEventHandler(simworker_DoWork);
  
@@ -342,20 +362,27 @@ namespace TradeLink.Common
         // here is cache filling for single core
         public void SingleCoreFillCache(int readahead)
         {
+            isWorking = true;
             readcount = 0;
             while (!CancellationPending && workersec.hasHistorical && (readcount++ < readahead))
                 Ticks.Enqueue(workersec.NextTick());
+            isWorking = false;
         }
 
+
+        // this is run when I/O thread completes on multi core
         void simworker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             // reset counts
             readcount = 0;
+            // mark as done
+            isWorking = false;
         }
 
         // fill cache for multi-core
         void simworker_DoWork(object sender, DoWorkEventArgs e)
         {
+            isWorking = true;
             int readahead = (int)e.Argument;
             // while simulation hasn't been canceled, we still have historical ticks to read and we haven't read too many, cache a tick
             while (!e.Cancel && workersec.hasHistorical && (readcount++ < readahead))

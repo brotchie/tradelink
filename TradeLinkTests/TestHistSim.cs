@@ -39,6 +39,11 @@ namespace TestTradeLink
 
             double time = DateTime.Now.Subtract(start).TotalSeconds;
 
+            // printout simulation runtime
+            Console.WriteLine("Raw runtime: " + time.ToString("N2") + "sec, versus: " + EXPECTRAW + "sec expected.");
+            Console.WriteLine("Raw speed: " + ((double)tickcount / time).ToString("N0") + " ticks/sec");
+
+
             // make sure ticks arrived in order
             Assert.IsTrue(GOODTIME,"Tick arrived out-of-order.");
             // check running time
@@ -52,9 +57,6 @@ namespace TestTradeLink
             Assert.AreEqual(h.TicksProcessed, tickcount);
             // last time is 1649 on SPX
             Assert.AreEqual(20080318155843, lasttime);
-            // printout simulation runtime
-            Console.WriteLine("Raw runtime: " + time.ToString("N2") + "sec, versus: " + EXPECTRAW + "sec expected.");
-            Console.WriteLine("Raw speed: " + ((double)tickcount / time).ToString("N0") + " ticks/sec");
         }
         int tickcount = 0;
         List<string> syms = new List<string>();

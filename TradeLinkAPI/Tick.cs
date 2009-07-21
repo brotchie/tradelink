@@ -8,7 +8,6 @@ namespace TradeLink.API
     public interface Tick
     {
         string symbol { get; set; } // symbol for security
-        Security Sec { get; set; } // security type
         int time { get; set; }// time in 1601 format
         int date { get; set; }// date in 20070926 format
         long datetime { get; set; } // datetime as long

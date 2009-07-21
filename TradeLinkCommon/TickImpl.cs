@@ -10,8 +10,9 @@ namespace TradeLink.Common
     [Serializable]
     public struct TickImpl : TradeLink.API.Tick
     {
+        private const int PREC = 1000;
+        private const decimal INVPREC = .001m;
         public string symbol { get { return _sym; } set { _sym = value; } }
-        public Security Sec { get { return _Sec; } set { _Sec = value; } }
         public int size { get { return _size; } set { _size = value; } }
         public int depth { get { return _depth; } set { _depth = value; } }
         public int date { get { return _date; } set { _date = value; } }
@@ -19,9 +20,9 @@ namespace TradeLink.Common
         public long datetime { get { return _datetime; } set { _datetime = value; } }
         public int bs { get { return _bs; } set { _bs = value; } }
         public int os { get { return _os; } set { _os = value; } }
-        public decimal trade { get { return _trade; } set { _trade = value; } }
-        public decimal bid { get { return _bid; } set { _bid = value; } }
-        public decimal ask { get { return _ask; } set { _ask = value; } }
+        public decimal trade { get { return _trade*INVPREC; } set { _trade = (long)(value*PREC); } }
+        public decimal bid { get { return _bid*INVPREC; } set { _bid = (long)(value*PREC); } }
+        public decimal ask { get { return _ask*INVPREC; } set { _ask = (long)(value*PREC); } }
         public string ex { get { return _ex; } set { _ex = value; } }
         public string be { get { return _be; } set { _be = value; } }
         public string oe { get { return _oe; } set { _oe = value; } }
@@ -49,12 +50,12 @@ namespace TradeLink.Common
         int _os;
         int _size;
         int _depth;
-        int _sec;
+
         int _date;
         int _time;
-        decimal _trade;
-        decimal _bid;
-        decimal _ask;
+        long _trade;
+        long _bid;
+        long _ask;
 
         public TickImpl(string symbol) 
         {
@@ -69,8 +70,7 @@ namespace TradeLink.Common
             _depth = 0;
             _date = 0;
             _time = 0;
-            _sec = 0;
-            _trade = 0m;
+            _trade = 0;
             _bid = 0;
             _ask = 0;
             _datetime = 0;
