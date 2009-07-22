@@ -97,20 +97,22 @@ namespace TradeLink.Common
             }
             else _isRecentNew = false;
             // blend tick into bar
+            // store value of Last
+            int l = Last();
             // open
-            if (opens[Last()] == 0) opens[Last()] = k.trade;
+            if (opens[l] == 0) opens[l] = k.trade;
             // high
-            if (k.trade > highs[Last()]) highs[Last()] = k.trade;
+            if (k.trade > highs[l]) highs[l] = k.trade;
             // low
-            if (k.trade < lows[Last()]) lows[Last()] = k.trade;
+            if (k.trade < lows[l]) lows[l] = k.trade;
             // close
-            closes[Last()] = k.trade;
+            closes[l] = k.trade;
             // count ticks
-            ticks[Last()]++;
+            ticks[l]++;
             // don't set volume for index
             if (k.isIndex) return;
             // volume
-            vols[Last()] += k.size;
+            vols[l] += k.size;
             // notify barlist
             if (_isRecentNew)
                 NewBar(k.symbol, intervallength);

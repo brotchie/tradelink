@@ -42,6 +42,7 @@
     <Compile Include="Bar.cs" />
     <Compile Include="BarList.cs" />
     <Compile Include="Chart.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="CurrencyType.cs" />
     <Compile Include="Debug.cs" />
     <Compile Include="Delegates.cs" />

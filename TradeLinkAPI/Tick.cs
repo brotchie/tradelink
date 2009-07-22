@@ -13,6 +13,9 @@ namespace TradeLink.API
         long datetime { get; set; } // datetime as long
         int size { get; set; } // trade size
         int depth { get; set; } // trade depth
+        int itrade { get; set; }
+        int ibid { get; set; }
+        int iask { get; set; }
         decimal trade { get; set; } // trade price
         decimal bid { get; set; } // bid price
         decimal ask { get; set; } // offer price

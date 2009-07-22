@@ -13,10 +13,10 @@ namespace TradeLink.Common
     {
         string _sym = "";
         public string Symbol { get { return _sym; } }
-        private decimal h = decimal.MinValue;
-        private decimal l = decimal.MaxValue;
-        private decimal o = 0;
-        private decimal c = 0;
+        private int h = int.MinValue;
+        private int l = int.MaxValue;
+        private int o = 0;
+        private int c = 0;
         private int v = 0;
         private int tradesinbar = 0;
         private bool _new = false;
@@ -25,10 +25,14 @@ namespace TradeLink.Common
         private int bardate = 0;
         private bool DAYEND = false;
         public bool DayEnd { get { return DAYEND; } }
-        public decimal High { get { return h; } }
-        public decimal Low { get { return l; } }
-        public decimal Open { get { return o; } }
-        public decimal Close { get { return c; } }
+        public int iHigh { get { return h; } }
+        public int iLow { get { return l; } }
+        public int iOpen { get { return o; } }
+        public int iClose { get { return c; } }
+        public decimal High { get { return h*Const.IPRECV; } }
+        public decimal Low { get { return l * Const.IPRECV; } }
+        public decimal Open { get { return o * Const.IPRECV; } }
+        public decimal Close { get { return c * Const.IPRECV; } }
         public int Volume { get { return v; } }
         public bool isNew { get { return _new; } set { _new = value; } }
         public bool isValid { get { return (h >= l) && (o != 0) && (c != 0); } }
@@ -37,20 +41,20 @@ namespace TradeLink.Common
         public BarImpl() : this(BarInterval.FiveMin) { }
         public BarImpl(decimal open, decimal high, decimal low, decimal close, int vol, int date, int time)
         {
-            h = high;
-            o = open;
-            l = low;
-            c = close;
+            h = (int)(high*Const.IPREC);
+            o = (int)(open * Const.IPREC);
+            l = (int)(low * Const.IPREC);
+            c = (int)(close * Const.IPREC);
             v = vol;
             bardate = date;
             bartime = time;
         }
         public BarImpl(decimal open, decimal high, decimal low, decimal close, int vol, int date, int time, string symbol)
         {
-            h = high;
-            o = open;
-            l = low;
-            c = close;
+            h = (int)(high * Const.IPREC);
+            o = (int)(open * Const.IPREC);
+            l = (int)(low * Const.IPREC);
+            c = (int)(close * Const.IPREC);
             v = vol;
             bardate = date;
             bartime = time;
@@ -59,10 +63,10 @@ namespace TradeLink.Common
         public BarImpl(BarImpl b)
         {
             v = b.Volume;
-            h = b.High;
-            l = b.Low;
-            o = b.Open;
-            c = b.Close;
+            h = b.iHigh;
+            l = b.iLow;
+            o = b.iOpen;
+            c = b.iClose;
             DAYEND = b.DAYEND;
             bartime = b.bartime;
             bardate = b.bardate;
@@ -106,10 +110,10 @@ namespace TradeLink.Common
             _new = tradesinbar == 1;
             // only count volume on trades, not indicies
             if (!t.isIndex) v += t.size; // add trade size to bar volume
-            if (o == 0) o = t.trade;
-            if (t.trade > h) h = t.trade;
-            if (t.trade < l) l = t.trade;
-            c = t.trade;
+            if (o == 0) o = t.itrade;
+            if (t.itrade > h) h = t.itrade;
+            if (t.itrade < l) l = t.itrade;
+            c = t.itrade;
             return true;
         }
         public override string ToString() { return "OHLC ("+bartime+") " + o + "," + h + "," + l + "," + c; }

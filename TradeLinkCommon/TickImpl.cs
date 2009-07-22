@@ -10,8 +10,6 @@ namespace TradeLink.Common
     [Serializable]
     public struct TickImpl : TradeLink.API.Tick
     {
-        private const int PREC = 1000;
-        private const decimal INVPREC = .001m;
         public string symbol { get { return _sym; } set { _sym = value; } }
         public int size { get { return _size; } set { _size = value; } }
         public int depth { get { return _depth; } set { _depth = value; } }
@@ -20,9 +18,12 @@ namespace TradeLink.Common
         public long datetime { get { return _datetime; } set { _datetime = value; } }
         public int bs { get { return _bs; } set { _bs = value; } }
         public int os { get { return _os; } set { _os = value; } }
-        public decimal trade { get { return _trade*INVPREC; } set { _trade = (long)(value*PREC); } }
-        public decimal bid { get { return _bid*INVPREC; } set { _bid = (long)(value*PREC); } }
-        public decimal ask { get { return _ask*INVPREC; } set { _ask = (long)(value*PREC); } }
+        public int itrade { get { return _trade; } set { _trade = value; } }
+        public int ibid { get { return _bid; } set { _bid = value; } }
+        public int iask { get { return _ask; } set { _ask = value; } }
+        public decimal trade { get { return _trade*Const.IPRECV; } set { _trade = (int)(value*Const.IPREC); } }
+        public decimal bid { get { return _bid * Const.IPRECV; } set { _bid = (int)(value * Const.IPREC); } }
+        public decimal ask { get { return _ask * Const.IPRECV; } set { _ask = (int)(value * Const.IPREC); } }
         public string ex { get { return _ex; } set { _ex = value; } }
         public string be { get { return _be; } set { _be = value; } }
         public string oe { get { return _oe; } set { _oe = value; } }
@@ -53,9 +54,9 @@ namespace TradeLink.Common
 
         int _date;
         int _time;
-        long _trade;
-        long _bid;
-        long _ask;
+        int _trade;
+        int  _bid;
+        int _ask;
 
         public TickImpl(string symbol) 
         {
