@@ -42,7 +42,7 @@ namespace TradeLink.AppKit
             }
             else
             {
-                status("failed.  check info, try again.");
+                status("login failed.");
                 if (TicketFailed != null)
                     TicketFailed();
             }
@@ -58,6 +58,26 @@ namespace TradeLink.AppKit
                 _stat.Text = msg;
                 _stat.Invalidate();
             }
+        }
+
+        double delta = 0;
+        double  hdelta = 0;
+        private void AssemblaTicketControl_SizeChanged(object sender, EventArgs e)
+        {
+            int neww = (int)(ClientRectangle.Width * delta);
+            if (neww != 0)
+                _desc.Width = neww;
+            int newh = (int)(ClientRectangle.Height - hdelta);
+            if (newh != 0)
+                _desc.Height = newh - (int)(_summ.Height*1.5);
+            Invalidate(true);
+        }
+
+        private void AssemblaTicketControl_Load(object sender, EventArgs e)
+        {
+            if (_desc.Height!=0)
+                hdelta = (double)ClientRectangle.Height - _desc.Height;
+            delta = (double)_desc.Width / ClientRectangle.Width;
         }
     }
 }

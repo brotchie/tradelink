@@ -18,26 +18,15 @@ namespace TradeLink.AppKit
         public bool isEnabled = true;
         private string fn = string.Empty;
         public string FullName { get { return fn; } }
-        public string Content
-        {
-            get
-            {
-                if (fn == string.Empty) return string.Empty;
-                try
-                {
-                    StreamReader sr = new StreamReader(fn);
-                    return sr.ReadToEnd();
-                }
-                catch { return string.Empty; }
-            }
-        }
+        private StringBuilder _content = new StringBuilder();
+        public string Content  { get { return _content.ToString(); } }
         public Log(string name) : this(name, true, true, Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)) { }
         public Log(string logname, bool dateinlogname,bool appendtolog,string path)
         {
             fn = path+"\\"+logname+(dateinlogname ? "."+TradeLink.Common.Util.ToTLDate(DateTime.Now): "") + ".txt";
             try
             {
-                _log = new StreamWriter(fn, appendtolog);
+                _log = new StreamWriter(fn,true);
                 _log.AutoFlush = true;
             }
             catch (Exception ex) { _log = null; }
@@ -52,7 +41,11 @@ namespace TradeLink.AppKit
             try
             {
                 if (_log != null)
-                    _log.WriteLine(DateTime.Now.ToString("HHmmss") + ": " + msg.Msg);
+                {
+                    string data = DateTime.Now.ToString("HHmmss") + ": " + msg.Msg;
+                    _log.WriteLine(data);
+                    _content.AppendLine(data);
+                }
             }
             catch { }
         }

@@ -52,6 +52,11 @@ namespace TradeLink.AppKit
             string[] r = new string[] { "Product:" + space, "Exception:" + (ex!=null ? ex.Message : "n/a"), "StackTrace:" + (ex!=null ? ex.StackTrace: "n/a"), "CommandLine:" + Environment.CommandLine, "OS:" + Environment.OSVersion.VersionString, "CLR:" + Environment.Version.ToString(4), "TradeLink:" + TradeLink.Common.Util.TLSIdentity(), "Memory:" + Environment.WorkingSet.ToString(), "Processors:" + Environment.ProcessorCount.ToString(), data };
             string desc = string.Join(Environment.NewLine, r);
             AssemblaTicketWindow atw = new AssemblaTicketWindow(space, user, pass, showtemplate ? templatequest(desc) : desc);
+            if (ex != null)
+            {
+                atw.Text = "Create ticket for crash report";
+                atw.Invalidate(true);
+            }
         }
 
         public delegate void LoginSucceedDel(string u, string p);
