@@ -21,7 +21,7 @@ namespace TradeLink.AppKit
             string summary = space+" "+TradeLink.Common.Util.ToTLDate(DateTime.Now).ToString()+":"+TradeLink.Common.Util.DT2FT(DateTime.Now).ToString();
             assemblaTicketControl1.TicketFailed += new TradeLink.API.VoidDelegate(assemblaTicketControl1_TicketFailed);
             assemblaTicketControl1.TicketSucceed += new TradeLink.API.VoidDelegate(assemblaTicketControl1_TicketSucceed);
-            assemblaTicketControl1.Update(space, summary, description);
+            assemblaTicketControl1.Update(space, summary, description,user,pass);
             Show();
         }
 
@@ -46,8 +46,8 @@ namespace TradeLink.AppKit
         public static void Report(string space, Log log, Exception ex) { Report(space, log.Content, ex, true); }
         public static void Report(string space, string data) { Report(space, data, null, true); }
         public static void Report(string space, string data, Exception ex) { Report(space, data, ex, true); }
-        public static void Report(string space, string data, Exception ex, bool showtemplate) { Report(space, data, ex, showtemplate, string.Empty, string.Empty); }
-        public static void Report(string space, string data, Exception ex, bool showtemplate, string user, string pass)
+        public static void Report(string space, string data, Exception ex, bool showtemplate) { Report(space, data, ex, showtemplate, string.Empty, string.Empty,null); }
+        public static void Report(string space, string data, Exception ex, bool showtemplate, string user, string pass, LoginSucceedDel handlesuceed)
         {
             string[] r = new string[] { "Product:" + space, "Exception:" + (ex!=null ? ex.Message : "n/a"), "StackTrace:" + (ex!=null ? ex.StackTrace: "n/a"), "CommandLine:" + Environment.CommandLine, "OS:" + Environment.OSVersion.VersionString, "CLR:" + Environment.Version.ToString(4), "TradeLink:" + TradeLink.Common.Util.TLSIdentity(), "Memory:" + Environment.WorkingSet.ToString(), "Processors:" + Environment.ProcessorCount.ToString(), data };
             string desc = string.Join(Environment.NewLine, r);
@@ -56,6 +56,10 @@ namespace TradeLink.AppKit
             {
                 atw.Text = "Create ticket for crash report";
                 atw.Invalidate(true);
+            }
+            if (handlesuceed != null)
+            {
+                atw.LoginSucceeded+=new LoginSucceedDel(handlesuceed);
             }
         }
 
