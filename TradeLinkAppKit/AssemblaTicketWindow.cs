@@ -15,7 +15,7 @@ namespace TradeLink.AppKit
         {
             InitializeComponent();
         }
-        public AssemblaTicketWindow(string space, string description)
+        public AssemblaTicketWindow(string space, string user, string pass, string description)
         {
             InitializeComponent();
             string summary = space+" "+TradeLink.Common.Util.ToTLDate(DateTime.Now).ToString()+":"+TradeLink.Common.Util.DT2FT(DateTime.Now).ToString();
@@ -28,7 +28,7 @@ namespace TradeLink.AppKit
         static string templatequest() { return templatequest(string.Empty); }
         static string templatequest(string reportdata)
         {
-            return "what steps led to seeing this error?" + Environment.NewLine + Environment.NewLine + "1. " + Environment.NewLine + "2." + Environment.NewLine + "3." + Environment.NewLine + Environment.NewLine + "---------------------------------------------------------" + Environment.NewLine + reportdata;
+            return "what was expected, and what happened instead?  what steps lead you to seeing this?" + Environment.NewLine + Environment.NewLine + "1. " + Environment.NewLine + "2." + Environment.NewLine + "3." + Environment.NewLine + Environment.NewLine + "---------------------------------------------------------" + Environment.NewLine + reportdata;
         }
         public static string LogData(string path)
         {
@@ -46,18 +46,20 @@ namespace TradeLink.AppKit
         public static void Report(string space, Log log, Exception ex) { Report(space, log.Content, ex, true); }
         public static void Report(string space, string data) { Report(space, data, null, true); }
         public static void Report(string space, string data, Exception ex) { Report(space, data, ex, true); }
-        public static void Report(string space, string data, Exception ex, bool showtemplate)
+        public static void Report(string space, string data, Exception ex, bool showtemplate) { Report(space, data, ex, showtemplate, string.Empty, string.Empty); }
+        public static void Report(string space, string data, Exception ex, bool showtemplate, string user, string pass)
         {
             string[] r = new string[] { "Product:" + space, "Exception:" + (ex!=null ? ex.Message : "n/a"), "StackTrace:" + (ex!=null ? ex.StackTrace: "n/a"), "CommandLine:" + Environment.CommandLine, "OS:" + Environment.OSVersion.VersionString, "CLR:" + Environment.Version.ToString(4), "TradeLink:" + TradeLink.Common.Util.TLSIdentity(), "Memory:" + Environment.WorkingSet.ToString(), "Processors:" + Environment.ProcessorCount.ToString(), data };
             string desc = string.Join(Environment.NewLine, r);
-            AssemblaTicketWindow atw = new AssemblaTicketWindow(space, showtemplate ? templatequest(desc) : desc);
+            AssemblaTicketWindow atw = new AssemblaTicketWindow(space, user, pass, showtemplate ? templatequest(desc) : desc);
         }
 
         public delegate void LoginSucceedDel(string u, string p);
-        public event LoginSucceedDel LoginSucceed;
+        public event LoginSucceedDel LoginSucceeded;
         void assemblaTicketControl1_TicketSucceed()
         {
-            LoginSucceed(assemblaTicketControl1._user.Text, assemblaTicketControl1._pass.Text);
+            if (LoginSucceeded!=null)
+                LoginSucceeded(assemblaTicketControl1._user.Text, assemblaTicketControl1._pass.Text);
             Close();
         }
 

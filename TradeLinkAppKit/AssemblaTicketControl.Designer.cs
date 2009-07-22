@@ -55,26 +55,26 @@
             // 
             // _space
             // 
-            this._space.Location = new System.Drawing.Point(89, 14);
+            this._space.Location = new System.Drawing.Point(69, 15);
             this._space.Name = "_space";
-            this._space.Size = new System.Drawing.Size(100, 26);
+            this._space.Size = new System.Drawing.Size(74, 26);
             this._space.TabIndex = 1;
             this.toolTip1.SetToolTip(this._space, "space name on assembla (project name)");
             // 
             // _user
             // 
-            this._user.Location = new System.Drawing.Point(311, 12);
+            this._user.Location = new System.Drawing.Point(202, 15);
             this._user.Name = "_user";
-            this._user.Size = new System.Drawing.Size(100, 26);
+            this._user.Size = new System.Drawing.Size(73, 26);
             this._user.TabIndex = 2;
             this.toolTip1.SetToolTip(this._user, "email address you login to assembla with");
             // 
             // _pass
             // 
-            this._pass.Location = new System.Drawing.Point(311, 42);
+            this._pass.Location = new System.Drawing.Point(335, 15);
             this._pass.Name = "_pass";
             this._pass.PasswordChar = '*';
-            this._pass.Size = new System.Drawing.Size(100, 26);
+            this._pass.Size = new System.Drawing.Size(73, 26);
             this._pass.TabIndex = 3;
             this.toolTip1.SetToolTip(this._pass, "password of your assembla account");
             this._pass.UseSystemPasswordChar = true;
@@ -91,7 +91,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(226, 20);
+            this.label2.Location = new System.Drawing.Point(149, 18);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(47, 20);
             this.label2.TabIndex = 5;
@@ -100,18 +100,18 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(226, 47);
+            this.label3.Location = new System.Drawing.Point(281, 18);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(82, 20);
+            this.label3.Size = new System.Drawing.Size(48, 20);
             this.label3.TabIndex = 6;
-            this.label3.Text = "Password:";
+            this.label3.Text = "Pass:";
             // 
             // _desc
             // 
             this._desc.Location = new System.Drawing.Point(5, 85);
             this._desc.Multiline = true;
             this._desc.Name = "_desc";
-            this._desc.Size = new System.Drawing.Size(399, 137);
+            this._desc.Size = new System.Drawing.Size(403, 137);
             this._desc.TabIndex = 7;
             this.toolTip1.SetToolTip(this._desc, "description of your ticket");
             this._desc.WordWrap = false;
@@ -130,7 +130,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(8, 47);
+            this.label4.Location = new System.Drawing.Point(4, 47);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(67, 20);
             this.label4.TabIndex = 9;
@@ -138,9 +138,9 @@
             // 
             // _summ
             // 
-            this._summ.Location = new System.Drawing.Point(89, 47);
+            this._summ.Location = new System.Drawing.Point(69, 47);
             this._summ.Name = "_summ";
-            this._summ.Size = new System.Drawing.Size(100, 26);
+            this._summ.Size = new System.Drawing.Size(339, 26);
             this._summ.TabIndex = 10;
             // 
             // AssemblaTicketControl
