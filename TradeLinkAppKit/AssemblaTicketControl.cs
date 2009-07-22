@@ -16,12 +16,15 @@ namespace TradeLink.AppKit
         {
             InitializeComponent();
         }
-        public AssemblaTicketControl(string SPACE, string summary, string description)
+
+        public void Update(string SPACE, string summary, string description) { Update(SPACE, summary, description, string.Empty, string.Empty); }
+        public void Update(string SPACE, string summary, string description, string user, string pass)
         {
-            InitializeComponent();
             _summ.Text = summary;
             _space.Text = SPACE;
             _desc.Text = description;
+            _user.Text = user;
+            _pass.Text = pass;
             Invalidate(true);
         }
 

@@ -19,9 +19,9 @@ namespace TradeLink.AppKit
         {
             InitializeComponent();
             string summary = space+" "+TradeLink.Common.Util.ToTLDate(DateTime.Now).ToString()+":"+TradeLink.Common.Util.DT2FT(DateTime.Now).ToString();
-            assemblaTicketControl1 = new AssemblaTicketControl(space, summary, description);
             assemblaTicketControl1.TicketFailed += new TradeLink.API.VoidDelegate(assemblaTicketControl1_TicketFailed);
             assemblaTicketControl1.TicketSucceed += new TradeLink.API.VoidDelegate(assemblaTicketControl1_TicketSucceed);
+            assemblaTicketControl1.Update(space, summary, description);
             Show();
         }
 
@@ -53,8 +53,11 @@ namespace TradeLink.AppKit
             AssemblaTicketWindow atw = new AssemblaTicketWindow(space, showtemplate ? templatequest(desc) : desc);
         }
 
+        public delegate void LoginSucceedDel(string u, string p);
+        public event LoginSucceedDel LoginSucceed;
         void assemblaTicketControl1_TicketSucceed()
         {
+            LoginSucceed(assemblaTicketControl1._user.Text, assemblaTicketControl1._pass.Text);
             Close();
         }
 
