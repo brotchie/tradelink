@@ -25,21 +25,32 @@ namespace TradeLink.AppKit
             Show();
         }
 
-        public static void Report(string space, System.Threading.ThreadExceptionEventArgs e)
+        static string templatequest() { return templatequest(string.Empty); }
+        static string templatequest(string reportdata)
         {
-            Report(space, e.Exception);
+            return "what steps led to seeing this error?" + Environment.NewLine + Environment.NewLine + "1. " + Environment.NewLine + "2." + Environment.NewLine + "3." + Environment.NewLine + Environment.NewLine + "---------------------------------------------------------" + Environment.NewLine + reportdata;
         }
-        public static void Report(string space)
+        public static string LogData(string path)
         {
-            string[] r = new string[] { "Product:" + space, "Exception: n/a" , "StackTrace: n/a" , "CommandLine:" + Environment.CommandLine, "OS:" + Environment.OSVersion.VersionString, "CLR:" + Environment.Version.ToString(4), "TradeLink:" + TradeLink.Common.Util.TLSIdentity(), "Memory:" + Environment.WorkingSet.ToString(), "Processors:" + Environment.ProcessorCount.ToString() };
-            string desc = string.Join(Environment.NewLine, r);
-            AssemblaTicketWindow atw = new AssemblaTicketWindow(space, desc);
+            try
+            {
+                System.IO.StreamReader sr = new System.IO.StreamReader(path);
+                return sr.ReadToEnd();
+            }
+            catch { }
+            return string.Empty;
         }
-        public static void Report(string space, Exception ex)
+        public static void Report(string space, Log log, System.Threading.ThreadExceptionEventArgs e) { Report(space, log.Content, e.Exception); }
+        public static void Report(string space, string data, System.Threading.ThreadExceptionEventArgs e) { Report(space, data, e.Exception); }
+        public static void Report(string space, Log log) { Report(space, log.Content, (Exception)null); }
+        public static void Report(string space, Log log, Exception ex) { Report(space, log.Content, ex, true); }
+        public static void Report(string space, string data) { Report(space, data, null, true); }
+        public static void Report(string space, string data, Exception ex) { Report(space, data, ex, true); }
+        public static void Report(string space, string data, Exception ex, bool showtemplate)
         {
-            string[] r = new string[] { "Product:" + space, "Exception:" + ex.Message, "StackTrace:" + ex.StackTrace, "CommandLine:" + Environment.CommandLine, "OS:" + Environment.OSVersion.VersionString, "CLR:" + Environment.Version.ToString(4), "TradeLink:" + TradeLink.Common.Util.TLSIdentity(), "Memory:" + Environment.WorkingSet.ToString(), "Processors:" + Environment.ProcessorCount.ToString() };
+            string[] r = new string[] { "Product:" + space, "Exception:" + ex!=null ? ex.Message : "n/a", "StackTrace:" + ex!=null ? ex.StackTrace: "n/a", "CommandLine:" + Environment.CommandLine, "OS:" + Environment.OSVersion.VersionString, "CLR:" + Environment.Version.ToString(4), "TradeLink:" + TradeLink.Common.Util.TLSIdentity(), "Memory:" + Environment.WorkingSet.ToString(), "Processors:" + Environment.ProcessorCount.ToString(), data };
             string desc = string.Join(Environment.NewLine, r);
-            AssemblaTicketWindow atw = new AssemblaTicketWindow(space, desc);
+            AssemblaTicketWindow atw = new AssemblaTicketWindow(space, showtemplate ? templatequest(desc) : desc);
         }
 
         void assemblaTicketControl1_TicketSucceed()
