@@ -11,7 +11,6 @@ namespace TradeLibFast
 	
 	AVL_TLWM* AVL_TLWM::instance = NULL;	
 
-
 	AVL_TLWM::AVL_TLWM(void)
 	{
 		instance = this;
@@ -531,7 +530,12 @@ namespace TradeLibFast
 		{
 			// save order if it was accepted
 			if (error==0)
-				error = saveOrder(orderSent,o.id) ? OK : DUPLICATE_ORDERID; 
+			{
+				if (saveOrder(orderSent,o.id))
+					error = OK;
+				else 
+					error = DUPLICATE_ORDERID; 
+			}
 		}
 		// return result
 		return error;
