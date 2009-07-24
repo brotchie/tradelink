@@ -41,6 +41,7 @@ namespace TradeLibFast
 		vector<int> imbalance_clients;
 		vector<Observable*> accounts;
 		vector<uint> orderids;
+		uint fetchOrderIdAndRemove(Order* order);
 		uint fetchOrderId(Order * order);
 		bool IdIsUnique(uint id);
 		bool saveOrder(Order* o,uint id);

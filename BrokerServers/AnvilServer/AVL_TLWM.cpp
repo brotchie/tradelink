@@ -558,6 +558,20 @@ namespace TradeLibFast
 		return 0;
 	}
 
+	uint AVL_TLWM::fetchOrderIdAndRemove(Order* order)
+	{
+		if (order==NULL) return ORDER_NOT_FOUND;
+		for (uint i = 0; i<ordercache.size(); i++)
+			if (ordercache[i]==order) 
+			{
+				ordercache[i] = NULL;
+				int id = orderids[i];
+				orderids[i] = 0;
+				return id;
+			}
+		return 0;
+	}
+
 	bool AVL_TLWM::saveOrder(Order* o,uint id)
 	{
 		// fail if invalid order
@@ -686,9 +700,10 @@ namespace TradeLibFast
 					if (info->m_order!=NULL)
 					{
 						Order* order = info->m_order;
-						unsigned int id = fetchOrderId(order);
+						unsigned int id = fetchOrderIdAndRemove(order);
 						if (id>0)
 							SrvGotCancel(id);
+
 					}
 
 				}
@@ -698,7 +713,7 @@ namespace TradeLibFast
 				AIMsgOrder* info = (AIMsgOrder*)additionalInfo;
 				Order* order = info->m_order;
 				unsigned int anvilid = order->GetId();
-				unsigned int id = fetchOrderId(order);
+				unsigned int id = fetchOrderIdAndRemove(order);
 				if (id>0)
 					SrvGotCancel(id);
 				break;
