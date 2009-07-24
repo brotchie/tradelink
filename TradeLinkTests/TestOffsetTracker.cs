@@ -130,6 +130,8 @@ namespace TestTradeLink
 
             // send position update
             ot.Adjust(new TradeImpl(SYM, PRICE+2, SIZE));
+            // tick
+            ot.GotTick(nt());
             // verify only one order exists
             Assert.AreEqual(1, profits.Count);
             Assert.AreEqual(1, stops.Count);
@@ -147,6 +149,8 @@ namespace TestTradeLink
 
             // partial hit the profit order
             ot.Adjust(new TradeImpl(SYM, PRICE + 1, -1 * SIZE));
+            // tick
+            ot.GotTick(nt());
             // verify only one order exists on each side
             Assert.AreEqual(1, profits.Count);
             Assert.AreEqual(1, stops.Count);
@@ -163,6 +167,8 @@ namespace TestTradeLink
             Assert.AreEqual(SIZE, stop.UnsignedSize);
 
         }
+
+        Tick nt() { return (Tick)TickImpl.NewTrade(SYM, PRICE, SIZE); }
 
         void ot_SendOffset(Order o)
         {
