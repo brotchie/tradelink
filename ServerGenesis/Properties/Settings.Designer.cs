@@ -61,7 +61,7 @@ namespace ServerGenesis.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("16888")]
+        [global::System.Configuration.DefaultSettingValueAttribute("15805")]
         public ushort executeport {
             get {
                 return ((ushort)(this["executeport"]));
@@ -85,7 +85,7 @@ namespace ServerGenesis.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("16811")]
+        [global::System.Configuration.DefaultSettingValueAttribute("15805")]
         public ushort quoteport {
             get {
                 return ((ushort)(this["quoteport"]));
@@ -109,7 +109,7 @@ namespace ServerGenesis.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("16810")]
+        [global::System.Configuration.DefaultSettingValueAttribute("15805")]
         public ushort l2port {
             get {
                 return ((ushort)(this["l2port"]));

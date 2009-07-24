@@ -12,19 +12,19 @@
       <Value Profile="(Default)">69.64.202.155</Value>
     </Setting>
     <Setting Name="executeport" Type="System.UInt16" Scope="User">
-      <Value Profile="(Default)">16888</Value>
+      <Value Profile="(Default)">15805</Value>
     </Setting>
     <Setting Name="quoteip" Type="System.String" Scope="User">
       <Value Profile="(Default)">69.64.202.155</Value>
     </Setting>
     <Setting Name="quoteport" Type="System.UInt16" Scope="User">
-      <Value Profile="(Default)">16811</Value>
+      <Value Profile="(Default)">15805</Value>
     </Setting>
     <Setting Name="l2ip" Type="System.String" Scope="User">
       <Value Profile="(Default)">69.64.202.155</Value>
     </Setting>
     <Setting Name="l2port" Type="System.UInt16" Scope="User">
-      <Value Profile="(Default)">16810</Value>
+      <Value Profile="(Default)">15805</Value>
     </Setting>
   </Settings>
 </SettingsFile>
