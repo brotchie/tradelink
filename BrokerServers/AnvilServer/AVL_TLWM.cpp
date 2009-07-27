@@ -15,6 +15,9 @@ namespace TradeLibFast
 	{
 		instance = this;
 
+		// remove canceled orders
+		B_KeepCancelledOrders(false);
+
 		// imbalances are off by default
 		imbalance = NULL;
 
@@ -36,6 +39,7 @@ namespace TradeLibFast
 
 	AVL_TLWM::~AVL_TLWM(void)
 	{
+
 		// remove all account observables
 		for (uint i = 0; i<accounts.size(); i++)
 			accounts[i] = NULL;
@@ -694,6 +698,7 @@ namespace TradeLibFast
 				}
 			}
 				break;
+			case M_ORDER_DELETED: // for regular cancels
 			case M_SMARTORDER_REMOVE: // for smart cancels
 				{
 					MsgOrderChange* info = (MsgOrderChange*)message;
@@ -708,18 +713,6 @@ namespace TradeLibFast
 
 				}
 				break;
-			case M_REQ_CANCEL_ORDER: // for regular cancels
-			{
-				AIMsgOrder* info = (AIMsgOrder*)additionalInfo;
-				Order* order = info->m_order;
-				unsigned int anvilid = order->GetId();
-				unsigned int id = fetchOrderIdAndRemove(order);
-				if (id>0)
-					SrvGotCancel(id);
-				break;
-
-			}
-			break;
 			case M_MS_NYSE_IMBALANCE: 
 			//case M_MS_NYSE_IMBALANCE_NONE:
 				{
