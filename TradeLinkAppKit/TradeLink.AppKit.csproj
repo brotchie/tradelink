@@ -50,10 +50,6 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="TwitterooCore, Version=1.4.0.42521, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\TwitterooCore.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblaDocument.cs" />
@@ -103,18 +99,6 @@
       <DependentUpon>Versions.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TwitControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TwitControl.Designer.cs">
-      <DependentUpon>TwitControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="TwitPopup.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="TwitPopup.Designer.cs">
-      <DependentUpon>TwitPopup.cs</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="AssemblaTicketControl.resx">
@@ -138,12 +122,6 @@
     <EmbeddedResource Include="Versions.resx">
       <DependentUpon>Versions.cs</DependentUpon>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TwitControl.resx">
-      <DependentUpon>TwitControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TwitPopup.resx">
-      <DependentUpon>TwitPopup.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

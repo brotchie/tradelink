@@ -64,15 +64,15 @@
             // 
             // _user
             // 
-            this._user.Location = new System.Drawing.Point(204, 10);
+            this._user.Location = new System.Drawing.Point(204, 12);
             this._user.Name = "_user";
             this._user.Size = new System.Drawing.Size(73, 26);
             this._user.TabIndex = 2;
-            this.toolTip1.SetToolTip(this._user, "email address you login to assembla with");
+            this.toolTip1.SetToolTip(this._user, "username you login to assembla with");
             // 
             // _pass
             // 
-            this._pass.Location = new System.Drawing.Point(337, 9);
+            this._pass.Location = new System.Drawing.Point(337, 10);
             this._pass.Name = "_pass";
             this._pass.PasswordChar = '*';
             this._pass.Size = new System.Drawing.Size(73, 26);
@@ -101,7 +101,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(283, 13);
+            this.label3.Location = new System.Drawing.Point(283, 15);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(48, 20);
             this.label3.TabIndex = 6;
@@ -158,7 +158,7 @@
             this.Controls.Add(this._space);
             this.Controls.Add(this._create);
             this.Name = "AssemblaTicketControl";
-            this.Size = new System.Drawing.Size(429, 252);
+            this.Size = new System.Drawing.Size(428, 252);
             this.Load += new System.EventHandler(this.AssemblaTicketControl_Load);
             this.SizeChanged += new System.EventHandler(this.AssemblaTicketControl_SizeChanged);
             this.ResumeLayout(false);

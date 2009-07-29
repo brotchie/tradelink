@@ -30,63 +30,32 @@ namespace ASP
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ASP));
-            this.LoadDLL = new System.Windows.Forms.Button();
             this._availresponses = new System.Windows.Forms.ComboBox();
-            this.label1 = new System.Windows.Forms.Label();
             this._resnames = new System.Windows.Forms.ListBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.debugon = new System.Windows.Forms.CheckBox();
-            this.archivetickbox = new System.Windows.Forms.CheckBox();
             this._newrespbox = new System.Windows.Forms.GroupBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this._togglemsgs = new System.Windows.Forms.Button();
-            this._account = new System.Windows.Forms.TextBox();
             this._twithelp = new System.Windows.Forms.Button();
-            this._skins = new System.Windows.Forms.ComboBox();
-            this._remskin = new System.Windows.Forms.Button();
-            this._saveskins = new System.Windows.Forms.Button();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label4 = new System.Windows.Forms.Label();
+            this._librarysel = new System.Windows.Forms.Button();
+            this._opttog = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this._newrespbox.SuspendLayout();
-            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // LoadDLL
-            // 
-            this.LoadDLL.Location = new System.Drawing.Point(19, 31);
-            this.LoadDLL.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.LoadDLL.Name = "LoadDLL";
-            this.LoadDLL.Size = new System.Drawing.Size(148, 29);
-            this.LoadDLL.TabIndex = 0;
-            this.LoadDLL.Text = "Response Library";
-            this.toolTip1.SetToolTip(this.LoadDLL, "Change current response library");
-            this.LoadDLL.UseVisualStyleBackColor = true;
-            this.LoadDLL.Click += new System.EventHandler(this.LoadDLL_Click);
             // 
             // _availresponses
             // 
             this._availresponses.FormattingEnabled = true;
-            this._availresponses.Location = new System.Drawing.Point(136, 31);
+            this._availresponses.Location = new System.Drawing.Point(7, 31);
             this._availresponses.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this._availresponses.Name = "_availresponses";
-            this._availresponses.Size = new System.Drawing.Size(287, 28);
+            this._availresponses.Size = new System.Drawing.Size(362, 28);
             this._availresponses.TabIndex = 1;
             this._availresponses.Text = "Select a response";
             this.toolTip1.SetToolTip(this._availresponses, "List of responses available in current response library");
             this._availresponses.SelectedIndexChanged += new System.EventHandler(this.Boxes_SelectedIndexChanged);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(7, 34);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(121, 20);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "New Response:";
             // 
             // _resnames
             // 
@@ -107,7 +76,7 @@ namespace ASP
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1,
             this.toolStripStatusLabel2});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 351);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 280);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 21, 0);
             this.statusStrip1.Size = new System.Drawing.Size(468, 22);
@@ -124,146 +93,68 @@ namespace ASP
             this.toolStripStatusLabel2.Name = "toolStripStatusLabel2";
             this.toolStripStatusLabel2.Size = new System.Drawing.Size(0, 17);
             // 
-            // debugon
-            // 
-            this.debugon.Appearance = System.Windows.Forms.Appearance.Button;
-            this.debugon.AutoSize = true;
-            this.debugon.Checked = true;
-            this.debugon.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.debugon.Location = new System.Drawing.Point(199, 68);
-            this.debugon.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.debugon.Name = "debugon";
-            this.debugon.Size = new System.Drawing.Size(67, 30);
-            this.debugon.TabIndex = 13;
-            this.debugon.Text = "Debug";
-            this.toolTip1.SetToolTip(this.debugon, "display debug messages from responses");
-            this.debugon.UseVisualStyleBackColor = true;
-            // 
-            // archivetickbox
-            // 
-            this.archivetickbox.Appearance = System.Windows.Forms.Appearance.Button;
-            this.archivetickbox.AutoSize = true;
-            this.archivetickbox.Checked = true;
-            this.archivetickbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.archivetickbox.Location = new System.Drawing.Point(97, 68);
-            this.archivetickbox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.archivetickbox.Name = "archivetickbox";
-            this.archivetickbox.Size = new System.Drawing.Size(95, 30);
-            this.archivetickbox.TabIndex = 14;
-            this.archivetickbox.Text = "Save Ticks";
-            this.toolTip1.SetToolTip(this.archivetickbox, "Save ticks for later analysis/replay in TradeLink");
-            this.archivetickbox.UseVisualStyleBackColor = true;
-            // 
             // _newrespbox
             // 
-            this._newrespbox.Controls.Add(this.label1);
+            this._newrespbox.Controls.Add(this._librarysel);
             this._newrespbox.Controls.Add(this._availresponses);
             this._newrespbox.Location = new System.Drawing.Point(14, 12);
             this._newrespbox.Name = "_newrespbox";
             this._newrespbox.Size = new System.Drawing.Size(435, 79);
             this._newrespbox.TabIndex = 16;
             this._newrespbox.TabStop = false;
-            this._newrespbox.Text = "Trade a Respose";
+            this._newrespbox.Text = "Start new Response (strategy)";
             // 
             // _togglemsgs
             // 
-            this._togglemsgs.Location = new System.Drawing.Point(19, 69);
+            this._togglemsgs.Location = new System.Drawing.Point(13, 231);
             this._togglemsgs.Name = "_togglemsgs";
-            this._togglemsgs.Size = new System.Drawing.Size(33, 29);
-            this._togglemsgs.TabIndex = 18;
-            this._togglemsgs.Text = "~";
-            this.toolTip1.SetToolTip(this._togglemsgs, "toggle display of debug window");
+            this._togglemsgs.Size = new System.Drawing.Size(27, 29);
+            this._togglemsgs.TabIndex = 19;
+            this._togglemsgs.Text = "!";
             this._togglemsgs.UseVisualStyleBackColor = true;
             this._togglemsgs.Click += new System.EventHandler(this._togglemsgs_Click);
             // 
-            // _account
-            // 
-            this._account.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::ASP.Properties.Settings.Default, "accountname", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this._account.Location = new System.Drawing.Point(344, 70);
-            this._account.Name = "_account";
-            this._account.Size = new System.Drawing.Size(82, 26);
-            this._account.TabIndex = 15;
-            this._account.Text = global::ASP.Properties.Settings.Default.accountname;
-            this.toolTip1.SetToolTip(this._account, "specify trading account name/id where orders are sent");
-            // 
             // _twithelp
             // 
-            this._twithelp.Location = new System.Drawing.Point(58, 68);
+            this._twithelp.Image = ((System.Drawing.Image)(resources.GetObject("_twithelp.Image")));
+            this._twithelp.Location = new System.Drawing.Point(418, 231);
             this._twithelp.Name = "_twithelp";
-            this._twithelp.Size = new System.Drawing.Size(33, 30);
-            this._twithelp.TabIndex = 19;
-            this._twithelp.Text = "?";
-            this.toolTip1.SetToolTip(this._twithelp, "twit for help");
+            this._twithelp.Size = new System.Drawing.Size(31, 29);
+            this._twithelp.TabIndex = 20;
+            this.toolTip1.SetToolTip(this._twithelp, "submit bug report");
             this._twithelp.UseVisualStyleBackColor = true;
-            this._twithelp.Click += new System.EventHandler(this._twithelp_Click);
+            this._twithelp.Click += new System.EventHandler(this._twithelp_Click_1);
             // 
-            // _skins
+            // _librarysel
             // 
-            this._skins.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this._skins.FormattingEnabled = true;
-            this._skins.Location = new System.Drawing.Point(174, 32);
-            this._skins.Name = "_skins";
-            this._skins.Size = new System.Drawing.Size(180, 28);
-            this._skins.TabIndex = 20;
-            this.toolTip1.SetToolTip(this._skins, "skins found");
-            this._skins.SelectedIndexChanged += new System.EventHandler(this._skins_SelectedIndexChanged);
+            this._librarysel.Location = new System.Drawing.Point(385, 31);
+            this._librarysel.Name = "_librarysel";
+            this._librarysel.Size = new System.Drawing.Size(32, 28);
+            this._librarysel.TabIndex = 21;
+            this._librarysel.Text = "L";
+            this.toolTip1.SetToolTip(this._librarysel, "view responses available in different dll library");
+            this._librarysel.UseVisualStyleBackColor = true;
+            this._librarysel.Click += new System.EventHandler(this.LoadDLL_Click);
             // 
-            // _remskin
+            // _opttog
             // 
-            this._remskin.Location = new System.Drawing.Point(360, 33);
-            this._remskin.Name = "_remskin";
-            this._remskin.Size = new System.Drawing.Size(29, 28);
-            this._remskin.TabIndex = 21;
-            this._remskin.Text = "-";
-            this.toolTip1.SetToolTip(this._remskin, "remove selected skin");
-            this._remskin.UseVisualStyleBackColor = true;
-            this._remskin.Click += new System.EventHandler(this._remskin_Click);
-            // 
-            // _saveskins
-            // 
-            this._saveskins.Location = new System.Drawing.Point(395, 32);
-            this._saveskins.Name = "_saveskins";
-            this._saveskins.Size = new System.Drawing.Size(31, 29);
-            this._saveskins.TabIndex = 22;
-            this._saveskins.Text = "S";
-            this.toolTip1.SetToolTip(this._saveskins, "save all loaded skins");
-            this._saveskins.UseVisualStyleBackColor = true;
-            this._saveskins.Click += new System.EventHandler(this._saveskins_Click);
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this._saveskins);
-            this.groupBox1.Controls.Add(this._remskin);
-            this.groupBox1.Controls.Add(this._skins);
-            this.groupBox1.Controls.Add(this._twithelp);
-            this.groupBox1.Controls.Add(this.LoadDLL);
-            this.groupBox1.Controls.Add(this._togglemsgs);
-            this.groupBox1.Controls.Add(this.debugon);
-            this.groupBox1.Controls.Add(this.label4);
-            this.groupBox1.Controls.Add(this.archivetickbox);
-            this.groupBox1.Controls.Add(this._account);
-            this.groupBox1.Location = new System.Drawing.Point(13, 231);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(435, 109);
-            this.groupBox1.TabIndex = 19;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "ASP Options";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(273, 73);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(72, 20);
-            this.label4.TabIndex = 17;
-            this.label4.Text = "Account:";
+            this._opttog.Location = new System.Drawing.Point(46, 231);
+            this._opttog.Name = "_opttog";
+            this._opttog.Size = new System.Drawing.Size(28, 29);
+            this._opttog.TabIndex = 21;
+            this._opttog.Text = "?";
+            this.toolTip1.SetToolTip(this._opttog, "change ASP options");
+            this._opttog.UseVisualStyleBackColor = true;
+            this._opttog.Click += new System.EventHandler(this._opttog_Click);
             // 
             // ASP
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(468, 373);
-            this.Controls.Add(this.groupBox1);
+            this.ClientSize = new System.Drawing.Size(468, 302);
+            this.Controls.Add(this._opttog);
+            this.Controls.Add(this._twithelp);
+            this.Controls.Add(this._togglemsgs);
             this.Controls.Add(this._newrespbox);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this._resnames);
@@ -274,9 +165,6 @@ namespace ASP
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this._newrespbox.ResumeLayout(false);
-            this._newrespbox.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -284,25 +172,17 @@ namespace ASP
 
         #endregion
 
-        private System.Windows.Forms.Button LoadDLL;
         private System.Windows.Forms.ComboBox _availresponses;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ListBox _resnames;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel2;
-        private System.Windows.Forms.CheckBox debugon;
-        private System.Windows.Forms.CheckBox archivetickbox;
-        private System.Windows.Forms.TextBox _account;
         private System.Windows.Forms.GroupBox _newrespbox;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.Button _togglemsgs;
-        private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button _twithelp;
-        private System.Windows.Forms.ComboBox _skins;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Button _remskin;
-        private System.Windows.Forms.Button _saveskins;
+        private System.Windows.Forms.Button _librarysel;
+        private System.Windows.Forms.Button _opttog;
     }
 }
 

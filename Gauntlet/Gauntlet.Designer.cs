@@ -40,6 +40,7 @@ namespace WinGauntlet
             this.label7 = new System.Windows.Forms.Label();
             this.queuebut = new System.Windows.Forms.Button();
             this.reslist = new System.Windows.Forms.ListBox();
+            this.tickFileFilterControl1 = new TradeLink.Common.TickFileFilterControl();
             this.optionpage = new System.Windows.Forms.TabPage();
             this._indicatcsv = new System.Windows.Forms.CheckBox();
             this._debugfile = new System.Windows.Forms.CheckBox();
@@ -58,7 +59,6 @@ namespace WinGauntlet
             this.messagepage = new System.Windows.Forms.TabPage();
             this.messages = new System.Windows.Forms.RichTextBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.tickFileFilterControl1 = new TradeLink.Common.TickFileFilterControl();
             this.tabControl1.SuspendLayout();
             this.studypage.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -108,12 +108,12 @@ namespace WinGauntlet
             // 
             // _twithelp
             // 
+            this._twithelp.Image = ((System.Drawing.Image)(resources.GetObject("_twithelp.Image")));
             this._twithelp.Location = new System.Drawing.Point(68, 421);
             this._twithelp.Name = "_twithelp";
             this._twithelp.Size = new System.Drawing.Size(31, 31);
             this._twithelp.TabIndex = 19;
-            this._twithelp.Text = "?";
-            this.toolTip1.SetToolTip(this._twithelp, "twit for help");
+            this.toolTip1.SetToolTip(this._twithelp, "open bug report");
             this._twithelp.UseVisualStyleBackColor = true;
             this._twithelp.Click += new System.EventHandler(this._twithelp_Click);
             // 
@@ -176,6 +176,13 @@ namespace WinGauntlet
             this.reslist.TabIndex = 2;
             this.toolTip1.SetToolTip(this.reslist, "select response to trade");
             this.reslist.SelectedIndexChanged += new System.EventHandler(this.boxlist_SelectedIndexChanged);
+            // 
+            // tickFileFilterControl1
+            // 
+            this.tickFileFilterControl1.Location = new System.Drawing.Point(9, 9);
+            this.tickFileFilterControl1.Name = "tickFileFilterControl1";
+            this.tickFileFilterControl1.Size = new System.Drawing.Size(607, 298);
+            this.tickFileFilterControl1.TabIndex = 18;
             // 
             // optionpage
             // 
@@ -404,13 +411,6 @@ namespace WinGauntlet
             this.messages.Size = new System.Drawing.Size(621, 509);
             this.messages.TabIndex = 0;
             this.messages.Text = "";
-            // 
-            // tickFileFilterControl1
-            // 
-            this.tickFileFilterControl1.Location = new System.Drawing.Point(9, 9);
-            this.tickFileFilterControl1.Name = "tickFileFilterControl1";
-            this.tickFileFilterControl1.Size = new System.Drawing.Size(607, 298);
-            this.tickFileFilterControl1.TabIndex = 18;
             // 
             // Gauntlet
             // 

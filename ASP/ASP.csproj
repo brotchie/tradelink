@@ -50,11 +50,20 @@
     <Compile Include="asp.Designer.cs">
       <DependentUpon>asp.cs</DependentUpon>
     </Compile>
+    <Compile Include="ASPOptions.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ASPOptions.Designer.cs">
+      <DependentUpon>ASPOptions.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="asp.resx">
       <SubType>Designer</SubType>
       <DependentUpon>asp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ASPOptions.resx">
+      <DependentUpon>ASPOptions.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

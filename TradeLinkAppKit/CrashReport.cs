@@ -14,28 +14,57 @@ namespace TradeLink.AppKit
     public partial class CrashReport : Form
     {
         string PROGRAM = string.Empty;
-        string BODY = string.Empty;
-        public CrashReport(string program, Exception ex)
+        Exception ex = null;
+        string data = string.Empty;
+        public CrashReport(string program, Exception ex) : this(program, ex, string.Empty) { }
+        public CrashReport(string program, Exception ex, string data)
         {
-            PROGRAM = program;
-            string[] r = new string[] { "Product:"+program, "Exception:"+ex.Message, "StackTrace:"+ex.StackTrace, "CommandLine:"+Environment.CommandLine, "OS:"+Environment.OSVersion.VersionString, "CLR:"+Environment.Version.ToString(4), "TradeLink:"+TradeLink.Common.Util.TLSIdentity(),"Memory:"+Environment.WorkingSet.ToString(), "Processors:"+Environment.ProcessorCount.ToString() };
-            BODY = string.Join(Environment.NewLine, r);
             InitializeComponent();
             ShowDialog();
         }
-        const string email = "tradelink-contribute@googlegroups.com";
-        const string webase = "http://groups.google.com/group/tradelink-contribute/post?";
+
+        public const string DEVELOPERURL = "http://groups.google.com/group/tradelink-contribute/post?";
+        public static string Desc(string program)
+        {
+            return program+ " Bug (" + TradeLink.Common.Util.ToTLDate(DateTime.Now).ToString() + ")";
+        }
         private void _email_Click(object sender, EventArgs e)
         {
-            if (BODY != string.Empty)
-            {
-                BODY = "what steps led to seeing this error?" + Environment.NewLine + Environment.NewLine+"1. " + Environment.NewLine + "2." + Environment.NewLine +"3."+Environment.NewLine+ Environment.NewLine + "---------------------------------------------------------"+Environment.NewLine+BODY;
-                string bodystring = Uri.EscapeUriString(BODY);
-                string url = webase + string.Format("subject={0}&body={1}", PROGRAM + " Crash ("+TradeLink.Common.Util.ToTLDate(DateTime.Now).ToString()+")", bodystring);
-                System.Diagnostics.Process.Start(url);
-            }
-                //Email.Send(email, PROGRAM + "." + Util.ToTLDate(DateTime.Now), BODY);
+            BugReport(PROGRAM, Desc(PROGRAM), ex, data);
             Close();
+        }
+
+        public static string DeveloperIssuePostURL(string program, string desc, Exception ex, string data)
+        {
+            string bodystring = Body(program, ex, data,true);
+            return DEVELOPERURL + string.Format("subject={0}&body={1}", desc, bodystring);
+        }
+
+        public static void BugReport(string program, string data)
+        {
+            BugReport(program, Desc(program), null, data);
+        }
+        public static void BugReport(string program, string desc, Exception ex, string data)
+        {
+            System.Diagnostics.Process.Start(DeveloperIssuePostURL(program, desc, ex, data));
+
+        }
+
+        static string template()
+        {
+            return "What did you expect to see, what did you see instead?"+Environment.NewLine+Environment.NewLine+"What steps led to seeing this error?" + Environment.NewLine + Environment.NewLine + "1. " + Environment.NewLine + "2." + Environment.NewLine + "3." + Environment.NewLine + Environment.NewLine + "---------------------------------------------------------" + Environment.NewLine;
+        }
+
+        static string Body(string program) { return Body(program, (Exception)null); }
+        static string Body(string program, string data) { return Body(program, null, data,true); }
+        static string Body(string program, Exception ex) { return Body(program, ex, string.Empty,true); }
+        static string Body(string program, Exception ex,string data, bool addtemplate)
+        {
+            string[] r = new string[] { (addtemplate ? template() : string.Empty),"Product:" + program, "Exception:" + (ex!=null ? ex.Message : "n/a"), "StackTrace:" + (ex!=null ? ex.StackTrace : "n/a"), "CommandLine:" + Environment.CommandLine, "OS:" + Environment.OSVersion.VersionString, "CLR:" + Environment.Version.ToString(4), "TradeLink:" + TradeLink.Common.Util.TLSIdentity(), "Memory:" + Environment.WorkingSet.ToString(), "Processors:" + Environment.ProcessorCount.ToString(),data};
+
+            string decoded = string.Join(Environment.NewLine, r);
+            return Uri.EscapeUriString(decoded);
+
         }
 
         private void _ignore_Click(object sender, EventArgs e)

@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using TradeLink.Common;
 using System.IO;
 using TradeLink.API;
+using TradeLink.AppKit;
 
 namespace WinGauntlet
 {
@@ -18,8 +19,8 @@ namespace WinGauntlet
         static GauntArgs args = new GauntArgs();
         public const string PROGRAM = "Gauntlet";
         StreamWriter indf;
-        StreamWriter log;
         bool background = false;
+        Log _log = new Log(PROGRAM);
 
 
 
@@ -275,12 +276,7 @@ namespace WinGauntlet
         void debug(string message) { status(message + Environment.NewLine); }
         void status(string message)
         {
-            if (log == null)
-            {
-                log = new StreamWriter(OUTFOLD+"Debugs"+uniquen+".txt", true);
-                log.AutoFlush = true;
-            }
-            log.Write(DateTime.Now.ToShortTimeString()+": "+message);
+            _log.GotDebug(message);
             if (background) return;
             if (messages.InvokeRequired)
             {
@@ -582,7 +578,7 @@ namespace WinGauntlet
 
         private void _twithelp_Click(object sender, EventArgs e)
         {
-            TradeLink.AppKit.TwitPopup.Twit();
+            CrashReport.BugReport(PROGRAM, _log.Content);
         }
 
 

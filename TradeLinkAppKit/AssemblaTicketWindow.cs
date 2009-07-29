@@ -28,7 +28,7 @@ namespace TradeLink.AppKit
         static string templatequest() { return templatequest(string.Empty); }
         static string templatequest(string reportdata)
         {
-            return "what was expected, and what happened instead?  what steps lead you to seeing this?" + Environment.NewLine + Environment.NewLine + "1. " + Environment.NewLine + "2." + Environment.NewLine + "3." + Environment.NewLine + Environment.NewLine + "---------------------------------------------------------" + Environment.NewLine + reportdata;
+            return "what was expected, and what happened instead?"+Environment.NewLine+Environment.NewLine+"What steps lead you to seeing this?" + Environment.NewLine + Environment.NewLine + "1. " + Environment.NewLine + "2." + Environment.NewLine + "3." + Environment.NewLine + Environment.NewLine + "---------------------------------------------------------" + Environment.NewLine + reportdata;
         }
         public static string LogData(string path)
         {

@@ -27,6 +27,7 @@ namespace ASP
         List<Response> _reslist = new List<Response>();
         TickArchiver _ta = new TickArchiver();
         BasketImpl _mb = new BasketImpl();
+        ASPOptions _ao = new ASPOptions();
 
         Dictionary<int, string> _resskinidx = new Dictionary<int, string>();
         Dictionary<string, string> _class2dll = new Dictionary<string, string>();
@@ -42,7 +43,7 @@ namespace ASP
             // read designer options for gui
             InitializeComponent();
             // don't save ticks from replay since they're already saved
-            archivetickbox.Checked = tl.LinkType != TLTypes.HISTORICALBROKER;
+            _ao.archivetickbox.Checked = tl.LinkType != TLTypes.HISTORICALBROKER;
             // if our machine is multi-core we use seperate thread to process ticks
             if (Environment.ProcessorCount == 1)
                 tl.gotTick += new TickDelegate(tl_gotTick);
@@ -166,7 +167,7 @@ namespace ASP
         void findskins()
         {
             // clear existing skins
-            _skins.Items.Clear();
+            _ao._skins.Items.Clear();
 
             // go through every skin file
             foreach (string fn in skinfiles(Environment.CurrentDirectory))
@@ -174,11 +175,11 @@ namespace ASP
                 // get skin name
                 string sk = skinfromfile(fn);
                 // if we don't have it, display as an option
-                if (!_skins.Items.Contains(sk))
-                    _skins.Items.Add(sk);
+                if (!_ao._skins.Items.Contains(sk))
+                    _ao._skins.Items.Add(sk);
             }
             // refresh screen
-            _skins.Invalidate(true);
+            _ao._skins.Invalidate(true);
         }
 
         string[] skinfiles(string path)
@@ -224,7 +225,7 @@ namespace ASP
             // user has selected a new skin
 
             // get the name
-            string skin = _skins.SelectedItem.ToString();
+            string skin = _ao._skins.SelectedItem.ToString();
             //confirm loading
             if (MessageBox.Show("Load skin " + skin + "?", "confirm skin load", MessageBoxButtons.YesNo) != DialogResult.Yes)
                 return;
@@ -431,7 +432,7 @@ namespace ASP
                 return;
 
             // see if we should save this tick
-            if (archivetickbox.Checked)
+            if (_ao.archivetickbox.Checked)
                 _ta.Save(t);
 
             // send tick to any valid requesting responses
@@ -681,7 +682,7 @@ namespace ASP
 
             // set account on order
             if (o.Account==string.Empty)
-                o.Account = _account.Text;
+                o.Account = _ao._account.Text;
             try
             {
                 // set the security
@@ -722,7 +723,7 @@ namespace ASP
         void workingres_GotDebug(Debug d)
         {
             // see if we are processing debugs
-            if (!debugon.Checked) return;
+            if (!_ao.debugon.Checked) return;
             // display to screen
             debug(d.Msg);
         }
@@ -790,18 +791,13 @@ namespace ASP
             _dw.Toggle();
         }
 
-        private void _twithelp_Click(object sender, EventArgs e)
-        {
-            // popup twitter window
-            TwitPopup.Twit();
-        }
 
         private void _remskin_Click(object sender, EventArgs e)
         {
             // make sure something is selected
-            if (_skins.SelectedIndex == -1) return;
+            if (_ao._skins.SelectedIndex == -1) return;
             // get name
-            string name = _skins.SelectedItem.ToString();
+            string name = _ao._skins.SelectedItem.ToString();
             // confirm removal
             if (MessageBox.Show("remove skin " + name + "?", "confirm skin deletion", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
@@ -868,6 +864,17 @@ namespace ASP
                 }
             }
             status("saved loaded skins");
+        }
+
+        private void _opttog_Click(object sender, EventArgs e)
+        {
+            _ao.Visible = !_ao.Visible;
+            _ao.Invalidate(true);
+        }
+
+        private void _twithelp_Click_1(object sender, EventArgs e)
+        {
+            CrashReport.BugReport(PROGRAM, _log.Content);
         }
 
                                          
