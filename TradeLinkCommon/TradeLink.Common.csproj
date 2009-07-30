@@ -90,6 +90,10 @@
     <Compile Include="TickFileFilterControl.Designer.cs">
       <DependentUpon>TickFileFilterControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="TikConstants.cs" />
+    <Compile Include="TikReader.cs" />
+    <Compile Include="TikUtil.cs" />
+    <Compile Include="TikWriter.cs" />
     <Compile Include="TLClient_IP.cs" />
     <Compile Include="Packet.cs" />
     <Compile Include="TLServer_IP.cs" />
