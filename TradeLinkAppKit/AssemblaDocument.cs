@@ -18,28 +18,32 @@ namespace TradeLink.AppKit
     {
         public static string GetDocumentsUrl(string space)
         {
-            return "http://www.assembla.com/spaces/" + space + "/documents/";
+            return "http://www.assembla.com/spaces/" + space + "/documents";
         }
         public static bool Create(string space, string user, string password, string filename)
         {
             string url = GetDocumentsUrl(space);
             try
             {
-                StreamReader sr = new StreamReader(filename);
-                string content = sr.ReadToEnd();
-                HttpWebRequest hr = (HttpWebRequest)WebRequest.Create(url);
-                hr.Credentials = new System.Net.NetworkCredential(user, password);
-                hr.Method = "POST";
-                hr.ContentType = "multipart/form-data";
-                PostData pd = new PostData();
-                pd.Params.Add(new PostDataParam("document[file]", filename,content, PostDataParamType.File));
+                FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
+                byte[] data = new byte[fs.Length];
+                fs.Read(data, 0, data.Length);
+                fs.Close();
 
-                byte[] buffer = Encoding.UTF8.GetBytes(pd.GetPostData());
-                hr.ContentLength = buffer.Length;
-                Stream ds = hr.GetRequestStream();
-                ds.Write(buffer, 0, buffer.Length);
-                ds.Close();
-                string res = new StreamReader(hr.GetResponse().GetResponseStream()).ReadToEnd();
+                // Generate post objects
+                Dictionary<string, object> postParameters = new Dictionary<string, object>();
+                postParameters.Add("document[name]", Path.GetFileName(filename));
+                postParameters.Add("document[file]", data);
+
+                // Create request and receive response
+                string postURL = url;
+                HttpWebResponse webResponse = WebHelpers.MultipartFormDataPost(postURL, user,password, postParameters);
+                
+
+                // Process response
+                StreamReader responseReader = new StreamReader(webResponse.GetResponseStream());
+                string fullResponse = responseReader.ReadToEnd();
+                webResponse.Close();
                 
 
                 return true;
@@ -84,88 +88,96 @@ namespace TradeLink.AppKit
         public static event DebugFullDelegate SendDebug;
     }
 
-    public class PostData
+    public static class WebHelpers
     {
-
-        private List<PostDataParam> m_Params;
-
-        public List<PostDataParam> Params
-        {
-            get { return m_Params; }
-            set { m_Params = value; }
-        }
-
-        public PostData()
-        {
-            m_Params = new List<PostDataParam>();
-
-            // Add sample param
-        }
-
+        public static Encoding encoding = Encoding.UTF8;
 
         /// <summary>
-        /// Returns the parameters array formatted for multi-part/form data
+        /// Post the data as a multipart form
+        /// postParameters with a value of type byte[] will be passed in the form as a file, and value of type string will be
+        /// passed as a name/value pair.
         /// </summary>
-        /// <returns></returns>
-        public string GetPostData()
+        public static HttpWebResponse MultipartFormDataPost(string postUrl, string user, string pw, Dictionary<string, object> postParameters)
         {
-            // Get boundary, default is --AaB03x
-            string boundary = "--AaB03x";
+            string formDataBoundary = "-----------------------------28947758029299";
+            string contentType = "multipart/form-data; boundary=" + formDataBoundary;
 
-            StringBuilder sb = new StringBuilder();
-            foreach (PostDataParam p in m_Params)
+            byte[] formData = WebHelpers.GetMultipartFormData(postParameters, formDataBoundary);
+
+            return WebHelpers.PostForm(postUrl,  user,pw,contentType, formData);
+        }
+
+        /// <summary>
+        /// Post a form
+        /// </summary>
+        private static HttpWebResponse PostForm(string postUrl, string user, string pw, string contentType, byte[] formData)
+
+        {
+            HttpWebRequest request = WebRequest.Create(postUrl) as HttpWebRequest;
+            request.Credentials = new System.Net.NetworkCredential(user, pw);
+
+            if (request == null)
             {
-                sb.AppendLine(boundary);
+                throw new NullReferenceException("request is not a http request");
+            }
 
-                if (p.Type == PostDataParamType.File)
+            // Add these, as we're doing a POST
+            request.Method = "POST";
+            request.ContentType = contentType;
+            //request.UserAgent = userAgent;
+
+            // We need to count how many bytes we're sending. 
+            request.ContentLength = formData.Length;
+
+            using (Stream requestStream = request.GetRequestStream())
+            {
+                // Push it out there
+                requestStream.Write(formData, 0, formData.Length);
+                requestStream.Close();
+            }
+
+            return request.GetResponse() as HttpWebResponse;
+        }
+
+        /// <summary>
+        /// Turn the key and value pairs into a multipart form.
+        /// See http://www.ietf.org/rfc/rfc2388.txt for issues about file uploads
+        /// </summary>
+        private static byte[] GetMultipartFormData(Dictionary<string, object> postParameters, string boundary)
+        {
+            Stream formDataStream = new System.IO.MemoryStream();
+
+            foreach (var param in postParameters)
+            {
+                if (param.Value is byte[])
                 {
-                    sb.AppendLine(string.Format("Content-Disposition: file; name=\"{0}\"; filename=\"{1}\"", p.Name, p.FileName));
-                    sb.AppendLine("Content-Type: text/plain");
-                    sb.AppendLine();
-                    sb.AppendLine(p.Value);
+                    byte[] fileData = param.Value as byte[];
+
+                    // Add just the first part of this param, since we will write the file data directly to the Stream
+                    string header = string.Format("--{0}\r\nContent-Disposition: form-data; name=\"{1}\"; filename=\"{2}\";\r\nContent-Type: application/octet-stream\r\n\r\n", boundary, param.Key, param.Key);
+                    formDataStream.Write(encoding.GetBytes(header), 0, header.Length);
+
+                    // Write the file data directly to the Stream, rather than serializing it to a string.  This 
+                    formDataStream.Write(fileData, 0, fileData.Length);
                 }
                 else
                 {
-                    sb.AppendLine(string.Format("Content-Disposition: form-data; name=\"{0}\"", p.Name));
-                    sb.AppendLine();
-                    sb.AppendLine(p.Value);
+                    string postData = string.Format("--{0}\r\nContent-Disposition: form-data; name=\"{1}\"\r\n\r\n{2}\r\n", boundary, param.Key, param.Value);
+                    formDataStream.Write(encoding.GetBytes(postData), 0, postData.Length);
                 }
             }
 
-            sb.AppendLine(boundary);
+            // Add the end of the request
+            string footer = "\r\n--" + boundary + "--\r\n";
+            formDataStream.Write(encoding.GetBytes(footer), 0, footer.Length);
 
-            return sb.ToString();
+            // Dump the Stream into a byte[]
+            formDataStream.Position = 0;
+            byte[] formData = new byte[formDataStream.Length];
+            formDataStream.Read(formData, 0, formData.Length);
+            formDataStream.Close();
+
+            return formData;
         }
-    }
-
-    public enum PostDataParamType
-    {
-        Field,
-        File
-    }
-
-    public class PostDataParam
-    {
-
-
-        public PostDataParam(string name, string value, PostDataParamType type)
-        {
-            Name = name;
-            Value = value;
-            Type = type;
-        }
-
-        public PostDataParam(string name, string filename, string value, PostDataParamType type)
-        {
-            Name = name;
-            Value = value;
-            FileName = filename;
-            Type = type;
-        }
-
-        public string Name;
-        public string FileName;
-        public string Value;
-        public PostDataParamType Type;
     }
 }

@@ -38,10 +38,10 @@
             this.label3 = new System.Windows.Forms.Label();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this._desc = new System.Windows.Forms.TextBox();
+            this._ss = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this._summ = new System.Windows.Forms.TextBox();
             this._stat = new System.Windows.Forms.Label();
-            this._ss = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // _create
@@ -118,6 +118,18 @@
             this._desc.TabIndex = 5;
             this.toolTip1.SetToolTip(this._desc, "description of your ticket");
             // 
+            // _ss
+            // 
+            this._ss.Location = new System.Drawing.Point(284, 44);
+            this._ss.Name = "_ss";
+            this._ss.Size = new System.Drawing.Size(47, 26);
+            this._ss.TabIndex = 6;
+            this._ss.Text = "SS";
+            this.toolTip1.SetToolTip(this._ss, "take screenshot now and attach.   make sure this tool is on same monitor that you" +
+                    " want the screenshot for.");
+            this._ss.UseVisualStyleBackColor = true;
+            this._ss.Click += new System.EventHandler(this._ss_Click);
+            // 
             // label4
             // 
             this.label4.AutoSize = true;
@@ -142,19 +154,6 @@
             this._stat.Name = "_stat";
             this._stat.Size = new System.Drawing.Size(0, 20);
             this._stat.TabIndex = 11;
-            // 
-            // _ss
-            // 
-            this._ss.Enabled = false;
-            this._ss.Location = new System.Drawing.Point(284, 44);
-            this._ss.Name = "_ss";
-            this._ss.Size = new System.Drawing.Size(47, 26);
-            this._ss.TabIndex = 6;
-            this._ss.Text = "SS";
-            this.toolTip1.SetToolTip(this._ss, "take screenshot now and attach.   make sure this tool is on same monitor that you" +
-                    " want the screenshot for.");
-            this._ss.UseVisualStyleBackColor = true;
-            this._ss.Click += new System.EventHandler(this._ss_Click);
             // 
             // AssemblaTicketControl
             // 
