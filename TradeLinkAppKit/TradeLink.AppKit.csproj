@@ -50,6 +50,14 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="TradeLinkAPI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files\TradeLink\TradeLinkSuite\TradeLinkAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="TradeLinkCommon, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files\TradeLink\TradeLinkSuite\TradeLinkCommon.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblaDocument.cs" />
@@ -123,16 +131,6 @@
       <DependentUpon>Versions.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\TradeLinkAPI\TradeLink.API.csproj">
-      <Project>{1B99C9ED-7AF1-4D48-AC9D-A97CF30E1A82}</Project>
-      <Name>TradeLink.API</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\TradeLinkCommon\TradeLink.Common.csproj">
-      <Project>{A0FE06A2-F31B-49DE-8901-917B5D593E43}</Project>
-      <Name>TradeLink.Common</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

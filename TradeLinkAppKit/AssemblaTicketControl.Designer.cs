@@ -41,6 +41,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this._summ = new System.Windows.Forms.TextBox();
             this._stat = new System.Windows.Forms.Label();
+            this._ss = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // _create
@@ -48,7 +49,7 @@
             this._create.Location = new System.Drawing.Point(337, 44);
             this._create.Name = "_create";
             this._create.Size = new System.Drawing.Size(73, 26);
-            this._create.TabIndex = 0;
+            this._create.TabIndex = 7;
             this._create.Text = "submit";
             this.toolTip1.SetToolTip(this._create, "login to assembla and create ticket");
             this._create.UseVisualStyleBackColor = true;
@@ -114,7 +115,7 @@
             this._desc.Name = "_desc";
             this._desc.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._desc.Size = new System.Drawing.Size(403, 159);
-            this._desc.TabIndex = 7;
+            this._desc.TabIndex = 5;
             this.toolTip1.SetToolTip(this._desc, "description of your ticket");
             // 
             // label4
@@ -130,8 +131,8 @@
             // 
             this._summ.Location = new System.Drawing.Point(71, 44);
             this._summ.Name = "_summ";
-            this._summ.Size = new System.Drawing.Size(260, 26);
-            this._summ.TabIndex = 10;
+            this._summ.Size = new System.Drawing.Size(206, 26);
+            this._summ.TabIndex = 4;
             // 
             // _stat
             // 
@@ -142,10 +143,24 @@
             this._stat.Size = new System.Drawing.Size(0, 20);
             this._stat.TabIndex = 11;
             // 
+            // _ss
+            // 
+            this._ss.Enabled = false;
+            this._ss.Location = new System.Drawing.Point(284, 44);
+            this._ss.Name = "_ss";
+            this._ss.Size = new System.Drawing.Size(47, 26);
+            this._ss.TabIndex = 6;
+            this._ss.Text = "SS";
+            this.toolTip1.SetToolTip(this._ss, "take screenshot now and attach.   make sure this tool is on same monitor that you" +
+                    " want the screenshot for.");
+            this._ss.UseVisualStyleBackColor = true;
+            this._ss.Click += new System.EventHandler(this._ss_Click);
+            // 
             // AssemblaTicketControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this._ss);
             this.Controls.Add(this._stat);
             this.Controls.Add(this._summ);
             this.Controls.Add(this.label4);
@@ -180,5 +195,6 @@
         private System.Windows.Forms.Label label4;
         public System.Windows.Forms.TextBox _summ;
         private System.Windows.Forms.Label _stat;
+        private System.Windows.Forms.Button _ss;
     }
 }

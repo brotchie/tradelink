@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using TradeLink.API;
 
+
 namespace TradeLink.AppKit
 {
     public partial class AssemblaTicketControl : UserControl
@@ -30,11 +31,18 @@ namespace TradeLink.AppKit
 
         public event VoidDelegate TicketSucceed;
         public event VoidDelegate TicketFailed;
-
+        const string SSFILE = "ss.jpg";
         private void _create_Click(object sender, EventArgs e)
         {
+            if (_summ.Text.Length == 0)
+            {
+                status("missing subject.");
+                return;
+            }
             if (AssemblaTicket.Create(_space.Text, _user.Text, _pass.Text, _summ.Text,_desc.Text, AssemblaStatus.New, AssemblaPriority.Normal))
             {
+                if (!AssemblaDocument.Create(_space.Text, _user.Text, _pass.Text, SSFILE))
+                    status("screen shot failed.");
                 System.Diagnostics.Process.Start(AssemblaTicket.GetTicketsUrl(_space.Text));
                 if (TicketSucceed != null)
                     TicketSucceed();
@@ -78,6 +86,14 @@ namespace TradeLink.AppKit
             if (_desc.Height!=0)
                 hdelta = (double)ClientRectangle.Height - _desc.Height;
             delta = (double)_desc.Width / ClientRectangle.Width;
+        }
+        bool attach = false;
+        private void _ss_Click(object sender, EventArgs e)
+        {
+            TradeLink.Common.ScreenCapture sc = new TradeLink.Common.ScreenCapture();
+            sc.CaptureScreenToFile(SSFILE, System.Drawing.Imaging.ImageFormat.Jpeg);
+            attach = true;
+            
         }
     }
 }
