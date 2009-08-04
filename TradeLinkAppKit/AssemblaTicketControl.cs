@@ -31,7 +31,7 @@ namespace TradeLink.AppKit
 
         public event VoidDelegate TicketSucceed;
         public event VoidDelegate TicketFailed;
-        const string SSFILE = "ss.jpg";
+        const string SSFILE = "ScreenShot.jpg";
         private void _create_Click(object sender, EventArgs e)
         {
             if (_summ.Text.Length == 0)
@@ -39,10 +39,12 @@ namespace TradeLink.AppKit
                 status("missing subject.");
                 return;
             }
-            if (AssemblaTicket.Create(_space.Text, _user.Text, _pass.Text, _summ.Text,_desc.Text, AssemblaStatus.New, AssemblaPriority.Normal))
+            int id = AssemblaTicket.Create(_space.Text, _user.Text, _pass.Text, _summ.Text,_desc.Text, AssemblaStatus.New, AssemblaPriority.Normal);
+            if (id!=0)
             {
-                if (!AssemblaDocument.Create(_space.Text, _user.Text, _pass.Text, SSFILE))
-                    status("screen shot failed.");
+                if (attach)
+                    if (!AssemblaDocument.Create(_space.Text, _user.Text, _pass.Text, SSFILE,id))
+                        status("screenshot failed.");
                 System.Diagnostics.Process.Start(AssemblaTicket.GetTicketsUrl(_space.Text));
                 if (TicketSucceed != null)
                     TicketSucceed();

@@ -27,7 +27,6 @@ namespace TradeLink.Common
 
         public override void Close()
         {
-            Write(TikConst.EndData);
             base.Close();
         }
 

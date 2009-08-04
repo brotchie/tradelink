@@ -17,14 +17,24 @@ namespace TradeLink.AppKit
         {
             return "http://www.assembla.com/spaces/" + space + "/tickets";
         }
-        public static bool Create(string space, string user, string password, string summary) { return Create(space, user, password, summary, string.Empty, AssemblaStatus.New, AssemblaPriority.Normal); }
-        public static bool Create(string space, string user, string password, string summary, string description, AssemblaStatus status, AssemblaPriority priority)
+        /// <summary>
+        /// returns global id of ticket if successful, zero if not successful
+        /// (global id does not equal space's ticket id)
+        /// </summary>
+        /// <param name="space"></param>
+        /// <param name="user"></param>
+        /// <param name="password"></param>
+        /// <param name="summary"></param>
+        /// <returns></returns>
+        public static int Create(string space, string user, string password, string summary) { return Create(space, user, password, summary, string.Empty, AssemblaStatus.New, AssemblaPriority.Normal); }
+        public static int Create(string space, string user, string password, string summary, string description, AssemblaStatus status, AssemblaPriority priority)
         {
             int stat = (int)status;
             int pri = (int)priority;
             string url = GetTicketsUrl(space);
             HttpWebRequest hr = WebRequest.Create(url) as HttpWebRequest;
             hr.Credentials = new System.Net.NetworkCredential(user, password);
+            hr.PreAuthenticate = true;
             hr.Method = "POST";
             hr.ContentType = "application/xml";
             StringBuilder data = new StringBuilder();
@@ -41,6 +51,8 @@ namespace TradeLink.AppKit
             // encode
             byte[] bytes = UTF8Encoding.UTF8.GetBytes(data.ToString());
             hr.ContentLength = bytes.Length;
+            // prepare id
+            int id = 0;
             try
             {
                 // write it
@@ -48,17 +60,26 @@ namespace TradeLink.AppKit
                 post.Write(bytes, 0, bytes.Length);
                 // get response
                 System.IO.StreamReader response = new System.IO.StreamReader(hr.GetResponse().GetResponseStream());
+                // get string version
+                string rs = response.ReadToEnd();
+
+                XmlDocument xd = new XmlDocument();
+                xd.LoadXml(rs);
+                XmlNodeList xnl = xd.GetElementsByTagName("id");
+                string val = xnl[0].InnerText;
+                if ((val!=null) && (val!=string.Empty))
+                    id = Convert.ToInt32(val);
                 // display it
                 if (SendDebug!=null)
-                    SendDebug(DebugImpl.Create(response.ReadToEnd()));
+                    SendDebug(DebugImpl.Create(rs));
             }
             catch (Exception ex) 
             {
                 if (SendDebug != null)
                     SendDebug(DebugImpl.Create("exception: " + ex.Message+ex.StackTrace)); 
-                return false; 
+                return 0; 
             }
-            return true;
+            return id;
         }
 
         /// <summary>

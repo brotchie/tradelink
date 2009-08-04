@@ -20,7 +20,8 @@ namespace TradeLink.AppKit
         {
             return "http://www.assembla.com/spaces/" + space + "/documents";
         }
-        public static bool Create(string space, string user, string password, string filename)
+        public static bool Create(string space, string user, string password, string filepath) { return Create(space, user, password, filepath, 0); }
+        public static bool Create(string space, string user, string password, string filename, int ticketid)
         {
             string url = GetDocumentsUrl(space);
             try
@@ -32,8 +33,11 @@ namespace TradeLink.AppKit
 
                 // Generate post objects
                 Dictionary<string, object> postParameters = new Dictionary<string, object>();
-                postParameters.Add("document[name]", Path.GetFileName(filename));
+                string unique = Util.ToTLDate(DateTime.Now).ToString() + Path.GetFileName(filename);
+                postParameters.Add("document[name]", unique);
                 postParameters.Add("document[file]", data);
+                if (ticketid!=0)
+                    postParameters.Add("document[ticket_id]",ticketid);
 
                 // Create request and receive response
                 string postURL = url;
@@ -115,6 +119,9 @@ namespace TradeLink.AppKit
         {
             HttpWebRequest request = WebRequest.Create(postUrl) as HttpWebRequest;
             request.Credentials = new System.Net.NetworkCredential(user, pw);
+            request.PreAuthenticate = true;
+            request.Method = "POST";
+            request.ContentType = contentType;
 
             if (request == null)
             {
@@ -122,8 +129,7 @@ namespace TradeLink.AppKit
             }
 
             // Add these, as we're doing a POST
-            request.Method = "POST";
-            request.ContentType = contentType;
+
             //request.UserAgent = userAgent;
 
             // We need to count how many bytes we're sending. 
@@ -135,6 +141,8 @@ namespace TradeLink.AppKit
                 requestStream.Write(formData, 0, formData.Length);
                 requestStream.Close();
             }
+
+
 
             return request.GetResponse() as HttpWebResponse;
         }
