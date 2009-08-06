@@ -331,7 +331,7 @@ namespace WinGauntlet
         {
             try
             {
-                args.Response = ResponseLoader.FromDLL((string)reslist.SelectedItem, WinGauntlet.Properties.Settings.Default.boxdll);
+                args.Response = ResponseLoader.FromDLL((string)reslist.SelectedItem, args.DllName);
             }
             catch (Exception ex) { status("Response failed to load, quitting... (" + ex.Message + (ex.InnerException != null ? ex.InnerException.Message.ToString() : "") + ")"); }
             if (!args.Response.isValid) { status("Response did not load or loaded in a shutdown state. "+args.Response.Name+ " "+args.Response.FullName); return; }
@@ -434,7 +434,7 @@ namespace WinGauntlet
             public double Seconds { get { return Stopped.Subtract(Started).TotalSeconds; } }
             public double TicksSecond { get { return Seconds == 0 ? 0 : ((double)TicksProcessed / Seconds); } }
 
-            bool _debugs = false;
+            bool _debugs = true;
             bool _indicators = false;
             bool _trades = true;
             bool _orders = false;
