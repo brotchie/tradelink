@@ -16,8 +16,10 @@ namespace ServerDBFX
         public ServerDBFXMain()
         {
             InitializeComponent();
+            _dbfx.SendDebug += new TradeLink.API.DebugFullDelegate(_dw.GotDebug);
             FormClosing += new FormClosingEventHandler(ServerDBFXMain_FormClosing);
         }
+
 
         void ServerDBFXMain_FormClosing(object sender, FormClosingEventArgs e)
         {

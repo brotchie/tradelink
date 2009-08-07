@@ -21,6 +21,7 @@ namespace ServerDBFX
         public ServerDBFX()
         {
             // dbfx events
+            _tradeDesk = (FXCore.TradeDeskAut)core.CreateTradeDesk("trader");
             sink = new FXCore.TradeDeskEventsSinkClass();
             sink.ITradeDeskEvents_Event_OnRowAddedEx += new FXCore.ITradeDeskEvents_OnRowAddedExEventHandler(sink_ITradeDeskEvents_Event_OnRowAddedEx);
             sink.ITradeDeskEvents_Event_OnRowBeforeRemoveEx += new FXCore.ITradeDeskEvents_OnRowBeforeRemoveExEventHandler(sink_ITradeDeskEvents_Event_OnRowBeforeRemoveEx);
@@ -60,13 +61,12 @@ namespace ServerDBFX
         {
             _tradeDesk.DeleteOrder(number.ToString());
         }
-
-        public bool Start(string username, string password, string data, int data2)
+        const string LOGINURL = @"http://dbfx.fxcorporate.com/Hosts.jsp";
+        public bool Start(string username, string password, string type, int data2)
         {
             try
             {
-                _tradeDesk = (FXCore.TradeDeskAut)core.CreateTradeDesk(username);
-                _tradeDesk.Login(username, password, "www.fxcorporate.com", data);
+                _tradeDesk.Login(username, password, LOGINURL, type);
             }
             catch (Exception ex) 
             {
