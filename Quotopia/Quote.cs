@@ -214,6 +214,7 @@ namespace Quotopia
             qg.ContextMenuStrip.Items.Add("Ticket", null,new EventHandler(rightticket));
             qg.ContextMenuStrip.Items.Add("Import Basket", null,new EventHandler(importbasketbut_Click));
             qg.ContextMenuStrip.Items.Add("Export Basket", null, new EventHandler(exportbasket));
+            qg.ContextMenuStrip.Items.Add("Report Bug", null, new EventHandler(report));
             qg.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
             qg.BackgroundColor = Quotopia.Properties.Settings.Default.marketbgcolor;
             qg.ForeColor = Quotopia.Properties.Settings.Default.marketfontcolor;
@@ -236,6 +237,11 @@ namespace Quotopia
             this.KeyUp += new KeyEventHandler(qg_KeyUp);
             qg.MouseUp += new MouseEventHandler(qg_MouseUp);
             SetColumnContext();
+        }
+
+        void report(object o, EventArgs e)
+        {
+            CrashReport.BugReport(PROGRAM, _dw.Content);
         }
 
         void qg_DoubleClick(object sender, EventArgs e)

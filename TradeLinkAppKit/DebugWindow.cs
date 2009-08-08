@@ -16,16 +16,20 @@ namespace TradeLink.AppKit
             InitializeComponent();
 
         }
-
+        public string Content { get { return _msg.ToString(); } }
+        StringBuilder _msg = new StringBuilder();
         public bool isValid = true;
         public bool TimeStamps { get { return debugControl1.TimeStamps; } set { debugControl1.TimeStamps = value; } }
+
         public void GotDebug(TradeLink.API.Debug deb)
         {
+            _msg.AppendLine(deb.Msg);
             debugControl1.GotDebug(deb);
         }
 
         public void GotDebug(string msg)
         {
+            _msg.AppendLine(msg);
             debugControl1.GotDebug(msg);
         }
 

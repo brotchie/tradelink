@@ -46,5 +46,17 @@ namespace ServerDBFX.Properties {
                 this["pw"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Demo")]
+        public string type {
+            get {
+                return ((string)(this["type"]));
+            }
+            set {
+                this["type"] = value;
+            }
+        }
     }
 }

@@ -17,7 +17,7 @@ namespace ServerGenesis
 
         public const string PROGRAM = "GenesisServer-BETA";
         Log _log = new Log(PROGRAM);
-        DebugWindow _dw = new DebugWindow();
+        public DebugWindow _dw = new DebugWindow();
 
         GenesisServer gs = new GenesisServer();
 

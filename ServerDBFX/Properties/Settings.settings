@@ -8,5 +8,8 @@
     <Setting Name="pw" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="type" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Demo</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
