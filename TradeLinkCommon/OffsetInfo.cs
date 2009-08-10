@@ -57,5 +57,43 @@ namespace TradeLink.Common
             return string.Format("p{0:n2}/{1:p0} s{2:n2}/{3:p0}", ProfitDist, ProfitPercent, StopDist, StopPercent);
         }
 
+        public static string Serialize(OffsetInfo oi)
+        {
+            string m =
+                string.Format("{0},{1},{2},{3},{4},{5}", oi.ProfitDist, oi.StopDist, oi.ProfitPercent, oi.StopPercent, oi.NormalizeSize, oi.MinimumLotSize);
+            return m;
+            
+        }
+
+        public static OffsetInfo Deserialize(string msg)
+        {
+            string[] r = msg.Split(',');
+            if (r.Length < System.Enum.GetNames(typeof(OffsetInfoFields)).Length) return null;
+
+            decimal pd;
+            decimal sd;
+            decimal pp;
+            decimal sp;
+            bool n = false;
+            int min = 1;
+            decimal.TryParse(r[(int)OffsetInfoFields.ProfitDist], out pd);
+            decimal.TryParse(r[(int)OffsetInfoFields.StopDist], out sd); 
+            decimal.TryParse(r[(int)OffsetInfoFields.ProfitPercent], out pp);
+            decimal.TryParse(r[(int)OffsetInfoFields.StopPercent], out sp);
+            bool.TryParse(r[(int)OffsetInfoFields.Normalize], out n);
+            int.TryParse(r[(int)OffsetInfoFields.MinSize], out min);
+            return new OffsetInfo(pd, sd, pp, sd, n, min);
+        }
+
+    }
+
+    public enum OffsetInfoFields
+    {
+        ProfitDist,
+        StopDist,
+        ProfitPercent,
+        StopPercent,
+        Normalize,
+        MinSize,
     }
 }
