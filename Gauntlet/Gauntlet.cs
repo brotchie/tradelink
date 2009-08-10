@@ -19,7 +19,7 @@ namespace WinGauntlet
         static GauntArgs args = new GauntArgs();
         public const string PROGRAM = "Gauntlet";
         StreamWriter indf;
-        bool background = false;
+
         Log _log = new Log(PROGRAM);
 
 
@@ -38,7 +38,6 @@ namespace WinGauntlet
 
             if (args.isUnattended)
             {
-                background = true;
                 ordersincsv.Checked = true;
                 //ShowWindow(System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle, SW_MINIMIZE);
                 bindresponseevents();
@@ -80,11 +79,11 @@ namespace WinGauntlet
             {
                 string msg = "No tick folder option is configured.";
                 status(msg);
-                if (!background) MessageBox.Show(msg);
+                if (!args.isUnattended) MessageBox.Show(msg);
                 return;
             }
             // prepare other arguments for the run
-            if (!background)
+            if (!args.isUnattended)
             {
                 args.Orders = ordersincsv.Checked;
                 args.Indicators = _indicatcsv.Checked;
@@ -174,7 +173,7 @@ namespace WinGauntlet
             h.Reset();
             count = 0;
             lastp = 0;
-            if (background)
+            if (args.isUnattended)
             {
                 Close();
                 return;
@@ -197,7 +196,7 @@ namespace WinGauntlet
                 args.Response.GotTick(t);
             }
             catch (Exception ex) { debug("response threw exception: " + ex.Message); }
-            if (background) return;
+            if (args.isUnattended) return;
             uint percent = (uint)((double)count*100 / h.TicksPresent);
             if ((percent!=lastp) && (percent % 5 == 0))
             {
@@ -273,11 +272,12 @@ namespace WinGauntlet
 
         delegate void ShowCallBack(string msg);
         string OUTFOLD = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\";
-        void debug(string message) { status(message + Environment.NewLine); }
-        void status(string message)
+        void debug(string message) { status(message + Environment.NewLine,true); }
+        void status(string message) { status(message, false); }
+        void status(string message,bool hascarriage)
         {
             _log.GotDebug(message);
-            if (background) return;
+
             if (messages.InvokeRequired)
             {
                 try
@@ -291,8 +291,10 @@ namespace WinGauntlet
                 try
                 {
                     messages.AppendText(message);
-                    if (message.Contains(Environment.NewLine)) lastmessage.Text = message.Substring(0,message.Length-2);
-                    else lastmessage.Text = lastmessage.Text + message;
+                    if (hascarriage) 
+                        lastmessage.Text = message.Substring(0,message.Length-2);
+                    else 
+                        lastmessage.Text = lastmessage.Text + message;
                     lastmessage.Invalidate();
                     messages.Invalidate(true);
                 }
@@ -307,7 +309,7 @@ namespace WinGauntlet
 
         private void Gauntlet_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (saveonexit.Checked && !background)
+            if (saveonexit.Checked && !args.isUnattended)
             {
                 Properties.Settings.Default.tickfolder = args.Folder;
                 Properties.Settings.Default.boxdll = args.DllName;
@@ -396,7 +398,7 @@ namespace WinGauntlet
         void Response_GotDebug(Debug msg)
         {
             if (!args.Debugs) return;
-            debug(msg.Msg);
+            status(msg.Msg,false);
         }
 
         void Response_IndicatorUpdate(object[] parameters)
@@ -456,7 +458,9 @@ namespace WinGauntlet
             public string Folder { get { return _folder; } set { _folder = value; } }
             public TickFileFilter Filter { get { return _filter; } set { _filter = value; } }
             public string FilterLocation { get { return _filterloc; } set { _filterloc = value; } }
-            public bool isUnattended { get { return (_response != null) && Directory.Exists(_folder); } }
+            public bool hasPrereq { get { return (_response != null) && Directory.Exists(_folder); } }
+            bool _background = false;
+            public bool isUnattended { get { return _background; } }
             public override string ToString()
             {
                 string[] r = new string[] { DllName, ResponseName, Folder, Flags,FilterLocation };
@@ -508,7 +512,8 @@ namespace WinGauntlet
                     Console.WriteLine("");
                 }
                 D("dll|resp|fold|flags|filt: " + this.ToString());
-
+                if (hasPrereq)
+                    _background = true;
                 
             }
             string Flags { get { return (Orders ? "O" : "") + (Debugs ? "D" : "") + (Indicators ? "I" : "") + (Trades ? "T" : ""); } }
