@@ -105,6 +105,7 @@
     <Compile Include="TestTick.cs" />
     <Compile Include="TestTickFileFilter.cs" />
     <Compile Include="TestTickWatcher.cs" />
+    <Compile Include="TestTikWriterReader.cs" />
     <Compile Include="TestTrade.cs" />
     <Compile Include="TestTradeLink_WM.cs">
     </Compile>
@@ -189,6 +190,6 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>CALL "$(ProjectDir)runtests.cmd" $(ConfigurationName) "$(TargetPath)"</PostBuildEvent>
+    <PostBuildEvent>rem CALL "$(ProjectDir)runtests.cmd" $(ConfigurationName) "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
 </Project>

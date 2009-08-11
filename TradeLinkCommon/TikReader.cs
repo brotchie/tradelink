@@ -16,7 +16,9 @@ namespace TradeLink.Common
         Security _sec = new TradeLink.Common.SecurityImpl();
         string _path = string.Empty;
         int ApproxTicks = 0;
-
+        public string RealSymbol { get { return _realsymbol; } }
+        public string Symbol { get { return _sym; } }
+        public Security ToSecurity() { return _sec; } 
         public TikReader(string filepath) : base(new FileStream(filepath, FileMode.Open)) 
         {
             _path = filepath;
@@ -32,7 +34,7 @@ namespace TradeLink.Common
             // get version id
             ReadByte();
             // get version
-            _filever = (int)ReadByte();
+            _filever = ReadInt32();
             // get real symbol
             _realsymbol = ReadString();
             // get security from symbol
@@ -41,8 +43,12 @@ namespace TradeLink.Common
             _sym = _sec.Symbol;
             // get end of header
             ReadByte();
-            // set flag
+            // make sure we read something
+            if (_realsymbol.Length <= 0)
+                throw new BadTikFile();
+            // flag header as read
             _haveheader = true;
+
         }
 
         public event TickDelegate gotTick;
@@ -126,6 +132,11 @@ namespace TradeLink.Common
                             k.ex = ReadString();
                         }
                         break;
+                    default:
+                        // weird data, try to keep reading 
+                        ReadByte();
+                        // but don't send this tick, just get next record
+                        return true; 
                 }
                 // send any tick we have
                 if (gotTick != null)
@@ -145,8 +156,11 @@ namespace TradeLink.Common
             }
 
         }
+    }
 
-
-
+    public class BadTikFile : Exception
+    {
+        public BadTikFile() : base() { }
+        public BadTikFile(string message) : base(message) { }
     }
 }
