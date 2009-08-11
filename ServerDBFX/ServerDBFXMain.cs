@@ -43,6 +43,7 @@ namespace ServerDBFX
             }
             else
             {
+                BackColor = Color.Red;
                 _dw.GotDebug("login failed.");
             }
         }

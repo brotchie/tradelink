@@ -88,7 +88,7 @@
             this._type.FormattingEnabled = true;
             this._type.Items.AddRange(new object[] {
             "Demo",
-            "Live"});
+            "Real"});
             this._type.Location = new System.Drawing.Point(79, 8);
             this._type.Name = "_type";
             this._type.Size = new System.Drawing.Size(100, 28);

@@ -21,7 +21,7 @@ namespace ServerDBFX
             try
             {
                 app = new ServerDBFXMain();
-                Application.Run();
+                Application.Run(app);
             }
             catch (Exception ex)
             {
