@@ -29,6 +29,7 @@ namespace ServerDBFX
             sink.ITradeDeskEvents_Event_OnRowChangedEx += new FXCore.ITradeDeskEvents_OnRowChangedExEventHandler(sink_ITradeDeskEvents_Event_OnRowChangedEx);
             _sub = _tradeDesk.Subscribe(sink);
             // tl events
+            newProviderName = Providers.DBFX;
             newFeatureRequest += new MessageArrayDelegate(ServerDBFX_newFeatureRequest);
             newOrderCancelRequest += new UIntDelegate(ServerDBFX_newOrderCancelRequest);
             newSendOrderRequest += new OrderDelegate(ServerDBFX_newSendOrderRequest);
