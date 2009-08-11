@@ -60,12 +60,14 @@ namespace TradeLink.AppKit
         static string Body(string program, Exception ex) { return Body(program, ex, string.Empty,true); }
         static string Body(string program, Exception ex,string data, bool addtemplate)
         {
-            string[] r = new string[] { (addtemplate ? template() : string.Empty),"Product:" + program, "Exception:" + (ex!=null ? ex.Message : "n/a"), "StackTrace:" + (ex!=null ? ex.StackTrace : "n/a"), "CommandLine:" + Environment.CommandLine, "OS:" + Environment.OSVersion.VersionString, "CLR:" + Environment.Version.ToString(4), "TradeLink:" + TradeLink.Common.Util.TLSIdentity(), "Memory:" + Environment.WorkingSet.ToString(), "Processors:" + Environment.ProcessorCount.ToString(),data};
+
+            string[] r = new string[] { (addtemplate ? template() : string.Empty), "Product:" + program, "Exception:" + (ex != null ? ex.Message : "n/a"), "StackTrace:" + (ex != null ? ex.StackTrace : "n/a"), "CommandLine:" + Environment.CommandLine, "OS:" + Environment.OSVersion.VersionString+" "+(IntPtr.Size*8).ToString()+"bit", "CLR:" + Environment.Version.ToString(4), "TradeLink:" + TradeLink.Common.Util.TLSIdentity(), "Memory:" + Environment.WorkingSet.ToString(), "Processors:" + Environment.ProcessorCount.ToString(), data };
 
             string decoded = string.Join(Environment.NewLine, r);
             return Uri.EscapeUriString(decoded);
 
         }
+
 
         private void _ignore_Click(object sender, EventArgs e)
         {

@@ -49,7 +49,7 @@ namespace TradeLink.AppKit
         public static void Report(string space, string data, Exception ex, bool showtemplate) { Report(space, data, ex, showtemplate, string.Empty, string.Empty,null); }
         public static void Report(string space, string data, Exception ex, bool showtemplate, string user, string pass, LoginSucceedDel handlesuceed)
         {
-            string[] r = new string[] { "Product:" + space, "Exception:" + (ex!=null ? ex.Message : "n/a"), "StackTrace:" + (ex!=null ? ex.StackTrace: "n/a"), "CommandLine:" + Environment.CommandLine, "OS:" + Environment.OSVersion.VersionString, "CLR:" + Environment.Version.ToString(4), "TradeLink:" + TradeLink.Common.Util.TLSIdentity(), "Memory:" + Environment.WorkingSet.ToString(), "Processors:" + Environment.ProcessorCount.ToString(), data };
+            string[] r = new string[] { "Product:" + space, "Exception:" + (ex != null ? ex.Message : "n/a"), "StackTrace:" + (ex != null ? ex.StackTrace : "n/a"), "CommandLine:" + Environment.CommandLine, "OS:" + Environment.OSVersion.VersionString + " " + (IntPtr.Size * 8).ToString() + "bit", "CLR:" + Environment.Version.ToString(4), "TradeLink:" + TradeLink.Common.Util.TLSIdentity(), "Memory:" + Environment.WorkingSet.ToString(), "Processors:" + Environment.ProcessorCount.ToString(), data };
             string desc = string.Join(Environment.NewLine, r);
             AssemblaTicketWindow atw = new AssemblaTicketWindow(space, user, pass, showtemplate ? templatequest(desc) : desc);
             if (ex != null)
