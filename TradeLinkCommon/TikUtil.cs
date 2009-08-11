@@ -30,9 +30,10 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="EXT"></param>
         /// <returns></returns>
-        public static string[] GetFiles(string EXT)
+        public static string[] GetFiles(string EXT) { return GetFiles(Environment.CurrentDirectory, EXT); }
+        public static string[] GetFiles(string path, string EXT)
         {
-            DirectoryInfo di = new DirectoryInfo(Environment.CurrentDirectory);
+            DirectoryInfo di = new DirectoryInfo(path);
             FileInfo[] fis = di.GetFiles(EXT);
             List<string> names = new List<string>();
             foreach (FileInfo fi in fis)
