@@ -63,6 +63,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\TS2EPF.lnk" "$INSTDIR\TS2EPF.exe" "" "$INSTDIR\TS2EPF.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\CQG2EPF.lnk" "$INSTDIR\CQG2EPF.exe" "" "$INSTDIR\CQG2EPF.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\Esignal.lnk" "$INSTDIR\ServerEsignal.exe" "" "$INSTDIR\ServerEsignal.exe" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink\DBFX.lnk" "$INSTDIR\ServerDBFX.exe" "" "$INSTDIR\ServerDBFX.exe" 0  
   
   
   
@@ -118,6 +119,10 @@ Section "TradeLinkSuite"
   File "ServerEsignal\bin\release\Interop.IESignal.dll"
   File "ServerEsignal\bin\release\ServerEsignal.exe"
   File "ServerEsignal\bin\release\ServerEsignal.exe.config"
+  File "ServerDBFX\bin\release\ServerDBFX.exe"
+  File "ServerDBFX\bin\release\ServerDBFX.exe.config"
+  File "ServerDBFX\bin\release\Interop.FXCore.dll"
+  
   ; Write the installation path into the registry
   WriteRegStr HKLM SOFTWARE\TradeLinkSuite "Install_Dir" "$INSTDIR"
   
