@@ -17,14 +17,20 @@ namespace TradeLink.Common
             foreach (string file in args)
             {
                 SecurityImpl sec = SecurityImpl.FromFile(file);
-                TikWriter tw = new TikWriter(sec.Symbol);
-                while (sec.hasHistorical)
-                {
-                    tw.newTick(sec.NextTick());
-                }
-                tw.Close();
+                sec.HistSource.gotTick += new TradeLink.API.TickDelegate(HistSource_gotTick);
+                _tw = new TikWriter(sec.Symbol);
+                while (sec.NextTick())
+                _tw.Close();
             }
         }
+
+        static void HistSource_gotTick(TradeLink.API.Tick t)
+        {
+            _tw.newTick(t);
+        }
+
+        private static TikWriter _tw;
+
         /// <summary>
         /// finds a group of files with a given extension
         /// </summary>

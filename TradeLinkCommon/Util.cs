@@ -653,6 +653,7 @@ namespace TradeLink.Common
         Invalid = 0,
         EPF,
         IDX,
+        TIK,
     }
 
     public struct TickFileInfo

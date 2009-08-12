@@ -33,8 +33,6 @@ namespace TradeLink.Common
             }
             catch (Exception) { return t; }
             if (line == null) return t; // blank line
-            System.Globalization.NumberFormatInfo ni = (System.Globalization.NumberFormatInfo)System.Globalization.NumberFormatInfo.CurrentInfo.Clone();
-            ni.NumberDecimalSeparator = ".";
             string[] r = line.Split(',');
             if (r.Length < 6) return t;
             decimal td = 0;

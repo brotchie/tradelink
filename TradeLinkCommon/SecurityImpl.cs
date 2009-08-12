@@ -109,32 +109,25 @@ namespace TradeLink.Common
         {
             return this.ToString().GetHashCode() + _date;
         }
+        bool _hashist = false;
         /// <summary>
         /// Says whether stock contains historical data.
         /// </summary>
-        public bool hasHistorical { get { return (_histfile != null) && !_histfile.EndOfStream; } }
-        private System.IO.StreamReader _histfile = null;
+        public bool hasHistorical { get { return _hashist; } }
+        public TikReader HistSource;
         /// <summary>
         /// Fetches next historical tick for stock, or invalid tick if no historical data is available.
         /// </summary>
-        public Tick NextTick()
+        public bool NextTick()
         {
-            if (!hasHistorical)
+            if (HistSource == null) return false;
+            bool v = true;
+            try
             {
-                if (_histfile != null)
-                {
-                    _histfile.Close();
-                    _histfile = null;
-                }
-                throw new EndSecurityTicks();
+                v = HistSource.NextTick();
             }
-            Tick t = null;
-            do
-            {
-                t = eSigTick.FromStream(Symbol, _histfile);
-            } 
-            while ((t==null) && hasHistorical);
-            return t;
+            catch (System.IO.IOException) { }
+            return v;
         }
         int _approxticks = 0;
         public int ApproxTicks { get { return _approxticks; } set { _approxticks = value; } }
@@ -143,17 +136,11 @@ namespace TradeLink.Common
         /// </summary>
         public static SecurityImpl FromFile(string filename)
         {
-            SecurityImpl s = null;
-            try
-            {
-                System.IO.FileInfo fi = new System.IO.FileInfo(filename);
-                System.IO.StreamReader sr = new System.IO.StreamReader(filename);
-                s = eSigTick.InitEpf(sr);
-                s._histfile = sr;
-                // for epf files
-                s._approxticks = (int)(fi.Length / 40);
-            }
-            catch (Exception) { }
+            
+            TikReader tr = new TikReader(filename);
+            SecurityImpl s = (SecurityImpl)tr.ToSecurity();
+            s.HistSource = tr;
+            s._approxticks = s.HistSource.ApproxTicks;
             return s;
         }
 

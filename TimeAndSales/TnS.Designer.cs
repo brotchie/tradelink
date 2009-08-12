@@ -29,32 +29,13 @@ namespace TimeSales
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TnS));
-            this.tsgrid = new System.Windows.Forms.DataGridView();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.autoresizebut = new System.Windows.Forms.ToolStripButton();
             this.selected = new System.Windows.Forms.ToolStripLabel();
-            ((System.ComponentModel.ISupportInitialize)(this.tsgrid)).BeginInit();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // tsgrid
-            // 
-            this.tsgrid.AllowUserToAddRows = false;
-            this.tsgrid.AllowUserToDeleteRows = false;
-            this.tsgrid.AllowUserToOrderColumns = true;
-            this.tsgrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.tsgrid.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tsgrid.Location = new System.Drawing.Point(0, 0);
-            this.tsgrid.Margin = new System.Windows.Forms.Padding(4);
-            this.tsgrid.Name = "tsgrid";
-            this.tsgrid.ReadOnly = true;
-            this.tsgrid.RowTemplate.Height = 24;
-            this.tsgrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.tsgrid.Size = new System.Drawing.Size(827, 322);
-            this.tsgrid.TabIndex = 0;
-            // 
             // toolStrip1
             // 
             this.toolStrip1.Dock = System.Windows.Forms.DockStyle.Bottom;
@@ -116,12 +97,10 @@ namespace TimeSales
             this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(827, 322);
             this.Controls.Add(this.toolStrip1);
-            this.Controls.Add(this.tsgrid);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "TnS";
             this.Text = "Time & Sales";
-            ((System.ComponentModel.ISupportInitialize)(this.tsgrid)).EndInit();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -131,7 +110,6 @@ namespace TimeSales
 
         #endregion
 
-        private System.Windows.Forms.DataGridView tsgrid;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton toolStripButton1;
         private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;

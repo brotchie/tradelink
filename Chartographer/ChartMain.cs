@@ -16,6 +16,7 @@ namespace Chartographer
         WebClient client = new WebClient();
         Dictionary<string, BarListImpl> blbox = new Dictionary<string, BarListImpl>();
         public const string PROGRAM = "Chartographer";
+
         public ChartMain()
         {
             InitializeComponent();
@@ -145,9 +146,8 @@ namespace Chartographer
             OpenFileDialog od = new OpenFileDialog();
             od.CheckFileExists = true;
             od.CheckPathExists = true;
-            od.DefaultExt = "*.EPF";
-            od.Filter = "TickFiles|*.EPF";
-            od.InitialDirectory = "c:\\program files\\tradelink\\tickdata\\";
+            od.DefaultExt = TikConst.WILDCARD_EXT;
+            od.Filter = "TickFiles|" + TikConst.WILDCARD_EXT;
             od.Multiselect = false;
             od.ShowDialog();
             BarList bl = BarListImpl.FromEPF(od.FileName);

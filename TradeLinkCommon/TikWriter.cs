@@ -14,7 +14,7 @@ namespace TradeLink.Common
         bool hasheader = false;
         string _realsymbol = string.Empty;
         public string RealSymbol { get { return _realsymbol; } }
-        public TikWriter(string sym) : this(sym, TradeLink.Common.Util.ToTLDate(DateTime.Now)) { }
+        public TikWriter(string realsymbol) : this(realsymbol, TradeLink.Common.Util.ToTLDate(DateTime.Now)) { }
         public TikWriter(string realsymbol, int date) : this(Environment.CurrentDirectory, realsymbol, date) { }
         public TikWriter(string path, string realsymbol, int date) 
         {

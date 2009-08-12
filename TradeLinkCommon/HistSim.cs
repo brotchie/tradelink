@@ -23,7 +23,7 @@ namespace TradeLink.Common
         long _nextticktime = ENDSIM;
         int _executions = 0;
         volatile int _tickcount;
-        long _bytestoprocess = 0;
+        int _availticks;
         List<simworker> Workers = new List<simworker>();
         int[] idx;
         int[] cidx;
@@ -37,7 +37,7 @@ namespace TradeLink.Common
         /// <summary>
         /// Total ticks available for processing, based on provided filter or tick files.
         /// </summary>
-        public int TicksPresent { get { return (int)Math.Floor((double)_bytestoprocess/39); } }
+        public int TicksPresent { get { return _availticks; } }
         /// <summary>
         /// Ticks processed in this simulation run.
         /// </summary>
@@ -111,12 +111,12 @@ namespace TradeLink.Common
             _nextticktime = STARTSIM;
             _broker.Reset();
             _executions = 0;
-            _bytestoprocess = 0;
+            _availticks = 0;
             _tickcount = 0;
 
         }
 
-        const string tickext = "*.EPF";
+        const string tickext = TikConst.WILDCARD_EXT;
         /// <summary>
         /// Reinitialize the cache
         /// </summary>
@@ -146,15 +146,12 @@ namespace TradeLink.Common
             // read in single tick just to get first time for user
             FillCache(1);
 
-            // get total bytes represented by files
-            DirectoryInfo di = new DirectoryInfo(_folder);
-            FileInfo[] fi = di.GetFiles(tickext, SearchOption.AllDirectories);
-            foreach (FileInfo thisfi in fi)
-            {
-                foreach (string file in _tickfiles)
-                    if (thisfi.FullName==file)
-                        _bytestoprocess += thisfi.Length;
-            }
+            // get total ticks represented by files
+            _availticks = 0;
+            for (int i = 0; i < Workers.Count; i++)
+                if (Workers[i].workersec != null)
+                    _availticks += Workers[i].workersec.ApproxTicks;
+
             D("Approximately " + TicksPresent + " ticks to process...");
             _inited = true;
             // set first time as hint for user
@@ -338,7 +335,7 @@ namespace TradeLink.Common
     internal class simworker : BackgroundWorker
     {
         Queue<Tick> Ticks = new Queue<Tick>(100000);
-        SecurityImpl workersec = null;
+        public SecurityImpl workersec = null;
         volatile int readcount = 0;
         const int YIELDTIME = 5;
         public bool isWorking = false;
@@ -353,9 +350,30 @@ namespace TradeLink.Common
             WorkerSupportsCancellation = true;
             RunWorkerCompleted += new RunWorkerCompletedEventHandler(simworker_RunWorkerCompleted);
             // if we're multi-core prepare to start I/O thread for this security
-            if (Environment.ProcessorCount>1)
+            if (Environment.ProcessorCount > 1)
+            {
                 DoWork += new DoWorkEventHandler(simworker_DoWork);
+                workersec.HistSource.gotTick += new TickDelegate(HistSource_gotTick2);
+            }
+            else
+            {
+                workersec.HistSource.gotTick += new TickDelegate(HistSource_gotTick);
+            }
  
+        }
+
+        void HistSource_gotTick2(Tick t)
+        {
+            lock (Ticks)
+            {
+                Ticks.Enqueue(t);
+            }
+
+        }
+
+        void HistSource_gotTick(Tick t)
+        {
+            Ticks.Enqueue(t);
         }
 
 
@@ -364,8 +382,8 @@ namespace TradeLink.Common
         {
             isWorking = true;
             readcount = 0;
-            while (!CancellationPending && workersec.hasHistorical && (readcount++ < readahead))
-                Ticks.Enqueue(workersec.NextTick());
+            while (!CancellationPending && workersec.HistSource.NextTick()
+                && (readcount++ < readahead)) ;
             isWorking = false;
         }
 
@@ -385,11 +403,8 @@ namespace TradeLink.Common
             isWorking = true;
             int readahead = (int)e.Argument;
             // while simulation hasn't been canceled, we still have historical ticks to read and we haven't read too many, cache a tick
-            while (!e.Cancel && workersec.hasHistorical && (readcount++ < readahead))
-                lock (Ticks)
-                {
-                    Ticks.Enqueue(workersec.NextTick());
-                }
+            while (!e.Cancel && workersec.NextTick()
+                && (readcount++ < readahead)) ;
         }
 
 

@@ -15,7 +15,7 @@ namespace TradeLink.Common
         string _sym = string.Empty;
         Security _sec = new TradeLink.Common.SecurityImpl();
         string _path = string.Empty;
-        int ApproxTicks = 0;
+        public int ApproxTicks = 0;
         public string RealSymbol { get { return _realsymbol; } }
         public string Symbol { get { return _sym; } }
         public Security ToSecurity() { return _sec; } 

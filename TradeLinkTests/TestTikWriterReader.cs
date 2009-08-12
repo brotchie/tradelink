@@ -14,9 +14,11 @@ namespace TestTradeLink
         {
         }
 
+        const int DATE = 20090811;
         const string FILE = "TST20090811.tik";
         const string SYM = "TST";
         const int TICKCOUNT = 100000;
+        string PATH = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         System.Collections.Generic.List<Tick> readdata = new List<Tick>(TICKCOUNT);
 
         [Test]
@@ -28,7 +30,7 @@ namespace TestTradeLink
             // ask
             data.Add(TickImpl.NewAsk(SYM, 11, 200));
             // full quote
-            data.Add(TickImpl.NewQuote(SYM, 20090811,93000,00,10, 11,300,300,"NYSE","ARCA"));
+            data.Add(TickImpl.NewQuote(SYM, DATE,93000,00,10, 11,300,300,"NYSE","ARCA"));
             // trade
             data.Add(TickImpl.NewTrade(SYM, 10, 400));
             // full tick
@@ -74,7 +76,7 @@ namespace TestTradeLink
             // apply date and time to ticks
             for (int i = 0; i < TICKCOUNT; i++)
             {
-                data[i].date = 20090811;
+                data[i].date = DATE;
                 data[i].time = Util.DT2FT(DateTime.Now);
             }
             // write and read data, clocking time
@@ -88,7 +90,7 @@ namespace TestTradeLink
             Assert.IsTrue(equal, "read/write mismatch on TIK data.");
             // verify performance
             double rate = TICKCOUNT/(elapms/1000);
-            Assert.GreaterOrEqual(rate, 100000);
+            Assert.GreaterOrEqual(rate, 90000);
 
 
         }
@@ -104,7 +106,7 @@ namespace TestTradeLink
             double elapms;
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
             // write new file from data
-            TikWriter tw = new TikWriter(SYM);
+            TikWriter tw = new TikWriter(PATH,SYM,DATE);
             sw.Start();
             foreach (Tick k in data)
                 tw.newTick(k);
@@ -115,7 +117,7 @@ namespace TestTradeLink
                 Console.WriteLine("write speed (ticks/sec): " + (data.Length / (elapms / 1000)).ToString("n0"));
 
             // read file back in from file
-            TikReader tr = new TikReader(FILE);
+            TikReader tr = new TikReader(PATH+"//"+FILE);
             tr.gotTick += new TickDelegate(tr_gotTick);
             sw.Reset();
             sw.Start();
@@ -143,7 +145,10 @@ namespace TestTradeLink
             {
                 System.IO.File.Delete(FILE);
             }
-            catch { }
+            catch (Exception ex) 
+            { 
+                System.Diagnostics.Debug.WriteLine(ex.Message); 
+            }
         }
 
     }

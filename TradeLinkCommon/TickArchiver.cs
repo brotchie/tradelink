@@ -14,7 +14,7 @@ namespace TradeLink.Common
         string _path;
         System.Windows.Forms.Timer _timer = new System.Windows.Forms.Timer();
 
-        Dictionary<string,StreamWriter> filedict = new Dictionary<string,StreamWriter>();
+        Dictionary<string, TikWriter> filedict = new Dictionary<string, TikWriter>();
         public TickArchiver() : this(Util.TLTickDir,60) { }
         public TickArchiver(string folderpath, int FlushAfterSeconds)
         {
@@ -38,32 +38,20 @@ namespace TradeLink.Common
         bool SaveTick(Tick t)
         {
             if ((t.symbol==null) || (t.symbol=="")) return false;
-            if (filedict.ContainsKey(t.symbol))
+            TikWriter tw;
+            if (filedict.TryGetValue(t.symbol, out tw))
             {
                 try 
                 {
-                   filedict[t.symbol].WriteLine(eSigTick.ToEPF(t));
+                    tw.newTick(t);
                 }
                 catch (IOException) { return false; }
             }
             else
             {
-                string fn = _path + @"/" + t.symbol + t.date + ".EPF";
-                bool hasheader = false;
                 try 
                 {
-                    if (File.Exists(fn))
-                    {
-                        StreamReader sr = new StreamReader(fn);
-                        SecurityImpl s = eSigTick.InitEpf(sr);
-                        if (s.isValid)
-                            hasheader = true;
-                        sr.Close();
-                    }
-                    filedict.Add(t.symbol, new StreamWriter(fn, true));
-                    if (!hasheader)
-                        filedict[t.symbol].Write(eSigTick.EPFheader(t.symbol, t.date));
-                    filedict[t.symbol].WriteLine(eSigTick.ToEPF(t));
+                    tw = new TikWriter(_path, t.symbol, t.date);
                 }
                 catch (IOException) { return false; }
                 catch (Exception) { return false; }

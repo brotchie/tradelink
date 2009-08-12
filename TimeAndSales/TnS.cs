@@ -13,24 +13,17 @@ namespace TimeSales
     public partial class TnS : Form
     {
         public const string PROGRAM = "Time&Sales";
+        DataTable _dt = new DataTable();
+        DataGridView _dg = new DataGridView();
+        SafeBindingSource _bs = new SafeBindingSource();
+
         public TnS()
         {
             
             InitializeComponent();
-            tsgrid.RowHeadersVisible = false;
-            tsgrid.ShowEditingIcon = false;
-            tsgrid.ColumnHeadersVisible = true;
-            tsgrid.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
-            tsgrid.Columns.Add("Time", "Time");
-            tsgrid.Columns.Add("Trade", "Trade");
-            tsgrid.Columns.Add("TSize", "TSize");
-            tsgrid.Columns.Add("TExch", "TExch");
-            tsgrid.Columns.Add("Bid", "Bid");
-            tsgrid.Columns.Add("Ask", "Ask");
-            tsgrid.Columns.Add("BSize", "BSize");
-            tsgrid.Columns.Add("ASize", "ASize");
-            tsgrid.Columns.Add("BExch", "BExch");
-            tsgrid.Columns.Add("AExch", "AExch");
+            initgrid();
+            
+
             SetColumnContext();
             bw.DoWork += new DoWorkEventHandler(bw_DoWork);
             bw.WorkerSupportsCancellation = true;
@@ -41,15 +34,62 @@ namespace TimeSales
             status("Click 'Open' to load time and sales.    " + Util.TLSIdentity());
 
         }
+        const string TIME = "Time";
+        const string TRADE = "Trade";
+        const string TSIZE = "TSize";
+        const string TX = "TExch";
+        const string BID = "Bid";
+        const string BSIZE = "BSize";
+        const string BX = "BExch";
+        const string ASK = "Ask";
+        const string ASIZE = "ASize";
+        const string AX = "AExch";
+
+        void initgrid()
+        {
+            _dt.Columns.Add(TIME);
+            _dt.Columns.Add(TRADE);
+            _dt.Columns.Add(TSIZE);
+            _dt.Columns.Add(TX);
+            _dt.Columns.Add(BID);
+            _dt.Columns.Add(ASK);
+            _dt.Columns.Add(BSIZE);
+            _dt.Columns.Add(ASIZE);
+            _dt.Columns.Add(BX);
+            _dt.Columns.Add(AX);
+            _bs.DataSource = _dt;
+            _dg.DataSource = _bs;
+            _dg.AllowUserToAddRows = false;
+            _dg.AllowUserToDeleteRows = false;
+            _dg.AllowUserToOrderColumns = true;
+            _dg.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            _dg.Location = new System.Drawing.Point(0, 0);
+            _dg.Margin = new System.Windows.Forms.Padding(4);
+            _dg.Name = "tsgrid";
+            _dg.ReadOnly = true;
+            _dg.RowTemplate.Height = 24;
+            _dg.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            _dg.Size = new System.Drawing.Size(827, 322);
+            _dg.TabIndex = 0;
+
+            _dg.RowHeadersVisible = false;
+            _dg.ShowEditingIcon = false;
+            _dg.ColumnHeadersVisible = true;
+            _dg.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+            _dg.Parent = this;
+            _dg.Dock = DockStyle.Fill;
+        }
+
+
 
         void SetColumnContext()
         {
-            tsgrid.ContextMenuStrip = new ContextMenuStrip();
-            for (int i = 0; i<tsgrid.Columns.Count; i++)
+            _dg.ContextMenuStrip = new ContextMenuStrip();
+            for (int i = 0; i<_dg.Columns.Count; i++)
             {
-                bool grey = !tsgrid.Columns[i].Visible;
-                string col = tsgrid.Columns[i].HeaderText;
-                tsgrid.ContextMenuStrip.Items.Add(col,null,ToggleCol);
+                bool grey = !_dg.Columns[i].Visible;
+                string col = _dg.Columns[i].HeaderText;
+                _dg.ContextMenuStrip.Items.Add(col,null,ToggleCol);
             }
             
         }
@@ -57,9 +97,9 @@ namespace TimeSales
         void ToggleCol(object sender, EventArgs e)
         {
             string col = ((ToolStripItem)sender).Text;
-            if (!tsgrid.Columns.Contains(col)) return;
-            tsgrid.Columns[col].Visible = !tsgrid.Columns[col].Visible;
-            tsgrid.Refresh();
+            if (!_dg.Columns.Contains(col)) return;
+            _dg.Columns[col].Visible = !_dg.Columns[col].Visible;
+            _dg.Refresh();
         }
 
         void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -68,11 +108,12 @@ namespace TimeSales
             if (autoresizebut.Checked)
             {
                 status("Resizing columns, please wait...");
-                tsgrid.AutoResizeColumns();
+                _dg.AutoResizeColumns();
             }
             if (e.Error != null) ;
             else if (!e.Cancelled)
                 status(headline);
+            SafeBindingSource.refreshgrid(_dg, _bs, true);
         }
         string symbol = "";
         int date = 0;
@@ -88,17 +129,16 @@ namespace TimeSales
                 return;
             }
             OpenFileDialog od = new OpenFileDialog();
-            od.Title = "Select the tick file you wish to view";
-            if (Directory.Exists(Util.TLTickDir))
-                od.InitialDirectory = Util.TLTickDir;
+            od.Title = "TickFiles in: "+Util.TLTickDir;
             od.Multiselect = false;
-            od.Filter = "Time & Sales |*.EPF";
-            od.DefaultExt = "*.epf";
+            od.Filter = "Time & Sales |"+TikConst.WILDCARD_EXT;
+            od.DefaultExt = TikConst.WILDCARD_EXT;
             od.CheckFileExists = true;
             od.CheckPathExists = true;
             if (od.ShowDialog() == DialogResult.OK)
             {
-                this.Refresh();
+                _dt.Clear();
+                SafeBindingSource.refreshgrid(_dg, _bs, false);
                 LoadEPF(od.FileName);
                 
                 od.Dispose();
@@ -108,15 +148,12 @@ namespace TimeSales
 
         void LoadEPF(string file)
         {
-            StreamReader sr = new StreamReader(file);
-            SecurityImpl s = eSigTick.InitEpf(sr);
-            total = 0;
+            SecurityImpl s = SecurityImpl.FromFile(file);
+            total = s.ApproxTicks;
             symbol = s.Symbol;
             date = s.Date;
-            FileInfo fi = new FileInfo(file);
-            total = (int)Math.Ceiling((decimal)fi.Length / 39);
             if (!bw.IsBusy)
-                bw.RunWorkerAsync(sr);
+                bw.RunWorkerAsync(s);
             else 
                 status("try again.");
 
@@ -141,29 +178,25 @@ namespace TimeSales
             
         }
 
+        int line;
+
         void bw_DoWork(object sender, DoWorkEventArgs e)
         {
-            StreamReader sr = (StreamReader)e.Argument;
-            int line = 0;
-            while (!sr.EndOfStream)
-            {
-                if (bw.CancellationPending)
-                    break;
-                line++;
-                NewTick(eSigTick.FromStream(symbol,sr));
-                int per = (int)(100 * line / (decimal)total);
-                if (per % 5 == 0)
-                    bw.ReportProgress(per);
-            }
+            SecurityImpl s = (SecurityImpl)e.Argument;
+            s.HistSource.gotTick += new TickDelegate(HistSource_gotTick);
+            line = 0;
+            while (s.HistSource.NextTick() && !bw.CancellationPending)
+                ;
+            
             status(headline + " (cleaning up)");
-            sr.Close();
-           
+            s.HistSource.Close();
             
         }
 
-        
-        void NewTick(Tick t)
+        void HistSource_gotTick(Tick t)
         {
+            
+            line++;
             string time = t.time.ToString();
             string trade = "";
             string bid = "";
@@ -196,21 +229,21 @@ namespace TimeSales
                 oe = t.oe;
                 os = t.os.ToString();
             }
-            if (tsgrid.InvokeRequired)
-            {
-                try
-                {
-                    tsgrid.Invoke(new TickDelegate(NewTick), new object[] { t });
-                }
-                catch (Exception) { }
-            }
-            else tsgrid.Rows.Add(time,trade, ts,ex,bid,ask,bs,os,be,oe); 
+
+            _dt.Rows.Add(time, trade, ts, ex, bid, ask, bs, os, be, oe);
+            if (Math.Abs(_dg.FirstDisplayedScrollingRowIndex-_dt.Rows.Count)<100)
+                SafeBindingSource.refreshgrid(_dg, _bs,false);
+            int per = (int)(100 * line / (double)total);
+            if (per % 5 == 0)
+                bw.ReportProgress(per);
+           
         }
+
 
         private void autoresizebut_CheckedChanged(object sender, EventArgs e)
         {
             status("Resizing columns, please wait...");
-            tsgrid.AutoResizeColumns();
+            _dg.AutoResizeColumns();
             status(headline);
         }
 
