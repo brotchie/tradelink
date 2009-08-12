@@ -29,11 +29,12 @@ namespace TradeLink.Common
         public string Version() { return Util.TLSIdentity(); }
         protected int MinorVer = 0;
 
-        public TLServer_WM() : this(WMUtil.SERVERWINDOW) { }
-        public TLServer_WM(string servername) : base()
+
+        public TLServer_WM() : base()
         {
             MinorVer = Util.BuildFromFile(Util.TLProgramDir + @"\VERSION.txt");
-            this.Text = WMUtil.GetUniqueWindow(servername);
+            
+            this.Text = WMUtil.GetUniqueWindow(WMUtil.SERVERWINDOW);
             this.WindowState = FormWindowState.Minimized;
             this.Show();
             this.ShowInTaskbar = false;
@@ -312,7 +313,7 @@ namespace TradeLink.Common
                     break;
                 default:
                     if (newUnknownRequest != null)
-                        newUnknownRequest(tlm.type,msg);
+                        result = newUnknownRequest(tlm.type,msg);
                     else
                         result = (long)MessageTypes.FEATURE_NOT_IMPLEMENTED;
                     break;

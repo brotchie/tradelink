@@ -34,9 +34,23 @@ namespace TestTradeLink
         public TestTradeLink_WM() 
         {
             s = new TLServer_WM();
-            c = new TLClient_WM("testtradelink",false);
+            s.newUnknownRequest += new UnknownMessageDelegate(s_newUnknownRequest);
+
+            // make sure we select our own loopback, if other servers are running
+            c = new TLClient_WM(false);
+            int pi = -1;
+            for (int i = 0; i < c.ProvidersAvailable.Length; i++)
+            {
+                long v = c.TLSend(MessageTypes.LOOPBACKSERVER, string.Empty, i);
+                if (v==SPECIAL)
+                    pi = i;
+            }
+            if (pi == -1) throw new Exception("unable to find test server");
+            c.Mode(pi, false);
+            
             // create a second client to verify order and fill copying work
-            c2 = new TLClient_WM("client2", false);
+            c2 = new TLClient_WM(false);
+            c2.Mode(pi, false);
 
             // register server events (so server can process orders)
             s.newSendOrderRequest += new OrderDelegate(tl_gotSrvFillRequest);
@@ -51,6 +65,15 @@ namespace TestTradeLink
             c2.gotOrder += new OrderDelegate(c2_gotOrder);
             c2.gotTick += new TickDelegate(c2_gotTick);
 
+        }
+        const long SPECIAL = -717171;
+        long s_newUnknownRequest(MessageTypes t, string msg)
+        {
+            if (t == MessageTypes.LOOPBACKSERVER)
+            {
+                return SPECIAL;
+            }
+            return 0;
         }
 
 
@@ -78,7 +101,7 @@ namespace TestTradeLink
             // discover our states
             Providers[] p = c.TLFound();
             Assert.Greater(p.Length, 0);
-            Assert.AreEqual(Providers.TradeLink, p[0]);
+            Assert.AreEqual(Providers.TradeLink, p[c.ProviderSelected]);
         }
 
         [Test]

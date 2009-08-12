@@ -27,6 +27,20 @@ namespace TradeLink.Common
         public event ImbalanceDelegate gotImbalance;
         public event MessageDelegate gotUnknownMessage;
 
+        // member fields
+        TLTypes _linktype = TLTypes.NONE;
+        IntPtr himh = IntPtr.Zero;
+        public List<MessageTypes> RequestFeatureList = new List<MessageTypes>();
+        Dictionary<string, decimal> chighs = new Dictionary<string, decimal>();
+        Dictionary<string, decimal> clows = new Dictionary<string, decimal>();
+        Dictionary<string, PositionImpl> cpos = new Dictionary<string, PositionImpl>();
+        List<Providers> servers = new List<Providers>();
+        List<string> srvrwin = new List<string>();
+        const int MAXSERVER = 10;
+        int _curprovider = -1;
+
+        public Providers[] ProvidersAvailable { get { return servers.ToArray(); } }
+        public int ProviderSelected { get { return _curprovider; } }
         public TLClient_WM() : this(0,WMUtil.CLIENTWINDOW,true) { }
         public TLClient_WM(bool showwarning) : this(0, WMUtil.CLIENTWINDOW, showwarning) { }
         public TLClient_WM(int ProviderIndex) : this(ProviderIndex, WMUtil.CLIENTWINDOW, true ) { }
@@ -62,6 +76,10 @@ namespace TradeLink.Common
         /// <value>Me H.</value>
         public IntPtr MeH { get { return this.Handle; } }
 
+        [Obsolete("you should check RequestFeatures list instead for this information.", false)]
+        public TLTypes LinkType { get { return _linktype; } }
+
+
         /// <summary>
         /// Sets the preferred communication channel of the link, if multiple channels are avaialble.
         /// Defaults to first provider found.
@@ -87,6 +105,7 @@ namespace TradeLink.Common
                 _linktype = TLTypes.LIVEBROKER;
                 Register();
                 RequestFeatures();
+                _curprovider = ProviderIndex;
                 return true;
             }
             catch (TLServerNotFound)
@@ -100,22 +119,26 @@ namespace TradeLink.Common
 
         }
 
-        TLTypes _linktype = TLTypes.NONE;
-
-        [Obsolete("you should check RequestFeatures list instead for this information.", false)]
-        public TLTypes LinkType { get { return _linktype; } }
-
-        IntPtr himh = IntPtr.Zero;
+        
+        delegate long TLSendDelegate(MessageTypes type, string msg, IntPtr d);
+        /// <summary>
+        /// sends a message to server.  
+        /// synchronous responses are returned immediately as a long
+        /// asynchronous responses come via their message type, or UnknownMessage event otherwise
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public long TLSend(MessageTypes type) { return TLSend(type, ""); }
-        delegate long TLSendDelegate(MessageTypes type, string msg);
-        public long TLSend(MessageTypes type, string m)
+        public long TLSend(MessageTypes type, string m) { return TLSend(type, m, himh); }
+        public long TLSend(MessageTypes type, string m,int ProviderIndex) { return ((ProviderIndex<0)|| (ProviderIndex>srvrwin.Count)) ? 0 : TLSend(type, m, WMUtil.HisHandle(srvrwin[ProviderIndex])); }
+        public long TLSend(MessageTypes type, string m, IntPtr dest)
         {
             if (InvokeRequired)
-                return (long)Invoke(new TLSendDelegate(TLSend), new object[] { type, m });
+                return (long)Invoke(new TLSendDelegate(TLSend), new object[] { type, m, dest });
             else
             {
-                if (himh == IntPtr.Zero) throw new TLServerNotFound();
-                long res = WMUtil.SendMsg(m, himh, Handle, (int)type);
+                if (dest == IntPtr.Zero) throw new TLServerNotFound();
+                long res = WMUtil.SendMsg(m, dest, Handle, (int)type);
                 return res;
             }
         }
@@ -132,11 +155,11 @@ namespace TradeLink.Common
             return (int)TLSend(MessageTypes.SENDORDER, m);
         }
 
-        public void RequestFeatures() { TLSend(MessageTypes.FEATUREREQUEST,Text); }
-        public List<MessageTypes> RequestFeatureList = new List<MessageTypes>();
-        Dictionary<string, decimal> chighs = new Dictionary<string, decimal>();
-        Dictionary<string, decimal> clows = new Dictionary<string, decimal>();
-        Dictionary<string, PositionImpl> cpos = new Dictionary<string, PositionImpl>();
+        public void RequestFeatures() 
+        {
+            RequestFeatureList.Clear();
+            TLSend(MessageTypes.FEATUREREQUEST,Text); 
+        }
 
         /// <summary>
         /// Today's high
@@ -245,9 +268,7 @@ namespace TradeLink.Common
         {
             TLSend(MessageTypes.DOMREQUEST, Text + "+" + depth);
         }
-        List<Providers> servers = new List<Providers>();
-        List<string> srvrwin = new List<string>();
-        const int MAXSERVER = 10;
+
         public Providers [] TLFound()
         {
             servers.Clear();
@@ -287,12 +308,8 @@ namespace TradeLink.Common
             }
 
             string msg = tlm.body;
-            string[] r = msg.Split(',');
             switch (tlm.type)
             {
-                case MessageTypes.ORDERCANCELRESPONSE:
-                    if (gotOrderCancel != null) gotOrderCancel(Convert.ToUInt32(msg));
-                    break;
                 case MessageTypes.TICKNOTIFY:
                     Tick t = TickImpl.Deserialize(msg);
                     if (t.isTrade)
@@ -309,6 +326,9 @@ namespace TradeLink.Common
                         }
                     }
                     if (gotTick != null) gotTick(t);
+                    break;
+                case MessageTypes.ORDERCANCELRESPONSE:
+                    if (gotOrderCancel != null) gotOrderCancel(Convert.ToUInt32(msg));
                     break;
                 case MessageTypes.EXECUTENOTIFY:
                     // date,time,symbol,side,size,price,comment
