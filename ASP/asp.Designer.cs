@@ -36,24 +36,24 @@ namespace ASP
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
             this._newrespbox = new System.Windows.Forms.GroupBox();
-            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this._togglemsgs = new System.Windows.Forms.Button();
-            this._twithelp = new System.Windows.Forms.Button();
             this._librarysel = new System.Windows.Forms.Button();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this._twithelp = new System.Windows.Forms.Button();
             this._opttog = new System.Windows.Forms.Button();
+            this._togglemsgs = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this._newrespbox.SuspendLayout();
             this.SuspendLayout();
             // 
             // _availresponses
             // 
+            this._availresponses.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._availresponses.FormattingEnabled = true;
             this._availresponses.Location = new System.Drawing.Point(7, 31);
             this._availresponses.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this._availresponses.Name = "_availresponses";
             this._availresponses.Size = new System.Drawing.Size(362, 28);
             this._availresponses.TabIndex = 1;
-            this._availresponses.Text = "Select a response";
             this.toolTip1.SetToolTip(this._availresponses, "List of responses available in current response library");
             this._availresponses.SelectedIndexChanged += new System.EventHandler(this.Boxes_SelectedIndexChanged);
             // 
@@ -104,15 +104,16 @@ namespace ASP
             this._newrespbox.TabStop = false;
             this._newrespbox.Text = "Start new Response (strategy)";
             // 
-            // _togglemsgs
+            // _librarysel
             // 
-            this._togglemsgs.Location = new System.Drawing.Point(13, 231);
-            this._togglemsgs.Name = "_togglemsgs";
-            this._togglemsgs.Size = new System.Drawing.Size(27, 29);
-            this._togglemsgs.TabIndex = 19;
-            this._togglemsgs.Text = "!";
-            this._togglemsgs.UseVisualStyleBackColor = true;
-            this._togglemsgs.Click += new System.EventHandler(this._togglemsgs_Click);
+            this._librarysel.Location = new System.Drawing.Point(385, 31);
+            this._librarysel.Name = "_librarysel";
+            this._librarysel.Size = new System.Drawing.Size(32, 28);
+            this._librarysel.TabIndex = 21;
+            this._librarysel.Text = "L";
+            this.toolTip1.SetToolTip(this._librarysel, "view responses available in different dll library");
+            this._librarysel.UseVisualStyleBackColor = true;
+            this._librarysel.Click += new System.EventHandler(this.LoadDLL_Click);
             // 
             // _twithelp
             // 
@@ -125,17 +126,6 @@ namespace ASP
             this._twithelp.UseVisualStyleBackColor = true;
             this._twithelp.Click += new System.EventHandler(this._twithelp_Click_1);
             // 
-            // _librarysel
-            // 
-            this._librarysel.Location = new System.Drawing.Point(385, 31);
-            this._librarysel.Name = "_librarysel";
-            this._librarysel.Size = new System.Drawing.Size(32, 28);
-            this._librarysel.TabIndex = 21;
-            this._librarysel.Text = "L";
-            this.toolTip1.SetToolTip(this._librarysel, "view responses available in different dll library");
-            this._librarysel.UseVisualStyleBackColor = true;
-            this._librarysel.Click += new System.EventHandler(this.LoadDLL_Click);
-            // 
             // _opttog
             // 
             this._opttog.Location = new System.Drawing.Point(46, 231);
@@ -146,6 +136,16 @@ namespace ASP
             this.toolTip1.SetToolTip(this._opttog, "change ASP options");
             this._opttog.UseVisualStyleBackColor = true;
             this._opttog.Click += new System.EventHandler(this._opttog_Click);
+            // 
+            // _togglemsgs
+            // 
+            this._togglemsgs.Location = new System.Drawing.Point(13, 231);
+            this._togglemsgs.Name = "_togglemsgs";
+            this._togglemsgs.Size = new System.Drawing.Size(27, 29);
+            this._togglemsgs.TabIndex = 19;
+            this._togglemsgs.Text = "!";
+            this._togglemsgs.UseVisualStyleBackColor = true;
+            this._togglemsgs.Click += new System.EventHandler(this._togglemsgs_Click);
             // 
             // ASP
             // 

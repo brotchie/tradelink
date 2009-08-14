@@ -6,6 +6,7 @@ using System.Text;
 using System.Windows.Forms;
 using TradeLink.API;
 using TradeLink.Common;
+using TradeLink.AppKit;
 using AMTD_API;
 
 /*
@@ -31,9 +32,6 @@ namespace TDServer
         public TDServerMain()
         {
             InitializeComponent();
-            _msg.BringToFront();
-            ContextMenu = new ContextMenu();
-            ContextMenu.MenuItems.Add(MESSAGES, new EventHandler(togglemessages));
             FormClosing += new FormClosingEventHandler(TDServerMain_FormClosing);
 
             // bindings
@@ -271,32 +269,13 @@ namespace TDServer
             }
         }
 
+        public static DebugWindow _dw = new DebugWindow();
+
         void debug(string msg)
         {
-            if (_msg.InvokeRequired)
-                Invoke(new DebugDelegate(debug), new object[] { msg });
-            else
-            {
-                _msg.Items.Add(DateTime.Now.ToShortTimeString()+" "+msg);
-                _msg.SelectedIndex = _msg.Items.Count - 1;
-            }
+            _dw.GotDebug(msg);
         }
         const string MESSAGES = "Messages";
-        void togglemessages(object sender, EventArgs e)
-        {
-            _msg.Visible = !_msg.Visible;
-            if (InvokeRequired)
-                Invoke(new EventHandler(togglemessages), new object[] { null, null });
-            else
-            {
-                for (int i = 0; i < ContextMenu.MenuItems.Count; i++)
-                    if (ContextMenu.MenuItems[i].Text == MESSAGES)
-                    {
-                        ContextMenu.MenuItems[i].Checked = _msg.Visible;
-                        return;
-                    }
-            }
-        }
 
         private void Close_Connections(bool lRecreateBrokerConnection)
         {
@@ -399,6 +378,16 @@ namespace TDServer
             }
             catch (Exception exc) { }
 
+        }
+
+        private void _togmsg_Click(object sender, EventArgs e)
+        {
+            _dw.Toggle();
+        }
+
+        private void _report_Click(object sender, EventArgs e)
+        {
+            CrashReport.BugReport(PROGRAM, _dw.Content);
         }
 
     }

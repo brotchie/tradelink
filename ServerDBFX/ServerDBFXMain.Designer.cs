@@ -85,6 +85,7 @@
             // _type
             // 
             this._type.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::ServerDBFX.Properties.Settings.Default, "type", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this._type.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._type.FormattingEnabled = true;
             this._type.Items.AddRange(new object[] {
             "Demo",

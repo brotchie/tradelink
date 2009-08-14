@@ -58,6 +58,7 @@
     <Compile Include="BarTickIntervalData.cs" />
     <Compile Include="BarTimeIntervalData.cs" />
     <Compile Include="BarVolIntervalData.cs" />
+    <Compile Include="Book.cs" />
     <Compile Include="Calc.cs" />
     <Compile Include="Broker.cs" />
     <Compile Include="ChartImpl.cs">
@@ -129,7 +130,6 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="TrailTracker.cs" />
-    <Compile Include="Tript.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="WMUtil.cs" />
     <EmbeddedResource Include="ParamPrompt.resx">

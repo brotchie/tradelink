@@ -1,4 +1,4 @@
-﻿namespace CQG2EPF
+﻿namespace TikConverter
 {
     partial class TikConvertMain
     {
@@ -35,6 +35,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this._progress = new System.Windows.Forms.ToolStripProgressBar();
+            this._con = new System.Windows.Forms.ComboBox();
+            this._conlab = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this._defaultsize)).BeginInit();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -45,7 +47,7 @@
             this._msg.ItemHeight = 20;
             this._msg.Location = new System.Drawing.Point(31, 67);
             this._msg.Name = "_msg";
-            this._msg.Size = new System.Drawing.Size(315, 144);
+            this._msg.Size = new System.Drawing.Size(436, 144);
             this._msg.TabIndex = 0;
             // 
             // _inputbut
@@ -60,7 +62,7 @@
             // 
             // _defaultsize
             // 
-            this._defaultsize.Location = new System.Drawing.Point(237, 35);
+            this._defaultsize.Location = new System.Drawing.Point(363, 33);
             this._defaultsize.Maximum = new decimal(new int[] {
             10000,
             0,
@@ -79,7 +81,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(209, 12);
+            this.label1.Location = new System.Drawing.Point(330, 9);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(137, 20);
             this.label1.TabIndex = 3;
@@ -92,7 +94,7 @@
             this.statusStrip1.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.Flow;
             this.statusStrip1.Location = new System.Drawing.Point(0, 226);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(376, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(479, 22);
             this.statusStrip1.SizingGrip = false;
             this.statusStrip1.TabIndex = 4;
             this.statusStrip1.Text = "statusStrip1";
@@ -100,21 +102,44 @@
             // _progress
             // 
             this._progress.Name = "_progress";
-            this._progress.Size = new System.Drawing.Size(325, 16);
+            this._progress.Size = new System.Drawing.Size(420, 16);
             // 
-            // CQG2EPFMAIN
+            // _con
+            // 
+            this._con.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this._con.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this._con.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this._con.FormattingEnabled = true;
+            this._con.Location = new System.Drawing.Point(195, 28);
+            this._con.Name = "_con";
+            this._con.Size = new System.Drawing.Size(151, 28);
+            this._con.TabIndex = 5;
+            this._con.SelectedIndexChanged += new System.EventHandler(this._con_SelectedIndexChanged);
+            // 
+            // _conlab
+            // 
+            this._conlab.AutoSize = true;
+            this._conlab.Location = new System.Drawing.Point(231, 9);
+            this._conlab.Name = "_conlab";
+            this._conlab.Size = new System.Drawing.Size(60, 20);
+            this._conlab.TabIndex = 6;
+            this._conlab.Text = "Source";
+            // 
+            // TikConvertMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(376, 248);
+            this.ClientSize = new System.Drawing.Size(479, 248);
+            this.Controls.Add(this._con);
+            this.Controls.Add(this._conlab);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this._defaultsize);
             this.Controls.Add(this._inputbut);
             this.Controls.Add(this._msg);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Name = "CQG2EPFMAIN";
-            this.Text = "CQG2EPF";
+            this.Name = "TikConvertMain";
+            this.Text = "TikConverter";
             ((System.ComponentModel.ISupportInitialize)(this._defaultsize)).EndInit();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
@@ -131,6 +156,8 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripProgressBar _progress;
+        private System.Windows.Forms.ComboBox _con;
+        private System.Windows.Forms.Label _conlab;
     }
 }
 

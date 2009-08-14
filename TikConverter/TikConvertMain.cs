@@ -9,9 +9,8 @@ using System.Windows.Forms;
 using System.IO;
 using TradeLink.Common;
 using TradeLink.API;
-using System.ComponentModel;
 
-namespace CQG2EPF
+namespace TikConverter
 {
     public partial class TikConvertMain : Form
     {
@@ -19,6 +18,7 @@ namespace CQG2EPF
         public TikConvertMain()
         {
             InitializeComponent();
+            _con.Items.AddRange(Enum.GetNames(typeof(Converter)));
             bw.WorkerReportsProgress = true;
             bw.DoWork += new DoWorkEventHandler(bw_DoWork);
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_RunWorkerCompleted);
@@ -54,11 +54,11 @@ namespace CQG2EPF
                 progress(0);
                 // start background thread to convert
                 bw.RunWorkerAsync(of.FileNames);
-                debug("started convesion");
+                debug("started conversion");
 
             }
         }
-
+        Converter _conval = Converter.None;
         void bw_DoWork(object sender, DoWorkEventArgs e)
         {
             string[] filenames = (string[])e.Argument;
@@ -67,7 +67,7 @@ namespace CQG2EPF
             {
                 debug("input file: " + Path.GetFileNameWithoutExtension(file));
                 // convert file
-                bool fg = convert(file, (int)_defaultsize.Value);
+                bool fg = convert(_conval,file, (int)_defaultsize.Value);
                 // report progress
                 if (!fg) debug("error converting file: " + file);
                 g &= fg;
@@ -91,7 +91,8 @@ namespace CQG2EPF
 
         int _ticksprocessed = 0;
         int _approxtotal = 0;
-        bool convert(string filename,int tradesize)
+        string _sym;
+        bool convert(Converter con, string filename,int tradesize)
         {
             bool g = true;
             // get output filename
@@ -103,26 +104,63 @@ namespace CQG2EPF
             try
             {
                 // open input file
-                infile = new StreamReader(filename);
+                switch (con)
+                {
+                    case Converter.TradeStation:
+                        infile = new StreamReader(filename);
+                        // read in and ignore header of input file
+                        infile.ReadLine();
+                        break;
+                    case Converter.eSignal_EPF:
+                        infile = new StreamReader(filename);
+                        // ignore header
+                        SecurityImpl esec = eSigTick.InitEpf(infile);
+                        _sym = esec.Symbol;
+                        break;
+                    case Converter.CQG:
+                        infile = new StreamReader(filename);
+                        // no header
+                        break;
+                }
+
             }
             catch (Exception ex) { debug("error reading input header:" + ex.Message); g = false; }
-            // setup previous tick
-            TickImpl pk = new TickImpl();
+            // setup previous tick and current tick
+            Tick pk = new TickImpl();
+            Tick k = null;
             do
             {
                 // get next tick from the file
-                TickImpl k = parseline(infile.ReadLine(), tradesize);
+
+                switch (con)
+                {
+                    case Converter.CQG:
+                        k = CQG.parseline(infile.ReadLine(), tradesize);
+                        break;
+                    case Converter.eSignal_EPF:
+                        k = eSigTick.FromStream(_sym, infile);
+                        break;
+                    case Converter.TradeStation:
+                        k = TradeStation.parseline(infile.ReadLine(), _sym, tradesize);
+                        break;
+                }
+                if (k == null)
+                {
+                    debug("Invalid converter: " + con.ToString());
+                    return false;
+                }
                 // if dates don't match, we need to write new output file
                 if (k.date != pk.date)
                 {
                     // if the outfile was open previously, close it
-                    if (outfile != null) outfile.Close();
+                    if (outfile != null) 
+                        outfile.Close();
                     try
                     {
-                        // get file name
-                        string fn = _path+"//"+k.symbol + k.date + ".EPF";
+                        // get path from input
+                        string path = Path.GetDirectoryName(filename) + "\\";
                         // setup new file
-                        outfile = new TikWriter(k.symbol, k.date);
+                        outfile = new TikWriter(path,k.symbol, k.date);
                         // report progress
                         progress((double)_ticksprocessed / _approxtotal);
                     }
@@ -143,41 +181,13 @@ namespace CQG2EPF
             while (!infile.EndOfStream);
             // close output file
             outfile.Close();
+            // close input file
+            infile.Close();
             // return status
             return g;
         }
 
-        // fields of tradestation files
-        const int SYM = 0;
-        const int DATE = 1;
-        const int TIME = 3;
-        const int TRADE = 4;
 
-        // here is where a line is converted
-        TickImpl parseline(string line, int defaultsize)
-        {
-            // split line
-            string[] r = line.Split(',');
-            // create tick for this symbol
-            TickImpl k = new TickImpl(r[SYM]);
-            // setup temp vars
-            int iv = 0;
-            decimal dv = 0;
-            // parse date
-            if (int.TryParse(r[DATE], out iv))
-                k.date = iv;
-            // parse time
-            if (int.TryParse(r[TIME], out iv))
-                k.time = iv * 100;
-            // parse close as trade price
-            if (decimal.TryParse(r[TRADE], out dv))
-            {
-                k.trade = (decimal)dv/100;
-                k.size = defaultsize;
-            }
-            // return tick
-            return k;
-        }
         delegate void pdouble(double p);
         void progress(double percent)
         {
@@ -205,6 +215,13 @@ namespace CQG2EPF
                 _msg.Items.Add(msg);
                 _msg.SelectedIndex = _msg.Items.Count - 1;
             }
+
+        }
+
+        private void _con_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // get converter
+            _conval = (Converter)Enum.Parse(typeof(Converter), _con.Text, true);
 
         }
     }

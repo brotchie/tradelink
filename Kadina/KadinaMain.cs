@@ -580,7 +580,8 @@ namespace Kadina
             string[] r = Kadina.Properties.Settings.Default.recentfiles.Split(',');
             for (int i = 0; i < r.Length; i++)
                 if ((r[i]!="") && System.IO.File.Exists(r[i]))
-                    recent.DropDownItems.Add(r[i]);
+                    if (isTIK(r[i]))
+                        recent.DropDownItems.Add(r[i]);
         }
 
         void saverecentlibs()

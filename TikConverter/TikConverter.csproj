@@ -12,8 +12,8 @@
     <AssemblyName>TikConverter</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <StartupObject>CQG2EPF.Program</StartupObject>
-    <ApplicationIcon>tradelinkinstaller.ico</ApplicationIcon>
+    <StartupObject>TikConverter.Program</StartupObject>
+    <ApplicationIcon>TikConverter.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -51,7 +51,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Console.cs" />
+    <Compile Include="Converter.cs" />
+    <Compile Include="CQG.cs" />
     <Compile Include="TikConvertMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -59,6 +60,7 @@
       <DependentUpon>TikConvertMain.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
+    <Compile Include="TradeStation.cs" />
     <EmbeddedResource Include="TikConvertMain.resx">
       <DependentUpon>TikConvertMain.cs</DependentUpon>
     </EmbeddedResource>
@@ -78,6 +80,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="TikConverter.ico" />
     <Content Include="tradelinkinstaller.ico" />
   </ItemGroup>
   <ItemGroup>

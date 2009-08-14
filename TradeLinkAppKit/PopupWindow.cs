@@ -11,15 +11,14 @@ namespace TradeLink.AppKit
 {
     public partial class PopupWindow : Form
     {
-        public PopupWindow() : this("Notice") { }
-        public PopupWindow(string caption)
+        public PopupWindow()
         {
-            Text = caption;
             InitializeComponent();
             
         }
 
         delegate void stringdel(string s);
+        string _m = string.Empty;
         void GotDebug(string msg)
         {
             if (InvokeRequired)
@@ -30,14 +29,31 @@ namespace TradeLink.AppKit
             }
         }
 
-        public static void Show(string msg) { Show("Notice", msg, true); }
-        public static void Show(string title, string msg) { Show(title,msg, true); }
-        public static void Show(string title,string msg, bool topmost)
+        public void Title(string title)
         {
-            PopupWindow tow = new PopupWindow(title);
+            if (InvokeRequired)
+                Invoke(new stringdel(Title),new object[] { title} );
+            else
+            {
+                Text = title;
+                Invalidate(true);
+            }
+        }
+
+        public static void Show(string msg) { Show("Notice", msg, true,false); }
+        public static void Show(string title, string msg) { Show(title,msg, true,false); }
+        public static void Show(string title,string msg, bool topmost, bool pause)
+        {
+            PopupWindow tow = new PopupWindow();
+
             tow.TopMost = topmost;
-            tow.Show();
+            
+            tow.Title(title);
             tow.GotDebug(msg);
+            if (pause)
+                tow.ShowDialog();
+            else
+                tow.Show();
         }
     }
 }

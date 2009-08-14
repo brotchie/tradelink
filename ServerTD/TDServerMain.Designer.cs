@@ -35,8 +35,9 @@
             this._login = new System.Windows.Forms.Button();
             this._pass = new System.Windows.Forms.TextBox();
             this._user = new System.Windows.Forms.TextBox();
-            this._msg = new System.Windows.Forms.ListBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this._report = new System.Windows.Forms.Button();
+            this._togmsg = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label2
@@ -88,28 +89,40 @@
             this._user.TabIndex = 1;
             this._user.Text = global::TDServer.Properties.Settings.Default.username;
             // 
-            // _msg
+            // _report
             // 
-            this._msg.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._msg.FormattingEnabled = true;
-            this._msg.ItemHeight = 20;
-            this._msg.Location = new System.Drawing.Point(0, 0);
-            this._msg.Name = "_msg";
-            this._msg.Size = new System.Drawing.Size(328, 164);
-            this._msg.TabIndex = 7;
-            this._msg.Visible = false;
+            this._report.Image = ((System.Drawing.Image)(resources.GetObject("_report.Image")));
+            this._report.Location = new System.Drawing.Point(258, 115);
+            this._report.Name = "_report";
+            this._report.Size = new System.Drawing.Size(32, 27);
+            this._report.TabIndex = 10;
+            this.toolTip1.SetToolTip(this._report, "report a bug");
+            this._report.UseVisualStyleBackColor = true;
+            this._report.Click += new System.EventHandler(this._report_Click);
+            // 
+            // _togmsg
+            // 
+            this._togmsg.Location = new System.Drawing.Point(216, 115);
+            this._togmsg.Name = "_togmsg";
+            this._togmsg.Size = new System.Drawing.Size(35, 27);
+            this._togmsg.TabIndex = 9;
+            this._togmsg.Text = "!";
+            this.toolTip1.SetToolTip(this._togmsg, "toggle connector messages");
+            this._togmsg.UseVisualStyleBackColor = true;
+            this._togmsg.Click += new System.EventHandler(this._togmsg_Click);
             // 
             // TDServerMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(328, 175);
+            this.Controls.Add(this._report);
+            this.Controls.Add(this._togmsg);
             this.Controls.Add(this._login);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this._pass);
             this.Controls.Add(this._user);
-            this.Controls.Add(this._msg);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "TDServerMain";
             this.Text = "TDServer BETA";
@@ -127,7 +140,8 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button _login;
         private System.Windows.Forms.ToolTip toolTip1;
-        private System.Windows.Forms.ListBox _msg;
+        private System.Windows.Forms.Button _report;
+        private System.Windows.Forms.Button _togmsg;
     }
 }
 
