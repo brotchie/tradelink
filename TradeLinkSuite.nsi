@@ -60,6 +60,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\Genesis+BrokerServer.lnk" "$INSTDIR\ServerGenesis.EXE" "" "$INSTDIR\ServerGenesis.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\Esignal.lnk" "$INSTDIR\ServerEsignal.exe" "" "$INSTDIR\ServerEsignal.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\DBFX.lnk" "$INSTDIR\ServerDBFX.exe" "" "$INSTDIR\ServerDBFX.exe" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink\TikConverter.exe" "" "$INSTDIR\TikConverter.exe" 0
   
   
   
@@ -113,6 +114,7 @@ Section "TradeLinkSuite"
   File "ServerDBFX\bin\release\ServerDBFX.exe"
   File "ServerDBFX\bin\release\ServerDBFX.exe.config"
   File "ServerDBFX\bin\release\Interop.FXCore.dll"
+  File "TikConverter\bin\release\TikConverter.exe"
   
   ; Write the installation path into the registry
   WriteRegStr HKLM SOFTWARE\TradeLinkSuite "Install_Dir" "$INSTDIR"
