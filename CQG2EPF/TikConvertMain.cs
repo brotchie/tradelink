@@ -97,7 +97,7 @@ namespace CQG2EPF
             // get output filename
             string convertname = string.Empty;
             // setup writing to output
-            StreamWriter outfile = null;
+            TikWriter outfile = null;
             // setup input file
             StreamReader infile = null;
             try
@@ -122,9 +122,7 @@ namespace CQG2EPF
                         // get file name
                         string fn = _path+"//"+k.symbol + k.date + ".EPF";
                         // setup new file
-                        outfile = new StreamWriter(fn, false);
-                        // write file header
-                        outfile.Write(eSigTick.EPFheader(k.symbol, k.date));
+                        outfile = new TikWriter(k.symbol, k.date);
                         // report progress
                         progress((double)_ticksprocessed / _approxtotal);
                     }
@@ -133,7 +131,7 @@ namespace CQG2EPF
                 try
                 {
                     // write the tick
-                    outfile.WriteLine(eSigTick.ToEPF(k));
+                    outfile.newTick(k);
                 }
                 catch (Exception ex) { debug("error writing output tick: " + ex.Message); g = false; }
                 // save this tick as previous tick
