@@ -92,6 +92,9 @@
     <Compile Include="PopupWindow.designer.cs">
       <DependentUpon>PopupWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="SafeBindingSource.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Versions.cs">
       <SubType>Form</SubType>
     </Compile>
