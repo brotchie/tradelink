@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using System.IO;
 using TradeLink.Common;
 using TradeLink.API;
+using TradeLink.AppKit;
 
 namespace TimeSales
 {

@@ -43,9 +43,6 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SafeBindingSource.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="TnS.cs">
       <SubType>Form</SubType>
     </Compile>
