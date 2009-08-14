@@ -26,16 +26,16 @@ namespace Kadina
         DataTable dt = new DataTable("ticktable");
         DataTable it = new DataTable("itable");
         DataTable ptab = new DataTable("ptable");
-        SafeBindingSource tbs = new SafeBindingSource();
-        SafeBindingSource ibs = new SafeBindingSource();
+        SafeBindingSource tbs = new SafeBindingSource(false);
+        SafeBindingSource ibs = new SafeBindingSource(false);
         DataGridView pg = new DataGridView();
         DataGridView ig = new DataGridView();
         DataGridView dg = new DataGridView();
 
         DataTable ot = new DataTable("otable");
-        SafeBindingSource obs = new SafeBindingSource();
+        SafeBindingSource obs = new SafeBindingSource(false);
         DataTable ft = new DataTable("ftable");
-        SafeBindingSource fbs = new SafeBindingSource();
+        SafeBindingSource fbs = new SafeBindingSource(false);
         DataGridView og = new DataGridView();
         DataGridView fg = new DataGridView();
 
@@ -45,7 +45,6 @@ namespace Kadina
 
         public kadinamain()
         {
-
             InitializeComponent();
             initgrids();
             InitContext();
@@ -56,7 +55,7 @@ namespace Kadina
             bw.WorkerReportsProgress = false;
             bw.WorkerSupportsCancellation = true;
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(PlayComplete);
-            status(Util.TLSIdentity());
+            debug(Util.TLSIdentity());
         }
 
 
@@ -101,21 +100,40 @@ namespace Kadina
             
             // add tick to grid
             NewTRow(new string[] { nowtime,t.symbol,trade,ts,bid,ask,bs,os,ex,be,oe});
+            // send to response
+            if (myres != null)
+                myres.GotTick(t);
         }
 
         void Play(object sender, DoWorkEventArgs e)
         {
             PlayTo type = (PlayTo)e.Argument;
             if (e.Cancel) return;
+            int time = (int)(h.NextTickTime % 100000);
+            long date = (h.NextTickTime / 100000)*100000;
             int t = (int)type;
-            h.Initialize();
-            int maxmin = (t > 127) && (t < 450) ? t - 127 : 0;
-            long firsttime = h.NextTickTime % 1000000;
-            long rem = h.NextTickTime - firsttime;
-            int stop = Util.FTADD((int)firsttime, maxmin * 60);
-            rem += stop;
+            long val = 0;
+            switch (type)
+            {
+                case PlayTo.End : 
+                    val = HistSim.ENDSIM; 
+                    break;
+                case PlayTo.FiveMin : 
+                case PlayTo.OneMin:
+                case PlayTo.TenMin:
+                case PlayTo.HalfHour :
+                    val = date + Util.FTADD(time, (t / 10)*60);
+                    break;
+                case PlayTo.Hour:
+                    val = date + Util.FTADD(time,(t/1000)*3660);
+                    break;
+                case PlayTo.OneSec:
+                case PlayTo.ThirtySec:
+                    val = date+ Util.FTADD(time, t); 
+                    break;
+            }
             cleardebugs(); // clear the message box on first box run
-            h.PlayTo(rem);
+            h.PlayTo(val);
         }
 
         void cleardebugs()
@@ -141,9 +159,11 @@ namespace Kadina
         void InitContext()
         {
             ContextMenu = new ContextMenu();
+            ContextMenu.MenuItems.Add("LastPlayTo", new EventHandler(rightplay));
             string[] list = Enum.GetNames(typeof(PlayTo));
             for (int i = 0; i < list.Length; i++)
-                ContextMenu.MenuItems.Add(PLAYTO+list[i]+PLAYTOUNIT,new EventHandler(rightplay));
+                if (list[i]!="LastPlayTo")
+                    ContextMenu.MenuItems.Add(PLAYTO+list[i]+PLAYTOUNIT,new EventHandler(rightplay));
             ContextMenu.MenuItems.Add("Reset", new EventHandler(rightreset));
             msgbox.ContextMenu = ContextMenu;
             
@@ -152,6 +172,13 @@ namespace Kadina
 
         void rightplay(object sender, EventArgs e)
         {
+            MenuItem mi = (MenuItem)sender;
+            string tmp = mi.Text;
+            tmp = tmp.Replace(PLAYTO, "");
+            tmp = tmp.Replace(PLAYTOUNIT, "");
+            PlayTo pttmp = (PlayTo)Enum.Parse(typeof(PlayTo), tmp);
+            if (pttmp != PlayTo.LastPlayTo)
+                pt = pttmp;
             if (epffiles.Count==0) { status("No data selected."); return; }
             if (myres == null) { status("No response selected."); return; }
             if (bw.IsBusy) { status("Still playing, please wait..."); return; }
@@ -202,7 +229,12 @@ namespace Kadina
             pg.ShowEditingIcon = false;
             pg.BackgroundColor = BackColor;
             pg.Dock = DockStyle.Fill;
+            pg.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+            pg.RowHeadersDefaultCellStyle.BackColor = BackColor;
             pg.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            pg.ColumnHeadersDefaultCellStyle.BackColor = BackColor;
+            pg.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+
             pg.Show();
 
             // order tab
@@ -222,6 +254,12 @@ namespace Kadina
             og.ShowEditingIcon = false;
             og.Dock = DockStyle.Fill;
             og.BackgroundColor = BackColor;
+            og.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+            og.RowHeadersDefaultCellStyle.BackColor = BackColor;
+            og.ColumnHeadersDefaultCellStyle.BackColor = BackColor;
+            og.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+
+
             og.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             og.Show();
 
@@ -243,6 +281,11 @@ namespace Kadina
             fg.ShowEditingIcon = false;
             fg.BackgroundColor = BackColor;
             fg.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            fg.ColumnHeadersDefaultCellStyle.BackColor = BackColor;
+            fg.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+            fg.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+            fg.RowHeadersDefaultCellStyle.BackColor = BackColor;
+
             fg.Show();
 
             // indicator tab
@@ -269,10 +312,18 @@ namespace Kadina
             dg.Parent = ticktab;
             dg.RowHeadersVisible = false;
             dg.BackgroundColor = BackColor;
+            dg.ColumnHeadersDefaultCellStyle.BackColor = BackColor;
+            dg.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+
             dg.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dg.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+            dg.RowHeadersDefaultCellStyle.BackColor = BackColor;
+
             dg.ReadOnly = true;
             dg.Dock = DockStyle.Fill;
             dg.Show();
+
+            // indicators
             ig.Parent = itab;
             ibs.DataSource = it;
             ig.DataSource = ibs;
@@ -284,6 +335,12 @@ namespace Kadina
             ig.AllowUserToDeleteRows = false;
             ig.ShowEditingIcon = false;
             ig.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            ig.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+            ig.RowHeadersDefaultCellStyle.BackColor = BackColor;
+            ig.ColumnHeadersDefaultCellStyle.BackColor = BackColor;
+            ig.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+
+
             ig.BackgroundColor = BackColor;
             ig.Show();
 
@@ -349,7 +406,8 @@ namespace Kadina
             catch (Exception ex) 
             { 
                 debug(ex.Message+ex.StackTrace); 
-                status("Error loading response"); 
+                status("Error loading response");
+                myres = null;
                 return; 
             }
             if ((myres != null) && (myres.FullName == name))
@@ -362,7 +420,6 @@ namespace Kadina
                 myres.SendMessage += new MessageDelegate(myres_SendMessage);
                 h.SimBroker.GotOrder += new OrderDelegate(myres.GotOrder);
                 h.SimBroker.GotFill += new FillDelegate(myres.GotFill);
-                h.GotTick += new TickDelegate(myres.GotTick);
                 status(resname + " is current response.");
                 updatetitle();
                 igridinit();
@@ -407,9 +464,10 @@ namespace Kadina
             h.SimBroker.CancelOrder(number);
         }
 
+        StringBuilder _msg = new StringBuilder(100000000);
         void myres_GotDebug(Debug msg)
         {
-            debug(nowtime+":"+myres.Name+" "+msg.Msg);
+            _msg.AppendFormat("{0}: {1}{2}",nowtime,msg.Msg,Environment.NewLine);
         }
 
 
@@ -460,7 +518,7 @@ namespace Kadina
                 h.SimBroker.GotFill += new FillDelegate(broker_GotFill);
                 h.GotTick += new TickDelegate(h_GotTick);
                 h.SimBroker.GotOrderCancel += new OrderCancelDelegate(broker_GotOrderCancel);
-
+                h.Initialize();
                 updatetitle();
                 status("Loaded tickdata: "+PrettyEPF());
                 return true;
@@ -489,9 +547,16 @@ namespace Kadina
 
         void status(string msg)
         {
-            statuslab.Text = msg;
-            statusStrip1.Refresh();
+            if (InvokeRequired)
+                Invoke(new DebugDelegate(status), new object[] { msg });
+            else
+            {
+                _stat.Text = msg;
+                _stat.Invalidate();
+            }
         }
+
+       
         void debug(string msg)
         {
             if (msgbox.InvokeRequired)
@@ -522,6 +587,12 @@ namespace Kadina
 
         void PlayComplete(object sender, RunWorkerCompletedEventArgs e)
         {
+            debug(_msg.ToString());
+            _msg = new StringBuilder();
+            SafeBindingSource.refreshgrid(dg, tbs);
+            SafeBindingSource.refreshgrid(ig, ibs);
+            SafeBindingSource.refreshgrid(og, obs);
+            SafeBindingSource.refreshgrid(fg, fbs);
             if (e.Error != null)
             {
                 debug(e.Error.Message);
@@ -529,7 +600,7 @@ namespace Kadina
             }
             else if (e.Cancelled) status("Canceled play.");
             else status("Reached next " + pt.ToString() + " at time " + KadTime);
-            if (ContextMenu.MenuItems.Count > 2) // remove cancel option
+            if (ContextMenu.MenuItems[ContextMenu.MenuItems.Count-1].Text=="Cancel") // remove cancel option
                 ContextMenu.MenuItems.RemoveAt(ContextMenu.MenuItems.Count - 1);
         }
 
@@ -629,18 +700,15 @@ namespace Kadina
 
     enum PlayTo
     {
-        // ticks get 0-31
-        // quotes get 32-63
-        // trades get 64-127
-        // minutes get 128-up
-        End = Int32.MaxValue,
-        Pause = Int32.MaxValue-1,
-        Time = Int32.MaxValue-2,
-        OneMin = 128,
-        FiveMin = 131,
-        FifteenMin = 141,
-        HalfHour = 156,
-        Hour = 186,
-        TwoHour = 246,
+        LastPlayTo,
+        OneSec = 1,
+        ThirtySec = 30,
+        OneMin = 10,
+        FiveMin = 50,
+        TenMin = 100,
+        HalfHour = 300,
+        Hour = 1000,
+        End,
+
     }
 }

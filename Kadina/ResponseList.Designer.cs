@@ -41,6 +41,7 @@
             this._list.Name = "_list";
             this._list.Size = new System.Drawing.Size(278, 244);
             this._list.TabIndex = 0;
+            this._list.SelectedIndexChanged += new System.EventHandler(this._list_SelectedIndexChanged);
             // 
             // _choose
             // 
@@ -52,6 +53,7 @@
             this._choose.Text = "OK";
             this._choose.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this._choose.UseVisualStyleBackColor = true;
+            this._choose.Visible = false;
             this._choose.Click += new System.EventHandler(this._choose_Click);
             // 
             // ResponseList

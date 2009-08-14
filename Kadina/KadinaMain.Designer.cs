@@ -36,7 +36,7 @@ namespace Kadina
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabmsg = new System.Windows.Forms.TabPage();
             this.statusStrip2 = new System.Windows.Forms.StatusStrip();
-            this.statuslab = new System.Windows.Forms.ToolStripStatusLabel();
+            this._stat = new System.Windows.Forms.ToolStripStatusLabel();
             this.msgbox = new System.Windows.Forms.RichTextBox();
             this.ticktab = new System.Windows.Forms.TabPage();
             this.itab = new System.Windows.Forms.TabPage();
@@ -117,7 +117,7 @@ namespace Kadina
             // 
             // tabmsg
             // 
-            this.tabmsg.Controls.Add(this.statusStrip2);
+            this.Controls.Add(this.statusStrip2);
             this.tabmsg.Controls.Add(this.msgbox);
             this.tabmsg.Location = new System.Drawing.Point(4, 32);
             this.tabmsg.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -131,19 +131,19 @@ namespace Kadina
             // statusStrip2
             // 
             this.statusStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.statuslab});
+            this._stat});
             this.statusStrip2.Location = new System.Drawing.Point(4, 239);
             this.statusStrip2.Name = "statusStrip2";
-            this.statusStrip2.Padding = new System.Windows.Forms.Padding(1, 0, 21, 0);
             this.statusStrip2.Size = new System.Drawing.Size(785, 30);
+            this.statusStrip2.SizingGrip = false;
             this.statusStrip2.TabIndex = 1;
             this.statusStrip2.Text = "statusStrip2";
             // 
-            // statuslab
+            // _stat
             // 
-            this.statuslab.Name = "statuslab";
-            this.statuslab.Size = new System.Drawing.Size(519, 25);
-            this.statuslab.Text = "Kadina lets you see your response to a given set of market data.";
+            this._stat.Name = "_stat";
+            this._stat.Size = new System.Drawing.Size(519, 25);
+            this._stat.Text = "Kadina lets you see your response to a given set of market data.";
             // 
             // msgbox
             // 
@@ -241,13 +241,13 @@ namespace Kadina
         private System.Windows.Forms.RichTextBox msgbox;
         private System.Windows.Forms.TabPage ticktab;
         private System.Windows.Forms.ToolStripDropDownButton recent;
-        private System.Windows.Forms.StatusStrip statusStrip2;
-        private System.Windows.Forms.ToolStripStatusLabel statuslab;
         private System.Windows.Forms.TabPage itab;
         private System.Windows.Forms.TabPage postab;
         private System.Windows.Forms.TabPage ordertab;
         private System.Windows.Forms.TabPage filltab;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.StatusStrip statusStrip2;
+        private System.Windows.Forms.ToolStripStatusLabel _stat;
     }
 }
 

@@ -30,6 +30,11 @@ namespace Kadina
 
         private void _choose_Click(object sender, EventArgs e)
         {
+
+        }
+
+        private void _list_SelectedIndexChanged(object sender, EventArgs e)
+        {
             if ((_list.SelectedIndex < 0)) return;
             string r = _list.Items[_list.SelectedIndex].ToString();
             if (ResponseSelected != null)

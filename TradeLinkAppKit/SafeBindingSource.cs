@@ -7,11 +7,14 @@ namespace TradeLink.AppKit
 {
     public class SafeBindingSource : BindingSource
     {
+        bool _sortable = true;
+        public SafeBindingSource() : this(true) { }
+        public SafeBindingSource(bool sortallowed) : base() { _sortable = false; }
         public override bool SupportsSorting
         {
             get
             {
-                return true;
+                return _sortable;
             }
         }
         public override int Add(object value)

@@ -29,7 +29,7 @@ namespace Responses
             if (p.isFlat)
             {
                 D("entering long");
-                O(new BuyMarket(tick.symbol, 1));
+                O(new BuyMarket(tick.symbol, 100));
             }
             // otherwise if we're up 10/th of a point, flat us
             else if (Calc.OpenPT(tick.trade, p) > .1m)
