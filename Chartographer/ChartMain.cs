@@ -150,7 +150,7 @@ namespace Chartographer
             od.Filter = "TickFiles|" + TikConst.WILDCARD_EXT;
             od.Multiselect = false;
             od.ShowDialog();
-            BarList bl = BarListImpl.FromEPF(od.FileName);
+            BarList bl = BarListImpl.FromTIK(od.FileName);
             ChartImpl c = new ChartImpl(bl, false);
             c.Symbol = bl.Symbol;
             try
@@ -170,6 +170,11 @@ namespace Chartographer
         private void chartsymbolbox_Click(object sender, EventArgs e)
         {
             chartsymbolbox.Clear();
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            button1_Click(null, null);
         }
     }
 }
