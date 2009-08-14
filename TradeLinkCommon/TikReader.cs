@@ -20,7 +20,7 @@ namespace TradeLink.Common
         public string Symbol { get { return _sym; } }
         public Security ToSecurity() { return _sec; }
         public bool isValid { get { return (_filever != 0) && (_realsymbol != string.Empty) && BaseStream.CanRead; } }
-        public TikReader(string filepath) : base(new FileStream(filepath, FileMode.Open)) 
+        public TikReader(string filepath) : base(new FileStream(filepath, FileMode.Open, FileAccess.Read, FileShare.Read)) 
         {
             _path = filepath;
             FileInfo fi = new FileInfo(filepath);
@@ -80,6 +80,7 @@ namespace TradeLink.Common
                         {
                             k.date = ReadInt32();
                             k.time = ReadInt32();
+                            k.datetime = ((long)k.date * 1000000) + (long)k.time;
                             k.iask = ReadInt32();
                             k.os = ReadInt32();
                             k.oe = ReadString();
@@ -90,6 +91,7 @@ namespace TradeLink.Common
                         {
                             k.date = ReadInt32();
                             k.time = ReadInt32();
+                            k.datetime = ((long)k.date * 1000000) + (long)k.time;
                             k.ibid = ReadInt32();
                             k.bs = ReadInt32();
                             k.be = ReadString();
@@ -100,6 +102,7 @@ namespace TradeLink.Common
                         {
                             k.date = ReadInt32();
                             k.time = ReadInt32();
+                            k.datetime = ((long)k.date * 1000000) + (long)k.time;
                             k.itrade = ReadInt32();
                             k.size = ReadInt32();
                             k.ex = ReadString();
@@ -116,6 +119,7 @@ namespace TradeLink.Common
                         {
                             k.date = ReadInt32();
                             k.time = ReadInt32();
+                            k.datetime = ((long)k.date * 1000000) + (long)k.time;
                             k.ibid = ReadInt32();
                             k.bs = ReadInt32();
                             k.be = ReadString();
@@ -129,6 +133,7 @@ namespace TradeLink.Common
                         {
                             k.date = ReadInt32();
                             k.time = ReadInt32();
+                            k.datetime = ((long)k.date * 1000000) + (long)k.time;
                             k.itrade = ReadInt32();
                             k.size = ReadInt32();
                             k.ex = ReadString();

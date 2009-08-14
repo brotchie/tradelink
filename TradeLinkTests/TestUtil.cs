@@ -148,7 +148,7 @@ namespace TestTradeLink
         public void TickIndex()
         {
 
-            string[,] idx = Util.TickFileIndex(Environment.CurrentDirectory + "\\", "*.epf");
+            string[,] idx = Util.TickFileIndex(Environment.CurrentDirectory + "\\", TikConst.WILDCARD_EXT);
             string[] syma = new string[] { "ABN", "$SPX", "FTI" };
             string syms = string.Join(",", syma);
             bool foundsym = true;

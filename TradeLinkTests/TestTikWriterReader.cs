@@ -131,9 +131,6 @@ namespace TestTradeLink
             if (printperf)
                 Console.WriteLine("read speed (ticks/sec): " + (data.Length/(elapms/1000)).ToString("n0"));
 
-            // wait for file to close
-            System.Threading.Thread.Sleep(100);
-            
             // remove file
             removefile(FILE);
             

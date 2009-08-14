@@ -15,10 +15,11 @@ namespace TestTradeLink
         double EXPECTEX = .8;
         double EXPECTBARS = .6;
 
+
         [Test]
         public void RawPerformance()
         {
-            HistSim h = new HistSim(Environment.CurrentDirectory+"\\");
+            HistSim h = new HistSim(Environment.CurrentDirectory);
             h.Initialize();
             h.GotTick += new TradeLink.API.TickDelegate(raw_GotTick);
 
@@ -57,7 +58,9 @@ namespace TestTradeLink
             Assert.AreEqual(h.TicksProcessed, tickcount);
             // last time is 1649 on SPX
             Assert.AreEqual(20080318155843, lasttime);
+            h.Stop();
         }
+
         int tickcount = 0;
         List<string> syms = new List<string>();
         long lasttime = 0;
@@ -72,34 +75,39 @@ namespace TestTradeLink
             lasttime = t.datetime;
         }
 
-        HistSim execute = new HistSim(Environment.CurrentDirectory + "\\");
         int fillcount = 0;
         int desiredfills = 1000;
+        HistSim h;
         [Test]
         public void ExecutionPerformance()
         {
-            execute.GotTick += new TradeLink.API.TickDelegate(execute_GotTick);
-            execute.SimBroker.GotFill += new TradeLink.API.FillDelegate(SimBroker_GotFill);
-
-            execute.Initialize();
+            System.Threading.Thread.Sleep(100);
+            h = new HistSim(Environment.CurrentDirectory);
+            h.Initialize();
+            h.GotTick += new TradeLink.API.TickDelegate(execute_GotTick);
+            h.SimBroker.GotFill += new TradeLink.API.FillDelegate(SimBroker_GotFill);
 
             tickcount = 0;
             lasttime = 0;
 
+            Assert.AreEqual(0, tickcount);
+            Assert.AreEqual(0, syms.Count);
             Assert.AreEqual(0, lasttime);
-            Assert.Greater(execute.TicksPresent, 0);
+            Assert.Greater(h.TicksPresent, 0);
             if (Environment.ProcessorCount == 1) EXPECTEX *= 2.5;
 
             DateTime start = DateTime.Now;
 
-            execute.PlayTo(HistSim.ENDSIM);
+            h.PlayTo(HistSim.ENDSIM);
 
             double time = DateTime.Now.Subtract(start).TotalSeconds;
 
+            Console.WriteLine("Execution runtime: " + time.ToString("N2") + "sec, versus: " + EXPECTEX + "sec expected.");
+            Console.WriteLine("Execution " + ((double)tickcount / time).ToString("N0") + " ticks/sec.  " + ((double)fillcount / time).ToString("N0") + " fills/sec");
+
             Assert.AreEqual(desiredfills, fillcount);
             Assert.LessOrEqual(time, EXPECTEX);
-            Console.WriteLine("Execution runtime: " + time.ToString("N2") + "sec, versus: " + EXPECTEX + "sec expected.");
-            Console.WriteLine("Execution " + ((double)tickcount / time).ToString("N0") + " ticks/sec.  "+((double)fillcount / time).ToString("N0") + " fills/sec");
+            h.Stop();
         }
 
         void SimBroker_GotFill(TradeLink.API.Trade t)
@@ -115,15 +123,16 @@ namespace TestTradeLink
             if (tickcount % 50 == 0)
             {
                 bool side = fillcount % 2 == 0;
-                execute.SimBroker.sendOrder(new MarketOrder(t.symbol, side, 100));
+                h.SimBroker.sendOrder(new MarketOrder(t.symbol, side, 100));
             }
         }
 
         BarListTracker bt = new BarListTracker();
+
         [Test]
         public void BarPerformance()
         {
-            HistSim h = new HistSim(Environment.CurrentDirectory + "\\");
+            HistSim h = new HistSim(Environment.CurrentDirectory);
             h.GotTick += new TradeLink.API.TickDelegate(h_GotTick);
 
             h.Initialize();
@@ -140,6 +149,7 @@ namespace TestTradeLink
             h.PlayTo(HistSim.ENDSIM);
 
             double time = DateTime.Now.Subtract(start).TotalSeconds;
+            h.Stop();
             Assert.GreaterOrEqual(tickcount, 50000);
             Assert.AreEqual(3, bt.SymbolCount);
             Assert.LessOrEqual(time, EXPECTBARS);

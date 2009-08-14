@@ -126,6 +126,10 @@ namespace TradeLink.Common
             {
                 v = HistSource.NextTick();
             }
+            catch (System.IO.EndOfStreamException)
+            {
+                HistSource.Close();
+            }
             catch (System.IO.IOException) { }
             return v;
         }

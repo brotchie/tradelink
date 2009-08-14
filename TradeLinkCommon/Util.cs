@@ -520,7 +520,7 @@ namespace TradeLink.Common
             try
             {
                 string ds = System.Text.RegularExpressions.Regex.Match(filename, "([0-9]{8})[.]", System.Text.RegularExpressions.RegexOptions.IgnoreCase).Result("$1");
-                string sym = filename.Replace(ds, "").Replace(".EPF", "");
+                string sym = filename.Replace(ds, "").Replace(TikConst.DOT_EXT, "");
                 SecurityImpl s = new SecurityImpl(sym);
                 s.Date = Convert.ToInt32(ds);
                 return s;

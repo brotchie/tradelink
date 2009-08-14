@@ -134,7 +134,7 @@ namespace TradeLink.Common
             foreach (string file in _tickfiles)
             {
                 SecurityImpl s = SecurityImpl.FromTIK(file);
-                if (s!=null)
+                if ((s!=null) && s.isValid && s.HistSource.isValid)
                     Workers.Add(new simworker(s));
             }
             // setup our initial index
@@ -178,7 +178,12 @@ namespace TradeLink.Common
         public void Stop()
         {
             foreach (simworker w in Workers)
-                w.CancelAsync();
+            {
+                if (w.IsBusy) 
+                    w.CancelAsync();
+                if (w.workersec.HistSource.BaseStream.CanRead)
+                    w.workersec.HistSource.Close();
+            }
         }
 
         int YIELDTIME = 1;
@@ -244,7 +249,8 @@ namespace TradeLink.Common
                 // test to see if ticks left in simulation
                 simrunning = (nextidx<times.Length) && (times[nextidx]<=endsim);
                 // if no ticks left or we exceeded simulation time, quit
-                if (!simrunning) break;
+                if (!simrunning) 
+                    break;
                 // get next tick
                 Tick k = Workers[cidx[nextidx]].NextTick();
                 // process pending orders
@@ -283,7 +289,8 @@ namespace TradeLink.Common
                 // test to see if ticks left in simulation
                 simrunning = (nextidx < times.Length) && (times[nextidx] <= endsim);
                 // if no ticks left or we exceeded simulation time, quit
-                if (!simrunning) break;
+                if (!simrunning) 
+                    break;
                 // get next tick
                 Tick k = Workers[cidx[nextidx]].NextTick();
                 // process pending orders
@@ -346,7 +353,6 @@ namespace TradeLink.Common
         Queue<Tick> Ticks = new Queue<Tick>(100000);
         public SecurityImpl workersec = null;
         volatile int readcount = 0;
-        const int YIELDTIME = 5;
         public bool isWorking = false;
 
         public bool hasTicks { get { lock (Ticks) { return (Ticks.Count > 0); } } }
@@ -404,8 +410,6 @@ namespace TradeLink.Common
             readcount = 0;
             // mark as done
             isWorking = false;
-            // close resource
-            workersec.HistSource.Close();
         }
 
         // fill cache for multi-core
@@ -414,8 +418,8 @@ namespace TradeLink.Common
             isWorking = true;
             int readahead = (int)e.Argument;
             // while simulation hasn't been canceled, we still have historical ticks to read and we haven't read too many, cache a tick
-            while (!e.Cancel && workersec.NextTick()
-                && (readcount++ < readahead)) ;
+            while ((!e.Cancel && workersec.NextTick()
+                && (readcount++ < readahead))) ;
         }
 
 
