@@ -362,10 +362,20 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="filename">The filename.</param>
         /// <returns>barlist</returns>
-        static BarList _fromepf;
         public static BarList FromEPF(string filename)
         {
-            SecurityImpl s = SecurityImpl.FromFile(filename);
+            System.IO.StreamReader sr = new System.IO.StreamReader(filename);
+            SecurityImpl s = eSigTick.InitEpf(sr);
+            BarList b = new BarListImpl(s.Symbol);
+            while (!sr.EndOfStream)
+                b.newTick(eSigTick.FromStream(s.Symbol, sr));
+            return b;
+        }
+
+        private static BarListImpl _fromepf;
+        public static BarList FromTIK(string filename)
+        {
+            SecurityImpl s = SecurityImpl.FromTIK(filename);
             s.HistSource.gotTick += new TickDelegate(HistSource_gotTick);
             _fromepf = new BarListImpl(s.Symbol);
             while (s.HistSource.NextTick()) ;

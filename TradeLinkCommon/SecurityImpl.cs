@@ -131,16 +131,17 @@ namespace TradeLink.Common
         }
         int _approxticks = 0;
         public int ApproxTicks { get { return _approxticks; } set { _approxticks = value; } }
-        /// <summary>
-        /// Initializes a security with historical data from tick archive file
-        /// </summary>
-        public static SecurityImpl FromFile(string filename)
+
+        public static SecurityImpl FromTIK(string filename)
         {
-            
             TikReader tr = new TikReader(filename);
             SecurityImpl s = (SecurityImpl)tr.ToSecurity();
-            s.HistSource = tr;
-            s._approxticks = s.HistSource.ApproxTicks;
+            if (s.isValid && tr.isValid)
+            {
+                s._hashist = true;
+                s.HistSource = tr;
+                s._approxticks = s.HistSource.ApproxTicks;
+            }
             return s;
         }
 

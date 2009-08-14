@@ -148,7 +148,7 @@ namespace TimeSales
 
         void LoadEPF(string file)
         {
-            SecurityImpl s = SecurityImpl.FromFile(file);
+            SecurityImpl s = SecurityImpl.FromTIK(file);
             total = s.ApproxTicks;
             symbol = s.Symbol;
             date = s.Date;

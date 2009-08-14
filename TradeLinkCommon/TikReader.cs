@@ -18,12 +18,14 @@ namespace TradeLink.Common
         public int ApproxTicks = 0;
         public string RealSymbol { get { return _realsymbol; } }
         public string Symbol { get { return _sym; } }
-        public Security ToSecurity() { return _sec; } 
+        public Security ToSecurity() { return _sec; }
+        public bool isValid { get { return (_filever != 0) && (_realsymbol != string.Empty) && BaseStream.CanRead; } }
         public TikReader(string filepath) : base(new FileStream(filepath, FileMode.Open)) 
         {
             _path = filepath;
             FileInfo fi = new FileInfo(filepath);
             ApproxTicks = (int)((double)fi.Length / 40);
+            ReadHeader();
         }
 
         bool _haveheader = false;

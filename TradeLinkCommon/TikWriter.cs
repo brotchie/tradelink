@@ -11,24 +11,75 @@ namespace TradeLink.Common
     /// </summary>
     public class TikWriter : BinaryWriter
     {
-        bool hasheader = false;
+        bool _hasheader = false;
         string _realsymbol = string.Empty;
+        string _file = string.Empty;
+        string _path = Environment.CurrentDirectory;
+        int _date = 0;
         public string RealSymbol { get { return _realsymbol; } }
+        public string Filepath { get { return _file; } }
+        public int Date { get { return _date; } }
+        /// <summary>
+        /// creates a tikwriter with no header, header is created from first tik
+        /// </summary>
+        public TikWriter()
+        {
+
+        }
+        /// <summary>
+        /// create a tikwriter for a specific symbol on todays date.
+        /// auto-creates header
+        /// </summary>
+        /// <param name="realsymbol"></param>
         public TikWriter(string realsymbol) : this(realsymbol, TradeLink.Common.Util.ToTLDate(DateTime.Now)) { }
+        /// <summary>
+        /// create a tikwriter for specific symbol on specific date
+        /// auto-creates header
+        /// </summary>
+        /// <param name="realsymbol"></param>
+        /// <param name="date"></param>
         public TikWriter(string realsymbol, int date) : this(Environment.CurrentDirectory, realsymbol, date) { }
+        /// <summary>
+        /// create tikwriter with specific location, symbol and date.
+        /// auto-creates header
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="realsymbol"></param>
+        /// <param name="date"></param>
         public TikWriter(string path, string realsymbol, int date) 
         {
+
+            init(realsymbol, date, path);
+
+        }
+
+        private void init(string realsymbol, int date, string path)
+        {
+            // if file exists, assume it has a header
+            _hasheader = File.Exists(_file);
+
+            // store important stuff
             _realsymbol = realsymbol;
-            string filename = path + "//" + SafeSymbol(realsymbol) + date.ToString() + TikConst.DOT_EXT;
-            hasheader = File.Exists(filename);
-            OutStream = new FileStream(filename, FileMode.OpenOrCreate);
-            if (!hasheader)
-                Header(this,realsymbol);
+            _path = path;
+            _date = date;
+            // get filename from path and symbol
+            _file = SafeFilename(_realsymbol, _path, _date);
+
+            if (!_hasheader)
+                Header(this, realsymbol);
+            else
+                OutStream = new FileStream(_file, FileMode.Open);
+
         }
 
         public override void Close()
         {
             base.Close();
+        }
+
+        public static string SafeFilename(string realsymbol, string path, int date)
+        {
+            return path + "//" + SafeSymbol(realsymbol) + date.ToString() + TikConst.DOT_EXT;
         }
 
         public static string SafeSymbol(string realsymbol)
@@ -46,19 +97,25 @@ namespace TradeLink.Common
             return realsymbol;
         }
 
-        public static bool Header(BinaryWriter bw, string realsymbol)
+        public static bool Header(TikWriter bw, string realsymbol)
         {
+            bw.OutStream = new FileStream(bw.Filepath, FileMode.Create);
+            // version
             bw.Write(TikConst.Version);
             bw.Write(TikConst.VERSION);
-            // fields follow
-            bw.Write(realsymbol); // real symbol 
+            // full symbol name
+            bw.Write(realsymbol); // 
             // fields end
             bw.Write(TikConst.StartData);
+            // flag header as created
+            bw._hasheader = true;
             return true;
         }
 
         public void newTick(Tick k)
         {
+            // make sure we have a header
+            if (!_hasheader) init(k.symbol, k.date, _path);
             // get types
             bool t = k.isTrade;
             bool fq = k.isFullQuote;

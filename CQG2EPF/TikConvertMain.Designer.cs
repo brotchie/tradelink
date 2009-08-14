@@ -1,6 +1,6 @@
 ﻿namespace CQG2EPF
 {
-    partial class CQG2EPFMAIN
+    partial class TikConvertMain
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CQG2EPFMAIN));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TikConvertMain));
             this._msg = new System.Windows.Forms.ListBox();
             this._inputbut = new System.Windows.Forms.Button();
             this._defaultsize = new System.Windows.Forms.NumericUpDown();

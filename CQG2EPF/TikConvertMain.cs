@@ -13,10 +13,10 @@ using System.ComponentModel;
 
 namespace CQG2EPF
 {
-    public partial class CQG2EPFMAIN : Form
+    public partial class TikConvertMain : Form
     {
         BackgroundWorker bw = new BackgroundWorker();
-        public CQG2EPFMAIN()
+        public TikConvertMain()
         {
             InitializeComponent();
             bw.WorkerReportsProgress = true;

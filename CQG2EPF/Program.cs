@@ -15,7 +15,7 @@ namespace CQG2EPF
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new CQG2EPFMAIN());
+            Application.Run(new TikConvertMain());
         }
     }
 }

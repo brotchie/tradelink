@@ -16,7 +16,7 @@ namespace TradeLink.Common
             // get a list of epf files
             foreach (string file in args)
             {
-                SecurityImpl sec = SecurityImpl.FromFile(file);
+                SecurityImpl sec = SecurityImpl.FromTIK(file);
                 sec.HistSource.gotTick += new TradeLink.API.TickDelegate(HistSource_gotTick);
                 _tw = new TikWriter(sec.Symbol);
                 while (sec.NextTick())

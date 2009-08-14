@@ -184,6 +184,16 @@ namespace TestTradeLink
         }
 
         [Test]
+        public void FromTIK()
+        {
+            // get sample tick data
+            BarList bl = BarListImpl.FromTIK("FTI20070926.TIK");
+            // verify expected number of 5min bars exist (78 in 9:30-4p)
+            Assert.AreEqual(83, bl.Count);
+
+        }
+
+        [Test]
         public void FromGoogle()
         {
             // get a year chart

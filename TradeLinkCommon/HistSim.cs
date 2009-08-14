@@ -133,7 +133,7 @@ namespace TradeLink.Common
             // now we have our list, initialize instruments from files
             foreach (string file in _tickfiles)
             {
-                SecurityImpl s = SecurityImpl.FromFile(file);
+                SecurityImpl s = SecurityImpl.FromTIK(file);
                 if (s!=null)
                     Workers.Add(new simworker(s));
             }
@@ -170,6 +170,15 @@ namespace TradeLink.Common
                 SecurityPlayTo(ftime); // then do stocks
             }
             else throw new Exception("Histsim was unable to initialize");
+        }
+
+        /// <summary>
+        /// stops any running simulation and closes all data files
+        /// </summary>
+        public void Stop()
+        {
+            foreach (simworker w in Workers)
+                w.CancelAsync();
         }
 
         int YIELDTIME = 1;
@@ -395,6 +404,8 @@ namespace TradeLink.Common
             readcount = 0;
             // mark as done
             isWorking = false;
+            // close resource
+            workersec.HistSource.Close();
         }
 
         // fill cache for multi-core

@@ -15,8 +15,7 @@ namespace TestTradeLink
         }
 
         const int DATE = 20090811;
-        const string FILE = "TST20090811.tik";
-        const string SYM = "TST";
+
         const int TICKCOUNT = 100000;
         string PATH = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         System.Collections.Generic.List<Tick> readdata = new List<Tick>(TICKCOUNT);
@@ -24,6 +23,9 @@ namespace TestTradeLink
         [Test]
         public void TikTypes()
         {
+            // get symbol
+            string SYM = TradeLink.Research.RandomSymbol.GetSymbol((int)DateTime.Now.Ticks);
+            // prepare data
             System.Collections.Generic.List<Tick> data = new List<Tick>();
             // bid
             data.Add(TickImpl.NewBid(SYM, 10, 100));
@@ -38,7 +40,7 @@ namespace TestTradeLink
             data.Add(full);
 
             // write and read the data
-            writeandread(data.ToArray());
+            writeandread(data.ToArray(),DATE,false);
 
             //verify the count
             Assert.AreEqual(data.Count, readdata.Count);
@@ -70,6 +72,9 @@ namespace TestTradeLink
         [Test]
         public void WriteandRead()
         {
+            // get symbol
+            string SYM = TradeLink.Research.RandomSymbol.GetSymbol((int)DateTime.Now.Ticks);
+
             // get some data to test with
             Tick[] data = 
                 TradeLink.Research.RandomTicks.GenerateSymbol(SYM, TICKCOUNT);
@@ -80,7 +85,7 @@ namespace TestTradeLink
                 data[i].time = Util.DT2FT(DateTime.Now);
             }
             // write and read data, clocking time
-            double elapms = writeandread(data,true);
+            double elapms = writeandread(data,0,true);
             // verify length
             Assert.AreEqual(data.Length, readdata.Count);
             // verify content
@@ -95,18 +100,16 @@ namespace TestTradeLink
 
         }
 
-        double writeandread(Tick[] data) { return writeandread(data, false); }
-        double writeandread(Tick[] data, bool printperf)
+        double writeandread(Tick[] data, int date, bool printperf)
         {            
             // clear out the read buffer
             readdata.Clear();
-            // remove existing file
-            removefile();
             // keep track of time
             double elapms;
             System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
             // write new file from data
-            TikWriter tw = new TikWriter(PATH,SYM,DATE);
+            TikWriter tw = new TikWriter(PATH,data[0].symbol,date==0 ? data[0].date: date);
+            string FILE = tw.Filepath;
             sw.Start();
             foreach (Tick k in data)
                 tw.newTick(k);
@@ -117,7 +120,7 @@ namespace TestTradeLink
                 Console.WriteLine("write speed (ticks/sec): " + (data.Length / (elapms / 1000)).ToString("n0"));
 
             // read file back in from file
-            TikReader tr = new TikReader(PATH+"//"+FILE);
+            TikReader tr = new TikReader(FILE);
             tr.gotTick += new TickDelegate(tr_gotTick);
             sw.Reset();
             sw.Start();
@@ -127,19 +130,40 @@ namespace TestTradeLink
             elapms = (double)sw.ElapsedMilliseconds;
             if (printperf)
                 Console.WriteLine("read speed (ticks/sec): " + (data.Length/(elapms/1000)).ToString("n0"));
+
+            // wait for file to close
+            System.Threading.Thread.Sleep(100);
             
-            // remove test file
-            removefile();
+            // remove file
+            removefile(FILE);
             
             return elapms;
         }
+
+        [Test]
+        public void TikFromTick()
+        {
+            // get symbol
+            string SYM = TradeLink.Research.RandomSymbol.GetSymbol((int)DateTime.Now.Ticks);
+
+            // get some data to test with
+            Tick[] data =
+                TradeLink.Research.RandomTicks.GenerateSymbol(SYM, 10);
+
+            writeandread(data, DATE,false);
+
+            Assert.AreEqual(data.Length, readdata.Count);
+
+        }
+
+
 
         void tr_gotTick(Tick t)
         {
             readdata.Add(t);
         }
 
-        static void removefile()
+        static void removefile(string FILE)
         {
             try
             {
