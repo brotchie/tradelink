@@ -59,6 +59,7 @@
     <Compile Include="BarTimeIntervalData.cs" />
     <Compile Include="BarVolIntervalData.cs" />
     <Compile Include="Book.cs" />
+    <Compile Include="BookTracker.cs" />
     <Compile Include="Calc.cs" />
     <Compile Include="Broker.cs" />
     <Compile Include="ChartImpl.cs">

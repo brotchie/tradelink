@@ -26,6 +26,7 @@ namespace TradeLink.Common
                 askex[i] = b.askex[i];
             }
         }
+
         int maxbook;
         public Book(string sym)
         {
@@ -37,7 +38,6 @@ namespace TradeLink.Common
             asksize = new int[maxbook];
             bidex = new string[maxbook];
             askex = new string[maxbook];
-
         }
         public bool isValid { get { return Sym != null; } }
         public string Sym;
