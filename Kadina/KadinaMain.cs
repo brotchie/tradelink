@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using TradeLink.Common;
 using System.IO;
 using TradeLink.API;
+using TradeLink.AppKit;
 
 namespace Kadina
 {
@@ -20,17 +21,24 @@ namespace Kadina
         Response myres;
         PlayTo pt = PlayTo.OneMin;
 
+        ResponseList _rl = new ResponseList();
+
         DataTable dt = new DataTable("ticktable");
         DataTable it = new DataTable("itable");
         DataTable ptab = new DataTable("ptable");
-        DataGrid pg = new DataGrid();
-        DataGrid ig = new DataGrid();
-        DataGrid dg = new DataGrid();
+        SafeBindingSource tbs = new SafeBindingSource();
+        SafeBindingSource ibs = new SafeBindingSource();
+        DataGridView pg = new DataGridView();
+        DataGridView ig = new DataGridView();
+        DataGridView dg = new DataGridView();
+
         DataTable ot = new DataTable("otable");
+        SafeBindingSource obs = new SafeBindingSource();
         DataTable ft = new DataTable("ftable");
-        DataGrid og = new DataGrid();
-        DataGrid fg = new DataGrid();
-        List<string> exfilter = new List<string>();
+        SafeBindingSource fbs = new SafeBindingSource();
+        DataGridView og = new DataGridView();
+        DataGridView fg = new DataGridView();
+
         BackgroundWorker bw = new BackgroundWorker();
         HistSim h = new HistSim();
        
@@ -39,26 +47,18 @@ namespace Kadina
         {
 
             InitializeComponent();
-            reslist.DropDownItemClicked += new ToolStripItemClickedEventHandler(boxlist_DropDownItemClicked);
-            playtobut.DropDownItemClicked += new ToolStripItemClickedEventHandler(playtobut_DropDownItemClicked);
-            InitPlayTo();
-            InitTickGrid();
-            InitPGrid();
-            InitOFGrids();
+            initgrids();
             InitContext();
-            restorerecent();
+            restorerecentfiles();
+            restorerecentlibs();
             FormClosing += new FormClosingEventHandler(kadinamain_FormClosing);
             bw.DoWork += new DoWorkEventHandler(Play);
             bw.WorkerReportsProgress = false;
             bw.WorkerSupportsCancellation = true;
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(PlayComplete);
             status(Util.TLSIdentity());
-            debug("1. Drag and drop tick files, or select from Recent menu.");
-            debug("2. Drag and drop DLL containing Responses to test, or select from Recent menu.");
-            debug("3. Select a Response from Responses list.");
-            debug("4. PlayTo time.");
-            debug("5. Finally right click and click play to play to that time.");
         }
+
 
         void h_GotTick(Tick t)
         {
@@ -66,9 +66,6 @@ namespace Kadina
             nowtime = t.time.ToString();
             
             // don't display ticks for unmatched exchanges
-            if (t.isTrade && !isDesiredExchange(t.ex)) return;
-            else if (t.hasBid && !isDesiredExchange(t.be)) return;
-            else if (t.hasAsk && !isDesiredExchange(t.oe)) return;
             string time = t.time.ToString();
             string trade = "";
             string bid = "";
@@ -117,31 +114,47 @@ namespace Kadina
             long rem = h.NextTickTime - firsttime;
             int stop = Util.FTADD((int)firsttime, maxmin * 60);
             rem += stop;
+            cleardebugs(); // clear the message box on first box run
             h.PlayTo(rem);
+        }
+
+        void cleardebugs()
+        {
+            if (msgbox.InvokeRequired)
+                msgbox.Invoke(new VoidDelegate(cleardebugs));
+            else
+            {
+                msgbox.Clear(); 
+            }
         }
 
 
 
         void kadinamain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            saverecent();
+            saverecentlibs();
+            saverecentfiles();
             Kadina.Properties.Settings.Default.Save();
         }
-
+        const string PLAYTO = "Play +";
+        const string PLAYTOUNIT = " min";
         void InitContext()
         {
             ContextMenu = new ContextMenu();
-            ContextMenu.MenuItems.Add("Play", new EventHandler(rightplay));
+            string[] list = Enum.GetNames(typeof(PlayTo));
+            for (int i = 0; i < list.Length; i++)
+                ContextMenu.MenuItems.Add(PLAYTO+list[i]+PLAYTOUNIT,new EventHandler(rightplay));
             ContextMenu.MenuItems.Add("Reset", new EventHandler(rightreset));
+            msgbox.ContextMenu = ContextMenu;
+            
         }
 
 
         void rightplay(object sender, EventArgs e)
         {
-            if (epffiles.Count==0) { status("You must select a tickfile to play."); return; }
-            if (myres == null) { status("You must drop a box dll AND select a specific box from the Boxes menu."); return; }
-            if (!igridinit) InitIGrid();
-            if (bw.IsBusy) { status("Play is already running..."); return; }
+            if (epffiles.Count==0) { status("No data selected."); return; }
+            if (myres == null) { status("No response selected."); return; }
+            if (bw.IsBusy) { status("Still playing, please wait..."); return; }
             bw.RunWorkerAsync(pt);
             ContextMenu.MenuItems.Add("Cancel", new EventHandler(rightcancel));
             status("Playing...");
@@ -150,7 +163,6 @@ namespace Kadina
 
         void rightreset(object sender, EventArgs e)
         {
-            igridinit = false;
             if (h!=null) h.Reset();
             msgbox.Clear();
             dt.Clear();
@@ -159,31 +171,20 @@ namespace Kadina
             ft.Clear();
             tabControl1.Refresh();
             if (it != null) { it.Clear(); it.Columns.Clear(); }
-            loadfile(tickfile);
-            loadfile(responsedll);
+            h.Reset();
             loadboxname(resname);
             if (myres!=null) myres.Reset();
             status("Reset box " + myres.Name + " "+PrettyEPF());
         }
 
-        bool igridinit = false;
 
         void NewIRow(object[] values)
         {
-            if (ig.InvokeRequired)
-            {
-                try
-                {
-                    Invoke(new ObjectArrayDelegate(NewIRow), values);
-                }
-                catch (ObjectDisposedException) { return; }
-            }
-            else
-                it.Rows.Add(values);
+            it.Rows.Add(values);
         }
-
-        void InitPGrid()
+        void initgrids()
         {
+            // position tab
             ptab.Columns.Add("Time");
             ptab.Columns.Add("Symbol");
             ptab.Columns.Add("Side");
@@ -194,102 +195,60 @@ namespace Kadina
             pg.Parent = postab;
             pg.DataSource = ptab;
             pg.RowHeadersVisible = false;
-            pg.CaptionVisible = false;
             pg.ContextMenu = ContextMenu;
-            pg.MouseUp += new MouseEventHandler(pg_MouseUp);
-            pg.FlatMode = true;
-            pg.HeaderBackColor = pg.BackColor;
-            pg.HeaderForeColor = pg.ForeColor;
             pg.ReadOnly = true;
+            pg.AllowUserToAddRows = false;
+            pg.AllowUserToDeleteRows = false;
+            pg.ShowEditingIcon = false;
+            pg.BackgroundColor = BackColor;
             pg.Dock = DockStyle.Fill;
+            pg.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             pg.Show();
-        }
 
-        void InitOFGrids()
-        {
+            // order tab
             ot.Columns.Add("Time");
             ot.Columns.Add("Symbol");
             ot.Columns.Add("Side");
             ot.Columns.Add("Size");
             ot.Columns.Add("Price");
             og.Parent = ordertab;
-            og.DataSource = ot;
+            obs.DataSource = ot;
+            og.DataSource = obs;
             og.RowHeadersVisible = false;
-            og.CaptionVisible = false;
             og.ContextMenu = ContextMenu;
-            og.MouseUp +=new MouseEventHandler(og_MouseUp);
-            og.HeaderBackColor = og.BackColor;
-            og.HeaderForeColor = og.ForeColor;
             og.ReadOnly = true;
+            og.AllowUserToAddRows = false;
+            og.AllowUserToDeleteRows = false;
+            og.ShowEditingIcon = false;
             og.Dock = DockStyle.Fill;
+            og.BackgroundColor = BackColor;
+            og.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             og.Show();
+
+            // fill tab
             ft.Columns.Add("xTime");
             ft.Columns.Add("Symbol");
             ft.Columns.Add("xSide");
             ft.Columns.Add("xSize");
             ft.Columns.Add("xPrice");
             fg.Parent = filltab;
-            fg.DataSource = ft;
+            fbs.DataSource = ft;
+            fg.DataSource = fbs;
             fg.RowHeadersVisible = false;
-            fg.CaptionVisible = false;
             fg.ContextMenu = ContextMenu;
-            fg.MouseUp += new MouseEventHandler(fg_MouseUp);
-            fg.HeaderBackColor = fg.BackColor;
-            fg.HeaderForeColor = fg.ForeColor;
             fg.ReadOnly = true;
             fg.Dock = DockStyle.Fill;
+            fg.AllowUserToAddRows = false;
+            fg.AllowUserToDeleteRows = false;
+            fg.ShowEditingIcon = false;
+            fg.BackgroundColor = BackColor;
+            fg.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             fg.Show();
-        }
 
-        void fg_MouseUp(object sender, MouseEventArgs e)
-        {
-            System.Drawing.Point pt = new Point(e.X, e.Y);
-            DataGrid.HitTestInfo hti = fg.HitTest(pt);
-            if (hti.Type == DataGrid.HitTestType.Cell)
-            {
-                fg.CurrentCell = new System.Windows.Forms.DataGridCell(hti.Row, hti.Column);
-                fg.Select(hti.Row);
-                if (it.Rows.Count > hti.Row) ig.Select(hti.Row);
-            }    
-        }
+            // indicator tab
+            igridinit();
 
-        void og_MouseUp(object sender, MouseEventArgs e)
-        {
-            System.Drawing.Point pt = new Point(e.X, e.Y);
-            DataGrid.HitTestInfo hti = og.HitTest(pt);
-            if (hti.Type == DataGrid.HitTestType.Cell)
-            {
-                og.CurrentCell = new System.Windows.Forms.DataGridCell(hti.Row, hti.Column);
-                og.Select(hti.Row);
-                if (it.Rows.Count > hti.Row) ig.Select(hti.Row);
-            }    
-        }
-
-
-        void InitIGrid()
-        {
-            if ((myres == null) || (myres.Indicators.Length==0))
-                return;
-            for (int i = 0; i < myres.Indicators.Length; i++)
-                it.Columns.Add(myres.Indicators[i]);
-
-            msgbox.Clear(); // clear the message box on first box run
-            ig.Parent = itab;
-            ig.DataSource = it;
-            ig.RowHeadersVisible = false;
-            ig.CaptionVisible = false;
-            ig.ContextMenu = this.ContextMenu;
-            ig.HeaderBackColor = ig.BackColor;
-            ig.HeaderForeColor = ig.ForeColor;
-            ig.MouseUp += new MouseEventHandler(ig_MouseUp);
-            ig.FlatMode = true;
-            ig.ReadOnly = true;
-            ig.Dock = DockStyle.Fill;
-            ig.Show();
-            igridinit = true;
-        }
-        void InitTickGrid()
-        {
+            // tick tab
             dt.Columns.Add("Time", "".GetType());
             dt.Columns.Add("Sym");
             dt.Columns.Add("Trade");
@@ -301,67 +260,47 @@ namespace Kadina
             dt.Columns.Add("TExch");
             dt.Columns.Add("BidExch");
             dt.Columns.Add("AskExch");
-            dg.TableStyles.Clear();
-            dg.TableStyles.Add(new DataGridTableStyle());
-            dg.TableStyles[0].GridColumnStyles.Clear();
-            dg.TableStyles[0].GridColumnStyles.Add(new DataGridCell());
             dg.ContextMenu = this.ContextMenu;
-            dg.DataSource = dt;
+            tbs.DataSource = dt;
+            dg.DataSource = tbs;
+            dg.AllowUserToAddRows = false;
+            dg.AllowUserToDeleteRows = false;
+            dg.ShowEditingIcon = false;
             dg.Parent = ticktab;
             dg.RowHeadersVisible = false;
-            dg.CaptionVisible = false;
-            dg.HeaderBackColor = dg.BackColor;
-            dg.HeaderForeColor = dg.ForeColor;
-            dg.MouseUp += new MouseEventHandler(dg_MouseUp);
-            dg.FlatMode = true;
+            dg.BackgroundColor = BackColor;
+            dg.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dg.ReadOnly = true;
             dg.Dock = DockStyle.Fill;
             dg.Show();
+            ig.Parent = itab;
+            ibs.DataSource = it;
+            ig.DataSource = ibs;
+            ig.RowHeadersVisible = false;
+            ig.ContextMenu = this.ContextMenu;
+            ig.ReadOnly = true;
+            ig.Dock = DockStyle.Fill;
+            ig.AllowUserToAddRows = false;
+            ig.AllowUserToDeleteRows = false;
+            ig.ShowEditingIcon = false;
+            ig.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            ig.BackgroundColor = BackColor;
+            ig.Show();
+
         }
 
-        void dg_MouseUp(object sender, MouseEventArgs e)
+        void igridinit()
         {
-            System.Drawing.Point pt = new Point(e.X, e.Y);
-            DataGrid.HitTestInfo hti = dg.HitTest(pt);
-            if (hti.Type == DataGrid.HitTestType.Cell)
-            {
-                dg.CurrentCell = new System.Windows.Forms.DataGridCell(hti.Row, hti.Column);
-                dg.Select(hti.Row);
-                if (it.Rows.Count>hti.Row) ig.Select(hti.Row);
-            }            
-        }
 
-        void ig_MouseUp(object sender, MouseEventArgs e)
-        {
-            System.Drawing.Point pt = new Point(e.X, e.Y);
-            DataGrid.HitTestInfo hti = ig.HitTest(pt);
-            if (hti.Type == DataGrid.HitTestType.Cell)
-            {
-                ig.CurrentCell = new System.Windows.Forms.DataGridCell(hti.Row, hti.Column);
-                ig.Select(hti.Row);
-                if (dg.VisibleRowCount < hti.Row)
-                    dg.Select(hti.Row);
-            }
+
+            if ((myres == null) || (myres.Indicators.Length == 0))
+                return;
+                for (int i = 0; i < myres.Indicators.Length; i++)
+                    it.Columns.Add(myres.Indicators[i]);
+                ig.Invalidate();
         }
 
 
-        void pg_MouseUp(object sender, MouseEventArgs e)
-        {
-            System.Drawing.Point point = new Point(e.X, e.Y);
-            DataGrid.HitTestInfo hti = pg.HitTest(point);
-            if (hti.Type == DataGrid.HitTestType.Cell)
-                pg.Select(hti.Row);
-        }
-
-
-
-        void InitPlayTo()
-        {
-            string [] list = Enum.GetNames(typeof(PlayTo));
-            playtobut.DropDownItems.Clear();
-            for (int i = 0; i < list.Length; i++)
-                playtobut.DropDownItems.Add(list[i]);
-        }
         Dictionary<string, PositionImpl> poslist = new Dictionary<string, PositionImpl>();
         void broker_GotFill(Trade t)
         {
@@ -394,51 +333,12 @@ namespace Kadina
         delegate void StringArrayDelegate(string[] vals);
         void NewTRow(string[] values)
         {
-            if (dg.InvokeRequired)
-            {
-                try
-                {
-                    Invoke(new StringArrayDelegate(NewTRow), new object[] { values });
-                }
-                catch (ObjectDisposedException) { }
-            }
-            else
-                dt.Rows.Add(values);
+            dt.Rows.Add(values);
         }
 
 
 
         int time = 0;
-        void playtobut_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-            pt = (PlayTo)Enum.Parse(typeof(PlayTo), e.ClickedItem.Text);
-            string extra = "";
-            if (pt == PlayTo.Time)
-            {
-                extra = Microsoft.VisualBasic.Interaction.InputBox("When should Kadina stop reading ticks?  Enter a time in TLTime.  930 = 9:30AM, 1459 = 2:59PM", "PlayTo Time", "0", 0, 0);
-                try
-                {
-                    time = Convert.ToInt32(extra);
-                    DateTime dt = Util.TLT2DT(time); // this should throw exceptions for bad times
-                }
-                catch (Exception) { status("You entered an invalid time."); return; }
-            }
-            else time = 0;
-            status("Playing to next " + e.ClickedItem.Text+" "+extra);
-        }
-
-        bool isDesiredExchange(string name)
-        {
-            foreach (ToolStripMenuItem m in filter.DropDown.Items)
-                if (m.Checked && !name.Contains(m.Text)) return false;
-            return true;
-        }
-
-        void boxlist_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-            resname = e.ClickedItem.Text;
-            loadboxname(resname);
-        }
 
         void loadboxname(string name)
         {
@@ -446,9 +346,15 @@ namespace Kadina
             {
                 myres = ResponseLoader.FromDLL(name, responsedll);
             }
-            catch (Exception ex) { debug(ex.Message); debug("Error, quitting..."); return; }
+            catch (Exception ex) 
+            { 
+                debug(ex.Message+ex.StackTrace); 
+                status("Error loading response"); 
+                return; 
+            }
             if ((myres != null) && (myres.FullName == name))
             {
+                resname = name;
                 myres.SendDebug += new DebugFullDelegate(myres_GotDebug);
                 myres.SendCancel += new UIntDelegate(myres_CancelOrderSource);
                 myres.SendOrder += new OrderDelegate(myres_SendOrder);
@@ -459,6 +365,7 @@ namespace Kadina
                 h.GotTick += new TickDelegate(myres.GotTick);
                 status(resname + " is current response.");
                 updatetitle();
+                igridinit();
             }
             else status("Response did not load.");
 
@@ -466,7 +373,7 @@ namespace Kadina
 
         void myres_SendMessage(MessageTypes type, uint id, string data)
         {
-            status("SendMessage command not supported in kadina.");
+            debug("SendMessage and custom messages not supported in kadina.");
         }
         public const string PROGRAM = "Kadina";
         void updatetitle() { Text = PROGRAM + " - Study: " + resname + " " + PrettyEPF(); Invalidate(); }
@@ -526,25 +433,26 @@ namespace Kadina
         }
          private bool loadfile(string path)
          {
-             string f = path;
+            string f = path;
             if (isResponse(f))
             {
                 responsedll = f;
-                reslist.DropDownItems.Clear();
                 List<string> l = Util.GetResponseList(responsedll);
-                if (System.IO.File.Exists(f))
-                    if (!isRecent(f))
-                        recent.DropDownItems.Add(f);
-                for (int i = 0; i < l.Count; i++)
-                    reslist.DropDownItems.Add(l[i]);
-                status("Found " + l.Count + " responses.  Please select one from Responses drop-down.");
+                if (System.IO.File.Exists(f) && (l.Count>0))
+                    if (!isRecentResLib(f))
+                        reslist.DropDownItems.Add(f);
+                status("Found " + l.Count + " responses.  ");
+                _rl = new ResponseList(l);
+                _rl.ResponseSelected+=new DebugDelegate(loadboxname);
+                if (_rl.ShowDialog() != DialogResult.OK)
+                    status("no response was selected.");
+                
                 return true;
             }
-            else if (isEPF(f))
+            else if (isTIK(f))
             {
-
                 if (System.IO.File.Exists(f))
-                    if (!isRecent(f) && Util.SecurityFromFileName(f).isValid)
+                    if (!isRecentTickfile(f) && Util.SecurityFromFileName(f).isValid)
                         recent.DropDownItems.Add(f);
                 epffiles.Add(f);
                 h = new HistSim(epffiles.ToArray());
@@ -563,10 +471,18 @@ namespace Kadina
         }
 
         
-        bool isRecent(string path)
+        bool isRecentTickfile(string path)
         {
             for (int i = 0; i < recent.DropDownItems.Count; i++)
                 if (recent.DropDownItems[i].Text.Equals(path))
+                    return true;
+            return false;
+        }
+
+        bool isRecentResLib(string path)
+        {
+            for (int i = 0; i < reslist.DropDownItems.Count; i++)
+                if (reslist.DropDownItems[i].Text.Equals(path))
                     return true;
             return false;
         }
@@ -601,8 +517,8 @@ namespace Kadina
                 e.Effect = DragDropEffects.None;
         }
 
-        bool isEPF(string path) { return path.Contains("EPF")||path.Contains("epf"); }
-        bool isResponse(string path) { return path.Contains("DLL")||path.Contains("dll"); }
+        bool isTIK(string path) { return System.Text.RegularExpressions.Regex.IsMatch(path, TikConst.EXT, System.Text.RegularExpressions.RegexOptions.IgnoreCase); }
+        bool isResponse(string path) { return System.Text.RegularExpressions.Regex.IsMatch(path, "DLL", System.Text.RegularExpressions.RegexOptions.IgnoreCase); }
 
         void PlayComplete(object sender, RunWorkerCompletedEventArgs e)
         {
@@ -637,7 +553,19 @@ namespace Kadina
             }
         }
 
-        void saverecent()
+        private void libs_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            if (e.ClickedItem.Text == "Browse") return;
+            if (System.IO.File.Exists(e.ClickedItem.Text))
+                loadfile(e.ClickedItem.Text);
+            else
+            {
+                status(e.ClickedItem.Text + " not found, removing from recent items.");
+                reslist.DropDown.Items.Remove(e.ClickedItem);
+            }
+        }
+
+        void saverecentfiles()
         {
             string s = "";
             for (int i = 0; i < recent.DropDownItems.Count; i++)
@@ -646,7 +574,7 @@ namespace Kadina
             Kadina.Properties.Settings.Default.recentfiles = s;
         }
 
-        void restorerecent()
+        void restorerecentfiles()
         {
             recent.DropDownItems.Add("Browse", null, new EventHandler(browserecent));
             string[] r = Kadina.Properties.Settings.Default.recentfiles.Split(',');
@@ -655,10 +583,28 @@ namespace Kadina
                     recent.DropDownItems.Add(r[i]);
         }
 
+        void saverecentlibs()
+        {
+            string s = "";
+            for (int i = 0; i < reslist.DropDownItems.Count; i++)
+                if (reslist.DropDownItems[i].Text != "")
+                    s += reslist.DropDownItems[i].Text + ",";
+            Kadina.Properties.Settings.Default.recentresponselibs= s;
+        }
+
+        void restorerecentlibs()
+        {
+            reslist.DropDownItems.Add("Browse", null, new EventHandler(browselibs));
+            string[] r = Kadina.Properties.Settings.Default.recentresponselibs.Split(',');
+            for (int i = 0; i < r.Length; i++)
+                if ((r[i] != "") && System.IO.File.Exists(r[i]))
+                    reslist.DropDownItems.Add(r[i]);
+        }
+
         void browserecent(object sender, EventArgs e)
         {
             OpenFileDialog of = new OpenFileDialog();
-            of.Filter = "Responses and TickFiles (*.dll;*.epf)|*.dll;*.epf|AllFiles|*.*";
+            of.Filter = "TickFiles|"+TikConst.WILDCARD_EXT+"|AllFiles|*.*";
             of.Multiselect = true;
             if (of.ShowDialog() == DialogResult.OK)
             {
@@ -667,12 +613,16 @@ namespace Kadina
             }
         }
 
-        private void filter_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        void browselibs(object sender, EventArgs e)
         {
-            ToolStripMenuItem m = (ToolStripMenuItem)e.ClickedItem;
-            if (m.Checked)
-                exfilter.Add(m.Text);
-            else exfilter.Remove(m.Text);
+            OpenFileDialog of = new OpenFileDialog();
+            of.Filter = "Responses Libraries|*.dll|AllFiles|*.*";
+            of.Multiselect = true;
+            if (of.ShowDialog() == DialogResult.OK)
+            {
+                foreach (string f in of.FileNames)
+                    loadfile(f);
+            }
         }
     }
 
