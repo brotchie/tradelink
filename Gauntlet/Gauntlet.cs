@@ -138,6 +138,8 @@ namespace WinGauntlet
         // runs after simulation is complete
         void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            debug(_sb.ToString());
+            _sb = new System.Text.StringBuilder(10000000);
             GauntArgs gargs = (GauntArgs)e.Result;
             if (!e.Cancelled)
             {
@@ -395,10 +397,13 @@ namespace WinGauntlet
             
         }
 
+        System.Text.StringBuilder _sb = new System.Text.StringBuilder(10000000);
+
         void Response_GotDebug(Debug msg)
         {
             if (!args.Debugs) return;
-            status(msg.Msg,false);
+            _sb.AppendLine(msg.Msg);
+            
         }
 
         void Response_IndicatorUpdate(object[] parameters)

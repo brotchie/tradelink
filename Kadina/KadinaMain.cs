@@ -588,7 +588,7 @@ namespace Kadina
         void PlayComplete(object sender, RunWorkerCompletedEventArgs e)
         {
             debug(_msg.ToString());
-            _msg = new StringBuilder();
+            _msg = new StringBuilder(1000000000);
             SafeBindingSource.refreshgrid(dg, tbs);
             SafeBindingSource.refreshgrid(ig, ibs);
             SafeBindingSource.refreshgrid(og, obs);
