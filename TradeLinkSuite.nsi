@@ -7,7 +7,7 @@ SetOverWrite on
 Icon "InstallSuite\tradelinkinstaller.ico"
 
 !define SHORT_APP_NAME "TradeLink"
-!define SUPPORT_EMAIL "trade@franta.com"
+!define SUPPORT_EMAIL "tradelink-users@googlegroups.com"
 !addplugindir InstallSuite
 !include "InstallSuite\DotNET.nsh"
 
@@ -50,18 +50,14 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\Replay.lnk" "$INSTDIR\Replay.exe" "" "$INSTDIR\Replay.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Time and Sales.lnk" "$INSTDIR\TimeSales.exe" "" "$INSTDIR\TimeSales.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Tattle.lnk" "$INSTDIR\Tattle.exe" "" "$INSTDIR\Tattle.exe" 0
-  CreateShortCut "$SMPROGRAMS\TradeLink\Uninstall TradeLinkSuite.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
-  CreateShortCut "$SMPROGRAMS\TradeLink\SplitEPF.lnk" "$INSTDIR\SplitEPF.EXE" "" "$INSTDIR\SplitEPF.EXE" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink\Uninstall TradeLink.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Kadina.lnk" "$INSTDIR\Kadina.EXE" "" "$INSTDIR\Kadina.EXE" 0 
-  CreateShortCut "$SMPROGRAMS\TradeLink\Tript.lnk" "$INSTDIR\Tript.EXE" "" "$INSTDIR\Tript.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\Record.lnk" "$INSTDIR\Record.EXE" "" "$INSTDIR\Record.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\Update TradeLink.lnk" "$INSTDIR\Update.EXE" "" "$INSTDIR\Update.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\Sterling+BrokerServer.lnk" "$INSTDIR\SterServer.EXE" "" "$INSTDIR\SterServer.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\TD+BrokerServer.lnk" "$INSTDIR\TDServer.EXE" "" "$INSTDIR\TDServer.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\MB+BrokerServer.lnk" "$INSTDIR\ServerMB.EXE" "" "$INSTDIR\ServerMB.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\Genesis+BrokerServer.lnk" "$INSTDIR\ServerGenesis.EXE" "" "$INSTDIR\ServerGenesis.EXE" 0  
-  CreateShortCut "$SMPROGRAMS\TradeLink\TS2EPF.lnk" "$INSTDIR\TS2EPF.exe" "" "$INSTDIR\TS2EPF.exe" 0  
-  CreateShortCut "$SMPROGRAMS\TradeLink\CQG2EPF.lnk" "$INSTDIR\CQG2EPF.exe" "" "$INSTDIR\CQG2EPF.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\Esignal.lnk" "$INSTDIR\ServerEsignal.exe" "" "$INSTDIR\ServerEsignal.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\DBFX.lnk" "$INSTDIR\ServerDBFX.exe" "" "$INSTDIR\ServerDBFX.exe" 0  
   
@@ -93,10 +89,7 @@ Section "TradeLinkSuite"
   File "Chartographer\bin\release\Chartographer.exe.config"
   File "Chartographer\bin\release\Chartographer.exe"
   File "TimeAndSales\bin\release\TimeSales.exe"
-  File "SplitEPF\bin\release\SplitEPF.exe"
   File "Tattle\bin\release\Tattle.exe"
-  File "Tript\bin\release\Tript.exe"
-  File "Tript\bin\release\Tript.exe.settings.xml"
   File "ASP\bin\release\ASP.exe"
   File "TradeLinkResearch\bin\release\TradeLinkResearch.dll"
   File "Record\bin\release\Record.exe"
@@ -114,8 +107,6 @@ Section "TradeLinkSuite"
   File "ServerGenesis\bin\release\GTAPI32.lib"
   File "ServerGenesis\bin\release\GTAPINet.dll"
   File "InstallSuite\VCRedistInstall.exe"
-  File "TS2EPF\bin\release\TS2EPF.exe"
-  File "CQG2EPF\bin\release\CQG2EPF.exe"
   File "ServerEsignal\bin\release\Interop.IESignal.dll"
   File "ServerEsignal\bin\release\ServerEsignal.exe"
   File "ServerEsignal\bin\release\ServerEsignal.exe.config"
@@ -170,14 +161,13 @@ Section "Uninstall"
   Delete "$SMPROGRAMS\TradeLink\Update TradeLink.lnk"
   Delete "$SMPROGRAMS\TradeLink\Sterling+BrokerServer.lnk"
   Delete "$SMPROGRAMS\TradeLink\Gauntlet.lnk"
-  Delete "$SMPROGRAMS\TradeLink\SplitEPF.lnk"
+  Delete "$SMPROGRAMS\TradeLink\Genesis+BrokerServer.lnk"
   Delete "$SMPROGRAMS\TradeLink\Tattle.lnk"
-  Delete "$SMPROGRAMS\TradeLink\Tript.lnk"
   Delete "$SMPROGRAMS\TradeLink\TDServer.lnk"
   Delete "$SMPROGRAMS\TradeLink\Uninstall TradeLinkSuite"
   Delete "$SMPROGRAMS\TradeLink\MB+BrokerServer.lnk"
-  Delete "$SMPROGRAMS\TradeLink\CQG2EPF.lnk"
-  Delete "$SMPROGRAMS\TradeLink\TS2EPF.lnk"
+  Delete "$SMPROGRAMS\TradeLink\Esignal.lnk"
+  Delete "$SMPROGRAMS\TradeLink\DBFX.lnk"
 
   ; Remove directories used
   RMDir "$SMPROGRAMS\TradeLink"
