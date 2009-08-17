@@ -85,6 +85,8 @@
     <Compile Include="TestBar.cs" />
     <Compile Include="TestBarList.cs" />
     <Compile Include="TestBarListTracker.cs" />
+    <Compile Include="TestBook.cs" />
+    <Compile Include="TestBookTracker.cs" />
     <Compile Include="TestGZip.cs" />
     <Compile Include="TestIdTracker.cs" />
     <Compile Include="TestImbalance.cs" />
@@ -103,6 +105,7 @@
     <Compile Include="TestSkin.cs" />
     <Compile Include="TestStock.cs" />
     <Compile Include="TestTick.cs" />
+    <Compile Include="TestTickArchiver.cs" />
     <Compile Include="TestTickFileFilter.cs" />
     <Compile Include="TestTickWatcher.cs" />
     <Compile Include="TestTikWriterReader.cs" />
@@ -193,6 +196,6 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>CALL "$(ProjectDir)runtests.cmd" $(ConfigurationName) "$(TargetPath)"</PostBuildEvent>
+    <PostBuildEvent>rem CALL "$(ProjectDir)runtests.cmd" $(ConfigurationName) "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
 </Project>

@@ -160,15 +160,17 @@ namespace TestTradeLink
             readdata.Add(t);
         }
 
-        static void removefile(string FILE)
+        public static bool removefile(string FILE)
         {
+            if (!System.IO.File.Exists(FILE)) return true;
             try
             {
                 System.IO.File.Delete(FILE);
+                return true;
             }
             catch (Exception ex) 
-            { 
-                System.Diagnostics.Debug.WriteLine(ex.Message); 
+            {
+                return false;
             }
         }
 
