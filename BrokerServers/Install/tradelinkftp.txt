@@ -1,3 +1,0 @@
-open mu.org
-cd www/trade
-mput BrokerServer*.exe

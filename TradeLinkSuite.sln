@@ -39,8 +39,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerMB", "ServerMB\Server
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResponseTests", "ResponseTests\ResponseTests.csproj", "{CA35A2EC-85DB-4C92-A560-F3B4A9A54F67}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerGenesis", "ServerGenesis\ServerGenesis.csproj", "{5F25DD44-4516-42B7-B371-F94EE0D6EC34}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeLink.AppKit", "TradeLinkAppKit\TradeLink.AppKit.csproj", "{4581ADEF-B013-4EA9-90C5-D585637008CA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerAnvil", "ServerAnvil\ServerAnvil.csproj", "{EA3A4A06-0D01-4CAB-8D7D-8F74189398CC}"
@@ -137,10 +135,6 @@ Global
 		{CA35A2EC-85DB-4C92-A560-F3B4A9A54F67}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA35A2EC-85DB-4C92-A560-F3B4A9A54F67}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA35A2EC-85DB-4C92-A560-F3B4A9A54F67}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5F25DD44-4516-42B7-B371-F94EE0D6EC34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5F25DD44-4516-42B7-B371-F94EE0D6EC34}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5F25DD44-4516-42B7-B371-F94EE0D6EC34}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5F25DD44-4516-42B7-B371-F94EE0D6EC34}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4581ADEF-B013-4EA9-90C5-D585637008CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4581ADEF-B013-4EA9-90C5-D585637008CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4581ADEF-B013-4EA9-90C5-D585637008CA}.Release|Any CPU.ActiveCfg = Release|Any CPU

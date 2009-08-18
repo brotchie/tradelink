@@ -54,10 +54,9 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\Kadina.lnk" "$INSTDIR\Kadina.EXE" "" "$INSTDIR\Kadina.EXE" 0 
   CreateShortCut "$SMPROGRAMS\TradeLink\Record.lnk" "$INSTDIR\Record.EXE" "" "$INSTDIR\Record.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\Update TradeLink.lnk" "$INSTDIR\Update.EXE" "" "$INSTDIR\Update.EXE" 0  
-  CreateShortCut "$SMPROGRAMS\TradeLink\Sterling+BrokerServer.lnk" "$INSTDIR\SterServer.EXE" "" "$INSTDIR\SterServer.EXE" 0  
-  CreateShortCut "$SMPROGRAMS\TradeLink\TD+BrokerServer.lnk" "$INSTDIR\TDServer.EXE" "" "$INSTDIR\TDServer.EXE" 0  
-  CreateShortCut "$SMPROGRAMS\TradeLink\MB+BrokerServer.lnk" "$INSTDIR\ServerMB.EXE" "" "$INSTDIR\ServerMB.EXE" 0  
-  CreateShortCut "$SMPROGRAMS\TradeLink\Genesis+BrokerServer.lnk" "$INSTDIR\ServerGenesis.EXE" "" "$INSTDIR\ServerGenesis.EXE" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink\SterlingPro.lnk" "$INSTDIR\SterServer.EXE" "" "$INSTDIR\SterServer.EXE" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink\TDAmeritrade.lnk" "$INSTDIR\TDServer.EXE" "" "$INSTDIR\TDServer.EXE" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink\MBTrading.lnk" "$INSTDIR\ServerMB.EXE" "" "$INSTDIR\ServerMB.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\Esignal.lnk" "$INSTDIR\ServerEsignal.exe" "" "$INSTDIR\ServerEsignal.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\DBFX.lnk" "$INSTDIR\ServerDBFX.exe" "" "$INSTDIR\ServerDBFX.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\TikConverter.lnk" "$INSTDIR\TikConverter.exe" "" "$INSTDIR\TikConverter.exe" 0
@@ -100,13 +99,6 @@ Section "TradeLinkSuite"
   File "ServerMB\bin\release\Interop.MBTHISTLib.dll"    
   File "ServerMB\bin\release\Interop.MBTORDERSLib.dll"    
   File "ServerMB\bin\release\Interop.MBTQUOTELib.dll"   
-  File "ServerGenesis\bin\release\ServerGenesis.exe"  
-  File "ServerGenesis\bin\release\ServerGenesis.exe.config"
-  File "ServerGenesis\bin\release\dbghelp.lib"
-  File "ServerGenesis\bin\release\dbghelp.dll"
-  File "ServerGenesis\bin\release\GTAPI32.dll"
-  File "ServerGenesis\bin\release\GTAPI32.lib"
-  File "ServerGenesis\bin\release\GTAPINet.dll"
   File "InstallSuite\VCRedistInstall.exe"
   File "ServerEsignal\bin\release\Interop.IESignal.dll"
   File "ServerEsignal\bin\release\ServerEsignal.exe"
@@ -168,7 +160,6 @@ Section "Uninstall"
   Delete "$SMPROGRAMS\TradeLink\Update TradeLink.lnk"
   Delete "$SMPROGRAMS\TradeLink\Sterling.lnk"
   Delete "$SMPROGRAMS\TradeLink\Gauntlet.lnk"
-  Delete "$SMPROGRAMS\TradeLink\Genesis.lnk"
   Delete "$SMPROGRAMS\TradeLink\Tattle.lnk"
   Delete "$SMPROGRAMS\TradeLink\TDServer.lnk"
   Delete "$SMPROGRAMS\TradeLink\Uninstall TradeLinkSuite"
