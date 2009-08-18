@@ -53,6 +53,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerDBFX", "ServerDBFX\Se
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TikConverter", "TikConverter\TikConverter.csproj", "{2ED3BB05-8CE3-4D85-9C93-0BBC002D6890}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerBlackwood", "ServerBlackwood\ServerBlackwood.csproj", "{DA7D7A07-FD1C-42D3-B10E-DBD586C524CD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -163,6 +165,10 @@ Global
 		{2ED3BB05-8CE3-4D85-9C93-0BBC002D6890}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2ED3BB05-8CE3-4D85-9C93-0BBC002D6890}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2ED3BB05-8CE3-4D85-9C93-0BBC002D6890}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA7D7A07-FD1C-42D3-B10E-DBD586C524CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA7D7A07-FD1C-42D3-B10E-DBD586C524CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA7D7A07-FD1C-42D3-B10E-DBD586C524CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA7D7A07-FD1C-42D3-B10E-DBD586C524CD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

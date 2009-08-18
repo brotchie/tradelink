@@ -1,0 +1,24 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ServerBlackwood.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="un" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="pw" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ipaddress" Type="System.String" Scope="User">
+      <Value Profile="(Default)">10.10.0.35</Value>
+    </Setting>
+    <Setting Name="dataport" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">5200</Value>
+    </Setting>
+    <Setting Name="orderport" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">5000</Value>
+    </Setting>
+    <Setting Name="historicalport" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">5300</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

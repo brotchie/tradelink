@@ -34,12 +34,12 @@
             this.label2 = new System.Windows.Forms.Label();
             this._login = new System.Windows.Forms.Button();
             this._togmsg = new System.Windows.Forms.Button();
-            this._type = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
-            this._pw = new System.Windows.Forms.TextBox();
-            this._un = new System.Windows.Forms.TextBox();
             this._report = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this._type = new System.Windows.Forms.ComboBox();
+            this._pw = new System.Windows.Forms.TextBox();
+            this._un = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // label1
@@ -82,6 +82,26 @@
             this._togmsg.UseVisualStyleBackColor = true;
             this._togmsg.Click += new System.EventHandler(this._togmsg_Click);
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(25, 13);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(47, 20);
+            this.label3.TabIndex = 7;
+            this.label3.Text = "Type:";
+            // 
+            // _report
+            // 
+            this._report.Image = ((System.Drawing.Image)(resources.GetObject("_report.Image")));
+            this._report.Location = new System.Drawing.Point(202, 106);
+            this._report.Name = "_report";
+            this._report.Size = new System.Drawing.Size(32, 27);
+            this._report.TabIndex = 8;
+            this.toolTip1.SetToolTip(this._report, "report a bug");
+            this._report.UseVisualStyleBackColor = true;
+            this._report.Click += new System.EventHandler(this._report_Click);
+            // 
             // _type
             // 
             this._type.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::ServerDBFX.Properties.Settings.Default, "type", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
@@ -95,15 +115,6 @@
             this._type.Size = new System.Drawing.Size(100, 28);
             this._type.TabIndex = 6;
             this._type.Text = global::ServerDBFX.Properties.Settings.Default.type;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(25, 13);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(47, 20);
-            this.label3.TabIndex = 7;
-            this.label3.Text = "Type:";
             // 
             // _pw
             // 
@@ -124,17 +135,6 @@
             this._un.Size = new System.Drawing.Size(100, 26);
             this._un.TabIndex = 0;
             this._un.Text = global::ServerDBFX.Properties.Settings.Default.un;
-            // 
-            // _report
-            // 
-            this._report.Image = ((System.Drawing.Image)(resources.GetObject("_report.Image")));
-            this._report.Location = new System.Drawing.Point(202, 106);
-            this._report.Name = "_report";
-            this._report.Size = new System.Drawing.Size(32, 27);
-            this._report.TabIndex = 8;
-            this.toolTip1.SetToolTip(this._report, "report a bug");
-            this._report.UseVisualStyleBackColor = true;
-            this._report.Click += new System.EventHandler(this._report_Click);
             // 
             // ServerDBFXMain
             // 

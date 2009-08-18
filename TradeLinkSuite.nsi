@@ -61,7 +61,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\Esignal.lnk" "$INSTDIR\ServerEsignal.exe" "" "$INSTDIR\ServerEsignal.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\DBFX.lnk" "$INSTDIR\ServerDBFX.exe" "" "$INSTDIR\ServerDBFX.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\TikConverter.lnk" "$INSTDIR\TikConverter.exe" "" "$INSTDIR\TikConverter.exe" 0
-  
+  CreateShortCut "$SMPROGRAMS\TradeLink\Blackwood.lnk" "$INSTDIR\ServerBlackwood.exe" "" "$INSTDIR\ServerBlackwood.exe" 0  
   
   
   
@@ -114,6 +114,11 @@ Section "TradeLinkSuite"
   File "ServerDBFX\bin\release\ServerDBFX.exe"
   File "ServerDBFX\bin\release\ServerDBFX.exe.config"
   File "ServerDBFX\bin\release\Interop.FXCore.dll"
+  File "ServerBlackwood\bin\release\ServerBlackwood.exe.config"
+  File "ServerBlackwood\bin\release\ServerBlackwood.exe"
+  File "ServerBlackwood\bin\release\Blackwood.Framework.dll"
+  File "ServerBlackwood\bin\release\BWCMessageLib.dll"
+
   File "TikConverter\bin\release\TikConverter.exe"
   
   ; Write the installation path into the registry
@@ -161,15 +166,16 @@ Section "Uninstall"
   Delete "$SMPROGRAMS\TradeLink\Replay.lnk"
   Delete "$SMPROGRAMS\TradeLink\Record.lnk"
   Delete "$SMPROGRAMS\TradeLink\Update TradeLink.lnk"
-  Delete "$SMPROGRAMS\TradeLink\Sterling+BrokerServer.lnk"
+  Delete "$SMPROGRAMS\TradeLink\Sterling.lnk"
   Delete "$SMPROGRAMS\TradeLink\Gauntlet.lnk"
-  Delete "$SMPROGRAMS\TradeLink\Genesis+BrokerServer.lnk"
+  Delete "$SMPROGRAMS\TradeLink\Genesis.lnk"
   Delete "$SMPROGRAMS\TradeLink\Tattle.lnk"
   Delete "$SMPROGRAMS\TradeLink\TDServer.lnk"
   Delete "$SMPROGRAMS\TradeLink\Uninstall TradeLinkSuite"
-  Delete "$SMPROGRAMS\TradeLink\MB+BrokerServer.lnk"
+  Delete "$SMPROGRAMS\TradeLink\MB.lnk"
   Delete "$SMPROGRAMS\TradeLink\Esignal.lnk"
   Delete "$SMPROGRAMS\TradeLink\DBFX.lnk"
+  Delete "$SMPROGRAMS\TradeLink\Blackwood.lnk"
 
   ; Remove directories used
   RMDir "$SMPROGRAMS\TradeLink"
