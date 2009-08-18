@@ -211,6 +211,9 @@ void AVLStock::Process(const Message* message, Observable* from, const Message* 
 		case M_TAL_LAST_TRADE:
 			TradeNotify();
 			break;
+		case M_RESP_REFRESH_SYMBOL_FAILED:
+			Clear();
+			break;
 
     }
 }

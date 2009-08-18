@@ -62,7 +62,6 @@ namespace TradeLibFast
 		{
 			if (subs[i]!=NULL)
 			{
-				delete subs[i];
 				subs[i] = NULL;
 			}
 		}
@@ -759,6 +758,11 @@ namespace TradeLibFast
 
 				}
 				break;
+			case MSGID_CONNECTION_LOST:
+				{
+					B_IsMarketSummaryPopulationDone();
+				}
+				break;
 		} // switchend
 	}
 
@@ -920,7 +924,6 @@ namespace TradeLibFast
 			if (subs[i]!=NULL)
 			{
 				subs[i]->Clear();
-				delete subs[i];
 				subsym[i] = "";
 				subs[i]= NULL;
 			}
