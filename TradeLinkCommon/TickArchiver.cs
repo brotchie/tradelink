@@ -12,30 +12,20 @@ namespace TradeLink.Common
     public class TickArchiver
     {
         string _path;
-        System.Windows.Forms.Timer _timer = new System.Windows.Forms.Timer();
 
         Dictionary<string, TikWriter> filedict = new Dictionary<string, TikWriter>();
-        public TickArchiver() : this(Util.TLTickDir,60) { }
-        public TickArchiver(string folderpath, int FlushAfterSeconds)
+        public TickArchiver() : this(Util.TLTickDir) { }
+        public TickArchiver(string folderpath)
         {
             _path = folderpath;
-            _timer.Interval = 1000 * FlushAfterSeconds;
-            _timer.Tick += new EventHandler(_timer_Tick);
-            _timer.Start();
         }
-        public void CloseArchive()
+        public void Stop()
         {
             foreach (string file in filedict.Keys)
                 filedict[file].Close();
         }
 
-        void _timer_Tick(object sender, EventArgs e)
-        {
-            foreach (string sym in filedict.Keys)
-                filedict[sym].Flush();
-        }
-
-        bool SaveTick(Tick t)
+        public bool newTick(Tick t)
         {
             if ((t.symbol==null) || (t.symbol=="")) return false;
             TikWriter tw;
@@ -52,6 +42,8 @@ namespace TradeLink.Common
                 try 
                 {
                     tw = new TikWriter(_path, t.symbol, t.date);
+                    tw.newTick(t);
+                    filedict.Add(t.symbol, tw);
                 }
                 catch (IOException) { return false; }
                 catch (Exception) { return false; }
@@ -59,9 +51,6 @@ namespace TradeLink.Common
 
             return true;
         }
-
-
-        public bool Save(Tick t) { return SaveTick(t); }
 
     }
 }

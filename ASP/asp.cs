@@ -400,7 +400,7 @@ namespace ASP
             if (Environment.ProcessorCount>1)
                 _ar.Stop();
             // stop archiving ticks
-            _ta.CloseArchive();
+            _ta.Stop();
             // stop logging
             _log.Stop();
             // save ASP properties
@@ -433,7 +433,7 @@ namespace ASP
 
             // see if we should save this tick
             if (_ao.archivetickbox.Checked)
-                _ta.Save(t);
+                _ta.newTick(t);
 
             // send tick to any valid requesting responses
             foreach (int idx in idxs)

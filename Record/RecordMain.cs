@@ -30,7 +30,7 @@ namespace Record
 
         void tl_gotTick(Tick t)
         {
-            ta.Save(t);
+            ta.newTick(t);
         }
 
 

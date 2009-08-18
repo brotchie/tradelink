@@ -68,7 +68,7 @@ namespace TradeLink.Common
             if (!_hasheader)
                 Header(this, realsymbol);
             else
-                OutStream = new FileStream(_file, FileMode.Open);
+                OutStream = new FileStream(_file, FileMode.Open,  FileAccess.Write, FileShare.Read);
 
         }
 
@@ -79,7 +79,7 @@ namespace TradeLink.Common
 
         public static string SafeFilename(string realsymbol, string path, int date)
         {
-            return path + "//" + SafeSymbol(realsymbol) + date.ToString() + TikConst.DOT_EXT;
+            return path + "\\" + SafeSymbol(realsymbol) + date.ToString() + TikConst.DOT_EXT;
         }
 
         public static string SafeSymbol(string realsymbol)
@@ -99,7 +99,7 @@ namespace TradeLink.Common
 
         public static bool Header(TikWriter bw, string realsymbol)
         {
-            bw.OutStream = new FileStream(bw.Filepath, FileMode.Create);
+            bw.OutStream = new FileStream(bw.Filepath, FileMode.Create, FileAccess.Write, FileShare.Read);
             // version
             bw.Write(TikConst.Version);
             bw.Write(TikConst.VERSION);
