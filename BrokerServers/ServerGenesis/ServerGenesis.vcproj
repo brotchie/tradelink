@@ -139,7 +139,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="Inc"
+				AdditionalIncludeDirectories="..\TradeLibFast;Inc"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -162,9 +162,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(OUTDIR)\GTAPI.LIB"
+				AdditionalDependencies="$(OUTDIR)\TradeLibFast.lib $(OUTDIR)\GTAPI.LIB"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="$(ConfigurationName)"
 				ProgramDatabaseFile="D:\Genesis\src\API\TestAPI\..\..\..\Release/TestAPI.pdb"
 				SubSystem="2"
 				TargetMachine="1"
