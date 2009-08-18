@@ -18,6 +18,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestTradeLibFast", "TestTra
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TradeLibFast", "TradeLibFast\TradeLibFast.vcproj", "{70D6F9FC-3067-4527-8858-D931623554CF}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ServerGenesis", "ServerGenesis\ServerGenesis.vcproj", "{98EF31FB-959E-4552-8F99-F2AD6DBB3A23}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -86,6 +88,18 @@ Global
 		{70D6F9FC-3067-4527-8858-D931623554CF}.Unicode Release|Win32.ActiveCfg = Release|Win32
 		{70D6F9FC-3067-4527-8858-D931623554CF}.Unicode Release|Win32.Build.0 = Release|Win32
 		{70D6F9FC-3067-4527-8858-D931623554CF}.Unicode Release|x64.ActiveCfg = Release|Win32
+		{98EF31FB-959E-4552-8F99-F2AD6DBB3A23}.Debug|Win32.ActiveCfg = Debug|Win32
+		{98EF31FB-959E-4552-8F99-F2AD6DBB3A23}.Debug|Win32.Build.0 = Debug|Win32
+		{98EF31FB-959E-4552-8F99-F2AD6DBB3A23}.Debug|x64.ActiveCfg = Debug|Win32
+		{98EF31FB-959E-4552-8F99-F2AD6DBB3A23}.Release|Win32.ActiveCfg = Release|Win32
+		{98EF31FB-959E-4552-8F99-F2AD6DBB3A23}.Release|Win32.Build.0 = Release|Win32
+		{98EF31FB-959E-4552-8F99-F2AD6DBB3A23}.Release|x64.ActiveCfg = Release|Win32
+		{98EF31FB-959E-4552-8F99-F2AD6DBB3A23}.Unicode Debug|Win32.ActiveCfg = Debug|Win32
+		{98EF31FB-959E-4552-8F99-F2AD6DBB3A23}.Unicode Debug|Win32.Build.0 = Debug|Win32
+		{98EF31FB-959E-4552-8F99-F2AD6DBB3A23}.Unicode Debug|x64.ActiveCfg = Debug|Win32
+		{98EF31FB-959E-4552-8F99-F2AD6DBB3A23}.Unicode Release|Win32.ActiveCfg = Release|Win32
+		{98EF31FB-959E-4552-8F99-F2AD6DBB3A23}.Unicode Release|Win32.Build.0 = Release|Win32
+		{98EF31FB-959E-4552-8F99-F2AD6DBB3A23}.Unicode Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,205 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\TestAPI.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\TestAPI.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_TESTAPI_DIALOG DIALOGEX 0, 0, 317, 258
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "TestAPI"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Session",IDC_STATIC,7,7,37,14,SS_CENTERIMAGE
+    CONTROL         "",IDC_SESSION,"GTSessionWindow",WS_TABSTOP,45,7,60,14
+    RTEXT           "",IDC_LEVEL2S,111,7,35,14,SS_CENTERIMAGE | WS_BORDER
+    LTEXT           "Stock",IDC_STATIC,7,27,37,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_STOCK,45,27,53,14,ES_UPPERCASE | ES_AUTOHSCROLL
+    PUSHBUTTON      "Dump",IDC_DUMP,105,27,50,14
+    RTEXT           "",IDC_BID_SHARES1,65,43,35,14,SS_CENTERIMAGE | WS_BORDER
+    RTEXT           "",IDC_BID_PRICE1,103,43,53,14,SS_CENTERIMAGE | WS_BORDER
+    RTEXT           "",IDC_BID_SHARES2,65,59,35,14,SS_CENTERIMAGE | WS_BORDER
+    RTEXT           "",IDC_BID_PRICE2,103,59,53,14,SS_CENTERIMAGE | WS_BORDER
+    CONTROL         "Hide MM",IDC_HIDEMM,"Button",BS_AUTOCHECKBOX | BS_PUSHLIKE | WS_TABSTOP,169,27,41,14
+    RTEXT           "",IDC_ASK_SHARES1,200,43,35,14,SS_CENTERIMAGE | WS_BORDER
+    RTEXT           "",IDC_ASK_PRICE1,208,43,53,14,SS_CENTERIMAGE | WS_BORDER
+    RTEXT           "",IDC_ASK_SHARES2,200,59,35,14,SS_CENTERIMAGE | WS_BORDER
+    RTEXT           "",IDC_ASK_PRICE2,238,59,53,14,SS_CENTERIMAGE | WS_BORDER
+    GROUPBOX        "Login",IDC_STATIC,7,76,131,71
+    LTEXT           "User Name",IDC_STATIC,18,87,37,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_USERNAME,56,87,68,14,ES_UPPERCASE | ES_AUTOHSCROLL
+    LTEXT           "Password",IDC_STATIC,18,110,37,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_PASSWORD,56,110,68,14,ES_PASSWORD | ES_AUTOHSCROLL
+    PUSHBUTTON      "Login",IDC_START,18,130,50,14
+    PUSHBUTTON      "Logout",IDC_STOP,74,130,50,14
+    PUSHBUTTON      "Bid",IDC_BID,7,159,50,14
+    PUSHBUTTON      "Offer",IDC_ASK,67,159,50,14
+    PUSHBUTTON      "Buy",IDC_BUY,7,175,50,14
+    PUSHBUTTON      "Sell",IDC_SELL,67,175,50,14
+    PUSHBUTTON      "Cancel Bid",IDC_CANCEL_BID,127,159,50,14
+    PUSHBUTTON      "Cancel Offer",IDC_CANCEL_OFFER,179,159,50,14
+    PUSHBUTTON      "Cancel All",IDC_CANCEL_BID2,127,175,102,14
+    LISTBOX         IDC_LIST,7,192,303,59,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Exit",IDCANCEL,260,7,50,14
+    PUSHBUTTON      "Accounts...",IDC_BUTTON_DISPLAY_ACCOUNTS,251,132,50,14
+    GROUPBOX        "Account(s)",IDC_STATIC,151,77,152,71
+    COMBOBOX        IDC_COMBO_ACCOUNTS,158,88,140,54,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Click 'Accounts...' to get accounts. And then select a current working account.",IDC_STATIC,159,107,137,20
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 5,3,1,1
+ PRODUCTVERSION 5,3,1,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x29L
+#else
+ FILEFLAGS 0x28L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "CompanyName", "Genesis Securities, LLC"
+            VALUE "FileDescription", "TestAPI MFC Application. Released by Genesis Securities, LLC."
+            VALUE "FileVersion", "5, 3, 1, 1"
+            VALUE "InternalName", "TestAPI"
+            VALUE "LegalCopyright", "Copyright (C) 2009, Genessis Securities, LLC"
+            VALUE "OriginalFilename", "TestAPI.EXE"
+            VALUE "PrivateBuild", "0901.001"
+            VALUE "ProductName", "TestAPI Application"
+            VALUE "ProductVersion", "5, 3, 1, 1"
+            VALUE "SpecialBuild", "0901"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_TESTAPI_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 310
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 251
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "res\TestAPI.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
