@@ -341,8 +341,15 @@ namespace ASP
                 _symidx.Remove(sym);
                 _mb.Remove(sym);
             }
-            // resubscribe
-            tl.Subscribe(_mb);
+            try
+            {
+                // resubscribe
+                tl.Subscribe(_mb);
+            }
+            catch (TLServerNotFound)
+            {
+                debug("symbol subscribe failed as no TL server was found.");
+            }
             // update display
             _resnames.Invalidate(true);
         }

@@ -17,12 +17,18 @@ namespace ASP
             try
             {
                 Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
+                AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
                 Application.Run(new ASP());
             }
             catch (Exception ex)
             {
                 TradeLink.AppKit.CrashReport.Report(ASP.PROGRAM, ex);
             }
+        }
+
+        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            TradeLink.AppKit.CrashReport.Report(ASP.PROGRAM, (Exception)e.ExceptionObject);
         }
 
         static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)

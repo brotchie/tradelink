@@ -14,12 +14,15 @@ namespace TradeLink.AppKit
     public partial class CrashReport : Form
     {
         string PROGRAM = string.Empty;
-        Exception ex = null;
-        string data = string.Empty;
+        Exception EX = null;
+        string DATA = string.Empty;
         public CrashReport(string program, Exception ex) : this(program, ex, string.Empty) { }
         public CrashReport(string program, Exception ex, string data)
         {
             InitializeComponent();
+            PROGRAM = program;
+            DATA = data;
+            EX = ex;
             ShowDialog();
         }
 
@@ -30,7 +33,7 @@ namespace TradeLink.AppKit
         }
         private void _email_Click(object sender, EventArgs e)
         {
-            BugReport(PROGRAM, Desc(PROGRAM), ex, data);
+            BugReport(PROGRAM, Desc(PROGRAM), EX, DATA);
             Close();
         }
 
