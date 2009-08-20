@@ -33,154 +33,154 @@ namespace ServerBlackwood
         public event DebugFullDelegate SendDebug;
         private bool _valid = false;
         public bool isValid { get { return _valid; } }
+        PositionTracker pt = new PositionTracker();
 
         public ServerBlackwood()
         {
             // broker stuff
-            SymbolDataHandler = new DisplaySymbolDataHandler(DisplaySymbolData);
-			Level1Handler = new DisplayLevel1Handler(DisplayLevel1);
-			Level2Handler = new DisplayLevel2Handler(DisplayLevel2);
-			TradeHandler = new DisplayTradeHandler(DisplayTrade);
-			InfoHandler = new DisplayInfoHandler(DisplayInfo);
-
             m_Session = new BWSession();
-
-            
+            m_Session.OnAccountMessage += new BWSession.AccountMessageHandler(m_Session_OnAccountMessage);
+            m_Session.OnNYSEImbalanceMessage += new BWSession.NYSEImbalanceMessageHandler(m_Session_OnNYSEImbalanceMessage);
+            m_Session.OnExecutionMessage += new BWSession.ExecutionMessageHandler(m_Session_OnExecutionMessage);
+            m_Session.OnOrderMessage += new BWSession.OrderMessageHandler(m_Session_OnOrderMessage);
+            foreach (BWStock s in m_Session.GetOpenPositions())
+            {
+                Position p = new PositionImpl(s.Symbol, (decimal)s.Price, s.Size, (decimal)s.ClosedPNL);
+                pt.Adjust(p);
+            }
+                
 
             // tradelink stuff
             newProviderName = Providers.Blackwood;
+            newUnknownRequest += new UnknownMessageDelegate(ServerBlackwood_newUnknownRequest);
             newFeatureRequest += new MessageArrayDelegate(ServerBlackwood_newFeatureRequest);
             newOrderCancelRequest += new UIntDelegate(ServerBlackwood_newOrderCancelRequest);
             newSendOrderRequest += new OrderDelegate(ServerBlackwood_newSendOrderRequest);
+            newImbalanceRequest += new VoidDelegate(ServerBlackwood_newImbalanceRequest);
+            newRegisterStocks += new DebugDelegate(ServerBlackwood_newRegisterStocks);
+            newPosList += new PositionArrayDelegate(ServerBlackwood_newPosList);
         }
 
-        private void DisplayLevel1(object sender, BWLevel1Quote msgLevel1)
+        Position[] ServerBlackwood_newPosList(string account)
         {
-            if (this.InvokeRequired)
-            {
-                this.BeginInvoke(Level1Handler, new object[] { sender, msgLevel1 });
-            }
-            else
-            {
-                if (m_Stock != sender)
-                    return;
-                debug(msgLevel1.Bid.ToString("F"));
-                debug(msgLevel1.Ask.ToString("F"));
-                debug(msgLevel1.BidSize.ToString());
-                debug(msgLevel1.AskSize.ToString());
-            }
+            return pt.ToArray();
         }
-        List<BWFeed> feeds = new List<BWFeed>();
-        private void DisplayLevel2(object sender, BWLevel2Quote level2Quote)
+
+        void ServerBlackwood_newRegisterStocks(string msg)
         {
-            if (this.InvokeRequired)
+            Basket b = BasketImpl.FromString(msg);
+            foreach (Security s in b)
             {
-                this.BeginInvoke(Level2Handler, new object[] { sender, level2Quote });
+                // make sure we don't already have a subscribption for this
+                if (_symstk.Contains(s.Symbol)) continue;
+                BWStock stk = m_Session.GetStock(s.Symbol);
+                stk.Subscribe();
+                stk.OnTrade += new BWStock.TradeHandler(stk_OnTrade);
+                stk.OnLevel2Update += new BWStock.Level2UpdateHandler(stk_OnLevel2Update);
+                stk.OnLevel1Update += new BWStock.Level1UpdateHandler(stk_OnLevel1Update);
+                _stocks.Add(stk);
+                _symstk.Add(s.Symbol);
             }
-            else
-            {
-                if (m_Stock != sender)
-                    return;
-                //	feeds.Add(BWFeed.SDOT);
-                feeds.Add(BWFeed.SDOT);
-                //	feeds.Add(BWFeed.INET);
-                //	feeds.Add(BWFeed.ARCA);
-                foreach (BWFeed feed in feeds)
-                {
+            
 
-                    BWLevel2Quote[] quotesBid = m_Stock.GetBook(BWQuoteSide.BID, feed);
-                    BWLevel2Quote[] quotesAsk = m_Stock.GetBook(BWQuoteSide.ASK, feed);
-
-                    string msg;
-                    for (int i = 0; (i < quotesBid.GetLength(0) || i < quotesAsk.GetLength(0)) && i < 8; i++)
-                    {
-                        msg = "";
-                        BWLevel2Quote quote;
-                        if (i < quotesBid.GetLength(0))
-                        {
-                            quote = quotesBid[i];
-                            msg = string.Format("{0,6} {1,6} {2,8:F3} {3,8} ", quote.MarketMaker, quote.BWFeed, quote.Bid, quote.BidSize);
-                        }
-                        else
-                        {
-                            msg += string.Format("                                ");
-                        }
-
-                        if (i < quotesAsk.GetLength(0))
-                        {
-                            quote = quotesAsk[i];
-                            msg += string.Format("{0,6} {1,6} {2,8:F3} {3,8} ", quote.MarketMaker, quote.BWFeed, quote.Ask, quote.AskSize);
-                        }
-                        else
-                        {
-                            msg += string.Format("                                ");
-                        }
-                        //Debug.WriteLine(msg);
-                    }
-                    //Debug.WriteLine("");
-                }
-
-                if ((m_Stock.IsNYSE() && level2Quote.BWFeed != BWFeed.SDOT) ||
-                    (!m_Stock.IsNYSE() && level2Quote.BWFeed != BWFeed.NASDAQ))
-                    return;
-
-                if (m_Stock.IsNYSE())
-                    DisplayLevel2(sender, BWFeed.SDOT);
-                else
-                    DisplayLevel2(sender, BWFeed.NASDAQ);
-            }
         }
 
-        		private void DisplayTrade(object sender, BWTrade msgTrade)
-		{
-            if (this.InvokeRequired)
+        void stk_OnLevel2Update(object sender, BWLevel2Quote quote)
+        {
+            Tick k = new TickImpl(quote.Symbol);
+            k.depth = quote.EcnOrder;
+            k.bid = (decimal)quote.Bid;
+            k.BidSize = quote.BidSize;
+            k.be = quote.MarketMaker;
+            k.ask = (decimal)quote.Ask;
+            k.os = quote.AskSize;
+            k.oe = quote.MarketMaker;
+            newTick(k);
+        }
+
+        void stk_OnLevel1Update(object sender, BWLevel1Quote quote)
+        {
+            if (_depth > 0) return;
+
+        }
+
+        void stk_OnTrade(object sender, BWTrade print)
+        {
+            Tick k = new TickImpl(print.Symbol);
+            k.trade = (decimal)print.Price;
+            k.size = print.Size;
+            k.ex = print.MarketMaker;
+            newTick(k);
+        }
+
+        void ServerBlackwood_newImbalanceRequest()
+        {
+            m_Session.RequestImbalances();
+        }
+        int _depth = 0;
+        long ServerBlackwood_newUnknownRequest(MessageTypes t, string msg)
+        {
+            MessageTypes ret = MessageTypes.UNKNOWN_MESSAGE;
+            switch (t)
             {
-                this.BeginInvoke(TradeHandler, new object[] { sender, msgTrade });
+                case MessageTypes.DOMREQUEST:
+                    _depth = Convert.ToInt32(msg);
+                    ret = MessageTypes.OK;
+                    break;
+                case MessageTypes.ISSHORTABLE:
+                    return (long)(m_Session.GetStock(msg).IsHardToBorrow() ? 0 : 1);
+                    break;
             }
-            else
-            {
-                if (m_Stock != sender)
-                    return;
+            return (long)ret;
+        }
 
-                debug(msgTrade.Price.ToString("F"));
-                debug((m_Stock.Close() - msgTrade.Price).ToString("F"));
-                debug(msgTrade.Time.ToString("HH:mm:ss"));
-                debug(m_Stock.GetVolume().ToString());
+        void m_Session_OnOrderMessage(object sender, BWOrder orderMsg)
+        {
+            Order o = new OrderImpl(orderMsg.Symbol,(int)orderMsg.Size);
+            o.side = (orderMsg.OrderSide == ORDER_SIDE.SIDE_BUY) || (orderMsg.OrderSide == ORDER_SIDE.SIDE_COVER);
+            o.stopp = (decimal)orderMsg.StopPrice;
+            o.price = (decimal)orderMsg.LimitPrice;
+            o.time = TradeLink.Common.Util.DT2FT(orderMsg.OrderTime);
+            o.date = TradeLink.Common.Util.ToTLDate(orderMsg.OrderTime);
+            o.ex = orderMsg.Venue.ToString();
+            o.id = (uint)orderMsg.CustomID;
+            newOrder(o);
+        }
 
-                string sTrade = string.Format("{0}  {1}  {2}", msgTrade.MarketMaker, msgTrade.Price, msgTrade.Size);
-                debug(sTrade);
-            }
-		}
+        string _acct = string.Empty;
+        double _cpl = 0;
 
-		private void stock_OnInfoUpdate(object sender, BWStockInfo msgInfo)
-		{
-			object[] args = { sender, msgInfo };
-			this.BeginInvoke(InfoHandler, args);
-		//	ThreadPool.QueueUserWorkItem(new WaitCallback(DisplayInfoThread), args);
-		}
+        void m_Session_OnAccountMessage(object sender, BWAccount accountMsg)
+        {
+            _cpl = accountMsg.ClosedProfit;
+        }
 
-		private void DisplayInfoThread(Object param)
-		{
-			object[] args = (object[])param;
-			DisplayInfo(args[0], (BWStockInfo)args[1]);
-		}
+        void m_Session_OnExecutionMessage(object sender, BWExecution executionMsg)
+        {
+            Trade t = new TradeImpl(executionMsg.Symbol, (decimal)executionMsg.Price, executionMsg.Size);
+            t.side = (executionMsg.Side == ORDER_SIDE.SIDE_COVER) || (executionMsg.Side == ORDER_SIDE.SIDE_BUY);
+            t.xtime = TradeLink.Common.Util.DT2FT(executionMsg.ExecutionTime);
+            t.xdate = TradeLink.Common.Util.ToTLDate(executionMsg.ExecutionTime);
+            t.Account = executionMsg.Account;
+            // might need to keep a table if this is not custom id,
+            // which looks like it's not
+            t.id = (uint)executionMsg.OrderID;
+            newFill(t);
+        }
 
-		private void DisplayInfo(object sender, BWStockInfo msgInfo)
-		{
-            if (this.InvokeRequired)
-            {
-                this.BeginInvoke(InfoHandler, new object[] { sender, msgInfo });
-            }
-            else
-            {
-                if (m_Stock != sender)
-                    return;
-                debug(msgInfo.Close.ToString());
-                debug(msgInfo.Open.ToString());
-                debug(msgInfo.Low.ToString("F"));
-                debug(msgInfo.High.ToString("F"));
-            }
-		}
+        void m_Session_OnNYSEImbalanceMessage(object sender, BWNYSEImbalance imbalanceMsg)
+        {
+            string s = imbalanceMsg.Symbol;
+            int i = imbalanceMsg.ImbalanceVolume;
+            int it = TradeLink.Common.Util.DT2FT(imbalanceMsg.Time);
+            int pi = imbalanceMsg.InitImbalanceVolume;
+            int pt = TradeLink.Common.Util.DT2FT(imbalanceMsg.InitTime);
+            string ex = imbalanceMsg.FeedID.ToString();
+            Imbalance imb = new ImbalanceImpl(s,ex,i,it,pi,pt,i);
+            newImbalance(imb);
+            
+        }
+
 
 		private void stock_OnSymbolData(object sender, BWSymbolData symbolData)
 		{
@@ -188,84 +188,11 @@ namespace ServerBlackwood
 			this.BeginInvoke(SymbolDataHandler, args);
 		}
 
-		private void DisplaySymbolData(object sender, BWSymbolData symbolData)
-		{
-            if (this.InvokeRequired)
-            {
-                this.BeginInvoke(SymbolDataHandler, new object[] { sender, symbolData });
-            }
-            else
-            {
-                if (m_Stock != sender)
-                    return;
 
-                BWTrade[] Trades = m_Stock.GetTrades(BWFeed.SDOT);
-
-                //Log.Ref.WriteLine(string.Format("MM: Got symbol data message for symbol: {0}", symbolData.Symbol));
-
-                m_SymbolData = new BWSymbolData(symbolData);
-                debug(m_SymbolData.StockInfo.Name);
-                debug(m_SymbolData.LastTrade.Price.ToString("F"));
-                debug((m_SymbolData.StockInfo.Close - m_SymbolData.LastTrade.Price).ToString("F"));
-                debug(m_SymbolData.LastTrade.Time.ToString("HH:mm:ss"));
-                debug(m_SymbolData.Volume.ToString());
-                debug(m_SymbolData.StockInfo.Close.ToString());
-                debug(m_SymbolData.StockInfo.Open.ToString());
-                debug(m_SymbolData.StockInfo.Low.ToString("F"));
-                debug(m_SymbolData.StockInfo.High.ToString("F"));
-                debug(m_SymbolData.Level1.Bid.ToString("F"));
-                debug(m_SymbolData.Level1.Ask.ToString("F"));
-                debug(m_SymbolData.Level1.BidSize.ToString());
-                debug(m_SymbolData.Level1.AskSize.ToString());
-
-                string sTrade;
-                foreach (FEED_ID feedID in m_SymbolData.Trades.Keys)
-                {
-                    TradeList listTrade = (TradeList)m_SymbolData.Trades[feedID];
-                    foreach (BWTrade msgTrade in listTrade)
-                    {
-                        sTrade = string.Format("{0}  {1}  {2}", msgTrade.MarketMaker, msgTrade.Price, msgTrade.Size);
-                        debug(sTrade);
-                    }
-                }
-
-                if (m_Stock.IsNYSE())
-                    DisplayLevel2(sender, BWFeed.SDOT);
-                else
-                    DisplayLevel2(sender, BWFeed.NASDAQ);
-            }
-		}
 
 		private void DisplayLevel2(object sender, BWFeed Feed)
 		{		
-			try
-			{
-				BWStock stock = (BWStock)sender;
-			
-				BWLevel2Quote[] book = stock.GetBook(BWQuoteSide.BID, Feed);
-				int count = 10 < book.Length ? 10 : book.Length;
-				for (int i=0; i < count; i++) 
-				{				
-					BWLevel2Quote quoteFromBook = book[i];
 
-					debug(quoteFromBook.Bid.ToString("F"));
-					debug(quoteFromBook.BidSize.ToString());
-				}	
-				book = stock.GetBook(BWQuoteSide.ASK, Feed);
-				count = 10 < book.Length ? 10 : book.Length;
-				for (int i=0; i < count; i++) 
-				{				
-					BWLevel2Quote quoteFromBook = book[i];
-
-					debug(quoteFromBook.MarketMaker);
-					debug(quoteFromBook.Ask.ToString("F"));
-					debug(quoteFromBook.AskSize.ToString());
-				}			
-			}
-			catch (Exception)
-			{
-
-			}
 		}
 
 
@@ -431,6 +358,9 @@ namespace ServerBlackwood
 
         }
 
+        List<BWStock> _stocks = new List<BWStock>();
+        List<string> _symstk = new List<string>();
+
         void bwOrder_BWOrderUpdateEvent(object sender, BWOrderStatus BWOrderStatus)
         {
             BWOrder bwo = (BWOrder)sender;
@@ -453,11 +383,14 @@ namespace ServerBlackwood
                     }
                     break;
             }
+
         }
 
         void ServerBlackwood_newOrderCancelRequest(uint number)
         {
-            
+            foreach (BWOrder o in m_Session.GetOpenOrders())
+                if (o.CustomID == (int)number)
+                    o.Cancel();
         }
 
         public void Stop()
@@ -472,6 +405,21 @@ namespace ServerBlackwood
         MessageTypes[] ServerBlackwood_newFeatureRequest()
         {
             List<MessageTypes> f = new List<MessageTypes>();
+            f.Add(MessageTypes.EXECUTENOTIFY);
+            f.Add(MessageTypes.SENDORDER);
+            f.Add(MessageTypes.SENDORDERLIMIT);
+            f.Add(MessageTypes.SENDORDERMARKET);
+            f.Add(MessageTypes.SENDORDERSTOP);
+            f.Add(MessageTypes.ORDERCANCELREQUEST);
+            f.Add(MessageTypes.ORDERCANCELRESPONSE);
+            f.Add(MessageTypes.ORDERNOTIFY);
+            f.Add(MessageTypes.IMBALANCEREQUEST);
+            f.Add(MessageTypes.IMBALANCERESPONSE);
+            f.Add(MessageTypes.DOMREQUEST);
+            f.Add(MessageTypes.DOMRESPONSE);
+            f.Add(MessageTypes.ISSHORTABLE);
+            f.Add(MessageTypes.POSITIONREQUEST);
+            f.Add(MessageTypes.POSITIONRESPONSE);
             return f.ToArray();
             
         }
