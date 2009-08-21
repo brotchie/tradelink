@@ -86,11 +86,6 @@ namespace Chartographer
         const string GOOGURL = "http://finance.google.com/finance/historical?histperiod=daily&start=250&num=25&output=csv&q=";
 
 
-        private void chartsymbolbox_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar != (char)Keys.Enter) return;
-            button1_Click(null, null);
-        }
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -175,6 +170,12 @@ namespace Chartographer
         private void button1_Click_1(object sender, EventArgs e)
         {
             button1_Click(null, null);
+        }
+
+        private void chartsymbolbox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+                button1_Click(null, null);
         }
     }
 }

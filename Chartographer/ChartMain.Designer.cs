@@ -52,7 +52,7 @@ namespace Chartographer
             this.chartsymbolbox.Text = "IBM";
             this.toolTip1.SetToolTip(this.chartsymbolbox, "load yearly chart for desired symbol from internet (free)");
             this.chartsymbolbox.Click += new System.EventHandler(this.chartsymbolbox_Click);
-            this.chartsymbolbox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.chartsymbolbox_KeyPress);
+            this.chartsymbolbox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.chartsymbolbox_KeyUp);
             // 
             // blackbackground
             // 
