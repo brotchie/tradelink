@@ -96,34 +96,34 @@ namespace TradeLink.Common
 
             try
             {
-                const string ext = "*.epf";
-                _index = Util.TickFileIndex(path, ext);
+                _index = Util.TickFileIndex(path, TikConst.WILDCARD_EXT);
             }
             catch (Exception ex) { status("exception loading stocks: " + ex.ToString()); return; }
             SetSymbols(_index);
         }
+        
         /// <summary>
         /// sets available symbols from an index
         /// </summary>
         /// <param name="index"></param>
         public void SetSymbols(string[,] index)
         {
-            _index = index;
+            List<string> tmpstk = new List<string>();
             int[] years = new int[200];
             int[] days = new int[31];
             int[] months = new int[12];
             int yc = 0;
             int dc = 0;
             int mc = 0;
-            int count = _index.GetLength(0);
+            int count = index.GetLength(0);
 
             for (int i = 0; i < count; i++)
             {
-                SecurityImpl s = Util.SecurityFromFileName(_index[i,0]);
+                SecurityImpl s = Util.SecurityFromFileName(index[i,0]);
                 if (!s.isValid) continue;
                 DateTime d = Util.ToDateTime(s.Date, 0);
-                if (!stocklist.Items.Contains(s.Symbol))
-                    stocklist.Items.Add(s.Symbol);
+                if (!tmpstk.Contains(s.Symbol))
+                    tmpstk.Add(s.Symbol);
                 if (!contains(d.Year, years))
                     years[yc++] = d.Year;
                 if (!contains(d.Month, months))
@@ -134,16 +134,39 @@ namespace TradeLink.Common
             Array.Sort(years);
             Array.Sort(days);
             Array.Sort(months);
-            for (int i = 0; i < years.Length; i++)
-                if (years[i] == 0) continue;
-                else yearlist.Items.Add(years[i]);
-            for (int i = 0; i < months.Length; i++)
-                if (months[i] == 0) continue;
-                else monthlist.Items.Add(months[i]);
-            for (int i = 0; i < days.Length; i++)
-                if (days[i] == 0) continue;
-                else daylist.Items.Add(days[i]);
-            Invalidate(true);
+            tmpstk.Sort();
+            updateGUI(tmpstk.ToArray(), days, years, months, index);
+
+        }
+
+        delegate void guidata(string[] stk, int[] d, int[] y, int[] m, string[,] idx);
+        void updateGUI(string[] stocks, int[] days, int[] years, int[] months, string[,] index)
+        {
+            if (InvokeRequired)
+                Invoke(new guidata(updateGUI), new object[] { stocks, days, years, months, index });
+            else
+            {
+                // clear gui elements
+                stocklist.Items.Clear();
+                yearlist.Items.Clear();
+                monthlist.Items.Clear();
+                daylist.Items.Clear();
+                // save index so if filter changes can recompute
+                _index = index;
+                // add items to gui
+                foreach (string sym in stocks)
+                    stocklist.Items.Add(sym);
+                for (int i = 0; i < years.Length; i++)
+                    if (years[i] == 0) continue;
+                    else yearlist.Items.Add(years[i]);
+                for (int i = 0; i < months.Length; i++)
+                    if (months[i] == 0) continue;
+                    else monthlist.Items.Add(months[i]);
+                for (int i = 0; i < days.Length; i++)
+                    if (days[i] == 0) continue;
+                    else daylist.Items.Add(days[i]);
+                Invalidate(true);
+            }
         }
 
         bool contains(int number, int[] array) { for (int i = 0; i < array.Length; i++) if (array[i] == number) return true; return false; }
