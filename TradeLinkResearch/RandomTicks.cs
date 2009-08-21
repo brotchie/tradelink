@@ -97,8 +97,10 @@ namespace TradeLink.Research
                 {
                     // by taking the initial price and moving it some amount between min and max move
                     _iprice[i] += (decimal)r.Next(_maxmove*-1,_maxmove)/100;
+                    // make sure it's still positive
+                    if (_iprice[i] < 0) _iprice[i] = 0;
                     // then store this result as a tick and continue
-                    _feed[i][j] = TickImpl.NewTrade(_syms[i],_iprice[i],VolPerTrade);
+                    _feed[i][j] = TickImpl.NewTrade(_syms[i], _iprice[i], VolPerTrade);
                 }
             }
         }

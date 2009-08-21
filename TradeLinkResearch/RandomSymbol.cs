@@ -14,7 +14,6 @@ namespace TradeLink.Research
     {
         /// <summary>
         /// gets a single random symbol.
-        /// 
         /// </summary>
         /// <param name="seed"></param>
         /// <returns></returns>
@@ -42,10 +41,17 @@ namespace TradeLink.Research
         /// <returns></returns>
         public static string Alphacodes2string(int[] codes)
         {
-            string s = "";
+            StringBuilder s = new StringBuilder();
             foreach (int c in codes)
-                s += (char)(c+64);
-            return s;
+            {
+                char ch = (char)(c + 65);
+                if (ch == '@')
+                {
+                    Console.WriteLine(ch);
+                }
+                s.Append(ch);
+            }
+            return s.ToString();
         }
         /// <summary>
         /// convert from base ten to another number system

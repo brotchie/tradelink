@@ -19,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASP", "ASP\ASP.csproj", "{3
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Record", "Record\Record.csproj", "{B9E0C89A-A460-4C03-A65C-DF8EA0A3B89F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SterServer", "SterServer\SterServer.csproj", "{4D10F179-3316-4B6D-AF93-E9D2543469F4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerSterling", "SterServer\ServerSterling.csproj", "{4D10F179-3316-4B6D-AF93-E9D2543469F4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Update", "Update\Update.csproj", "{2F1D368C-358E-441B-908A-475DFAB87550}"
 EndProject

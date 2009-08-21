@@ -59,6 +59,7 @@ namespace WinGauntlet
             this.messagepage = new System.Windows.Forms.TabPage();
             this.messages = new System.Windows.Forms.RichTextBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this._viewresults = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.studypage.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -91,6 +92,7 @@ namespace WinGauntlet
             // 
             // studypage
             // 
+            this.studypage.Controls.Add(this._viewresults);
             this.studypage.Controls.Add(this._twithelp);
             this.studypage.Controls.Add(this.statusStrip1);
             this.studypage.Controls.Add(this.label7);
@@ -156,7 +158,7 @@ namespace WinGauntlet
             this.queuebut.Location = new System.Drawing.Point(106, 421);
             this.queuebut.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.queuebut.Name = "queuebut";
-            this.queuebut.Size = new System.Drawing.Size(506, 31);
+            this.queuebut.Size = new System.Drawing.Size(372, 31);
             this.queuebut.TabIndex = 4;
             this.queuebut.Text = "Run the Gauntlet";
             this.toolTip1.SetToolTip(this.queuebut, "start the backtesting run");
@@ -367,6 +369,8 @@ namespace WinGauntlet
             // _debugs
             // 
             this._debugs.AutoSize = true;
+            this._debugs.Checked = true;
+            this._debugs.CheckState = System.Windows.Forms.CheckState.Checked;
             this._debugs.Location = new System.Drawing.Point(42, 189);
             this._debugs.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this._debugs.Name = "_debugs";
@@ -411,6 +415,17 @@ namespace WinGauntlet
             this.messages.Size = new System.Drawing.Size(621, 509);
             this.messages.TabIndex = 0;
             this.messages.Text = "";
+            // 
+            // _viewresults
+            // 
+            this._viewresults.Location = new System.Drawing.Point(486, 421);
+            this._viewresults.Name = "_viewresults";
+            this._viewresults.Size = new System.Drawing.Size(126, 31);
+            this._viewresults.TabIndex = 20;
+            this._viewresults.Text = "View Results";
+            this.toolTip1.SetToolTip(this._viewresults, "View Results Folder");
+            this._viewresults.UseVisualStyleBackColor = true;
+            this._viewresults.Click += new System.EventHandler(this._viewresults_Click);
             // 
             // Gauntlet
             // 
@@ -466,6 +481,7 @@ namespace WinGauntlet
         private System.Windows.Forms.CheckBox _indicatcsv;
         private TradeLink.Common.TickFileFilterControl tickFileFilterControl1;
         private System.Windows.Forms.Button _twithelp;
+        private System.Windows.Forms.Button _viewresults;
     }
 }
 

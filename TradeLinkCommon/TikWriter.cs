@@ -16,9 +16,22 @@ namespace TradeLink.Common
         string _file = string.Empty;
         string _path = Environment.CurrentDirectory;
         int _date = 0;
+        /// <summary>
+        /// real symbol represented by tick file
+        /// </summary>
         public string RealSymbol { get { return _realsymbol; } }
+        /// <summary>
+        /// path of this file
+        /// </summary>
         public string Filepath { get { return _file; } }
+        /// <summary>
+        /// date represented by data
+        /// </summary>
         public int Date { get { return _date; } }
+        /// <summary>
+        /// ticks written
+        /// </summary>
+        public int Count = 0;
         /// <summary>
         /// creates a tikwriter with no header, header is created from first tik
         /// </summary>
@@ -187,6 +200,9 @@ namespace TradeLink.Common
             Write(TikConst.EndTick);
             // write to disk
             Flush();
+            // count it
+            Count++;
+
         }
     }
 }

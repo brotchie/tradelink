@@ -15,16 +15,36 @@ namespace TradeLink.Common
         string _sym = string.Empty;
         Security _sec = new TradeLink.Common.SecurityImpl();
         string _path = string.Empty;
+        /// <summary>
+        /// estimate of ticks contained in file
+        /// </summary>
         public int ApproxTicks = 0;
+        /// <summary>
+        /// real symbol for data represented in file
+        /// </summary>
         public string RealSymbol { get { return _realsymbol; } }
+        /// <summary>
+        /// security-parsed symbol
+        /// </summary>
         public string Symbol { get { return _sym; } }
+        /// <summary>
+        /// security represented by parsing realsymbol
+        /// </summary>
+        /// <returns></returns>
         public Security ToSecurity() { return _sec; }
+        /// <summary>
+        /// file is readable, has version and real symbol
+        /// </summary>
         public bool isValid { get { return (_filever != 0) && (_realsymbol != string.Empty) && BaseStream.CanRead; } }
+        /// <summary>
+        /// count of ticks presently read
+        /// </summary>
+        public int Count = 0;
         public TikReader(string filepath) : base(new FileStream(filepath, FileMode.Open, FileAccess.Read, FileShare.Read)) 
         {
             _path = filepath;
             FileInfo fi = new FileInfo(filepath);
-            ApproxTicks = (int)((double)fi.Length / 40);
+            ApproxTicks = (int)((double)fi.Length / 39);
             ReadHeader();
         }
 
@@ -65,6 +85,7 @@ namespace TradeLink.Common
         {
             if (!_haveheader)
                 ReadHeader();
+
             try
             {
                 // get tick type
@@ -74,10 +95,10 @@ namespace TradeLink.Common
                 // get the tick
                 switch (type)
                 {
-                    case TikConst.EndData: return false; 
-                    case TikConst.EndTick: return true; 
-                    case TikConst.StartData: return true; 
-                    case TikConst.Version: return true; 
+                    case TikConst.EndData: return false;
+                    case TikConst.EndTick: return true;
+                    case TikConst.StartData: return true;
+                    case TikConst.Version: return true;
                     case TikConst.TickAsk:
                         {
                             k.date = ReadInt32();
@@ -145,13 +166,15 @@ namespace TradeLink.Common
                         // weird data, try to keep reading 
                         ReadByte();
                         // but don't send this tick, just get next record
-                        return true; 
+                        return true;
                 }
                 // send any tick we have
                 if (gotTick != null)
                     gotTick(k);
                 // read end of tick
                 ReadByte();
+                // count it
+                Count++;
                 // assume there is more
                 return true;
             }
@@ -163,7 +186,6 @@ namespace TradeLink.Common
             {
                 return false;
             }
-
         }
     }
 

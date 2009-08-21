@@ -16,6 +16,7 @@ namespace WinGauntlet
 
         HistSim h;
         BackgroundWorker bw = new BackgroundWorker();
+        BackgroundWorker getsymwork = new BackgroundWorker();
         static GauntArgs args = new GauntArgs();
         public const string PROGRAM = "Gauntlet";
         StreamWriter indf;
@@ -35,6 +36,11 @@ namespace WinGauntlet
             bw.WorkerSupportsCancellation = true;
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_RunWorkerCompleted);
             bw.DoWork += new DoWorkEventHandler(bw_DoWork);
+            getsymwork.WorkerSupportsCancellation = true;
+            getsymwork.DoWork += new DoWorkEventHandler(getsymwork_DoWork);
+            getsymwork.RunWorkerCompleted += new RunWorkerCompletedEventHandler(getsymwork_RunWorkerCompleted);
+            getsymwork.RunWorkerAsync();
+            getsymwork.RunWorkerCompleted += new RunWorkerCompletedEventHandler(getsymwork_RunWorkerCompleted);
 
             if (args.isUnattended)
             {
@@ -45,16 +51,35 @@ namespace WinGauntlet
             }
             else
             {
-                tickFileFilterControl1.SetSymbols(args.Folder);
+                status("wait while tickdata is loaded...");
                 UpdateResponses(Util.GetResponseList(args.DllName));
-                debug(Util.TLSIdentity());
             }
             
         }
 
+        void getsymwork_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Error == null)
+                status("completed loading tick data.");
+            else
+            {
+                status("error loading data");
+                debug(e.Error.Message + e.Error.StackTrace);
+            }
+            queuebut.Enabled = true;
+            queuebut.Invalidate();
+        }
+
+        void getsymwork_DoWork(object sender, DoWorkEventArgs e)
+        {
+            queuebut.Enabled = false;
+            queuebut.Invalidate();
+            tickFileFilterControl1.SetSymbols(args.Folder);
+        }
+
         void args_GotDebug(string msg)
         {
-            debug(msg);
+            Console.WriteLine(msg);
         }
 
 
@@ -272,19 +297,25 @@ namespace WinGauntlet
             messages.Clear();
         }
 
-        delegate void ShowCallBack(string msg);
         string OUTFOLD = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\";
-        void debug(string message) { status(message + Environment.NewLine,true); }
-        void status(string message) { status(message, false); }
-        void status(string message,bool hascarriage)
+        void debug(string message) 
         {
-            _log.GotDebug(message);
+            if (InvokeRequired)
+                Invoke(new DebugDelegate(debug), new object[] { message });
+            else
+            {
+                messages.AppendText(message);
+                messages.Invalidate(true);
+            }
+        }
 
-            if (messages.InvokeRequired)
+        void status(string message)
+        {
+            if (InvokeRequired)
             {
                 try
                 {
-                    Invoke(new ShowCallBack(status), new object[] { message });
+                    Invoke(new DebugDelegate(status), new object[] { message });
                 }
                 catch (ObjectDisposedException) { }
             }
@@ -292,13 +323,8 @@ namespace WinGauntlet
             {
                 try
                 {
-                    messages.AppendText(message);
-                    if (hascarriage) 
-                        lastmessage.Text = message.Substring(0,message.Length-2);
-                    else 
-                        lastmessage.Text = lastmessage.Text + message;
+                    lastmessage.Text = message;
                     lastmessage.Invalidate();
-                    messages.Invalidate(true);
                 }
                 catch (ObjectDisposedException) { }
             }
@@ -589,6 +615,11 @@ namespace WinGauntlet
         private void _twithelp_Click(object sender, EventArgs e)
         {
             CrashReport.BugReport(PROGRAM, _log.Content);
+        }
+
+        private void _viewresults_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
         }
 
 
