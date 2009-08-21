@@ -93,6 +93,8 @@
     <Compile Include="TestOffsetInfo.cs" />
     <Compile Include="TestOffsetTracker.cs" />
     <Compile Include="TestPositionTracker.cs" />
+    <Compile Include="TestRandomSymbol.cs" />
+    <Compile Include="TestRandomTicks.cs" />
     <Compile Include="TestResponse.cs" />
     <Compile Include="TestCalc.cs" />
     <Compile Include="TestBroker.cs" />
