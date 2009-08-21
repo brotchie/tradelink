@@ -37,6 +37,8 @@ namespace TradeLink.Common
             ReadByte();
             // get version
             _filever = ReadInt32();
+            if (_filever != TikConst.VERSION)
+                throw new BadTikFile("version: " + _filever + " expected: " + TikConst.VERSION);
             // get real symbol
             _realsymbol = ReadString();
             // get security from symbol
@@ -47,7 +49,7 @@ namespace TradeLink.Common
             ReadByte();
             // make sure we read something
             if (_realsymbol.Length <= 0)
-                throw new BadTikFile();
+                throw new BadTikFile("no symbol defined in tickfile");
             // flag header as read
             _haveheader = true;
 
@@ -81,7 +83,7 @@ namespace TradeLink.Common
                             k.date = ReadInt32();
                             k.time = ReadInt32();
                             k.datetime = ((long)k.date * 1000000) + (long)k.time;
-                            k.iask = ReadInt32();
+                            k.lask = ReadUInt64();
                             k.os = ReadInt32();
                             k.oe = ReadString();
                             k.depth = ReadInt32();
@@ -92,7 +94,7 @@ namespace TradeLink.Common
                             k.date = ReadInt32();
                             k.time = ReadInt32();
                             k.datetime = ((long)k.date * 1000000) + (long)k.time;
-                            k.ibid = ReadInt32();
+                            k.lbid = ReadUInt64();
                             k.bs = ReadInt32();
                             k.be = ReadString();
                             k.depth = ReadInt32();
@@ -103,13 +105,13 @@ namespace TradeLink.Common
                             k.date = ReadInt32();
                             k.time = ReadInt32();
                             k.datetime = ((long)k.date * 1000000) + (long)k.time;
-                            k.itrade = ReadInt32();
+                            k.ltrade = ReadUInt64();
                             k.size = ReadInt32();
                             k.ex = ReadString();
-                            k.ibid = ReadInt32();
+                            k.lbid = ReadUInt64();
                             k.bs = ReadInt32();
                             k.be = ReadString();
-                            k.iask = ReadInt32();
+                            k.lask = ReadUInt64();
                             k.os = ReadInt32();
                             k.oe = ReadString();
                             k.depth = ReadInt32();
@@ -120,10 +122,10 @@ namespace TradeLink.Common
                             k.date = ReadInt32();
                             k.time = ReadInt32();
                             k.datetime = ((long)k.date * 1000000) + (long)k.time;
-                            k.ibid = ReadInt32();
+                            k.lbid = ReadUInt64();
                             k.bs = ReadInt32();
                             k.be = ReadString();
-                            k.iask = ReadInt32();
+                            k.lask = ReadUInt64();
                             k.os = ReadInt32();
                             k.oe = ReadString();
                             k.depth = ReadInt32();
@@ -134,7 +136,7 @@ namespace TradeLink.Common
                             k.date = ReadInt32();
                             k.time = ReadInt32();
                             k.datetime = ((long)k.date * 1000000) + (long)k.time;
-                            k.itrade = ReadInt32();
+                            k.ltrade = ReadUInt64();
                             k.size = ReadInt32();
                             k.ex = ReadString();
                         }

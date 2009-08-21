@@ -129,7 +129,7 @@ namespace TradeLink.Common
                 Write(TikConst.TickBid);
                 Write(k.date);
                 Write(k.time);
-                Write(k.ibid);
+                Write(k.lbid);
                 Write(k.bs);
                 Write(k.be);
                 Write(k.depth);
@@ -139,7 +139,7 @@ namespace TradeLink.Common
                 Write(TikConst.TickAsk);
                 Write(k.date);
                 Write(k.time);
-                Write(k.iask);
+                Write(k.lask);
                 Write(k.os);
                 Write(k.oe);
                 Write(k.depth);
@@ -149,7 +149,7 @@ namespace TradeLink.Common
                 Write(TikConst.TickTrade);
                 Write(k.date);
                 Write(k.time);
-                Write(k.itrade);
+                Write(k.ltrade);
                 Write(k.size);
                 Write(k.ex);
             }
@@ -158,13 +158,13 @@ namespace TradeLink.Common
                 Write(TikConst.TickFull);
                 Write(k.date);
                 Write(k.time);
-                Write(k.itrade);
+                Write(k.ltrade);
                 Write(k.size);
                 Write(k.ex);
-                Write(k.ibid);
+                Write(k.lbid);
                 Write(k.bs);
                 Write(k.be);
-                Write(k.iask);
+                Write(k.lask);
                 Write(k.os);
                 Write(k.oe);
                 Write(k.depth);
@@ -175,10 +175,10 @@ namespace TradeLink.Common
                 Write(TikConst.TickQuote);
                 Write(k.date);
                 Write(k.time);
-                Write(k.ibid);
+                Write(k.lbid);
                 Write(k.bs);
                 Write(k.be);
-                Write(k.iask);
+                Write(k.lask);
                 Write(k.os);
                 Write(k.oe);
                 Write(k.depth);
