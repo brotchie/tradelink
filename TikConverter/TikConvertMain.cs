@@ -94,6 +94,8 @@ namespace TikConverter
         string _sym;
         bool convert(Converter con, string filename,int tradesize)
         {
+            int bads = 0;
+            int thistotal = _ticksprocessed;
             bool g = true;
             // get output filename
             string convertname = string.Empty;
@@ -130,33 +132,39 @@ namespace TikConverter
             Tick k = null;
             do
             {
-                // get next tick from the file
-
-                switch (con)
+                try
                 {
-                    case Converter.CQG:
-                        k = CQG.parseline(infile.ReadLine(), tradesize);
-                        break;
-                    case Converter.eSignal_EPF:
-                        k = eSigTick.FromStream(_sym, infile);
-                        break;
-                    case Converter.TradeStation:
-                        k = TradeStation.parseline(infile.ReadLine(), _sym, tradesize);
-                        break;
+                    // get next tick from the file
+
+                    switch (con)
+                    {
+                        case Converter.CQG:
+                            k = CQG.parseline(infile.ReadLine(), tradesize);
+                            break;
+                        case Converter.eSignal_EPF:
+                            k = eSigTick.FromStream(_sym, infile);
+                            break;
+                        case Converter.TradeStation:
+                            k = TradeStation.parseline(infile.ReadLine(), _sym, tradesize);
+                            break;
+                    }
                 }
+                catch (Exception ex) { bads++;  continue; }
                 if (k == null)
                 {
                     debug("Invalid converter: " + con.ToString());
                     return false;
                 }
+                // bad tick
+                if (k.date == 0) { bads++; continue; }
                 // if dates don't match, we need to write new output file
                 if (k.date != pk.date)
                 {
+                    try
+                    {
                     // if the outfile was open previously, close it
                     if (outfile != null) 
                         outfile.Close();
-                    try
-                    {
                         // get path from input
                         string path = Path.GetDirectoryName(filename) + "\\";
                         // setup new file
@@ -170,12 +178,13 @@ namespace TikConverter
                 {
                     // write the tick
                     outfile.newTick(k);
+                    // save this tick as previous tick
+                    pk = k;
+                    // count the tick as processed
+                    _ticksprocessed++;
                 }
                 catch (Exception ex) { debug("error writing output tick: " + ex.Message); g = false; }
-                // save this tick as previous tick
-                pk = k;
-                // count the tick as processed
-                _ticksprocessed++;
+
             }
             // keep going until input file is exhausted
             while (!infile.EndOfStream);
@@ -183,9 +192,18 @@ namespace TikConverter
             outfile.Close();
             // close input file
             infile.Close();
+            // get percentage of good ticks
+            double goodratio = (_ticksprocessed - thistotal - bads) / (_ticksprocessed - (double)thistotal);
+            if (goodratio < GOODRATIO)
+            {
+                debug("Less than " + GOODRATIO.ToString("P0") + " good ticks");
+                g = false;
+            }
             // return status
             return g;
         }
+
+        const double GOODRATIO = .95;
 
 
         delegate void pdouble(double p);
@@ -222,7 +240,32 @@ namespace TikConverter
         {
             // get converter
             _conval = (Converter)Enum.Parse(typeof(Converter), _con.Text, true);
+            // esignal convert does not use default size
+            _defaultsize.Enabled = _conval != Converter.eSignal_EPF;
+            _defaultsize.Invalidate();
+                
 
         }
+
+        private void TikConvertMain_SizeChanged(object sender, EventArgs e)
+        {
+            int neww = (int)(ClientRectangle.Width * delta);
+            if (neww != 0)
+                _msg.Width = neww;
+            int newh = (int)(ClientRectangle.Height - hdelta);
+            if (newh != 0)
+                _msg.Height = newh - (int)(_con.Height * 1.5);
+            Invalidate(true);
+        }
+        double hdelta, delta;
+
+        private void TikConvertMain_Load(object sender, EventArgs e)
+        {
+            if (_msg.Height != 0)
+                hdelta = (double)ClientRectangle.Height - _msg.Height;
+            delta = (double)_msg.Width / ClientRectangle.Width;
+        }
+
+
     }
 }

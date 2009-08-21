@@ -44,6 +44,7 @@
             // _msg
             // 
             this._msg.FormattingEnabled = true;
+            this._msg.HorizontalScrollbar = true;
             this._msg.ItemHeight = 20;
             this._msg.Location = new System.Drawing.Point(31, 67);
             this._msg.Name = "_msg";
@@ -140,6 +141,8 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "TikConvertMain";
             this.Text = "TikConverter";
+            this.Load += new System.EventHandler(this.TikConvertMain_Load);
+            this.SizeChanged += new System.EventHandler(this.TikConvertMain_SizeChanged);
             ((System.ComponentModel.ISupportInitialize)(this._defaultsize)).EndInit();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
