@@ -8,10 +8,10 @@ namespace TradeLink.API
     public interface Bar
     {
         string Symbol { get; }
-        int iHigh { get; }
-        int iLow { get; }
-        int iOpen { get; }
-        int iClose { get; }
+        ulong lHigh { get; }
+        ulong lLow { get; }
+        ulong lOpen { get; }
+        ulong lClose { get; }
         decimal High { get; }
         decimal Low { get;  }
         decimal Open { get;  }

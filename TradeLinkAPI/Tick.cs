@@ -33,17 +33,17 @@ namespace TradeLink.API
         /// </summary>
         int depth { get; set; } 
         /// <summary>
-        /// integer representation of last trade
+        /// long representation of last trade
         /// </summary>
-        int itrade { get; set; }
+        ulong ltrade { get; set; }
         /// <summary>
-        /// integer representation of bid price
+        /// long representation of bid price
         /// </summary>
-        int ibid { get; set; }
+        ulong lbid { get; set; }
         /// <summary>
-        /// integer representation of ask price
+        /// long representation of ask price
         /// </summary>
-        int iask { get; set; }
+        ulong lask { get; set; }
         /// <summary>
         /// trade price
         /// </summary>
