@@ -17,10 +17,6 @@ namespace TradeLink.Common
         /// </summary>
         public event OrderCancelDelegate GotOrderCancel;
         /// <summary>
-        /// Occurs when [got tick].
-        /// </summary>
-        public event TickDelegate GotTick;
-        /// <summary>
         /// Occurs when [got order].
         /// </summary>
         public event OrderDelegate GotOrder;
