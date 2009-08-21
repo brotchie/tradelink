@@ -185,7 +185,7 @@ namespace TradeLink.Common
         public static string Serialize(Order o)
         {
             if (o.isFilled) return TradeImpl.Serialize((Trade)o);
-            string[] r = new string[] { o.symbol, (o.side ? "true" : "false"), o.UnsignedSize.ToString(), o.price.ToString(), o.stopp.ToString(), o.comment, o.ex, o.Account, o.Security.ToString(), o.Currency.ToString(), o.LocalSymbol, o.id.ToString(), o.TIF, o.date.ToString(), o.time.ToString(), "", o.trail.ToString() };
+            string[] r = new string[] { o.symbol, (o.side ? "true" : "false"), o.UnsignedSize.ToString(), o.price.ToString(System.Globalization.CultureInfo.InvariantCulture), o.stopp.ToString(System.Globalization.CultureInfo.InvariantCulture), o.comment, o.ex, o.Account, o.Security.ToString(), o.Currency.ToString(), o.LocalSymbol, o.id.ToString(), o.TIF, o.date.ToString(), o.time.ToString(), "", o.trail.ToString(System.Globalization.CultureInfo.InvariantCulture) };
             return string.Join(",", r);
         }
         /// <summary>
@@ -199,8 +199,8 @@ namespace TradeLink.Common
             if (rec.Length < 17) throw new InvalidOrder();
             bool side = Convert.ToBoolean(rec[(int)OrderField.Side]);
             int size = Convert.ToInt32(rec[(int)OrderField.Size]);
-            decimal oprice = Convert.ToDecimal(rec[(int)OrderField.Price]);
-            decimal ostop = Convert.ToDecimal(rec[(int)OrderField.Stop]);
+            decimal oprice = Convert.ToDecimal(rec[(int)OrderField.Price], System.Globalization.CultureInfo.InvariantCulture);
+            decimal ostop = Convert.ToDecimal(rec[(int)OrderField.Stop], System.Globalization.CultureInfo.InvariantCulture);
             string sym = rec[(int)OrderField.Symbol];
             o = new OrderImpl(sym, side, size);
             o.price = oprice;
@@ -213,7 +213,7 @@ namespace TradeLink.Common
             o.Security = (SecurityType)Enum.Parse(typeof(SecurityType), rec[(int)OrderField.Security]);
             o.id = Convert.ToUInt32(rec[(int)OrderField.OrderID]);
             o.TIF = rec[(int)OrderField.OrderTIF];
-            o.trail = Convert.ToDecimal(rec[(int)OrderField.Trail]);
+            o.trail = Convert.ToDecimal(rec[(int)OrderField.Trail], System.Globalization.CultureInfo.InvariantCulture);
             o.date = Convert.ToInt32(rec[(int)OrderField.oDate]);
             o.time = Convert.ToInt32(rec[(int)OrderField.oTime]);
             return o;

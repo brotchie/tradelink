@@ -110,8 +110,8 @@ namespace TradeLink.Common
             decimal p = 0;
             int s = 0;
             try {
-                p = Convert.ToDecimal(oprice.Value);
-                s = Convert.ToInt32(osize.Value);
+                p = oprice.Value;
+                s = (int)osize.Value;
             }
             catch (InvalidCastException) { castexcep = true; }
             if (marketbut.Checked) p = 0;
@@ -122,7 +122,7 @@ namespace TradeLink.Common
         {
             if (!isValid()) return;
             work.side = obuybut.Checked;
-            work.size = Math.Abs(Convert.ToInt32(osize.Text));
+            work.size = Math.Abs((int)osize.Value);
             if (marketbut.Checked)
             {
                 work.price = 0;
@@ -131,8 +131,8 @@ namespace TradeLink.Common
             else
             {
                 bool islimit = limitbut.Checked;
-                decimal limit = islimit ? Convert.ToDecimal(oprice.Value) : 0;
-                decimal stop = !islimit ? Convert.ToDecimal(oprice.Value) : 0;
+                decimal limit = islimit ? oprice.Value : 0;
+                decimal stop = !islimit ? oprice.Value : 0;
                 work.price = limit;
                 work.stopp = stop;
             }

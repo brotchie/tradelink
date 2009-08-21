@@ -109,7 +109,7 @@ namespace TradeLink.Common
         public static string Serialize(Trade t)
         {
             const char d = ',';
-            return t.xdate.ToString() + d + t.xtime.ToString() + d +  d + t.symbol + d + t.side.ToString() + d + t.xsize.ToString() + d + t.xprice.ToString() + d + t.comment + d + t.Account + d + t.Security.ToString() + d + t.Currency.ToString() + d + t.LocalSymbol + d + t.id.ToString() + d + t.ex; ;
+            return t.xdate.ToString() + d + t.xtime.ToString() + d + d + t.symbol + d + t.side.ToString() + d + t.xsize.ToString() + d + t.xprice.ToString(System.Globalization.CultureInfo.InvariantCulture) + d + t.comment + d + t.Account + d + t.Security.ToString() + d + t.Currency.ToString() + d + t.LocalSymbol + d + t.id.ToString() + d + t.ex; ;
         }
         /// <summary>
         /// Deserialize string to Trade
@@ -123,7 +123,7 @@ namespace TradeLink.Common
             bool side = Convert.ToBoolean(rec[(int)TradeField.Side]);
             int size = Convert.ToInt32(rec[(int)TradeField.Size]);
             size = Math.Abs(size) * (side ? 1 : -1);
-            decimal xprice = Convert.ToDecimal(rec[(int)TradeField.Price]);
+            decimal xprice = Convert.ToDecimal(rec[(int)TradeField.Price],System.Globalization.CultureInfo.InvariantCulture);
             string sym = rec[(int)TradeField.Symbol];
             t = new TradeImpl(sym, xprice, size);
             t.xdate = Convert.ToInt32(rec[(int)TradeField.xDate]);

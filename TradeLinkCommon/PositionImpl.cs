@@ -90,8 +90,8 @@ namespace TradeLink.Common
             
             string[] r = msg.Split(',');
             string sym = r[(int)PositionField.symbol];
-            decimal price = Convert.ToDecimal(r[(int)PositionField.price]);
-            decimal cpl = Convert.ToDecimal(r[(int)PositionField.closedpl]);
+            decimal price = Convert.ToDecimal(r[(int)PositionField.price], System.Globalization.CultureInfo.InvariantCulture);
+            decimal cpl = Convert.ToDecimal(r[(int)PositionField.closedpl], System.Globalization.CultureInfo.InvariantCulture);
             int size = Convert.ToInt32(r[(int)PositionField.size]);
             Position p = new PositionImpl(sym,price,size,cpl);
             return p;
@@ -99,7 +99,7 @@ namespace TradeLink.Common
 
         public static string Serialize(Position p)
         {
-            string[] r = new string[] { p.Symbol, p.AvgPrice.ToString("N2"), p.Size.ToString(), p.ClosedPL.ToString("N2") };
+            string[] r = new string[] { p.Symbol, p.AvgPrice.ToString("N2",System.Globalization.CultureInfo.InvariantCulture), p.Size.ToString(), p.ClosedPL.ToString("N2",System.Globalization.CultureInfo.InvariantCulture) };
             return string.Join(",", r);
         }
 
