@@ -18,12 +18,12 @@ namespace TradeLink.Common
         public long datetime { get { return _datetime; } set { _datetime = value; } }
         public int bs { get { return _bs; } set { _bs = value; } }
         public int os { get { return _os; } set { _os = value; } }
-        public int itrade { get { return _trade; } set { _trade = value; } }
-        public int ibid { get { return _bid; } set { _bid = value; } }
-        public int iask { get { return _ask; } set { _ask = value; } }
-        public decimal trade { get { return _trade*Const.IPRECV; } set { _trade = (int)(value*Const.IPREC); } }
-        public decimal bid { get { return _bid * Const.IPRECV; } set { _bid = (int)(value * Const.IPREC); } }
-        public decimal ask { get { return _ask * Const.IPRECV; } set { _ask = (int)(value * Const.IPREC); } }
+        public ulong ltrade { get { return _trade; } set { _trade = value; } }
+        public ulong lbid { get { return _bid; } set { _bid = value; } }
+        public ulong lask { get { return _ask; } set { _ask = value; } }
+        public decimal trade { get { return _trade*Const.IPRECV; } set { _trade = (ulong)(value*Const.IPREC); } }
+        public decimal bid { get { return _bid * Const.IPRECV; } set { _bid = (ulong)(value * Const.IPREC); } }
+        public decimal ask { get { return _ask * Const.IPRECV; } set { _ask = (ulong)(value * Const.IPREC); } }
         public string ex { get { return _ex; } set { _ex = value; } }
         public string be { get { return _be; } set { _be = value; } }
         public string oe { get { return _oe; } set { _oe = value; } }
@@ -54,9 +54,9 @@ namespace TradeLink.Common
 
         int _date;
         int _time;
-        int _trade;
-        int  _bid;
-        int _ask;
+        ulong _trade;
+        ulong _bid;
+        ulong _ask;
 
         public TickImpl(string symbol) 
         {
@@ -186,15 +186,15 @@ namespace TradeLink.Common
             sb.Append(d);
             // unused field
             sb.Append(d);
-            sb.Append(t.trade);
+            sb.Append(t.trade.ToString(System.Globalization.CultureInfo.InvariantCulture));
             sb.Append(d);
             sb.Append(t.size); 
             sb.Append(d);
             sb.Append(t.ex);
             sb.Append(d);
-            sb.Append(t.bid);
+            sb.Append(t.bid.ToString(System.Globalization.CultureInfo.InvariantCulture));
             sb.Append(d);
-            sb.Append(t.ask);
+            sb.Append(t.ask.ToString(System.Globalization.CultureInfo.InvariantCulture));
             sb.Append(d);
             sb.Append(t.bs);
             sb.Append(d);
@@ -215,11 +215,11 @@ namespace TradeLink.Common
             decimal d = 0;
             int i = 0;
             t.symbol = r[(int)TickField.symbol];
-            if (decimal.TryParse(r[(int)TickField.trade], out d))
+            if (decimal.TryParse(r[(int)TickField.trade], System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out d))
                 t.trade = d;
-            if (decimal.TryParse(r[(int)TickField.bid], out d))
+            if (decimal.TryParse(r[(int)TickField.bid],  System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture,out d))
                 t.bid = d;
-            if (decimal.TryParse(r[(int)TickField.ask], out d))
+            if (decimal.TryParse(r[(int)TickField.ask], System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out d))
                 t.ask = d;
             if (int.TryParse(r[(int)TickField.tsize], out i))
                 t.size = i;

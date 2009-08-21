@@ -13,10 +13,10 @@ namespace TradeLink.Common
     {
         string _sym = "";
         public string Symbol { get { return _sym; } }
-        private int h = int.MinValue;
-        private int l = int.MaxValue;
-        private int o = 0;
-        private int c = 0;
+        private ulong h = ulong.MinValue;
+        private ulong l = ulong.MaxValue;
+        private ulong o = 0;
+        private ulong c = 0;
         private int v = 0;
         private int tradesinbar = 0;
         private bool _new = false;
@@ -25,10 +25,10 @@ namespace TradeLink.Common
         private int bardate = 0;
         private bool DAYEND = false;
         public bool DayEnd { get { return DAYEND; } }
-        public int iHigh { get { return h; } }
-        public int iLow { get { return l; } }
-        public int iOpen { get { return o; } }
-        public int iClose { get { return c; } }
+        public ulong lHigh { get { return h; } }
+        public ulong lLow { get { return l; } }
+        public ulong lOpen { get { return o; } }
+        public ulong lClose { get { return c; } }
         public decimal High { get { return h*Const.IPRECV; } }
         public decimal Low { get { return l * Const.IPRECV; } }
         public decimal Open { get { return o * Const.IPRECV; } }
@@ -41,20 +41,20 @@ namespace TradeLink.Common
         public BarImpl() : this(BarInterval.FiveMin) { }
         public BarImpl(decimal open, decimal high, decimal low, decimal close, int vol, int date, int time)
         {
-            h = (int)(high*Const.IPREC);
-            o = (int)(open * Const.IPREC);
-            l = (int)(low * Const.IPREC);
-            c = (int)(close * Const.IPREC);
+            h = (ulong)(high*Const.IPREC);
+            o = (ulong)(open * Const.IPREC);
+            l = (ulong)(low * Const.IPREC);
+            c = (ulong)(close * Const.IPREC);
             v = vol;
             bardate = date;
             bartime = time;
         }
         public BarImpl(decimal open, decimal high, decimal low, decimal close, int vol, int date, int time, string symbol)
         {
-            h = (int)(high * Const.IPREC);
-            o = (int)(open * Const.IPREC);
-            l = (int)(low * Const.IPREC);
-            c = (int)(close * Const.IPREC);
+            h = (ulong)(high * Const.IPREC);
+            o = (ulong)(open * Const.IPREC);
+            l = (ulong)(low * Const.IPREC);
+            c = (ulong)(close * Const.IPREC);
             v = vol;
             bardate = date;
             bartime = time;
@@ -63,10 +63,10 @@ namespace TradeLink.Common
         public BarImpl(BarImpl b)
         {
             v = b.Volume;
-            h = b.iHigh;
-            l = b.iLow;
-            o = b.iOpen;
-            c = b.iClose;
+            h = b.lHigh;
+            l = b.lLow;
+            o = b.lOpen;
+            c = b.lClose;
             DAYEND = b.DAYEND;
             bartime = b.bartime;
             bardate = b.bardate;
@@ -110,10 +110,10 @@ namespace TradeLink.Common
             _new = tradesinbar == 1;
             // only count volume on trades, not indicies
             if (!t.isIndex) v += t.size; // add trade size to bar volume
-            if (o == 0) o = t.itrade;
-            if (t.itrade > h) h = t.itrade;
-            if (t.itrade < l) l = t.itrade;
-            c = t.itrade;
+            if (o == 0) o = t.ltrade;
+            if (t.ltrade > h) h = t.ltrade;
+            if (t.ltrade < l) l = t.ltrade;
+            c = t.ltrade;
             return true;
         }
         public override string ToString() { return "OHLC ("+bartime+") " + o + "," + h + "," + l + "," + c; }
@@ -135,10 +135,10 @@ namespace TradeLink.Common
             }
             catch (System.FormatException) { return null; }
             int date = (d.Year*10000)+(d.Month*100)+d.Day;
-            decimal open = Convert.ToDecimal(r[1]);
-            decimal high = Convert.ToDecimal(r[2]);
-            decimal low = Convert.ToDecimal(r[3]);
-            decimal close = Convert.ToDecimal(r[4]);
+            decimal open = Convert.ToDecimal(r[1],System.Globalization.CultureInfo.InvariantCulture);
+            decimal high = Convert.ToDecimal(r[2], System.Globalization.CultureInfo.InvariantCulture);
+            decimal low = Convert.ToDecimal(r[3], System.Globalization.CultureInfo.InvariantCulture);
+            decimal close = Convert.ToDecimal(r[4], System.Globalization.CultureInfo.InvariantCulture);
             int vol = Convert.ToInt32(r[5]);
             return new BarImpl(open,high,low,close,vol,date,0,symbol);
         }
