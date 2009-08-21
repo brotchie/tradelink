@@ -148,6 +148,8 @@ namespace TradeLink.Common
                 MasterOrders.Add(a,new List<Order>()); // if not, create one
             o.Account = a.ID; // make sure order knows his account
             MasterOrders[a].Add(o); // record the order
+            // increment pending count
+            _pendorders++; 
         }
         public bool CancelOrder(uint orderid)
         {
@@ -216,6 +218,8 @@ namespace TradeLink.Common
             return (int)MessageTypes.OK;
         }
 
+        int _pendorders = 0;
+
         List<string> hasopened = new List<string>();
 
         /// <summary>
@@ -225,7 +229,7 @@ namespace TradeLink.Common
         /// <returns>the number of orders executed using the tick.</returns>
         public int Execute(Tick tick)
         {
-            if (GotTick != null) GotTick(tick);
+            if (_pendorders == 0) return 0;
             if (!tick.isTrade) return 0;
             int filledorders = 0;
             foreach (Account a in MasterOrders.Keys)
@@ -280,9 +284,13 @@ namespace TradeLink.Common
                         filledorders++; 
                     }
                 }
+                int rmcount = remove.Count;
                 // remove the filled orders
                 for (int i = remove.Count - 1; i >= 0; i--)
                     MasterOrders[a].RemoveAt(remove[i]);
+                // unmark filled orders as pending
+                _pendorders -= rmcount;
+                if (_pendorders < 0) _pendorders = 0;
                 // notify subscribers of trade
                 if ((GotFill != null) && a.Notify)
                     foreach (int tradeidx in notifytrade)

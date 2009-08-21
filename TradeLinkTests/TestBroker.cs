@@ -83,26 +83,7 @@ namespace TestTradeLink
         int gottickDP = 0;
         Tick receivedtickDP;
 
-        [Test]
-        public void DataProvider()
-        {
-            TickImpl t = TickImpl.NewTrade(s, 10, 700);
-            // feature to pass-through ticks to any subscriber
-            // this can be connected to tradelink library to allow filtered subscribptions
-            // and interapplication communication
-            Broker broker = new Broker();
-            broker.GotTick += new TickDelegate(broker_GotTick);
-            Assert.That((receivedtickDP == null) && (gottickDP == 0));
-            broker.Execute(t); // should fire a gotTick
-            Assert.That(gottickDP != 0);
-            Assert.That((receivedtickDP != null) && (receivedtickDP.trade == t.trade));
 
-        }
-        void broker_GotTick(Tick tick)
-        {
-            receivedtickDP = TickImpl.Copy(tick);
-            gottickDP++;
-        }
 
         [Test]
         public void BBO()
