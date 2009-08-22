@@ -107,7 +107,9 @@
     <Compile Include="TestSkin.cs" />
     <Compile Include="TestStock.cs" />
     <Compile Include="TestTick.cs" />
-    <Compile Include="TestTickArchiver.cs" />
+    <Compile Include="TestTickArchiver.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="TestTickFileFilter.cs" />
     <Compile Include="TestTickWatcher.cs" />
     <Compile Include="TestTikWriterReader.cs" />

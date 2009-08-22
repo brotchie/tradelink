@@ -55,19 +55,21 @@ namespace TradeLink.Research
         /// creates random ticks from a list of symbols, with randomized initial prices
         /// </summary>
         /// <param name="symbols"></param>
-        public RandomTicks(string [] symbols) : this(symbols,RandomPrices(symbols.Length)) {}
+        public RandomTicks(string [] symbols) : this(symbols,RandomPrices(symbols.Length),(int)DateTime.Now.Ticks) {}
         /// <summary>
         /// creates random ticks for a list of symbols and starting prices.
         /// prices should be in same order for symbol they represent.
         /// </summary>
         /// <param name="symbols">list of symbols</param>
         /// <param name="startingprices">opening trade for each symbol</param>
-        public RandomTicks(string[] symbols, decimal[] startingprices)
+        public RandomTicks(string[] symbols, decimal[] startingprices, int seed)
         {
             // save symbol list
             _syms = symbols;
             // save initial prices
             _iprice = startingprices;
+            // init generator
+            r = new Random(seed);
         }
         int _maxmove = 3;
         int _volpertrade = 100;
@@ -79,6 +81,7 @@ namespace TradeLink.Research
         /// volume to use on each tick
         /// </summary>
         public int VolPerTrade { get { return _volpertrade; } set { _volpertrade = value; } }
+        Random r = null;
         /// <summary>
         /// generate Ticks per symbol using a random walk from initial prices
         /// </summary>
@@ -87,7 +90,7 @@ namespace TradeLink.Research
         public void Generate(int Ticks, int Seed)
         {
             _feed = new Tick[_syms.Length][];
-            Random r = new Random(Seed);
+
             // for each symbol
             for (int i = 0; i<_syms.Length; i++)
             {
@@ -96,7 +99,7 @@ namespace TradeLink.Research
                 for (int j = 0; j<Ticks; j++)
                 {
                     // by taking the initial price and moving it some amount between min and max move
-                    _iprice[i] += (decimal)r.Next(_maxmove*-1,_maxmove)/100;
+                    _iprice[i] += (decimal)r.Next(_maxmove*-1,_maxmove+1)/100;
                     // make sure it's still positive
                     if (_iprice[i] < 0) _iprice[i] = 0;
                     // then store this result as a tick and continue
