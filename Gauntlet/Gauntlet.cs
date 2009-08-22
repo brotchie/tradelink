@@ -251,8 +251,7 @@ namespace WinGauntlet
 
         void h_GotDebug(string msg)
         {
-            if (args.Debugs)
-                debug(msg);
+            debug(msg);
         }
 
 
@@ -304,7 +303,7 @@ namespace WinGauntlet
                 Invoke(new DebugDelegate(debug), new object[] { message });
             else
             {
-                messages.AppendText(message);
+                messages.AppendText(message+Environment.NewLine);
                 messages.Invalidate(true);
             }
         }
@@ -427,7 +426,6 @@ namespace WinGauntlet
 
         void Response_GotDebug(Debug msg)
         {
-            if (!args.Debugs) return;
             _sb.AppendLine(msg.Msg);
             
         }
