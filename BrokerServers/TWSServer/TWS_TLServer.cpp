@@ -547,7 +547,7 @@ namespace TradeLibFast
 			k.time = (ct.GetHour()*10000)+(ct.GetMinute()*100) + ct.GetSecond();
 			k.sym = stockticks[tickerId].sym;
 			TLSecurity sec = TLSecurity::Deserialize(k.sym);
-			bool hundrednorm = sec.type== STK;
+			bool hundrednorm = (sec.type== STK) || (sec.type== NIL );
 			if (tickType==LAST_SIZE)
 			{
 				stockticks[tickerId].size = hundrednorm ? size*100 : size;
