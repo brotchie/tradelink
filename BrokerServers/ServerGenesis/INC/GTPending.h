@@ -20,8 +20,6 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "..\Inc32\GTPending32.h"
-
 /*! \ingroup cpp
 */
 /*! \class GTPending

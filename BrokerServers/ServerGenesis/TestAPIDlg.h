@@ -17,6 +17,9 @@
 #endif // _MSC_VER > 1000
 
 #include "MySession.h"
+#include "ServerGenesis.h"
+
+
 
 /////////////////////////////////////////////////////////////////////////////
 // CTestAPIDlg dialog
@@ -26,6 +29,10 @@ class CTestAPIDlg : public CDialog
 // Construction
 public:
 	CTestAPIDlg(CWnd* pParent = NULL);	// standard constructor
+
+
+	ServerGenesis tl;
+
 
 // Dialog Data
 	//{{AFX_DATA(CTestAPIDlg)

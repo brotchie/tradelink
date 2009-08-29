@@ -128,7 +128,7 @@
 
 	enum Brokers
 	{
-        UnknownBroker = -1,
+		Unknown = -1,
         TradeLink = 0,
         Assent,
         InteractiveBrokers,
@@ -142,6 +142,15 @@
         HUBB,
         Tradespeed,
         REDI,
+        eSignal,
+        IQFeed,
+        TrackData,
+        TradingTechnologies,
+        ZenFire,
+        GAINCapital,
+        FxCm,
+        OpenEcry,
+        DBFX
 	};
 
 

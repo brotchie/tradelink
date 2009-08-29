@@ -12,7 +12,7 @@
 #include "stdafx.h"
 #include "TestAPI.h"
 #include "TestAPIDlg.h"
-#include ".\testapidlg.h"
+//#include ".\testapidlg.h"
 
 #include <sstream>
 
@@ -39,7 +39,11 @@ CTestAPIDlg::CTestAPIDlg(CWnd* pParent /*=NULL*/)
 	m_strStock = "ZVZZT";
 	m_strUserName = _T("");
 	m_strPassword = _T("");
+
+
 }
+
+
 
 void CTestAPIDlg::DoDataExchange(CDataExchange* pDX)
 {
@@ -47,7 +51,7 @@ void CTestAPIDlg::DoDataExchange(CDataExchange* pDX)
 	//{{AFX_DATA_MAP(CTestAPIDlg)
 	DDX_Control(pDX, IDC_LIST, m_list);
 	DDX_Control(pDX, IDC_START, m_start);
-	DDX_Control(pDX, IDC_SESSION, m_session);
+	DDX_Control(pDX, IDC_SESSION, m_session );
 	DDX_Text(pDX, IDC_STOCK, m_strStock);
 	DDV_MaxChars(pDX, m_strStock, 10);
 	DDX_Text(pDX, IDC_PASSWORD, m_strPassword);
@@ -105,6 +109,7 @@ BOOL CTestAPIDlg::OnInitDialog()
 
 	CDialog::OnInitDialog();
 
+	tl.Start();
 	// Set the icon for this dialog.  The framework does this automatically
 	//  when the application's main window is not a dialog
 	SetIcon(m_hIcon, TRUE);			// Set big icon
@@ -171,6 +176,7 @@ void CTestAPIDlg::OnCancel()
 
 void CTestAPIDlg::OnClose() 
 {
+
 }
 
 void CTestAPIDlg::OnStart() 
@@ -180,15 +186,7 @@ void CTestAPIDlg::OnStart()
 
 	m_session.DeleteAllStocks();
 	m_session.CreateStock(m_strStock);
-/*	m_session.CreateStock("MSFT");
-	m_session.CreateStock("CSCO");
-	m_session.CreateStock("QQQ");
-	m_session.CreateStock("DIA");
-	m_session.CreateStock("SPY");
-	m_session.CreateStock("AMAT");
-	m_session.CreateStock("QCOM");
-	m_session.CreateStock("AMGN");
-	m_session.CreateStock("DELL");*/
+
 
 #if 0
 	m_session.m_setting.SetExecAddress("76.8.64.3", 15605);
@@ -221,12 +219,15 @@ void CTestAPIDlg::OnStart()
 	//m_session.m_setting.m_hidden[MMID_NYB]=1;
 
 	m_session.Login(m_strUserName, m_strPassword);	
+	tl.Login(m_strUserName, m_strPassword);
 }
 
 void CTestAPIDlg::OnStop() 
 {
 	m_session.Logout();
 	m_session.TryClose();
+	tl.Logout();
+	tl.TryClose();
 }
 
 void CTestAPIDlg::OnBid() 
@@ -476,7 +477,8 @@ void CTestAPIDlg::UpdateAccountInfo(std::list<std::string>& lstAccounts)
 	{
 		CString strNew;
 		comb->GetLBText(nID, strNew);
-		if(!stricmp(strOldSelected.GetString(), strNew.GetString()))
+		
+		if(!_stricmp(strOldSelected.GetString(), strNew.GetString()))
 		{
 			comb->SetCurSel(nID);
 		}
