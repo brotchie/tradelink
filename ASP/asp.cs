@@ -100,10 +100,10 @@ namespace ASP
         void tl_gotUnknownMessage(MessageTypes type, uint id, string data)
         {
             // send unknown messages to valid responses
-            foreach (string sym in _symidx.Keys)
-                foreach (int idx in _symidx[sym])
-                    if (_reslist[idx].isValid)
-                        _reslist[idx].GotMessage(type, id, data);
+            int idx = (int)id;
+            if (idx == ResponseTemplate.UNKNOWNRESPONSE) return;
+            if (_reslist[idx].isValid)
+                    _reslist[idx].GotMessage(type, id, data);
         }
 
 
@@ -694,6 +694,7 @@ namespace ASP
                     break;
             }
             long result = tl.TLSend(type, data);
+            tl_gotUnknownMessage(type, id, result.ToString());
         }
 
         void workingres_SendOrder(Order o)

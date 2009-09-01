@@ -138,7 +138,7 @@ namespace TradeLink.Common
         /// <param name="type"></param>
         /// <param name="id"></param>
         /// <param name="data"></param>
-        public virtual void sendmessage(MessageTypes type, uint id, string data) { sendmessage(type, id, data); }
+        public virtual void sendmessage(MessageTypes type, string data) { if (SendMessage!=null) SendMessage(type, (uint)ID, data); }
         /// <summary>
         /// sends a debug message about what your response is doing at the moment.
         /// </summary>
@@ -154,8 +154,8 @@ namespace TradeLink.Common
         string _name = "";
         string _full = "";
         bool _valid = true;
-        int _id = -1;
-
+        int _id = UNKNOWNRESPONSE;
+        public const int UNKNOWNRESPONSE = int.MaxValue;
         /// <summary>
         /// numeric tag for this response used by programs that load responses
         /// </summary>
