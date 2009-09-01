@@ -44,6 +44,9 @@ namespace ASP
             InitializeComponent();
             // don't save ticks from replay since they're already saved
             _ao.archivetickbox.Checked = tl.LinkType != TLTypes.HISTORICALBROKER;
+            _ao._remskin.Click+=new EventHandler(_remskin_Click);
+            _ao._saveskins.Click+=new EventHandler(_saveskins_Click);
+            _ao._skins.SelectedIndexChanged+=new EventHandler(_skins_SelectedIndexChanged);
             // if our machine is multi-core we use seperate thread to process ticks
             if (Environment.ProcessorCount == 1)
                 tl.gotTick += new TickDelegate(tl_gotTick);
@@ -86,8 +89,6 @@ namespace ASP
             _resnames.ContextMenu.MenuItems.Add("edit symbols", new EventHandler(editsyms));
             // make sure we exit properly
             this.FormClosing += new FormClosingEventHandler(ASP_FormClosing);
-            // show version to user
-            
             // check for new versions
             Versions.UpgradeAlert(tl);
             // get last loaded response library
@@ -238,6 +239,7 @@ namespace ASP
                 // notify user
                 status("loaded skin: " + skin);
             }
+            _ao.Hide();
         }
 
         bool tradeskins(string name)
@@ -256,14 +258,14 @@ namespace ASP
                     {
                         // get it along with it's persisted settings
                         Response r = (Response)SkinImpl.DeskinFile(fn);
+                        // bind events
+                        bindresponseevents(r);
                         // add it to trade list
                         _reslist.Add(r);
                         // show it to user
                         _resnames.Items.Add(r.FullName);
                         // mark it as loaded
                         _resskinidx.Add(_reslist.Count - 1, name);
-                        // route symbols to it?
-
                         // update status
                         worked &= true;
                     }
@@ -400,8 +402,7 @@ namespace ASP
 
         void ASP_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if ((_resskinidx.Count>0) &&
-                (MessageBox.Show("Save skins before quiting?", "Save skins", MessageBoxButtons.YesNo) == DialogResult.Yes))
+            if (_resskinidx.Count>0) 
                 _saveskins_Click(null, null);
             // if we're using another thread to process ticks, stop it
             if (Environment.ProcessorCount>1)
@@ -512,7 +513,15 @@ namespace ASP
                 LoadResponseDLL(of.FileName); // load it
         }
 
-
+        void bindresponseevents(Response tmp)
+        {
+            // handle all the outgoing events from the response
+            tmp.SendOrder += new OrderDelegate(workingres_SendOrder);
+            tmp.SendDebug += new DebugFullDelegate(workingres_GotDebug);
+            tmp.SendCancel += new UIntDelegate(workingres_CancelOrderSource);
+            tmp.SendMessage += new MessageDelegate(_workingres_SendMessage);
+            tmp.SendBasket += new BasketDelegate(_workingres_SendBasket);
+        }
 
 
         private void Boxes_SelectedIndexChanged(object sender, EventArgs e)
@@ -523,13 +532,8 @@ namespace ASP
             string resname = (string)_availresponses.SelectedItem;
             // load it into working response
             Response tmp = ResponseLoader.FromDLL(resname, Properties.Settings.Default.boxdll);
-            // handle all the outgoing events from the response
-            tmp.SendOrder += new OrderDelegate(workingres_SendOrder);
-            tmp.SendDebug += new DebugFullDelegate(workingres_GotDebug);
-            tmp.SendCancel += new UIntDelegate(workingres_CancelOrderSource);
-            tmp.SendMessage += new MessageDelegate(_workingres_SendMessage);
-            tmp.SendBasket += new BasketDelegate(_workingres_SendBasket);
-
+            // handle events
+            bindresponseevents(tmp);
             // save the dll that contains the class for use with skins
             string dll = string.Empty;
             // if we don't have this class, add it
@@ -655,7 +659,9 @@ namespace ASP
             // save symbols
             _rsym[idx] = string.Join(",",syms);
             // update screen
-            _resnames.Items[getrdidx(idx)] = getrstat(idx);
+            int didx = getrdidx(idx);
+            if (didx!=-1)
+                _resnames.Items[didx] = getrstat(idx);
             Invalidate(true);
             // subscribe to whatever symbols were requested
             try
@@ -729,8 +735,6 @@ namespace ASP
 
         void workingres_GotDebug(Debug d)
         {
-            // see if we are processing debugs
-            if (!_ao.debugon.Checked) return;
             // display to screen
             debug(d.Msg);
         }
@@ -860,10 +864,13 @@ namespace ASP
                 string[] names = _resskinidx[idx].Split(' ');
                 // get response
                 Response r = _reslist[idx];
+                // don't save invalid responses
+                if (r.Name == new InvalidResponse().Name) continue;
                 // save status
                 bool worked = true;
                 foreach (string name in names)
                 {
+  
                     // remove skin first
                     remskin(name);
                     // then re-add it
