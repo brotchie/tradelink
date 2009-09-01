@@ -263,9 +263,8 @@ namespace TDServer
             }
             else
             {
-                const string msg = "login failed.  check information.";
-                MessageBox.Show(msg);
-                debug(msg);
+                BackColor = Color.Red;
+                debug("login failed.  check information");
             }
         }
 

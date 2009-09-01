@@ -68,6 +68,7 @@
             this.toolTip1.SetToolTip(this._login, "Email tradelink-users@googlegroups.com with any problems using TD ameritrade with" +
                     " tradelink");
             this._login.UseVisualStyleBackColor = true;
+            this._login.Click += new System.EventHandler(this._login_Click);
             // 
             // _pass
             // 
