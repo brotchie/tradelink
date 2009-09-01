@@ -47,15 +47,15 @@
             this.dg.RowHeadersVisible = false;
             this.dg.RowTemplate.Height = 28;
             this.dg.ShowEditingIcon = false;
-            this.dg.Size = new System.Drawing.Size(278, 248);
+            this.dg.Size = new System.Drawing.Size(459, 369);
             this.dg.TabIndex = 0;
             // 
             // butsell
             // 
             this.butsell.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.butsell.Location = new System.Drawing.Point(0, 225);
+            this.butsell.Location = new System.Drawing.Point(0, 346);
             this.butsell.Name = "butsell";
-            this.butsell.Size = new System.Drawing.Size(278, 23);
+            this.butsell.Size = new System.Drawing.Size(459, 23);
             this.butsell.TabIndex = 1;
             this.butsell.Text = "Sell";
             this.butsell.UseVisualStyleBackColor = true;
@@ -64,9 +64,9 @@
             // butbuy
             // 
             this.butbuy.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.butbuy.Location = new System.Drawing.Point(0, 202);
+            this.butbuy.Location = new System.Drawing.Point(0, 323);
             this.butbuy.Name = "butbuy";
-            this.butbuy.Size = new System.Drawing.Size(278, 23);
+            this.butbuy.Size = new System.Drawing.Size(459, 23);
             this.butbuy.TabIndex = 2;
             this.butbuy.Text = "Buy";
             this.butbuy.UseVisualStyleBackColor = true;
@@ -76,7 +76,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(278, 248);
+            this.ClientSize = new System.Drawing.Size(459, 369);
             this.Controls.Add(this.butbuy);
             this.Controls.Add(this.butsell);
             this.Controls.Add(this.dg);
