@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using TradeLink.Common;
 using System.IO;
 using TradeLink.API;
+using TradeLink.AppKit;
 
 namespace Replay
 {
@@ -19,6 +20,8 @@ namespace Replay
         string tickfolder = Util.TLTickDir;
         static Account HISTBOOK = new Account("_HISTBOOK");
         public const string PROGRAM = "Replay";
+        public DebugWindow _dw = new DebugWindow();
+
         public Replay()
         {
             InitializeComponent();
@@ -29,10 +32,12 @@ namespace Replay
             tl.newAcctRequest += new StringDelegate(tl_gotSrvAcctRequest);
             tl.newPosList += new PositionArrayDelegate(tl_gotSrvPosList);
             tl.newFeatureRequest+=new MessageArrayDelegate(GetFeatures);
+            tl.DOMRequest += new IntDelegate(tl_DOMRequest);
             h.GotTick += new TickDelegate(h_GotTick);
             h.SimBroker.GotOrder += new OrderDelegate(SimBroker_GotOrder);
             h.SimBroker.GotFill += new FillDelegate(SimBroker_GotFill);
             h.SimBroker.GotOrderCancel += new OrderCancelDelegate(SimBroker_GotOrderCancel);
+            h.GotDebug+=new DebugDelegate(_dw.GotDebug);
             h.CacheWait = 500;
             // setup playback
             _playback = new Playback(h);
@@ -47,6 +52,12 @@ namespace Replay
             // (this is for determining top of book between historical sources and our own orders)
             HISTBOOK.Execute = false; // make sure our special book is never executed by simulator
             HISTBOOK.Notify = false; // don't notify 
+        }
+
+        int tickdepth = 0;
+        void tl_DOMRequest(long number)
+        {
+            tickdepth = (int)number;
         }
 
         MessageTypes[] GetFeatures()
@@ -210,7 +221,10 @@ namespace Replay
                 statusStrip1.Invoke(new DebugDelegate(status), new object[] { msg });
             else
                 statuslab.Text = msg;
+            debug(msg);
         }
+
+        void debug(string msg) { _dw.GotDebug(msg); }
 
         private void playbut_Click(object sender, EventArgs e)
         {
@@ -224,7 +238,7 @@ namespace Replay
             highs = new Dictionary<string, decimal>();
             lows = new Dictionary<string, decimal>();
             // start playback
-            _playback.RunWorkerAsync(new PlayBackArgs((int)trackBar1.Value/5,Util.DT2FT(daystartpicker.Value)));
+            _playback.RunWorkerAsync(new PlayBackArgs((int)trackBar1.Value/5));
             // notify user
             status("Playback started...");
             // update user interface options
@@ -277,6 +291,8 @@ namespace Replay
 
         void _playback_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
+            // save some UI processing
+            if (e.ProgressPercentage <= progressbar.Value) return;
             progressbar.Value = (e.ProgressPercentage < 101) && (e.ProgressPercentage>=0) ? e.ProgressPercentage : 0;
             int ctime = (int)(h.NextTickTime % 1000000) / 100;
             string time = (h != null) ? string.Format("{0:####:##}",ctime) : "";
@@ -312,6 +328,9 @@ namespace Replay
         int lastdate = 0;
         void h_GotTick(Tick t)
         {
+            // only process requested depth
+            if (t.depth > tickdepth) return;
+
             lasttime = t.time;
             lastdate = t.date;
             if (t.isTrade)
@@ -392,6 +411,7 @@ namespace Replay
             // and the other order books
         {
             if (t.isTrade) return;
+            if (t.depth != 0) return;
 
             if (t.hasAsk)
             {
@@ -447,6 +467,16 @@ namespace Replay
             tff.DateFilter(Util.ToTLDate(monthCalendar1.SelectionEnd), DateMatchType.Day | DateMatchType.Month | DateMatchType.Year);
             // set the filter on the simulator
             h.FileFilter = tff;
+        }
+
+        private void _msg_Click(object sender, EventArgs e)
+        {
+            _dw.Toggle();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            CrashReport.BugReport(PROGRAM, _dw.Content);
         }
 
 

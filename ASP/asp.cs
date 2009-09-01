@@ -686,7 +686,14 @@ namespace ASP
 
         void _workingres_SendMessage(MessageTypes type, uint id, string data)
         {
-            tl.TLSend(type, data);
+            // extra message processing
+            switch (type)
+            {
+                case MessageTypes.DOMREQUEST:
+                    data.Replace(Book.EMPTYREQUESTOR, tl.Text);
+                    break;
+            }
+            long result = tl.TLSend(type, data);
         }
 
         void workingres_SendOrder(Order o)

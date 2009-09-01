@@ -201,7 +201,8 @@ namespace TradeLink.Common
             int cid = client.IndexOf(cname);
             if (cid == -1) return;
             SrvBeatHeart(cname);
-            DOMRequest(depth);
+            if (DOMRequest!=null)
+                DOMRequest(depth);
         }
 
         public void newOrderCancel(long orderid_being_cancled)

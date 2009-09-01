@@ -87,5 +87,12 @@ namespace TradeLink.Common
                 askex[k.depth] = k.oe;
             }
         }
+
+        public const string EMPTYREQUESTOR = "EMPTY";
+        public static string NewDOMRequest(int depthrequested) { return NewDOMRequest(EMPTYREQUESTOR, depthrequested); }
+        public static string NewDOMRequest(string client, int depthrequested)
+        {
+            return string.Join("+", new string[] { client, depthrequested.ToString() });
+        }
     }
 }

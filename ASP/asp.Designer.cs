@@ -111,7 +111,7 @@ namespace ASP
             this._librarysel.Size = new System.Drawing.Size(32, 28);
             this._librarysel.TabIndex = 21;
             this._librarysel.Text = "L";
-            this.toolTip1.SetToolTip(this._librarysel, "view responses available in different dll library");
+            this.toolTip1.SetToolTip(this._librarysel, "Change library where responses are obtained");
             this._librarysel.UseVisualStyleBackColor = true;
             this._librarysel.Click += new System.EventHandler(this.LoadDLL_Click);
             // 

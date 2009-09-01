@@ -16,7 +16,7 @@ namespace Replay
             WorkerSupportsCancellation = true;
             WorkerReportsProgress = true;
         }
-
+        int lastprogress = 0;
         protected override void OnDoWork(DoWorkEventArgs e)
         {
             if (e.Cancel)
@@ -35,21 +35,26 @@ namespace Replay
                 long next = h.NextTickTime;
                 h.PlayTo(next); 
                 // adjust delay, based on user's setting of 'speed'
-                // as well as daystart (no delay before daystart)
-                int delay = next >= args.DayStart ?
-                    Util.FTDIFF((int)prevtime, (int)next) * 1000 * args.DELAYSCALE : 0;
+                int delay = Util.FTDIFF((int)prevtime, (int)next) * 1000 * args.DELAYSCALE;
                 // if not first tick, wait realistic time between ticks
-                if (prevtime != 0) 
+                if (prevtime *delay !=0) 
                     System.Threading.Thread.CurrentThread.Join(delay); 
                 // save time for calculating next day
                 prevtime = next; 
                 // calculate progress
                 double progress = 100.0 * (h.TicksProcessed / (double)h.TicksPresent);
+                int thisprogress = (int)progress;
                 // report progress
-                ReportProgress((int)progress); 
+                if (thisprogress > lastprogress)
+                {
+                    ReportProgress(thisprogress);
+                    lastprogress = thisprogress;
+                }
                 
             }
             while (h.NextTickTime != HistSim.ENDSIM);
+            // reset last progress
+            lastprogress = 0;
             base.OnDoWork(e);
         }
 
@@ -67,12 +72,10 @@ namespace Replay
 
     public class PlayBackArgs
     {
-        public PlayBackArgs(int DelayScale, int StartOfDay)
+        public PlayBackArgs(int DelayScale)
         {
             DELAYSCALE = DelayScale;
-            DayStart = StartOfDay;
         }
         public int DELAYSCALE = 1;
-        public int DayStart;
     }
 }
