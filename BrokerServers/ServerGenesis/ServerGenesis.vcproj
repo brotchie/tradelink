@@ -17,8 +17,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="D:\Genesis\src\API\TestAPI\..\..\..\Debug\GTM"
-			IntermediateDirectory="D:\Genesis\src\API\TestAPI\Debug"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="2"
@@ -49,6 +49,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="..\TradeLibFast;Inc"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -56,7 +57,7 @@
 				PrecompiledHeaderThrough="stdafx.h"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -71,9 +72,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(OUTDIR)\GTAPI.LIB"
+				AdditionalDependencies="$(OUTDIR)\TradeLibFast.lib $(OUTDIR)\GTAPI.LIB"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="$(ConfigurationName)"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="D:\Genesis\src\API\TestAPI\..\..\..\Debug/TestAPI.pdb"
 				SubSystem="2"
