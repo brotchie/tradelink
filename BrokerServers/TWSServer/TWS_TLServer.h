@@ -33,6 +33,7 @@ namespace TradeLibFast
 
 
 	private:
+		bool linktest();
 		vector<TLPosition> poslist;
 		bool havepos(TLPosition p);
 		int PositionResponse(CString account, CString client);

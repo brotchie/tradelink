@@ -31,7 +31,7 @@ CString UniqueWindowName(CString rootname)
 	HWND dest = FindWindow(NULL,(LPCSTR)(LPCTSTR)rootname);
 	int i = -1;
 	CString final(rootname);
-	while (!dest && (i<100))
+	while (dest!=NULL)
 	{
 		i++;
 		final = CString("");

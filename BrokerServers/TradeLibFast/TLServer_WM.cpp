@@ -346,19 +346,18 @@ namespace TradeLibFast
 					return true;
 		return false;
 	}
-	void TLServer_WM::Start() { Start("TradeLinkServer"); }
-	void TLServer_WM::Start(CString ServerName)
+	void TLServer_WM::Start() 
 	{
 		
 		if (!ENABLED)
 		{
 			ENABLED = true;
-			this->Create(NULL, ServerName, 0,CRect(0,0,20,20), CWnd::GetDesktopWindow(),NULL);
+			CString servername = UniqueWindowName("TradeLinkServer");
+			CWnd* parent = CWnd::GetDesktopWindow();
+			this->Create(NULL, servername, 0,CRect(0,0,20,20),parent ,NULL);
 			this->ShowWindow(SW_HIDE); // hide our window
-			CString servername = UniqueWindowName(ServerName);
-			SetWindowText((LPCTSTR)servername);
 			CString msg;
-			msg.Format("Started TL BrokerServer %s [ %.1f.%i]",ServerName,MajorVer,MinorVer);
+			msg.Format("Started TL BrokerServer %s [ %.1f.%i]",servername,MajorVer,MinorVer);
 			this->D(msg);
 
 		}

@@ -19,6 +19,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TradeLibFast", "TradeLibFast\TradeLibFast.vcproj", "{70D6F9FC-3067-4527-8858-D931623554CF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ServerGenesis", "ServerGenesis\ServerGenesis.vcproj", "{98EF31FB-959E-4552-8F99-F2AD6DBB3A23}"
+	ProjectSection(ProjectDependencies) = postProject
+		{70D6F9FC-3067-4527-8858-D931623554CF} = {70D6F9FC-3067-4527-8858-D931623554CF}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

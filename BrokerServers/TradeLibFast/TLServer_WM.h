@@ -60,7 +60,6 @@ namespace TradeLibFast
 		virtual int ClearStocks(CString client);
 		virtual int CancelRequest(long order);
 		virtual void Start();
-		virtual void Start(CString servername);
 
 		void D(const CString & message);
 

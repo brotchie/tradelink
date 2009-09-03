@@ -184,8 +184,12 @@ namespace TradeLibFast
 	int TWS_TLServer::SendOrder(TLOrder o)
 	{
 		// check our order
-		if (o.symbol=="") return UNKNOWN_SYMBOL;
-		if (!o.isValid()) return INVALID_ORDERSIZE;
+		if (o.symbol=="") 
+			return UNKNOWN_SYMBOL;
+		if (!o.isValid()) 
+			return INVALID_ORDERSIZE;
+		if (!linktest())
+			return BROKERSERVER_NOT_FOUND;
 
 
 		// create broker-specific objects here
@@ -459,12 +463,24 @@ namespace TradeLibFast
 		return false;
 	}
 
-
+	bool TWS_TLServer::linktest()
+	{
+		if (validlinkids.size()>0)
+			return true;
+		D("Operation failed, no TWS instances running.");
+		return false;
+	}
 
 	int TWS_TLServer::RegisterStocks(CString clientname)
 	{
+		// make sure base function is called
 		TLServer_WM::RegisterStocks(clientname);
-		int cid = this->FindClient(clientname);  // get client id so we can find his stocks
+		// get client id so we can find his symbols
+		int cid = this->FindClient(clientname);  
+		// make sure at least one TWS is running
+		if (!linktest())
+			return BROKERSERVER_NOT_FOUND;
+
 		// loop through every stock for this client
 		for (unsigned int i = 0; i<stocks[cid].size(); i++)
 		{
@@ -495,10 +511,13 @@ namespace TradeLibFast
 			k.sym = stocks[cid][i]; // store long symbol
 			stockticks.push_back(k);
 			D(CString("Added IB subscription for ")+CString(sec.sym));
+
 		}
 		return OK;
 
 	}
+
+
 
 	void TWS_TLServer::tickPrice( TickerId tickerId, TickType tickType, double price, int canAutoExecute) 
 	{ 
