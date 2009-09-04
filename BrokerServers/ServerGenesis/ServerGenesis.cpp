@@ -132,7 +132,8 @@ void ServerGenesis::accounttest()
 
 	if (m_accts.size()>0)
 	{
-		m.Format("User %s [ID: %s] has %i accounts",gtw->m_user.szUserName,gtw->m_user.szUserID,lstAccounts.size());
+		CString js = gjoin(m_accts,CString(","));
+		m.Format("User %s [ID: %s] has %i accounts: %s",gtw->m_user.szUserName,gtw->m_user.szUserID,lstAccounts.size(),js);
 		gtw->SetCurrentAccount(m_accts[0]);
 	}
 	else
@@ -145,10 +146,8 @@ void ServerGenesis::Start(LPCSTR user, LPCSTR pw)
 	Start();
 	int err;
 	err = gtw->Login(user,pw);
-	CString m = (err==0 ? CString("Login succeeded.") : CString("Login failed.  Check information."));
+	CString m = (err==0 ? CString("Login succeeded, wait for connection turn-up...") : CString("Login failed.  Check information."));
 	D(m);
-	
-
 }
 
 void ServerGenesis::Stop()
@@ -159,7 +158,7 @@ void ServerGenesis::Stop()
 		gtw->TryClose();
 		Sleep(0);
 	}
-	D("Session closed.");
+	D("Connection closed.");
 }
 
 

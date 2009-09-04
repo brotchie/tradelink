@@ -487,6 +487,14 @@
 			RelativePath="TestAPIDlg.h"
 			>
 		</File>
+		<File
+			RelativePath="..\TradeLibFast\Util.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\TradeLibFast\Util.h"
+			>
+		</File>
 	</Files>
 	<Globals>
 		<Global

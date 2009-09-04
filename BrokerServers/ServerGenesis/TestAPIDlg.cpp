@@ -40,6 +40,7 @@ CTestAPIDlg::CTestAPIDlg(CWnd* pParent /*=NULL*/)
 	m_strUserName = _T("");
 	m_strPassword = _T("");
 	tl = new ServerGenesis();
+	m_session.SubclassDlgItem(IDC_SESSION,this);
 
 
 }
@@ -58,7 +59,7 @@ void CTestAPIDlg::DoDataExchange(CDataExchange* pDX)
 	//{{AFX_DATA_MAP(CTestAPIDlg)
 	DDX_Control(pDX, IDC_LIST, m_list);
 	DDX_Control(pDX, IDC_START, m_start);
-	DDX_Control(pDX, IDC_SESSION, m_session );
+	//DDX_Control(pDX, IDC_SESSION, m_session );
 	DDX_Text(pDX, IDC_STOCK, m_strStock);
 	DDV_MaxChars(pDX, m_strStock, 10);
 	DDX_Text(pDX, IDC_PASSWORD, m_strPassword);
@@ -83,6 +84,8 @@ void CTestAPIDlg::DoDataExchange(CDataExchange* pDX)
 void CTestAPIDlg::status(LPCTSTR m)
 {
 	m_list.AddString(m);
+	int last = m_list.GetCount()-1;
+	m_list.SetCurSel(last);
 }
 
 BEGIN_MESSAGE_MAP(CTestAPIDlg, CDialog)
@@ -120,7 +123,10 @@ BOOL CTestAPIDlg::OnInitDialog()
 	m_session.m_pDlg = this;
 
 	CDialog::OnInitDialog();
+	tl->gtw->SubclassDlgItem(IDC_SESSION,this);
+
 	__hook(&ServerGenesis::GotDebug,tl,&CTestAPIDlg::status);
+	tl->Start();
 	// Set the icon for this dialog.  The framework does this automatically
 	//  when the application's main window is not a dialog
 	SetIcon(m_hIcon, TRUE);			// Set big icon

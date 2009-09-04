@@ -15,7 +15,7 @@
 // MySession.h : header file
 //
 
-#include "..\Inc\GTSession.h"
+#include "GTSession.h"
 
 class CTestAPIDlg;
 
