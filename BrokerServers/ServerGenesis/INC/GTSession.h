@@ -22,8 +22,8 @@
 
 #include <string>
 #include <list>
-#include "..\Inc32\GTAPI32.h"
-#include "..\Inc32\GTSession32.h"
+#include "Inc32\GTAPI32.h"
+#include "Inc32\GTSession32.h"
 
 #include "GTAPI_API.h"
 #include "GTime0.h"

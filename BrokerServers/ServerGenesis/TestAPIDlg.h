@@ -32,7 +32,7 @@ public:
 	~CTestAPIDlg(void);
 
 
-	ServerGenesis tl;
+	ServerGenesis* tl;
 
 
 // Dialog Data

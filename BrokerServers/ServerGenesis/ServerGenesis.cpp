@@ -5,13 +5,14 @@ using namespace TradeLibFast;
 
 ServerGenesis::ServerGenesis()
 {
-	//_gt = new GTSess(this);
-
+	gtw = new GTWrap();
+	gtw->_sg = this;
 }
 
 ServerGenesis::~ServerGenesis()
 {
-	//delete gt;
+	gtw->_sg = NULL;
+	delete gtw;
 }
 
 void ServerGenesis::Start()
@@ -71,20 +72,28 @@ std::vector<int> ServerGenesis::GetFeatures()
 
 int ServerGenesis::SendOrder(TradeLibFast::TLOrder o)
 {
-	/*
-	BOOL valid = _sg->IsLoggedIn();
+	BOOL valid = gtw->IsLoggedIn();
 	if(valid == FALSE)
+	{
+		D("Session not logged in.");
 		return BROKERSERVER_NOT_FOUND;
+	}
 	
-	GTStock *pStock = GetStock(o.symbol);
+	GTStock *pStock;
+	pStock = gtw->GetStock(o.symbol);
 	if(pStock == NULL)
+	{
+		D("Symbol could not be obtained.");
 		return BROKERSERVER_NOT_FOUND;
+	}
 
 	MMID mmid = getexchange(o.exchange);
 
-	double price = o.isMarket() ? (o.side ? pStock->m_level2.GetBestAskPrice() : pStock->m_level2.GetBestBidPrice() ) : o.price;
+	double price;
+	price = o.isMarket() ? (o.side ? pStock->m_level2.GetBestAskPrice() : pStock->m_level2.GetBestBidPrice() ) : o.price;
 
-	int err = OK;
+	int err;
+	err = OK;
 
 	GTOrder go;
 	go.chSide = o.side ? 'B' : 'S';
@@ -101,31 +110,56 @@ int ServerGenesis::SendOrder(TradeLibFast::TLOrder o)
 		m_order.push_back(go);
 
 	return err;
-	*/
-	return OK;
 }
 
 
 
 int ServerGenesis::CancelRequest(long id)
 {
-	//CancelOrder(id);
+	gtw->CancelOrder(id);
 	return OK;
 }
 
+void ServerGenesis::accounttest()
+{
+	CString m;
+	std::list<std::string> lstAccounts;
+	gtw->GetAllAccountName(lstAccounts);
+	
+	std::list<std::string>::iterator s;
+	for (s = lstAccounts.begin(); s != lstAccounts.end(); s++)
+		m_accts.push_back((*s).c_str());
 
+	if (m_accts.size()>0)
+	{
+		m.Format("User %s [ID: %s] has %i accounts",gtw->m_user.szUserName,gtw->m_user.szUserID,lstAccounts.size());
+		gtw->SetCurrentAccount(m_accts[0]);
+	}
+	else
+		m.Format("No accounts found.");
+	D(m);
+}
 
 void ServerGenesis::Start(LPCSTR user, LPCSTR pw)
 {
 	Start();
-	//int err = _sg->Login(user,pw);
-	//D((err==0 ? CString("Login succeeded.") : CString("Login failed.  Check information.")));
+	int err;
+	err = gtw->Login(user,pw);
+	CString m = (err==0 ? CString("Login succeeded.") : CString("Login failed.  Check information."));
+	D(m);
+	
+
 }
 
 void ServerGenesis::Stop()
 {
-	//_sg->Logout();
-	//_sg->TryClose();
+	gtw->Logout();
+	D("Logged out.");
+	while(!gtw->CanClose()){
+		gtw->TryClose();
+		Sleep(0);
+	}
+	D("Session closed.");
 }
 
 

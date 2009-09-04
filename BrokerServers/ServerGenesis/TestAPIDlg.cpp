@@ -39,14 +39,15 @@ CTestAPIDlg::CTestAPIDlg(CWnd* pParent /*=NULL*/)
 	m_strStock = "ZVZZT";
 	m_strUserName = _T("");
 	m_strPassword = _T("");
+	tl = new ServerGenesis();
 
 
 }
 
 CTestAPIDlg::~CTestAPIDlg()
 {
-	__unhook(&ServerGenesis::GotDebug,&tl,&CTestAPIDlg::status);
-	//delete tl;
+	__unhook(&ServerGenesis::GotDebug,tl,&CTestAPIDlg::status);
+	delete tl;
 }
 
 
@@ -119,7 +120,7 @@ BOOL CTestAPIDlg::OnInitDialog()
 	m_session.m_pDlg = this;
 
 	CDialog::OnInitDialog();
-	__hook(&ServerGenesis::GotDebug,&tl,&CTestAPIDlg::status);
+	__hook(&ServerGenesis::GotDebug,tl,&CTestAPIDlg::status);
 	// Set the icon for this dialog.  The framework does this automatically
 	//  when the application's main window is not a dialog
 	SetIcon(m_hIcon, TRUE);			// Set big icon
@@ -193,19 +194,20 @@ void CTestAPIDlg::OnStart()
 {
 	if(UpdateData() == FALSE)
 		return;
-	//m_session.m_setting.SetExecAddress("69.64.202.155", 15805);
-	//m_session.m_setting.SetQuoteAddress("69.64.202.155", 15805);
-	//m_session.m_setting.SetLevel2Address("69.64.202.155", 15805);
+	m_session.m_setting.SetExecAddress("69.64.202.155", 15805);
+	m_session.m_setting.SetQuoteAddress("69.64.202.155", 15805);
+	m_session.m_setting.SetLevel2Address("69.64.202.155", 15805);
 
 
-	tl.Start(m_strUserName, m_strPassword);
+	tl->Start(m_strUserName, m_strPassword);
 	//m_session.Login(m_strUserName, m_strPassword);
 }
 
 void CTestAPIDlg::OnStop() 
 {
-	m_session.Logout();
-	m_session.TryClose();
+	tl->Stop();
+	//m_session.Logout();
+	//m_session.TryClose();
 }
 
 void CTestAPIDlg::OnBid() 

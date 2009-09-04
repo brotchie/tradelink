@@ -1,16 +1,17 @@
 #pragma once
 #include "TradeLibFast.h"
 #include "GTOrder.h"
+#include "GTWrap.h"
 #include <vector>
 
 class GTWrap;
 
-class ServerGenesis : 
+class ServerGenesis :
 	public TradeLibFast::TLServer_WM
 {
 public :
 	ServerGenesis();
-	virtual ~ServerGenesis();
+	~ServerGenesis();
 
 	// tradelink overrides
 	void Start(void);
@@ -20,12 +21,15 @@ public :
 	int CancelRequest(long id);
 	int BrokerName();
 	std::vector<int> GetFeatures();
+	void accounttest();
+	GTWrap* gtw;
 
 private:
-		CString m_strAccountID;
+
+		std::vector<CString> m_accts;
 		std::vector<GTOrder> m_order;
 		// genesis overrides
-		GTWrap * gtw;
+
 
 	// Generated message map functions
 protected:
@@ -33,8 +37,4 @@ protected:
 		// NOTE - the ClassWizard will add and remove member functions here.
 	//}}AFX_MSG
 	//DECLARE_MESSAGE_MAP()
-
-
-
 };
-
