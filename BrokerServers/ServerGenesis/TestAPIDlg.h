@@ -29,6 +29,7 @@ class CTestAPIDlg : public CDialog
 // Construction
 public:
 	CTestAPIDlg(CWnd* pParent = NULL);	// standard constructor
+	~CTestAPIDlg(void);
 
 
 	ServerGenesis tl;
@@ -43,6 +44,7 @@ public:
 	CString	m_strStock;
 	CString	m_strPassword;
 	CString	m_strUserName;
+	void status(LPCTSTR m);
 	//}}AFX_DATA
 
 	// ClassWizard generated virtual function overrides

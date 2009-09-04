@@ -43,6 +43,12 @@ CTestAPIDlg::CTestAPIDlg(CWnd* pParent /*=NULL*/)
 
 }
 
+CTestAPIDlg::~CTestAPIDlg()
+{
+	__unhook(&ServerGenesis::GotDebug,&tl,&CTestAPIDlg::status);
+	//delete tl;
+}
+
 
 
 void CTestAPIDlg::DoDataExchange(CDataExchange* pDX)
@@ -71,6 +77,11 @@ void CTestAPIDlg::DoDataExchange(CDataExchange* pDX)
 		}
 	}
 	DDX_Control(pDX, IDC_HIDEMM, m_hidemm);
+}
+
+void CTestAPIDlg::status(LPCTSTR m)
+{
+	m_list.AddString(m);
 }
 
 BEGIN_MESSAGE_MAP(CTestAPIDlg, CDialog)
@@ -108,8 +119,7 @@ BOOL CTestAPIDlg::OnInitDialog()
 	m_session.m_pDlg = this;
 
 	CDialog::OnInitDialog();
-
-	tl.Start();
+	__hook(&ServerGenesis::GotDebug,&tl,&CTestAPIDlg::status);
 	// Set the icon for this dialog.  The framework does this automatically
 	//  when the application's main window is not a dialog
 	SetIcon(m_hIcon, TRUE);			// Set big icon
@@ -183,56 +193,25 @@ void CTestAPIDlg::OnStart()
 {
 	if(UpdateData() == FALSE)
 		return;
+	//m_session.m_setting.SetExecAddress("69.64.202.155", 15805);
+	//m_session.m_setting.SetQuoteAddress("69.64.202.155", 15805);
+	//m_session.m_setting.SetLevel2Address("69.64.202.155", 15805);
 
-	m_session.DeleteAllStocks();
-	m_session.CreateStock(m_strStock);
 
-
-#if 0
-	m_session.m_setting.SetExecAddress("76.8.64.3", 15605);
-	m_session.m_setting.SetQuoteAddress("76.8.64.3", 16811);
-	m_session.m_setting.SetLevel2Address("76.8.64.3", 16810);
-#else
-	m_session.m_setting.SetExecAddress("69.64.202.155", 15805);
-	m_session.m_setting.SetQuoteAddress("69.64.202.155", 15805);
-	m_session.m_setting.SetLevel2Address("69.64.202.155", 15805);
-	//m_session.m_setting.SetOptionQuoteAddress("192.168.3.200", 16323);
-	//m_session.m_setting.SetOptionLevel2Address("10.1.10.22", 16322);
-	//m_session.m_setting.SetQuoteAddress("10.1.5.8", 16323);
-	
-#endif
-
-#ifdef UDP_QUOTE
-	m_session.m_bAutoCreateStocks = TRUE;
-	m_session.m_bAutoResizeStocks = TRUE;
-	m_session.AddUDPQuote("10.2.28.70", 16825, "10.2.255.255", 16825);	// ISLD
-	m_session.AddUDPQuote("10.2.28.70", 16830, "10.2.255.255", 16830);	// NQDS
-	m_session.AddUDPQuote("10.2.28.70", 16839, "10.2.255.255", 16839);	// SIAC
-	m_session.AddUDPQuote("10.2.28.70", 16832, "10.2.255.255", 16832);	// ARCA
-	m_session.AddUDPQuote("10.2.28.70", 16842, "10.2.255.255", 16842);	// ITC
-	m_session.AddUDPQuote("10.2.28.70", 16841, "10.2.255.255", 16841);	// OPENBOOK
-		//m_session.AddUDPQuote("10.2.28.70", 16816, "10.2.255.255", 16816);	// HF
-		//m_session.AddUDPQuote("10.2.28.70", 16831, "10.2.255.255", 16831);	// BRUT
-		//m_session.AddUDPQuote("10.2.28.70", 16844, "10.2.255.255", 16844);	// OPENVIEW
-#endif
-
-	//m_session.m_setting.m_hidden[MMID_NYB]=1;
-
-	m_session.Login(m_strUserName, m_strPassword);	
-	tl.Login(m_strUserName, m_strPassword);
+	tl.Start(m_strUserName, m_strPassword);
+	//m_session.Login(m_strUserName, m_strPassword);
 }
 
 void CTestAPIDlg::OnStop() 
 {
 	m_session.Logout();
 	m_session.TryClose();
-	tl.Logout();
-	tl.TryClose();
 }
 
 void CTestAPIDlg::OnBid() 
 {
-	if(m_session.IsLoggedIn() == FALSE)
+	BOOL v = m_session.IsLoggedIn();
+	if( v == FALSE)
 		return;
 	
 	GTStock *pStock = m_session.GetStock(m_strStock);
