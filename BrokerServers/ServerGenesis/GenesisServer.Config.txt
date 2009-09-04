@@ -1,0 +1,6 @@
+// exec server and port
+69.64.202.155,15805
+// quote server and port
+69.64.202.155,15805	
+// level2 server and port
+69.64.202.155,15805

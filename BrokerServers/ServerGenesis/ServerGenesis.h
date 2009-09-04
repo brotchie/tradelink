@@ -23,11 +23,15 @@ public :
 	std::vector<int> GetFeatures();
 	void accounttest();
 	GTWrap* gtw;
+	bool LoadConfig();
+	bool Autologin();
 
 private:
 
 		std::vector<CString> m_accts;
 		std::vector<GTOrder> m_order;
+		CString un;
+		CString pw;
 		// genesis overrides
 
 

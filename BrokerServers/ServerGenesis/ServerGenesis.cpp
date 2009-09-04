@@ -1,11 +1,64 @@
 #include "stdafx.h"
 #include "ServerGenesis.h"
+#include <fstream>
 
 using namespace TradeLibFast;
+
+const char* CONFIGFILE = "GenesisServer.Config.txt";
+const int MAXSERVERS = 3;
+enum GENESISSERVERTYPE
+{
+	GTEXEC,
+	GTQUOTE,
+	GTLEVEL2,
+};
+bool ServerGenesis::LoadConfig()
+{
+	std::ifstream file;
+	file.open(CONFIGFILE);
+	std::vector<CString> servers;
+	std::vector<int> ports;
+	if (file.is_open())
+	{
+		char skip[100];
+		char data[100];
+		int i = 0;
+		while (i++<MAXSERVERS)
+		{
+			file.getline(skip,100);
+			file.getline(data,100);
+			CString tmp = CString(data);
+			std::vector<CString> r;
+			gsplit(tmp,CString(","),r);
+			servers.push_back(r[0]);
+			int port = 15805;
+			port = atoi(r[1].GetBuffer());
+			ports.push_back(port);
+		}
+		file.close();
+	}
+
+	if (servers.size()<MAXSERVERS)
+	{
+		servers.clear();
+		ports.clear();
+		for (int i = 0; i<MAXSERVERS; i++)
+		{
+			servers.push_back("69.64.202.155");
+			ports.push_back(15805);
+		}
+	}
+
+	gtw->m_setting.SetExecAddress(servers[GTEXEC], ports[GTEXEC]);
+	gtw->m_setting.SetQuoteAddress(servers[GTQUOTE], ports[GTQUOTE]);
+	gtw->m_setting.SetLevel2Address(servers[GTLEVEL2], ports[GTLEVEL2]);
+	return true;
+}
 
 ServerGenesis::ServerGenesis()
 {
 	gtw = new GTWrap();
+	LoadConfig();
 	gtw->_sg = this;
 }
 
@@ -15,9 +68,16 @@ ServerGenesis::~ServerGenesis()
 	delete gtw;
 }
 
+bool ServerGenesis::Autologin()
+{
+	return false;
+}
+
 void ServerGenesis::Start()
 {
 	TLServer_WM::Start();
+	if (Autologin())
+		Start(un,pw);
 }
 
 int ServerGenesis::BrokerName()
@@ -75,7 +135,7 @@ int ServerGenesis::SendOrder(TradeLibFast::TLOrder o)
 	BOOL valid = gtw->IsLoggedIn();
 	if(valid == FALSE)
 	{
-		D("Session not logged in.");
+		D("Must login before sending orders.");
 		return BROKERSERVER_NOT_FOUND;
 	}
 	
@@ -83,8 +143,10 @@ int ServerGenesis::SendOrder(TradeLibFast::TLOrder o)
 	pStock = gtw->GetStock(o.symbol);
 	if(pStock == NULL)
 	{
-		D("Symbol could not be obtained.");
-		return BROKERSERVER_NOT_FOUND;
+		CString m;
+		m.Format("Symbol %s could not be loaded.",o.symbol);
+		D(m);
+		return SYMBOL_NOT_LOADED;
 	}
 
 	MMID mmid = getexchange(o.exchange);

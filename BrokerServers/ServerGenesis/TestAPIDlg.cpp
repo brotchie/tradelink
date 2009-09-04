@@ -40,9 +40,6 @@ CTestAPIDlg::CTestAPIDlg(CWnd* pParent /*=NULL*/)
 	m_strUserName = _T("");
 	m_strPassword = _T("");
 	tl = new ServerGenesis();
-	m_session.SubclassDlgItem(IDC_SESSION,this);
-
-
 }
 
 CTestAPIDlg::~CTestAPIDlg()

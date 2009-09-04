@@ -327,6 +327,10 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath=".\GenesisServer.Config.txt"
+			>
+		</File>
+		<File
 			RelativePath=".\GTWrap.cpp"
 			>
 		</File>
