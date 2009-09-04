@@ -27,7 +27,7 @@ public :
 	bool Autologin();
 
 private:
-
+	bool autoattempt;
 		std::vector<CString> m_accts;
 		std::vector<GTOrder> m_order;
 		CString un;

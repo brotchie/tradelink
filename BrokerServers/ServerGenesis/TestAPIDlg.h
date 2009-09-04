@@ -75,6 +75,7 @@ protected:
 	afx_msg void OnCancelOffer();
 	afx_msg void OnCancelBid2();
 	afx_msg void OnDump();
+	afx_msg LRESULT AttemptLogin(WPARAM, LPARAM);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 public:

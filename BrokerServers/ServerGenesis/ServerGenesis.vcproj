@@ -331,6 +331,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\GenesisServer.Login.txt"
+			>
+		</File>
+		<File
 			RelativePath=".\GTWrap.cpp"
 			>
 		</File>

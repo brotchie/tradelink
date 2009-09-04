@@ -56,7 +56,6 @@ void CTestAPIDlg::DoDataExchange(CDataExchange* pDX)
 	//{{AFX_DATA_MAP(CTestAPIDlg)
 	DDX_Control(pDX, IDC_LIST, m_list);
 	DDX_Control(pDX, IDC_START, m_start);
-	//DDX_Control(pDX, IDC_SESSION, m_session );
 	DDX_Text(pDX, IDC_STOCK, m_strStock);
 	DDV_MaxChars(pDX, m_strStock, 10);
 	DDX_Text(pDX, IDC_PASSWORD, m_strPassword);
@@ -84,7 +83,7 @@ void CTestAPIDlg::status(LPCTSTR m)
 	int last = m_list.GetCount()-1;
 	m_list.SetCurSel(last);
 }
-
+#define ATTEMPTLOGIN WM_USER+0X02
 BEGIN_MESSAGE_MAP(CTestAPIDlg, CDialog)
 	//{{AFX_MSG_MAP(CTestAPIDlg)
 	ON_WM_PAINT()
@@ -110,6 +109,7 @@ ON_BN_CLICKED(IDC_TEST, OnBnClickedTest)
 ON_BN_CLICKED(IDC_BUTTON_DISPLAY_ACCOUNTS, OnBnClickedButtonDisplayAccounts)
 ON_CBN_SELCHANGE(IDC_COMBO_ACCOUNTS, OnCbnSelchangeComboAccounts)
 ON_CBN_DROPDOWN(IDC_COMBO_ACCOUNTS, &CTestAPIDlg::OnCbnDropdownComboAccounts)
+ON_MESSAGE(ATTEMPTLOGIN,AttemptLogin)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -123,13 +123,18 @@ BOOL CTestAPIDlg::OnInitDialog()
 	tl->gtw->SubclassDlgItem(IDC_SESSION,this);
 
 	__hook(&ServerGenesis::GotDebug,tl,&CTestAPIDlg::status);
-	tl->Start();
 	// Set the icon for this dialog.  The framework does this automatically
 	//  when the application's main window is not a dialog
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
-
+	PostMessage(ATTEMPTLOGIN,0,0);
 	return TRUE;  // return TRUE  unless you set the focus to a control
+}
+
+LRESULT CTestAPIDlg::AttemptLogin(WPARAM w, LPARAM l)
+{
+	tl->Start();
+	return 0;
 }
 
 // If you add a minimize button to your dialog, you will need the code below

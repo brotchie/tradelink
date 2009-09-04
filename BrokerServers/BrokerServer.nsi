@@ -104,6 +104,8 @@ SectionEnd
 Section "Genesis Server"
   File "release\ServerGenesis.exe"  
   File "release\GTAPI.dll"  
+  File "ServerGenesis\GenesisServer.Config.txt"
+  File "ServerGenesis\GenesisServer.Login.txt"
   CreateShortCut "$SMPROGRAMS\TradeLink\Genesis.lnk" "$INSTDIR\ServerGenesis.EXE" "" "$INSTDIR\ServerGenesis.EXE" 0  
 SectionEnd
 

@@ -5,6 +5,7 @@
 using namespace TradeLibFast;
 
 const char* CONFIGFILE = "GenesisServer.Config.txt";
+const char* AUTOFILE = "GenesisServer.Login.txt";
 const int MAXSERVERS = 3;
 enum GENESISSERVERTYPE
 {
@@ -57,6 +58,7 @@ bool ServerGenesis::LoadConfig()
 
 ServerGenesis::ServerGenesis()
 {
+	autoattempt = false;
 	gtw = new GTWrap();
 	LoadConfig();
 	gtw->_sg = this;
@@ -70,14 +72,34 @@ ServerGenesis::~ServerGenesis()
 
 bool ServerGenesis::Autologin()
 {
+	if (autoattempt) return false;
+	autoattempt = true;
+	std::ifstream file;
+	file.open(AUTOFILE);
+	if (file.is_open())
+	{
+		char skip[100];
+		char data[100];
+		file.getline(skip,100);
+		file.getline(data,100);
+		un = CString(data);
+		file.getline(skip,100);
+		file.getline(data,100);
+		pw = CString(data);
+		file.close();
+		if (pw.GetLength()*un.GetLength()>0)
+		{
+			Start(un,pw);
+			return true;
+		}
+	}
 	return false;
 }
 
 void ServerGenesis::Start()
 {
 	TLServer_WM::Start();
-	if (Autologin())
-		Start(un,pw);
+	Autologin();
 }
 
 int ServerGenesis::BrokerName()
@@ -173,8 +195,6 @@ int ServerGenesis::SendOrder(TradeLibFast::TLOrder o)
 
 	return err;
 }
-
-
 
 int ServerGenesis::CancelRequest(long id)
 {
