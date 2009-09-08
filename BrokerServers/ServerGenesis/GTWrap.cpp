@@ -25,7 +25,7 @@ END_MESSAGE_MAP()
 
 GTStock *GTWrap::OnCreateStock(LPCSTR pszStock)
 {
-	return NULL;
+	return new GTStock(*this,pszStock);
 }
 
 void GTWrap::OnDeleteStock(GTStock *pStock)

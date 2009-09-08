@@ -438,6 +438,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\StkWrap.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\StkWrap.h"
+			>
+		</File>
+		<File
 			RelativePath="TestAPI.cpp"
 			>
 			<FileConfiguration

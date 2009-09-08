@@ -56,6 +56,7 @@ void CTestAPIDlg::DoDataExchange(CDataExchange* pDX)
 	//{{AFX_DATA_MAP(CTestAPIDlg)
 	DDX_Control(pDX, IDC_LIST, m_list);
 	DDX_Control(pDX, IDC_START, m_start);
+	//DDX_Control(pDX, IDC_SESSION, m_session );
 	DDX_Text(pDX, IDC_STOCK, m_strStock);
 	DDV_MaxChars(pDX, m_strStock, 10);
 	DDX_Text(pDX, IDC_PASSWORD, m_strPassword);
@@ -206,6 +207,7 @@ void CTestAPIDlg::OnStart()
 	m_session.m_setting.SetQuoteAddress("69.64.202.155", 15805);
 	m_session.m_setting.SetLevel2Address("69.64.202.155", 15805);
 
+	m_session.DeleteAllStocks();
 
 	tl->Start(m_strUserName, m_strPassword);
 	//m_session.Login(m_strUserName, m_strPassword);
@@ -224,6 +226,7 @@ void CTestAPIDlg::OnBid()
 	if( v == FALSE)
 		return;
 	
+	m_session.CreateStock(m_strStock);
 	GTStock *pStock = m_session.GetStock(m_strStock);
 	if(pStock == NULL)
 		return;

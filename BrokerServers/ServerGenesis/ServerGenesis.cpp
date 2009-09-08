@@ -107,6 +107,8 @@ int ServerGenesis::BrokerName()
 	return Genesis;
 }
 
+#define DEFAULTMETHOD METHOD_HELF
+
 MMID getexchange(CString exch)
 {
 	if (exch=="ISLD")
@@ -121,7 +123,49 @@ MMID getexchange(CString exch)
 		return METHOD_AUTO;
 	if (exch=="HELF")
 		return METHOD_HELF;
-	return METHOD_HELF;
+	MMID_NYSE;
+	return DEFAULTMETHOD;
+
+}
+
+MMID getplace(CString exch)
+{
+	if (exch=="ISLD")
+		return MMID_ISLD;
+	if (exch=="ARCA")
+		return MMID_ARCA;
+	if (exch=="MSE")
+		return MMID_MSE;
+	if (exch=="BATS")
+		return MMID_BATS;
+	if (exch=="NASD")
+		return MMID_NASD;
+	if (exch=="NYSE")
+		return MMID_NYSE;
+	return MMID_NYSE;
+
+}
+
+long getTIF(CString tif)
+{
+	if (tif=="DAY")
+		return TIF_DAY;
+	if (tif=="IOC")
+		return TIF_IOC;
+	if (tif=="GTC")
+		return TIF_MGTC;
+	return TIF_DAY;
+}
+
+char getPI(TLOrder o)
+{
+	if (o.isLimit() && o.isStop())
+		return PRICE_INDICATOR_STOPLIMIT;
+	else if (o.isLimit())
+		return PRICE_INDICATOR_LIMIT;
+	else if (o.isStop())
+		return PRICE_INDICATOR_STOP;
+	return PRICE_INDICATOR_MARKET;
 
 }
 
@@ -160,34 +204,35 @@ int ServerGenesis::SendOrder(TradeLibFast::TLOrder o)
 		D("Must login before sending orders.");
 		return BROKERSERVER_NOT_FOUND;
 	}
-	
+
 	GTStock *pStock;
 	pStock = gtw->GetStock(o.symbol);
 	if(pStock == NULL)
 	{
-		CString m;
-		m.Format("Symbol %s could not be loaded.",o.symbol);
-		D(m);
-		return SYMBOL_NOT_LOADED;
+		gtw->CreateStock(o.symbol);
+		pStock = gtw->GetStock(o.symbol);
+		if (pStock==NULL)
+		{
+			CString m;
+			m.Format("Symbol %s could not be loaded.",o.symbol);
+			D(m);
+			return SYMBOL_NOT_LOADED;
+		}
 	}
 
-	MMID mmid = getexchange(o.exchange);
-
-	double price;
-	price = o.isMarket() ? (o.side ? pStock->m_level2.GetBestAskPrice() : pStock->m_level2.GetBestBidPrice() ) : o.price;
-
-	int err;
-	err = OK;
+	int err = OK;
 
 	GTOrder go;
-	go.chSide = o.side ? 'B' : 'S';
-	go.dblPrice = o.price;
-	go.dblStopLimitPrice = o.stop;
-	go.method = mmid;
-	go.dwShare = o.size;
-	go.nIOIid = o.id;
-
-	err = pStock->PlaceOrder(go);
+	go = pStock->m_defOrder;
+	if(pStock->PlaceOrder(go, (o.side ? 'B' : 'S'), o.size, o.price, getexchange(o.exchange), getTIF(o.TIF))==0)
+	{
+		go.chPriceIndicator = getPI(o);
+		go.dblStopLimitPrice = o.stop;
+		go.dwUserData = o.id;
+		go.nIOIid = o.id;
+		go.place = getplace(o.exchange);
+		err = pStock->PlaceOrder(go);
+	}
 	
 	// save order so it can be canceled later
 	if (err==OK)
