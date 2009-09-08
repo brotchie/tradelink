@@ -20,6 +20,7 @@ public :
 	int SendOrder(TradeLibFast::TLOrder order);
 	int CancelRequest(long id);
 	int BrokerName();
+	int AccountResponse(CString clientname);
 	std::vector<int> GetFeatures();
 	void accounttest();
 	GTWrap* gtw;

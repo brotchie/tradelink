@@ -56,6 +56,13 @@ bool ServerGenesis::LoadConfig()
 	return true;
 }
 
+	int ServerGenesis::AccountResponse(CString clientname)
+	{
+		CString s = gjoin(m_accts,","); // join em back together
+		TLSend(ACCOUNTRESPONSE,s,clientname); // send the whole list
+		return OK;
+	}
+
 ServerGenesis::ServerGenesis()
 {
 	autoattempt = false;
@@ -176,8 +183,8 @@ std::vector<int> ServerGenesis::GetFeatures()
 	f.push_back(BROKERNAME);
 	//f.push_back(REGISTERCLIENT);
 	//f.push_back(REGISTERSTOCK);
-	//f.push_back(ACCOUNTREQUEST);
-	//f.push_back(ACCOUNTRESPONSE);
+	f.push_back(ACCOUNTREQUEST);
+	f.push_back(ACCOUNTRESPONSE);
 	f.push_back(ORDERCANCELREQUEST);
 	//f.push_back(ORDERCANCELRESPONSE);
 	//f.push_back(ORDERNOTIFY);
