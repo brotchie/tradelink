@@ -84,11 +84,11 @@ SectionEnd
 Section "AnvilServer"
 
 
-  CreateShortCut "$SMPROGRAMS\TradeLink\Assent.lnk" "$INSTDIR\AnvilRelease_x32_2_7_7_2\Anvil.exe" "" "$INSTDIR\AnvilRelease_x32_2_7_7_2\Anvil.exe" 0
+  CreateShortCut "$SMPROGRAMS\TradeLink\Assent.lnk" "$INSTDIR\${ANVILDIRNAME}\Anvil.exe" "" "$INSTDIR\${ANVILDIRNAME}\Anvil.exe" 0
   ; Put file there
  
   
-  File /r "${ANVILDIRNAME}"
+  File /r "Install\${ANVILDIRNAME}"
   WriteINIStr "$INSTDIR\${ANVILDIRNAME}\Anvil.ini" Extension Path "$INSTDIR\${ANVILDIRNAME}\"
 
 
@@ -124,7 +124,7 @@ Section "Uninstall"
 
   ; Remove files and uninstaller
   Delete $INSTDIR\uninstall.exe
-  Delete "$INSTDIR\AnvilRelease_x32_2_7_7_2\*.*"
+  Delete "$INSTDIR\${ANVILDIRNAME}\*.*"
   Delete "$INSTDIR\*.*"
   ; Remove shortcuts, if any
   Delete "$SMPROGRAMS\TradeLink\InteractiveBrokers.lnk"
@@ -133,7 +133,7 @@ Section "Uninstall"
   
 
   ; Remove directories used
-  RMDir "$INSTDIR\AnvilRelease_x32_2_7_5_0"
+  RMDir "$INSTDIR\${ANVILDIRNAME}"
   RMDir "$INSTDIR"
   
 
