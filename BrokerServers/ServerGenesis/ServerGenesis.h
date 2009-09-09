@@ -3,6 +3,7 @@
 #include "GTOrder.h"
 #include "GTWrap.h"
 #include <vector>
+#include "StkWrap.h"
 
 class GTWrap;
 
@@ -17,18 +18,24 @@ public :
 	void Start(void);
 	void Start(LPCSTR user, LPCSTR pw);
 	void Stop();
+	int DOMRequest(int depth);
 	int SendOrder(TradeLibFast::TLOrder order);
 	int CancelRequest(long id);
 	int BrokerName();
 	int AccountResponse(CString clientname);
+	int RegisterStocks(CString client);
+	int PositionResponse(CString account, CString client);
 	std::vector<int> GetFeatures();
 	void accounttest();
 	GTWrap* gtw;
 	bool LoadConfig();
 	bool Autologin();
-
+	int _depth;
 private:
+
 	bool autoattempt;
+	bool subscribed(CString sym);
+	std::vector<StkWrap*> m_stk;
 		std::vector<CString> m_accts;
 		std::vector<GTOrder> m_order;
 		CString un;

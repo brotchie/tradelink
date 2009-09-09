@@ -65,10 +65,12 @@ bool ServerGenesis::LoadConfig()
 
 ServerGenesis::ServerGenesis()
 {
+	_depth = 0;
 	autoattempt = false;
 	gtw = new GTWrap();
 	LoadConfig();
 	gtw->_sg = this;
+	
 }
 
 ServerGenesis::~ServerGenesis()
@@ -107,6 +109,60 @@ void ServerGenesis::Start()
 {
 	TLServer_WM::Start();
 	Autologin();
+}
+
+bool ServerGenesis::subscribed(CString sym)
+{
+	for (uint i = 0; i<m_stk.size(); i++)
+		if (m_stk[i]->GetSymbolName()==sym) 
+			return true;
+	return false;
+}
+
+int ServerGenesis::RegisterStocks(CString client)
+{
+	TLServer_WM::RegisterStocks(client);
+
+	// get client id
+	int cid = FindClient(client);
+
+	// loop through every stock for this client
+	for (unsigned int i = 0; i<stocks[cid].size(); i++)
+	{
+		CString sym = stocks[cid][i];
+		// make sure we have subscription
+		if (!subscribed(sym))
+		{
+			StkWrap* stk = (StkWrap*)gtw->CreateStock(sym);
+			//stk->tl = this;
+			m_stk.push_back(stk);
+			CString m;
+			m.Format("Added subscription for: %s",sym);
+			D(m);
+		}
+	}
+	return OK;
+}
+
+int ServerGenesis::PositionResponse(CString account, CString client)
+{
+	void *it;
+	it = NULL;
+	for (uint i = 0; i<m_accts.size(); i++)
+	{
+		GTOpenPosition pos;
+		if (it==NULL)
+			it = gtw->GetFirstOpenPosition(m_accts[i].GetBuffer(),pos);
+		else
+			gtw->GetNextOpenPosition(m_accts[i].GetBuffer(),it,pos);
+		TLPosition p;
+		p.Symbol = CString(pos.szStock);
+		p.Size = abs(pos.nOpenShares)*(pos.chOpenSide=='B' ? 1 : -1);
+		p.AvgPrice = pos.dblOpenPrice;
+		TLSend(POSITIONRESPONSE,p.Serialize(),client);
+	}
+	it = NULL;
+	return OK;
 }
 
 int ServerGenesis::BrokerName()
@@ -176,29 +232,35 @@ char getPI(TLOrder o)
 
 }
 
+int ServerGenesis::DOMRequest(int depth)
+{
+	_depth = depth;
+	return OK;
+}
+
 std::vector<int> ServerGenesis::GetFeatures()
 {
 	std::vector<int> f;
 	f.push_back(SENDORDER);
 	f.push_back(BROKERNAME);
-	//f.push_back(REGISTERCLIENT);
-	//f.push_back(REGISTERSTOCK);
+	f.push_back(REGISTERSTOCK);
 	f.push_back(ACCOUNTREQUEST);
 	f.push_back(ACCOUNTRESPONSE);
 	f.push_back(ORDERCANCELREQUEST);
-	//f.push_back(ORDERCANCELRESPONSE);
-	//f.push_back(ORDERNOTIFY);
-	//f.push_back(EXECUTENOTIFY);
-	//f.push_back(TICKNOTIFY);
+	f.push_back(ORDERCANCELRESPONSE);
+	f.push_back(ORDERNOTIFY);
+	f.push_back(EXECUTENOTIFY);
+	f.push_back(TICKNOTIFY);
 	f.push_back(SENDORDERMARKET);
 	f.push_back(SENDORDERLIMIT);
 	f.push_back(SENDORDERSTOP);
+	f.push_back(DOMREQUEST);
 	//f.push_back(SENDORDERTRAIL);
-	//f.push_back(LIVEDATA);
-	//f.push_back(LIVETRADING);
-	//f.push_back(SIMTRADING);
-	//f.push_back(POSITIONRESPONSE);
-	//f.push_back(POSITIONREQUEST);
+	f.push_back(LIVEDATA);
+	f.push_back(LIVETRADING);
+	f.push_back(SIMTRADING);
+	f.push_back(POSITIONRESPONSE);
+	f.push_back(POSITIONREQUEST);
 	return f;
 }
 
@@ -286,6 +348,10 @@ void ServerGenesis::Start(LPCSTR user, LPCSTR pw)
 
 void ServerGenesis::Stop()
 {
+	for (uint i = 0; i<m_stk.size(); i++)
+		m_stk[i] = NULL;
+	m_stk.clear();
+	gtw->DeleteAllStocks();
 	gtw->Logout();
 	D("Logged out.");
 	while(!gtw->CanClose()){

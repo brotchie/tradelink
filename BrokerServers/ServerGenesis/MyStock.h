@@ -10,8 +10,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_MYSTOCK_H__66F52ECC_BD30_4449_B973_55521242E873__INCLUDED_)
-#define AFX_MYSTOCK_H__66F52ECC_BD30_4449_B973_55521242E873__INCLUDED_
+//#if !defined(AFX_MYSTOCK_H__66F52ECC_BD30_4449_B973_55521242E873__INCLUDED_)
+//#define AFX_MYSTOCK_H__66F52ECC_BD30_4449_B973_55521242E873__INCLUDED_
 
 #if _MSC_VER > 1000
 #pragma once
@@ -46,4 +46,4 @@ protected:
 	virtual int OnExecMsgOpenPosition(const GTOpenPosition &open);
 };
 
-#endif // !defined(AFX_MYSTOCK_H__66F52ECC_BD30_4449_B973_55521242E873__INCLUDED_)
+//#endif // !defined(AFX_MYSTOCK_H__66F52ECC_BD30_4449_B973_55521242E873__INCLUDED_)

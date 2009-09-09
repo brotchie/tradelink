@@ -1,35 +1,22 @@
-/****************************************************************************
- *                                                                          *
- *    All codes are property of Genesis Securities, LLC.                    *
- *    Any use without prior written permission is illegal.                  *
- *    This material cannot be distributed without prior written permission. *
- *                                                                          *
- ****************************************************************************/
-
-// MyStock.cpp: implementation of the StkWrap class.
-//
-//////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
 #include "testapi.h"
 #include "TestAPIDlg.h"
 #include "StkWrap.h"
 
-
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
-#define new DEBUG_NEW
-#endif
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+using namespace TradeLibFast;
 
 StkWrap::StkWrap(GTSession &session, LPCSTR pszStock)
 	: GTStock(session, pszStock)
 {
-	//m_pDlg = NULL;
+
+	tl = NULL;
+
+	time_t now;
+	time(&now);
+	CTime ct(now);
+	date = (ct.GetYear()*10000) + (ct.GetMonth()*100) + ct.GetDay();
+
 
 #ifdef UDP_QUOTE
 	m_level2.m_bid.m_nMaxLevels = 10;
@@ -41,7 +28,23 @@ StkWrap::StkWrap(GTSession &session, LPCSTR pszStock)
 
 StkWrap::~StkWrap()
 {
+	tl = NULL;
+}
 
+int StkWrap::OnExecMsgErrMsg(const GTErrMsg &err)
+{
+	CString m;
+	m.Format("error: %s %s %l",err.szStock,err.szText,err.dwOrderSeqNo);
+	tl->D(m);
+	return GTStock::OnExecMsgErrMsg(err);
+}
+
+int StkWrap::OnExecMsgCancel(const GTCancel &cancel)
+{
+	tl->SrvGotCancel((int)cancel.dwTicketNo);
+
+
+	return GTStock::OnExecMsgCancel(cancel);
 }
 
 int StkWrap::OnGotQuoteLevel1(GTLevel1 *pRcd)
@@ -54,189 +57,163 @@ int StkWrap::OnGotQuoteLevel1(GTLevel1 *pRcd)
 	if(strStock != pRcd->szStock)
 		return GTStock::OnGotQuoteLevel1(pRcd);
 
-	//TRACE("%d %d %d %d %d %f %d %c %c %c %c %c\n", pRcd->locBidSize, pRcd->locAskSize, pRcd->nAskSize, pRcd->nBidSize, pRcd->nLastSize, pRcd->locAskPrice, pRcd->chSaleCondition, pRcd->chSaleCondition,
-	//	pRcd->bboAskExchangeCode[0], pRcd->bboBidExchangeCode[0], pRcd->locAskExchangeCode[0], pRcd->locBidExchangeCode[0]
-	//	);
 	return GTStock::OnGotQuoteLevel1(pRcd);
 #endif	
 }
-
+#define SHAREUNITS 100
 int StkWrap::OnGotLevel2Record(GTLevel2 *pRcd)
 {
 #ifdef UDP_QUOTE
 	return GTStock::OnGotLevel2Record(pRcd);
 #else
 	CString strStock;
-	//m_pDlg->GetDlgItemText(IDC_STOCK, strStock);
 
-	if(strStock != pRcd->szStock)
-		return GTStock::OnGotLevel2Record(pRcd);
+	int rc = GTStock::OnGotLevel2Record(pRcd);
+	int depth = (int)(pRcd->dblLevelPrice * m_session.m_setting.m_nLevelRate);
+
+	if (depth>tl->_depth) return rc;
 
 	char chSide = pRcd->chSide;
 
-	int rc = GTStock::OnGotLevel2Record(pRcd);
-	//if(m_level2.GetBestBidPrice()>m_level2.GetBestAskPrice())
-	//	TRACE("BID %lf, ASK %lf\n", m_level2.GetBestBidPrice(), m_level2.GetBestAskPrice()); 
 
-	if(chSide == 'B')
-		DisplayBidLevel();
+	TLTick k;
+	k.sym = CString(pRcd->szStock);
+	k.depth = depth;
+	k.time = pRcd->gtime.dwTime/100;
+	k.date = date;
+	
+	if (pRcd->chSide=='B')
+	{
+		k.bid = pRcd->dblPrice;
+		k.bs = pRcd->dwShares / SHAREUNITS;
+		k.be = CAST_MMID_TEXT(pRcd->mmid);
+	}
 	else
-		DisplayAskLevel();
+	{
+		k.ask = pRcd->dblPrice;
+		k.os = pRcd->dwShares / SHAREUNITS;
+		k.oe = CAST_MMID_TEXT(pRcd->mmid);
+
+	}
+	tl->SrvGotTick(k);
 
 	return rc;
 #endif
 }
 
-int StkWrap::DisplayBidLevel()
-{
-	long dwShares[2];
-	double dblPrices[2];
-	int nLevels = m_level2.GetBidLevel(dwShares, dblPrices, 2);
 
-	int nShareIDs[] = {IDC_BID_SHARES1, IDC_BID_SHARES2};
-	int nPriceIDs[] = {IDC_BID_PRICE1, IDC_BID_PRICE2};
 
-	int i;
-	for(i = 0; i < nLevels; ++i)
-	{
-		char ss[256];
-		sprintf(ss, "%.2lf", dblPrices[i]);
-		//m_pDlg->SetDlgItemText(nPriceIDs[i], ss);
-		//m_pDlg->SetDlgItemInt(nShareIDs[i], dwShares[i]);
-	}
 
-	//for(; i < nLevels; ++i)
-	//{
-		//m_pDlg->SetDlgItemText(nPriceIDs[i], "");
-		//m_pDlg->SetDlgItemInt(nShareIDs[i], 0);
-	//}
-
-	if(nLevels >= 1 && dblPrices[0] > 31.3)
-	{
-//		TRACE("Begin %.4lf\n", dblPrices[0]);
-		for(int i = 0; i < 20; ++i)
-		{
-			GTLevel2 *pRcd = m_level2.GetBidItem(i);
-			if(pRcd == NULL)
-				break;
-
-//			TRACE("%d\t%.4s\t%.4lf\n", pRcd->dwShares, &pRcd->mmid, pRcd->dblPrice);
-		}
-	}
-
-	return 0;
-}
-
-int StkWrap::DisplayAskLevel()
-{
-	long dwShares[2];
-	double dblPrices[2];
-	int nLevels = m_level2.GetAskLevel(dwShares, dblPrices, 2);
-
-	int nShareIDs[] = {IDC_ASK_SHARES1, IDC_ASK_SHARES2};
-	int nPriceIDs[] = {IDC_ASK_PRICE1, IDC_ASK_PRICE2};
-
-	int i;
-	for(i = 0; i < nLevels; ++i)
-	{
-		char ss[256];
-		sprintf(ss, "%.2lf", dblPrices[i]);
-		//m_pDlg->SetDlgItemText(nPriceIDs[i], ss);
-		//m_pDlg->SetDlgItemInt(nShareIDs[i], dwShares[i]);
-	}
-
-	//for(; i < nLevels; ++i)
-	//{
-	//	m_pDlg->SetDlgItemText(nPriceIDs[i], "");
-	//	m_pDlg->SetDlgItemInt(nShareIDs[i], 0);
-	//}
-
-	return 0;
-}
 
 int StkWrap::OnTick()
 {
 	GTStock::OnTick();
-
-	//TRACE("StkWrap::OnTick()\n");
 
 	return 0;
 }
 
 int StkWrap::OnGotQuotePrint(GTPrint *pRcd)
 {
-	//TRACE("%s Ex=%.1s SC=%.1s Src=%.1s MMID=%d %d\n", pRcd->szStock, &pRcd->chExchangeCode, &pRcd->chSaleCondition, &pRcd->chSource, pRcd->mmidContraBrokerCode, sizeof(*pRcd));
+	TLTick k;
+	k.sym = CString(pRcd->szStock);
+	k.trade = pRcd->dblPrice;
+	k.size = (int)pRcd->dwShares;
+	k.ex = CString(pRcd->chSource);
+	k.time = pRcd->gtime.dwTime/100;
+	k.date = date;
+
+	tl->SrvGotTick(k);
 	
 	return GTStock::OnGotQuotePrint(pRcd);
 }
 
 int StkWrap::OnExecMsgSending(const GTSending &pRcd)
 {
-	char ss[256];
-
-	sprintf(ss, "Sending %s %.1s %.4lf %5d", pRcd.szStock, &pRcd.chEntrySide, pRcd.dblEntryPrice, pRcd.nEntryShares);
-	//m_pDlg->m_list.InsertString(0, ss);
-
-//	int count = m_pDlg->m_list.GetCount();
-	//if(count >= 1000)
-	//{
-	//	for(int i = count - 1; i >= 500; --i)
-	//		;
-			//m_pDlg->m_list.DeleteString(i);
-	//}
 
 	return GTStock::OnExecMsgSending(pRcd);
 }
 
+CString tifstring(int TIF)
+{
+	switch (TIF)
+	{
+		case TIF_DAY : return CString("DAY"); break;
+		case TIF_MGTC : return CString("GTC"); break;
+		case TIF_IOC : return CString("IOC"); break;
+	}
+	return CString("DAY");
+}
+
+int StkWrap::OnBestAskPriceChanged()
+{
+	TLTick k;
+	k.sym = CString(m_szStock);
+	k.ask = m_level1.dblAskPrice;
+	k.os = m_level1.nAskSize;
+	k.oe = CString(m_level1.locAskExchangeCode);
+	k.date = date;
+	k.time = m_level1.gtime.dwTime/100;
+
+	tl->SrvGotTick(k);
+	return OK;
+}
+
+int StkWrap::OnBestBidPriceChanged()
+{
+	TLTick k;
+	k.sym = CString(m_szStock);
+	k.ask = m_level1.dblBidPrice;
+	k.os = m_level1.nBidSize;
+	k.oe = CString(m_level1.locBidExchangeCode);
+	k.date = date;
+	k.time = m_level1.gtime.dwTime/100;
+
+	tl->SrvGotTick(k);
+
+	return OK;
+
+
+}
+
+
 int StkWrap::OnExecMsgPending(const GTPending &pRcd)
 {
-	GTPending32 gPend = pRcd;
-	char ss[256];
+	TLOrder o;
+	o.symbol = CString(pRcd.szStock);
+	o.side = pRcd.chPendSide == 'B';
+	o.size = pRcd.nEntryShares;
+	o.TIF = tifstring(pRcd.nEntryTIF);
+	o.time = pRcd.nPendTime;
+	o.date = pRcd.nEntryDate;
+	o.price = pRcd.dblEntryPrice;
+	o.stop = pRcd.dblPendStopLimitPrice;
+	o.id = (uint)pRcd.dwTicketNo;
+	o.account = CString(pRcd.szAccountID);
+	o.exchange = CAST_MMID_TEXT(pRcd.place);
 
-	sprintf(ss, "Pending %s %.1s %.4lf %5d", pRcd.szStock, &pRcd.chPendSide, pRcd.dblPendPrice, pRcd.nPendShares);
-
-	//m_pDlg->m_list.InsertString(0, ss);
-
-	//int count = m_pDlg->m_list.GetCount();
-	//if(count >= 1000)
-	//{
-	//	for(int i = count - 1; i >= 500; --i)
-	//		;
-	//		m_pDlg->m_list.DeleteString(i);
-	//}
+	tl->SrvGotOrder(o);
 
 	return GTStock::OnExecMsgPending(pRcd);
 }
 
 int StkWrap::OnExecMsgTrade(const GTTrade &pRcd)
 {
-	char ss[256];
+	TLTrade t;
+	t.symbol = CString(pRcd.szStock);
+	t.account = CString(pRcd.szAccountID);
+	t.id = (uint)pRcd.dwTicketNo;
+	t.xdate = pRcd.nExecDate;
+	t.xtime = pRcd.nExecTime;
+	t.xprice = pRcd.dblExecPrice;
+	t.xsize = pRcd.nExecShares;
+	t.exchange = CAST_MMID_TEXT(pRcd.execfirm);
 
-	//TRACE("Trade %s %.1s %.4lf %5d\n", pRcd.szStock, &pRcd.chExecSide, pRcd.dblExecPrice, pRcd.nExecShares);
-	char side;
-	int share;
-	double price;
-	GetOpenPosition(side, share, price);
-	TRACE("TradeOpenBefore %c %.4lf %5d\n", side, price, share);
+	tl->SrvGotFill(t);
 
-	sprintf(ss, "Trade %s %.1s %.4lf %5d\n", pRcd.szStock, &pRcd.chExecSide, pRcd.dblExecPrice, pRcd.nExecShares);
-	//m_pDlg->m_list.InsertString(0, ss);
-
-	//int count = m_pDlg->m_list.GetCount();
-	//if(count >= 1000)
-	//{
-	//	for(int i = count - 1; i >= 500; --i)
-	//		m_pDlg->m_list.DeleteString(i);
-	//}
-
-	GTStock::OnExecMsgTrade(pRcd);
-	GetOpenPosition(side, share, price);
-	TRACE("TradeOpenAfter %c %.4lf %5d\n", side, price, share);
-	return 0;
+	return GTStock::OnExecMsgTrade(pRcd);
 }
 
 int StkWrap::OnExecMsgOpenPosition(const GTOpenPosition &open)
 {
-	TRACE("OPEN: %s %s %s %s %d %c\n", open.szAccountID, open.szAccountCode, open.szReconcileID, open.szStock, open.nOpenShares, open.chOpenSide);
 	return GTStock::OnExecMsgOpenPosition(open);
 }
