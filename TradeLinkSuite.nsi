@@ -42,6 +42,9 @@ Section "TradeLinkSuite"
   ; Set output path to the installation directory.
   SetOutPath $INSTDIR
   
+  ; remove existing shortcuts and recreate
+  	
+  
   CreateDirectory "$SMPROGRAMS\TradeLink"
   CreateShortCut "$SMPROGRAMS\TradeLink\Asp.lnk" "$INSTDIR\ASP.exe" "" "$INSTDIR\ASP.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Quotopia.lnk" "$INSTDIR\Quotopia.exe" "" "$INSTDIR\Quotopia.exe" 0
@@ -53,7 +56,6 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\Uninstall TradeLink.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Kadina.lnk" "$INSTDIR\Kadina.EXE" "" "$INSTDIR\Kadina.EXE" 0 
   CreateShortCut "$SMPROGRAMS\TradeLink\Record.lnk" "$INSTDIR\Record.EXE" "" "$INSTDIR\Record.EXE" 0  
-  CreateShortCut "$SMPROGRAMS\TradeLink\Update TradeLink.lnk" "$INSTDIR\Update.EXE" "" "$INSTDIR\Update.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\SterlingPro.lnk" "$INSTDIR\SterServer.EXE" "" "$INSTDIR\SterServer.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\TDAmeritrade.lnk" "$INSTDIR\TDServer.EXE" "" "$INSTDIR\TDServer.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\MBTrading.lnk" "$INSTDIR\ServerMB.EXE" "" "$INSTDIR\ServerMB.EXE" 0  
@@ -63,10 +65,8 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\Blackwood.lnk" "$INSTDIR\ServerBlackwood.exe" "" "$INSTDIR\ServerBlackwood.exe" 0  
   
   
-  
   ; Put file there
   File "VERSION.txt"
-  File "Update\bin\release\Update.exe"  
   File "Kadina\bin\release\Kadina.exe"
   File "Kadina\bin\release\Kadina.exe.config"
   File "Replay\bin\release\Replay.exe"
@@ -113,6 +113,10 @@ Section "TradeLinkSuite"
 
   File "TikConverter\bin\release\TikConverter.exe"
   
+  Delete "$SMPROGRAMS\TradeLink\Update*.lnk"  
+  Delete "$INSTDIR\Update.exe"
+
+  
   ; Write the installation path into the registry
   WriteRegStr HKLM SOFTWARE\TradeLinkSuite "Install_Dir" "$INSTDIR"
   
@@ -150,14 +154,13 @@ Section "Uninstall"
   Delete "$INSTDIR\*.*"
   Delete "$INSTDIR\Properties\*.*"
   RMDir "$INSTDIR\Properties"
-  ; Remove shortcuts, if any
+    ; Remove shortcuts, if any
   Delete "$SMPROGRAMS\TradeLink\Asp.lnk"  
   Delete "$SMPROGRAMS\TradeLink\Kadina.lnk"
   Delete "$SMPROGRAMS\TradeLink\Quotopia.lnk"
   Delete "$SMPROGRAMS\TradeLink\Time and Sales.lnk"
   Delete "$SMPROGRAMS\TradeLink\Replay.lnk"
   Delete "$SMPROGRAMS\TradeLink\Record.lnk"
-  Delete "$SMPROGRAMS\TradeLink\Update TradeLink.lnk"
   Delete "$SMPROGRAMS\TradeLink\Sterling.lnk"
   Delete "$SMPROGRAMS\TradeLink\Gauntlet.lnk"
   Delete "$SMPROGRAMS\TradeLink\Tattle.lnk"
@@ -171,12 +174,9 @@ Section "Uninstall"
   ; Remove directories used
   RMDir "$SMPROGRAMS\TradeLink"
   RMDir "$INSTDIR"
+
+  SectionEnd
   
-
-
-
-SectionEnd
-
 Function .onInit
 
   ; plugins dir should be automatically removed after installer runs

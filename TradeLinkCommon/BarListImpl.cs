@@ -122,7 +122,7 @@ namespace TradeLink.Common
         public decimal[] High() { return _intdata[_intdataidx[_defaultint]].high().ToArray(); }
         public decimal[] Low() { return _intdata[_intdataidx[_defaultint]].low().ToArray(); }
         public decimal[] Close() { return _intdata[_intdataidx[_defaultint]].close().ToArray(); }
-        public int[] Vol() { return _intdata[_intdataidx[_defaultint]].vol().ToArray(); }
+        public long[] Vol() { return _intdata[_intdataidx[_defaultint]].vol().ToArray(); }
         public int[] Date() { return _intdata[_intdataidx[_defaultint]].date().ToArray(); }
         public int[] Time() { return _intdata[_intdataidx[_defaultint]].time().ToArray(); }
         public decimal[] Open(int interval) { return _intdata[_intdataidx[interval]].open().ToArray(); }

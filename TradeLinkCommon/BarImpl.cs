@@ -17,7 +17,7 @@ namespace TradeLink.Common
         private ulong l = ulong.MaxValue;
         private ulong o = 0;
         private ulong c = 0;
-        private int v = 0;
+        private long v = 0;
         private int tradesinbar = 0;
         private bool _new = false;
         private BarInterval tunits = BarInterval.FiveMin; //5min bar default
@@ -33,7 +33,7 @@ namespace TradeLink.Common
         public decimal Low { get { return l * Const.IPRECV; } }
         public decimal Open { get { return o * Const.IPRECV; } }
         public decimal Close { get { return c * Const.IPRECV; } }
-        public int Volume { get { return v; } }
+        public long Volume { get { return v; } }
         public bool isNew { get { return _new; } set { _new = value; } }
         public bool isValid { get { return (h >= l) && (o != 0) && (c != 0); } }
         public int TradeCount { get { return tradesinbar; } }
@@ -49,7 +49,7 @@ namespace TradeLink.Common
             bardate = date;
             bartime = time;
         }
-        public BarImpl(decimal open, decimal high, decimal low, decimal close, int vol, int date, int time, string symbol)
+        public BarImpl(decimal open, decimal high, decimal low, decimal close, long vol, int date, int time, string symbol)
         {
             h = (ulong)(high * Const.IPREC);
             o = (ulong)(open * Const.IPREC);
@@ -139,7 +139,7 @@ namespace TradeLink.Common
             decimal high = Convert.ToDecimal(r[2], System.Globalization.CultureInfo.InvariantCulture);
             decimal low = Convert.ToDecimal(r[3], System.Globalization.CultureInfo.InvariantCulture);
             decimal close = Convert.ToDecimal(r[4], System.Globalization.CultureInfo.InvariantCulture);
-            int vol = Convert.ToInt32(r[5]);
+            long vol = Convert.ToInt64(r[5]);
             return new BarImpl(open,high,low,close,vol,date,0,symbol);
         }
 

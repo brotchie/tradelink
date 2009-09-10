@@ -11,7 +11,7 @@ namespace TradeLink.Common
         public List<decimal> close() { return closes; }
         public List<decimal> high() { return highs; }
         public List<decimal> low() { return lows; }
-        public List<int> vol() { return vols; }
+        public List<long> vol() { return vols; }
         public List<int> date() { return dates; }
         public List<int> time() { return times; }
         public List<int> tick() { return ticks; }
@@ -63,7 +63,7 @@ namespace TradeLink.Common
         internal List<decimal> closes = new List<decimal>();
         internal List<decimal> highs = new List<decimal>();
         internal List<decimal> lows = new List<decimal>();
-        internal List<int> vols = new List<int>();
+        internal List<long> vols = new List<long>();
         internal List<int> dates = new List<int>();
         internal List<int> times = new List<int>();
         internal int _Count = 0;

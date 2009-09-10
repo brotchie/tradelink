@@ -16,7 +16,7 @@ namespace TradeLink.API
         decimal Low { get;  }
         decimal Open { get;  }
         decimal Close { get;  }
-        int Volume { get;  }
+        long Volume { get;  }
         bool isNew { get; set;}
         int Bartime { get;  }
         int Bardate { get; }

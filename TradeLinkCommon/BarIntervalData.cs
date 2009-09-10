@@ -14,7 +14,7 @@ namespace TradeLink.Common
         List<decimal> close();
         List<decimal> high();
         List<decimal> low();
-        List<int> vol();
+        List<long> vol();
         List<int> date();
         List<int> time();
         event SymBarIntervalDelegate NewBar;

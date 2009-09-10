@@ -30,7 +30,7 @@ namespace TradeLink.API
         decimal[] Low();
         int[] Date();
         int[] Time();
-        int[] Vol();
+        long[] Vol();
         BarInterval[] Intervals { get; }
         int[] CustomIntervals { get; }
 

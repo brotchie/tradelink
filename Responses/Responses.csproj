@@ -39,6 +39,8 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.XML" />
+    <Reference Include="TradeLinkAPI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="TradeLinkCommon, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="OpenAsymetry.cs" />
@@ -73,16 +75,6 @@
     <EmbeddedResource Include="Quotelet.resx">
       <DependentUpon>Quotelet.cs</DependentUpon>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\TradeLinkAPI\TradeLink.API.csproj">
-      <Project>{1B99C9ED-7AF1-4D48-AC9D-A97CF30E1A82}</Project>
-      <Name>TradeLink.API</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\TradeLinkCommon\TradeLink.Common.csproj">
-      <Project>{A0FE06A2-F31B-49DE-8901-917B5D593E43}</Project>
-      <Name>TradeLink.Common</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

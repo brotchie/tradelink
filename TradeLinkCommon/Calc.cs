@@ -248,6 +248,28 @@ namespace TradeLink.Common
                 sum += array[i];
             return sum;
         }
+
+        /// <summary>
+        /// sum part of an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="startindex"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
+        public static long Sum(long[] array, int startindex, int length)
+        {
+            long sum = 0;
+            for (int i = startindex; i < startindex + length; i++)
+                sum += array[i];
+            return sum;
+        }
+        /// <summary>
+        /// gets sum of entire array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static long Sum(long[] array) { return Sum(array, 0, array.Length); }
+
         /// <summary>
         /// gets sum of entire array
         /// </summary>
@@ -299,6 +321,18 @@ namespace TradeLink.Common
         public static decimal Avg(decimal[] array, bool returnzeroIfempty) { return array.Length == 0 ? 0 : Sum(array) / array.Length; }
         public static decimal Avg(int[] array ) { return Avg(array,true); }
         public static decimal Avg(int[] array, bool returnzeroIfempty) { return array.Length == 0 ? 0 : (decimal)Sum(array) / array.Length; }
+        public static decimal Avg(long[] array) { return Avg(array, true); }
+        public static decimal Avg(long[] array, bool returnzeroifEmpty)
+        {
+            if (returnzeroifEmpty)
+            {
+                if (array.Length == 0) return 0;
+                return Sum(array) / array.Length;
+            }
+            return Sum(array) / array.Length;
+        }
+
+            
 
         /// <summary>
         /// adds two arrays
@@ -315,6 +349,20 @@ namespace TradeLink.Common
             int[] s2 = new int[max];
             Buffer.BlockCopy(array1,0,s1,0,array1.Length*4);
             Buffer.BlockCopy(array2,0,s2,0,array2.Length*4);
+            // calculate values
+            for (int i = 0; i < s1.Length; i++)
+                s2[i] += s1[i];
+            return s2;
+        }
+        public static long[] Add(long[] array1, long[] array2)
+        {
+            // normalize sizes of arrays
+            bool a2bigger = array1.Length < array2.Length;
+            int max = a2bigger ? array2.Length : array1.Length;
+            long[] s1 = new long[max];
+            long[] s2 = new long[max];
+            Buffer.BlockCopy(array1, 0, s1, 0, array1.Length * 8);
+            Buffer.BlockCopy(array2, 0, s2, 0, array2.Length * 8);
             // calculate values
             for (int i = 0; i < s1.Length; i++)
                 s2[i] += s1[i];
@@ -889,9 +937,9 @@ namespace TradeLink.Common
         /// <param name="chart"></param>
         /// <param name="bars"></param>
         /// <returns></returns>
-        public static int[] Volumes(BarList chart, int bars)
+        public static long[] Volumes(BarList chart, int bars)
         {
-            List<int> l = new List<int>();
+            List<long> l = new List<long>();
             for (int i = chart.Count - bars; i < chart.Count; i++)
                 l.Add(chart[i].Volume);
             return l.ToArray();
@@ -901,7 +949,7 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="chart"></param>
         /// <returns></returns>
-        public static int[] Volumes(BarList chart) { return Volumes(chart, chart.Count); }
+        public static long[] Volumes(BarList chart) { return Volumes(chart, chart.Count); }
 
         /// <summary>
         /// gets the high to low range of a barlist, for the default interval
