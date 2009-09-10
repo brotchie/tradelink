@@ -6,7 +6,7 @@ using namespace TradeLibFast;
 
 const char* CONFIGFILE = "GenesisServer.Config.txt";
 const char* AUTOFILE = "GenesisServer.Login.txt";
-const int MAXSERVERS = 3;
+const int MINSERVERS = 3;
 enum GENESISSERVERTYPE
 {
 	GTEXEC,
@@ -24,7 +24,7 @@ bool ServerGenesis::LoadConfig()
 		char skip[100];
 		char data[100];
 		int i = 0;
-		while (i++<MAXSERVERS)
+		while (i++<MINSERVERS)
 		{
 			file.getline(skip,100);
 			file.getline(data,100);
@@ -39,15 +39,16 @@ bool ServerGenesis::LoadConfig()
 		file.close();
 	}
 
-	if (servers.size()<MAXSERVERS)
+	if (servers.size()<MINSERVERS)
 	{
 		servers.clear();
 		ports.clear();
-		for (int i = 0; i<MAXSERVERS; i++)
-		{
-			servers.push_back("69.64.202.155");
-			ports.push_back(15805);
-		}
+		servers.push_back("69.64.202.155");
+		ports.push_back(15805);
+		servers.push_back("69.64.202.156");
+		ports.push_back(17811);
+		servers.push_back("69.64.202.156");
+		ports.push_back(17810);
 	}
 
 	gtw->m_setting.SetExecAddress(servers[GTEXEC], ports[GTEXEC]);

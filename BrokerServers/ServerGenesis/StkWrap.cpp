@@ -69,8 +69,12 @@ int StkWrap::OnGotLevel2Record(GTLevel2 *pRcd)
 	CString strStock;
 
 	int rc = GTStock::OnGotLevel2Record(pRcd);
+	// make sure depth is enabled
+	if (tl->_depth==0) return rc;
+	// make sure quote is good
+	if (pRcd->szStock!=this->GetSymbolName()) return rc;
+	// make sure depth is requested
 	int depth = (int)(pRcd->dblLevelPrice * m_session.m_setting.m_nLevelRate);
-
 	if (depth>tl->_depth) return rc;
 
 	char chSide = pRcd->chSide;
@@ -162,9 +166,9 @@ int StkWrap::OnBestBidPriceChanged()
 {
 	TLTick k;
 	k.sym = CString(m_szStock);
-	k.ask = m_level1.dblBidPrice;
-	k.os = m_level1.nBidSize;
-	k.oe = CString(m_level1.locBidExchangeCode);
+	k.bid = m_level1.dblBidPrice;
+	k.bs = m_level1.nBidSize;
+	k.be = CString(m_level1.locBidExchangeCode);
 	k.date = date;
 	k.time = m_level1.gtime.dwTime/100;
 

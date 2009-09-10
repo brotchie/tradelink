@@ -16,7 +16,6 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "MySession.h"
 #include "ServerGenesis.h"
 
 
@@ -40,8 +39,6 @@ public:
 	enum { IDD = IDD_TESTAPI_DIALOG };
 	CListBox	m_list;
 	CButton	m_start;
-	CMySession	m_session;
-	CString	m_strStock;
 	CString	m_strPassword;
 	CString	m_strUserName;
 	void status(LPCTSTR m);
@@ -52,7 +49,6 @@ public:
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 	//}}AFX_VIRTUAL
-	void UpdateAccountInfo(std::list<std::string>& lstAccounts);
 // Implementation
 protected:
 	HICON m_hIcon;
@@ -67,27 +63,13 @@ protected:
 	afx_msg void OnClose();
 	afx_msg void OnStart();
 	afx_msg void OnStop();
-	afx_msg void OnBid();
-	afx_msg void OnAsk();
-	afx_msg void OnBuy();
-	afx_msg void OnSell();
-	afx_msg void OnCancelBid();
-	afx_msg void OnCancelOffer();
-	afx_msg void OnCancelBid2();
 	afx_msg void OnDump();
 	afx_msg LRESULT AttemptLogin(WPARAM, LPARAM);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnBnClickedHidemm();
-	CButton m_hidemm;
-	afx_msg void OnBnClickedMarketbuy();
-	afx_msg void OnBnClickedMarketsell();
-	afx_msg void OnBnClickedRequestchian();
-	afx_msg void OnBnClickedTest();
-	afx_msg void OnBnClickedButtonDisplayAccounts();
-	afx_msg void OnCbnSelchangeComboAccounts();
-	afx_msg void OnCbnDropdownComboAccounts();
+
+	afx_msg void OnEnChangePassword();
 };
 
 //{{AFX_INSERT_LOCATION}}
