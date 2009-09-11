@@ -26,6 +26,11 @@ StkWrap::StkWrap(GTSession &session, LPCSTR pszStock)
 #endif
 }
 
+inline int GT2TL(GTime32 gtime)
+{
+	return gtime.chSec+gtime.chMin*100+gtime.chHour*10000;
+}
+
 StkWrap::~StkWrap()
 {
 	tl = NULL;
@@ -83,7 +88,7 @@ int StkWrap::OnGotLevel2Record(GTLevel2 *pRcd)
 	TLTick k;
 	k.sym = CString(pRcd->szStock);
 	k.depth = depth;
-	k.time = pRcd->gtime.dwTime/100;
+	k.time = GT2TL(pRcd->gtime);
 	k.date = date;
 	
 	if (pRcd->chSide=='B')
@@ -123,7 +128,7 @@ int StkWrap::OnGotQuotePrint(GTPrint *pRcd)
 	k.trade = pRcd->dblPrice;
 	k.size = (int)pRcd->dwShares;
 	k.ex = CString(pRcd->chSource);
-	k.time = pRcd->gtime.dwTime/100;
+	k.time = GT2TL(pRcd->gtime);
 	k.date = date;
 
 	tl->SrvGotTick(k);
@@ -156,7 +161,7 @@ int StkWrap::OnBestAskPriceChanged()
 	k.os = m_level1.nAskSize;
 	k.oe = CString(m_level1.locAskExchangeCode);
 	k.date = date;
-	k.time = m_level1.gtime.dwTime/100;
+	k.time = GT2TL(m_level1.gtime);
 
 	tl->SrvGotTick(k);
 	return OK;
@@ -170,7 +175,7 @@ int StkWrap::OnBestBidPriceChanged()
 	k.bs = m_level1.nBidSize;
 	k.be = CString(m_level1.locBidExchangeCode);
 	k.date = date;
-	k.time = m_level1.gtime.dwTime/100;
+	k.time = GT2TL(m_level1.gtime);
 
 	tl->SrvGotTick(k);
 
