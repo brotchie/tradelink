@@ -39,7 +39,15 @@ namespace TradeLibFast
 
 	AVL_TLWM::~AVL_TLWM(void)
 	{
-
+		// remove account observables
+		void* iterator = B_CreateAccountIterator();
+		B_StartIteration(iterator);
+		Observable* acct;
+		while (acct = B_GetNextAccount(iterator)) 
+		{
+			acct->Remove(this); 
+		}
+		B_DestroyIterator(iterator);
 		// remove all account observables
 		for (uint i = 0; i<accounts.size(); i++)
 			accounts[i] = NULL;
@@ -62,14 +70,12 @@ namespace TradeLibFast
 		{
 			if (subs[i]!=NULL)
 			{
+				subs[i]->Clear();
 				subs[i] = NULL;
 			}
 		}
 		subs.clear();
 		subsym.clear();
-
-		// if we stored a pointer to ourself, remove it for safety
-		instance = NULL;
 	}
 
 	int AVL_TLWM::BrokerName(void)
@@ -651,50 +657,52 @@ namespace TradeLibFast
 			case M_POOL_ASSIGN_ORDER_ID://Original order sent has a unigue generated id. The server sends this message to notify you that the order was assigned a new id different from the original. Both ids are part of this notification structure. This message can come 1 or 2 times.
 			case M_POOL_UPDATE_ORDER:// Order status is modified
 			{
-				if(additionalInfo != NULL && additionalInfo->GetType() == M_AI_ORDER)
+				Order* order = NULL;
+				// see if it's a smart order
+				if (message->GetType()==M_SMARTORDER_ADD)
 				{
-					Order* order = NULL;
-					if (message->GetType()==M_SMARTORDER_ADD)
-					{
-						MsgOrderChange* info = (MsgOrderChange*)message;
-						if (info!=NULL)
-							order = info->m_order;
-					}
-					else 
-					{
-
-						AIMsgOrder* info = (AIMsgOrder*)additionalInfo;
-						if (info!=NULL)
-							order = info->m_order;
-					}
-
-					// don't process null orders
-					if (order==NULL) return; 
-
-					// don't notify on dead orders
-					if (order->isDead()) return; 
-
-					// try to save this order
-					bool isnew = saveOrder(order,0);
-					// if it fails, we already have it so get the id
-					// if it succeeds, we should be able to get the id anyways
-					uint id = fetchOrderId(order);
-
-					CTime ct = CTime::GetCurrentTime();
-					TLOrder o;
-					o.id = id;
-					o.price = order->isMarketOrder() ? 0: order->GetOrderPrice().toDouble();
-					o.stop = order->GetStopPrice()->toDouble();
-					o.time = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
-					o.date = (ct.GetYear()*10000)+(ct.GetMonth()*100)+ct.GetDay();
-					o.size = order->GetSize();
-					o.side = order->GetSide()=='B';
-					o.comment = order->GetUserDescription();
-					o.TIF = TIFName(order->GetTimeInForce());
-					o.account = CString(B_GetAccountName(order->GetAccount()));
-					o.symbol = CString(order->GetSymbol());
-					SrvGotOrder(o);
+					MsgOrderChange* info = (MsgOrderChange*)message;
+					if (info!=NULL)
+						order = info->m_order;
 				}
+				// otherwise it's a normal order
+				else 
+				{
+					// make sure normal order has data we need
+					if ((additionalInfo==NULL) || (additionalInfo->GetType()!= M_AI_ORDER))
+						return;
+					// get the data
+					AIMsgOrder* info = (AIMsgOrder*)additionalInfo;
+					if (info!=NULL)
+						order = info->m_order;
+				}
+
+				// don't process null orders
+				if (order==NULL) return; 
+
+				// don't notify on dead orders
+				if (order->isDead()) return; 
+
+				// try to save this order
+				bool isnew = saveOrder(order,0);
+				// if it fails, we already have it so get the id
+				// if it succeeds, we should be able to get the id anyways
+				uint id = fetchOrderId(order);
+
+				CTime ct = CTime::GetCurrentTime();
+				TLOrder o;
+				o.id = id;
+				o.price = order->isMarketOrder() ? 0: order->GetOrderPrice().toDouble();
+				o.stop = order->GetStopPrice()->toDouble();
+				o.time = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
+				o.date = (ct.GetYear()*10000)+(ct.GetMonth()*100)+ct.GetDay();
+				o.size = order->GetSize();
+				o.side = order->GetSide()=='B';
+				o.comment = order->GetUserDescription();
+				o.TIF = TIFName(order->GetTimeInForce());
+				o.account = CString(B_GetAccountName(order->GetAccount()));
+				o.symbol = CString(order->GetSymbol());
+				SrvGotOrder(o);
 			}
 				break;
 			case M_ORDER_DELETED: // for regular cancels

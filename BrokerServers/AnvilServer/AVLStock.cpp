@@ -58,6 +58,11 @@ void AVLStock::Clear()
 			B_DestroyIterator(pnti);
 			pnti= NULL;
 		}
+		if (m_account)
+		{
+			m_account->Remove(this);
+			m_account = NULL;
+		}
 		if(m_level1)
 		{
 			m_level1->Remove(this);
