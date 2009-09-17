@@ -300,11 +300,35 @@ namespace TradeLink.Common
         }
 
         /// <summary>
+        /// get sums of squares for part of an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="startindex"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
+        public static long SumSquares(long[] array, int startindex, int length)
+        {
+            long sum = 0;
+            for (int i = startindex; i < startindex + length; i++)
+                sum += array[i] * array[i];
+            return sum;
+
+        }
+
+        /// <summary>
         /// gets sum of squares for entire array
         /// </summary>
         /// <param name="array"></param>
         /// <returns></returns>
         public static long SumSquares(int[] array) { return SumSquares(array, 0, array.Length); }
+
+        /// <summary>
+        /// gets sum of squares for entire array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static long SumSquares(long[] array) { return SumSquares(array, 0, array.Length); }
+
 
         /// <summary>
         /// gets mean of an array
@@ -464,6 +488,27 @@ namespace TradeLink.Common
         /// <param name="array1"></param>
         /// <param name="array2"></param>
         /// <returns></returns>
+        public static long[] Subtract(long[] array1, long[] array2)
+        {
+            // normalize sizes of arrays
+            bool a2bigger = array1.Length < array2.Length;
+            int max = a2bigger ? array2.Length : array1.Length;
+            long[] s1 = new long[max];
+            long[] s2 = new long[max];
+            Buffer.BlockCopy(array1, 0, s1, 0, array1.Length * 4);
+            Buffer.BlockCopy(array2, 0, s2, 0, array2.Length * 4);
+            // calculate values
+            for (int i = 0; i < s1.Length; i++)
+                s1[i] -= s2[i];
+            return s1;
+        }
+
+        /// <summary>
+        /// subtracts 2nd array from first array
+        /// </summary>
+        /// <param name="array1"></param>
+        /// <param name="array2"></param>
+        /// <returns></returns>
         public static decimal[] Subtract(decimal[] array1, decimal[] array2)
         {
             // normalize sizes of arrays
@@ -525,6 +570,28 @@ namespace TradeLink.Common
         /// <param name="array1"></param>
         /// <param name="array2"></param>
         /// <returns></returns>
+        public static long[] ProductBig(long[] array1, long[] array2)
+        {
+            // normalize sizes of arrays
+            bool a2bigger = array1.Length < array2.Length;
+            int max = a2bigger ? array2.Length : array1.Length;
+            long[] s1 = new long[max];
+            long[] s2 = new long[max];
+            long[] s3 = new long[max];
+            Buffer.BlockCopy(array1, 0, s1, 0, array1.Length * 4);
+            Buffer.BlockCopy(array2, 0, s2, 0, array2.Length * 4);
+            // calculate values
+            for (int i = 0; i < s1.Length; i++)
+                s3[i] = s2[i] * s1[i];
+            return s3;
+        }
+
+        /// <summary>
+        /// multiplies two arrays
+        /// </summary>
+        /// <param name="array1"></param>
+        /// <param name="array2"></param>
+        /// <returns></returns>
         public static decimal[] Product(decimal[] array1, decimal[] array2)
         {
             // normalize sizes of arrays
@@ -570,6 +637,32 @@ namespace TradeLink.Common
         /// <param name="array1"></param>
         /// <param name="array2"></param>
         /// <returns></returns>
+        public static decimal[] Divide(long[] array1, long[] array2) { return Divide(array1, array2, true); }
+        public static decimal[] Divide(long[] array1, long[] array2, bool zeroIfundefined)
+        {
+            // normalize sizes of arrays
+            bool a2bigger = array1.Length < array2.Length;
+            int max = a2bigger ? array2.Length : array1.Length;
+            long[] s1 = new long[max];
+            long[] s2 = new long[max];
+            decimal[] r = new decimal[max];
+            Buffer.BlockCopy(array1, 0, s1, 0, array1.Length * 4);
+            Buffer.BlockCopy(array2, 0, s2, 0, array2.Length * 4);
+            // calculate values
+            for (int i = 0; i < s1.Length; i++)
+                if (zeroIfundefined)
+                    r[i] = s2[i] != 0 ? (decimal)s1[i] / s2[i] : 0;
+                else
+                    r[i] = (decimal)s1[i] / s2[i];
+            return r;
+        }
+
+        /// <summary>
+        /// divides first array by second array.  
+        /// </summary>
+        /// <param name="array1"></param>
+        /// <param name="array2"></param>
+        /// <returns></returns>
         public static decimal[] Divide(decimal[] array1, decimal[] array2) { return Divide(array1, array2, true); }
         public static decimal[] Divide(decimal[] array1, decimal[] array2, bool zeroIfundefined)
         {
@@ -602,6 +695,35 @@ namespace TradeLink.Common
                 r[i] = array[i] + val;
             return r;
         }
+        /// <summary>
+        /// adds a constant to an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public static decimal[] Add(long[] array, decimal val)
+        {
+            decimal[] r = new decimal[array.Length];
+            for (int i = 0; i < array.Length; i++)
+                r[i] = array[i] + val;
+            return r;
+        }
+
+        /// <summary>
+        /// adds a constant to an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public static long[] Add(long[] array, long val)
+        {
+            long[] r = new long[array.Length];
+            for (int i = 0; i < array.Length; i++)
+                r[i] = array[i] + val;
+            return r;
+        }
+
+
         public static int[] Add(int[] array, int val)
         {
             int[] r = new int[array.Length];
@@ -630,6 +752,26 @@ namespace TradeLink.Common
                 r[i] = array[i] - val;
             return r;
         }
+        /// <summary>
+        /// subtracts constant from an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public static decimal[] Subtract(long[] array, decimal val)
+        {
+            decimal[] r = new decimal[array.Length];
+            for (int i = 0; i < array.Length; i++)
+                r[i] = array[i] - val;
+            return r;
+        }
+
+        /// <summary>
+        /// subtracts constant from an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="val"></param>
+        /// <returns></returns>
         public static int[] Subtract(int[] array, int val)
         {
             int[] r = new int[array.Length];
@@ -637,6 +779,25 @@ namespace TradeLink.Common
                 r[i] = array[i] - val;
             return r;
         }
+        /// <summary>
+        /// subtracts constant from an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public static long[] Subtract(long[] array, long val)
+        {
+            long[] r = new long[array.Length];
+            for (int i = 0; i < array.Length; i++)
+                r[i] = array[i] - val;
+            return r;
+        }
+        /// <summary>
+        /// subtracts constant from an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="val"></param>
+        /// <returns></returns>
         public static decimal[] Subtract(decimal[] array, decimal val)
         {
             decimal[] r = new decimal[array.Length];
@@ -659,6 +820,26 @@ namespace TradeLink.Common
                 r[i] = array[i]*val;
             return r;
         }
+
+        /// <summary>
+        /// takes product of constant and an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public static decimal[] Product(long[] array, decimal val)
+        {
+            decimal[] r = new decimal[array.Length];
+            for (int i = 0; i < array.Length; i++)
+                r[i] = array[i] * val;
+            return r;
+        }
+        /// <summary>
+        /// takes product of constant and an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="val"></param>
+        /// <returns></returns>
         public static int[] Product(int[] array, int val)
         {
             int[] r = new int[array.Length];
@@ -666,6 +847,26 @@ namespace TradeLink.Common
                 r[i] = array[i] * val;
             return r;
         }
+        /// <summary>
+        /// takes product of constant and an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public static long[] Product(long[] array, long val)
+        {
+            long[] r = new long[array.Length];
+            for (int i = 0; i < array.Length; i++)
+                r[i] = array[i] * val;
+            return r;
+        }
+
+        /// <summary>
+        /// takes product of constant and an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="val"></param>
+        /// <returns></returns>
         public static decimal[] Product(decimal[] array, decimal val)
         {
             decimal[] r = new decimal[array.Length];
@@ -707,6 +908,20 @@ namespace TradeLink.Common
             return stdev;
         }
 
+        /// <summary>
+        /// gets standard deviation for values of a population
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static decimal StdDev(long[] array)
+        {
+            decimal avg = Avg(array);
+            decimal sq = SumSquares(array);
+            decimal tmp = (sq / array.Length) - (avg * avg);
+            decimal stdev = (decimal)Math.Pow((double)tmp, .5);
+            return stdev;
+        }
+
         public static decimal StdDev(decimal[] array)
         {
             decimal avg = Avg(array);
@@ -722,6 +937,21 @@ namespace TradeLink.Common
         /// <param name="array"></param>
         /// <returns></returns>
         public static decimal StdDevSam(int[] array)
+        {
+            decimal avg = Avg(array);
+            decimal[] var = Subtract(array, avg);
+            decimal[] varsq = Product(var, var);
+            decimal sumvar = Sum(varsq);
+            decimal stdev = (decimal)Math.Pow((double)sumvar / (array.Length - 1), .5);
+            return stdev;
+        }
+
+        /// <summary>
+        /// gets standard deviation for values of a sample
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static decimal StdDevSam(long[] array)
         {
             decimal avg = Avg(array);
             decimal[] var = Subtract(array, avg);
@@ -766,6 +996,22 @@ namespace TradeLink.Common
         {
             int[] output = new int[lastNumElements];
             int count = lastNumElements-1;
+            int end = inputarray.Length >= lastNumElements ? inputarray.Length - lastNumElements : 0;
+            for (int i = inputarray.Length - 1; i >= end; i--)
+                output[count--] = inputarray[i];
+            return output;
+        }
+
+        /// <summary>
+        /// Takes slice of last N elements of an array
+        /// </summary>
+        /// <param name="inputarray"></param>
+        /// <param name="lastNumElements"></param>
+        /// <returns></returns>
+        public static long[] EndSlice(long[] inputarray, int lastNumElements)
+        {
+            long[] output = new long[lastNumElements];
+            int count = lastNumElements - 1;
             int end = inputarray.Length >= lastNumElements ? inputarray.Length - lastNumElements : 0;
             for (int i = inputarray.Length - 1; i >= end; i--)
                 output[count--] = inputarray[i];
@@ -845,6 +1091,20 @@ namespace TradeLink.Common
         }
 
         /// <summary>
+        /// gets minimum of an array (will return MinValue if array has no elements)
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static long Min(long[] array)
+        {
+            long low = long.MaxValue;
+            for (int i = 0; i < array.Length; i++)
+                if (array[i] < low) low = array[i];
+            return low;
+
+        }
+
+        /// <summary>
         /// gets maximum in an array (will return MaxValue if array has no elements)
         /// </summary>
         /// <param name="array"></param>
@@ -865,6 +1125,19 @@ namespace TradeLink.Common
         public static int Max(int[] array)
         {
             int max = int.MaxValue;
+            for (int i = 0; i < array.Length; i++)
+                if (array[i] > max) max = array[i];
+            return max;
+        }
+
+        /// <summary>
+        /// gets maximum in an array (will return MaxValue if array has no elements)
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static long Max(long[] array)
+        {
+            long max = long.MaxValue;
             for (int i = 0; i < array.Length; i++)
                 if (array[i] > max) max = array[i];
             return max;
@@ -1097,6 +1370,20 @@ namespace TradeLink.Common
         {
             decimal calc = p.AvgPrice*p.Size;
             return absolutecost ? Math.Abs(calc) : calc;
+        }
+
+        /// <summary>
+        /// computes money used to purchase a portfolio of positions.
+        /// uses average price for position.
+        /// </summary>
+        /// <param name="pt"></param>
+        /// <returns></returns>
+        public static decimal MoneyInUse(PositionTracker pt)
+        {
+            decimal miu = 0;
+            foreach (Position p in pt)
+                miu += p.AvgPrice * p.UnsignedSize;
+            return miu;
         }
 
     }
