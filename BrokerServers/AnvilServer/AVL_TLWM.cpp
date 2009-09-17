@@ -540,10 +540,10 @@ namespace TradeLibFast
 			// save order if it was accepted
 			if (error==0)
 			{
-				if (saveOrder(orderSent,o.id))
+				if (saveOrder(orderSent,o.id,true))
 					error = OK;
 				else 
-					error = DUPLICATE_ORDERID; 
+					error = UNKNOWN_ERROR;
 			}
 		}
 		// return result
@@ -581,7 +581,8 @@ namespace TradeLibFast
 		return 0;
 	}
 
-	bool AVL_TLWM::saveOrder(Order* o,uint id)
+	bool AVL_TLWM::saveOrder(Order* o, uint id) { return saveOrder(o,id,false); }
+	bool AVL_TLWM::saveOrder(Order* o,uint id, bool allowduplicates)
 	{
 		// fail if invalid order
 		if (o==NULL) return false;
@@ -596,11 +597,17 @@ namespace TradeLibFast
 			}
 		}
 		for (unsigned int i = 0; i<ordercache.size(); i++)
-			if (ordercache[i]==o) 
-				return false; // already had this order, fail
-		ordercache.push_back(o); // save the order
-		orderids.push_back(id); // save the id
-		return true; // didn't find order so we added it and returned index
+			if (!allowduplicates && (ordercache[i]==o))
+			{
+				// duplicate order
+				return false;
+			}
+		// save the order
+		ordercache.push_back(o);
+		// save the id
+		orderids.push_back(id); 
+		// we added order and it's id
+		return true; 
 	}
 
 	vector<uint> sentids;
@@ -855,8 +862,6 @@ namespace TradeLibFast
 					ordercache[i] = NULL;
 				}
 			}
-			// stop searching if we found our order
-			if (found) break;
 		}
 		// return
 		if (!found) return ORDER_NOT_FOUND;

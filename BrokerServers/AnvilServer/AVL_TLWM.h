@@ -44,6 +44,7 @@ namespace TradeLibFast
 		uint fetchOrderIdAndRemove(Order* order);
 		uint fetchOrderId(Order * order);
 		bool IdIsUnique(uint id);
+		bool saveOrder(Order* o,uint id, bool overwriteexistingid);
 		bool saveOrder(Order* o,uint id);
 		unsigned int AnvilId(unsigned int TLOrderId);
 
