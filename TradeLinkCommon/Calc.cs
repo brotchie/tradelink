@@ -1378,12 +1378,51 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="pt"></param>
         /// <returns></returns>
-        public static decimal MoneyInUse(PositionTracker pt)
+        public static decimal[] MoneyInUse(PositionTracker pt)
         {
-            decimal miu = 0;
-            foreach (Position p in pt)
-                miu += p.AvgPrice * p.UnsignedSize;
+            decimal [] miu = new decimal[pt.Count];
+            for (int i = 0; i<pt.Count; i++)
+                miu[i] += pt[i].AvgPrice * pt[i].UnsignedSize;
             return miu;
+        }
+
+        /// <summary>
+        /// calculate a percentage return based upon a given amount of money used and the absolute return for this money, for each respective securtiy in a portfolio.
+        /// </summary>
+        /// <param name="MoneyInUse"></param>
+        /// <param name="AbsoluteReturn"></param>
+        /// <returns></returns>
+        public static decimal[] RateOfReturn(decimal[] MoneyInUse, decimal[] AbsoluteReturn)
+        {
+            if (MoneyInUse.Length!=AbsoluteReturn.Length)
+                throw new Exception("Money in use and Absolute return must have 1:1 security correspondence");
+            decimal[] ror = new decimal[MoneyInUse.Length];
+            for (int i = 0; i < MoneyInUse.Length; i++)
+                ror[i] = AbsoluteReturn[i] / MoneyInUse[i];
+            return ror;
+        }
+
+        /// <summary>
+        /// gets absolute return of portfolio of positions at closing or market prices, or both
+        /// </summary>
+        /// <param name="pt"></param>
+        /// <param name="marketprices"></param>
+        /// <param name="countClosedPL"></param>
+        /// <param name="countOpenPL"></param>
+        /// <returns></returns>
+        public static decimal[] AbsoluteReturn(PositionTracker pt, decimal[] marketprices, bool countClosedPL, bool countOpenPL)
+        {
+            decimal [] aret = new decimal[pt.Count];
+            if (countOpenPL && (pt.Count != marketprices.Length))
+                throw new Exception("market prices must have 1:1 correspondence with positions in tracker.");
+            for (int i = 0; i < pt.Count; i++)
+            {
+                if (countOpenPL)
+                    aret[i] += Calc.OpenPL(marketprices[i],pt[i]);
+                if (countClosedPL)
+                    aret[i] += pt[i].ClosedPL;
+            }
+            return aret;
         }
 
     }

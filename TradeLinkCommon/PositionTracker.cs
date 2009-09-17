@@ -12,20 +12,35 @@ namespace TradeLink.Common
     /// </summary>
     public class PositionTracker
     {
-        public PositionTracker() { }
-        Dictionary<string, Position> posdict = new Dictionary<string, Position>();
+        public PositionTracker() : this(3) { }
+        public PositionTracker(int estimatedPositions) 
+        {
+            _poslist = new List<Position>(estimatedPositions);
+        }
+        List<Position> _poslist = null;
+        Dictionary<string, int> _symidx = new Dictionary<string, int>();
 
-        public Position this[string symbol] { get { Position p; if (posdict.TryGetValue(symbol, out p)) return p; return new PositionImpl(symbol);  } }
-        public IEnumerator GetEnumerator() { foreach (Position p in posdict.Values) yield return p; }
+        public Position this[int idx] { get { return _poslist[idx]; } }
+        public Position this[string symbol] 
+        { 
+            get 
+            {
+                int idx = -1;
+                if (_symidx.TryGetValue(symbol, out idx))
+                    return _poslist[idx];
+                return new PositionImpl(symbol);  
+            } 
+        }
+        public IEnumerator GetEnumerator() 
+        { 
+            foreach (Position p in _poslist) 
+                yield return p; 
+        }
 
-        public int Count { get { return posdict.Count; } }
+        public int Count { get { return _poslist.Count; } }
         public Position[] ToArray()
         {
-            Position[] pl = new Position[posdict.Count];
-            int i = 0;
-            foreach (Position p in posdict.Values)
-                pl[i++] = p;
-            return pl;
+            return _poslist.ToArray();
         }
 
         decimal _totalclosedpl = 0;
@@ -42,10 +57,14 @@ namespace TradeLink.Common
         {
             _totalclosedpl += newpos.ClosedPL;
             Position p;
-            if (posdict.TryGetValue(newpos.Symbol, out p))
-                posdict[newpos.Symbol] = new PositionImpl(newpos);
+            int idx = 0;
+            if (_symidx.TryGetValue(newpos.Symbol,out idx))
+                _poslist[idx] = new PositionImpl(newpos);
             else
-                posdict.Add(newpos.Symbol, new PositionImpl(newpos));
+            {
+                _poslist.Add(new PositionImpl(newpos));
+                _symidx.Add(newpos.Symbol,_poslist.Count-1);
+            }
         }
 
         /// <summary>
@@ -57,10 +76,14 @@ namespace TradeLink.Common
         {
             Position p;
             decimal cpl = 0;
-            if (posdict.TryGetValue(fill.symbol, out p))
-                cpl += posdict[fill.symbol].Adjust(fill);
+            int idx = -1;
+            if (_symidx.TryGetValue(fill.symbol, out idx))
+                cpl += _poslist[idx].Adjust(fill);
             else
-                posdict.Add(fill.symbol, new PositionImpl(fill));
+            {
+                _poslist.Add(new PositionImpl(fill));
+                _symidx.Add(fill.symbol, _poslist.Count - 1);
+            }
             _totalclosedpl += cpl;
             return cpl;
         }
