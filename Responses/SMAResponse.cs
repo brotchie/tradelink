@@ -34,7 +34,7 @@ namespace Responses
 
             // set our indicator names, in case we import indicators into R
             // or excel, or we want to view them in gauntlet or kadina
-            Indicators = new string[] { "SMA" };
+            Indicators = new string[] { "Time","SMA" };
         }
 
         void blt_GotNewBar(string symbol, int interval)
@@ -53,7 +53,7 @@ namespace Responses
 
             // this way we can debug our indicators during development
             // indicators are sent in the same order as they are named above
-            sendindicators(SMA.ToString());
+            sendindicators(new string[] { time.ToString(),SMA.ToString("N2")});
         }
 
         // turn on bar tracking
@@ -61,9 +61,14 @@ namespace Responses
         // turn on position tracking
         PositionTracker pt = new PositionTracker();
 
+        // keep track of time for use in other functions
+        int time = 0;
+
         // got tick is called whenever this strategy receives a tick
         public override void GotTick(Tick tick)
         {
+            // keep track of time from tick
+            time = tick.time;
             // apply bar tracking to all ticks that enter
             blt.newTick(tick);
 

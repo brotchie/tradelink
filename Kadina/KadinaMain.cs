@@ -443,7 +443,7 @@ namespace Kadina
             else
             {
                 string[] parameters = param.Split(',');
-                NewIRow(new object[] { parameters });
+                NewIRow(parameters);
             }
         }
 
