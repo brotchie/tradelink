@@ -67,6 +67,18 @@
       <DependentUpon>AssemblaTicketWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="Auth.cs" />
+    <Compile Include="Chart.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Chart.Designer.cs">
+      <DependentUpon>Chart.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ChartControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ChartControl.Designer.cs">
+      <DependentUpon>ChartControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="CrashReport.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -95,6 +107,18 @@
     <Compile Include="SafeBindingSource.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Ticket.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Ticket.Designer.cs">
+      <DependentUpon>Ticket.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TickFileFilterControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TickFileFilterControl.Designer.cs">
+      <DependentUpon>TickFileFilterControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Versions.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -110,6 +134,13 @@
     <EmbeddedResource Include="AssemblaTicketWindow.resx">
       <DependentUpon>AssemblaTicketWindow.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Chart.resx">
+      <DependentUpon>Chart.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ChartControl.resx">
+      <DependentUpon>ChartControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="CrashReport.resx">
       <DependentUpon>CrashReport.cs</DependentUpon>
     </EmbeddedResource>
@@ -121,6 +152,13 @@
     </EmbeddedResource>
     <EmbeddedResource Include="PopupWindow.resx">
       <DependentUpon>PopupWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Ticket.resx">
+      <DependentUpon>Ticket.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TickFileFilterControl.resx">
+      <DependentUpon>TickFileFilterControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Versions.resx">
       <DependentUpon>Versions.cs</DependentUpon>

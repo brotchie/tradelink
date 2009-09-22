@@ -252,6 +252,37 @@ namespace TestTradeLink
             Assert.AreEqual(4, bl.Count);
         }
 
+        [Test]
+        public void AsyncFromGoogle()
+        {
+            bool r = BarListImpl.DayFromGoogleAsync("IBM", new BarListDelegate(testbar));
+
+            Assert.IsTrue(r);
+            // no result yet
+            Assert.IsNull(blt);
+            // keep track of polls
+            int polls = 0;
+            // wait moment for result
+            do
+            {
+                System.Threading.Thread.Sleep(100);
+            }
+            while ((blt == null) && (polls++ < 30));
+            // verify result
+            Assert.AreEqual(blt.Symbol, "IBM");
+            Assert.GreaterOrEqual(blt.Count, 199);
+                
+
+
+        }
+
+        BarList blt = null;
+        
+        void testbar(BarList bars)
+        {
+            blt = bars;
+        }
+
 
     }
 }

@@ -320,7 +320,7 @@ namespace Quotopia
             Chart c = null;
             try
             {
-                c = new ChartImpl(bardict[sym]);
+                c = new Chart(bardict[sym]);
             }
             catch (Exception) { return; }
             c.Symbol = sym;

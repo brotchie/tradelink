@@ -35,15 +35,16 @@ namespace Kadina
             this.reslist = new System.Windows.Forms.ToolStripDropDownButton();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabmsg = new System.Windows.Forms.TabPage();
-            this.statusStrip2 = new System.Windows.Forms.StatusStrip();
-            this._stat = new System.Windows.Forms.ToolStripStatusLabel();
             this.msgbox = new System.Windows.Forms.RichTextBox();
             this.ticktab = new System.Windows.Forms.TabPage();
             this.itab = new System.Windows.Forms.TabPage();
             this.postab = new System.Windows.Forms.TabPage();
             this.ordertab = new System.Windows.Forms.TabPage();
             this.filltab = new System.Windows.Forms.TabPage();
+            this.statusStrip2 = new System.Windows.Forms.StatusStrip();
+            this._stat = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.charttab = new System.Windows.Forms.TabPage();
             this.statusStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabmsg.SuspendLayout();
@@ -105,6 +106,7 @@ namespace Kadina
             this.tabControl1.Controls.Add(this.postab);
             this.tabControl1.Controls.Add(this.ordertab);
             this.tabControl1.Controls.Add(this.filltab);
+            this.tabControl1.Controls.Add(this.charttab);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Location = new System.Drawing.Point(0, 45);
             this.tabControl1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -117,7 +119,6 @@ namespace Kadina
             // 
             // tabmsg
             // 
-            this.Controls.Add(this.statusStrip2);
             this.tabmsg.Controls.Add(this.msgbox);
             this.tabmsg.Location = new System.Drawing.Point(4, 32);
             this.tabmsg.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -127,23 +128,6 @@ namespace Kadina
             this.tabmsg.TabIndex = 0;
             this.tabmsg.Text = "Messages";
             this.tabmsg.UseVisualStyleBackColor = true;
-            // 
-            // statusStrip2
-            // 
-            this.statusStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._stat});
-            this.statusStrip2.Location = new System.Drawing.Point(4, 239);
-            this.statusStrip2.Name = "statusStrip2";
-            this.statusStrip2.Size = new System.Drawing.Size(785, 30);
-            this.statusStrip2.SizingGrip = false;
-            this.statusStrip2.TabIndex = 1;
-            this.statusStrip2.Text = "statusStrip2";
-            // 
-            // _stat
-            // 
-            this._stat.Name = "_stat";
-            this._stat.Size = new System.Drawing.Size(519, 25);
-            this._stat.Text = "Kadina lets you see your response to a given set of market data.";
             // 
             // msgbox
             // 
@@ -207,12 +191,39 @@ namespace Kadina
             this.filltab.Text = "Fills";
             this.filltab.UseVisualStyleBackColor = true;
             // 
+            // statusStrip2
+            // 
+            this.statusStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._stat});
+            this.statusStrip2.Location = new System.Drawing.Point(0, 325);
+            this.statusStrip2.Name = "statusStrip2";
+            this.statusStrip2.Size = new System.Drawing.Size(801, 30);
+            this.statusStrip2.SizingGrip = false;
+            this.statusStrip2.TabIndex = 1;
+            this.statusStrip2.Text = "statusStrip2";
+            // 
+            // _stat
+            // 
+            this._stat.Name = "_stat";
+            this._stat.Size = new System.Drawing.Size(519, 25);
+            this._stat.Text = "Kadina lets you see your response to a given set of market data.";
+            // 
+            // charttab
+            // 
+            this.charttab.Location = new System.Drawing.Point(4, 32);
+            this.charttab.Name = "charttab";
+            this.charttab.Size = new System.Drawing.Size(793, 274);
+            this.charttab.TabIndex = 6;
+            this.charttab.Text = "Chart";
+            this.charttab.UseVisualStyleBackColor = true;
+            // 
             // kadinamain
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(801, 355);
+            this.Controls.Add(this.statusStrip2);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.statusStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -225,10 +236,10 @@ namespace Kadina
             this.statusStrip1.PerformLayout();
             this.tabControl1.ResumeLayout(false);
             this.tabmsg.ResumeLayout(false);
-            this.tabmsg.PerformLayout();
             this.statusStrip2.ResumeLayout(false);
             this.statusStrip2.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -248,6 +259,7 @@ namespace Kadina
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.StatusStrip statusStrip2;
         private System.Windows.Forms.ToolStripStatusLabel _stat;
+        private System.Windows.Forms.TabPage charttab;
     }
 }
 

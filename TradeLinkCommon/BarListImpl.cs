@@ -347,15 +347,58 @@ namespace TradeLink.Common
             return bl;
         }
 
+        public static bool DayFromGoogleAsync(string Symbol, BarListDelegate resultHandler)
+        {
+            System.Net.WebClient wc = new System.Net.WebClient();
+            wc.DownloadStringCompleted +=new System.Net.DownloadStringCompletedEventHandler(wc_DownloadStringCompleted);
+            try
+            {
+                wc.DownloadStringAsync(new Uri(GOOGURL + Symbol),new BarListDownload(Symbol,resultHandler));
+            }
+            catch (System.Net.WebException) { return false; }
+            return true;
+        }
+
+        static void wc_DownloadStringCompleted(object sender, System.Net.DownloadStringCompletedEventArgs e)
+        {
+            string res = string.Empty;
+            BarListDownload bld = (BarListDownload)e.UserState;
+            if (!bld.isValid)
+                return;
+            if (e.Cancelled || (e.Error != null))
+                bld.DoResults(new BarListImpl(BarInterval.Day,bld.Symbol));
+            res = e.Result;
+            BarListImpl bl = new BarListImpl(BarInterval.Day, bld.Symbol);
+            string[] line = res.Split(Environment.NewLine.ToCharArray());
+            for (int i = line.Length - 1; i > 0; i--)
+            {
+                if (line[i] != "")
+                    addbar(bl, BarImpl.FromCSV(line[i]), 0);
+            }
+            bld.DoResults(bl);
+        }
+
+        private class BarListDownload
+        {
+            public BarListDownload(string Symbol, BarListDelegate bld)
+            {
+                this.Symbol = Symbol;
+                DoResults = bld;
+            }
+            public string Symbol = string.Empty;
+            public BarListDelegate DoResults;
+            public bool isValid { get { return (DoResults != null) && (Symbol != string.Empty); } }
+        }
+
         /// <summary>
         /// Populate the day-interval barlist using google finance as the source.
         /// </summary>
         /// <returns></returns>
         public static BarList DayFromGoogle(string symbol)
         {
-            const string GOOGURL = @"http://finance.google.com/finance/historical?histperiod=daily&start=250&num=25&output=csv&q=";
             return DayFromURL(GOOGURL,symbol);
         }
+        const string GOOGURL = @"http://finance.google.com/finance/historical?histperiod=daily&start=250&num=25&output=csv&q=";
 
         /// <summary>
         /// Build a barlist using an EPF file as the source

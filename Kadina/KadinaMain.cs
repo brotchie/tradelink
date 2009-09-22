@@ -38,10 +38,11 @@ namespace Kadina
         SafeBindingSource fbs = new SafeBindingSource(false);
         DataGridView og = new DataGridView();
         DataGridView fg = new DataGridView();
+        
 
         BackgroundWorker bw = new BackgroundWorker();
         HistSim h = new HistSim();
-       
+        ChartControl c = new ChartControl();
 
         public kadinamain()
         {
@@ -103,6 +104,9 @@ namespace Kadina
             // send to response
             if (myres != null)
                 myres.GotTick(t);
+            // send to chart
+            if (c != null)
+                c.newTick(t);
         }
 
         void Play(object sender, DoWorkEventArgs e)
@@ -197,6 +201,7 @@ namespace Kadina
             ot.Clear();
             ft.Clear();
             tabControl1.Refresh();
+            c.Reset();
             if (it != null) { it.Clear(); it.Columns.Clear(); }
             h.Reset();
             loadboxname(resname);
@@ -343,6 +348,10 @@ namespace Kadina
 
             ig.BackgroundColor = BackColor;
             ig.Show();
+
+            // chart
+            c.Parent = charttab;
+            c.Dock = DockStyle.Fill;
 
         }
 

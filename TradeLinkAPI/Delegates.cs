@@ -26,4 +26,5 @@ namespace TradeLink.API
     public delegate void VoidDelegate();
     public delegate void MessageDelegate(MessageTypes type, uint id, string data);
     public delegate void BasketDelegate(Basket b, int id);
+    public delegate void BarListDelegate(BarList b);
 }

@@ -7,8 +7,9 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using TradeLink.API;
+using TradeLink.Common;
 
-namespace TradeLink.Common
+namespace TradeLink.AppKit
 {
     /// <summary>
     /// a GUI for building tick file filters easily.

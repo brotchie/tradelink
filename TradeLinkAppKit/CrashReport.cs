@@ -37,9 +37,10 @@ namespace TradeLink.AppKit
             Close();
         }
 
-        public static string DeveloperIssuePostURL(string program, string desc, Exception ex, string data)
+        public static string DeveloperIssuePostURL(string program, string desc, Exception ex, string data) { return DeveloperIssuePostURL(program, desc, ex, data, true); }
+        public static string DeveloperIssuePostURL(string program, string desc, Exception ex, string data, bool template)
         {
-            string bodystring = Body(program, ex, data,true);
+            string bodystring = Body(program, ex, data,template);
             return DEVELOPERURL + string.Format("subject={0}&body={1}", desc, bodystring);
         }
 
@@ -49,8 +50,28 @@ namespace TradeLink.AppKit
         }
         public static void BugReport(string program, string desc, Exception ex, string data)
         {
-            System.Diagnostics.Process.Start(DeveloperIssuePostURL(program, desc, ex, data));
-
+            try
+            {
+                System.Diagnostics.Process.Start(DeveloperIssuePostURL(program, desc, ex, data));
+            }
+            catch (Win32Exception)
+            {
+                try
+                {
+                    // data passed too small/big
+                    System.Diagnostics.Process.Start(DeveloperIssuePostURL(program, program, ex, data, false));
+                }
+                catch 
+                {
+                    string report = DeveloperIssuePostURL(program, desc, ex, data);
+                    System.IO.StreamWriter sw = new System.IO.StreamWriter("tempreport.txt");
+                    sw.WriteLine(report);
+                    sw.Flush();
+                    sw.Close();
+                    System.Diagnostics.Process.Start("notepad.exe tempreport.txt");
+                    System.Diagnostics.Process.Start(DeveloperIssuePostURL(program, desc, null, Environment.NewLine + " PASTE NOTEPAD CONTENTS HERE"));
+                }
+            }
         }
 
         static string template()
@@ -64,7 +85,7 @@ namespace TradeLink.AppKit
         static string Body(string program, Exception ex,string data, bool addtemplate)
         {
 
-            string[] r = new string[] { (addtemplate ? template() : string.Empty), "Product:" + program, "Exception:" + (ex != null ? ex.Message : "n/a"), "StackTrace:" + (ex != null ? ex.StackTrace : "n/a"), "CommandLine:" + Environment.CommandLine, "OS:" + Environment.OSVersion.VersionString+" "+(IntPtr.Size*8).ToString()+"bit", "CLR:" + Environment.Version.ToString(4), "TradeLink:" + TradeLink.Common.Util.TLSIdentity(), "Memory:" + Environment.WorkingSet.ToString(), "Processors:" + Environment.ProcessorCount.ToString(), data };
+            string[] r = new string[] { (addtemplate ? template() : string.Empty), "App:" + program, "Err:" + (ex != null ? ex.Message : "n/a"), "Trace:" + (ex != null ? ex.StackTrace : "n/a"), "OS:" + Environment.OSVersion.VersionString+" "+(IntPtr.Size*8).ToString()+"bit", "CLR:" + Environment.Version.ToString(4), "TL:" + TradeLink.Common.Util.TLSIdentity(), "Mem:" + Environment.WorkingSet.ToString(), "Proc:" + Environment.ProcessorCount.ToString(), data };
 
             string decoded = string.Join(Environment.NewLine, r);
             return Uri.EscapeUriString(decoded);

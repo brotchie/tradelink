@@ -1,4 +1,6 @@
-﻿namespace TradeLink.Common
+﻿using TradeLink.Common;
+
+namespace TradeLink.AppKit
 {
     partial class TickFileFilterControl
     {

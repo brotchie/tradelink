@@ -1,6 +1,8 @@
-namespace TradeLink.Common
+using TradeLink.Common;
+
+namespace TradeLink.AppKit
 {
-    partial class ChartImpl
+    partial class ChartControl
     {
         /// <summary>
         /// Required designer variable.

@@ -41,7 +41,7 @@ namespace WinGauntlet
             this.label7 = new System.Windows.Forms.Label();
             this.queuebut = new System.Windows.Forms.Button();
             this.reslist = new System.Windows.Forms.ListBox();
-            this.tickFileFilterControl1 = new TradeLink.Common.TickFileFilterControl();
+            this.tickFileFilterControl1 = new TradeLink.AppKit.TickFileFilterControl();
             this.optionpage = new System.Windows.Forms.TabPage();
             this._indicatcsv = new System.Windows.Forms.CheckBox();
             this._debugfile = new System.Windows.Forms.CheckBox();
@@ -478,7 +478,7 @@ namespace WinGauntlet
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.CheckBox _debugfile;
         private System.Windows.Forms.CheckBox _indicatcsv;
-        private TradeLink.Common.TickFileFilterControl tickFileFilterControl1;
+        private TradeLink.AppKit.TickFileFilterControl tickFileFilterControl1;
         private System.Windows.Forms.Button _twithelp;
         private System.Windows.Forms.Button _viewresults;
         private System.Windows.Forms.CheckBox _debugs;

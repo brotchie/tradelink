@@ -6,8 +6,9 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using TradeLink.API;
+using TradeLink.Common;
 
-namespace TradeLink.Common
+namespace TradeLink.AppKit
 {
     /// <summary>
     /// Used to pass changes to barlists
@@ -17,41 +18,76 @@ namespace TradeLink.Common
     /// <summary>
     /// A generic charting form that plots BarList objects
     /// </summary>
-    public partial class ChartImpl : Form, Chart
+    public partial class ChartControl : UserControl
     {
-        public event SecurityDelegate FetchStock;
+
+        //public event SecurityDelegate FetchStock;
         BarList bl = null;
         public BarList Bars 
         { 
             get { return bl; } 
             set { NewBarList(value); } 
         }
+        public void newTick(Tick k)
+        {
+            if (bl == null)
+                bl = new BarListImpl(BarInterval.FiveMin, k.symbol);
+            bl.newTick(k);
+            if (k.isTrade)
+            {
+                if (k.trade > highesth)
+                    highesth = k.trade;
+                if (k.trade < lowestl)
+                    lowestl = k.trade;
+            }
+            barc = bl.Count;
+            refresh();
+        }
+
+        public void refresh()
+        {
+            if (InvokeRequired)
+                Invoke(new VoidDelegate(refresh));
+            else
+            {
+                Invalidate(true);
+            }
+        }
+
+        public void Reset()
+        {
+            bl.Reset();
+            highesth = 0;
+            lowestl = BIGVAL;
+            barc = 0;
+            refresh();
+        }
         string sym = "";
         public string Symbol { get { return sym; } set { sym = value; Text = Title; } }
         Graphics g = null;
         string mlabel = "";
         decimal highesth = 0;
-        decimal lowestl = 10000000000000000000;
+        const decimal BIGVAL = 10000000000000000000;
+        decimal lowestl = BIGVAL;
         int barc = 0;
         Rectangle r;
         const int border = 60;
         decimal pixperbar = 0;
         decimal  pixperdollar = 0;
-        string newstock = "";
+
         List<TextLabel> points = new List<TextLabel>();
-        public ChartImpl() : this(null,false) { }
-        public ChartImpl(BarList b) : this(b, false) { }
+        public ChartControl() : this(null,false) { }
+        public ChartControl(BarList b) : this(b, false) { }
         /// <summary>
         /// Initializes a new instance of the <see cref="Chart"/> class.
         /// </summary>
         /// <param name="b">The barlist.</param>
         /// <param name="allowtype">if set to <c>true</c> [allowtype] will allow typing/changing of new symbols on the chart window.</param>
-        public ChartImpl(BarList b,bool allowtype)
+        public ChartControl(BarList b,bool allowtype)
         {
             InitializeComponent();
             Paint += new PaintEventHandler(Chart_Paint);
             MouseWheel +=new MouseEventHandler(Chart_MouseUp);
-            if (allowtype) this.KeyUp += new KeyEventHandler(Chart_KeyUp);
             if (b != null)
             {
                 bl = b;
@@ -61,32 +97,16 @@ namespace TradeLink.Common
 
         public void NewBarList(BarList barlist)
         {
+            if (barlist == null) return;
             bl = barlist;
+            highesth = Calc.HH(bl);
+            lowestl = Calc.LL(bl);
+            barc = bl.Count;
             Symbol = barlist.Symbol;
-            Text = Title;
-            Invalidate(true);
+            refresh();
         }
 
-        void Chart_KeyUp(object sender, KeyEventArgs e)
-        {
 
-            try
-            {
-                if ((e.KeyValue >= (int)Keys.A) && (e.KeyValue <= (int)Keys.Z)) newstock += e.KeyCode.ToString();
-                if ((newstock.Length > 0) && (e.KeyValue == (int)Keys.Back)) newstock = newstock.Substring(0, newstock.Length - 1);
-                this.Text = Title + " " + newstock;
-            }
-            catch (Exception) { }
-            if (e.KeyValue == (int)Keys.Enter)
-            {
-                string stock = newstock.ToString();
-                newstock = "";
-                if (FetchStock != null) FetchStock(new SecurityImpl(stock));
-                Refresh();
-            }
-
-            
-        }
         // as we add bars and barindex gets higher, the xcoordinate moves right and gets higher
         int getX(int bar) { return (int)(bar * pixperbar) + (border/3); } 
         // as price goes up and pricemagnitude goes higher, the y coordinate moves up and goes lower
@@ -99,17 +119,12 @@ namespace TradeLink.Common
         public string Title { get { if (bl==null) return ""; return Symbol + " " + Enum.GetName(typeof(BarInterval), bl.DefaultInterval).ToString(); } }
         void Chart_Paint(object sender, PaintEventArgs e)
         {
-            if (bl != null)
-            {
-                highesth = Calc.HH(bl);
-                lowestl = Calc.LL(bl);
-                barc = bl.Count;
-            }
+
             if ((bl == null)||(bl.Count==0)) return;
             // setup to draw
             Pen p = new Pen(Color.Black);
             g = e.Graphics;
-            Form f = (Form)sender;
+            ChartControl f = (ChartControl)sender;
             g.Clear(f.BackColor);
             // get title
             Text = Title;
@@ -231,7 +246,7 @@ namespace TradeLink.Common
 
         private void Chart_Resize(object sender, EventArgs e)
         {
-            Refresh();
+            refresh();
         }
         private void DrawLabels()
         {
@@ -251,7 +266,7 @@ namespace TradeLink.Common
             {
                 points.Clear();
             }
-            Refresh();
+            refresh();
         }
 
         private void redToolStripMenuItem_Click(object sender, EventArgs e)
@@ -287,7 +302,7 @@ namespace TradeLink.Common
         private void clearAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
             points.Clear();
-            Refresh(); 
+            refresh();
 
         }
 
@@ -315,7 +330,8 @@ namespace TradeLink.Common
             {
                 bl.DefaultInterval = (biord - 1 < 0) ? v[v.Length - 1] : v[biord - 1];
             }
-            if ((bl.DefaultInterval != old) && bl.Has(1,bl.DefaultInterval)) Bars = this.bl;
+            if ((bl.DefaultInterval != old) && bl.Has(1,bl.DefaultInterval)) 
+                NewBarList(this.bl);
         }
     }
     public class TextLabel
