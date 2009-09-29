@@ -44,9 +44,9 @@ namespace ASP
             InitializeComponent();
             // don't save ticks from replay since they're already saved
             _ao.archivetickbox.Checked = tl.LinkType != TLTypes.HISTORICALBROKER;
-            _ao._remskin.Click+=new EventHandler(_remskin_Click);
-            _ao._saveskins.Click+=new EventHandler(_saveskins_Click);
-            _ao._skins.SelectedIndexChanged+=new EventHandler(_skins_SelectedIndexChanged);
+            _remskin.Click+=new EventHandler(_remskin_Click);
+            _saveskins.Click+=new EventHandler(_saveskins_Click);
+            _skins.SelectedIndexChanged+=new EventHandler(_skins_SelectedIndexChanged);
             // if our machine is multi-core we use seperate thread to process ticks
             if (Environment.ProcessorCount == 1)
                 tl.gotTick += new TickDelegate(tl_gotTick);
@@ -168,7 +168,7 @@ namespace ASP
         void findskins()
         {
             // clear existing skins
-            _ao._skins.Items.Clear();
+            _skins.Items.Clear();
 
             // go through every skin file
             foreach (string fn in skinfiles(Environment.CurrentDirectory))
@@ -176,11 +176,11 @@ namespace ASP
                 // get skin name
                 string sk = skinfromfile(fn);
                 // if we don't have it, display as an option
-                if (!_ao._skins.Items.Contains(sk))
-                    _ao._skins.Items.Add(sk);
+                if (!_skins.Items.Contains(sk))
+                    _skins.Items.Add(sk);
             }
             // refresh screen
-            _ao._skins.Invalidate(true);
+            _skins.Invalidate(true);
         }
 
         string[] skinfiles(string path)
@@ -226,7 +226,7 @@ namespace ASP
             // user has selected a new skin
 
             // get the name
-            string skin = _ao._skins.SelectedItem.ToString();
+            string skin = _skins.SelectedItem.ToString();
             //confirm loading
             if (MessageBox.Show("Load skin " + skin + "?", "confirm skin load", MessageBoxButtons.YesNo) != DialogResult.Yes)
                 return;
@@ -260,10 +260,12 @@ namespace ASP
                         Response r = (Response)SkinImpl.DeskinFile(fn);
                         // bind events
                         bindresponseevents(r);
-                        // add it to trade list
-                        _reslist.Add(r);
                         // show it to user
                         _resnames.Items.Add(r.FullName);
+                        // add it to trade list
+                        _reslist.Add(r);
+                        // map name to response
+                        _name2r.Add(_resnames.Items.Count - 1, _reslist.Count - 1);
                         // mark it as loaded
                         _resskinidx.Add(_reslist.Count - 1, name);
                         // update status
@@ -814,9 +816,9 @@ namespace ASP
         private void _remskin_Click(object sender, EventArgs e)
         {
             // make sure something is selected
-            if (_ao._skins.SelectedIndex == -1) return;
+            if (_skins.SelectedIndex == -1) return;
             // get name
-            string name = _ao._skins.SelectedItem.ToString();
+            string name = _skins.SelectedItem.ToString();
             // confirm removal
             if (MessageBox.Show("remove skin " + name + "?", "confirm skin deletion", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
