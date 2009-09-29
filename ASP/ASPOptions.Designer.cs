@@ -95,6 +95,7 @@
             this._saveskins.Size = new System.Drawing.Size(31, 29);
             this._saveskins.TabIndex = 22;
             this._saveskins.Text = "S";
+            this.toolTip1.SetToolTip(this._saveskins, "save current settings from running skins");
             this._saveskins.UseVisualStyleBackColor = true;
             // 
             // _remskin
@@ -104,6 +105,7 @@
             this._remskin.Size = new System.Drawing.Size(29, 28);
             this._remskin.TabIndex = 21;
             this._remskin.Text = "-";
+            this.toolTip1.SetToolTip(this._remskin, "delete current skin");
             this._remskin.UseVisualStyleBackColor = true;
             // 
             // _skins
@@ -114,6 +116,7 @@
             this._skins.Name = "_skins";
             this._skins.Size = new System.Drawing.Size(180, 28);
             this._skins.TabIndex = 20;
+            this.toolTip1.SetToolTip(this._skins, "Skins you have saved");
             // 
             // groupBox2
             // 
@@ -125,7 +128,7 @@
             this.groupBox2.Size = new System.Drawing.Size(275, 72);
             this.groupBox2.TabIndex = 21;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Skins";
+            this.groupBox2.Text = "Preconfiged Response Skins";
             // 
             // ASPOptions
             // 
