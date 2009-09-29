@@ -602,6 +602,7 @@ namespace Kadina
             SafeBindingSource.refreshgrid(ig, ibs);
             SafeBindingSource.refreshgrid(og, obs);
             SafeBindingSource.refreshgrid(fg, fbs);
+            c.refresh();
             if (e.Error != null)
             {
                 debug(e.Error.Message+e.Error.StackTrace);

@@ -28,6 +28,13 @@ namespace TradeLink.AppKit
             get { return bl; } 
             set { NewBarList(value); } 
         }
+        bool _alwaysupdate = false;
+        /// <summary>
+        /// if set, control will autorefresh with each tick.
+        /// otherwise, refresh must be called manually.
+        /// manual is recommended during rapid updates, as the chart may flash otherwise.
+        /// </summary>
+        public bool AutoUpdate { get { return _alwaysupdate; } set { _alwaysupdate = value; } }
         public void newTick(Tick k)
         {
             if (bl == null)
@@ -41,9 +48,13 @@ namespace TradeLink.AppKit
                     lowestl = k.trade;
             }
             barc = bl.Count;
-            refresh();
+            if (_alwaysupdate)
+                refresh();
         }
 
+        /// <summary>
+        /// force a manual refresh of the grid
+        /// </summary>
         public void refresh()
         {
             if (InvokeRequired)
@@ -54,6 +65,9 @@ namespace TradeLink.AppKit
             }
         }
 
+        /// <summary>
+        /// reset the chart and underlying data structures
+        /// </summary>
         public void Reset()
         {
             bl.Reset();
