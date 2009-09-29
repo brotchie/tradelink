@@ -604,7 +604,7 @@ namespace Kadina
             SafeBindingSource.refreshgrid(fg, fbs);
             if (e.Error != null)
             {
-                debug(e.Error.Message);
+                debug(e.Error.Message+e.Error.StackTrace);
                 status("Terminated because of an Exception.  See messages.");
             }
             else if (e.Cancelled) status("Canceled play.");
