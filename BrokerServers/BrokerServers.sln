@@ -110,4 +110,7 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		AMDCaProjectFile = C:\Users\jfranta\Desktop\TLS\BrokerServers\CodeAnalyst\BrokerServers.caw
+	EndGlobalSection
 EndGlobal

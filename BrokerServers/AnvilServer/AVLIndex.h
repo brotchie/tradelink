@@ -8,7 +8,7 @@ class AVLIndex : public Observer
 {
 // Construction
 public:
-	AVLIndex(CString symbol,TradeLibFast::TLServer_WM* tl);   // standard constructor
+	AVLIndex(CString symbol, int id, TradeLibFast::TLServer_WM* tl);   // standard constructor
 	~AVLIndex();
 	CString m_symbol;
 	CString m_StaticSymbol;
@@ -17,6 +17,8 @@ public:
 // Implementation
 protected:
 	TradeLibFast::TLServer_WM* tl;
+	int _symid;
+	int _date;
 
 	afx_msg void OnChangeIndexSymbol();
 	afx_msg void OnDynamicUpdate();

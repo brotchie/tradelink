@@ -54,25 +54,13 @@ namespace TradeLibFast
 		ON_WM_COPYDATA()
 	END_MESSAGE_MAP()
 
-	unsigned int TLServer_WM::FindClientFromStock(CString stock)
-	{
-		for (unsigned int i = 0; i<client.size(); i++)
-			for (unsigned int j = 0; j<stocks[i].size(); j++)
-			{
-				if (stocks[i][j].CompareNoCase(stock)==0)
-					return i;
-			}
-		return -1;
-	}
 
 	bool TLServer_WM::needStock(CString stock)
 	{
-		for (size_t i = 0; i<stocks.size(); i++)
-			for (size_t j = 0; j<stocks[i].size(); j++)
-			{
-				if (stocks[i][j]==stock) return true;
-			}
-		return false;
+		int idx = FindSym(stock);
+		if (idx==-1) return false;
+		bool needed = symclientidx[idx].size()!=0;
+		return needed;
 	}
 
 	int TLServer_WM::FindClient(CString cwind)
@@ -93,6 +81,69 @@ namespace TradeLibFast
 		}
 		// join vector and return serialized structure
 		return gjoin(tmp,",");
+	}
+
+	int TLServer_WM::FindSym(CString sym)
+	{
+		for (uint i = 0; i<symindex.size(); i++)
+		{
+			if (symindex[i]==sym) return i;
+		}
+		return -1;
+	}
+
+	void TLServer_WM::IndexBaskets()
+	{
+		// build list of clients with no symbols
+		vector<bool> empty;
+		for (uint c = 0; c<stocks.size(); c++)
+		{
+			empty.push_back(stocks[c].size()==0);
+		}
+		for (uint c = 0; c<stocks.size(); c++)
+		{
+			clientstocklist hisstocks = stocks[c];
+			for (uint i = 0; i<hisstocks.size(); i++)
+			{
+				// current symbol
+				CString sym = hisstocks[i];
+				// see if we know this symbol
+				int idx = FindSym(sym);
+				// make sure we have it
+				if (idx==-1) 
+				{
+					// never seen this symbol so add it
+					symindex.push_back(sym);
+					// keep track of the index
+					idx = (int)symindex.size()-1;
+					// also add client index
+					clientindex tmp;
+					tmp.push_back(c);
+					symclientidx.push_back(tmp);
+				}
+				else
+				{
+					// get current client index
+					clientindex tmp = symclientidx[idx];
+					// remove all invalid clients, make sure this one is present
+					clientindex newtmp;
+					bool present = false;
+					for (uint z = 0; z<tmp.size(); z++)
+					{
+						// flag if we already included ourself on this symbol
+						present |= tmp[z]==c;
+						// if not us and the client has symbols, keep him
+						if (!empty[tmp[z]] && !present)
+							newtmp.push_back(tmp[z]);
+					}
+					// if we didn't find ourselves, add us
+					if (!present)
+						newtmp.push_back(c);
+					// save index for this symbol and continue to next one
+					symclientidx[idx] = newtmp;
+				}
+			}
+		}
 	}
 
 	// TLServer_WM message handlers
@@ -131,6 +182,8 @@ namespace TradeLibFast
 				if (cid==-1) return CLIENTNOTREGISTERED; //client not registered
 				// save the basket
 				stocks[cid] = hisstocks; 
+				// index his basket
+				IndexBaskets();
 				D(CString(_T("Client ")+client+_T(" registered: ")+gjoin(hisstocks,",")));
 				HeartBeat(client);
 				return RegisterStocks(client);
@@ -236,7 +289,10 @@ namespace TradeLibFast
 			return (int)dif;
 	}
 
-	int TLServer_WM::RegisterStocks(CString clientname) { return OK; }
+	int TLServer_WM::RegisterStocks(CString clientname) 
+	{ 
+		return OK; 
+	}
 	int TLServer_WM::DOMRequest(int depth) { return OK; }
 	std::vector<int> TLServer_WM::GetFeatures() { std::vector<int> blank; return blank; } 
 
@@ -276,6 +332,7 @@ namespace TradeLibFast
 		int cid = FindClient(clientname);
 		if (cid==-1) return CLIENTNOTREGISTERED;
 		stocks[cid] = clientstocklist(0);
+		IndexBaskets();
 		HeartBeat(clientname);
 		D(CString(_T("Cleared stocks for ")+clientname));
 		return OK;
@@ -315,13 +372,24 @@ namespace TradeLibFast
 
 	void TLServer_WM::SrvGotTick(TLTick tick)
 	{
-		//if (tick.sym=="") return;
-		for (uint i = 0; i<stocks.size(); i++)
-			for (uint j = 0; j<stocks[i].size(); j++)
-			{
-				if (stocks[i][j]==tick.sym)
-					TLSend(TICKNOTIFY,tick.Serialize(),i);
-			}
+		// if tick has no symbol index, send it old way
+		if (tick.symid<0)
+		{
+
+			for (uint i = 0; i<stocks.size(); i++)
+				for (uint j = 0; j<stocks[i].size(); j++)
+				{
+					if (stocks[i][j]==tick.sym)
+						TLSend(TICKNOTIFY,tick.Serialize(),i);
+				}
+			return;
+		}
+		// otherwise get only clients by their index
+		clientindex symclients = symclientidx[tick.symid];
+		for (uint i = 0; i<symclients.size(); i++)
+		{
+			TLSend(TICKNOTIFY,tick.Serialize(),symclients[i]);
+		}
 	}
 
 	void TLServer_WM::SrvGotCancel(int orderid)

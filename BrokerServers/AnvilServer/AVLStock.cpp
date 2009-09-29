@@ -16,7 +16,7 @@ using namespace TradeLibFast;
 #pragma warning (disable:4355)
 
 
-AVLStock::AVLStock(const char* symbol, TradeLibFast::TLServer_WM* tlinst, bool load, int dep):
+AVLStock::AVLStock(const char* symbol, int id, TradeLibFast::TLServer_WM* tlinst, bool load, int dep):
     m_symbol(symbol),
     m_stockHandle(NULL),
     m_level1(NULL),
@@ -25,9 +25,17 @@ AVLStock::AVLStock(const char* symbol, TradeLibFast::TLServer_WM* tlinst, bool l
 	bidi(NULL),
 	aski(NULL),
 	pnti(B_CreatePrintsAndBookExecutionsIterator(NULL, (1 << PS_LAST) - 1, 0, false, NULL, true)),
-	depth(dep)
+	depth(dep),
+	_symid(id)
 {
+	_sym = CString(symbol);
 	tl = tlinst;
+
+	time_t now;
+	time(&now);
+	CTime ct(now);
+	_date = (ct.GetYear()*10000) + (ct.GetMonth()*100) + ct.GetDay();
+
     if(load)
     {
         Load();
@@ -121,13 +129,13 @@ void AVLStock::QuoteNotify()
 {
 	if (isLoaded())
 	{
-			time_t now;
-			time(&now);
-			CTime ct(now);
 			TLTick k;
-			k.date = (ct.GetYear()*10000) + (ct.GetMonth()*100) + ct.GetDay();
-			k.time = (ct.GetHour()*10000)+(ct.GetMinute()*100) + ct.GetSecond();
-			k.sym = CString(m_symbol.c_str());
+			k.date = _date;
+			uint hour,minute,second;
+			B_GetCurrentServerNYTimeTokens(hour, minute, second);
+			k.time = (hour*10000)+(minute*100) + second;
+			k.sym = _sym;
+			k.symid = _symid;
 			// get bid
 			B_StartIteration(bidi);
 			//const BookEntry* be = B_GetNextBookEntry(bidi);
@@ -162,13 +170,13 @@ void AVLStock::TradeNotify()
 {
 	if (isLoaded())
 	{
-			time_t now;
-			time(&now);
-			CTime ct(now);
 			TLTick k;
-			k.date = (ct.GetYear()*10000) + (ct.GetMonth()*100) + ct.GetDay();
-			k.time = (ct.GetHour()*10000)+(ct.GetMinute()*100) + ct.GetSecond();
-			k.sym = CString(m_symbol.c_str());
+			uint hour,minute,second;
+			B_GetCurrentServerNYTimeTokens(hour, minute, second);
+			k.date = _date;
+			k.time = (hour*10000)+(minute*100) + second;
+			k.sym = _sym;
+			k.symid = _symid;
 			// get trade
 			B_StartIteration(pnti);
 			const Transaction* t = B_GetNextPrintsEntry(pnti);

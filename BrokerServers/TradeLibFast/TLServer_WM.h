@@ -40,7 +40,11 @@ namespace TradeLibFast
 		vector <time_t>heart; // map last contact to id
 		typedef vector <CString> clientstocklist; // hold a single clients stocks
 		vector < clientstocklist > stocks; // map stocklist to id
-		unsigned int FindClientFromStock(CString stock);
+		typedef vector<int> clientindex; // points to clients
+		vector<clientindex> symclientidx; // points which clients have a symbol
+		vector<CString> symindex;
+		int FindSym(CString sym);
+		void IndexBaskets();
 		
 		DECLARE_MESSAGE_MAP()
 

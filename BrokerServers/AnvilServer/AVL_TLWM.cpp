@@ -963,13 +963,15 @@ namespace TradeLibFast
 		{
 			if (hasHammerSub(my[i])) continue; // if we've already subscribed once, skip to next stock
 			Observer* sec;
+			int symidx = FindSym(my[i]);
 			if (isIndex(my[i]))
-				sec = new AVLIndex(my[i],this);
+				sec = new AVLIndex(my[i],symidx,this);
 			else
 			{
 				//AVLStock *stk = new AVLStock(my[i],this); // create new stock instance
-				AVLStock *stk = new AVLStock(my[i],this,true,depth); // create new stock instance with added depth param
+				AVLStock *stk = new AVLStock(my[i],symidx,this,true,depth); // create new stock instance with added depth param
 				sec = stk;
+				
 			}
 			subs.push_back(sec);
 			subsym.push_back(my[i]);

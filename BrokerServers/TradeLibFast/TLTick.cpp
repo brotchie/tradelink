@@ -6,6 +6,7 @@ namespace TradeLibFast
 {
 	TLTick::TLTick(void)
 	{
+		symid = -1;
 		sym = "";
 		size = 0;
 		bs = 0;

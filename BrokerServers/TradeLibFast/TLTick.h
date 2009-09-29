@@ -8,6 +8,7 @@ namespace TradeLibFast
 		TLTick(void);
 		~TLTick(void);
 		CString sym;
+		int symid;
 		int date;
 		int time;
 		int size;

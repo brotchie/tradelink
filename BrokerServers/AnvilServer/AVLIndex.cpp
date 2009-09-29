@@ -11,6 +11,11 @@
 
 void AVLIndex::Load(CString symbol)
 {
+	time_t now;
+	time(&now);
+	CTime ct(now);
+	_date = (ct.GetYear()*10000) + (ct.GetMonth()*100) + ct.GetDay();
+
     if(symbol.GetLength() != 0)
     {
         MarketIndex* index = B_FindIndex(symbol);
@@ -32,8 +37,9 @@ void AVLIndex::Load(CString symbol)
 }
 
 
-AVLIndex::AVLIndex(CString symbol,TradeLibFast::TLServer_WM* tlinst)
+AVLIndex::AVLIndex(CString symbol,int id,TradeLibFast::TLServer_WM* tlinst)
 {
+	_symid = id;
 	m_index = NULL;
 	m_symbol = "";
 	Load(symbol);
@@ -63,22 +69,17 @@ void AVLIndex::OnChangeIndexSymbol()
 void AVLIndex::FillInfo()
 {
 
-	time_t now;
-	CTime ct(time(&now));
-	int xd = (ct.GetYear()*10000)+(ct.GetMonth()*100)+ct.GetDay();
-	int xt = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
 	double val = m_index->GetValue().toDouble();
-	double open = m_index->GetOpenValue().toDouble();
-	double high = m_index->GetHigh().toDouble();
-	double low = m_index->GetLow().toDouble();
-	double close = m_index->GetCloseValue().toDouble();
 
 	TradeLibFast::TLTick k;
-	k.sym = m_index->GetSymbol();
+	k.sym = m_symbol;
+	k.symid = _symid;
 	k.trade = val;
 	k.size = -1;
-	k.date = xd;
-	k.time = xt;
+	k.date = _date;
+	uint hour,minute,second;
+	B_GetCurrentServerNYTimeTokens(hour, minute, second);
+	k.time = (hour*10000)+(minute*100) + second;
 	tl->SrvGotTick(k);
 }
 
