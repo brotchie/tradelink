@@ -22,7 +22,8 @@ namespace TradeLink.Common
             System.Reflection.Assembly a;
             try
             {
-                a = System.Reflection.Assembly.LoadFrom(dllname);
+                byte[] raw = loadFile(dllname);
+                a = System.Reflection.Assembly.Load(raw);
             }
             catch (Exception ex) { Response b = new InvalidResponse(); b.Name = ex.Message; return b; }
             return FromAssembly(a, fullname);
@@ -59,6 +60,21 @@ namespace TradeLink.Common
                 b.Name = fullname.Substring(partial + 1, fullname.Length - partial);
             } catch (Exception ex) {}
             return b;
+        }
+
+        static byte[] loadFile(string filename)
+        {
+
+            System.IO.FileStream fs = new System.IO.FileStream(filename, System.IO.FileMode.Open,  System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite);
+
+            byte[] buffer = new byte[(int)fs.Length];
+
+            fs.Read(buffer, 0, buffer.Length);
+
+            fs.Close();
+
+            return buffer;
+
         }
     }
 
