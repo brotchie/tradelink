@@ -370,6 +370,8 @@ namespace Kadina
         Dictionary<string, PositionImpl> poslist = new Dictionary<string, PositionImpl>();
         void broker_GotFill(Trade t)
         {
+            if (myres != null)
+                myres.GotFill(t);
             PositionImpl mypos = new PositionImpl(t);
             decimal cpl = 0;
             decimal cpt = 0;
@@ -391,6 +393,8 @@ namespace Kadina
 
         void broker_GotOrder(Order o)
         {
+            if (myres != null)
+                myres.GotOrder(o);
             ot.Rows.Add(o.time, o.symbol,(o.side ? "BUY" : "SELL"), o.size, o.isStop? o.stopp : (o.isTrail ? o.trail : o.price));
         }
         string nowtime = "0";
@@ -427,14 +431,18 @@ namespace Kadina
                 myres.SendOrder += new OrderDelegate(myres_SendOrder);
                 myres.SendIndicators += new StringParamDelegate(myres_SendIndicators);
                 myres.SendMessage += new MessageDelegate(myres_SendMessage);
-                h.SimBroker.GotOrder += new OrderDelegate(myres.GotOrder);
-                h.SimBroker.GotFill += new FillDelegate(myres.GotFill);
+                myres.SendChartLabel += new ChartLabelDelegate(myres_SendChartLabel);
                 status(resname + " is current response.");
                 updatetitle();
                 igridinit();
             }
             else status("Response did not load.");
 
+        }
+
+        void myres_SendChartLabel(decimal price, int bar, string label)
+        {
+            c.DrawChartLabel(price, bar, label);
         }
 
         void myres_SendMessage(MessageTypes type, uint id, string data)

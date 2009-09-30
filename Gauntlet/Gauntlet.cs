@@ -380,8 +380,14 @@ namespace WinGauntlet
             args.Response.SendDebug += new DebugFullDelegate(Response_GotDebug);
             args.Response.SendCancel += new UIntDelegate(Response_CancelOrderSource);
             args.Response.SendOrder += new OrderDelegate(Response_SendOrder);
+            args.Response.SendChartLabel += new ChartLabelDelegate(Response_SendChartLabel);
             _boundonce = true;
             return true;
+        }
+
+        void Response_SendChartLabel(decimal price, int bar, string label)
+        {
+            
         }
 
         void Response_SendMessage(MessageTypes type, uint id, string data)

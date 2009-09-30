@@ -523,6 +523,12 @@ namespace ASP
             tmp.SendCancel += new UIntDelegate(workingres_CancelOrderSource);
             tmp.SendMessage += new MessageDelegate(_workingres_SendMessage);
             tmp.SendBasket += new BasketDelegate(_workingres_SendBasket);
+            tmp.SendChartLabel += new ChartLabelDelegate(tmp_SendChartLabel);
+        }
+
+        void tmp_SendChartLabel(decimal price, int bar, string label)
+        {
+            
         }
 
 

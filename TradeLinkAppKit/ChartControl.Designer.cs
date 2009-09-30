@@ -39,27 +39,28 @@ namespace TradeLink.AppKit
             this.offToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.chartContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.chartContextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // blueToolStripMenuItem
             // 
             this.blueToolStripMenuItem.Name = "blueToolStripMenuItem";
-            this.blueToolStripMenuItem.Size = new System.Drawing.Size(95, 22);
+            this.blueToolStripMenuItem.Size = new System.Drawing.Size(102, 30);
             this.blueToolStripMenuItem.Text = "Buy";
             this.blueToolStripMenuItem.Click += new System.EventHandler(this.blueToolStripMenuItem_Click);
             // 
             // blackToolStripMenuItem
             // 
             this.blackToolStripMenuItem.Name = "blackToolStripMenuItem";
-            this.blackToolStripMenuItem.Size = new System.Drawing.Size(95, 22);
+            this.blackToolStripMenuItem.Size = new System.Drawing.Size(102, 30);
             this.blackToolStripMenuItem.Text = "Sell";
             this.blackToolStripMenuItem.Click += new System.EventHandler(this.blackToolStripMenuItem_Click);
             // 
             // greenToolStripMenuItem
             // 
             this.greenToolStripMenuItem.Name = "greenToolStripMenuItem";
-            this.greenToolStripMenuItem.Size = new System.Drawing.Size(95, 22);
+            this.greenToolStripMenuItem.Size = new System.Drawing.Size(102, 30);
             this.greenToolStripMenuItem.Text = "Flat";
             this.greenToolStripMenuItem.Click += new System.EventHandler(this.greenToolStripMenuItem_Click);
             // 
@@ -67,7 +68,7 @@ namespace TradeLink.AppKit
             // 
             this.yellowToolStripMenuItem.CheckOnClick = true;
             this.yellowToolStripMenuItem.Name = "yellowToolStripMenuItem";
-            this.yellowToolStripMenuItem.Size = new System.Drawing.Size(95, 22);
+            this.yellowToolStripMenuItem.Size = new System.Drawing.Size(102, 30);
             this.yellowToolStripMenuItem.Text = "Flag1";
             this.yellowToolStripMenuItem.Click += new System.EventHandler(this.yellowToolStripMenuItem_Click);
             // 
@@ -76,7 +77,7 @@ namespace TradeLink.AppKit
             this.redToolStripMenuItem.CheckOnClick = true;
             this.redToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.redToolStripMenuItem.Name = "redToolStripMenuItem";
-            this.redToolStripMenuItem.Size = new System.Drawing.Size(95, 22);
+            this.redToolStripMenuItem.Size = new System.Drawing.Size(102, 30);
             this.redToolStripMenuItem.Text = "Flag2";
             this.redToolStripMenuItem.Click += new System.EventHandler(this.redToolStripMenuItem_Click);
             // 
@@ -86,7 +87,7 @@ namespace TradeLink.AppKit
             this.offToolStripMenuItem.CheckOnClick = true;
             this.offToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.offToolStripMenuItem.Name = "offToolStripMenuItem";
-            this.offToolStripMenuItem.Size = new System.Drawing.Size(95, 22);
+            this.offToolStripMenuItem.Size = new System.Drawing.Size(102, 30);
             this.offToolStripMenuItem.Text = "None";
             this.offToolStripMenuItem.Click += new System.EventHandler(this.offToolStripMenuItem_Click);
             // 
@@ -94,7 +95,7 @@ namespace TradeLink.AppKit
             // 
             this.clearAllToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.clearAllToolStripMenuItem.Name = "clearAllToolStripMenuItem";
-            this.clearAllToolStripMenuItem.Size = new System.Drawing.Size(95, 22);
+            this.clearAllToolStripMenuItem.Size = new System.Drawing.Size(102, 30);
             this.clearAllToolStripMenuItem.Text = "Clear";
             this.clearAllToolStripMenuItem.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.clearAllToolStripMenuItem.Click += new System.EventHandler(this.clearAllToolStripMenuItem_Click);
@@ -112,18 +113,18 @@ namespace TradeLink.AppKit
             this.chartContextMenu.Name = "chartContextMenu";
             this.chartContextMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             this.chartContextMenu.ShowImageMargin = false;
-            this.chartContextMenu.Size = new System.Drawing.Size(96, 158);
+            this.chartContextMenu.Size = new System.Drawing.Size(103, 214);
             // 
-            // Chart
+            // ChartControl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.ClientSize = new System.Drawing.Size(553, 392);
             this.ContextMenuStrip = this.chartContextMenu;
-            this.Name = "Chart";
-            this.Text = "Chart";
-            this.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.Chart_MouseDoubleClick);
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.Name = "ChartControl";
+            this.Size = new System.Drawing.Size(830, 603);
+            this.toolTip1.SetToolTip(this, "right click to annotate.   double click to screenshot.  ");
             this.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Chart_MouseClick);
             this.Resize += new System.EventHandler(this.Chart_Resize);
             this.chartContextMenu.ResumeLayout(false);
@@ -141,5 +142,6 @@ namespace TradeLink.AppKit
         private System.Windows.Forms.ToolStripMenuItem offToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem clearAllToolStripMenuItem;
         private System.Windows.Forms.ContextMenuStrip chartContextMenu;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }

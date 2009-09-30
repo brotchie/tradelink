@@ -145,6 +145,41 @@ namespace TradeLink.Common
         /// <param name="msg"></param>
         public virtual void senddebug(string msg) { if (SendDebug!=null) SendDebug(DebugImpl.Create(msg)); }
         /// <summary>
+        /// clears the chart
+        /// </summary>
+        public virtual void sendchartlabel() { sendchartlabel(-1, 0); }
+        /// <summary>
+        /// draws text directly on a point on chart
+        /// </summary>
+        /// <param name="price"></param>
+        /// <param name="bar"></param>
+        /// <param name="text"></param>
+        public virtual void sendchartlabel(decimal price, int bar, string text) { if (SendChartLabel != null) SendChartLabel(price, bar, text); }
+        /// <summary>
+        /// draws a line between this and previous point drawn
+        /// </summary>
+        /// <param name="price"></param>
+        /// <param name="bar"></param>
+        public virtual void sendchartlabel(decimal price, int bar) { sendchartlabel(price, bar, null); }
+        /// <summary>
+        /// same as sendchartlabel
+        /// </summary>
+        public virtual void CL() { sendchartlabel(); }
+        /// <summary>
+        /// same as sendchartlabel
+        /// </summary>
+        /// <param name="price"></param>
+        /// <param name="bar"></param>
+        public virtual void CL(decimal price, int bar) { sendchartlabel(price, bar); }
+        /// <summary>
+        /// same as sendchartlabel
+        /// </summary>
+        /// <param name="price"></param>
+        /// <param name="bar"></param>
+        /// <param name="text"></param>
+        public virtual void CL(decimal price, int bar, string text) { sendchartlabel(price, bar, text); }
+
+        /// <summary>
         /// called when a position update is received (usually only when the response is initially loaded)
         /// </summary>
         /// <param name="p"></param>
@@ -184,5 +219,6 @@ namespace TradeLink.Common
         public event StringParamDelegate SendIndicators;
         public event MessageDelegate SendMessage;
         public event BasketDelegate SendBasket;
+        public event ChartLabelDelegate SendChartLabel;
     }
 }

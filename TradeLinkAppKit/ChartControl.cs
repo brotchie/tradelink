@@ -38,7 +38,10 @@ namespace TradeLink.AppKit
         public void newTick(Tick k)
         {
             if (bl == null)
+            {
+                Symbol = k.symbol;
                 bl = new BarListImpl(BarInterval.FiveMin, k.symbol);
+            }
             bl.newTick(k);
             if (k.isTrade)
             {
@@ -89,7 +92,9 @@ namespace TradeLink.AppKit
         decimal pixperbar = 0;
         decimal  pixperdollar = 0;
 
-        List<TextLabel> points = new List<TextLabel>();
+        List<Label> points = new List<Label>();
+
+        
         public ChartControl() : this(null,false) { }
         public ChartControl(BarList b) : this(b, false) { }
         /// <summary>
@@ -101,12 +106,22 @@ namespace TradeLink.AppKit
         {
             InitializeComponent();
             Paint += new PaintEventHandler(Chart_Paint);
+            MouseDoubleClick += new MouseEventHandler(ChartControl_MouseDoubleClick);
             MouseWheel +=new MouseEventHandler(Chart_MouseUp);
             if (b != null)
             {
                 bl = b;
                 Symbol = b.Symbol;
             }
+        }
+
+        void ChartControl_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            string s = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\" + Symbol + ".png";
+            ScreenCapture sc = new ScreenCapture();
+            sc.CaptureWindowToFile(Handle, s, System.Drawing.Imaging.ImageFormat.Png);
+
+
         }
 
         public void NewBarList(BarList barlist)
@@ -246,6 +261,26 @@ namespace TradeLink.AppKit
             DrawLabels();
         }
 
+        /// <summary>
+        /// draws text label on a chart.
+        /// if price is less than zero, all labels are cleared.
+        /// </summary>
+        /// <param name="price"></param>
+        /// <param name="bar"></param>
+        /// <param name="label"></param>
+        public void DrawChartLabel(decimal price, int bar, string label)
+        {
+            if (price < 0)
+            {
+                points.Clear();
+                lineend.Clear();
+                return;
+            }
+            points.Add(new Label(bar,price,label));
+            if (_alwaysupdate)
+                refresh();
+        }
+
         private decimal NearestPrettyPriceUnits(decimal pricerange,int maxlabels)
         {
             decimal[] prettyunits = new decimal[] { .01m, .02m, .04m, .05m, .1m, .2m, .25m, .4m, .5m, 1,2,5,10 };
@@ -262,23 +297,59 @@ namespace TradeLink.AppKit
         {
             refresh();
         }
+
+        struct Label
+        {
+            public bool isLineEnd { get { return (Text == null) || (Text == string.Empty); } }
+            public int Bar;
+            public decimal Price;
+            public string Text;
+            public Color Color;
+            public Label(int bar, decimal price, string text)
+            {
+                Bar = bar;
+                Price = price;
+                Text = text;
+                Color = Color.White;
+            }
+        }
+
+        List<int> lineend = new List<int>();
         private void DrawLabels()
         {
             if (points == null) return;
             Graphics gd = CreateGraphics();
-            Font font = new Font(FontFamily.GenericSerif, 14, FontStyle.Bold);
-            for (int i = 0; i<points.Count; i++) gd.DrawString(points[i].Label, font, Brushes.Purple, points[i].X, points[i].Y);
-        }
+            Font font = new Font(FontFamily.GenericSerif, 8,FontStyle.Regular);
+            Font manfont = new Font(FontFamily.GenericSerif, 14,FontStyle.Bold);
+            for (int i = 0; i < points.Count; i++)
+            {
+                if (points[i].isLineEnd)
+                {
+                    lineend.Add(i);
+                    // can't draw from first point
+                    if (i == 0) continue;
+                    // draw from previous point
+                    gd.DrawLine(new Pen(Color.Orange), getX(points[lineend[lineend.Count - 2]].Bar), getY(points[lineend[lineend.Count - 2]].Price), getX(points[i].Bar), getY(points[i].Price));
 
+                }
+                else
+                    gd.DrawString(points[i].Text, font, Brushes.Purple, getX(points[i].Bar), getY(points[i].Price));
+            }
+            for (int i = 0; i<manualpoints.Count; i++)
+                gd.DrawString(manualpoints[i].Label,manfont, Brushes.Turquoise, manualpoints[i].X,manualpoints[i].Y);
+
+
+        }
+        List<TextLabel> manualpoints = new List<TextLabel>();
         private void Chart_MouseClick(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
-                points.Add(new TextLabel(mlabel, e.X, e.Y));
+                manualpoints.Add(new TextLabel(mlabel, e.X, e.Y));
             }
             else if (e.Button == MouseButtons.Middle) 
             {
-                points.Clear();
+                manualpoints.Clear();
             }
             refresh();
         }
@@ -315,18 +386,11 @@ namespace TradeLink.AppKit
 
         private void clearAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            points.Clear();
+            manualpoints.Clear();
             refresh();
 
         }
 
-        private void Chart_MouseDoubleClick(object sender, MouseEventArgs e)
-        {
-            string s = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\" + Symbol + ".png";
-            ScreenCapture sc = new ScreenCapture();
-            sc.CaptureWindowToFile(Handle, s, System.Drawing.Imaging.ImageFormat.Png);
-
-        }
 
         public void Chart_MouseUp(object sender, MouseEventArgs e)
         {

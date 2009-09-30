@@ -139,6 +139,11 @@ namespace TradeLink.Common
             return t;
         }
 
+        public static string ToChartLabel(Trade t)
+        {
+            return t.xsize+t.symbol;
+        }
+
         public Security Sec { get { return new SecurityImpl(symbol, ex, Security); } }
     }
 

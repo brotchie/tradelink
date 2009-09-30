@@ -39,5 +39,6 @@ namespace TradeLink.Common
         public event UIntDelegate SendCancel;
         public event StringParamDelegate SendIndicators;
         public event MessageDelegate SendMessage;
+        public event ChartLabelDelegate SendChartLabel;
     }
 }

@@ -54,6 +54,9 @@ namespace Responses
             // this way we can debug our indicators during development
             // indicators are sent in the same order as they are named above
             sendindicators(new string[] { time.ToString(),SMA.ToString("N2")});
+
+            // draw the MA as a line
+            sendchartlabel(SMA, blt[symbol].Last);
         }
 
         // turn on bar tracking
@@ -94,6 +97,8 @@ namespace Responses
         {
             // make sure every fill is tracked against a position
             pt.Adjust(fill);
+            // chart fills
+            sendchartlabel(fill.xprice,blt[fill.symbol].Last,TradeImpl.ToChartLabel(fill));
         }
 
         public override void GotPosition(Position p)
@@ -117,4 +122,8 @@ namespace Responses
     {
         public SMAResponseAuto() : base(false) { }
     }
+
+
+
+#warning If you get errors about missing references to TradeLink.Common or TradeLink.Api, choose Project->Add Reference->Browse to folder where you installed tradelink (usually Program Files) and add a reference for each dll.
 }

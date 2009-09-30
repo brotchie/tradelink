@@ -39,6 +39,7 @@ namespace Responses
         public event StringParamDelegate SendIndicators;
         public event MessageDelegate SendMessage;
         public event BasketDelegate SendBasket;
+        public event ChartLabelDelegate SendChartLabel;
         public int ID { get; set; }
     }
 }
