@@ -33,6 +33,7 @@ namespace Record
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.symbox = new System.Windows.Forms.ToolStripTextBox();
             this.recordbut = new System.Windows.Forms.ToolStripButton();
+            this._level2enabled = new System.Windows.Forms.ToolStripButton();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -52,17 +53,18 @@ namespace Record
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.symbox,
-            this.recordbut});
+            this.recordbut,
+            this._level2enabled});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(290, 28);
+            this.toolStrip1.Size = new System.Drawing.Size(290, 32);
             this.toolStrip1.TabIndex = 1;
             this.toolStrip1.Text = "toolStrip1";
             // 
             // symbox
             // 
             this.symbox.Name = "symbox";
-            this.symbox.Size = new System.Drawing.Size(100, 28);
+            this.symbox.Size = new System.Drawing.Size(100, 32);
             this.symbox.ToolTipText = "Enter symbol to record";
             this.symbox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.symbox_KeyUp);
             // 
@@ -72,10 +74,23 @@ namespace Record
             this.recordbut.Image = ((System.Drawing.Image)(resources.GetObject("recordbut.Image")));
             this.recordbut.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.recordbut.Name = "recordbut";
-            this.recordbut.Size = new System.Drawing.Size(66, 25);
+            this.recordbut.Size = new System.Drawing.Size(72, 29);
             this.recordbut.Text = "Record";
             this.recordbut.ToolTipText = "Enter a symbol and press record";
             this.recordbut.Click += new System.EventHandler(this.recordbut_Click);
+            // 
+            // _level2enabled
+            // 
+            this._level2enabled.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this._level2enabled.CheckOnClick = true;
+            this._level2enabled.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this._level2enabled.Image = ((System.Drawing.Image)(resources.GetObject("_level2enabled.Image")));
+            this._level2enabled.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this._level2enabled.Name = "_level2enabled";
+            this._level2enabled.Size = new System.Drawing.Size(65, 29);
+            this._level2enabled.Text = "Level2";
+            this._level2enabled.ToolTipText = "Level2 data requested";
+            this._level2enabled.Click += new System.EventHandler(this._level2enabled_Click);
             // 
             // RecordMain
             // 
@@ -100,6 +115,7 @@ namespace Record
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripTextBox symbox;
         private System.Windows.Forms.ToolStripButton recordbut;
+        private System.Windows.Forms.ToolStripButton _level2enabled;
     }
 }
 

@@ -17,12 +17,19 @@ namespace Record
         TLClient_WM tl = new TLClient_WM();
         BasketImpl mb = new BasketImpl();
         public const string PROGRAM = "Record";
+        AsyncResponse _ar = new AsyncResponse();
         public RecordMain()
         {
             InitializeComponent();
             if ((tl.LinkType == TLTypes.LIVEBROKER) || (tl.LinkType == TLTypes.SIMBROKER))
             {
-                tl.gotTick += new TickDelegate(tl_gotTick);
+                if (Environment.ProcessorCount == 1)
+                    tl.gotTick += new TickDelegate(tl_gotTick);
+                else
+                {
+                    tl.gotTick+=new TickDelegate(_ar.newTick);
+                    _ar.GotTick+=new TickDelegate(tl_gotTick);
+                }
             }
             TradeLink.AppKit.Versions.UpgradeAlert(tl);
         }
@@ -60,6 +67,15 @@ namespace Record
                 mb.Add(sec);
             refreshlist(size);
 
+        }
+
+        bool _l2 = false;
+        private void _level2enabled_Click(object sender, EventArgs e)
+        {
+            if (_l2) return;
+            _l2 = true;
+            tl.RequestDOM(Book.MAXBOOK);
+            _level2enabled.Enabled = false;
         }
 
     }
