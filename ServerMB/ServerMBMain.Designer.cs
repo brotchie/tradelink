@@ -30,7 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ServerMBMain));
-            this._msg = new System.Windows.Forms.ListBox();
             this._user = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this._pass = new System.Windows.Forms.TextBox();
@@ -39,19 +38,10 @@
             this.label3 = new System.Windows.Forms.Label();
             this._id = new System.Windows.Forms.NumericUpDown();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this._report = new System.Windows.Forms.Button();
+            this._togmsg = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this._id)).BeginInit();
             this.SuspendLayout();
-            // 
-            // _msg
-            // 
-            this._msg.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._msg.FormattingEnabled = true;
-            this._msg.ItemHeight = 20;
-            this._msg.Location = new System.Drawing.Point(0, 0);
-            this._msg.Name = "_msg";
-            this._msg.Size = new System.Drawing.Size(346, 184);
-            this._msg.TabIndex = 0;
-            this._msg.Visible = false;
             // 
             // _user
             // 
@@ -127,11 +117,35 @@
             this._id.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this._id.Value = global::ServerMB.Properties.Settings.Default.memberid;
             // 
+            // _report
+            // 
+            this._report.Image = ((System.Drawing.Image)(resources.GetObject("_report.Image")));
+            this._report.Location = new System.Drawing.Point(238, 140);
+            this._report.Name = "_report";
+            this._report.Size = new System.Drawing.Size(32, 27);
+            this._report.TabIndex = 12;
+            this.toolTip1.SetToolTip(this._report, "report a bug");
+            this._report.UseVisualStyleBackColor = true;
+            this._report.Click += new System.EventHandler(this._report_Click);
+            // 
+            // _togmsg
+            // 
+            this._togmsg.Location = new System.Drawing.Point(196, 140);
+            this._togmsg.Name = "_togmsg";
+            this._togmsg.Size = new System.Drawing.Size(35, 27);
+            this._togmsg.TabIndex = 11;
+            this._togmsg.Text = "!";
+            this.toolTip1.SetToolTip(this._togmsg, "toggle connector messages");
+            this._togmsg.UseVisualStyleBackColor = true;
+            this._togmsg.Click += new System.EventHandler(this._togmsg_Click);
+            // 
             // ServerMBMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(346, 186);
+            this.ClientSize = new System.Drawing.Size(299, 186);
+            this.Controls.Add(this._report);
+            this.Controls.Add(this._togmsg);
             this.Controls.Add(this._id);
             this.Controls.Add(this.label3);
             this.Controls.Add(this._loginbut);
@@ -139,7 +153,6 @@
             this.Controls.Add(this._pass);
             this.Controls.Add(this.label1);
             this.Controls.Add(this._user);
-            this.Controls.Add(this._msg);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ServerMBMain";
             this.Text = "ServerMB BETA";
@@ -152,7 +165,6 @@
 
         #endregion
 
-        private System.Windows.Forms.ListBox _msg;
         private System.Windows.Forms.TextBox _user;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox _pass;
@@ -161,6 +173,8 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.NumericUpDown _id;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.Button _report;
+        private System.Windows.Forms.Button _togmsg;
     }
 }
 

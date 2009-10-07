@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using TradeLink.API;
 using TradeLink.Common;
+using TradeLink.AppKit;
 using MBTCOMLib;
 using MBTORDERSLib;
 using MBTQUOTELib;
@@ -23,18 +24,16 @@ namespace ServerMB
         static MbtQuotes m_Quotes;
         PositionTracker pt = new PositionTracker();
         bool showmessage = false;
+        DebugWindow _dw = new DebugWindow();
         public const string PROGRAM = "ServerMB BETA"; 
         public ServerMBMain()
         {
             InitializeComponent();
-            _msg.SendToBack();
             m_ComMgr = new MBTCOMLib.MbtComMgrClass();
             m_ComMgr.SilentMode = true;
             m_ComMgr.EnableSplash(false);
             m_OrderClient = m_ComMgr.OrderClient;
             m_Quotes = m_ComMgr.Quotes;
-            ContextMenu = new ContextMenu();
-            ContextMenu.MenuItems.Add("Messages", new EventHandler(rightmessage));
 
             // tradelink bindings
             tl.newProviderName = Providers.MBTrading;
@@ -61,6 +60,7 @@ namespace ServerMB
         void m_ComMgr_OnLogonDeny(string bstrReason)
         {
             debug("login denied: " + bstrReason);
+            BackColor = Color.Red;
         }
 
         void m_ComMgr_OnLogonSucceed()
@@ -72,19 +72,7 @@ namespace ServerMB
 
         void rightmessage(object sender, EventArgs e)
         {
-            showmessage = !showmessage;
-            if (showmessage)
-            {
-                _msg.Visible = true;
-                _msg.BringToFront();
-                Invalidate(true);
-            }
-            else
-            {
-                _msg.Visible = false;
-                _msg.SendToBack();
-                Invalidate(true);
-            }
+            _dw.Toggle();
         }
 
 
@@ -252,18 +240,22 @@ namespace ServerMB
 
         void debug(string msg)
         {
-            if (_msg.InvokeRequired)
-                Invoke(new DebugDelegate(debug), new object[] { msg });
-            else
-            {
-                _msg.Items.Add(DateTime.Now.ToShortTimeString() + " " + msg);
-                _msg.SelectedIndex = _msg.Items.Count - 1;
-            }
+            _dw.GotDebug(msg);
         }
 
         private void _loginbut_Click(object sender, EventArgs e)
         {
             m_ComMgr.DoLogin((int)_id.Value, _user.Text, _pass.Text, "");
+        }
+
+        private void _togmsg_Click(object sender, EventArgs e)
+        {
+            _dw.Toggle();
+        }
+
+        private void _report_Click(object sender, EventArgs e)
+        {
+            CrashReport.BugReport(PROGRAM, _dw.Content);
         }
     }
 
