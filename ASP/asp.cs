@@ -256,8 +256,12 @@ namespace ASP
                     // if it's the skin we want to trade
                     if (skinfromfile(fn) == name)
                     {
+                        // get it's ID
+                        int id = _reslist.Count;
                         // get it along with it's persisted settings
                         Response r = (Response)SkinImpl.DeskinFile(fn);
+                        // set the id
+                        r.ID = id;
                         // bind events
                         bindresponseevents(r);
                         // show it to user
@@ -265,11 +269,14 @@ namespace ASP
                         // add it to trade list
                         _reslist.Add(r);
                         // map name to response
-                        _name2r.Add(_resnames.Items.Count - 1, _reslist.Count - 1);
+                        _name2r.Add(_resnames.Items.Count - 1, id);
                         // mark it as loaded
                         _resskinidx.Add(_reslist.Count - 1, name);
                         // update status
                         worked &= true;
+                        // reset response
+                        _reslist[id].Reset();
+
                     }
                 }
                 return true;
@@ -554,8 +561,6 @@ namespace ASP
             }
             // handle events
             bindresponseevents(tmp);
-            // reset the response
-            tmp.Reset();
             // save the dll that contains the class for use with skins
             string dll = string.Empty;
             // if we don't have this class, add it
@@ -574,6 +579,8 @@ namespace ASP
                 // add it
                 _reslist.Add(tmp);
             }
+            // reset it
+            _reslist[idx].Reset();
             // send response current positions
             foreach (Position p in _pt)
                 _reslist[idx].GotPosition(p);
