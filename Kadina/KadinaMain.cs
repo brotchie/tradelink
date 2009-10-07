@@ -358,11 +358,16 @@ namespace Kadina
         void igridinit()
         {
 
-
+            // don't process invalid responses
             if ((myres == null) || (myres.Indicators.Length == 0))
                 return;
-                for (int i = 0; i < myres.Indicators.Length; i++)
-                    it.Columns.Add(myres.Indicators[i]);
+            // clear existing indicators
+            it.Clear();
+            it.Columns.Clear();
+            // load new ones
+            for (int i = 0; i < myres.Indicators.Length; i++)
+                it.Columns.Add(myres.Indicators[i]);
+            // refresh screen
                 ig.Invalidate();
         }
 
