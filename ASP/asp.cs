@@ -554,6 +554,8 @@ namespace ASP
             }
             // handle events
             bindresponseevents(tmp);
+            // reset the response
+            tmp.Reset();
             // save the dll that contains the class for use with skins
             string dll = string.Empty;
             // if we don't have this class, add it

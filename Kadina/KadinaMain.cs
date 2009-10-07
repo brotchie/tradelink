@@ -413,8 +413,6 @@ namespace Kadina
 
 
 
-        int time = 0;
-
         void loadboxname(string name)
         {
             try
@@ -440,6 +438,7 @@ namespace Kadina
                 status(resname + " is current response.");
                 updatetitle();
                 igridinit();
+                myres.Reset();
             }
             else status("Response did not load.");
 

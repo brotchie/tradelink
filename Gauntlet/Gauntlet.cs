@@ -367,6 +367,7 @@ namespace WinGauntlet
             args.ResponseName = args.Response.FullName;
             _boundonce = false;
             bindresponseevents();
+            args.Response.Reset();
         }
 
         bool _boundonce = false;
