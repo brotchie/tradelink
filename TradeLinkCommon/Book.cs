@@ -8,6 +8,8 @@ namespace TradeLink.Common
         public const int MAXBOOK = 40;
         public Book(Book b)
         {
+            ActualDepth = b.ActualDepth;
+            UpdateTime = b.UpdateTime;
             Sym = b.Sym;
             maxbook = b.maxbook;
             bidprice = new decimal[b.askprice.Length];
@@ -20,16 +22,19 @@ namespace TradeLink.Common
             Array.Copy(b.bidsize, bidsize, b.bidprice.Length);
             Array.Copy(b.askprice, askprice, b.bidprice.Length);
             Array.Copy(b.asksize, asksize, b.bidprice.Length);
-            for (int i = 0; i < b.askex.Length; i++)
+            for (int i = 0; i < b.ActualDepth; i++)
             {
                 bidex[i] = b.bidex[i];
                 askex[i] = b.askex[i];
             }
         }
-
+        public int UpdateTime;
+        public int ActualDepth;
         int maxbook;
         public Book(string sym)
         {
+            UpdateTime = 0;
+            ActualDepth = 0;
             maxbook = MAXBOOK;
             Sym = sym;
             bidprice = new decimal[maxbook];
@@ -49,6 +54,7 @@ namespace TradeLink.Common
         public string[] askex;
         public void Reset()
         {
+            ActualDepth = 0;
             for (int i = 0; i < maxbook; i++)
             {
                 bidex[i] = null;
@@ -59,7 +65,6 @@ namespace TradeLink.Common
                 asksize[i] = 0;
             }
         }
-        const string NYSE = "NYS";
         public void GotTick(Tick k)
         {
             // ignore trades
@@ -73,18 +78,22 @@ namespace TradeLink.Common
             // if depth is zero, must be a new book
             if (k.depth == 0) Reset();
             // update buy book
-            if (k.hasBid && k.be.Contains(NYSE))
+            if (k.hasBid)
             {
                 bidprice[k.depth] = k.bid;
                 bidsize[k.depth] = k.BidSize;
                 bidex[k.depth] = k.be;
+                if (k.depth > ActualDepth)
+                    ActualDepth = k.depth;
             }
             // update sell book
-            if (k.hasAsk && k.oe.Contains(NYSE))
+            if (k.hasAsk)
             {
                 askprice[k.depth] = k.ask;
                 asksize[k.depth] = k.AskSize;
                 askex[k.depth] = k.oe;
+                if (k.depth > ActualDepth)
+                    ActualDepth = k.depth;
             }
         }
 
