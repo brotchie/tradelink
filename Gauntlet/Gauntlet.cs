@@ -579,7 +579,14 @@ namespace WinGauntlet
                 if (!Util.GetResponseList(DllName).Contains(name))
                     return false;
                 _resp = name;
-                _response = ResponseLoader.FromDLL(_resp, DllName);
+                try
+                {
+                    _response = ResponseLoader.FromDLL(_resp, DllName);
+                }
+                catch (Exception ex)
+                {
+                    D(ex.Message + ex.StackTrace);
+                }
                 bool r = _response.isValid;
                 if (r)
                     D("loaded response: " + name);

@@ -20,12 +20,13 @@ namespace TradeLink.Common
         public static Response FromDLL(string fullname, string dllname)
         {
             System.Reflection.Assembly a;
-            try
-            {
-                byte[] raw = loadFile(dllname);
-                a = System.Reflection.Assembly.Load(raw);
-            }
-            catch (Exception ex) { Response b = new InvalidResponse(); b.Name = ex.Message; return b; }
+            
+#if (DEBUG)
+            a = System.Reflection.Assembly.LoadFrom(dllname);
+#else
+            byte[] raw = loadFile(dllname);
+            a = System.Reflection.Assembly.Load(raw);
+#endif
             return FromAssembly(a, fullname);
         }
         /// <summary>
@@ -39,40 +40,34 @@ namespace TradeLink.Common
             Type type;
             object[] args;
             Response b = null;
-            try
-            {
-                type = a.GetType(fullname, true, true);
-            }
-            catch (Exception ex) { b = new InvalidResponse(); b.Name = ex.Message; return b; }
+            // get class from assembly
+            type = a.GetType(fullname, true, true);
             args = new object[] { };
-            try
+            // create an instance of type and cast to response
+            b = (Response)Activator.CreateInstance(type, args);
+            // if it doesn't have a name, add one
+            if (b.Name == string.Empty)
             {
-                b = (Response)Activator.CreateInstance(type, args);
+                b.Name = type.Name;
             }
-            catch (Exception ex)
+            if (b.FullName == string.Empty)
             {
-                b = new InvalidResponse(); b.Name = ex.InnerException.Message; return b;
+                b.FullName = type.FullName;
             }
-            b.FullName = fullname;
-            try
-            {
-                int partial = fullname.IndexOf('.');
-                b.Name = fullname.Substring(partial + 1, fullname.Length - partial);
-            } catch (Exception ex) {}
             return b;
         }
 
         static byte[] loadFile(string filename)
         {
-
+            // get file
             System.IO.FileStream fs = new System.IO.FileStream(filename, System.IO.FileMode.Open,  System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite);
-
+            // prepare buffer based on file size
             byte[] buffer = new byte[(int)fs.Length];
-
+            // read file into buffer
             fs.Read(buffer, 0, buffer.Length);
-
+            // close file
             fs.Close();
-
+            // return buffer
             return buffer;
 
         }

@@ -539,7 +539,19 @@ namespace ASP
             // get selected response
             string resname = (string)_availresponses.SelectedItem;
             // load it into working response
-            Response tmp = ResponseLoader.FromDLL(resname, Properties.Settings.Default.boxdll);
+            Response tmp = new InvalidResponse();
+            try
+            {
+                tmp = ResponseLoader.FromDLL(resname, Properties.Settings.Default.boxdll);
+            }
+            catch (Exception ex)
+            {
+                status("response failed.  see messages.");
+                debug(ex.Message + ex.StackTrace);
+                // unselect response
+                _availresponses.SelectedIndex = -1;
+                return;
+            }
             // handle events
             bindresponseevents(tmp);
             // save the dll that contains the class for use with skins
@@ -572,9 +584,9 @@ namespace ASP
 
             // show we added response
             status(tmp.FullName +  getsyms(idx));
+
             // unselect response
             _availresponses.SelectedIndex = -1;
-
 
         }
 
