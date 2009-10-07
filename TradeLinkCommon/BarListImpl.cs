@@ -430,6 +430,19 @@ namespace TradeLink.Common
             _fromepf.newTick(t);
         }
 
+        public static Bar GetBarPreceeding(BarList chart, int date)
+        {
+            // look for previous day's close
+            for (int j = chart.Last; (j >= chart.First); j--)
+            {
+                if (chart.Date()[j] < date)
+                {
+                    return chart[j];
+                }
+            }
+            return new BarImpl();
+        }
+
 
     }
 
