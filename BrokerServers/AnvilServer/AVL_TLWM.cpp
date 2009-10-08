@@ -412,9 +412,15 @@ namespace TradeLibFast
 		//convert the arguments
 		Order* orderSent;
 		char side = (o.side) ? 'B' : 'S';
-		const Money pricem = Money((int)(o.price*1024));
-		const Money stopm = Money((int)(o.stop*1024));
-		const Money trailm = Money((int)(o.trail*1024));
+		int pw = (int)o.price;
+		int pf = (int)((double)(o.price-pw)*1000);
+		int sw = (int)o.stop;
+		int sf = (int)((double)(o.stop-sw)*1000);
+		int tw = (int)o.trail;
+		int tf = (int)((double)(o.trail-tw)*1000);
+		const Money pricem = Money(pw,pf);
+		const Money stopm = Money(sw,sf);
+		const Money trailm = Money(tw,tf);
 		unsigned int mytif = TIFId(o.TIF);
 
 		if (Stock==NULL)
@@ -886,6 +892,15 @@ namespace TradeLibFast
 		return OK;
 	}
 
+	double AVL_TLWM::GetDouble(Money  m)
+	{
+		double v = m.GetWhole();
+		int tf = m.GetThousandsFraction();
+		double f = ((double)tf/1000);
+		v += f;
+		return v;
+	}
+
 	int AVL_TLWM::PositionResponse(CString account, CString client)
 	{
 		if (account=="") return INVALID_ACCOUNT;
@@ -897,8 +912,8 @@ namespace TradeLibFast
 		while(pos = B_GetNextPosition(iterator))
 		{
 			TradeLibFast::TLPosition p;
-			p.AvgPrice = pos->GetAverageExecPrice().GetMoneyValueForServer()/(double)1024;
-			p.ClosedPL = pos->GetClosedPnl().GetMoneyValueForServer()/(double)1024;
+			p.AvgPrice = GetDouble((Money)pos->GetAverageExecPrice());
+			p.ClosedPL = GetDouble(pos->GetClosedPnl());
 			p.Size = pos->GetSize();
 			p.Symbol = CString(pos->GetSymbol());
 			CString msg = p.Serialize();
