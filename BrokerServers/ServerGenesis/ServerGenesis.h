@@ -33,6 +33,7 @@ public :
 	int _depth;
 private:
 
+	void SendPosition(int client, GTOpenPosition& p);
 	bool autoattempt;
 	bool subscribed(CString sym);
 	std::vector<StkWrap*> m_stk;

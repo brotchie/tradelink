@@ -145,24 +145,31 @@ int ServerGenesis::RegisterStocks(CString client)
 	return OK;
 }
 
+void ServerGenesis::SendPosition(int cid,GTOpenPosition& pos)
+{
+	CString sym = CString(pos.szStock);
+	int len = sym.GetLength();
+	if ((len>10) || (len==0)) return;
+	TLPosition p;
+	p.Symbol = CString(pos.szStock);
+	p.Size = abs(pos.nOpenShares)*(pos.chOpenSide=='B' ? 1 : -1);
+	p.AvgPrice = pos.dblOpenPrice;
+	TLSend(POSITIONRESPONSE,p.Serialize(),cid);
+}
+
 int ServerGenesis::PositionResponse(CString account, CString client)
 {
-	void *it;
-	it = NULL;
-	for (uint i = 0; i<m_accts.size(); i++)
+	GTOpenPosition pos;
+	int cid = FindClient(client);
+	if (cid==-1) return CLIENTNOTREGISTERED;
+	const char * acct = (account=="") ? NULL : account.GetBuffer();
+	void *it = gtw->GetFirstOpenPosition(acct,pos);
+	SendPosition(cid,pos);
+	while (it!=NULL)
 	{
-		GTOpenPosition pos;
-		if (it==NULL)
-			it = gtw->GetFirstOpenPosition(m_accts[i].GetBuffer(),pos);
-		else
-			gtw->GetNextOpenPosition(m_accts[i].GetBuffer(),it,pos);
-		TLPosition p;
-		p.Symbol = CString(pos.szStock);
-		p.Size = abs(pos.nOpenShares)*(pos.chOpenSide=='B' ? 1 : -1);
-		p.AvgPrice = pos.dblOpenPrice;
-		TLSend(POSITIONRESPONSE,p.Serialize(),client);
+		it = gtw->GetNextOpenPosition(acct,it,pos);
+		SendPosition(cid,pos);
 	}
-	it = NULL;
 	return OK;
 }
 
