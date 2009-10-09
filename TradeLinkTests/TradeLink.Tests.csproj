@@ -138,6 +138,7 @@
     <Compile Include="TestSecurity.cs" />
     <Compile Include="TestSkin.cs" />
     <Compile Include="TestStock.cs" />
+    <Compile Include="TestTemplate.cs" />
     <Compile Include="TestTick.cs" />
     <Compile Include="TestTickArchiver.cs">
       <SubType>Code</SubType>
@@ -145,6 +146,7 @@
     <Compile Include="TestTickFileFilter.cs" />
     <Compile Include="TestTickWatcher.cs" />
     <Compile Include="TestTikWriterReader.cs" />
+    <Compile Include="TestTLFastInterop.cs" />
     <Compile Include="TestTrade.cs" />
     <Compile Include="TestTradeLink_WM.cs">
     </Compile>
