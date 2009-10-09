@@ -51,7 +51,7 @@ namespace TradeLink.Common
             opens.Add(mybar.Open);
             dates.Add(mybar.Bardate);
             highs.Add(mybar.High);
-            lows.Add(mybar.Close);
+            lows.Add(mybar.Low);
             vols.Add(mybar.Volume);
             times.Add(mybar.Bartime);
         }
