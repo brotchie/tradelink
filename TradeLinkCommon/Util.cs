@@ -6,6 +6,7 @@ using System.IO;
 using System.Reflection;
 using System.Net;
 using TradeLink.API;
+using Microsoft.Win32;
 
 namespace TradeLink.Common
 {
@@ -14,10 +15,19 @@ namespace TradeLink.Common
     /// </summary>
     public class Util
     {
+        static string TLSREGPATH = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite";
+        static string TLSREGKEY_PATH = "Path";
+        static string TLSREGKEY_VERSION = "Version";
         public static string TLBaseDir 
         { get { return Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)+@"\tradelink\"; } }
         public static string TLProgramDir 
-        { get { return TLBaseDir + "TradeLinkSuite\\"; } }
+        { 
+            get 
+            {
+                RegistryKey r = Registry.LocalMachine;
+                return r.OpenSubKey(TLSREGPATH).GetValue(TLSREGKEY_PATH).ToString();
+            } 
+        }
         public static string TLTickDir 
         { get { return TLBaseDir + "TickData\\"; } }
 

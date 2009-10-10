@@ -63,6 +63,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\DBFX.lnk" "$INSTDIR\ServerDBFX.exe" "" "$INSTDIR\ServerDBFX.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\TikConverter.lnk" "$INSTDIR\TikConverter.exe" "" "$INSTDIR\TikConverter.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Blackwood.lnk" "$INSTDIR\ServerBlackwood.exe" "" "$INSTDIR\ServerBlackwood.exe" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink\LogViewer.lnk" "$INSTDIR\LogViewer.exe" "" "$INSTDIR\LogViewer.exe" 0  
   
   
   ; Put file there
@@ -110,6 +111,8 @@ Section "TradeLinkSuite"
   File "ServerBlackwood\bin\release\ServerBlackwood.exe"
   File "ServerBlackwood\bin\release\Blackwood.Framework.dll"
   File "ServerBlackwood\bin\release\BWCMessageLib.dll"
+  File "LogViewer\bin\release\LogViewer.exe"
+  File "LogViewer\bin\release\LogViewer.exe.config"
 
   File "TikConverter\bin\release\TikConverter.exe"
   
@@ -132,6 +135,8 @@ Section "TradeLinkSuite"
 finishinstall:  
   ; Write the uninstall keys for Windows
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "DisplayName" "TradeLinkSuite"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "Path" '"$INSTDIR"'
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "Version" '"${VERSION}"'
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "UninstallString" '"$INSTDIR\uninstall.exe"'
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "NoModify" 1
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "NoRepair" 1
@@ -170,6 +175,7 @@ Section "Uninstall"
   Delete "$SMPROGRAMS\TradeLink\Esignal.lnk"
   Delete "$SMPROGRAMS\TradeLink\DBFX.lnk"
   Delete "$SMPROGRAMS\TradeLink\Blackwood.lnk"
+  Delete "$SMPROGRAMS\TradeLink\LogViewer.lnk"
 
   ; Remove directories used
   RMDir "$SMPROGRAMS\TradeLink"
