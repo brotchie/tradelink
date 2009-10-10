@@ -47,6 +47,7 @@ Section "BrokerServer"
 
   SectionIn RO
     ; Set output path to the installation directory.
+	DetailPrint "Installing version ${PVERSION}..."
   SetOutPath $INSTDIR
   CreateDirectory "$SMPROGRAMS\TradeLink"
   
@@ -72,10 +73,12 @@ DetailPrint "Checking for VCRedistributable..."
   ; shortcut to uninstaller
   CreateShortCut "$SMPROGRAMS\TradeLink\Uninstall BrokerServer.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
   ; Write the uninstall keys for Windows
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\NSIS_TLBrokerServer" "DisplayName" "TradeLinkAnvilServer"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\NSIS_TLBrokerServer" "UninstallString" '"$INSTDIR\uninstall.exe"'
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\NSIS_TLBrokerServer" "NoModify" 1
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\NSIS_TLBrokerServer" "NoRepair" 1
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BrokerServer" "DisplayName" "BrokerServer"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BrokerServer" "Path" "$INSTDIR\"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BrokerServer" "Version" "${PVERSION}"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BrokerServer" "UninstallString" '"$INSTDIR\uninstall.exe"'
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BrokerServer" "NoModify" 1
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BrokerServer" "NoRepair" 1
   WriteUninstaller "uninstall.exe"  
 
 SectionEnd

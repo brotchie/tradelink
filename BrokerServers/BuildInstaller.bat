@@ -23,7 +23,7 @@ goto :eof
 ) else (
 echo NSIS found.  Building installer...
 echo.
-c:\progra~1\nsis\makensis.exe /v1 BrokerServer.nsi > NUL
+c:\progra~1\nsis\makensis.exe /v1 /DPVERSION=%REVISION% BrokerServer.nsi > NUL
 )
 
 if exist BrokerServer.exe (

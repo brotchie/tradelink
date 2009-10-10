@@ -45,8 +45,9 @@ namespace TradeLink.AppKit
             {
                 WebClient wc = new WebClient();
                 wc.DownloadStringCompleted += new DownloadStringCompletedEventHandler(wc_DownloadStringCompleted);
-
-                int current = Util.BuildFromFile(path + "\\VERSION.txt");
+                int current = Util.BuildFromRegistry(Program);
+                if (current==0)
+                    current = Util.BuildFromFile(path + "\\VERSION.txt");
                 if (current != 0)
                     wc.DownloadStringAsync(new Uri(ProgramUrl), new verstate(Program, ProgramUrl, current));
             }
@@ -55,8 +56,8 @@ namespace TradeLink.AppKit
                 WebClient wc = new WebClient();
                 wc.DownloadStringCompleted += new DownloadStringCompletedEventHandler(wc_DownloadStringCompleted);
 
-                int current = Util.BuildFromFile(Util.TLProgramDir+ VERSIONFILE);
-                wc.DownloadStringAsync(new Uri(TLSITEURL), new verstate(TRADELINKSUITE,TLSITEURL, current));
+                int current = Util.BuildFromRegistry(Util.PROGRAM);
+                wc.DownloadStringAsync(new Uri(TLSITEURL), new verstate(Util.PROGRAM,TLSITEURL, current));
             }
             if (checkbrokerserver)
             {
@@ -89,12 +90,6 @@ namespace TradeLink.AppKit
             return ver;
         }
 
-        public static void ExistsNewVersionsAsync(TLClient_WM tl)
-        {
-            int tlv = Util.BuildFromFile(Util.TLProgramDir + @"\VERSION.txt");
-            
-        }
-
         static void wc_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
         {
             // if we don't have arguments, quit
@@ -123,7 +118,6 @@ namespace TradeLink.AppKit
 
         public const string TLSITEURL = "http://code.google.com/p/tradelink/";
         public const string BROKERSERVER = "BrokerServer";
-        public const string TRADELINKSUITE = "TradeLinkSuite";
         /// <summary>
         /// Gets latest version number of an application's exe file, when version is embedded in file name like 'MyAppName-123.exe', and can be found at URL.
         /// </summary>
@@ -162,8 +156,10 @@ namespace TradeLink.AppKit
         /// <returns></returns>
         public static bool ExistsNewTLS()
         {
-            int latest = LatestVersion(TRADELINKSUITE);
-            int build = Util.BuildFromFile(Util.TLProgramDir+@"\VERSION.txt");
+            int latest = LatestVersion(Util.PROGRAM);
+            int build = Util.BuildFromRegistry(Util.PROGRAM);
+            if (build == 0)
+                build = Util.BuildFromFile(Util.TLProgramDir + @"\VERSION.txt");
             return latest > build;
         }
         /// <summary>
@@ -177,7 +173,7 @@ namespace TradeLink.AppKit
             if (tl.LinkType == TLTypes.NONE) return false;
             int latest = 0;
             if (tl.LinkType == TLTypes.HISTORICALBROKER)
-                latest = LatestVersion(TRADELINKSUITE);
+                latest = LatestVersion(Util.PROGRAM);
             else
                 latest = LatestVersion(BROKERSERVER);
             int thisver = tl.ServerVersion;

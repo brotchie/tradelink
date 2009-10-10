@@ -28,7 +28,7 @@ echo Removing last installer...
 del /q TradeLinkSuite*.exe > NUL
 
 echo Building TradeLink executable...
-c:\progra~1\nsis\makensis.exe /v1 TradeLinkSuite.nsi /DVERSION=%REVISION%  > NUL
+c:\progra~1\nsis\makensis.exe /v1 /DPVERSION=%REVISION% TradeLinkSuite.nsi  > NUL
 if ERRORLEVEL 1 (
 echo.
 echo ERROR Building installer...  did you compile the solution?

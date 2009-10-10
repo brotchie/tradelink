@@ -15,9 +15,11 @@ namespace TradeLink.Common
     /// </summary>
     public class Util
     {
-        static string TLSREGPATH = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite";
-        static string TLSREGKEY_PATH = "Path";
-        static string TLSREGKEY_VERSION = "Version";
+        public const string PROGRAM = "TradeLinkSuite";
+        static string REGPATH = @"Software\Microsoft\Windows\CurrentVersion\Uninstall";
+        static string TLSREGPATH = REGPATH+@"\"+PROGRAM;
+        static string KEY_PATH = "Path";
+        static string KEY_VERSION = "Version";
         public static string TLBaseDir 
         { get { return Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)+@"\tradelink\"; } }
         public static string TLProgramDir 
@@ -25,7 +27,7 @@ namespace TradeLink.Common
             get 
             {
                 RegistryKey r = Registry.LocalMachine;
-                return r.OpenSubKey(TLSREGPATH).GetValue(TLSREGKEY_PATH).ToString();
+                return r.OpenSubKey(TLSREGPATH).GetValue(KEY_PATH).ToString();
             } 
         }
         public static string TLTickDir 
@@ -216,6 +218,34 @@ namespace TradeLink.Common
             }
             return build;
         }
+
+        /// <summary>
+        /// get build for installed tradelink
+        /// </summary>
+        /// <returns></returns>
+        public static int TLBuild() { return BuildFromRegistry(PROGRAM); }
+        /// <summary>
+        /// gets build for specific installed program.
+        /// returns 0 if not installed or error.
+        /// </summary>
+        /// <param name="program"></param>
+        /// <returns></returns>
+        public static int BuildFromRegistry(string program)
+        {
+            try
+            {
+                RegistryKey r = Registry.LocalMachine;
+                string ver = r.OpenSubKey(REGPATH + "\\" + program).GetValue(KEY_VERSION).ToString();
+                int build = Convert.ToInt32(ver);
+                return build;
+            }
+            catch (Exception ex)
+            { 
+
+            }
+            return 0;
+            
+        }
         /// <summary>
         /// Gets string representing the version of this suite.
         /// </summary>
@@ -223,7 +253,7 @@ namespace TradeLink.Common
         public static string TLVersion()
         {
             const string major = "0.1.";
-            string build = BuildFromFile(TLProgramDir + @"\VERSION.txt").ToString();
+            string build = TLBuild().ToString();
             return major + build;
         }
         /// <summary>
