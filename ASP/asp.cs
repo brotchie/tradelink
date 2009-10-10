@@ -19,6 +19,7 @@ namespace ASP
     {
         public const string PROGRAM = "ASP";
         const string SKINEXT = ".skn";
+        public string SKINPATH = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)+"\\";
 
         // working variables
         TLClient_WM tl = new TLClient_WM(false);
@@ -141,12 +142,12 @@ namespace ASP
             // get name
             string name = Interaction.InputBox("What is the skin name for these responses?", "Skin name", "Skin" + DateTime.Now.Ticks.ToString(), 0, 0);
             // get next available index for this name
-            int startidx = nextskinidx(Environment.CurrentDirectory,name);
+            int startidx = nextskinidx(SKINPATH,name);
             // go through all selected responses
             foreach (int idx in _resnames.SelectedIndices)
             {
                 // save them as skin
-                SkinImpl.SkinFile(_reslist[idx], _reslist[idx].FullName, _class2dll[_reslist[idx].FullName], name + "." + startidx.ToString() + SKINEXT);
+                SkinImpl.SkinFile(_reslist[idx], _reslist[idx].FullName, _class2dll[_reslist[idx].FullName], SKINPATH+name + "." + startidx.ToString() + SKINEXT);
                 // add index as part of skin
                 string sn = string.Empty;
                 if (_resskinidx.TryGetValue(idx, out sn))
@@ -171,7 +172,7 @@ namespace ASP
             _skins.Items.Clear();
 
             // go through every skin file
-            foreach (string fn in skinfiles(Environment.CurrentDirectory))
+            foreach (string fn in skinfiles(SKINPATH))
             {
                 // get skin name
                 string sk = skinfromfile(fn);
@@ -187,7 +188,7 @@ namespace ASP
         {
             List<string> files = new List<string>();
             // get info for this directory
-            DirectoryInfo di = new DirectoryInfo(Environment.CurrentDirectory);
+            DirectoryInfo di = new DirectoryInfo(path);
             // find all skins in this directory
             FileInfo[] skins = di.GetFiles("*" + SKINEXT);
             // build list of their names
@@ -245,7 +246,7 @@ namespace ASP
         bool tradeskins(string name)
         {
             // get skin files available
-            string[] files = skinfiles(Environment.CurrentDirectory);
+            string[] files = skinfiles(SKINPATH);
             // set status variable
             bool worked = true;
             try
@@ -259,7 +260,7 @@ namespace ASP
                         // get it's ID
                         int id = _reslist.Count;
                         // get it along with it's persisted settings
-                        Response r = (Response)SkinImpl.DeskinFile(fn);
+                        Response r = (Response)SkinImpl.DeskinFile(SKINPATH+fn);
                         // set the id
                         r.ID = id;
                         // bind events
@@ -859,14 +860,14 @@ namespace ASP
         void remskin(string name, bool filesonly)
         {
             // get number of repsonses in skin
-            int count = nextskinidx(Environment.CurrentDirectory, name);
+            int count = nextskinidx(SKINPATH, name);
             // remove file names
             for (int i = 0; i < count; i++)
             {
                 try
                 {
                     // remove skin file
-                    File.Delete(Environment.CurrentDirectory + "\\" + name + "." + i.ToString() + SKINEXT);
+                    File.Delete(SKINPATH+ name + "." + i.ToString() + SKINEXT);
                 }
                 catch (Exception) { continue; }
             }
@@ -911,7 +912,7 @@ namespace ASP
                     // remove skin first
                     remskin(name);
                     // then re-add it
-                    worked &= SkinImpl.SkinFile(r, r.FullName, _class2dll[r.FullName], name + "." + nextskinidx(Environment.CurrentDirectory, name).ToString() + SKINEXT);
+                    worked &= SkinImpl.SkinFile(r, r.FullName, _class2dll[r.FullName], SKINPATH+name + "." + nextskinidx(SKINPATH, name).ToString() + SKINEXT);
                 }
             }
             status("saved loaded skins");
