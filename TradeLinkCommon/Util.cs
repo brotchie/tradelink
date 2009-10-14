@@ -247,8 +247,12 @@ namespace TradeLink.Common
                 return build;
             }
             catch (Exception ex)
-            { 
-
+            {
+                try
+                {
+                    return BuildFromFile(Environment.CurrentDirectory + "\\VERSION.txt");
+                }
+                catch { }
             }
             return 0;
             
