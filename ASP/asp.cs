@@ -555,7 +555,13 @@ namespace ASP
             catch (Exception ex)
             {
                 status("response failed.  see messages.");
-                debug(ex.Message + ex.StackTrace);
+                debug("exception: "+ex.Message);
+                debug("stack: " + ex.StackTrace);
+                if (ex.InnerException != null)
+                {
+                    debug("inner: " + ex.InnerException.Message);
+                    debug("inner stack: " + ex.InnerException.StackTrace);
+                }
                 // unselect response
                 _availresponses.SelectedIndex = -1;
                 return;
@@ -637,6 +643,7 @@ namespace ASP
         void editsyms(object sender, EventArgs e)
         {
             int idx = _resnames.SelectedIndex;
+            if (idx == -1) return;
             string rname = _reslist[getrindx(idx)].FullName;
             string syms = Interaction.InputBox("Enter symbols seperated by commas", rname + " Symbols", getsyms(idx,false), 0, 0);
             newsyms(syms.Split(','), getrindx(idx));
