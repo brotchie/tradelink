@@ -30,7 +30,9 @@ public :
 	GTWrap* gtw;
 	bool LoadConfig();
 	bool Autologin();
+	bool IdIsUnique(uint id);
 	int _depth;
+	std::vector<uint> orderids;
 private:
 
 	void SendPosition(int client, GTOpenPosition& p);
@@ -38,9 +40,9 @@ private:
 	bool subscribed(CString sym);
 	std::vector<StkWrap*> m_stk;
 		std::vector<CString> m_accts;
-		std::vector<GTOrder> m_order;
 		CString un;
 		CString pw;
+	std::vector<GTOrder> m_order;
 		// genesis overrides
 
 

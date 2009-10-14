@@ -138,7 +138,7 @@ int StkWrap::OnGotQuotePrint(GTPrint *pRcd)
 
 int StkWrap::OnExecMsgSending(const GTSending &pRcd)
 {
-
+	int id = pRcd.dwUserData;
 	return GTStock::OnExecMsgSending(pRcd);
 }
 
@@ -199,7 +199,7 @@ int StkWrap::OnExecMsgPending(const GTPending &pRcd)
 	o.id = (uint)pRcd.dwTicketNo;
 	o.account = CString(pRcd.szAccountID);
 	o.exchange = CAST_MMID_TEXT(pRcd.place);
-
+	
 	tl->SrvGotOrder(o);
 
 	return GTStock::OnExecMsgPending(pRcd);

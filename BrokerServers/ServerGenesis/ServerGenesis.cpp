@@ -275,6 +275,7 @@ std::vector<int> ServerGenesis::GetFeatures()
 
 int ServerGenesis::SendOrder(TradeLibFast::TLOrder o)
 {
+	// ensure logged in
 	BOOL valid = gtw->IsLoggedIn();
 	if(valid == FALSE)
 	{
@@ -282,6 +283,7 @@ int ServerGenesis::SendOrder(TradeLibFast::TLOrder o)
 		return BROKERSERVER_NOT_FOUND;
 	}
 
+	// make sure symbol is loaded
 	GTStock *pStock;
 	pStock = gtw->GetStock(o.symbol);
 	if(pStock == NULL)
@@ -296,26 +298,49 @@ int ServerGenesis::SendOrder(TradeLibFast::TLOrder o)
 			return SYMBOL_NOT_LOADED;
 		}
 	}
+	// ensure id is unique
+	if (o.id==0) // if id is zero, we auto-assign the id
+	{
+		vector<int> now;
+		int id = GetTickCount();
+		while (!IdIsUnique(id))
+		{
+			if (id<2) id = 4000000000;
+			id--;
+		}
+		o.id = id;
+	}
 
 	int err = OK;
 
+	// place order
 	GTOrder go;
 	go = pStock->m_defOrder;
+	go.dwUserData = o.id;
 	if(pStock->PlaceOrder(go, (o.side ? 'B' : 'S'), o.size, o.price, getexchange(o.exchange), getTIF(o.TIF))==0)
 	{
 		go.chPriceIndicator = getPI(o);
 		go.dblStopLimitPrice = o.stop;
-		go.dwUserData = o.id;
-		go.nIOIid = o.id;
 		go.place = getplace(o.exchange);
 		err = pStock->PlaceOrder(go);
 	}
 	
 	// save order so it can be canceled later
 	if (err==OK)
+	{
 		m_order.push_back(go);
+		orderids.push_back(o.id);
+	}
 
 	return err;
+}
+
+bool ServerGenesis::IdIsUnique(uint id)
+{
+	for (uint i = 0; i<orderids.size(); i++)
+		if (orderids[i]==id) 
+			return false;
+	return true;
 }
 
 int ServerGenesis::CancelRequest(long id)
