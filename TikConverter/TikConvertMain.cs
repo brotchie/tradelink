@@ -14,6 +14,7 @@ namespace TikConverter
 {
     public partial class TikConvertMain : Form
     {
+        public const string PROGRAM = "TikConverter";
         BackgroundWorker bw = new BackgroundWorker();
         public TikConvertMain()
         {

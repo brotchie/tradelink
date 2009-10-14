@@ -15,6 +15,7 @@ namespace Tattle
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             try
             {
                 Application.Run(new TattleMain());
@@ -23,6 +24,12 @@ namespace Tattle
             {
                 TradeLink.AppKit.CrashReport.Report(TattleMain.PROGRAM, e);
             }
+        }
+
+        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            TradeLink.AppKit.CrashReport.Report(TattleMain.PROGRAM, (Exception)e.ExceptionObject); 
+
         }
 
         static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)

@@ -15,7 +15,7 @@ namespace Tattle
     public partial class TattleMain : Form
     {
         DataTable dt = new DataTable("results");
-        DataGrid dg = new DataGrid();
+        DataGridView dg = new DataGridView();
 
         FileSystemWatcher fw;
         const string FID = "Trades.csv";
@@ -30,18 +30,28 @@ namespace Tattle
             dg.DataSource = dt;
             dg.Parent = splitContainer1.Panel2;
             dg.Dock = DockStyle.Fill;
+            dg.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            
             dg.ReadOnly = true;
             dg.BackColor = Color.White;
-            dg.HeaderBackColor = dg.BackColor;
-            dg.HeaderForeColor = dg.ForeColor;
+            dg.AutoGenerateColumns = true;
+            dg.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dg.ColumnHeadersDefaultCellStyle.BackColor = dg.BackColor;
+            dg.ColumnHeadersDefaultCellStyle.ForeColor = dg.ForeColor;
             dg.BackgroundColor = Color.White;
-            dg.CaptionVisible = false;
             dg.Font = new Font(FontFamily.GenericSansSerif, 10);
             WatchPath();
             BackColor = Color.White;
             splitContainer1.Panel2.BackColor = Color.White;
             tradefiles.SelectedIndexChanged += new EventHandler(tradefiles_SelectedIndexChanged);
             Text = "Tattle " + Util.TLVersion();
+            refreshgrid();
+            MouseEnter += new EventHandler(TattleMain_MouseEnter);
+        }
+
+        void TattleMain_MouseEnter(object sender, EventArgs e)
+        {
+            dg.AutoResizeColumnHeadersHeight();
         }
 
         void WatchPath() { WatchPath(Environment.GetFolderPath(Environment.SpecialFolder.Personal)); }
@@ -155,8 +165,8 @@ namespace Tattle
                 while (!sr.EndOfStream)
                 {
                     TradeResult tr = TradeResult.Init(sr.ReadLine());
-                    if (!r.SymbolsTraded.Contains(tr.Source.symbol))
-                        r.SymbolsTraded += tr.Source.symbol + ",";
+                    if (!r.Symbols.Contains(tr.Source.symbol))
+                        r.Symbols += tr.Source.symbol + ",";
                     r.Trades++;
                     r.HundredLots += (int)(tr.Source.xsize / 100);
                     r.GrossPL += tr.ClosedPL;
@@ -179,6 +189,7 @@ namespace Tattle
 
         void DisplayResults(Results r)
         {
+            dt.BeginLoadData();
             dt.Clear();
             Type t = r.GetType();
             FieldInfo[] fis = t.GetFields();
@@ -195,14 +206,23 @@ namespace Tattle
                 if (pi.GetType() == typeof(Decimal)) format = "N2";
                 dt.Rows.Add(pi.Name, (format!=null) ? string.Format(format, pi.GetValue(r,null)) : pi.GetValue(r,null).ToString());
             }
+            dt.EndLoadData();
+            refreshgrid();
+        }
+
+        void refreshgrid()
+        {
+            dg.Invalidate();
         }
    }
 
+
+
     public class Results
     {
-        public string SymbolsTraded = "";
+        public string Symbols = "";
         public decimal GrossPL = 0;
-        public decimal NetPL { get { return GrossPL - Commissions; } }
+        public string NetPL { get { return v2s(GrossPL - (HundredLots * 100 * ComPerShare)); } }
         public int Winners = 0;
         public int Losers = 0;
         public int Flats = 0;
@@ -212,10 +232,11 @@ namespace Tattle
         public decimal MaxOpenLoss=0;
         public int HundredLots=0;
         public int Trades=0;
-        public decimal CommissionPerShare = 0.01m;
-        public decimal Commissions { get { return HundredLots * 100 * CommissionPerShare; } }
-        public decimal WLRatio { get { return (Losers==0) ? 0 : Winners/Losers; }}
-        public decimal GrossMargin { get { return (GrossPL==0) ? 0 : NetPL / GrossPL; } }
+        public decimal ComPerShare = 0.01m;
+        public string Commissions { get { return v2s(HundredLots * 100 * ComPerShare); } }
+        string v2s(decimal v) { return v.ToString("N2"); }
+        public string WLRatio { get { return v2s((Losers==0) ? 0 : (Winners/Losers)); }}
+        public string GrossMargin { get { return v2s((GrossPL == 0) ? 0 : ((GrossPL - (HundredLots * 100 * ComPerShare)) / GrossPL)); } }
     }
 
     public class TradeResult : TradeImpl

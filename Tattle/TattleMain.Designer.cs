@@ -39,35 +39,39 @@ namespace Tattle
             // 
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer1.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.splitContainer1.Name = "splitContainer1";
+            this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
             // splitContainer1.Panel1
             // 
             this.splitContainer1.Panel1.Controls.Add(this.tradefiles);
             this.splitContainer1.Panel1MinSize = 50;
             this.splitContainer1.Panel2MinSize = 50;
-            this.splitContainer1.Size = new System.Drawing.Size(581, 308);
-            this.splitContainer1.SplitterDistance = 310;
+            this.splitContainer1.Size = new System.Drawing.Size(413, 385);
+            this.splitContainer1.SplitterDistance = 171;
             this.splitContainer1.TabIndex = 0;
             // 
             // tradefiles
             // 
             this.tradefiles.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tradefiles.FormattingEnabled = true;
-            this.tradefiles.ItemHeight = 16;
+            this.tradefiles.ItemHeight = 20;
             this.tradefiles.Location = new System.Drawing.Point(0, 0);
+            this.tradefiles.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.tradefiles.Name = "tradefiles";
-            this.tradefiles.Size = new System.Drawing.Size(310, 308);
+            this.tradefiles.Size = new System.Drawing.Size(413, 164);
             this.tradefiles.TabIndex = 0;
             // 
-            // MainForm
+            // TattleMain
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(581, 308);
+            this.ClientSize = new System.Drawing.Size(413, 385);
             this.Controls.Add(this.splitContainer1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Name = "MainForm";
+            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.Name = "TattleMain";
             this.Text = "Tattle";
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.ResumeLayout(false);

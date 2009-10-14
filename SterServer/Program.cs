@@ -15,6 +15,7 @@ namespace SterServer
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
             Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
             try
             {
@@ -24,6 +25,11 @@ namespace SterServer
             { 
                 TradeLink.AppKit.CrashReport.Report(SterMain.PROGRAM, e); 
             }
+        }
+
+        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            TradeLink.AppKit.CrashReport.Report(SterMain.PROGRAM, (Exception)e.ExceptionObject); 
         }
 
         static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
