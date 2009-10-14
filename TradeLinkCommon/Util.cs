@@ -26,8 +26,15 @@ namespace TradeLink.Common
         { 
             get 
             {
-                RegistryKey r = Registry.LocalMachine;
-                return r.OpenSubKey(TLSREGPATH).GetValue(KEY_PATH).ToString();
+                try
+                {
+                    RegistryKey r = Registry.LocalMachine;
+                    return r.OpenSubKey(TLSREGPATH).GetValue(KEY_PATH).ToString();
+                }
+                catch 
+                {
+                    return TLBaseDir + PROGRAM + "\\";
+                }
             } 
         }
         public static string TLTickDir 
