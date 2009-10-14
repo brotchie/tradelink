@@ -122,7 +122,7 @@ namespace TradeLink.Common
         public override string ToString()
         {
             if (this.isFilled) return base.ToString();
-            return (side ? " BUY" : " SELL") + UnSignedSize + " " + this.symbol + "@" + (isMarket ? "Market" : (isLimit ? this.price.ToString("N2") : this.stopp.ToString("N2"))) + "["+this.Account+"]" +this.date + ":" + this.time ;
+            return (side ? " BUY" : " SELL") + UnSignedSize + " " + this.symbol + "@" + (isMarket ? "Mkt" : (isLimit ? this.price.ToString("N2") : this.stopp.ToString("N2")+"stp")) + " ["+this.Account+"] " +id.ToString() ;
         }
 
         /// <summary>
