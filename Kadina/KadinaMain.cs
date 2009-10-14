@@ -205,7 +205,17 @@ namespace Kadina
             if (it != null) { it.Clear(); it.Columns.Clear(); }
             h.Reset();
             loadboxname(resname);
-            if (myres!=null) myres.Reset();
+            if (myres != null)
+            {
+                try
+                {
+                    myres.Reset();
+                }
+                catch (Exception ex)
+                {
+                    debug(ex.Message + ex.StackTrace);
+                }
+            }
             status("Reset box " + myres.Name + " "+PrettyEPF());
         }
 

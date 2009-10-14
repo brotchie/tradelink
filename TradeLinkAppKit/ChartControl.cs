@@ -73,7 +73,8 @@ namespace TradeLink.AppKit
         /// </summary>
         public void Reset()
         {
-            bl.Reset();
+            if (bl!=null)
+                bl.Reset();
             highesth = 0;
             lowestl = BIGVAL;
             barc = 0;
