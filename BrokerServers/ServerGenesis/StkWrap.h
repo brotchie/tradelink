@@ -35,5 +35,7 @@ protected:
 	virtual int OnExecMsgTrade(const GTTrade &trade);
 	virtual int OnExecMsgOpenPosition(const GTOpenPosition &open);
 	virtual int OnExecMsgCancel(const GTCancel & cancel);
+	virtual int OnSendingOrder(const GTSending &gtsending);
+
 };
 

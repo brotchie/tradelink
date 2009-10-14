@@ -33,6 +33,10 @@ public :
 	bool IdIsUnique(uint id);
 	int _depth;
 	std::vector<uint> orderids;
+	std::vector<long> orderseq;
+	std::vector<long> orderticket;
+	int GetIDIndex(long id, int type);
+
 private:
 
 	void SendPosition(int client, GTOpenPosition& p);
@@ -42,7 +46,6 @@ private:
 		std::vector<CString> m_accts;
 		CString un;
 		CString pw;
-	std::vector<GTOrder> m_order;
 		// genesis overrides
 
 
@@ -52,4 +55,12 @@ protected:
 		// NOTE - the ClassWizard will add and remove member functions here.
 	//}}AFX_MSG
 	//DECLARE_MESSAGE_MAP()
+};
+
+enum ORDERIDTYPE
+{
+	NO_ID = -1,
+	ID,
+	SEQ,
+	TICKET,
 };

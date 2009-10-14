@@ -138,8 +138,18 @@ int StkWrap::OnGotQuotePrint(GTPrint *pRcd)
 
 int StkWrap::OnExecMsgSending(const GTSending &pRcd)
 {
-	int id = pRcd.dwUserData;
 	return GTStock::OnExecMsgSending(pRcd);
+}
+
+int StkWrap::OnSendingOrder(const GTSending &pRcd)
+{
+	// ensure we have the order id
+	long id = pRcd.dwUserData;
+	int index = tl->GetIDIndex(id,ID);
+	if (index==NO_ID) return GTStock::OnSendingOrder(pRcd);
+	// save the sequence for the id
+	tl->orderseq[index] =  pRcd.dwTraderSeqNo;
+	return GTStock::OnSendingOrder(pRcd);
 }
 
 CString tifstring(int TIF)
@@ -187,6 +197,13 @@ int StkWrap::OnBestBidPriceChanged()
 
 int StkWrap::OnExecMsgPending(const GTPending &pRcd)
 {
+	// ensure we have the sequence
+	long seq = pRcd.dwTraderSeqNo;
+	int index = tl->GetIDIndex(seq,SEQ);
+	if (index==NO_ID) return GTStock::OnExecMsgPending(pRcd);
+	// save the ticket
+	tl->orderticket[index] = pRcd.dwTicketNo;
+	// build the order
 	TLOrder o;
 	o.symbol = CString(pRcd.szStock);
 	o.side = pRcd.chPendSide == 'B';
@@ -196,10 +213,10 @@ int StkWrap::OnExecMsgPending(const GTPending &pRcd)
 	o.date = pRcd.nEntryDate;
 	o.price = pRcd.dblEntryPrice;
 	o.stop = pRcd.dblPendStopLimitPrice;
-	o.id = (uint)pRcd.dwTicketNo;
+	o.id = tl->orderids[index];
 	o.account = CString(pRcd.szAccountID);
 	o.exchange = CAST_MMID_TEXT(pRcd.place);
-	
+	// send it
 	tl->SrvGotOrder(o);
 
 	return GTStock::OnExecMsgPending(pRcd);
@@ -207,16 +224,22 @@ int StkWrap::OnExecMsgPending(const GTPending &pRcd)
 
 int StkWrap::OnExecMsgTrade(const GTTrade &pRcd)
 {
+	// make sure we have the order for this trade
+	long ticket = pRcd.dwTicketNo;
+	int index = tl->GetIDIndex(ticket,TICKET);
+	// if we don't, we're done
+	if (index==NO_ID) return GTStock::OnExecMsgTrade(pRcd);
+	// build trade object
 	TLTrade t;
 	t.symbol = CString(pRcd.szStock);
 	t.account = CString(pRcd.szAccountID);
-	t.id = (uint)pRcd.dwTicketNo;
+	t.id = tl->orderids[index];
 	t.xdate = pRcd.nExecDate;
 	t.xtime = pRcd.nExecTime;
 	t.xprice = pRcd.dblExecPrice;
 	t.xsize = pRcd.nExecShares;
 	t.exchange = CAST_MMID_TEXT(pRcd.execfirm);
-
+	// send it
 	tl->SrvGotFill(t);
 
 	return GTStock::OnExecMsgTrade(pRcd);

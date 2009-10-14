@@ -310,10 +310,16 @@ int ServerGenesis::SendOrder(TradeLibFast::TLOrder o)
 		}
 		o.id = id;
 	}
-
-	int err = OK;
+	// prepare to track order
+	// first... save our id
+	orderids.push_back(o.id);
+	// with same index, store unknown sequence id we get on order ack
+	orderseq.push_back(0);
+	// with same index, store unknown trade id we get on fill
+	orderticket.push_back(0);
 
 	// place order
+	int err = OK;
 	GTOrder go;
 	go = pStock->m_defOrder;
 	go.dwUserData = o.id;
@@ -328,11 +334,31 @@ int ServerGenesis::SendOrder(TradeLibFast::TLOrder o)
 	// save order so it can be canceled later
 	if (err==OK)
 	{
-		m_order.push_back(go);
-		orderids.push_back(o.id);
+
 	}
 
 	return err;
+}
+
+int ServerGenesis::GetIDIndex(long id, int type)
+{
+	switch (type)
+	{
+	case ID :
+		for (uint i = 0; i<orderids.size(); i++)
+			if (orderids[i]==id) return i;
+		break;
+	case SEQ:
+		for (uint i = 0; i<orderseq.size(); i++)
+			if (orderseq[i]==id) return i;
+		break;
+	case TICKET:
+		for (uint i = 0; i<orderseq.size(); i++)
+			if (orderticket[i]==id) return i;
+		break;
+	}
+	// not found
+	return NO_ID;
 }
 
 bool ServerGenesis::IdIsUnique(uint id)
