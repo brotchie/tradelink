@@ -238,6 +238,7 @@ int StkWrap::OnExecMsgTrade(const GTTrade &pRcd)
 	t.xtime = pRcd.nExecTime;
 	t.xprice = pRcd.dblExecPrice;
 	t.xsize = pRcd.nExecShares;
+	t.side = pRcd.chExecSide == 'B';
 	t.exchange = CAST_MMID_TEXT(pRcd.execfirm);
 	// send it
 	tl->SrvGotFill(t);
