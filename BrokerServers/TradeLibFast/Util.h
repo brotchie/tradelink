@@ -10,6 +10,7 @@ void TLTimeNow(vector<int> & nowtime);
 char* cleansvnrev(const char * dirtyrev);
 CString SerializeIntVec(std::vector<int> input);
 CString UniqueWindowName(CString rootname);
+double rndup(double n, int decimaldigits);
 
 enum TLTimeField
 {

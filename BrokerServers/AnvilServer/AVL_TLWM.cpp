@@ -392,6 +392,14 @@ namespace TradeLibFast
 		return B_GetStockHandle(symbol);
 	}
 
+	Money AVL_TLWM::Double2Money(double val)
+	{
+		int vw = (int)val;
+		double vfp = (val-vw)*1000;
+		int vf = (int)rndup(vfp,2);
+		return Money(vw,vf);
+	}
+
 	int AVL_TLWM::SendOrder(TLOrder o) 
 	{
 		const StockBase* Stock = preload(o.symbol);
@@ -412,15 +420,9 @@ namespace TradeLibFast
 		//convert the arguments
 		Order* orderSent;
 		char side = (o.side) ? 'B' : 'S';
-		int pw = (int)o.price;
-		int pf = (int)((double)(o.price-pw)*1000);
-		int sw = (int)o.stop;
-		int sf = (int)((double)(o.stop-sw)*1000);
-		int tw = (int)o.trail;
-		int tf = (int)((double)(o.trail-tw)*1000);
-		const Money pricem = Money(pw,pf);
-		const Money stopm = Money(sw,sf);
-		const Money trailm = Money(tw,tf);
+		const Money pricem = Double2Money(o.price);
+		const Money stopm = Double2Money(o.stop);
+		const Money trailm = Double2Money(o.trail);
 		unsigned int mytif = TIFId(o.TIF);
 
 		if (Stock==NULL)
@@ -705,8 +707,8 @@ namespace TradeLibFast
 				CTime ct = CTime::GetCurrentTime();
 				TLOrder o;
 				o.id = id;
-				o.price = order->isMarketOrder() ? 0: order->GetOrderPrice().toDouble();
-				o.stop = order->GetStopPrice()->toDouble();
+				o.price = order->isMarketOrder() ? 0: GetDouble(order->GetOrderPrice());
+				o.stop = GetDouble(order->GetStopPrice());
 				o.time = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
 				o.date = (ct.GetYear()*10000)+(ct.GetMonth()*100)+ct.GetDay();
 				o.size = order->GetSize();
@@ -892,6 +894,15 @@ namespace TradeLibFast
 		return OK;
 	}
 
+	double AVL_TLWM::GetDouble(const Money* m)
+	{
+		double v = m->GetWhole();
+		int tf = m->GetThousandsFraction();
+		double f = ((double)tf/1000);
+		v += f;
+		return v;
+
+	}
 	double AVL_TLWM::GetDouble(Money  m)
 	{
 		double v = m.GetWhole();

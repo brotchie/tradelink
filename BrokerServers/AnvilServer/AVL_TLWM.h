@@ -25,7 +25,9 @@ namespace TradeLibFast
 		
 
 	protected:
+		double GetDouble(const Money* m);
 		double GetDouble(Money m);
+		Money  Double2Money(double val);
 		static AVL_TLWM* instance;
 		vector <Observer*> subs;
 		vector<CString> subsym;
