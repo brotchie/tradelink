@@ -16,24 +16,7 @@ double unpack(long i) {
 	return dec;
 }
 
-double rndup(double n, int decimaldigits)//round up a float type and show one decimal place
-{
-      double t;
-      t=n-floor(n);
-      if (t>=0.5)    
-      {
-              n*=(10*decimaldigits);//where n is the multi-decimal float
-              ceil(n);
-              n/=(10*decimaldigits);
-              }
-      else 
-      {
-              n*=(10*decimaldigits);//where n is the multi-decimal float
-              floor(n);
-              n/=(10*decimaldigits);
-              }
-      return n;
-} 
+
 
 void TLTimeNow(std::vector<int> & nowtime)
 {

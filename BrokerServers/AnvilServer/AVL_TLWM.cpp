@@ -392,11 +392,22 @@ namespace TradeLibFast
 		return B_GetStockHandle(symbol);
 	}
 
+	inline int rndup(int val)
+	{
+		double t = val/(double)10;
+		int tw = (int)t;
+		double tf = t-tw;
+		if (tf>0.5)
+			tw++;
+		tw *=10;
+		return tw;
+	} 
+
 	Money AVL_TLWM::Double2Money(double val)
 	{
 		int vw = (int)val;
-		double vfp = (val-vw)*1000;
-		int vf = (int)rndup(vfp,2);
+		int vfp = (int)((val-vw)*1000);
+		int vf = rndup(vfp);
 		return Money(vw,vf);
 	}
 
