@@ -217,7 +217,7 @@ void AVLStock::Process(const Message* message, Observable* from, const Message* 
         case M_LEVEL2_QUOTE:
 			if (from==m_prints)
 				TradeNotify();
-			if ((from==m_level2) || (from==m_level1))
+			if ((from==m_level2))
 				QuoteNotify();
 			break;
         case M_LAST_TRADE_SHORT:
