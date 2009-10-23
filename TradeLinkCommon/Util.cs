@@ -284,7 +284,8 @@ namespace TradeLink.Common
             {
                 try
                 {
-                    return BuildFromFile(Environment.CurrentDirectory + "\\VERSION.txt");
+                    string path = ProgramPath(program);
+                    return BuildFromFile(path+"\\VERSION.txt");
                 }
                 catch { }
             }
