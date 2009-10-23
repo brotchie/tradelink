@@ -588,6 +588,16 @@ namespace TradeLink.Common
                 s += Convert.ToChar(Convert.ToUInt32(data.Substring(i, 2), 16)).ToString();
             return s;
         }
+
+        public static string DumpObjectProperties(Object o)
+        {
+            System.Type t = o.GetType();
+            System.Xml.Serialization.XmlSerializer xs = new System.Xml.Serialization.XmlSerializer(t);
+            System.IO.StringWriter sw = new System.IO.StringWriter();
+            xs.Serialize(sw, o);
+            sw.Close();
+            return sw.ToString();
+        }
         
     }
 
