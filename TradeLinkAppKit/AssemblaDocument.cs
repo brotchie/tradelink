@@ -62,6 +62,17 @@ namespace TradeLink.AppKit
 
         }
 
+        static string contenttype(string filename)
+        {
+            string ext = Path.GetExtension(filename);
+            ext = ext.ToLower();
+            if (ext == ".jpg")
+                return @"image/jpeg";
+            else if (ext == ".txt")
+                return @"text/plain";
+            return null;
+        }
+
         public static bool Delete(string space, string user, string password, string documentid)
         {
             string url = GetDocumentsUrl(space) + documentid;

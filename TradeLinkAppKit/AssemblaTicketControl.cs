@@ -19,15 +19,33 @@ namespace TradeLink.AppKit
         }
 
         public void Update(string SPACE, string summary, string description) { Update(SPACE, summary, description, string.Empty, string.Empty); }
-        public void Update(string SPACE, string summary, string description, string user, string pass)
+        public void Update(string SPACE, string summary, string description, string user, string pass) { Update(SPACE, summary, null, description, user, pass); }
+        public void Update(string SPACE, string summary,  string data, string description, string user, string pass)
         {
             _summ.Text = summary;
             _space.Text = SPACE;
             _desc.Text = description;
             _user.Text = user;
             _pass.Text = pass;
+            if (data != null)
+            {
+                try
+                {
+                    System.IO.StreamWriter sw = new System.IO.StreamWriter(path+ DATAFILE, false);
+                    sw.WriteLine(data);
+                    sw.Close();
+                    _attachdataasfile = true;
+                }
+                catch 
+                {
+                    _attachdataasfile = false;
+                }
+            }
+
             Invalidate(true);
         }
+
+        string path { get { return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\"; } }
 
         public event VoidDelegate TicketSucceed;
         public event VoidDelegate TicketFailed;
@@ -43,8 +61,11 @@ namespace TradeLink.AppKit
             if (id!=0)
             {
                 if (attach)
-                    if (!AssemblaDocument.Create(_space.Text, _user.Text, _pass.Text, SSFILE,id))
+                    if (!AssemblaDocument.Create(_space.Text, _user.Text, _pass.Text, path+SSFILE,id))
                         status("screenshot failed.");
+                if (_attachdataasfile)
+                    if (!AssemblaDocument.Create(_space.Text, _user.Text, _pass.Text, path + DATAFILE, id))
+                        status("data attach failed.");
                 System.Diagnostics.Process.Start(AssemblaTicket.GetTicketsUrl(_space.Text));
                 if (TicketSucceed != null)
                     TicketSucceed();
@@ -93,9 +114,12 @@ namespace TradeLink.AppKit
         private void _ss_Click(object sender, EventArgs e)
         {
             TradeLink.Common.ScreenCapture sc = new TradeLink.Common.ScreenCapture();
-            sc.CaptureScreenToFile(SSFILE, System.Drawing.Imaging.ImageFormat.Jpeg);
+            sc.CaptureScreenToFile(path+SSFILE, System.Drawing.Imaging.ImageFormat.Jpeg);
             attach = true;
             
         }
+
+        bool _attachdataasfile = false;
+        const string DATAFILE = "Log.txt";
     }
 }

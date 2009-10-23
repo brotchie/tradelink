@@ -28,6 +28,7 @@ namespace LogViewer
             try
             {
                 app = new TradeLink.AppKit.LogViewer(namefilter,succeed,Properties.Settings.Default.au,Properties.Settings.Default.ap);
+                app.Icon = Properties.Resources.LogViewer;
                 Application.Run(app);
             }
             catch (Exception ex)
