@@ -110,6 +110,7 @@
     <Compile Include="MarketOrderFlat.cs" />
     <Compile Include="OffsetInfo.cs" />
     <Compile Include="OffsetTracker.cs" />
+    <Compile Include="OrderTIFTracker.cs" />
     <Compile Include="PositionTracker.cs" />
     <Compile Include="ResponseTemplate.cs" />
     <Compile Include="SkinImpl.cs" />
