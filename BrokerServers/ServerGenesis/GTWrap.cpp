@@ -25,7 +25,12 @@ END_MESSAGE_MAP()
 
 GTStock *GTWrap::OnCreateStock(LPCSTR pszStock)
 {
-	StkWrap* stk = new StkWrap(*this,pszStock);
+	// get id for symbol
+	int symid = _sg->FindSym(CString(pszStock));
+	// make sure it's registered
+	if (symid<0) 
+		return GTSession::OnCreateStock(pszStock);
+	StkWrap* stk = new StkWrap(*this,pszStock,symid);
 	stk->tl = _sg;
 	return stk;
 }

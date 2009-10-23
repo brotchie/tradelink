@@ -27,6 +27,7 @@ namespace TradeLibFast
 		void SrvGotTick(TLTick tick);
 		void SrvGotCancel(int orderid);
 		CString Version();
+		int FindSym(CString sym);
 
 	protected:
 		bool needStock(CString stock);
@@ -43,7 +44,7 @@ namespace TradeLibFast
 		typedef vector<int> clientindex; // points to clients
 		vector<clientindex> symclientidx; // points which clients have a symbol
 		vector<CString> symindex;
-		int FindSym(CString sym);
+
 		bool ClientHasSymbol(int clientid, CString sym);
 		void IndexBaskets();
 		

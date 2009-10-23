@@ -12,8 +12,9 @@ public:
 
 
 public:
-	StkWrap(GTSession &session, LPCSTR pszStock);
+	StkWrap(GTSession &session, LPCSTR pszStock,int symid);
 	virtual ~StkWrap();
+	int _symid;
 
 public:
 	ServerGenesis* tl;

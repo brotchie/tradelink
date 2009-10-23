@@ -6,10 +6,11 @@
 
 using namespace TradeLibFast;
 
-StkWrap::StkWrap(GTSession &session, LPCSTR pszStock)
+StkWrap::StkWrap(GTSession &session, LPCSTR pszStock, int symid)
 	: GTStock(session, pszStock)
 {
 
+	_symid = symid;
 	tl = NULL;
 
 	time_t now;
@@ -87,6 +88,7 @@ int StkWrap::OnGotLevel2Record(GTLevel2 *pRcd)
 
 	TLTick k;
 	k.sym = CString(pRcd->szStock);
+	k.symid = _symid;
 	k.depth = depth;
 	k.time = GT2TL(pRcd->gtime);
 	k.date = date;

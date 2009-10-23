@@ -282,7 +282,20 @@ int ServerGenesis::SendOrder(TradeLibFast::TLOrder o)
 		D("Must login before sending orders.");
 		return BROKERSERVER_NOT_FOUND;
 	}
-
+	// make sure account is default or valid
+	bool accountok = (o.account=="") && (m_accts.size()==0);
+	for (uint i = 0; i<m_accts.size(); i++)
+		accountok |= (m_accts[i]==o.account) ;
+	if (!accountok)
+	{
+		CString m;
+		m.Format("Account %s unavailable.   Are you logged in?",o.account);
+		D(m);
+		return INVALID_ACCOUNT;
+	}
+	// set requested account, otherwise use whatever was discovered
+	if (o.account!="")
+		gtw->SetCurrentAccount(o.account);
 	// make sure symbol is loaded
 	GTStock *pStock;
 	pStock = gtw->GetStock(o.symbol);
@@ -390,6 +403,7 @@ void ServerGenesis::accounttest()
 		CString js = gjoin(m_accts,CString(","));
 		m.Format("User %s [ID: %s] has %i accounts: %s",gtw->m_user.szUserName,gtw->m_user.szUserID,lstAccounts.size(),js);
 		gtw->SetCurrentAccount(m_accts[0]);
+		m.Format("Current account set to: %s",m_accts[0]);
 	}
 	else
 		m.Format("No accounts found.");
