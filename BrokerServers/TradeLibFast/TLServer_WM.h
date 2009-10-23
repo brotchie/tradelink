@@ -44,6 +44,7 @@ namespace TradeLibFast
 		vector<clientindex> symclientidx; // points which clients have a symbol
 		vector<CString> symindex;
 		int FindSym(CString sym);
+		bool ClientHasSymbol(int clientid, CString sym);
 		void IndexBaskets();
 		
 		DECLARE_MESSAGE_MAP()

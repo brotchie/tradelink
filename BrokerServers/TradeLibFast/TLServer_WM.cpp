@@ -94,56 +94,63 @@ namespace TradeLibFast
 
 	void TLServer_WM::IndexBaskets()
 	{
-		// build list of clients with no symbols
-		vector<bool> empty;
+		// this function builds an index of all client subscribed to each symbol
+
+		// go through every client's symbols
 		for (uint c = 0; c<stocks.size(); c++)
 		{
-			empty.push_back(stocks[c].size()==0);
-		}
-		for (uint c = 0; c<stocks.size(); c++)
-		{
+			// get current client
 			clientstocklist hisstocks = stocks[c];
+			// go through every symbol
 			for (uint i = 0; i<hisstocks.size(); i++)
 			{
-				// current symbol
+				// get client's next symbol
 				CString sym = hisstocks[i];
-				// see if we know this symbol
+				// see if a client has subscribed to it already
 				int idx = FindSym(sym);
-				// make sure we have it
+				// if this client is first subscriber, add the symbol
 				if (idx==-1) 
 				{
 					// never seen this symbol so add it
 					symindex.push_back(sym);
 					// keep track of the index
 					idx = (int)symindex.size()-1;
-					// also add client index
+					// create an index to hold all clients watching this symbol
 					clientindex tmp;
+					// add our client to the index
 					tmp.push_back(c);
+					// save the index at the same offset as the symbol index
 					symclientidx.push_back(tmp);
 				}
-				else
+				else // somebody has already subscribed to this symbol before
 				{
-					// get current client index
-					clientindex tmp = symclientidx[idx];
-					// remove all invalid clients, make sure this one is present
-					clientindex newtmp;
-					bool present = false;
-					for (uint z = 0; z<tmp.size(); z++)
+					// now that we have the symbol indexed,
+					// lets go through every client and make sure
+					// 1) client is subscribing to this symbol
+					// 2) if he's subscribed, only subscribed once
+
+					// we'll build a new index to replace current one
+					clientindex newidx;
+					// go through every client
+					for (uint cid = 0; cid<stocks.size(); cid++)
 					{
-						// flag if we already included ourself on this symbol
-						present |= tmp[z]==c;
-						// if not us and the client has symbols, keep him
-						if (!empty[tmp[z]] && !present)
-							newtmp.push_back(tmp[z]);
+						// if client still wants symbol, add him to index
+						if (ClientHasSymbol(cid,sym))
+							newidx.push_back(cid);
 					}
-					// if we didn't find ourselves, add us
-					if (!present)
-						newtmp.push_back(c);
 					// save index for this symbol and continue to next one
-					symclientidx[idx] = newtmp;
+					symclientidx[idx] = newidx;
 				}
 			}
 		}
+	}
+
+	bool TLServer_WM::ClientHasSymbol(int clientid, CString sym)
+	{
+		for (uint i = 0; i<stocks[clientid].size(); i++)
+			if (stocks[clientid][i]==sym)
+				return true;
+		return false;
 	}
 
 	// TLServer_WM message handlers
