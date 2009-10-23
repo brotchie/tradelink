@@ -27,8 +27,9 @@ namespace TradeLink.AppKit
             urlloclab.LinkClicked += new LinkLabelLinkClickedEventHandler(urlloclab_LinkClicked);
         }
 
-        public static void UpgradeAlert(TLClient_WM tl) { UpgradeAlert(null, null, null,true, true, tl); }
-        public static void UpgradeAlert(string Program, string ProgramUrl) {  UpgradeAlert(Program, ProgramUrl, Environment.CurrentDirectory,true,false,null); }
+        public static void UpgradeAlert(TLClient_WM tl) { UpgradeAlert(null, null, true, true, tl); }
+        public static void UpgradeAlert(string Program, string ProgramUrl, TLClient_WM tl) { UpgradeAlert(Program, ProgramUrl, true, true, tl); }
+        public static void UpgradeAlert(string Program, string ProgramUrl) {  UpgradeAlert(Program, ProgramUrl, true,false,null); }
         /// <summary>
         /// checks a url for all EXEs with version numbers.
         /// Finds highest version number and alerts if local version number is different
@@ -38,7 +39,7 @@ namespace TradeLink.AppKit
         /// <param name="path"></param>
         /// <param name="checktradelink"></param>
         /// <param name="checkbrokerserver"></param>
-        public static void UpgradeAlert(string Program, string ProgramUrl, string path, bool checktradelink, bool checkbrokerserver, TLClient_WM tl)
+        public static void UpgradeAlert(string Program, string ProgramUrl, bool checktradelink, bool checkbrokerserver, TLClient_WM tl)
         {
  
             if (Program != null)
@@ -46,8 +47,11 @@ namespace TradeLink.AppKit
                 WebClient wc = new WebClient();
                 wc.DownloadStringCompleted += new DownloadStringCompletedEventHandler(wc_DownloadStringCompleted);
                 int current = Util.BuildFromRegistry(Program);
-                if (current==0)
+                if (current == 0)
+                {
+                    string path = Util.ProgramPath(Program);
                     current = Util.BuildFromFile(path + "\\VERSION.txt");
+                }
                 if (current != 0)
                     wc.DownloadStringAsync(new Uri(ProgramUrl), new verstate(Program, ProgramUrl, current));
             }
@@ -57,15 +61,17 @@ namespace TradeLink.AppKit
                 wc.DownloadStringCompleted += new DownloadStringCompletedEventHandler(wc_DownloadStringCompleted);
 
                 int current = Util.BuildFromRegistry(Util.PROGRAM);
-                wc.DownloadStringAsync(new Uri(TLSITEURL), new verstate(Util.PROGRAM,TLSITEURL, current));
+                if (current!=0)
+                    wc.DownloadStringAsync(new Uri(TLSITEURL), new verstate(Util.PROGRAM,TLSITEURL, current));
             }
             if (checkbrokerserver)
             {
                 WebClient wc = new WebClient();
                 wc.DownloadStringCompleted += new DownloadStringCompletedEventHandler(wc_DownloadStringCompleted);
 
-                int current = ((tl == null) || (tl.LinkType == TLTypes.NONE)) ? 0 : tl.ServerVersion;
-                wc.DownloadStringAsync(new Uri(TLSITEURL), new verstate(BROKERSERVER, TLSITEURL, current));
+                int current = ((tl == null) || (tl.ProvidersAvailable.Length==0)) ? 0 : tl.ServerVersion;
+                if (current!=0)
+                    wc.DownloadStringAsync(new Uri(TLSITEURL), new verstate(BROKERSERVER, TLSITEURL, current));
             }
         }
         public const string VERSIONFILE = @"\VERSION.txt";

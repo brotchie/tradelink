@@ -20,6 +20,40 @@ namespace TradeLink.Common
         static string TLSREGPATH = REGPATH+@"\"+PROGRAM;
         static string KEY_PATH = "Path";
         static string KEY_VERSION = "Version";
+
+        public static string ProgramRegPath(string PROGRAM)
+        {
+            if (PROGRAM == string.Empty) return string.Empty;
+            return REGPATH + @"\" + PROGRAM;
+        }
+
+        public static string ProgramPath(string PROGRAM)
+        {
+            try
+            {
+                // check registry first
+                RegistryKey r = Registry.LocalMachine;
+                string regpath = ProgramRegPath(PROGRAM);
+                return r.OpenSubKey(regpath).GetValue(KEY_PATH).ToString();
+            }
+            catch
+            {
+                // then check program files
+                try
+                {
+                    string fold = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)+@"\"+PROGRAM;
+                    if (Directory.Exists(fold))
+                        return fold + @"\";
+                }
+                catch
+                {
+
+                }
+            }
+            // otherwise assume current directory
+            return Environment.CurrentDirectory;
+        }
+
         public static string TLBaseDir 
         { get { return Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)+@"\tradelink\"; } }
         public static string TLProgramDir 
