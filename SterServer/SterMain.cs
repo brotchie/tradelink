@@ -145,55 +145,62 @@ namespace SterServer
         Dictionary<uint, string> idacct = new Dictionary<uint, string>();
         void tt_Tick(object sender, EventArgs e)
         {
-            // orders
-            while (or < oc)
+            try
             {
-                STIOrder order = new STIOrder();
-                if (or == oq.Length) or = 0;
-                Order o = oq[or++];
-                order.LmtPrice = (double)o.price;
-                order.StpPrice = (double)o.stopp;
-                order.Destination = o.Exchange;
-                order.Side = o.side ? "B" : "S";
-                order.Symbol = o.symbol;
-                order.Quantity = o.UnsignedSize;
-                string acct = accts.Count>0 ? accts[0] : "";
-                order.Account = o.Account != "" ? o.Account : acct;
-                order.Destination = o.Exchange != "" ? o.ex : "NYSE";
-                order.Tif = o.TIF;
-                order.PriceType = o.isMarket ? STIPriceTypes.ptSTIMkt : (o.isLimit ? STIPriceTypes.ptSTILmt : STIPriceTypes.ptSTISvrStp);
-                order.ClOrderID = o.id.ToString();
-                int err = order.SubmitOrder();
-                string tmp = "";
-                if ((err==0) && (!idacct.TryGetValue(o.id, out tmp)))
-                    idacct.Add(o.id,order.Account);
-                if (err < 0)
-                    debug("Error sending order: " + Util.PrettyError(tl.newProviderName, err) + o.ToString());
-                if (err == -1)
-                    debug("Make sure you have set the account in sending program.");
-            }
-
-            // quotes
-            if (qc > qr)
-            {
-                foreach (string sym in symquotes.Split(','))
-                    stiQuote.RegisterQuote(sym, "*");
-                qr = qc;
-            }
-
-            // cancels
-            if (ic > ir)
-            {
-                if (ir == idq.Length) ir = 0;
-                uint number = idq[ir++];
-                string acct = "";
-                if (idacct.TryGetValue(number, out acct))
+                // orders
+                while (or < oc)
                 {
-                    stiOrder.CancelOrder(acct, 0, number.ToString(), DateTime.Now.Ticks.ToString() + acct);
-                    tl.newOrderCancel(number);
+                    STIOrder order = new STIOrder();
+                    if (or == oq.Length) or = 0;
+                    Order o = oq[or++];
+                    order.LmtPrice = (double)o.price;
+                    order.StpPrice = (double)o.stopp;
+                    order.Destination = o.Exchange;
+                    order.Side = o.side ? "B" : "S";
+                    order.Symbol = o.symbol;
+                    order.Quantity = o.UnsignedSize;
+                    string acct = accts.Count > 0 ? accts[0] : "";
+                    order.Account = o.Account != "" ? o.Account : acct;
+                    order.Destination = o.Exchange != "" ? o.ex : "NYSE";
+                    order.Tif = o.TIF;
+                    order.PriceType = o.isMarket ? STIPriceTypes.ptSTIMkt : (o.isLimit ? STIPriceTypes.ptSTILmt : STIPriceTypes.ptSTISvrStp);
+                    order.ClOrderID = o.id.ToString();
+                    int err = order.SubmitOrder();
+                    string tmp = "";
+                    if ((err == 0) && (!idacct.TryGetValue(o.id, out tmp)))
+                        idacct.Add(o.id, order.Account);
+                    if (err < 0)
+                        debug("Error sending order: " + Util.PrettyError(tl.newProviderName, err) + o.ToString());
+                    if (err == -1)
+                        debug("Make sure you have set the account in sending program.");
                 }
-                else
-                    debug("No record of id: " + number.ToString());
+
+                // quotes
+                if (qc > qr)
+                {
+                    foreach (string sym in symquotes.Split(','))
+                        stiQuote.RegisterQuote(sym, "*");
+                    qr = qc;
+                }
+
+                // cancels
+                if (ic > ir)
+                {
+                    if (ir == idq.Length) ir = 0;
+                    uint number = idq[ir++];
+                    string acct = "";
+                    if (idacct.TryGetValue(number, out acct))
+                    {
+                        stiOrder.CancelOrder(acct, 0, number.ToString(), DateTime.Now.Ticks.ToString() + acct);
+                        tl.newOrderCancel(number);
+                    }
+                    else
+                        debug("No record of id: " + number.ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                debug(ex.Message);
             }
 
 
