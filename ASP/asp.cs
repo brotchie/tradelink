@@ -37,7 +37,8 @@ namespace ASP
         AsyncResponse _ar = new AsyncResponse();
         Log _log = new Log(PROGRAM);
         DebugWindow _dw = new DebugWindow();
-
+        const int ENABLED = 1;
+        const int EDITSYM = 3;
 
         public ASP()
         {
@@ -126,12 +127,24 @@ namespace ASP
 
         void ContextMenu_Popup(object sender, EventArgs e)
         {
-            // make sure a response is selected
-            if (_resnames.SelectedIndices.Count == 0) return;
-            const int VALID = 1;
+            // make sure a single response is selected
+            if (_resnames.SelectedIndices.Count != 1)
+            {
+                // disable stuff that only makes sense in context of one symbols
+                _resnames.ContextMenu.MenuItems[ENABLED].Visible = false;
+                _resnames.ContextMenu.MenuItems[EDITSYM].Visible = false;
+                return;
+            }
+            // enable stuff that makes sense in context of one symbol
+            _resnames.ContextMenu.MenuItems[ENABLED].Visible = true;
+            _resnames.ContextMenu.MenuItems[EDITSYM].Visible = true;
             // update check to reflect validity of response
-            foreach (int index in _resnames.SelectedIndices)
-                _resnames.ContextMenu.MenuItems[VALID].Checked = _reslist[index].isValid;
+            foreach (int dindex in _resnames.SelectedIndices)
+            {
+                if ((dindex < 0) || (dindex > _resnames.Items.Count)) continue;
+                int index = _disp2real[dindex];
+                _resnames.ContextMenu.MenuItems[ENABLED].Checked = !isBadResponse(index);
+            }
 
         }
 
@@ -257,27 +270,17 @@ namespace ASP
                     // if it's the skin we want to trade
                     if (skinfromfile(fn) == name)
                     {
-                        // get it's ID
-                        int id = _reslist.Count;
                         // get it along with it's persisted settings
-                        Response r = (Response)SkinImpl.DeskinFile(SKINPATH+fn);
-                        // set the id
-                        r.ID = id;
-                        // bind events
-                        bindresponseevents(r);
-                        // show it to user
-                        _resnames.Items.Add(r.FullName);
-                        // add it to trade list
-                        _reslist.Add(r);
-                        // map name to response
-                        _name2r.Add(_resnames.Items.Count - 1, id);
-                        // mark it as loaded
-                        _resskinidx.Add(_reslist.Count - 1, name);
+                        Response r = (Response)SkinImpl.DeskinFile(SKINPATH + fn);
+                        // add it
+                        int id = addresponse(r);
+                        // check if it was added
+                        bool added = id != -1;
                         // update status
-                        worked &= true;
-                        // reset response
-                        _reslist[id].Reset();
-
+                        worked &= added;
+                        // mark it as loaded
+                        if (added)
+                            _resskinidx.Add(id, name);
                     }
                 }
                 return true;
@@ -286,73 +289,156 @@ namespace ASP
             return false;
         }
 
-        void remresp(object sender, EventArgs e)
+        int addresponse(Response r)
         {
-            // mark empty symbols needed removal
-            List<string> remsym = new List<string>();
-            // mark UI entry for removal
-            List<int> remidx = new List<int>();
-            // process each selected response
-            foreach (int selbox in _resnames.SelectedIndices)
+            int id = -1;
+            try
             {
-                string name = _reslist[selbox].FullName;
-                List<string> syms = new List<string>();
-                string[] tmpsym = new string[_symidx.Keys.Count];
-                _symidx.Keys.CopyTo(tmpsym,0);
-                foreach (string sym in tmpsym)
+                // get it's ID
+                id = _reslist.Count;
+                // set the id
+                r.ID = id;
+                // bind events
+                bindresponseevents(r);
+                // show it to user
+                _resnames.Items.Add(r.FullName);
+                // add it to trade list
+                lock (_reslist)
                 {
-                    // build a new index
-                    List<int> newidx = new List<int>();
-                    // get current subscription count for this sym
-                    int orgsymcount = _symidx[sym].Length;
-                    // go through and add everything but our response
-                    for (int i = 0; i < orgsymcount ; i++)
-                        if (_symidx[sym][i] != selbox)
-                            newidx.Add(_symidx[sym][i]);
-                    // see if we did anything
-                    if (newidx.Count != orgsymcount)
+                    _reslist.Add(r);
+                }
+                // setup place for it's symbols
+                _rsym.Add(id, string.Empty);
+                // map name to response
+                _disp2real.Add(id);
+                // reset response
+                _reslist[id].Reset();
+                // send it current positions
+                foreach (Position p in _pt)
+                    _reslist[id].GotPosition(p);
+                // update everything
+                IndexBaskets();
+                // show we added response
+                status(r.FullName + getsyms(id));
+            }
+            catch (Exception ex)
+            {
+                return -1;
+            }
+            return id;
+        }
+
+        private void Boxes_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // make sure something is selected
+            if (_availresponses.SelectedIndex == -1) return;
+            // get selected response
+            string resname = (string)_availresponses.SelectedItem;
+            // load it into working response
+            Response tmp = new InvalidResponse();
+            try
+            {
+                tmp = ResponseLoader.FromDLL(resname, Properties.Settings.Default.boxdll);
+            }
+            catch (Exception ex)
+            {
+                // log it
+                bigexceptiondump(ex);
+                // unselect response
+                _availresponses.SelectedIndex = -1;
+                return;
+            }
+            // add it
+            int idx = addresponse(tmp);
+            // make sure it worked
+            if (idx==-1)
+            {
+                return;
+            }
+            // save the dll that contains the class for use with skins
+            string dll = string.Empty;
+            // if we don't have this class, add it
+            if (!_class2dll.TryGetValue(resname, out dll))
+                _class2dll.Add(resname, Properties.Settings.Default.boxdll);
+            else // otherwise replace current dll as providing this class
+                _class2dll[resname] = Properties.Settings.Default.boxdll;
+            // unselect response
+            _availresponses.SelectedIndex = -1;
+
+        }
+
+        void bigexceptiondump(Exception ex)
+        {
+            status("response failed.  see messages.");
+            debug("exception: " + ex.Message);
+            debug("stack: " + ex.StackTrace);
+            if (ex.InnerException != null)
+            {
+                debug("inner: " + ex.InnerException.Message);
+                debug("inner stack: " + ex.InnerException.StackTrace);
+            }
+        }
+
+        void IndexBaskets()
+        {
+            // purpose of this function :  update symidx from _rsym 
+            // _rsym roughly equivalent to TLServer::stocks
+            // create new index
+            Dictionary<string, List<int>> newidx = new Dictionary<string, List<int>>(_mb.Count);
+            foreach (int r in _rsym.Keys)
+            {
+                // get all syms response is subscribed to
+                string [] syms = _rsym[r].Split(',');
+                // go through every sym
+                foreach (string sym in syms)
+                {
+                    // keep track of clients for this symbol
+                    List<int> responseclients;
+                    // make sure we have symbol
+                    if (!newidx.TryGetValue(sym, out responseclients))
                     {
-                        // update result
-                        _symidx[sym] = newidx.ToArray();
-                        // mark symbol
-                        syms.Add(sym);
-                        // if no more subscribers, remove symbol
-                        if (newidx.Count==0)
-                            remsym.Add(sym);
+                        responseclients = new List<int>(20);
+                        newidx.Add(sym, responseclients);
                     }
+                    // make sure we have this response subscribing to this symbol
+                    if (!responseclients.Contains(r))
+                        responseclients.Add(r);
+                    // save it back
+                    newidx[sym] = responseclients;
                 }
-                // remove the response
-                _reslist[selbox] = new InvalidResponse();
-                // mark it's UI element for removal
-                remidx.Add(selbox);
-                debug("removed: "+name);
             }
-            // remove response from screen
-            for (int i = remidx.Count -1; i>=0; i--)
+
+            // update _mb from contents of symidx
+            updateMB();
+            // update screen to match symidx
+            updateScreenResponses();
+        }
+
+        void updateScreenResponses()
+        {
+            // go through every displayed response
+            for (int disp = 0; disp<_disp2real.Count; disp++)
             {
-                // remove it
-                _resnames.Items.RemoveAt(i);
-                // remove name map
-                _name2r.Remove(i);
-                // prepare new response 2 name map
-                Dictionary<int, int> n2r = new Dictionary<int, int>();
-                foreach (int k in _name2r.Keys)
-                {
-                    // get new idx
-                    int newidx = k>i ? k - 1 : k;
-                    // if valid add back adjusted index
-                    if ((newidx>=0) && (newidx<_resnames.Items.Count))
-                        n2r.Add(k, newidx); 
-                }
-                _name2r = n2r;
+                // get real index
+                int real = _disp2real[disp];
+                // update the displayed name and symlist
+                _resnames.Items[disp] = getrstat(real);
             }
-            
-            // remove any empty symbols
-            foreach (string sym in remsym)
-            {
-                _symidx.Remove(sym);
-                _mb.Remove(sym);
-            }
+            // refresh screen
+            _resnames.Invalidate(true);
+        }
+
+        void updateMB()
+        {
+            List<string> syms = new List<string>(_symidx.Count);
+            foreach (string sym in _symidx.Keys)
+                syms.Add(sym);
+            string old = _mb.ToString();
+            _mb = new BasketImpl(syms.ToArray());
+            bool subscribe = old != _mb.ToString();
+
+            if (!subscribe) return;
+
             try
             {
                 // resubscribe
@@ -362,8 +448,42 @@ namespace ASP
             {
                 debug("symbol subscribe failed as no TL server was found.");
             }
-            // update display
-            _resnames.Invalidate(true);
+        }
+
+        void remresp(object sender, EventArgs e)
+        {
+            // mark UI entry for removal
+            List<int> remdidx = new List<int>();
+            // process each selected response
+            foreach (int dispidx in _resnames.SelectedIndices)
+            {
+                // make sure we're still trading it
+                if ((dispidx<0) || (dispidx>_disp2real.Count))
+                    continue;
+                // get actual index
+                int selbox = _disp2real[dispidx];
+                // get name
+                string name = _reslist[selbox].FullName;
+                // remove the response
+                _reslist[selbox] = new InvalidResponse();
+                // clear it's symbols
+                _rsym[selbox] = string.Empty;
+                // mark it's UI element for removal
+                remdidx.Add(dispidx);
+                // notify user
+                debug("removed #"+dispidx+": "+name+" id:"+selbox);
+            }
+            // remove response from screen
+            for (int i = remdidx.Count -1; i>=0; i--)
+            {
+                // remove it
+                _resnames.Items.RemoveAt(remdidx[i]);
+                // remove name map
+                _disp2real.RemoveAt(remdidx[i]);
+            }
+
+            // update everything
+            IndexBaskets();
         }
 
         int contains(string sym, int response)
@@ -380,8 +500,12 @@ namespace ASP
         void toggleresponse(object sender, EventArgs e)
         {
             // process each selected response
-            foreach (int selbox in _resnames.SelectedIndices)
+            foreach (int dbox in _resnames.SelectedIndices)
             {
+                // make sure it's valid
+                if ((dbox < 0) || (dbox > _resnames.Items.Count)) continue;
+                // get selected box
+                int selbox = _disp2real[dbox];
                 // invert current response's validity
                 bool valid = !_reslist[selbox].isValid;
                 // save it back
@@ -534,92 +658,25 @@ namespace ASP
             tmp.SendChartLabel += new ChartLabelDelegate(tmp_SendChartLabel);
         }
 
+        bool _charterror = false;
         void tmp_SendChartLabel(decimal price, int bar, string label)
         {
-            
+            if (!_charterror)
+            {
+                debug(PROGRAM + " does not support sendchart.");
+                _charterror = true;
+            }
         }
 
 
-        private void Boxes_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            // make sure something is selected
-            if (_availresponses.SelectedIndex == -1) return;
-            // get selected response
-            string resname = (string)_availresponses.SelectedItem;
-            // load it into working response
-            Response tmp = new InvalidResponse();
-            try
-            {
-                tmp = ResponseLoader.FromDLL(resname, Properties.Settings.Default.boxdll);
-            }
-            catch (Exception ex)
-            {
-                status("response failed.  see messages.");
-                debug("exception: "+ex.Message);
-                debug("stack: " + ex.StackTrace);
-                if (ex.InnerException != null)
-                {
-                    debug("inner: " + ex.InnerException.Message);
-                    debug("inner stack: " + ex.InnerException.StackTrace);
-                }
-                // unselect response
-                _availresponses.SelectedIndex = -1;
-                return;
-            }
-            // handle events
-            bindresponseevents(tmp);
-            // save the dll that contains the class for use with skins
-            string dll = string.Empty;
-            // if we don't have this class, add it
-            if (!_class2dll.TryGetValue(resname, out dll))
-                _class2dll.Add(resname, Properties.Settings.Default.boxdll);
-            else // otherwise replace current dll as providing this class
-                _class2dll[resname] = Properties.Settings.Default.boxdll;
 
-            // get index to new response
-            int idx = _reslist.Count;
-            // save the id
-            tmp.ID = idx;
-            // add working response to response list after obtaining a lock
-            lock (_reslist)
-            {
-                // add it
-                _reslist.Add(tmp);
-            }
-            // reset it
-            _reslist[idx].Reset();
-            // send response current positions
-            foreach (Position p in _pt)
-                _reslist[idx].GotPosition(p);
-            // add name to user's screen
-            _resnames.Items.Add(getrstat(idx));
-            // map name to response
-            _name2r.Add(_resnames.Items.Count - 1,idx);
-            // update their screen
-            _resnames.Invalidate(true);
-
-            // show we added response
-            status(tmp.FullName +  getsyms(idx));
-
-            // unselect response
-            _availresponses.SelectedIndex = -1;
-
-        }
-
-        Dictionary<int, int> _name2r = new Dictionary<int, int>();
-
-        int getrdidx(int idx)
-        {
-            foreach (int k in _name2r.Keys)
-                if (_name2r[k] == idx)
-                    return k;
-            return -1;
-        }
+        List<int> _disp2real = new List<int>();
+        
 
         int getrindx(int nameidx)
         {
-            if (_name2r.ContainsKey(nameidx))
-                return _name2r[nameidx];
+            if ((nameidx<_disp2real.Count) && (nameidx>=0))
+                return _disp2real[nameidx];
             return -1;
         }
 
@@ -657,63 +714,27 @@ namespace ASP
                 return;
             }
             // ignore from invalid responses
-            if ((_reslist[idx] == null) || !_reslist[idx].isValid) return;
-            // ignore from invalid responses
-            if (_reslist[idx].FullName == new InvalidResponse().FullName) return;
-            // prepare a list of valid symbols
-            List<string> valid = new List<string>();
-            // see whether we need to resubscribe
-            bool resubscribe = false;
-            // process every provided symbol
-            foreach (string symt in syms)
+            if (isBadResponse(idx))
             {
-                // make it uppercase
-                string sym = symt.ToUpper();
-                // parse out security information
-                SecurityImpl sec = SecurityImpl.Parse(sym);
-                // if it's an invalid security, ignore it
-                if (!sec.isValid)
-                {
-                    status("Security invalid: " + sec.ToString());
-                    continue;
-                }
-                // register security with ASP
-                resubscribe |= regsec(sec, idx);
-                // save simple symbol as valid
-                valid.Add(sec.Symbol);
-                // if we don't have this security
-                if (!_seclist.ContainsKey(sec.Symbol))
-                {
-                    // lock so other threads don't modify seclist at same time
-                    lock (_seclist)
-                    {
-                        // add security to our list
-                        _seclist.Add(sec.Symbol, sec);
-                    }
-                }
-
+                debug("ignoring basket request from response: " + idx);
+                return;
             }
             // save symbols
             _rsym[idx] = string.Join(",",syms);
-            // update screen
-            int didx = getrdidx(idx);
-            if (didx!=-1)
-                _resnames.Items[didx] = getrstat(idx);
-            Invalidate(true);
-            // subscribe to whatever symbols were requested
-            try
-            {
-                if (resubscribe)
-                    tl.Subscribe(_mb);
-            }
-            catch (TLServerNotFound) { debug("subscribe failed because no TL server is running."); }
+            // update everything
+            IndexBaskets();
+        }
 
+        bool isBadResponse(int idx)
+        {
+            return ((_reslist[idx] == null) || !_reslist[idx].isValid ||
+                (_reslist[idx].FullName == new InvalidResponse().FullName) || !_disp2real.Contains(idx));
         }
 
         void _workingres_SendBasket(Basket b, int id)
         {
             // ignore if response has been deleted
-            if (_reslist[id].FullName==new InvalidResponse().FullName) return;
+            if (isBadResponse(id)) return;
             // otherwise notify and subscribe
             debug("got basket request: " + b.ToString() + " from: " + _reslist[id].FullName);
             newsyms(b.ToString().Split(','), id);
@@ -723,15 +744,22 @@ namespace ASP
 
         void _workingres_SendMessage(MessageTypes type, uint id, string data)
         {
-            // extra message processing
-            switch (type)
+            try
             {
-                case MessageTypes.DOMREQUEST:
-                    data.Replace(Book.EMPTYREQUESTOR, tl.Text);
-                    break;
+                // extra message processing
+                switch (type)
+                {
+                    case MessageTypes.DOMREQUEST:
+                        data.Replace(Book.EMPTYREQUESTOR, tl.Text);
+                        break;
+                }
+                long result = tl.TLSend(type, data);
+                tl_gotUnknownMessage(type, id, result.ToString());
             }
-            long result = tl.TLSend(type, data);
-            tl_gotUnknownMessage(type, id, result.ToString());
+            catch (Exception ex)
+            {
+                bigexceptiondump(ex);   
+            }
         }
 
         void workingres_SendOrder(Order o)
@@ -783,48 +811,6 @@ namespace ASP
             // display to screen
             debug(d.Msg);
         }
-
-        bool regsec(Security sec, int idx)
-        {
-            lock (_symidx)
-            {
-                // get existing syms
-                string syms = string.Empty;
-                if (!_rsym.TryGetValue(idx,out syms))
-                    syms = string.Empty;
-                // process all securities and build  a quick index for a security's name to the response that requests it
-                if (_symidx.ContainsKey(sec.FullName) && !syms.Contains(sec.Symbol)) // we already had one requestor
-                {
-                    // get current length of request list for security
-                    int len = _symidx[sec.FullName].Length;
-                    // mark it as not found
-                    bool found = false;
-                    // see if this guy already requested this symbol
-                    foreach (int tidx in _symidx[sec.FullName])
-                        found |= tidx == idx;
-                    // if he didn't, add him
-                    if (!found)
-                    {
-                        // add one to it for our new requestor
-                        int[] a = new int[len + 1];
-                        // copy existing into A
-                        Array.Copy(_symidx[sec.FullName], a, len);
-                        // add our new requestor's index at the end
-                        a[len] = idx;
-                        // save it back
-                        _symidx[sec.FullName] = a;
-                    }
-                }
-                else if (!_symidx.ContainsKey(sec.FullName))// otherwise it's just this guy so add him and request
-                {
-                    _symidx.Add(sec.FullName, new int[] { idx });
-                    _mb.Add(sec);
-                    return true;
-                }
-            }
-            return false;
-        }
-        
 
         private void status(string msg)
         {
