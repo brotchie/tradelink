@@ -17,7 +17,7 @@ namespace TradeLink.Common
     {
         public const string PROGRAM = "TradeLinkSuite";
         static string REGPATH = @"Software\Microsoft\Windows\CurrentVersion\Uninstall";
-        static string TLSREGPATH = REGPATH+@"\"+PROGRAM;
+        static string REGPATH64 = REGPATH + @"\wow6432Node";
         static string KEY_PATH = "Path";
         static string KEY_VERSION = "Version";
 
@@ -60,15 +60,7 @@ namespace TradeLink.Common
         { 
             get 
             {
-                try
-                {
-                    RegistryKey r = Registry.LocalMachine;
-                    return r.OpenSubKey(TLSREGPATH).GetValue(KEY_PATH).ToString();
-                }
-                catch 
-                {
-                    return TLBaseDir + PROGRAM + "\\";
-                }
+                return ProgramPath(PROGRAM);
             } 
         }
         public static string TLTickDir 
@@ -276,7 +268,9 @@ namespace TradeLink.Common
             try
             {
                 RegistryKey r = Registry.LocalMachine;
-                string ver = r.OpenSubKey(REGPATH + "\\" + program).GetValue(KEY_VERSION).ToString();
+                bool sixfourbit = IntPtr.Size * 8 == 64;
+                string path = (sixfourbit ? REGPATH64 : REGPATH) + @"\" + program;
+                string ver = r.OpenSubKey(path).GetValue(KEY_VERSION).ToString();
                 int build = Convert.ToInt32(ver);
                 return build;
             }
