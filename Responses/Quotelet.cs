@@ -79,7 +79,7 @@ namespace Responses
             else
             {
                 // ignore update if doesn't match symbol we're watching
-                if (p.Symbol != _sym.Text) return;
+                if ((p.Symbol != _sym.Text) || !p.isValid) return;
                 // otherwise update our value
                 _pos.Text = p.Size.ToString();
                 // refresh this box's screen area
@@ -135,6 +135,8 @@ namespace Responses
 
         void q_NewSymbol(string symbol)
         {
+            // make sure symbol is valid
+            if (symbol.Length == 0) return;
             // request a basket with a single symbol specified by user
             sendbasket(new string[] { symbol });
             // provide any position information to user

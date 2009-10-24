@@ -407,6 +407,10 @@ namespace ASP
                     newidx[sym] = responseclients;
                 }
             }
+            // save it
+            _symidx.Clear();
+            foreach (string sym in newidx.Keys)
+                _symidx.Add(sym, newidx[sym].ToArray());
 
             // update _mb from contents of symidx
             updateMB();
