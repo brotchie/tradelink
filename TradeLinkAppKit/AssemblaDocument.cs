@@ -41,7 +41,7 @@ namespace TradeLink.AppKit
 
                 // Create request and receive response
                 string postURL = url;
-                HttpWebResponse webResponse = WebHelpers.MultipartFormDataPost(postURL, user,password, postParameters);
+                HttpWebResponse webResponse = WebHelpers.MultipartFormDataPost(postURL, user,password, postParameters,contenttype(filename));
                 
 
                 // Process response
@@ -70,7 +70,7 @@ namespace TradeLink.AppKit
                 return @"image/jpeg";
             else if (ext == ".txt")
                 return @"text/plain";
-            return null;
+            return "application/octet-stream";
         }
 
         public static bool Delete(string space, string user, string password, string documentid)
@@ -112,12 +112,12 @@ namespace TradeLink.AppKit
         /// postParameters with a value of type byte[] will be passed in the form as a file, and value of type string will be
         /// passed as a name/value pair.
         /// </summary>
-        public static HttpWebResponse MultipartFormDataPost(string postUrl, string user, string pw, Dictionary<string, object> postParameters)
+        public static HttpWebResponse MultipartFormDataPost(string postUrl, string user, string pw, Dictionary<string, object> postParameters, string contenttype)
         {
             string formDataBoundary = "-----------------------------28947758029299";
             string contentType = "multipart/form-data; boundary=" + formDataBoundary;
 
-            byte[] formData = WebHelpers.GetMultipartFormData(postParameters, formDataBoundary);
+            byte[] formData = WebHelpers.GetMultipartFormData(postParameters, formDataBoundary,contenttype);
 
             return WebHelpers.PostForm(postUrl,  user,pw,contentType, formData);
         }
@@ -162,7 +162,7 @@ namespace TradeLink.AppKit
         /// Turn the key and value pairs into a multipart form.
         /// See http://www.ietf.org/rfc/rfc2388.txt for issues about file uploads
         /// </summary>
-        private static byte[] GetMultipartFormData(Dictionary<string, object> postParameters, string boundary)
+        private static byte[] GetMultipartFormData(Dictionary<string, object> postParameters, string boundary, string contenttype)
         {
             Stream formDataStream = new System.IO.MemoryStream();
 
@@ -173,7 +173,7 @@ namespace TradeLink.AppKit
                     byte[] fileData = param.Value as byte[];
 
                     // Add just the first part of this param, since we will write the file data directly to the Stream
-                    string header = string.Format("--{0}\r\nContent-Disposition: form-data; name=\"{1}\"; filename=\"{2}\";\r\nContent-Type: application/octet-stream\r\n\r\n", boundary, param.Key, param.Key);
+                    string header = string.Format("--{0}\r\nContent-Disposition: form-data; name=\"{1}\"; filename=\"{2}\";\r\nContent-Type: {3}\r\n\r\n", boundary, param.Key, param.Key,contenttype);
                     formDataStream.Write(encoding.GetBytes(header), 0, header.Length);
 
                     // Write the file data directly to the Stream, rather than serializing it to a string.  This 

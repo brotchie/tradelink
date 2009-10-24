@@ -32,7 +32,7 @@ namespace TradeLink.Common
 
         public TLServer_WM() : base()
         {
-            MinorVer = Util.BuildFromRegistry(Util.TLProgramDir + @"\VERSION.txt");
+            MinorVer = Util.BuildFromRegistry(Util.PROGRAM);
             
             this.Text = WMUtil.GetUniqueWindow(WMUtil.SERVERWINDOW);
             this.WindowState = FormWindowState.Minimized;
