@@ -35,8 +35,17 @@ namespace TestTradeLink
             Assert.IsFalse(p.isFlat);
             Assert.IsTrue(p.isLong);
             Assert.IsTrue(p.isValid);
-            PositionImpl p3 = new PositionImpl(s, 0, 100,0);
-            Assert.That(!p3.isValid);
+            bool invalidexcept = false;
+            PositionImpl p3 = null;
+            try
+            {
+                p3 = new PositionImpl(s, 0, 100, 0);
+            }
+            catch
+            {
+                invalidexcept = true;
+            }
+            Assert.That(invalidexcept);
             p3 = new PositionImpl(s, 12, 100,0);
             p.Adjust(p3);
             Assert.AreEqual(11,p.AvgPrice);
