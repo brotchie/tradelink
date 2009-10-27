@@ -39,11 +39,28 @@ namespace ASP
         DebugWindow _dw = new DebugWindow();
         const int ENABLED = 1;
         const int EDITSYM = 3;
+        const int MAXRESPONSEPERASP = 100;
+        const int MAXASPINSTANCE = 3;
+        int _ASPINSTANCE = 0;
+        int _INITIALRESPONSEID = 0;
+        int _NEXTRESPONSEID = 0;
+        List<IdTracker> _idt = new List<IdTracker>(MAXRESPONSEPERASP);
 
         public ASP()
         {
             // read designer options for gui
             InitializeComponent();
+            // count instances of program
+            _ASPINSTANCE = getprocesscount(PROGRAM);
+            // ensure have not exceeded maximum
+            if (_ASPINSTANCE > MAXASPINSTANCE)
+            {
+                MessageBox.Show("You have exceeded maximum # of running ASPs.  Please close one.", "too many ASPs");
+                Close();
+            }
+            // set next response id
+            _NEXTRESPONSEID = (_ASPINSTANCE-1) * MAXRESPONSEPERASP;
+            _INITIALRESPONSEID = _NEXTRESPONSEID;
             // don't save ticks from replay since they're already saved
             _ao.archivetickbox.Checked = tl.LinkType != TLTypes.HISTORICALBROKER;
             _remskin.Click+=new EventHandler(_remskin_Click);
@@ -102,10 +119,21 @@ namespace ASP
         void tl_gotUnknownMessage(MessageTypes type, uint id, string data)
         {
             // send unknown messages to valid responses
-            int idx = (int)id;
+            int idx = r2r(id);
             if (idx == ResponseTemplate.UNKNOWNRESPONSE) return;
             if (_reslist[idx].isValid)
                     _reslist[idx].GotMessage(type, id, data);
+        }
+
+        /// <summary>
+        /// converts a response's local id to it's storage location in ASP
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        int r2r(uint id) { return r2r((int)id); }
+        int r2r(int id)
+        {
+            return (int)id + _INITIALRESPONSEID;
         }
 
 
@@ -157,8 +185,10 @@ namespace ASP
             // get next available index for this name
             int startidx = nextskinidx(SKINPATH,name);
             // go through all selected responses
-            foreach (int idx in _resnames.SelectedIndices)
+            foreach (int didx in _resnames.SelectedIndices)
             {
+                //get response index from display index
+                int idx = getrindx(didx);
                 // save them as skin
                 SkinImpl.SkinFile(_reslist[idx], _reslist[idx].FullName, _class2dll[_reslist[idx].FullName], SKINPATH+name + "." + startidx.ToString() + SKINEXT);
                 // add index as part of skin
@@ -291,13 +321,13 @@ namespace ASP
 
         int addresponse(Response r)
         {
-            int id = -1;
+            int id = _NEXTRESPONSEID;
             try
             {
-                // get it's ID
-                id = _reslist.Count;
                 // set the id
                 r.ID = id;
+                // save the index
+                int idx = r2r(id);
                 // bind events
                 bindresponseevents(r);
                 // show it to user
@@ -310,16 +340,20 @@ namespace ASP
                 // setup place for it's symbols
                 _rsym.Add(id, string.Empty);
                 // map name to response
-                _disp2real.Add(id);
+                _disp2real.Add(idx);
+                // save a tracker for response
+                _idt.Add(new IdTracker((uint)id));
+                // save id
+                _NEXTRESPONSEID++;
                 // reset response
-                _reslist[id].Reset();
+                _reslist[idx].Reset();
                 // send it current positions
                 foreach (Position p in _pt)
-                    _reslist[id].GotPosition(p);
+                    _reslist[idx].GotPosition(p);
                 // update everything
                 IndexBaskets();
                 // show we added response
-                status(r.FullName + getsyms(id));
+                status(r.FullName + getsyms(idx));
             }
             catch (Exception ex)
             {
@@ -523,6 +557,11 @@ namespace ASP
 
         void tl_gotOrderCancel(uint number)
         {
+            // see if we need to remap
+            if (_ao._virtids.Checked)
+            {
+                number = aspid2responseid(number);
+            }
             // send order cancel notification to every valid box
             foreach (string sym in _symidx.Keys)
                 foreach (int idx in _symidx[sym])
@@ -532,10 +571,40 @@ namespace ASP
 
         void tl_gotOrder(Order o)
         {
-            // send order notification to any valid responses
-            for (int i = 0; i < _reslist.Count; i++)
-                if (_reslist[i].isValid)
-                    _reslist[i].GotOrder(o);
+            // see if we need to remap order ids
+            if (_ao._virtids.Checked && (o.id!=0))
+            {
+                // see if we already have a map
+                uint newid = aspid2responseid(o.id);
+
+                // if we don't create one for every response and send it
+                for (int i = 0; i<_reslist.Count; i++)
+                    if (_reslist[i].isValid)
+                    {
+                        if (o.id == 0)
+                            _reslist[i].GotOrder(o);
+                        else
+                        {
+                            // get an id
+                            newid = _idt[i].AssignId;
+                            // save it
+                            _r2a.Add(newid, o.id);
+                            // save other way
+                            _a2r.Add(o.id, newid);
+                            // remap it
+                            o.id = newid;
+                            // send it
+                            _reslist[i].GotOrder(o);
+                        }
+                    }
+            }
+            else
+            {
+                // send order notification to any valid responses
+                for (int i = 0; i < _reslist.Count; i++)
+                    if (_reslist[i].isValid)
+                        _reslist[i].GotOrder(o);
+            }
         }
 
         void ASP_FormClosing(object sender, FormClosingEventArgs e)
@@ -676,7 +745,11 @@ namespace ASP
 
         List<int> _disp2real = new List<int>();
         
-
+        /// <summary>
+        /// gets storage location from displayed location
+        /// </summary>
+        /// <param name="nameidx"></param>
+        /// <returns></returns>
         int getrindx(int nameidx)
         {
             if ((nameidx<_disp2real.Count) && (nameidx>=0))
@@ -738,7 +811,10 @@ namespace ASP
 
         void _workingres_SendBasket(Basket b, int id)
         {
-            newsyms(b.ToString().Split(','), id);
+            // get storage index of response from response id
+            int idx = r2r(id);
+            // update symbols for response
+            newsyms(b.ToString().Split(','), idx);
         }
 
         
@@ -761,6 +837,28 @@ namespace ASP
             {
                 bigexceptiondump(ex);   
             }
+        }
+
+        uint responseid2asp(uint responseorderid)
+        {
+            uint id = 0;
+            if (_r2a.TryGetValue(responseorderid, out id))
+                return id;
+            return 0;
+
+        }
+
+        const int EXPECTORDERS = 3000;
+        IdTracker _masteridt = new IdTracker();
+        Dictionary<uint, uint> _r2a = new Dictionary<uint, uint>(EXPECTORDERS);
+        Dictionary<uint, uint> _a2r = new Dictionary<uint, uint>(EXPECTORDERS);
+
+        uint aspid2responseid(uint aspid)
+        {
+            uint id = 0;
+            if (_a2r.TryGetValue(aspid, out id))
+                return id;
+            return 0;
         }
 
         void workingres_SendOrder(Order o)
@@ -794,6 +892,8 @@ namespace ASP
             // set the local symbol
             if (o.LocalSymbol==string.Empty)
                 o.LocalSymbol = o.symbol;
+            // assign master order if necessary
+            assignmasterorderid(ref o);
             // send order and get error message
             int res = tl.SendOrder(o);
             // if error, display it
@@ -801,8 +901,39 @@ namespace ASP
                 debug(Util.PrettyError(tl.BrokerName, res) + " " + o.ToString());
         }
 
+        void assignmasterorderid(ref Order o)
+        {
+            // see if we're remaping orders
+            if (_ao._virtids.Checked && (o.id != 0))
+            {
+                // get master id for this order
+                uint newid = responseid2asp(o.id) ;
+                // if we don't have a master, assign one
+                if (newid == 0)
+                {
+                    // get storage location for response
+                    int idx = r2r(o.VirtualOwner);
+                    // get a new virtual id for this response
+                    newid = _idt[idx].AssignId;
+                    // get a master id
+                    uint master = _masteridt.AssignId;
+                    // save association
+                    _r2a.Add(newid, master);
+                    // save other way association
+                    _a2r.Add(master, newid);
+                }
+                // apply new id to order
+                o.id = newid;
+            }
+        }
+
         void workingres_CancelOrderSource(uint number)
         {
+            // see if we need to remap
+            if (_ao._virtids.Checked)
+            {
+                number = responseid2asp(number);
+            }
             // pass cancels along to tradelink
             tl.CancelOrder((long)number);
         }
@@ -921,6 +1052,16 @@ namespace ASP
         private void _twithelp_Click_1(object sender, EventArgs e)
         {
             CrashReport.BugReport(PROGRAM, _log.Content);
+        }
+
+        static int getprocesscount(string PROGRAM)
+        {
+            System.Diagnostics.Process[] ps = System.Diagnostics.Process.GetProcesses();
+            int count = 0;
+            foreach (System.Diagnostics.Process p in ps)
+                if (p.ProcessName.ToLower().Contains(PROGRAM.ToLower()))
+                    count++;
+            return count;
         }
 
                                          

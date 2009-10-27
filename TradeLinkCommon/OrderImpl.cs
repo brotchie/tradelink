@@ -12,6 +12,8 @@ namespace TradeLink.Common
         string _tif = "DAY";
         int _sec, _date, _time,_size;
         decimal _price,_stopp,_trail;
+        int _virtowner = 0;
+        public int VirtualOwner { get { return _virtowner; } set { _virtowner = value; } }
         public new int UnsignedSize { get { return Math.Abs(_size); } }
         public string TIF { get { return _tif; } set { _tif = value; } }
         public decimal trail { get { return _trail; } set { _trail = value; } }

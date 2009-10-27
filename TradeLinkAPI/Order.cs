@@ -33,6 +33,7 @@ namespace TradeLink.API
         bool Fill(Tick t);
         bool Fill(Tick t, bool fillOPG);
         bool isValid { get; }
+        int VirtualOwner { get; set; }
     }
 
     public class InvalidOrder : Exception { }

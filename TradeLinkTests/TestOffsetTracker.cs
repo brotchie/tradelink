@@ -14,6 +14,12 @@ namespace TestTradeLink
         {
             ot.SendCancel += new UIntDelegate(ot_SendCancel);
             ot.SendOffset += new OrderDelegate(ot_SendOffset);
+            ot.SendDebug += new DebugFullDelegate(ot_SendDebug);
+        }
+
+        void ot_SendDebug(Debug debug)
+        {
+            //Console.WriteLine(debug.Msg);
         }
 
         OffsetTracker ot = new OffsetTracker();

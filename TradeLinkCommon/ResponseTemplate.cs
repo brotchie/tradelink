@@ -76,7 +76,7 @@ namespace TradeLink.Common
         /// short form of sendorder
         /// </summary>
         /// <param name="o"></param>
-        public virtual void O(Order o) { SendOrder(o); }
+        public virtual void O(Order o) { o.VirtualOwner = ID;  SendOrder(o); }
         /// <summary>
         /// short form of sendcancel
         /// </summary>
@@ -101,7 +101,7 @@ namespace TradeLink.Common
         /// sends an order
         /// </summary>
         /// <param name="o"></param>
-        public virtual void sendorder(Order o) { SendOrder(o); }
+        public virtual void sendorder(Order o) { o.VirtualOwner = ID;  SendOrder(o); }
         /// <summary>
         /// cancels an order (must have the id)
         /// </summary>

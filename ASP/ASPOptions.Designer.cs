@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this._virtids = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
             this.archivetickbox = new System.Windows.Forms.CheckBox();
             this._account = new System.Windows.Forms.TextBox();
@@ -39,15 +40,29 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this._virtids);
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.archivetickbox);
             this.groupBox1.Controls.Add(this._account);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(275, 76);
+            this.groupBox1.Size = new System.Drawing.Size(381, 76);
             this.groupBox1.TabIndex = 20;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "General";
+            // 
+            // _virtids
+            // 
+            this._virtids.Appearance = System.Windows.Forms.Appearance.Button;
+            this._virtids.AutoSize = true;
+            this._virtids.Checked = global::ASP.Properties.Settings.Default.usevirtualids;
+            this._virtids.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::ASP.Properties.Settings.Default, "usevirtualids", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this._virtids.Location = new System.Drawing.Point(264, 26);
+            this._virtids.Name = "_virtids";
+            this._virtids.Size = new System.Drawing.Size(90, 30);
+            this._virtids.TabIndex = 18;
+            this._virtids.Text = "Virtual Ids";
+            this._virtids.UseVisualStyleBackColor = true;
             // 
             // label4
             // 
@@ -87,7 +102,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(313, 107);
+            this.ClientSize = new System.Drawing.Size(415, 105);
             this.Controls.Add(this.groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "ASPOptions";
@@ -105,5 +120,6 @@
         private System.Windows.Forms.ToolTip toolTip1;
         public System.Windows.Forms.CheckBox archivetickbox;
         public System.Windows.Forms.TextBox _account;
+        public System.Windows.Forms.CheckBox _virtids;
     }
 }
