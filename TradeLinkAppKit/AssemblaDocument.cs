@@ -33,7 +33,7 @@ namespace TradeLink.AppKit
 
                 // Generate post objects
                 Dictionary<string, object> postParameters = new Dictionary<string, object>();
-                string unique = Util.ToTLDate(DateTime.Now).ToString() + Path.GetFileName(filename);
+                string unique = Util.ToTLDate(DateTime.Now).ToString() +Util.ToTLTime(DateTime.Now)+ Path.GetFileName(filename);
                 postParameters.Add("document[name]", unique);
                 postParameters.Add("document[file]", data);
                 if (ticketid!=0)
