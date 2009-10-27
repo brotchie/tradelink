@@ -32,7 +32,7 @@ namespace TestTradeLink
             // ask
             data.Add(TickImpl.NewAsk(SYM, 11, 200));
             // full quote
-            data.Add(TickImpl.NewQuote(SYM, DATE,93000,00,10, 11,300,300,"NYSE","ARCA"));
+            data.Add(TickImpl.NewQuote(SYM, DATE,93000,10, 11,300,300,"NYSE","ARCA"));
             // trade
             data.Add(TickImpl.NewTrade(SYM, 10, 400));
             // full tick

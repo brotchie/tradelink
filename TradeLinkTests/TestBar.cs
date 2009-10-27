@@ -42,7 +42,7 @@ namespace TestTradeLink
             Assert.That(b.isValid);
             Assert.That(!b.isNew);
             Assert.That(b.Volume == 200);
-            b.newTick(TickImpl.NewQuote(sym,d,t,0,10m,11m,1,1,x,x));
+            b.newTick(TickImpl.NewQuote(sym,d,t,10m,11m,1,1,x,x));
             Assert.That(b.TradeCount == 2);
 
 

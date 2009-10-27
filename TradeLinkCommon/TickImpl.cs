@@ -284,9 +284,10 @@ namespace TradeLink.Common
         }
 
 
-        public static TickImpl NewBid(string sym, decimal bid, int bidsize) { return NewQuote(sym, 0, 0, 0, bid, 0, bidsize, 0, "", ""); }
-        public static TickImpl NewAsk(string sym, decimal ask, int asksize) { return NewQuote(sym, 0, 0, 0, 0, ask, 0, asksize, "", ""); }
-        public static TickImpl NewQuote(string sym, int date, int time, int sec, decimal bid, decimal ask, int bidsize, int asksize, string be, string oe)
+        public static TickImpl NewBid(string sym, decimal bid, int bidsize) { return NewQuote(sym, Util.ToTLDate(DateTime.Now), Util.ToTLTime(DateTime.Now),  bid, 0, bidsize, 0, "", ""); }
+        public static TickImpl NewAsk(string sym, decimal ask, int asksize) { return NewQuote(sym, Util.ToTLDate(DateTime.Now), Util.ToTLTime(DateTime.Now),  0, ask, 0, asksize, "", ""); }
+        public static TickImpl NewQuote(string sym, decimal bid, decimal ask, int bidsize, int asksize, string be, string oe) { return NewQuote(sym, Util.ToTLDate(DateTime.Now), Util.ToTLTime(DateTime.Now), bid, ask, bidsize, asksize, be, oe); }
+        public static TickImpl NewQuote(string sym, int date, int time, decimal bid, decimal ask, int bidsize, int asksize, string be, string oe)
         {
             TickImpl q = new TickImpl(sym);
             q.date = date;
@@ -303,9 +304,9 @@ namespace TradeLink.Common
             return q;
         }
         //methods overloaded with depth field
-        public static TickImpl NewBid(string sym, decimal bid, int bidsize, int depth) { return NewQuote(sym, 0, 0, 0, bid, 0, bidsize, 0, "", "",depth); }
-        public static TickImpl NewAsk(string sym, decimal ask, int asksize, int depth) { return NewQuote(sym, 0, 0, 0, 0, ask, 0, asksize, "", "",depth); }
-        public static TickImpl NewQuote(string sym, int date, int time, int sec, decimal bid, decimal ask, int bidsize, int asksize, string be, string oe, int depth)
+        public static TickImpl NewBid(string sym, decimal bid, int bidsize, int depth) { return NewQuote(sym, Util.ToTLDate(DateTime.Now), Util.ToTLTime(DateTime.Now),bid, 0, bidsize, 0, "", "", depth); }
+        public static TickImpl NewAsk(string sym, decimal ask, int asksize, int depth) { return NewQuote(sym, Util.ToTLDate(DateTime.Now), Util.ToTLTime(DateTime.Now),0,ask, 0, asksize, "", "", depth); }
+        public static TickImpl NewQuote(string sym, int date, int time, decimal bid, decimal ask, int bidsize, int asksize, string be, string oe, int depth)
         {
             TickImpl q = new TickImpl(sym);
             q.date = date;
@@ -322,7 +323,7 @@ namespace TradeLink.Common
             return q;
         }
 
-        public static TickImpl NewTrade(string sym, decimal trade, int size) { return NewTrade(sym, 0, 0,  trade, size, ""); }
+        public static TickImpl NewTrade(string sym, decimal trade, int size) { return NewTrade(sym, Util.ToTLDate(DateTime.Now), Util.ToTLTime(DateTime.Now),  trade, size, ""); }
         public static TickImpl NewTrade(string sym, int date, int time, decimal trade, int size, string ex)
         {
             TickImpl t = new TickImpl(sym);
