@@ -703,28 +703,29 @@ namespace ASP
 
         void editsyms(object sender, EventArgs e)
         {
-            int idx = _resnames.SelectedIndex;
-            if (idx == -1) return;
-            string rname = _reslist[getrindx(idx)].FullName;
+            int didx = _resnames.SelectedIndex;
+            if (didx == -1) return;
+            int idx = getrindx(didx);
+            string rname = _reslist[idx].FullName;
             string syms = Interaction.InputBox("Enter symbols seperated by commas", rname + " Symbols", getsyms(idx,false), 0, 0);
-            newsyms(syms.Split(','), getrindx(idx));
+            newsyms(syms.Split(','), idx);
         }
 
         void newsyms(string[] syms,int idx)
         {
-            if (idx == -1)
+            // save contents
+            string basket = string.Join(",", syms);
+            // make sure there's a response there
+            if ((idx<0) || (idx>_reslist.Count))
             {
-                status("must trade the response first");
+                debug("ignoring basket "+basket+" from: " + idx);
                 return;
             }
-            // ignore from invalid responses
-            if (isBadResponse(idx))
-            {
-                debug("ignoring basket request from response: " + idx);
-                return;
-            }
+            // if good response, notify 
+            if (!isBadResponse(idx))
+                debug("got basket request: " + basket+ " from: " + _reslist[idx].FullName);
             // save symbols
-            _rsym[idx] = string.Join(",",syms);
+            _rsym[idx] = basket;
             // update everything
             IndexBaskets();
         }
@@ -737,10 +738,6 @@ namespace ASP
 
         void _workingres_SendBasket(Basket b, int id)
         {
-            // ignore if response has been deleted
-            if (isBadResponse(id)) return;
-            // otherwise notify and subscribe
-            debug("got basket request: " + b.ToString() + " from: " + _reslist[id].FullName);
             newsyms(b.ToString().Split(','), id);
         }
 
