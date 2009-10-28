@@ -54,7 +54,7 @@ namespace WinGauntlet
                 status("wait while tickdata is loaded...");
                 UpdateResponses(Util.GetResponseList(args.DllName));
             }
-            
+
         }
 
         void getsymwork_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -138,6 +138,7 @@ namespace WinGauntlet
             GauntArgs ga = (GauntArgs)e.Argument;
             // notify user
             debug("Run started: " + ga.Name);
+            status("Started: " + ga.ResponseName);
             // prepare simulator
             h = new HistSim(ga.Folder,ga.Filter);
             h.GotDebug += new DebugDelegate(h_GotDebug);
@@ -186,7 +187,9 @@ namespace WinGauntlet
                         sw.WriteLine(OrderImpl.Serialize(olist[i]));
                     sw.Close();
                 }
-                debug("Done.  Ticks: " + gargs.TicksProcessed + " Speed:" + gargs.TicksSecond.ToString("N0") + " t/s  Fills: " + gargs.Executions.ToString());
+                string msg = "Done.  Ticks: " + gargs.TicksProcessed + " Speed:" + gargs.TicksSecond.ToString("N0") + " t/s  Fills: " + gargs.Executions.ToString();
+                debug(msg);
+                status(msg);
             }
             else debug("Canceled.");
             // close indicators
@@ -336,12 +339,22 @@ namespace WinGauntlet
 
         private void Gauntlet_FormClosing(object sender, FormClosingEventArgs e)
         {
+            try
+            {
+                bw.CancelAsync();
+                getsymwork.CancelAsync();
+                if (indf != null)
+                    indf.Close();
+                h.Stop();
+            }
+            catch { }
             if (saveonexit.Checked && !args.isUnattended)
             {
                 Properties.Settings.Default.tickfolder = args.Folder;
                 Properties.Settings.Default.boxdll = args.DllName;
                 WinGauntlet.Properties.Settings.Default.Save();
             }
+            _log.Stop();
         }
 
 

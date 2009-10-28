@@ -29,7 +29,7 @@ namespace WinGauntlet
             app = new Gauntlet();
             try
             {
-                Application.Run();
+                Application.Run(app);
             }
             catch (Exception ex) { TradeLink.AppKit.CrashReport.Report(Gauntlet.PROGRAM, ex); }
         }
