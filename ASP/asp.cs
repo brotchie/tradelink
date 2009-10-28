@@ -44,7 +44,6 @@ namespace ASP
         int _ASPINSTANCE = 0;
         int _INITIALRESPONSEID = 0;
         int _NEXTRESPONSEID = 0;
-        List<IdTracker> _idt = new List<IdTracker>(MAXRESPONSEPERASP);
 
         public ASP()
         {
@@ -341,8 +340,6 @@ namespace ASP
                 _rsym.Add(id, string.Empty);
                 // map name to response
                 _disp2real.Add(idx);
-                // save a tracker for response
-                _idt.Add(new IdTracker((uint)id));
                 // save id
                 _NEXTRESPONSEID++;
                 // reset response
@@ -560,7 +557,18 @@ namespace ASP
             // see if we need to remap
             if (_ao._virtids.Checked)
             {
+                uint master = number;
                 number = aspid2responseid(number);
+                // if we don't have one, assign one
+                if (number == 0)
+                {
+                    // assign
+                    number = _masteridt.AssignId;
+                    // map
+                    _r2a.Add(number, master);
+                    // other way
+                    _a2r.Add(master, number);
+                }
             }
             // send order cancel notification to every valid box
             foreach (string sym in _symidx.Keys)
@@ -575,36 +583,25 @@ namespace ASP
             if (_ao._virtids.Checked && (o.id!=0))
             {
                 // see if we already have a map
-                uint newid = aspid2responseid(o.id);
+                uint rorderid = aspid2responseid(o.id);
+                // if we don't create one
+                if (rorderid == 0)
+                {
+                    // get an id
+                    rorderid = _masteridt.AssignId;
+                    // save it
+                    _r2a.Add(rorderid, o.id);
+                    // save other way
+                    _a2r.Add(o.id, rorderid);
 
-                // if we don't create one for every response and send it
-                for (int i = 0; i<_reslist.Count; i++)
-                    if (_reslist[i].isValid)
-                    {
-                        if (o.id == 0)
-                            _reslist[i].GotOrder(o);
-                        else
-                        {
-                            // get an id
-                            newid = _idt[i].AssignId;
-                            // save it
-                            _r2a.Add(newid, o.id);
-                            // save other way
-                            _a2r.Add(o.id, newid);
-                            // remap it
-                            o.id = newid;
-                            // send it
-                            _reslist[i].GotOrder(o);
-                        }
-                    }
+                }
+                // remap it
+                o.id = rorderid;
             }
-            else
-            {
-                // send order notification to any valid responses
-                for (int i = 0; i < _reslist.Count; i++)
-                    if (_reslist[i].isValid)
-                        _reslist[i].GotOrder(o);
-            }
+            // send order notification to any valid responses
+            for (int i = 0; i < _reslist.Count; i++)
+                if (_reslist[i].isValid)
+                    _reslist[i].GotOrder(o);
         }
 
         void ASP_FormClosing(object sender, FormClosingEventArgs e)
@@ -662,8 +659,26 @@ namespace ASP
         {
             // keep track of position
             _pt.Adjust(t);
+            // see if we're using virtual ids
+            if (_ao._virtids.Checked && (t.id != 0))
+            {
+                // get the map
+                uint rorderid = aspid2responseid(t.id);
+                // if we don't have a map, create one
+                if (rorderid == 0)
+                {
+                    // get id
+                    rorderid = _masteridt.AssignId;
+                    // map it
+                    _r2a.Add(rorderid, t.id);
+                    // map other way
+                    _a2r.Add(t.id, rorderid);
+                }
+                // apply map
+                t.id = rorderid;
+            }
             // send trade notification to any valid requesting responses
-            for (int i = 0; i < _reslist.Count; i++ )
+            for (int i = 0; i < _reslist.Count; i++)
                 if (_reslist[i].isValid)
                     _reslist[i].GotFill(t);
         }
@@ -907,23 +922,21 @@ namespace ASP
             if (_ao._virtids.Checked && (o.id != 0))
             {
                 // get master id for this order
-                uint newid = responseid2asp(o.id) ;
+                uint master = responseid2asp(o.id) ;
                 // if we don't have a master, assign one
-                if (newid == 0)
+                if (master == 0)
                 {
                     // get storage location for response
                     int idx = r2r(o.VirtualOwner);
-                    // get a new virtual id for this response
-                    newid = _idt[idx].AssignId;
                     // get a master id
-                    uint master = _masteridt.AssignId;
+                    master = _masteridt.AssignId;
                     // save association
-                    _r2a.Add(newid, master);
+                    _r2a.Add(o.id, master);
                     // save other way association
-                    _a2r.Add(master, newid);
+                    _a2r.Add(master, o.id);
                 }
                 // apply new id to order
-                o.id = newid;
+                o.id = master;
             }
         }
 
