@@ -934,6 +934,18 @@ namespace TradeLibFast
 		while(pos = B_GetNextPosition(iterator))
 		{
 			TradeLibFast::TLPosition p;
+			double p1 = GetDouble(pos->GetAveragePrice());
+			double p2 = GetDouble(pos->GetAveragePriceProper());
+			double p3 = GetDouble(pos->GetAveragePriceInventory(true));
+			double p4 = GetDouble(pos->GetAverageExecPrice());
+			double p5 = GetDouble(pos->GetAverageExecPriceProper());
+			double p6 = GetDouble(pos->GetAverageExecPriceInventory(true));
+
+			double o1 = GetDouble(pos->GetOvernightMoney())/pos->GetOvernightSize();
+			CString m;
+			m.Format("%s,%f,%f,%f,%f,%f,%f,%f\n",pos->GetSymbol(),p1,p2,p3,p4,p5,p6,o1);
+			TRACE0(m);
+
 			bool overnight = pos->isOvernight();
 			p.AvgPrice = overnight ? GetDouble(pos->GetOvernightMoney()) 
 				: GetDouble((Money)pos->GetAverageExecPrice());

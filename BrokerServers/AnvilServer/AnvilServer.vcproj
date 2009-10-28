@@ -52,7 +52,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
+				Optimization="0"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="..\TradeLibFast"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_AFXEXT"
@@ -69,6 +69,7 @@
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="3"
 				CompileAs="0"
 			/>
 			<Tool
@@ -90,8 +91,10 @@
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="&quot;..\$(Configurationname)&quot;;&quot;$(OutDir)&quot;"
 				ModuleDefinitionFile="$(ProjectName).def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)\$(ProjectName).pdb"
 				SubSystem="2"
+				OptimizeReferences="2"
 				ImportLibrary="$(OutDir)/$(ProjectName).lib"
 				TargetMachine="1"
 			/>
@@ -484,7 +487,7 @@
 				>
 				<Tool
 					Name="VCCLCompilerTool"
-					Optimization="2"
+					Optimization="0"
 					AdditionalIncludeDirectories=""
 					PreprocessorDefinitions=""
 					CompileAsManaged="0"

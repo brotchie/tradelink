@@ -23,40 +23,47 @@ namespace TradeLink.Common
         /// <summary>
         /// creates an object to assign unique order ids
         /// </summary>
-        public IdTracker() : this(DEFAULTOWNER, OrderImpl.Unique) { }
+        public IdTracker() : this(false,DEFAULTOWNER, OrderImpl.Unique) { }
         /// <summary>
         /// creates an object to assign unique ids
         /// </summary>
         /// <param name="OwnerId"></param>
-        public IdTracker(uint OwnerId) : this(OwnerId, OrderImpl.Unique) { }
+        public IdTracker(uint OwnerId) : this(true,OwnerId, OrderImpl.Unique) { }
 
         /// <summary>
         /// creates an object to assign unique order ids to one or more owners.
         /// </summary>
         /// <param name="OwnerId">A unique number identifying this owner</param>
         /// <param name="initialId">Owners first order id</param>
-        public IdTracker(uint OwnerId, uint initialId)
+        public IdTracker(bool virtualids,uint OwnerId, uint initialId)
         {
             _owner = OwnerId;
-            // make sure valid
-            if (_owner > MAXOWNER)
-                throw new Exception("You can't assign more than " + MAXOWNER + " owners.");
-            unchecked
+            if (virtualids)
             {
-                // create a mask to strip off lower portion of id
-                const uint lowermask = (MAXOWNER - 1) << MASKLEN;
-                // get inverse to mask out top part
-                const uint topmask = ~lowermask;
-                // top mask is also the count
-                Count = (topmask+1);
-                // get seed as lower part
-                uint seed = initialId & lowermask;
-                // get high bits of first id
-                uint highbits = _owner << MASKLEN;
-                // calculate first id
-                _first = highbits + seed;
-                // calculate max value
-                _maxid = highbits + topmask;
+                // make sure valid
+                if (_owner > MAXOWNER)
+                    throw new Exception("You can't assign more than " + MAXOWNER + " owners.");
+                unchecked
+                {
+                    // create a mask to strip off lower portion of id
+                    const uint lowermask = (MAXOWNER - 1) << MASKLEN;
+                    // get inverse to mask out top part
+                    const uint topmask = ~lowermask;
+                    // top mask is also the count
+                    Count = (topmask + 1);
+                    // get seed as lower part
+                    uint seed = initialId & topmask;
+                    // get high bits of first id
+                    uint highbits = _owner << MASKLEN;
+                    // calculate first id
+                    _first = highbits + seed;
+                    // calculate max value
+                    _maxid = highbits + topmask;
+                }
+            }
+            else
+            {
+                _first = initialId;
             }
             // assign next id
             _nextid = _first;
