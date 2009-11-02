@@ -941,14 +941,12 @@ namespace TradeLibFast
 			double p5 = GetDouble(pos->GetAverageExecPriceProper());
 			double p6 = GetDouble(pos->GetAverageExecPriceInventory(true));
 
-			double o1 = GetDouble(pos->GetOvernightMoney())/pos->GetOvernightSize();
 			CString m;
-			m.Format("%s,%f,%f,%f,%f,%f,%f,%f\n",pos->GetSymbol(),p1,p2,p3,p4,p5,p6,o1);
+			m.Format("%s,%f,%f,%f,%f,%f,%f\n",pos->GetSymbol(),p1,p2,p3,p4,p5,p6);
 			TRACE0(m);
 
 			bool overnight = pos->isOvernight();
-			p.AvgPrice = overnight ? GetDouble(pos->GetOvernightMoney()) 
-				: GetDouble((Money)pos->GetAverageExecPrice());
+			p.AvgPrice = GetDouble((Money)pos->GetAveragePrice());
 			p.ClosedPL = GetDouble(pos->GetClosedPnl());
 			p.Size = pos->GetSize();
 			p.Symbol = CString(pos->GetSymbol());
