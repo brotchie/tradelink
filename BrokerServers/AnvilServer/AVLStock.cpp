@@ -190,6 +190,14 @@ void AVLStock::TradeNotify()
 	}
 }
 
+bool AVLStock::isLoaded() const
+{
+	const bool nonull = (m_stockHandle != NULL);
+	if (!nonull) return false;
+	const bool load = m_stockHandle->isLoaded();
+	return (m_stockHandle->GetSymbol()==m_symbol) && load; 
+}
+
 
 void AVLStock::Process(const Message* message, Observable* from, const Message* additionalInfo)
 {
