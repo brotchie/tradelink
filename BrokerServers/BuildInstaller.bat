@@ -11,6 +11,7 @@ echo.
 set ANVILDIR=Install\AnvilRelease_x32_2_7_7_2
 echo ANVILSERVER %ANVILDIR%
 xcopy /q /y AnvilServer\Release\AnvilServer.dll %ANVILDIR% > NUL
+xcopy /q /y AnvilServer\Release\AnvilServer.pdb %ANVILDIR% > NUL
 
 if not exist "c:\progra~1\nsis\makensis.exe" (
 echo NSIS must be installed to use this script.

@@ -18,7 +18,11 @@ public:
 
     void Load();
     const StockBase* GetStockHandle() const{return m_stockHandle;}
-    bool isLoaded() const{return m_stockHandle != NULL && (m_stockHandle->GetSymbol()==m_symbol) && m_stockHandle->isLoaded();}
+	bool isLoaded() const
+	{
+		const bool load = m_stockHandle->isLoaded();
+		return (m_stockHandle != NULL) && (m_stockHandle->GetSymbol()==m_symbol) && load; 
+	} 
     const std::string& GetSymbol() const{return m_symbol;}
 	TradeLibFast::TLServer_WM* tl;
 
