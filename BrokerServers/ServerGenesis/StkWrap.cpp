@@ -39,8 +39,17 @@ StkWrap::~StkWrap()
 
 int StkWrap::OnExecMsgErrMsg(const GTErrMsg &err)
 {
+	// ensure we have the sequence
+	long oseq = err.dwOrderSeqNo;
+	int index = tl->GetIDIndex(oseq,SEQ);
+	if (index==NO_ID) return GTStock::OnExecMsgErrMsg(err);
+	// get id
+	uint id = tl->orderids[index];
+	CString sym = CString(err.szStock);
+	CString errmsg = CString(err.szText);
+	int ioseq = (int)oseq;
 	CString m;
-	m.Format("error: %s %s %l",err.szStock,err.szText,err.dwOrderSeqNo);
+	m.Format("error: %s %s %i %i %u",sym,errmsg,err.nErrCode,ioseq,id);
 	tl->D(m);
 	return GTStock::OnExecMsgErrMsg(err);
 }

@@ -178,9 +178,7 @@ int ServerGenesis::BrokerName()
 	return Genesis;
 }
 
-#define DEFAULTMETHOD METHOD_HELF
-
-MMID getexchange(CString exch)
+MMID getmethod(CString exch)
 {
 	if (exch=="ISLD")
 		return METHOD_ISLD;
@@ -194,8 +192,7 @@ MMID getexchange(CString exch)
 		return METHOD_AUTO;
 	if (exch=="HELF")
 		return METHOD_HELF;
-	MMID_NYSE;
-	return DEFAULTMETHOD;
+	return METHOD_SMRT;
 
 }
 
@@ -213,7 +210,7 @@ MMID getplace(CString exch)
 		return MMID_NASD;
 	if (exch=="NYSE")
 		return MMID_NYSE;
-	return MMID_NYSE;
+	return MMID_DEFAULT;
 
 }
 
@@ -283,7 +280,7 @@ int ServerGenesis::SendOrder(TradeLibFast::TLOrder o)
 		return BROKERSERVER_NOT_FOUND;
 	}
 	// make sure account is default or valid
-	bool accountok = (o.account=="") && (m_accts.size()==0);
+	bool accountok = (o.account=="") && (m_accts.size()!=0);
 	for (uint i = 0; i<m_accts.size(); i++)
 		accountok |= (m_accts[i]==o.account) ;
 	if (!accountok)
@@ -336,7 +333,7 @@ int ServerGenesis::SendOrder(TradeLibFast::TLOrder o)
 	GTOrder go;
 	go = pStock->m_defOrder;
 	go.dwUserData = o.id;
-	if(pStock->PlaceOrder(go, (o.side ? 'B' : 'S'), o.size, o.price, getexchange(o.exchange), getTIF(o.TIF))==0)
+	if(pStock->PlaceOrder(go, (o.side ? 'B' : 'S'), o.size, o.price, getmethod(o.exchange), getTIF(o.TIF))==0)
 	{
 		go.chPriceIndicator = getPI(o);
 		go.dblStopLimitPrice = o.stop;
