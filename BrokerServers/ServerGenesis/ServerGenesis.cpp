@@ -192,7 +192,7 @@ MMID getmethod(CString exch)
 		return METHOD_AUTO;
 	if (exch=="HELF")
 		return METHOD_HELF;
-	return METHOD_SMRT;
+	return METHOD_HELF;
 
 }
 
@@ -337,7 +337,7 @@ int ServerGenesis::SendOrder(TradeLibFast::TLOrder o)
 	{
 		go.chPriceIndicator = getPI(o);
 		go.dblStopLimitPrice = o.stop;
-		go.place = getplace(o.exchange);
+		//go.place = getplace(o.exchange);
 		err = pStock->PlaceOrder(go);
 	}
 	
