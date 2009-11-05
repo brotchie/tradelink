@@ -67,5 +67,20 @@ namespace TestTradeLink
             Assert.AreEqual(100, pt[sym].Size);
             Assert.AreEqual(100, pt2[sym].Size);
         }
+
+        [Test]
+        public void BlankPositionReq()
+        {
+            PositionTracker pt = new PositionTracker();
+            bool except = false;
+            int s = 100;
+            try
+            {
+                s = pt["IBM"].Size;
+            }
+            catch { except = true; }
+            Assert.AreEqual(0, s);
+            Assert.IsFalse(except);
+        }
     }
 }
