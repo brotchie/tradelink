@@ -1042,6 +1042,18 @@ namespace TradeLink.Common
             return Max(EndSlice(b.High(), barsback));
         }
         /// <summary>
+        /// highest high of array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static decimal HH(decimal[] array) { return Max(array); }
+        /// <summary>
+        /// lowest low of array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static decimal LL(decimal[] array) { return Min(array); }
+        /// <summary>
         /// Returns the highest high for the entire barlist.
         /// </summary>
         /// <param name="b">The b.</param>
