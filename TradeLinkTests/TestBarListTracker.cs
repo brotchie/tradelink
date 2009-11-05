@@ -53,6 +53,9 @@ namespace TestTradeLink
             // make sure same on individual bars
             Assert.AreEqual(blt.DefaultInterval,blt["TST"].DefaultInterval);
 
+            Assert.AreEqual(9, blt["TST"].IntervalCount(BarInterval.Minute));
+            Assert.AreEqual(3, blt["TST"].IntervalCount(BarInterval.FiveMin));
+
         }
 
         List<string> syms = new List<string>();
