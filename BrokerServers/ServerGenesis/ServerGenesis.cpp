@@ -192,7 +192,7 @@ MMID getmethod(CString exch)
 		return METHOD_AUTO;
 	if (exch=="HELF")
 		return METHOD_HELF;
-	return METHOD_HELF;
+	return METHOD_ISLD;
 
 }
 
@@ -209,8 +209,8 @@ MMID getplace(CString exch)
 	if (exch=="NASD")
 		return MMID_NASD;
 	if (exch=="NYSE")
-		return MMID_NYSE;
-	return MMID_DEFAULT;
+		return MMID_DOTI;
+	return MMID_DOTI;
 
 }
 
