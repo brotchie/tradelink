@@ -16,7 +16,7 @@ namespace Tattle
     {
         DataTable dt = new DataTable("results");
         DataGridView dg = new DataGridView();
-
+        PositionTracker pt = new PositionTracker(100);
         FileSystemWatcher fw;
         const string FID = "Trades.csv";
         public const string PROGRAM = "Tattle";
@@ -31,7 +31,8 @@ namespace Tattle
             dg.Parent = splitContainer1.Panel2;
             dg.Dock = DockStyle.Fill;
             dg.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            
+            ContextMenu = new ContextMenu();
+            ContextMenu.MenuItems.Add("RiskFreeRate", new EventHandler(changerfr));
             dg.ReadOnly = true;
             dg.BackColor = Color.White;
             dg.AutoGenerateColumns = true;
@@ -49,6 +50,16 @@ namespace Tattle
             MouseEnter += new EventHandler(TattleMain_MouseEnter);
         }
 
+        decimal _rfr = .001m;
+        void changerfr(object sender, EventArgs e)
+        {
+            string input = Microsoft.VisualBasic.Interaction.InputBox("Risk Free Rate: ", "Update RfR", _rfr.ToString("P2"), 0, 0);
+            decimal rfr = 0;
+            input.Replace("%", "");
+            if (decimal.TryParse(input, out rfr))
+                _rfr = (rfr/100);
+            tradefiles_SelectedIndexChanged(null, null);
+        }
         void TattleMain_MouseEnter(object sender, EventArgs e)
         {
             dg.AutoResizeColumnHeadersHeight();
@@ -144,6 +155,8 @@ namespace Tattle
             DisplayResults(FetchResults((string)tradefiles.SelectedItem));
         }
 
+        List<decimal> _MIU = new List<decimal>();
+        List<decimal> _return = new List<decimal>();
 
         Results FetchResults(string name)
         {
@@ -152,12 +165,8 @@ namespace Tattle
 
 
 
-
-
-
-
-
             Results r = new Results();
+            r.RiskFreeRet = string.Format("{0:P2}",_rfr);
             try
             {
                 sr = new StreamReader(fw.Path + @"\" + name);
@@ -165,6 +174,15 @@ namespace Tattle
                 while (!sr.EndOfStream)
                 {
                     TradeResult tr = TradeResult.Init(sr.ReadLine());
+                    // for each call of TradeResult.Init, feed source to position tracker
+                    pt.Adjust(tr.Source);
+                    // calculate MIU and store on array
+                    decimal miu = Calc.Sum(Calc.MoneyInUse(pt));
+                    _MIU.Add(miu);
+                    // get p&l
+                    decimal pl = Calc.Sum(Calc.AbsoluteReturn(pt, new decimal[pt.Count], true, false));
+                    _return.Add(pl);
+
                     if (!r.Symbols.Contains(tr.Source.symbol))
                         r.Symbols += tr.Source.symbol + ",";
                     r.Trades++;
@@ -179,11 +197,17 @@ namespace Tattle
                     if (tr.OpenPL < r.MaxOpenLoss) r.MaxOpenLoss = tr.OpenPL;
                 }
                 sr.Close();
+                r.MoneyInUse = Math.Round(Calc.Max(_MIU.ToArray()),2);
+                r.MaxPL = Math.Round(Calc.Max(_return.ToArray()),2);
+                r.MinPL = Math.Round(Calc.Min(_return.ToArray()),2);
+                r.MaxDD = string.Format("{0:P1}",Calc.MaxDD(_return.ToArray()));
             }
             catch (Exception) {  }
             return r;
 
         }
+
+
 
 
 
@@ -226,6 +250,10 @@ namespace Tattle
         public int Winners = 0;
         public int Losers = 0;
         public int Flats = 0;
+        public decimal MoneyInUse = 0;
+        public decimal MaxPL = 0;
+        public decimal MinPL = 0;
+        public string MaxDD = "0%";
         public decimal MaxWin =0 ;
         public decimal MaxLoss = 0;
         public decimal MaxOpenWin=0;
@@ -237,6 +265,7 @@ namespace Tattle
         string v2s(decimal v) { return v.ToString("N2"); }
         public string WLRatio { get { return v2s((Losers==0) ? 0 : (Winners/Losers)); }}
         public string GrossMargin { get { return v2s((GrossPL == 0) ? 0 : ((GrossPL - (HundredLots * 100 * ComPerShare)) / GrossPL)); } }
+        public string RiskFreeRet = "0%";
     }
 
     public class TradeResult : TradeImpl

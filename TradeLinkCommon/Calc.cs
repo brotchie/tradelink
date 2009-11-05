@@ -1425,5 +1425,26 @@ namespace TradeLink.Common
             return aret;
         }
 
+        /// <summary>
+        /// calculate maximum drawdown from a PL stream for a given security/portfolio
+        /// </summary>
+        /// <param name="ret">array containing p&l values for portfolio or security</param>
+        /// <returns></returns>
+        public static decimal MaxDD(decimal[] ret)
+        {
+            decimal peak = decimal.MinValue;
+            decimal maxdd = 0;
+            foreach (decimal pl in ret)
+            {
+                if (pl > peak)
+                    peak = pl;
+                if (peak == 0) continue;
+                decimal dd = (peak - pl) / peak;
+                if (dd > maxdd)
+                    maxdd = dd;
+            }
+            return maxdd;
+        }
+
     }
 }
