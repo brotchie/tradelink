@@ -158,7 +158,7 @@ namespace TradeLink.Common
         /// <summary>
         /// symbol for bar
         /// </summary>
-        public string Symbol { get { return _sym; } set { _sym = value; } }
+        public string Symbol { get { return _sym; } set { _sym = value.Replace(AMEX,""); } }
         /// <summary>
         /// returns true if bar has symbol and has requested intervals
         /// </summary>
@@ -322,12 +322,14 @@ namespace TradeLink.Common
         {
             b._intdata[instdataidx].addbar(mybar);
         }
+        private const string AMEX = ":AMEX";
         /// <summary>
         /// Populate the day-interval barlist of this instance from a URL, where the results are returned as a CSV file.  URL should accept requests in the form of http://url/get.py?sym=IBM
         /// </summary>
         /// <param name="url">The URL.</param>
         /// <returns></returns>
-        private static BarList DayFromURL(string url,string Symbol)
+        private static BarList DayFromURL(string url, string Symbol) { return DayFromURL(url, Symbol, true); }
+        private static BarList DayFromURL(string url,string Symbol,bool appendAMEXonfail)
         {
             BarListImpl bl = new BarListImpl(BarInterval.Day,Symbol);
             if (Symbol == "") return bl;
@@ -337,7 +339,13 @@ namespace TradeLink.Common
             {
                 res = wc.DownloadString(url + Symbol);
             }
-            catch (System.Net.WebException) { return bl; }
+            catch (Exception) 
+            {
+                if (appendAMEXonfail)
+                    return DayFromURL(url, Symbol + AMEX, false);
+                return bl;
+                
+            }
             string[] line = res.Split(Environment.NewLine.ToCharArray());
             for (int i = line.Length - 1; i > 0; i--)
             {
@@ -347,13 +355,14 @@ namespace TradeLink.Common
             return bl;
         }
 
-        public static bool DayFromGoogleAsync(string Symbol, BarListDelegate resultHandler)
+        public static bool DayFromGoogleAsync(string Symbol, BarListDelegate resultHandler) { return DayFromGoogleAsync(Symbol, resultHandler, true); }
+        public static bool DayFromGoogleAsync(string Symbol, BarListDelegate resultHandler, bool appendAmexOnFail)
         {
             System.Net.WebClient wc = new System.Net.WebClient();
             wc.DownloadStringCompleted +=new System.Net.DownloadStringCompletedEventHandler(wc_DownloadStringCompleted);
             try
             {
-                wc.DownloadStringAsync(new Uri(GOOGURL + Symbol), new BarListDownload(Symbol, resultHandler));
+                wc.DownloadStringAsync(new Uri(GOOGURL + Symbol), new BarListDownload(Symbol, resultHandler,appendAmexOnFail));
             }
             catch (System.Net.WebException) { return false; }
             catch (Exception ex) { return false; }
@@ -368,6 +377,11 @@ namespace TradeLink.Common
                 return;
             if (e.Cancelled || (e.Error != null))
             {
+                if (bld.AppendAMEXonFail)
+                {
+                    DayFromGoogleAsync(bld.Symbol + AMEX, bld.DoResults,false);
+                    return;
+                }
                 bld.DoResults(new BarListImpl(BarInterval.Day, bld.Symbol));
                 return;
             }
@@ -384,11 +398,13 @@ namespace TradeLink.Common
 
         private class BarListDownload
         {
-            public BarListDownload(string Symbol, BarListDelegate bld)
+            public BarListDownload(string Symbol, BarListDelegate bld,bool appendAMEX)
             {
+                AppendAMEXonFail = appendAMEX;
                 this.Symbol = Symbol;
                 DoResults = bld;
             }
+            public bool AppendAMEXonFail = true;
             public string Symbol = string.Empty;
             public BarListDelegate DoResults;
             public bool isValid { get { return (DoResults != null) && (Symbol != string.Empty); } }

@@ -22,13 +22,19 @@ namespace TradeLink.AppKit
         public Chart(BarList b,bool allowtype)
         {
             InitializeComponent();
-            MouseWheel +=new MouseEventHandler(chartControl1.Chart_MouseUp);
+            MouseUp +=new MouseEventHandler(chartControl1.Chart_MouseUp);
+            MouseWheel += new MouseEventHandler(Chart_MouseUp);
             if (allowtype) this.KeyUp += new KeyEventHandler(Chart_KeyUp);
             if (b != null)
             {
                 chartControl1.NewBarList(b);
                 Symbol = b.Symbol;
             }
+        }
+
+        void Chart_MouseUp(object sender, MouseEventArgs e)
+        {
+            Text = chartControl1.Title;
         }
 
         string _sym = string.Empty;
