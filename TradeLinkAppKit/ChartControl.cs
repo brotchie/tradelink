@@ -217,9 +217,9 @@ namespace TradeLink.AppKit
                     if (bl.DefaultInterval != BarInterval.Day)
                     {
                         // every 6 bars draw the bartime
-                        if ((i % labeleveryX) == 0) g.DrawString(bl[i].Bartime.ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (f.Font.GetHeight() * 3));
+                        if ((i % labeleveryX) == 0) g.DrawString((bl[i].Bartime/100).ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (f.Font.GetHeight() * 3));
                         // if it's noon, draw the date
-                        if (bl[i].Bartime == 1200) g.DrawString(bl[i].Bardate.ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (float)(f.Font.GetHeight() * 1.5));
+                        if (bl[i].Bartime == 120000) g.DrawString(bl[i].Bardate.ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (float)(f.Font.GetHeight() * 1.5));
                     }
                     else // otherwise it's daily data
                     {

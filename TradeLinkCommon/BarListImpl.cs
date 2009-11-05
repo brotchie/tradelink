@@ -190,6 +190,18 @@ namespace TradeLink.Common
         /// <returns></returns>
         public Bar this[int barnumber,BarInterval interval] { get { return _intdata[_intdataidx[(int)interval]].GetBar(barnumber,Symbol); } }
         /// <summary>
+        /// gets count for given bar interval
+        /// </summary>
+        /// <param name="interval"></param>
+        /// <returns></returns>
+        public int IntervalCount(BarInterval interval) { return _intdata[_intdataidx[(int)interval]].Count(); }
+        /// <summary>
+        /// gets count for given bar interval
+        /// </summary>
+        /// <param name="interval"></param>
+        /// <returns></returns>
+        public int IntervalCount(int interval) { return _intdata[_intdataidx[interval]].Count(); }
+        /// <summary>
         /// gets a specific bar in specified seconds interval
         /// </summary>
         /// <param name="barnumber"></param>

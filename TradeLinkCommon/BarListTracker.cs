@@ -31,7 +31,19 @@ namespace TradeLink.Common
         /// custom bar intervals used by this tracker
         /// </summary>
         public int[] CustomIntervals { get { return _requested; } }
-        public BarInterval DefaultInterval { get { return BarListImpl.Int2BarInterval(new int[] {_default})[0]; } set { _default = BarListImpl.BarInterval2Int(new BarInterval[] { value })[0]; } }
+        public BarInterval DefaultInterval 
+        { 
+            get 
+            { 
+                return BarListImpl.Int2BarInterval(new int[] {_default})[0]; 
+            } 
+            set 
+            { 
+                _default = BarListImpl.BarInterval2Int(new BarInterval[] { value })[0];
+                foreach (string sym in _bdict.Keys)
+                    _bdict[sym].DefaultInterval = value;
+            } 
+        }
         /// <summary>
         /// intervals requested when tracker was created
         /// </summary>
@@ -73,11 +85,19 @@ namespace TradeLink.Common
 
             get
             {
+                return this[sym, _default];
+            }
+        }
+
+        public BarList this[string sym, int interval]
+        {
+            get
+            {
                 BarListImpl bl;
                 if (_bdict.TryGetValue(sym, out bl))
                     return (BarList)bl;
-                bl = new BarListImpl(sym,_requested,_reqtype);
-                bl.DefaultCustomInterval = _default;
+                bl = new BarListImpl(sym, _requested, _reqtype);
+                bl.DefaultCustomInterval = interval;
                 bl.GotNewBar += new SymBarIntervalDelegate(bl_GotNewBar);
                 _bdict.Add(sym, bl);
                 return bl;

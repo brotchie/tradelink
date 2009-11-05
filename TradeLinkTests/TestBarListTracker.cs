@@ -48,6 +48,11 @@ namespace TestTradeLink
             // make sure symbols are there
             Assert.IsTrue(symstring.Contains("TST") && symstring.Contains("TST2"));
 
+            // change default interval
+            blt.DefaultInterval = BarInterval.Minute;
+            // make sure same on individual bars
+            Assert.AreEqual(blt.DefaultInterval,blt["TST"].DefaultInterval);
+
         }
 
         List<string> syms = new List<string>();

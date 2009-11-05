@@ -33,6 +33,8 @@ namespace TradeLink.API
         long[] Vol();
         BarInterval[] Intervals { get; }
         int[] CustomIntervals { get; }
+        int IntervalCount(BarInterval interval);
+        int IntervalCount(int interval);
 
     }
 }
