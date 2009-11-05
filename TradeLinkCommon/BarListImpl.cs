@@ -353,9 +353,10 @@ namespace TradeLink.Common
             wc.DownloadStringCompleted +=new System.Net.DownloadStringCompletedEventHandler(wc_DownloadStringCompleted);
             try
             {
-                wc.DownloadStringAsync(new Uri(GOOGURL + Symbol),new BarListDownload(Symbol,resultHandler));
+                wc.DownloadStringAsync(new Uri(GOOGURL + Symbol), new BarListDownload(Symbol, resultHandler));
             }
             catch (System.Net.WebException) { return false; }
+            catch (Exception ex) { return false; }
             return true;
         }
 
@@ -366,7 +367,10 @@ namespace TradeLink.Common
             if (!bld.isValid)
                 return;
             if (e.Cancelled || (e.Error != null))
-                bld.DoResults(new BarListImpl(BarInterval.Day,bld.Symbol));
+            {
+                bld.DoResults(new BarListImpl(BarInterval.Day, bld.Symbol));
+                return;
+            }
             res = e.Result;
             BarListImpl bl = new BarListImpl(BarInterval.Day, bld.Symbol);
             string[] line = res.Split(Environment.NewLine.ToCharArray());

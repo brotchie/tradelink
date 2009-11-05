@@ -127,12 +127,16 @@ namespace TradeLink.AppKit
 
         public void NewBarList(BarList barlist)
         {
-            if (barlist == null) return;
+            if ((barlist != null) && (barlist.isValid))
+                Symbol = barlist.Symbol;
+            if ((barlist == null) || (barlist.Intervals.Length==0) || (barlist.Count==0))
+            {
+                return;
+            }
             bl = barlist;
             highesth = Calc.HH(bl);
             lowestl = Calc.LL(bl);
             barc = bl.Count;
-            Symbol = barlist.Symbol;
             refresh();
         }
 
@@ -146,20 +150,26 @@ namespace TradeLink.AppKit
         /// Gets the title of this chart.
         /// </summary>
         /// <value>The title.</value>
-        public string Title { get { if (bl==null) return ""; return Symbol + " " + Enum.GetName(typeof(BarInterval), bl.DefaultInterval).ToString(); } }
+        public string Title { get { if (bl == null) return Symbol; return Symbol + " " + Enum.GetName(typeof(BarInterval), bl.DefaultInterval).ToString(); } }
         void Chart_Paint(object sender, PaintEventArgs e)
         {
-
-            if ((bl == null)||(bl.Count==0)) return;
-            // setup to draw
-            Pen p = new Pen(Color.Black);
-            g = e.Graphics;
+            // get form
             ChartControl f = (ChartControl)sender;
-            g.Clear(f.BackColor);
-            // get title
-            Text = Title;
+            // get graphics
+            g = e.Graphics;
             // get window
             r = ClientRectangle;
+            // get title
+            Text = Title;
+            // check for data
+            if ((bl == null) || (bl.Intervals.Length==0) || (bl.Count == 0))
+            {
+                g.DrawString("Unknown symbol, or no data.", new Font(FontFamily.GenericSerif, 14, FontStyle.Bold), Brushes.Red, new PointF(r.Width / 3, r.Height / 2));
+                return;
+            }
+            // setup to draw
+            Pen p = new Pen(Color.Black);
+            g.Clear(f.BackColor);
             // get number of pixels available for each bar, based on screensize and barcount
             pixperbar = (((decimal)r.Width - (decimal)border - ((decimal)border/3)) / (decimal)barc);
             // pixels for each time stamp
@@ -396,6 +406,7 @@ namespace TradeLink.AppKit
         public void Chart_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Delta == 0) return;
+            if (bl == null) return;
             BarInterval old = bl.DefaultInterval;
             BarInterval [] v = bl.Intervals;
             int biord = 0;
