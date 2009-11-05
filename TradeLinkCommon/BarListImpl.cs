@@ -447,6 +447,19 @@ namespace TradeLink.Common
             return new BarImpl();
         }
 
+        public static Bar GetBar(BarList chart, int date)
+        {
+            // look for previous day's close
+            for (int j = chart.Last; (j >= chart.First); j--)
+            {
+                if (chart.Date()[j] == date)
+                {
+                    return chart[j];
+                }
+            }
+            return new BarImpl();
+        }
+
 
     }
 
