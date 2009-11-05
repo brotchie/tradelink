@@ -744,6 +744,17 @@ namespace ASP
             tmp.SendMessage += new MessageDelegate(_workingres_SendMessage);
             tmp.SendBasket += new BasketDelegate(_workingres_SendBasket);
             tmp.SendChartLabel += new ChartLabelDelegate(tmp_SendChartLabel);
+            tmp.SendIndicators += new StringParamDelegate(tmp_SendIndicators);
+        }
+
+        bool _inderror = false;
+        void tmp_SendIndicators(string param)
+        {
+            if (!_inderror)
+            {
+                debug(PROGRAM + " does not support sendindicator.");
+                _inderror = true;
+            }
         }
 
         bool _charterror = false;
