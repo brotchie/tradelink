@@ -56,7 +56,9 @@ int StkWrap::OnExecMsgErrMsg(const GTErrMsg &err)
 
 int StkWrap::OnExecMsgCancel(const GTCancel &cancel)
 {
-	tl->SrvGotCancel((int)cancel.dwTicketNo);
+	int idx = tl->GetIDIndex(cancel.dwTicketNo,TICKET);
+	int id = tl->orderids[idx];
+	tl->SrvGotCancel(id);
 
 
 	return GTStock::OnExecMsgCancel(cancel);
