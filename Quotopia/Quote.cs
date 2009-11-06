@@ -199,6 +199,9 @@ namespace Quotopia
             qt.Columns.Add("Exch");
             qt.Columns.Add("BidEx");
             qt.Columns.Add("AskEx");
+            //bid-ask spread
+            qt.Columns.Add("BASpreadBPS");
+            qt.Columns.Add("BASpread");
             qg.AllowUserToAddRows = false;
             qg.AllowUserToDeleteRows = false;
             qg.AllowUserToOrderColumns = true;
@@ -496,9 +499,11 @@ namespace Quotopia
                     int r = rows[i];
                     if (qt.Rows[r].RowState == DataRowState.Deleted) continue;
                     if ((r < 0) || (r >= qt.Rows.Count)) continue;
+                    //if forex, use 5 decimal points
+                    string strSigFigs = t.symbol.Contains("/") ? "N5" : "N2";
                     if (t.isTrade)
                     {
-                        qt.Rows[r]["Last"] = t.trade.ToString("N2");
+                        qt.Rows[r]["Last"] = t.trade.ToString(strSigFigs);
                         qt.Rows[r]["Exch"] = t.ex;
                         if (t.size > 0) // make sure TSize is reported
                             qt.Rows[r]["TSize"] = t.size;
@@ -506,8 +511,8 @@ namespace Quotopia
                     if (t.isFullQuote)
                     {
 
-                        qt.Rows[r]["Bid"] = t.bid.ToString("N2");
-                        qt.Rows[r]["Ask"] = t.ask.ToString("N2");
+                        qt.Rows[r]["Bid"] = t.bid.ToString(strSigFigs);
+                        qt.Rows[r]["Ask"] = t.ask.ToString(strSigFigs);
                         qt.Rows[r]["BidEx"] = t.be;
                         qt.Rows[r]["AskEx"] = t.oe;
                         qt.Rows[r]["BSize"] = t.bs;
@@ -516,7 +521,7 @@ namespace Quotopia
                     }
                     else if (t.hasBid)
                     {
-                        qt.Rows[r]["Bid"] = t.bid.ToString("N2");
+                        qt.Rows[r]["Bid"] = t.bid.ToString(strSigFigs);
                         qt.Rows[r]["BidEx"] = t.be;
                         qt.Rows[r]["BSize"] = t.bs;
                         string s = qt.Rows[r]["ASize"].ToString();
@@ -525,15 +530,36 @@ namespace Quotopia
                     }
                     else if (t.hasAsk)
                     {
-                        qt.Rows[r]["Ask"] = t.ask.ToString("N2");
+                        qt.Rows[r]["Ask"] = t.ask.ToString(strSigFigs);
                         qt.Rows[r]["ASize"] = t.os;
                         qt.Rows[r]["AskEx"] = t.oe;
                         string s = qt.Rows[r]["BSize"].ToString();
                         int bs = (s != "") ? Convert.ToInt32(s) : 0;
                         qt.Rows[r]["Sizes"] = bs.ToString() + "x" + t.os.ToString();
                     }
-                    qt.Rows[r]["High"] = high.ToString("N2");
-                    qt.Rows[r]["Low"] = low.ToString("N2");
+                    qt.Rows[r]["High"] = high.ToString(strSigFigs);
+                    qt.Rows[r]["Low"] = low.ToString(strSigFigs);
+                    //most recent bid
+                    decimal bid = Decimal.Parse((string)qt.Rows[r]["Bid"]);
+                    //most recent ask
+                    decimal ask = Decimal.Parse((string)qt.Rows[r]["Ask"]);
+                    decimal baSpread = 0;
+                    decimal baSpreadRel = 0;
+                    if (bid != 0 && ask != 0)
+                    {
+                        baSpread = ask - bid;
+                        baSpreadRel = (ask - bid) / bid;
+                        //sigfig is the multiplier => 10 to the power 2 for stocks
+                        //10 to the power 5 for forex
+                        decimal sigfig = (decimal)Math.Pow(10, Double.Parse(strSigFigs[1] + ""));
+                        baSpreadRel *= sigfig;
+                        baSpread *= sigfig;
+                        qt.Rows[r]["BASpread"] = baSpread.ToString(strSigFigs);
+                        qt.Rows[r]["BASpreadBPS"] = baSpreadRel.ToString(strSigFigs);
+                    }
+
+
+
 
 
                 }
