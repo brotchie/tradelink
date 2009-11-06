@@ -162,12 +162,27 @@ namespace ServerMB
             string [] syms = msg.Split(',');
             m_Quotes.UnadviseAll(this);
             for (int i = 0; i < syms.Length; i++)
-                m_Quotes.AdviseSymbol(this, syms[i], (int)enumQuoteServiceFlags.qsfTimeAndSales);
+            {
+				if  (syms[i].Contains(".")) {
+					//we can reasonably assume this is an options request
+					m_Quotes.AdviseSymbol(this, syms[i], (int)enumQuoteServiceFlags.qsfOptions);
+				} else if (syms[i].Contains("/"))
+				{
+					//we know (or can at least reasonably assume) this is forex
+					//advise only level1 bid-ask quotes
+					m_Quotes.AdviseSymbol(this, syms[i], (int)enumQuoteServiceFlags.qsfLevelOne);
+				} else {
+					//probably equity, advise time and sales
+					m_Quotes.AdviseSymbol(this, syms[i], ((int)enumQuoteServiceFlags.qsfTimeAndSales));
+				}
+			}
         }
 
         void MBTQUOTELib.IMbtQuotesNotify.OnOptionsData(ref OPTIONSRECORD pRec)
         {
+            //not yet implemented
         }
+
         void MBTQUOTELib.IMbtQuotesNotify.OnTSData(ref TSRECORD pRec)
         {
             TickImpl k = new TickImpl();
@@ -191,13 +206,41 @@ namespace ServerMB
                     k.size= pRec.lSize;
                     break;
             }
+
             tl.newTick(k);
         }
         void MBTQUOTELib.IMbtQuotesNotify.OnQuoteData(ref QUOTERECORD pQuote)
         {
+            TickImpl k = new TickImpl();
+            k.symbol = pQuote.bstrSymbol;
+            k.ask = (decimal)pQuote.dAsk;
+            k.bid = (decimal)pQuote.dBid;
+            k.os = k.AskSize = pQuote.lAskSize;
+            k.bs = k.BidSize = pQuote.lBidSize;
+            k.ex = k.be = k.oe = pQuote.bstrMarket;
+            tl.newTick(k);
         }
         void MBTQUOTELib.IMbtQuotesNotify.OnLevel2Data(ref LEVEL2RECORD pRec)
         {
+            
+            TickImpl k = new TickImpl();
+            k.symbol = pRec.bstrSymbol;
+            k.ex = pRec.bstrSource;
+            enumMarketSide ems = (enumMarketSide)pRec.side;
+            switch (ems)
+            {
+                case enumMarketSide.msAsk:
+                    k.ask = (decimal)pRec.dPrice;
+                    k.oe = pRec.bstrSource;
+                    k.os = pRec.lSize;
+                    break;
+                case enumMarketSide.msBid:
+                    k.bid = (decimal)pRec.dPrice;
+                    k.oe = pRec.bstrSource;
+                    k.os = pRec.lSize;
+                    break;
+            }
+            tl.newTick(k);
         }
 
 
@@ -206,8 +249,8 @@ namespace ServerMB
         {
             test();
             int side = o.side ? MBConst.VALUE_BUY : MBConst.VALUE_SELL;
-            int tif = MBConst.VALUE_DAY;
-            if (o.TIF=="GTC") tif = MBConst.VALUE_GTC;
+            //int tif = MBConst.VALUE_DAY;
+            int tif = MBConst.VALUE_GTC;
             int otype = MBConst.VALUE_MARKET;
             if (o.isLimit) otype = MBConst.VALUE_LIMIT;
             string route = "MBTX";
@@ -215,7 +258,15 @@ namespace ServerMB
             DateTime dt = new DateTime(0);
             string res = null;
             MbtAccount m_account = getaccount(o.Account);
+            //make sure the account is "loaded"
+            //could be done in onlogonsucceed also
+            if (m_account.State == enumAcctState.asUnloaded)
+                m_account.Load();
             bool good = m_OrderClient.Submit(side, o.UnsignedSize, o.symbol, (double)o.price, (double)o.stopp, tif, 0, otype, voltype, 0, m_account, route, "", 0, 0, dt, dt, 0, 0, 0, 0, 0, ref res);
+            if (!good)
+            {
+                debug("The following order failed: " + o);
+            }
         }
 
         MbtAccount getaccount(string name) { foreach (MbtAccount a in m_OrderClient.Accounts) if (a.Account == name) return a; return m_OrderClient.Accounts.DefaultAccount; }
