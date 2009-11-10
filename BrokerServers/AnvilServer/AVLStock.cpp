@@ -99,7 +99,11 @@ AVLStock::~AVLStock()
 
 void AVLStock::Load()
 {
+	// ignore empty symbols
+	if (m_symbol.empty()) return;
+	// start loading stock
     m_stockHandle = B_GetStockHandle(m_symbol.c_str());//This will load the stock from the Hammer server. The stock will not be available immediately for monitoring and trading, only after Hammer server sends all the info about the stock.
+	// make sure we got something back
 	if(m_stockHandle)
 	{
 		m_level1 = B_GetLevel1(m_stockHandle);
@@ -129,13 +133,12 @@ void AVLStock::QuoteNotify()
 {
 	if (isLoaded())
 	{
-			TLTick k;
-			k.date = _date;
+			kquote.date = _date;
 			uint hour,minute,second;
 			B_GetCurrentServerNYTimeTokens(hour, minute, second);
-			k.time = (hour*10000)+(minute*100) + second;
-			k.sym = _sym;
-			k.symid = _symid;
+			kquote.time = (hour*10000)+(minute*100) + second;
+			kquote.sym = _sym;
+			kquote.symid = _symid;
 			// get bid
 			B_StartIteration(bidi);
 			//const BookEntry* be = B_GetNextBookEntry(bidi);
@@ -147,21 +150,21 @@ void AVLStock::QuoteNotify()
 			{
 				be = B_GetNextBookEntry(bidi);
 				if (be==NULL) return;
-				k.bid = be->toDouble();
-				k.bs = be->GetSize()/m_stockHandle->GetRoundLot();
-				k.be = be->GetMmid();
+				kquote.bid = be->toDouble();
+				kquote.bs = be->GetSize()/m_stockHandle->GetRoundLot();
+				kquote.be = be->GetMmid();
 				// get ask
 				//B_StartIteration(aski);
 				//const BookEntry* ae = B_GetNextBookEntry(aski);
 				ae = B_GetNextBookEntry(aski);
 				if (ae==NULL) return;
-				k.ask = ae->toDouble();
-				k.os = ae->GetSize()/m_stockHandle->GetRoundLot();
-				k.oe = ae->GetMmid();
+				kquote.ask = ae->toDouble();
+				kquote.os = ae->GetSize()/m_stockHandle->GetRoundLot();
+				kquote.oe = ae->GetMmid();
 				//set depth
-				k.depth = i;
+				kquote.depth = i;
 				// send tick
-				tl->SrvGotTick(k);
+				tl->SrvGotTick(kquote);
 			}
 	}
 
@@ -170,23 +173,22 @@ void AVLStock::TradeNotify()
 {
 	if (isLoaded())
 	{
-			TLTick k;
 			uint hour,minute,second;
 			B_GetCurrentServerNYTimeTokens(hour, minute, second);
-			k.date = _date;
-			k.time = (hour*10000)+(minute*100) + second;
-			k.sym = _sym;
-			k.symid = _symid;
+			ktrade.date = _date;
+			ktrade.time = (hour*10000)+(minute*100) + second;
+			ktrade.sym = _sym;
+			ktrade.symid = _symid;
 			// get trade
 			B_StartIteration(pnti);
 			const Transaction* t = B_GetNextPrintsEntry(pnti);
 			if (t==NULL) return;
-			k.trade = t->toDouble();
-			k.size = t->GetSize();
-			k.ex = t->GetMmid();
+			ktrade.trade = t->toDouble();
+			ktrade.size = t->GetSize();
+			ktrade.ex = t->GetMmid();
 
 			// send tick
-			tl->SrvGotTick(k);
+			tl->SrvGotTick(ktrade);
 	}
 }
 
@@ -194,8 +196,15 @@ bool AVLStock::isLoaded() const
 {
 	const bool nonull = (m_stockHandle != NULL);
 	if (!nonull) return false;
-	const bool load = m_stockHandle->isLoaded();
-	return (m_stockHandle->GetSymbol()==m_symbol) && load; 
+	__try
+	{
+		const bool load = m_stockHandle->isLoaded();
+		return load && (m_stockHandle->GetSymbol()==m_symbol); 
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER)
+	{
+		return false;
+	}
 }
 
 
@@ -205,12 +214,16 @@ void AVLStock::Process(const Message* message, Observable* from, const Message* 
     switch(message->GetType())
     {
 		case M_RESP_REFRESH_SYMBOL:
+		case M_NW2_MM_QUOTE:
+        case M_LEVEL2_QUOTE:
 		case M_ITCH_1_00_NewVisibleOrder:
 		case M_ITCH_1_00_VisibleOrderExecution:
 		case M_ITCH_1_00_CanceledOrder:
 		case M_BOOK_NEW_ORDER:
 		case M_BOOK_MODIFY_ORDER:
 		case M_BOOK_DELETE_ORDER:
+		case M_ITCH_1_00_HiddenOrderExecution:
+		case M_ITCH_1_00_HiddenAttributedOrderExecution:
 		case M_ITCH_1_00_NewVisibleAttributedOrder:
 		case M_ITCH_1_00_VisibleAttributedOrderExecution:
 		case M_ITCH_1_00_ATTRIBUTED_CanceledOrder:
@@ -221,8 +234,7 @@ void AVLStock::Process(const Message* message, Observable* from, const Message* 
 		case M_FLUSH_ATTRIBUTED_BOOK:
 		case M_FLUSH_ATTRIBUTED_BOOK_FOR_STOCK:
 		case M_NW2_INSIDE_QUOTE:
-		case M_NW2_MM_QUOTE:
-        case M_LEVEL2_QUOTE:
+
 			if (from==m_prints)
 				TradeNotify();
 			if ((from==m_level2))
@@ -234,6 +246,12 @@ void AVLStock::Process(const Message* message, Observable* from, const Message* 
 			break;
 		case M_RESP_REFRESH_SYMBOL_FAILED:
 			Clear();
+			break;
+		case MSGID_CONNECTION_MADE:
+			if (from== B_GetMarketReceiver())
+			{
+				Load();
+			}
 			break;
 
     }

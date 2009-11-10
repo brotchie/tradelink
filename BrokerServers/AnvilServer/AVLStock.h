@@ -39,6 +39,8 @@ protected:
     Observable* m_level2;
     Observable* m_prints;
 	Observable* m_account;
+	TradeLibFast::TLTick kquote;
+	TradeLibFast::TLTick ktrade;
 
 	void* bidi;
 	void* aski;
