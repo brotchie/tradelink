@@ -499,11 +499,33 @@ namespace Quotopia
                     int r = rows[i];
                     if (qt.Rows[r].RowState == DataRowState.Deleted) continue;
                     if ((r < 0) || (r >= qt.Rows.Count)) continue;
-                    //if forex, use 5 decimal points
-                    string strSigFigs = t.symbol.Contains("/") ? "N5" : "N2";
+                    //get number of decimal points from settings
+                    int numDecimalPoints = 2; //default = 2
+                    try {
+                        numDecimalPoints = Int32.Parse(Quotopia.Properties.Settings.Default.tbDecimalPoints);
+                    } catch (Exception e) {
+                        debug("Error with default numDecimalPoints: " + e.ToString());
+                    }
+                    //floor and ceiling
+                    if (numDecimalPoints < 0) numDecimalPoints = 0;
+                    if (numDecimalPoints > 10) numDecimalPoints = 10;
+                    //string strSigFigs = t.symbol.Contains("/") ? "N5" : "N2"
+                    string strPriceDecimalPoints = "N" + numDecimalPoints + "";
+                    //get number of shares to display per unit size
+                    int numSharesPerContract = 1;
+                    try
+                    {
+                        numSharesPerContract = Int32.Parse(Quotopia.Properties.Settings.Default.SharesPerContract);
+                    }
+                    catch (Exception e)
+                    {
+                        debug("Error with parsing numSharesPerContract: " + e.ToString());
+                    }
+                    //floor, no ceiling
+                    if (numSharesPerContract < 1) numSharesPerContract = 1;
                     if (t.isTrade)
                     {
-                        qt.Rows[r]["Last"] = t.trade.ToString(strSigFigs);
+                        qt.Rows[r]["Last"] = t.trade.ToString(strPriceDecimalPoints);
                         qt.Rows[r]["Exch"] = t.ex;
                         if (t.size > 0) // make sure TSize is reported
                             qt.Rows[r]["TSize"] = t.size;
@@ -511,34 +533,38 @@ namespace Quotopia
                     if (t.isFullQuote)
                     {
 
-                        qt.Rows[r]["Bid"] = t.bid.ToString(strSigFigs);
-                        qt.Rows[r]["Ask"] = t.ask.ToString(strSigFigs);
+                        qt.Rows[r]["Bid"] = t.bid.ToString(strPriceDecimalPoints);
+                        qt.Rows[r]["Ask"] = t.ask.ToString(strPriceDecimalPoints);
                         qt.Rows[r]["BidEx"] = t.be;
                         qt.Rows[r]["AskEx"] = t.oe;
-                        qt.Rows[r]["BSize"] = t.bs;
-                        qt.Rows[r]["ASize"] = t.os;
-                        qt.Rows[r]["Sizes"] = t.bs.ToString() + "x" + t.os.ToString();
+                        int bs = t.bs / numSharesPerContract;
+                        int os = t.os / numSharesPerContract;
+                        qt.Rows[r]["BSize"] = bs;
+                        qt.Rows[r]["ASize"] = os;
+                        qt.Rows[r]["Sizes"] = bs.ToString() + "x" + os.ToString();
                     }
                     else if (t.hasBid)
                     {
-                        qt.Rows[r]["Bid"] = t.bid.ToString(strSigFigs);
+                        qt.Rows[r]["Bid"] = t.bid.ToString(strPriceDecimalPoints);
                         qt.Rows[r]["BidEx"] = t.be;
-                        qt.Rows[r]["BSize"] = t.bs;
+                        int bs = t.bs / numSharesPerContract;
+                        qt.Rows[r]["BSize"] = bs;
                         string s = qt.Rows[r]["ASize"].ToString();
                         int os = (s != "") ? Convert.ToInt32(s) : 0;
-                        qt.Rows[r]["Sizes"] = t.bs.ToString() + "x" + os.ToString();
+                        qt.Rows[r]["Sizes"] = bs.ToString() + "x" + os.ToString();
                     }
                     else if (t.hasAsk)
                     {
-                        qt.Rows[r]["Ask"] = t.ask.ToString(strSigFigs);
-                        qt.Rows[r]["ASize"] = t.os;
+                        qt.Rows[r]["Ask"] = t.ask.ToString(strPriceDecimalPoints);
+                        int os = t.bs / numSharesPerContract;
+                        qt.Rows[r]["ASize"] = os;
                         qt.Rows[r]["AskEx"] = t.oe;
                         string s = qt.Rows[r]["BSize"].ToString();
                         int bs = (s != "") ? Convert.ToInt32(s) : 0;
-                        qt.Rows[r]["Sizes"] = bs.ToString() + "x" + t.os.ToString();
+                        qt.Rows[r]["Sizes"] = bs.ToString() + "x" + os.ToString();
                     }
-                    qt.Rows[r]["High"] = high.ToString(strSigFigs);
-                    qt.Rows[r]["Low"] = low.ToString(strSigFigs);
+                    qt.Rows[r]["High"] = high.ToString(strPriceDecimalPoints);
+                    qt.Rows[r]["Low"] = low.ToString(strPriceDecimalPoints);
                     //most recent bid
                     decimal bid = Decimal.Parse((string)qt.Rows[r]["Bid"]);
                     //most recent ask
@@ -548,14 +574,9 @@ namespace Quotopia
                     if (bid != 0 && ask != 0)
                     {
                         baSpread = ask - bid;
-                        baSpreadRel = (ask - bid) / bid;
-                        //sigfig is the multiplier => 10 to the power 2 for stocks
-                        //10 to the power 5 for forex
-                        decimal sigfig = (decimal)Math.Pow(10, Double.Parse(strSigFigs[1] + ""));
-                        baSpreadRel *= sigfig;
-                        baSpread *= sigfig;
-                        qt.Rows[r]["BASpread"] = baSpread.ToString(strSigFigs);
-                        qt.Rows[r]["BASpreadBPS"] = baSpreadRel.ToString(strSigFigs);
+                        baSpreadRel = 10000 * (ask - bid) / bid;
+                        qt.Rows[r]["BASpread"] = baSpread.ToString(strPriceDecimalPoints);
+                        qt.Rows[r]["BASpreadBPS"] = baSpreadRel.ToString(strPriceDecimalPoints);
                     }
 
 
@@ -698,6 +719,16 @@ namespace Quotopia
         {
             Properties.Settings.Default.Reset();
             
+        }
+
+        private void tbDecimalPoints_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Settings_Click(object sender, EventArgs e)
+        {
+
         }
 
 
