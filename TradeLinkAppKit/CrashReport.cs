@@ -68,7 +68,7 @@ namespace TradeLink.AppKit
                     sw.WriteLine(report);
                     sw.Flush();
                     sw.Close();
-                    System.Diagnostics.Process.Start("notepad.exe tempreport.txt");
+                    System.Diagnostics.Process.Start(Environment.SystemDirectory+"\\notepad.exe tempreport.txt");
                     System.Diagnostics.Process.Start(DeveloperIssuePostURL(program, desc, null, Environment.NewLine + " PASTE NOTEPAD CONTENTS HERE"));
                 }
             }
