@@ -19,7 +19,7 @@ namespace Kadina
         string responsedll = "";
         string resname = "";
         Response myres;
-        PlayTo pt = PlayTo.OneMin;
+        PlayTo pt = PlayTo.Hour;
 
         ResponseList _rl = new ResponseList();
 
