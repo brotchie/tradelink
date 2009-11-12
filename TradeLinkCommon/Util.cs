@@ -618,14 +618,24 @@ namespace TradeLink.Common
             return s;
         }
 
+        /// <summary>
+        /// dumps public properties and fields of an object as an xml string
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
         public static string DumpObjectProperties(Object o)
         {
-            System.Type t = o.GetType();
-            System.Xml.Serialization.XmlSerializer xs = new System.Xml.Serialization.XmlSerializer(t);
-            System.IO.StringWriter sw = new System.IO.StringWriter();
-            xs.Serialize(sw, o);
-            sw.Close();
-            return sw.ToString();
+            try
+            {
+                System.Type t = o.GetType();
+                System.Xml.Serialization.XmlSerializer xs = new System.Xml.Serialization.XmlSerializer(t);
+                System.IO.StringWriter sw = new System.IO.StringWriter();
+                xs.Serialize(sw, o);
+                sw.Close();
+                return sw.ToString();
+            }
+            catch { }
+            return string.Empty;
         }
         
     }
