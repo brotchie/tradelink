@@ -24,6 +24,7 @@ namespace TradeLink.Common
 			this.Text = DisplayParamsOfObject.Name + " Options";
             propertyGrid1.PropertySort = PropertySort.Categorized;
 			propertyGrid1.SelectedObject = (object)DisplayParamsOfObject;
+            Invalidate();
 
 		}
         /// <summary>
@@ -61,19 +62,18 @@ namespace TradeLink.Common
             // propertyGrid1
             // 
             this.propertyGrid1.CommandsVisibleIfAvailable = false;
-            this.propertyGrid1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.propertyGrid1.LineColor = System.Drawing.SystemColors.ControlLight;
             this.propertyGrid1.Location = new System.Drawing.Point(0, 0);
             this.propertyGrid1.Name = "propertyGrid1";
-            this.propertyGrid1.Size = new System.Drawing.Size(292, 261);
+            this.propertyGrid1.Size = new System.Drawing.Size(467, 464);
             this.propertyGrid1.TabIndex = 0;
-            this.propertyGrid1.ToolbarVisible = false;
             // 
             // applyoptionsbut
             // 
             this.applyoptionsbut.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.applyoptionsbut.Location = new System.Drawing.Point(0, 231);
+            this.applyoptionsbut.Location = new System.Drawing.Point(0, 434);
             this.applyoptionsbut.Name = "applyoptionsbut";
-            this.applyoptionsbut.Size = new System.Drawing.Size(292, 30);
+            this.applyoptionsbut.Size = new System.Drawing.Size(467, 30);
             this.applyoptionsbut.TabIndex = 1;
             this.applyoptionsbut.Text = "Accept";
             this.applyoptionsbut.UseVisualStyleBackColor = true;
@@ -81,7 +81,7 @@ namespace TradeLink.Common
             // 
             // ParamPrompt
             // 
-            this.ClientSize = new System.Drawing.Size(292, 261);
+            this.ClientSize = new System.Drawing.Size(467, 464);
             this.Controls.Add(this.applyoptionsbut);
             this.Controls.Add(this.propertyGrid1);
             this.MaximizeBox = false;
@@ -92,6 +92,25 @@ namespace TradeLink.Common
             this.TopMost = true;
             this.ResumeLayout(false);
 
+            SizeChanged += new EventHandler(ParamPrompt_SizeChanged);
+            Load += new EventHandler(ParamPrompt_Load);
+
+        }
+
+        void ParamPrompt_Load(object sender, EventArgs e)
+        {
+            if (ClientRectangle.Height != 0)
+                propertyGrid1.Height = (int)ClientRectangle.Height - applyoptionsbut.Height -3 ;
+        }
+
+        void ParamPrompt_SizeChanged(object sender, EventArgs e)
+        {
+            int neww = (int)(ClientRectangle.Width);
+            if (neww != 0)
+                propertyGrid1.Width = neww;
+            if (ClientRectangle.Height != 0)
+                propertyGrid1.Height = (int)ClientRectangle.Height - applyoptionsbut.Height -3;
+            Invalidate(true);
         }
 	}
 }
