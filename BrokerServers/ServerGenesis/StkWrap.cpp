@@ -180,6 +180,7 @@ int StkWrap::OnBestAskPriceChanged()
 {
 	TLTick k;
 	k.sym = CString(m_szStock);
+	k.symid = _symid;
 	k.ask = m_level1.dblAskPrice;
 	k.os = m_level1.nAskSize;
 	k.oe = CString(m_level1.locAskExchangeCode);
@@ -194,6 +195,7 @@ int StkWrap::OnBestBidPriceChanged()
 {
 	TLTick k;
 	k.sym = CString(m_szStock);
+	k.symid = _symid;
 	k.bid = m_level1.dblBidPrice;
 	k.bs = m_level1.nBidSize;
 	k.be = CString(m_level1.locBidExchangeCode);

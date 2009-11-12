@@ -382,6 +382,8 @@ bool ServerGenesis::IdIsUnique(uint id)
 int ServerGenesis::CancelRequest(long id)
 {
 	int idx = GetIDIndex(id,ID);
+	if (idx==NO_ID) 
+		return OK;
 	long ticket = orderticket[idx];
 	gtw->CancelOrder(ticket);
 	return OK;
