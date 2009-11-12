@@ -119,12 +119,18 @@ namespace TradeLink.Common
         }
         public static Basket FromFile(string filename)
         {
-            StreamReader sr = new StreamReader(filename);
-            string file = sr.ReadToEnd();
-            sr.Close();
-            string[] syms = file.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-            BasketImpl b = new BasketImpl(syms);
-            return b;
+            try
+            {
+                StreamReader sr = new StreamReader(filename);
+                string file = sr.ReadToEnd();
+                sr.Close();
+                string[] syms = file.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                BasketImpl b = new BasketImpl(syms);
+                b.Name = Path.GetFileNameWithoutExtension(filename);
+                return b;
+            }
+            catch { }
+            return new BasketImpl();
         }
 
         public static void ToFile(Basket b, string filename) { ToFile(b, filename, false); }
