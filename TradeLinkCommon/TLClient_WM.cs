@@ -26,6 +26,7 @@ namespace TradeLink.Common
         public event PositionDelegate gotPosition;
         public event ImbalanceDelegate gotImbalance;
         public event MessageDelegate gotUnknownMessage;
+        public event DebugDelegate SendDebug;
 
         // member fields
         TLTypes _linktype = TLTypes.NONE;
@@ -340,8 +341,16 @@ namespace TradeLink.Common
                     if (gotOrder != null) gotOrder(o);
                     break;
                 case MessageTypes.POSITIONRESPONSE:
-                    Position pos = PositionImpl.Deserialize(msg);
-                    if (gotPosition != null) gotPosition(pos);
+                    try
+                    {
+                        Position pos = PositionImpl.Deserialize(msg);
+                        if (gotPosition != null) gotPosition(pos);
+                    }
+                    catch (Exception ex)
+                    {
+                        if (SendDebug!=null)
+                            SendDebug(msg+" "+ex.Message + ex.StackTrace);
+                    }
                     break;
 
                 case MessageTypes.ACCOUNTRESPONSE:
