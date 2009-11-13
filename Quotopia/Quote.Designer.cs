@@ -45,11 +45,11 @@ namespace Quotopia
             this.OrderTimeCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.OrderDateCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this._sharepercontract = new System.Windows.Forms.NumericUpDown();
+            this._dispdecpoints = new System.Windows.Forms.NumericUpDown();
             this.Settings = new System.Windows.Forms.TabPage();
             this.label4 = new System.Windows.Forms.Label();
-            this.tbSharesPerContract = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.tbDecimalPoints = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.exchdest = new System.Windows.Forms.TextBox();
             this.accountname = new System.Windows.Forms.TextBox();
@@ -80,6 +80,8 @@ namespace Quotopia
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.statuslab = new System.Windows.Forms.ToolStripStatusLabel();
             this.quoteTab = new System.Windows.Forms.TabControl();
+            ((System.ComponentModel.ISupportInitialize)(this._sharepercontract)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._dispdecpoints)).BeginInit();
             this.Settings.SuspendLayout();
             this.TradeTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.TradesView)).BeginInit();
@@ -132,13 +134,52 @@ namespace Quotopia
             this.OrderDateCol.Name = "OrderDateCol";
             this.OrderDateCol.ReadOnly = true;
             // 
+            // _sharepercontract
+            // 
+            this._sharepercontract.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::Quotopia.Properties.Settings.Default, "sharepercontract", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this._sharepercontract.Location = new System.Drawing.Point(187, 179);
+            this._sharepercontract.Maximum = new decimal(new int[] {
+            1000000000,
+            0,
+            0,
+            0});
+            this._sharepercontract.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this._sharepercontract.Name = "_sharepercontract";
+            this._sharepercontract.Size = new System.Drawing.Size(87, 26);
+            this._sharepercontract.TabIndex = 31;
+            this._sharepercontract.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.toolTip1.SetToolTip(this._sharepercontract, "Number of shares per contract for size display");
+            this._sharepercontract.Value = global::Quotopia.Properties.Settings.Default.sharepercontract;
+            this._sharepercontract.ValueChanged += new System.EventHandler(this._sharepercontract_ValueChanged);
+            // 
+            // _dispdecpoints
+            // 
+            this._dispdecpoints.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::Quotopia.Properties.Settings.Default, "displaydecpoints", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this._dispdecpoints.Location = new System.Drawing.Point(187, 147);
+            this._dispdecpoints.Maximum = new decimal(new int[] {
+            6,
+            0,
+            0,
+            0});
+            this._dispdecpoints.Name = "_dispdecpoints";
+            this._dispdecpoints.Size = new System.Drawing.Size(87, 26);
+            this._dispdecpoints.TabIndex = 30;
+            this._dispdecpoints.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.toolTip1.SetToolTip(this._dispdecpoints, "Number of decimal points for price display");
+            this._dispdecpoints.Value = global::Quotopia.Properties.Settings.Default.displaydecpoints;
+            this._dispdecpoints.ValueChanged += new System.EventHandler(this._dispdecpoints_ValueChanged);
+            // 
             // Settings
             // 
             this.Settings.BackColor = System.Drawing.Color.Transparent;
             this.Settings.Controls.Add(this.label4);
-            this.Settings.Controls.Add(this.tbSharesPerContract);
             this.Settings.Controls.Add(this.label3);
-            this.Settings.Controls.Add(this.tbDecimalPoints);
+            this.Settings.Controls.Add(this._sharepercontract);
+            this.Settings.Controls.Add(this._dispdecpoints);
             this.Settings.Controls.Add(this.label2);
             this.Settings.Controls.Add(this.exchdest);
             this.Settings.Controls.Add(this.accountname);
@@ -148,74 +189,47 @@ namespace Quotopia
             this.Settings.Controls.Add(this.saveSettingsbut);
             this.Settings.ForeColor = System.Drawing.SystemColors.MenuText;
             this.Settings.Location = new System.Drawing.Point(4, 4);
+            this.Settings.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Settings.Name = "Settings";
-            this.Settings.Padding = new System.Windows.Forms.Padding(3);
-            this.Settings.Size = new System.Drawing.Size(531, 220);
+            this.Settings.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.Settings.Size = new System.Drawing.Size(800, 345);
             this.Settings.TabIndex = 1;
             this.Settings.Text = "Settings";
             this.Settings.UseVisualStyleBackColor = true;
-            this.Settings.Click += new System.EventHandler(this.Settings_Click);
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(6, 161);
-            this.label4.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label4.Location = new System.Drawing.Point(8, 181);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(224, 13);
-            this.label4.TabIndex = 29;
-            this.label4.Text = "Number of shares per contract for size display:";
-            // 
-            // tbSharesPerContract
-            // 
-            this.tbSharesPerContract.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Quotopia.Properties.Settings.Default, "SharesPerContract", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.tbSharesPerContract.Location = new System.Drawing.Point(234, 158);
-            this.tbSharesPerContract.Margin = new System.Windows.Forms.Padding(2);
-            this.tbSharesPerContract.Name = "tbSharesPerContract";
-            this.tbSharesPerContract.Size = new System.Drawing.Size(87, 20);
-            this.tbSharesPerContract.TabIndex = 28;
-            this.tbSharesPerContract.Text = global::Quotopia.Properties.Settings.Default.SharesPerContract;
-            this.tbSharesPerContract.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.label4.Size = new System.Drawing.Size(173, 20);
+            this.label4.TabIndex = 33;
+            this.label4.Text = "Shares / VisibleShares:";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(6, 132);
-            this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label3.Location = new System.Drawing.Point(8, 153);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(208, 13);
-            this.label3.TabIndex = 27;
-            this.label3.Text = "Number of decimal points for price display: ";
-            // 
-            // tbDecimalPoints
-            // 
-            this.tbDecimalPoints.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Quotopia.Properties.Settings.Default, "tbDecimalPoints", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.tbDecimalPoints.Location = new System.Drawing.Point(234, 129);
-            this.tbDecimalPoints.Margin = new System.Windows.Forms.Padding(2);
-            this.tbDecimalPoints.Name = "tbDecimalPoints";
-            this.tbDecimalPoints.Size = new System.Drawing.Size(87, 20);
-            this.tbDecimalPoints.TabIndex = 26;
-            this.tbDecimalPoints.Text = global::Quotopia.Properties.Settings.Default.tbDecimalPoints;
-            this.tbDecimalPoints.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.tbDecimalPoints.TextChanged += new System.EventHandler(this.tbDecimalPoints_TextChanged);
+            this.label3.Size = new System.Drawing.Size(118, 20);
+            this.label3.TabIndex = 32;
+            this.label3.Text = "Decimal Points:";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 101);
-            this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label2.Location = new System.Drawing.Point(8, 121);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(58, 13);
+            this.label2.Size = new System.Drawing.Size(84, 20);
             this.label2.TabIndex = 25;
             this.label2.Text = "Exchange:";
             // 
             // exchdest
             // 
             this.exchdest.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Quotopia.Properties.Settings.Default, "exchangedest", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.exchdest.Location = new System.Drawing.Point(66, 97);
-            this.exchdest.Margin = new System.Windows.Forms.Padding(2);
+            this.exchdest.Location = new System.Drawing.Point(98, 115);
             this.exchdest.Name = "exchdest";
-            this.exchdest.Size = new System.Drawing.Size(119, 20);
+            this.exchdest.Size = new System.Drawing.Size(176, 26);
             this.exchdest.TabIndex = 24;
             this.exchdest.Text = global::Quotopia.Properties.Settings.Default.exchangedest;
             this.exchdest.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
@@ -223,10 +237,9 @@ namespace Quotopia
             // accountname
             // 
             this.accountname.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::Quotopia.Properties.Settings.Default, "accountname", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.accountname.Location = new System.Drawing.Point(66, 77);
-            this.accountname.Margin = new System.Windows.Forms.Padding(2);
+            this.accountname.Location = new System.Drawing.Point(98, 84);
             this.accountname.Name = "accountname";
-            this.accountname.Size = new System.Drawing.Size(119, 20);
+            this.accountname.Size = new System.Drawing.Size(176, 26);
             this.accountname.TabIndex = 22;
             this.accountname.Text = global::Quotopia.Properties.Settings.Default.accountname;
             this.accountname.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
@@ -234,18 +247,18 @@ namespace Quotopia
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 79);
-            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label1.Location = new System.Drawing.Point(8, 88);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(50, 13);
+            this.label1.Size = new System.Drawing.Size(72, 20);
             this.label1.TabIndex = 23;
             this.label1.Text = "Account:";
             // 
             // resetsetbut
             // 
-            this.resetsetbut.Location = new System.Drawing.Point(72, 13);
+            this.resetsetbut.Location = new System.Drawing.Point(108, 20);
+            this.resetsetbut.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.resetsetbut.Name = "resetsetbut";
-            this.resetsetbut.Size = new System.Drawing.Size(59, 23);
+            this.resetsetbut.Size = new System.Drawing.Size(88, 35);
             this.resetsetbut.TabIndex = 6;
             this.resetsetbut.Text = "Discard";
             this.resetsetbut.UseVisualStyleBackColor = true;
@@ -253,9 +266,10 @@ namespace Quotopia
             // 
             // restoredefaultsbut
             // 
-            this.restoredefaultsbut.Location = new System.Drawing.Point(137, 13);
+            this.restoredefaultsbut.Location = new System.Drawing.Point(206, 20);
+            this.restoredefaultsbut.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.restoredefaultsbut.Name = "restoredefaultsbut";
-            this.restoredefaultsbut.Size = new System.Drawing.Size(60, 23);
+            this.restoredefaultsbut.Size = new System.Drawing.Size(90, 35);
             this.restoredefaultsbut.TabIndex = 5;
             this.restoredefaultsbut.Text = "Defaults";
             this.restoredefaultsbut.UseVisualStyleBackColor = true;
@@ -263,9 +277,10 @@ namespace Quotopia
             // 
             // saveSettingsbut
             // 
-            this.saveSettingsbut.Location = new System.Drawing.Point(6, 13);
+            this.saveSettingsbut.Location = new System.Drawing.Point(9, 20);
+            this.saveSettingsbut.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.saveSettingsbut.Name = "saveSettingsbut";
-            this.saveSettingsbut.Size = new System.Drawing.Size(61, 23);
+            this.saveSettingsbut.Size = new System.Drawing.Size(92, 35);
             this.saveSettingsbut.TabIndex = 4;
             this.saveSettingsbut.Text = "Save";
             this.saveSettingsbut.UseVisualStyleBackColor = true;
@@ -277,9 +292,10 @@ namespace Quotopia
             this.TradeTab.Controls.Add(this.TradesView);
             this.TradeTab.ForeColor = System.Drawing.SystemColors.MenuText;
             this.TradeTab.Location = new System.Drawing.Point(4, 4);
+            this.TradeTab.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.TradeTab.Name = "TradeTab";
-            this.TradeTab.Padding = new System.Windows.Forms.Padding(3);
-            this.TradeTab.Size = new System.Drawing.Size(531, 220);
+            this.TradeTab.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.TradeTab.Size = new System.Drawing.Size(800, 345);
             this.TradeTab.TabIndex = 3;
             this.TradeTab.Text = "Trades";
             this.TradeTab.UseVisualStyleBackColor = true;
@@ -314,7 +330,8 @@ namespace Quotopia
             this.TradesView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TradesView.EnableHeadersVisualStyles = false;
             this.TradesView.GridColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.TradesView.Location = new System.Drawing.Point(3, 3);
+            this.TradesView.Location = new System.Drawing.Point(4, 5);
+            this.TradesView.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.TradesView.Name = "TradesView";
             this.TradesView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
             dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
@@ -329,7 +346,7 @@ namespace Quotopia
             this.TradesView.RowTemplate.Height = 24;
             this.TradesView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.TradesView.ShowEditingIcon = false;
-            this.TradesView.Size = new System.Drawing.Size(525, 214);
+            this.TradesView.Size = new System.Drawing.Size(792, 335);
             this.TradesView.TabIndex = 0;
             // 
             // Date
@@ -387,9 +404,9 @@ namespace Quotopia
             // 
             this.ordertab.Controls.Add(this.ordergrid);
             this.ordertab.Location = new System.Drawing.Point(4, 4);
-            this.ordertab.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.ordertab.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.ordertab.Name = "ordertab";
-            this.ordertab.Size = new System.Drawing.Size(531, 220);
+            this.ordertab.Size = new System.Drawing.Size(800, 345);
             this.ordertab.TabIndex = 4;
             this.ordertab.Text = "Orders";
             this.ordertab.UseVisualStyleBackColor = true;
@@ -429,7 +446,7 @@ namespace Quotopia
             this.ordergrid.DefaultCellStyle = dataGridViewCellStyle5;
             this.ordergrid.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ordergrid.Location = new System.Drawing.Point(0, 0);
-            this.ordergrid.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+            this.ordergrid.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.ordergrid.Name = "ordergrid";
             this.ordergrid.ReadOnly = true;
             dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
@@ -448,7 +465,7 @@ namespace Quotopia
             this.ordergrid.RowTemplate.DefaultCellStyle.ForeColor = System.Drawing.SystemColors.WindowText;
             this.ordergrid.RowTemplate.Height = 24;
             this.ordergrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.ordergrid.Size = new System.Drawing.Size(531, 220);
+            this.ordergrid.Size = new System.Drawing.Size(800, 345);
             this.ordergrid.TabIndex = 0;
             // 
             // oid
@@ -500,9 +517,10 @@ namespace Quotopia
             this.Markets.Controls.Add(this.statusStrip1);
             this.Markets.ForeColor = System.Drawing.Color.White;
             this.Markets.Location = new System.Drawing.Point(4, 4);
+            this.Markets.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Markets.Name = "Markets";
-            this.Markets.Padding = new System.Windows.Forms.Padding(3);
-            this.Markets.Size = new System.Drawing.Size(531, 220);
+            this.Markets.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.Markets.Size = new System.Drawing.Size(800, 345);
             this.Markets.TabIndex = 0;
             this.Markets.Text = "Markets";
             this.Markets.UseVisualStyleBackColor = true;
@@ -512,10 +530,10 @@ namespace Quotopia
             this.statusStrip1.BackColor = System.Drawing.Color.Transparent;
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.statuslab});
-            this.statusStrip1.Location = new System.Drawing.Point(3, 195);
+            this.statusStrip1.Location = new System.Drawing.Point(4, 310);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 9, 0);
-            this.statusStrip1.Size = new System.Drawing.Size(525, 22);
+            this.statusStrip1.Padding = new System.Windows.Forms.Padding(2, 0, 14, 0);
+            this.statusStrip1.Size = new System.Drawing.Size(792, 30);
             this.statusStrip1.TabIndex = 0;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -524,7 +542,7 @@ namespace Quotopia
             this.statuslab.BackColor = System.Drawing.Color.Transparent;
             this.statuslab.ForeColor = System.Drawing.Color.Black;
             this.statuslab.Name = "statuslab";
-            this.statuslab.Size = new System.Drawing.Size(128, 17);
+            this.statuslab.Size = new System.Drawing.Size(208, 25);
             this.statuslab.Text = "Enter symbols to begin...";
             // 
             // quoteTab
@@ -541,24 +559,27 @@ namespace Quotopia
             this.quoteTab.Name = "quoteTab";
             this.quoteTab.SelectedIndex = 0;
             this.quoteTab.ShowToolTips = true;
-            this.quoteTab.Size = new System.Drawing.Size(539, 246);
+            this.quoteTab.Size = new System.Drawing.Size(808, 378);
             this.quoteTab.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
             this.quoteTab.TabIndex = 0;
             // 
             // Quote
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.ClientSize = new System.Drawing.Size(539, 246);
+            this.ClientSize = new System.Drawing.Size(808, 378);
             this.Controls.Add(this.quoteTab);
             this.DataBindings.Add(new System.Windows.Forms.Binding("Location", global::Quotopia.Properties.Settings.Default, "location", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.ForeColor = System.Drawing.SystemColors.Window;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Location = global::Quotopia.Properties.Settings.Default.location;
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "Quote";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Quotopia";
+            ((System.ComponentModel.ISupportInitialize)(this._sharepercontract)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._dispdecpoints)).EndInit();
             this.Settings.ResumeLayout(false);
             this.Settings.PerformLayout();
             this.TradeTab.ResumeLayout(false);
@@ -615,9 +636,9 @@ namespace Quotopia
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel statuslab;
         private System.Windows.Forms.TabControl quoteTab;
+        private System.Windows.Forms.NumericUpDown _sharepercontract;
+        private System.Windows.Forms.NumericUpDown _dispdecpoints;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox tbSharesPerContract;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox tbDecimalPoints;
     }
 }

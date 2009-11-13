@@ -95,11 +95,11 @@
     <Setting Name="exchangedest" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="tbDecimalPoints" Type="System.String" Scope="User">
-      <Value Profile="(Default)">2</Value>
-    </Setting>
-    <Setting Name="SharesPerContract" Type="System.String" Scope="User">
+    <Setting Name="sharepercontract" Type="System.Decimal" Scope="User">
       <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="displaydecpoints" Type="System.Decimal" Scope="User">
+      <Value Profile="(Default)">2</Value>
     </Setting>
   </Settings>
 </SettingsFile>

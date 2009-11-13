@@ -103,9 +103,9 @@ namespace Quotopia
             {
                 foreach (int r in rows)
                 {
-                    qt.Rows[r]["AvgPrice"] = pos.AvgPrice.ToString("N2");
+                    qt.Rows[r]["AvgPrice"] = pos.AvgPrice.ToString(_dispdecpointformat);
                     qt.Rows[r]["PosSize"] = pos.Size.ToString();
-                    qt.Rows[r]["ClosedPL"] = pos.ClosedPL.ToString("N2");
+                    qt.Rows[r]["ClosedPL"] = pos.ClosedPL.ToString(_dispdecpointformat);
                 }
 
             }
@@ -153,7 +153,7 @@ namespace Quotopia
         void tl_gotOrder(Order o)
         {
             if (orderidx(o.id)==-1) // if we don't have this order, add it
-                ordergrid.Rows.Add(new object[] { o.id, o.symbol, (o.side ? "BUY" : "SELL"),o.UnsignedSize, (o.price == 0 ? "Market" : o.price.ToString()), (o.stopp==0 ? "" : o.stopp.ToString()), o.Account });
+                ordergrid.Rows.Add(new object[] { o.id, o.symbol, (o.side ? "BUY" : "SELL"), o.UnsignedSize, (o.price == 0 ? "Market" : o.price.ToString(_dispdecpointformat)), (o.stopp == 0 ? "" : o.stopp.ToString(_dispdecpointformat)), o.Account });
         }
 
         int orderidx(uint orderid)
@@ -499,33 +499,11 @@ namespace Quotopia
                     int r = rows[i];
                     if (qt.Rows[r].RowState == DataRowState.Deleted) continue;
                     if ((r < 0) || (r >= qt.Rows.Count)) continue;
-                    //get number of decimal points from settings
-                    int numDecimalPoints = 2; //default = 2
-                    try {
-                        numDecimalPoints = Int32.Parse(Quotopia.Properties.Settings.Default.tbDecimalPoints);
-                    } catch (Exception e) {
-                        debug("Error with default numDecimalPoints: " + e.ToString());
-                    }
-                    //floor and ceiling
-                    if (numDecimalPoints < 0) numDecimalPoints = 0;
-                    if (numDecimalPoints > 10) numDecimalPoints = 10;
-                    //string strSigFigs = t.symbol.Contains("/") ? "N5" : "N2"
-                    string strPriceDecimalPoints = "N" + numDecimalPoints + "";
                     //get number of shares to display per unit size
-                    int numSharesPerContract = 1;
-                    try
-                    {
-                        numSharesPerContract = Int32.Parse(Quotopia.Properties.Settings.Default.SharesPerContract);
-                    }
-                    catch (Exception e)
-                    {
-                        debug("Error with parsing numSharesPerContract: " + e.ToString());
-                    }
-                    //floor, no ceiling
-                    if (numSharesPerContract < 1) numSharesPerContract = 1;
+                    int numSharesPerContract = (int)_sharepercontract.Value;
                     if (t.isTrade)
                     {
-                        qt.Rows[r]["Last"] = t.trade.ToString(strPriceDecimalPoints);
+                        qt.Rows[r]["Last"] = t.trade.ToString(_dispdecpointformat);
                         qt.Rows[r]["Exch"] = t.ex;
                         if (t.size > 0) // make sure TSize is reported
                             qt.Rows[r]["TSize"] = t.size;
@@ -533,8 +511,8 @@ namespace Quotopia
                     if (t.isFullQuote)
                     {
 
-                        qt.Rows[r]["Bid"] = t.bid.ToString(strPriceDecimalPoints);
-                        qt.Rows[r]["Ask"] = t.ask.ToString(strPriceDecimalPoints);
+                        qt.Rows[r]["Bid"] = t.bid.ToString(_dispdecpointformat);
+                        qt.Rows[r]["Ask"] = t.ask.ToString(_dispdecpointformat);
                         qt.Rows[r]["BidEx"] = t.be;
                         qt.Rows[r]["AskEx"] = t.oe;
                         int bs = t.bs / numSharesPerContract;
@@ -545,7 +523,7 @@ namespace Quotopia
                     }
                     else if (t.hasBid)
                     {
-                        qt.Rows[r]["Bid"] = t.bid.ToString(strPriceDecimalPoints);
+                        qt.Rows[r]["Bid"] = t.bid.ToString(_dispdecpointformat);
                         qt.Rows[r]["BidEx"] = t.be;
                         int bs = t.bs / numSharesPerContract;
                         qt.Rows[r]["BSize"] = bs;
@@ -555,7 +533,7 @@ namespace Quotopia
                     }
                     else if (t.hasAsk)
                     {
-                        qt.Rows[r]["Ask"] = t.ask.ToString(strPriceDecimalPoints);
+                        qt.Rows[r]["Ask"] = t.ask.ToString(_dispdecpointformat);
                         int os = t.bs / numSharesPerContract;
                         qt.Rows[r]["ASize"] = os;
                         qt.Rows[r]["AskEx"] = t.oe;
@@ -563,20 +541,25 @@ namespace Quotopia
                         int bs = (s != "") ? Convert.ToInt32(s) : 0;
                         qt.Rows[r]["Sizes"] = bs.ToString() + "x" + os.ToString();
                     }
-                    qt.Rows[r]["High"] = high.ToString(strPriceDecimalPoints);
-                    qt.Rows[r]["Low"] = low.ToString(strPriceDecimalPoints);
-                    //most recent bid
-                    decimal bid = Decimal.Parse((string)qt.Rows[r]["Bid"]);
-                    //most recent ask
-                    decimal ask = Decimal.Parse((string)qt.Rows[r]["Ask"]);
-                    decimal baSpread = 0;
-                    decimal baSpreadRel = 0;
-                    if (bid != 0 && ask != 0)
+                    qt.Rows[r]["High"] = high.ToString(_dispdecpointformat);
+                    qt.Rows[r]["Low"] = low.ToString(_dispdecpointformat);
+                    if (_dispdecpoints.Value > 2)
                     {
-                        baSpread = ask - bid;
-                        baSpreadRel = 10000 * (ask - bid) / bid;
-                        qt.Rows[r]["BASpread"] = baSpread.ToString(strPriceDecimalPoints);
-                        qt.Rows[r]["BASpreadBPS"] = baSpreadRel.ToString(strPriceDecimalPoints);
+                        try
+                        {
+                            //most recent bid
+                            decimal bid = 0;
+                            decimal ask = 0;
+                            if (decimal.TryParse(qt.Rows[r]["Bid"].ToString(), out bid)
+                                && decimal.TryParse(qt.Rows[r]["Ask"].ToString(), out ask))
+                            {
+                                decimal baSpread = ask - bid;
+                                decimal baSpreadRel = 10000 * baSpread / bid;
+                                qt.Rows[r]["BASpread"] = baSpread.ToString(_dispdecpointformat);
+                                qt.Rows[r]["BASpreadBPS"] = baSpreadRel.ToString(_dispdecpointformat);
+                            }
+                        }
+                        catch { }
                     }
 
 
@@ -612,10 +595,10 @@ namespace Quotopia
                 for (int i = 0; i < rows.Length; i++)
                 {
                     qt.Rows[rows[i]]["PosSize"] = pt[t.symbol].Size.ToString();
-                    qt.Rows[rows[i]]["AvgPrice"] = pt[t.symbol].AvgPrice.ToString("N2");
-                    qt.Rows[rows[i]]["ClosedPL"] = pt[t.symbol].ClosedPL.ToString("N2");
+                    qt.Rows[rows[i]]["AvgPrice"] = pt[t.symbol].AvgPrice.ToString(_dispdecpointformat);
+                    qt.Rows[rows[i]]["ClosedPL"] = pt[t.symbol].ClosedPL.ToString(_dispdecpointformat);
                 }
-                TradesView.Rows.Add(t.xdate, t.xtime, t.symbol, (t.side ? "BUY" : "SELL"), t.xsize, t.xprice.ToString("N2"), t.comment, t.Account.ToString()); // if we accept trade, add it to list
+                TradesView.Rows.Add(t.xdate, t.xtime, t.symbol, (t.side ? "BUY" : "SELL"), t.xsize, t.xprice.ToString(_dispdecpointformat), t.comment, t.Account.ToString()); // if we accept trade, add it to list
             }
         }
 
@@ -721,14 +704,16 @@ namespace Quotopia
             
         }
 
-        private void tbDecimalPoints_TextChanged(object sender, EventArgs e)
+
+        private void _sharepercontract_ValueChanged(object sender, EventArgs e)
         {
 
         }
 
-        private void Settings_Click(object sender, EventArgs e)
+        string _dispdecpointformat = "N2";
+        private void _dispdecpoints_ValueChanged(object sender, EventArgs e)
         {
-
+            _dispdecpointformat = "N" + ((int)_dispdecpoints.Value).ToString();
         }
 
 
