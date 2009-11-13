@@ -822,7 +822,7 @@ namespace ASP
             }
             // if good response, notify 
             if (!isBadResponse(idx))
-                debug("got basket request: " + basket+ " from: " + _reslist[idx].FullName);
+                debug("got basket request: " + basket+ " from: " + _reslist[idx].FullName+ " "+(idx-_INITIALRESPONSEID));
             // save symbols
             _rsym[idx] = basket;
             // update everything
