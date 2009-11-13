@@ -444,6 +444,7 @@ namespace Kadina
                 myres.SendOrder += new OrderDelegate(myres_SendOrder);
                 myres.SendIndicators += new StringParamDelegate(myres_SendIndicators);
                 myres.SendMessage += new MessageDelegate(myres_SendMessage);
+                myres.SendBasket += new BasketDelegate(myres_SendBasket);
                 myres.SendChartLabel += new ChartLabelDelegate(myres_SendChartLabel);
                 status(resname + " is current response.");
                 updatetitle();
@@ -454,13 +455,24 @@ namespace Kadina
 
         }
 
+        bool _sendbaskwarn = false;
+        void myres_SendBasket(Basket b, int id)
+        {
+            if (_sendbaskwarn) return;
+            debug("Sendbasket not supported in kadina.");
+            debug("To specify trading symbols, add data to study.");
+            _sendbaskwarn = true;
+        }
+
         void myres_SendChartLabel(decimal price, int bar, string label)
         {
             c.DrawChartLabel(price, bar, label);
         }
-
+        bool _sendmesswarn = false;
         void myres_SendMessage(MessageTypes type, uint id, string data)
         {
+            if (_sendmesswarn) return;
+            _sendmesswarn = true;
             debug("SendMessage and custom messages not supported in kadina.");
         }
         public const string PROGRAM = "Kadina";

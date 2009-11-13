@@ -220,6 +220,7 @@ namespace WinGauntlet
         void h_GotTick(Tick t)
         {
             if (args.Response == null) return;
+            if (t.depth > _depth) return;
             count++;
             try
             {
@@ -394,19 +395,36 @@ namespace WinGauntlet
             args.Response.SendDebug += new DebugFullDelegate(Response_GotDebug);
             args.Response.SendCancel += new UIntDelegate(Response_CancelOrderSource);
             args.Response.SendOrder += new OrderDelegate(Response_SendOrder);
+            args.Response.SendBasket += new BasketDelegate(Response_SendBasket);
             args.Response.SendChartLabel += new ChartLabelDelegate(Response_SendChartLabel);
             _boundonce = true;
             return true;
+        }
+
+        bool _sendbaskwarn = false;
+        void Response_SendBasket(Basket b, int id)
+        {
+            if (_sendbaskwarn) return;
+            debug("Sendbasket not supported in kadina.");
+            debug("To specify trading symbols, add data to study.");
+            _sendbaskwarn = true;
         }
 
         void Response_SendChartLabel(decimal price, int bar, string label)
         {
             
         }
-
+        int _depth = 0;
         void Response_SendMessage(MessageTypes type, uint id, string data)
         {
-            
+            switch (type)
+            {
+                case MessageTypes.DOMREQUEST :
+                    int d = 0;
+                    if (int.TryParse(data, out d))
+                        _depth = d;
+                    break;
+            }
         }
 
         void Response_SendIndicators(string param)
