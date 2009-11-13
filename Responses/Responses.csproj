@@ -73,6 +73,10 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LessonBoxHello.cs" />
+    <Compile Include="LessonIndicators.cs" />
+    <Compile Include="LessonParamPrompt.cs" />
+    <Compile Include="LessonTradingRules.cs" />
     <Compile Include="OpenAsymetry.cs" />
     <Compile Include="AlwaysEnter.cs" />
     <Compile Include="BigTrades.cs" />
