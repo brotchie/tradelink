@@ -197,10 +197,20 @@ namespace Tattle
                     if (tr.OpenPL < r.MaxOpenLoss) r.MaxOpenLoss = tr.OpenPL;
                 }
                 sr.Close();
-                r.MoneyInUse = Math.Round(Calc.Max(_MIU.ToArray()),2);
-                r.MaxPL = Math.Round(Calc.Max(_return.ToArray()),2);
-                r.MinPL = Math.Round(Calc.Min(_return.ToArray()),2);
-                r.MaxDD = string.Format("{0:P1}",Calc.MaxDD(_return.ToArray()));
+                if (r.Trades != 0)
+                {
+                    r.MoneyInUse = Math.Round(Calc.Max(_MIU.ToArray()), 2);
+                    r.MaxPL = Math.Round(Calc.Max(_return.ToArray()), 2);
+                    r.MinPL = Math.Round(Calc.Min(_return.ToArray()), 2);
+                    r.MaxDD = string.Format("{0:P1}", Calc.MaxDD(_return.ToArray()));
+                }
+                else
+                {
+                    r.MoneyInUse = 0;
+                    r.MaxPL = 0;
+                    r.MinPL = 0;
+                    r.MaxDD = "0";
+                }
             }
             catch (Exception) {  }
             return r;
