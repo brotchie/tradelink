@@ -986,6 +986,31 @@ namespace TradeLink.Common
                 output[count--] = inputarray[i];
             return output;
         }
+
+        /// <summary>
+        /// takes slice of first N elements of array
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public static decimal[] Slice(decimal[] input, int count) { return Slice(input, 0, count); }
+        /// <summary>
+        /// takes slice of any N elements of array
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="start"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public static decimal[] Slice(decimal[] input, int start, int count)
+        {
+            int len = count < input.Length ? count : input.Length;
+            decimal[] o = new decimal[len];
+            if (start > input.Length) return o;
+            for (int i = start; i < start + len; i++)
+                o[i - start] = input[start];
+            return o;
+        }
+
         /// <summary>
         /// Takes slice of last N elements of an array
         /// </summary>
