@@ -7,6 +7,27 @@ namespace TradeLink.Common
 {
     public class TIFTracker
     {
+
+        uint this[string symbol] 
+        { 
+            get 
+            {
+              int idx = symidx(symbol);
+              if (idx==NOIDX) return _tif;
+              return _tifs[idx];
+            }
+        set
+        {
+            int idx = symidx(symbol);
+            if (idx == NOIDX)
+            {
+                _symidx.Add(symbol, _tifs.Count);
+                _tifs.Add(value);
+            }
+            else
+                _tifs[idx] = value;
+        }
+        }
         public TIFTracker() : this(new IdTracker()) { }
         public TIFTracker(IdTracker id)
         {
@@ -96,5 +117,7 @@ namespace TradeLink.Common
             if (SendOrder != null)
                 SendOrder(o);
         }
+
+
     }
 }
