@@ -20,6 +20,7 @@ namespace TradeLink.Common
         event SymBarIntervalDelegate NewBar;
         Bar GetBar(int index, string symbol);
         Bar GetBar(string symbol);
+        void newPoint(decimal p, int time, int date, int size);
         void newTick(Tick k);
         void addbar(Bar b);
     }

@@ -78,8 +78,9 @@ namespace TradeLink.Common
         public Bar GetBar(string symbol) { return GetBar(Last(), symbol); }
         public void newTick(Tick k)
         {
-            // only pay attention to trades and indicies
+            // ignore quotes
             if (k.trade == 0) return;
+            // process data
             // if we have no bars or 
             if ((curr_barid == -1) || (vols[curr_barid] + k.size > intervallength))
             {
@@ -105,12 +106,43 @@ namespace TradeLink.Common
             // close
             closes[Last()] = k.trade;
             // don't set volume for index
-            if (k.isIndex) return;
-            // volume
-            vols[Last()] += k.size;
+            if (k.size >= 0)
+                vols[Last()] += k.size;
+
             // notify barlist
             if (_isRecentNew)
                 NewBar(k.symbol, intervallength);
+        }
+        public void newPoint(decimal p, int time, int date, int size)
+        {
+            // if we have no bars or 
+            if ((curr_barid == -1) || (vols[curr_barid] + size > intervallength))
+            {
+                // create a new one
+                newbar();
+                // mark it
+                _isRecentNew = true;
+                // make it current
+                curr_barid++;
+                // set time
+                times[times.Count - 1] = time;
+                // set date
+                dates[dates.Count - 1] = date;
+            }
+            else _isRecentNew = false;
+            // blend tick into bar
+            // open
+            if (opens[Last()] == 0) opens[Last()] = p;
+            // high
+            if (p > highs[Last()]) highs[Last()] = p;
+            // low
+            if (p < lows[Last()]) lows[Last()] = p;
+            // close
+            closes[Last()] = p;
+            // don't set volume for index
+            if (size>=0) 
+                vols[Last()] += size;
+
 
         }
 

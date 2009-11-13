@@ -77,9 +77,9 @@ namespace TradeLink.Common
             return b;
         }
         public Bar GetBar(string symbol) { return GetBar(Last(), symbol); }
-        public void newTick(Tick k)
-        {
-            // only pay attention to trades and indicies
+        public void newTick(Tick k) 
+        { 
+            // ignore quotes
             if (k.trade == 0) return;
             // if we have no bars or we'll exceed our interval length w/this tick
             if ((curr_barid == -1) || (ticks[curr_barid] == intervallength))
@@ -110,12 +110,45 @@ namespace TradeLink.Common
             // count ticks
             ticks[l]++;
             // don't set volume for index
-            if (k.isIndex) return;
-            // volume
-            vols[l] += k.size;
-            // notify barlist
+            if (k.size > 0)
+                vols[l] += k.size;            // notify barlist
             if (_isRecentNew)
                 NewBar(k.symbol, intervallength);
+        }
+        public void newPoint(decimal p, int time, int date, int size)
+        {
+            // if we have no bars or we'll exceed our interval length w/this tick
+            if ((curr_barid == -1) || (ticks[curr_barid] == intervallength))
+            {
+                // create a new one
+                newbar();
+                // mark it
+                _isRecentNew = true;
+                // make it current
+                curr_barid++;
+                // set time
+                times[times.Count - 1] = time;
+                // set date
+                dates[dates.Count - 1] = date;
+            }
+            else _isRecentNew = false;
+            // blend tick into bar
+            // store value of Last
+            int l = Last();
+            // open
+            if (opens[l] == 0) opens[l] = p;
+            // high
+            if (p > highs[l]) highs[l] = p;
+            // low
+            if (p < lows[l]) lows[l] = p;
+            // close
+            closes[l] = p;
+            // count ticks
+            ticks[l]++;
+            // don't set volume for index
+            if (size>0)
+                vols[l] += size;
+
 
         }
 

@@ -313,6 +313,13 @@ namespace TradeLink.Common
                 _intdata[i].newTick(k);
         }
 
+        public void newPoint(decimal p, int time, int date, int size)
+        {
+            // add tick to every requested bar interval
+            for (int i = 0; i < _intdata.Length; i++)
+                _intdata[i].newPoint(p,time,date,size);
+        }
+
         /// <summary>
         /// Create a barlist from a succession of bar records provided as comma-delimited OHLC+volume data.
         /// </summary>

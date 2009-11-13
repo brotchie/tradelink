@@ -14,6 +14,8 @@ namespace TradeLink.AppKit
     {
         public Chart() : this(null, false) { }
         public Chart(BarList b) : this(b, false) { }
+        bool _allowclose = false;
+        public bool AllowClosing { get { return _allowclose; } set { _allowclose = value; } }
         /// <summary>
         /// Initializes a new instance of the <see cref="Chart"/> class.
         /// </summary>
@@ -30,6 +32,24 @@ namespace TradeLink.AppKit
                 chartControl1.NewBarList(b);
                 Symbol = b.Symbol;
             }
+            FormClosing += new FormClosingEventHandler(Chart_FormClosing);
+        }
+
+        void Chart_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (!_allowclose)
+            {
+                e.Cancel = true;
+                Toggle();
+            }
+        }
+
+        public void Toggle()
+        {
+            if (Visible)
+                Hide();
+            else
+                Show();
         }
 
         void Chart_MouseUp(object sender, MouseEventArgs e)
@@ -47,6 +67,21 @@ namespace TradeLink.AppKit
             Symbol = barlist.Symbol;
             Text = chartControl1.Title;
             Invalidate(true);
+        }
+
+        public void newTick(Tick k)
+        {
+            chartControl1.newTick(k);
+            if (Visible)
+                chartControl1.refresh();
+        }
+
+        public void newPoint(decimal p, int time, int date, int size)
+        {
+            chartControl1.newPoint(p, time, date, size);
+            if (Visible)
+                chartControl1.refresh();
+
         }
 
         void Chart_KeyUp(object sender, KeyEventArgs e)

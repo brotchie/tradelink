@@ -35,6 +35,10 @@ namespace TradeLink.AppKit
         /// manual is recommended during rapid updates, as the chart may flash otherwise.
         /// </summary>
         public bool AutoUpdate { get { return _alwaysupdate; } set { _alwaysupdate = value; } }
+        /// <summary>
+        /// create bars from ticks
+        /// </summary>
+        /// <param name="k"></param>
         public void newTick(Tick k)
         {
             if (bl == null)
@@ -49,6 +53,33 @@ namespace TradeLink.AppKit
                     highesth = k.trade;
                 if (k.trade < lowestl)
                     lowestl = k.trade;
+            }
+            barc = bl.Count;
+            if (_alwaysupdate)
+                refresh();
+        }
+        /// <summary>
+        /// create bars from points
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="time"></param>
+        /// <param name="date"></param>
+        /// <param name="size"></param>
+        public void newPoint(decimal p, int time, int date, int size)
+        {
+            if (bl == null)
+            {
+                Symbol = string.Empty;
+                highesth = SMALLVAL;
+                bl = new BarListImpl(BarInterval.FiveMin, string.Empty);
+            }
+            bl.newPoint(p, time, date, size);
+            if (p!=0)
+            {
+                if (p > highesth)
+                    highesth = p;
+                if (p < lowestl)
+                    lowestl = p;
             }
             barc = bl.Count;
             if (_alwaysupdate)
@@ -85,6 +116,7 @@ namespace TradeLink.AppKit
         Graphics g = null;
         string mlabel = "";
         decimal highesth = 0;
+        const decimal SMALLVAL = -100000000000000;
         const decimal BIGVAL = 10000000000000000000;
         decimal lowestl = BIGVAL;
         int barc = 0;

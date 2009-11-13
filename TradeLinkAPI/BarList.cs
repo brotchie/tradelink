@@ -14,6 +14,7 @@ namespace TradeLink.API
         int Count { get; }
         Bar RecentBar { get; }
         void newTick(Tick k);
+        void newPoint(decimal p, int time, int date, int size);
         Bar this[int index] { get; }
         Bar this[int index, BarInterval interval] { get; }
         int DefaultCustomInterval { get; set; } // custom intervals

@@ -78,10 +78,10 @@ namespace TradeLink.Common
         public Bar GetBar(string symbol) { return GetBar(Last(), symbol); }
         public void newTick(Tick k)
         {
-            // only pay attention to trades and indicies
+            // ignore quotes
             if (k.trade == 0) return;
             // get the barcount
-            long barid = getbarid(k);
+            long barid = getbarid(k.time, k.date);
             // if not current bar
             if (barid != curr_barid)
             {
@@ -106,24 +106,57 @@ namespace TradeLink.Common
             if (k.trade < lows[Last()]) lows[Last()] = k.trade;
             // close
             closes[Last()] = k.trade;
-            // don't set volume for index
-            if (k.isIndex) return;
             // volume
-            vols[Last()] += k.size;
+            if (k.size >= 0)
+                vols[Last()] += k.size;
             // notify barlist
             if (_isRecentNew)
                 NewBar(k.symbol, intervallength);
+        }
+        public void newPoint(decimal p, int time, int date, int size)
+        {
+
+            // get the barcount
+            long barid = getbarid(time,date);
+            // if not current bar
+            if (barid != curr_barid)
+            {
+                // create a new one
+                newbar();
+                // mark it
+                _isRecentNew = true;
+                // make it current
+                curr_barid = barid;
+                // set time
+                times[times.Count - 1] = time;
+                // set date
+                dates[dates.Count - 1] = date;
+            }
+            else _isRecentNew = false;
+            // blend tick into bar
+            // open
+            if (opens[Last()] == 0) opens[Last()] = p;
+            // high
+            if (p > highs[Last()]) highs[Last()] = p;
+            // low
+            if (p < lows[Last()]) lows[Last()] = p;
+            // close
+            closes[Last()] = p;
+            // volume
+            if (size>=0)
+                vols[Last()] += size;
+
 
         }
 
-        private long getbarid(Tick k)
+        private long getbarid(int time, int date)
         {
             // get time elapsed to this point
-            int elap = Util.FT2FTS(k.time);
+            int elap = Util.FT2FTS(time);
             // get number of this bar in the day for this interval
             long bcount = (int)((double)elap / intervallength);
             // add the date to the front of number to make it unique
-            bcount += (long)k.date * 10000;
+            bcount += (long)date * 10000;
             return bcount;
         }
 

@@ -38,6 +38,27 @@ namespace TestTradeLink
         }
 
         [Test]
+        public void PointFiveMin()
+        {
+            // get some sample data to fill barlist
+            Tick[] ticklist = SampleData();
+            // prepare barlist
+            BarListImpl bl = new BarListImpl(BarInterval.FiveMin);
+            bl.GotNewBar += new SymBarIntervalDelegate(bl_GotNewBar);
+            // reset count
+            newbars = 0;
+            // create bars from all ticks available
+            foreach (TickImpl k in ticklist)
+            {
+                /// add tick to bar
+                bl.newPoint(k.trade,k.time,k.date,k.size);
+            }
+
+            // verify we had expected number of bars
+            Assert.AreEqual(3, bl.Count);
+        }
+
+        [Test]
         public void OneMinute()
         {
             // prepare barlist
@@ -59,6 +80,29 @@ namespace TestTradeLink
             Assert.AreEqual(newbars, bl.Count);
 
         }
+
+        [Test]
+        public void PointMinute()
+        {
+            // prepare barlist
+            BarList bl = new BarListImpl(BarInterval.Minute);
+            // reset count
+            int newbars = 0;
+            // build bars from ticks available
+            foreach (TickImpl k in SampleData())
+            {
+                // add tick to bar
+                bl.newPoint(k.trade,k.time,k.date,k.size);
+                // count if it's a new bar
+                if (bl.RecentBar.isNew)
+                    newbars++;
+            }
+            // verify expected # of bars are present
+            Assert.AreEqual(9, newbars);
+            // verify barcount is same as newbars
+            Assert.AreEqual(newbars, bl.Count);
+        }
+
 
         const string sym = "TST";
 
@@ -123,6 +167,29 @@ namespace TestTradeLink
             // make sure we actually have two bars
             Assert.AreEqual(2, newbars);
             Assert.AreEqual(bl.Count, newbars);
+        }
+
+        [Test]
+        public void PointHour()
+        {
+            // get data
+            Tick[] tape = SampleData();
+            // count new hour bars
+            newbars = 0;
+            // setup hour bar barlist
+            BarListImpl bl = new BarListImpl(BarInterval.Hour, sym);
+            // handle new bar events
+            bl.GotNewBar += new SymBarIntervalDelegate(bl_GotNewBar);
+            // add ticks to bar
+            foreach (Tick k in tape)
+            {
+                // add ticks
+                bl.newPoint(k.trade,k.time,k.date,k.size);
+            }
+            // make sure we have at least 1 bars
+            Assert.IsTrue(bl.Has(1));
+            // make sure we actually have two bars
+            Assert.AreEqual(2, bl.Count);
         }
 
         [Test]
@@ -197,7 +264,7 @@ namespace TestTradeLink
         public void FromGoogle()
         {
             // get a year chart
-            BarList bl = BarListImpl.DayFromGoogle("IBM");
+            BarList bl = BarListImpl.DayFromGoogle("MHS");
             // make sure it's there
             Assert.IsTrue(bl.isValid);
             // verify we have at least a year of bar data
@@ -255,7 +322,7 @@ namespace TestTradeLink
         [Test]
         public void AsyncFromGoogle()
         {
-            bool r = BarListImpl.DayFromGoogleAsync("IBM", new BarListDelegate(testbar));
+            bool r = BarListImpl.DayFromGoogleAsync("GE", new BarListDelegate(testbar));
 
             Assert.IsTrue(r);
             // no result yet
@@ -269,7 +336,7 @@ namespace TestTradeLink
             }
             while ((blt == null) && (polls++ < 30));
             // verify result
-            Assert.AreEqual(blt.Symbol, "IBM");
+            Assert.AreEqual(blt.Symbol, "GE");
             Assert.GreaterOrEqual(blt.Count, 199);
                 
 
