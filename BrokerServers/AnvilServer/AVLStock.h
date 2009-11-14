@@ -2,16 +2,18 @@
 #include "ObserverApi.h"
 #include "BusinessApi.h"
 #include "TradeLibFast.h"
-
+#include "AVL_TLWM.h"
 
 unsigned int TIFId(CString name);
+
+class AVL_TLWM;
 
 class AVLStock : public Observer
 	//we derive this object from Obsererver to be able to get info about dynamic changes of the stock
     //every Observer must have function virtual void Process(const Message* message, Observable* from, const Message* additionalInfo); which will be called when a stock update is received from the server.
 {
 public:
-	AVLStock(const char* symbol, int id, TradeLibFast::TLServer_WM* tl, bool load = true, int depth = 0);
+	AVLStock(const char* symbol, int id, AVL_TLWM* tl, bool load = true, int depth = 0);
 
     virtual ~AVLStock();
 
@@ -20,7 +22,7 @@ public:
     const StockBase* GetStockHandle() const{return m_stockHandle;}
 	bool isLoaded() const;
     const std::string& GetSymbol() const{return m_symbol;}
-	TradeLibFast::TLServer_WM* tl;
+	AVL_TLWM * tl;
 
 
 	void Clear();

@@ -52,7 +52,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="0"
+				Optimization="2"
 				InlineFunctionExpansion="0"
 				AdditionalIncludeDirectories="..\TradeLibFast"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_AFXEXT"
@@ -487,7 +487,6 @@
 				>
 				<Tool
 					Name="VCCLCompilerTool"
-					Optimization="0"
 					AdditionalIncludeDirectories=""
 					PreprocessorDefinitions=""
 					CompileAsManaged="0"

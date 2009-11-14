@@ -16,7 +16,7 @@ using namespace TradeLibFast;
 #pragma warning (disable:4355)
 
 
-AVLStock::AVLStock(const char* symbol, int id, TradeLibFast::TLServer_WM* tlinst, bool load, int dep):
+AVLStock::AVLStock(const char* symbol, int id, AVL_TLWM* tlinst, bool load, int dep):
     m_symbol(symbol),
     m_stockHandle(NULL),
     m_level1(NULL),
@@ -164,7 +164,7 @@ void AVLStock::QuoteNotify()
 				//set depth
 				kquote.depth = i;
 				// send tick
-				tl->SrvGotTick(kquote);
+				tl->SrvGotTickAsync(kquote);
 			}
 	}
 
@@ -188,7 +188,7 @@ void AVLStock::TradeNotify()
 			ktrade.ex = t->GetMmid();
 
 			// send tick
-			tl->SrvGotTick(ktrade);
+			tl->SrvGotTickAsync(ktrade);
 	}
 }
 

@@ -3,10 +3,11 @@
 #include "Util.h"
 #include "Messages.h"
 #include "MessageIds.h"
+#include "windows.h"
+#include "mmsystem.h"
 
 
-namespace TradeLibFast
-{
+
 	
 	
 	AVL_TLWM* AVL_TLWM::instance = NULL;	
@@ -35,10 +36,34 @@ namespace TradeLibFast
 		B_DestroyIterator(iterator);
 
 		depth = 0;
+
+		// thread setup stuff
+
+		for (uint i = 0; i<MAXTICKS; i++)
+		{
+			TLTick k;
+			tickcache.push_back(k);
+		}
+
+		_tickflip = false;
+		_readticks = 0;
+		_writeticks = 0;
+		_go = true;
+		_startthread = false;
+
 	}
+
+
 
 	AVL_TLWM::~AVL_TLWM(void)
 	{
+		// clear tick cache
+		tickcache.clear();
+		// ensure threads are marked to stop
+		_go = false;
+		// signal threads to stop
+		//SetEvent(_tickswaiting);
+
 		// remove account observables
 		void* iterator = B_CreateAccountIterator();
 		B_StartIteration(iterator);
@@ -76,7 +101,83 @@ namespace TradeLibFast
 		}
 		subs.clear();
 		subsym.clear();
+
+
 	}
+
+
+
+
+	UINT __cdecl DoReadTickThread(LPVOID param)
+	{
+		// we need a queue object
+		AVL_TLWM* tl = (AVL_TLWM*)param;
+		// ensure it's present
+		if (tl==NULL)
+		{
+			return OK;
+		}
+
+		// process until quick req
+		while (tl->_go)
+		{
+			// process ticks in queue
+			while (tl->_go && (tl->_readticks < tl->tickcache.size()))
+			{
+				// if we're done reading, quit trying
+				if ((tl->_readticks>=tl->_writeticks) && !tl->_tickflip)
+					break;
+				// read next tick from cache
+				TLTick k;
+				k = tl->tickcache[tl->_readticks++];
+				// send it
+				tl->SrvGotTick(k);
+				// if we hit end of cache buffer, ring back around to start
+				if (tl->_readticks>=tl->tickcache.size())
+				{
+					tl->_readticks = 0;
+					tl->_tickflip = false;
+				}
+				
+				// this is from asyncresponse, but may not be same
+				// functions because it doesn't appear to behave as nicely
+				//ResetEvent(tl->_tickswaiting);
+				//WaitForSingleObject(tl->_tickswaiting,INFINITE);
+			}
+			Sleep(100);
+		}
+		// mark thread as terminating
+		tl->_startthread = false;
+		// end thread
+		return OK;
+	}
+
+	void AVL_TLWM::SrvGotTickAsync(TLTick k)
+	{
+		// if thread is stopped don't restart it
+		if (!_go) return;
+		// add tick to queue and increment
+		tickcache[_writeticks++] = k;
+		// implement ringbuffer on queue
+		if (_writeticks>=tickcache.size())
+		{
+			_writeticks = 0;
+			_tickflip = true;
+		}
+		// ensure that we're reading from thread
+		if (!_startthread)
+		{
+			AfxBeginThread(DoReadTickThread,this);
+			_startthread = true;
+		}
+		else
+		{
+			// signal read thread that ticks are ready (adapted from asyncresponse)
+			//SetEvent(_tickswaiting);
+		}
+	}
+
+
 
 	int AVL_TLWM::BrokerName(void)
 	{
@@ -1068,5 +1169,5 @@ namespace TradeLibFast
 		return OK;
 	}
 
-}
+
 
