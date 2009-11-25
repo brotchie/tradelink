@@ -183,13 +183,18 @@ namespace ASP
             string name = Interaction.InputBox("What is the skin name for these responses?", "Skin name", "Skin" + DateTime.Now.Ticks.ToString(), 0, 0);
             // get next available index for this name
             int startidx = nextskinidx(SKINPATH,name);
+            // count successes
+            int succount = 0;
             // go through all selected responses
             foreach (int didx in _resnames.SelectedIndices)
             {
                 //get response index from display index
                 int idx = getrindx(didx);
                 // save them as skin
-                SkinImpl.SkinFile(_reslist[idx], _reslist[idx].FullName, _class2dll[_reslist[idx].FullName], SKINPATH+name + "." + startidx.ToString() + SKINEXT);
+                bool worked = SkinImpl.SkinFile(_reslist[idx], _reslist[idx].FullName, _class2dll[_reslist[idx].FullName], SKINPATH+name + "." + startidx.ToString() + SKINEXT);
+                // notify errors
+                if (!worked)
+                    debug("skin failed on: " + _reslist[idx].FullName + " " + _reslist[idx].ID);
                 // add index as part of skin
                 string sn = string.Empty;
                 if (_resskinidx.TryGetValue(idx, out sn))
@@ -200,8 +205,10 @@ namespace ASP
                     _resskinidx.Add(idx, name);
                 // increment next filename index
                 startidx++;
+                // count as good
+                succount++;
             }
-            status("added " + _resnames.SelectedIndices.Count + " responses to " + name);
+            status("added " + succount + " responses to " + name);
             // find any new names
             findskins();
         }
@@ -1057,11 +1064,17 @@ namespace ASP
                 bool worked = true;
                 foreach (string name in names)
                 {
-  
-                    // remove skin first
-                    remskin(name);
-                    // then re-add it
-                    worked &= SkinImpl.SkinFile(r, r.FullName, _class2dll[r.FullName], SKINPATH+name + "." + nextskinidx(SKINPATH, name).ToString() + SKINEXT);
+                    try
+                    {
+                        // remove skin first
+                        remskin(name);
+                        // then re-add it
+                        worked &= SkinImpl.SkinFile(r, r.FullName, _class2dll[r.FullName], SKINPATH + name + "." + nextskinidx(SKINPATH, name).ToString() + SKINEXT);
+                    }
+                    catch (Exception ex)
+                    {
+                        debug("error saving skin: " + name);
+                    }
                 }
             }
             status("saved loaded skins");
