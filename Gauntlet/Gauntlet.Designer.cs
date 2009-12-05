@@ -33,6 +33,7 @@ namespace WinGauntlet
             this.button1 = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.studypage = new System.Windows.Forms.TabPage();
+            this.button5 = new System.Windows.Forms.Button();
             this._viewresults = new System.Windows.Forms.Button();
             this._twithelp = new System.Windows.Forms.Button();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -55,11 +56,11 @@ namespace WinGauntlet
             this.savesettings = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.button2 = new System.Windows.Forms.Button();
+            this._debugs = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.messagepage = new System.Windows.Forms.TabPage();
             this.messages = new System.Windows.Forms.RichTextBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this._debugs = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.studypage.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -92,6 +93,7 @@ namespace WinGauntlet
             // 
             // studypage
             // 
+            this.studypage.Controls.Add(this.button5);
             this.studypage.Controls.Add(this._viewresults);
             this.studypage.Controls.Add(this._twithelp);
             this.studypage.Controls.Add(this.statusStrip1);
@@ -108,13 +110,23 @@ namespace WinGauntlet
             this.studypage.Text = "Studies";
             this.studypage.UseVisualStyleBackColor = true;
             // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(421, 421);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(75, 31);
+            this.button5.TabIndex = 21;
+            this.button5.Text = "Results";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
             // _viewresults
             // 
-            this._viewresults.Location = new System.Drawing.Point(486, 421);
+            this._viewresults.Location = new System.Drawing.Point(502, 421);
             this._viewresults.Name = "_viewresults";
-            this._viewresults.Size = new System.Drawing.Size(126, 31);
+            this._viewresults.Size = new System.Drawing.Size(110, 31);
             this._viewresults.TabIndex = 20;
-            this._viewresults.Text = "View Results";
+            this._viewresults.Text = "Raw Results";
             this.toolTip1.SetToolTip(this._viewresults, "View Results Folder");
             this._viewresults.UseVisualStyleBackColor = true;
             this._viewresults.Click += new System.EventHandler(this._viewresults_Click);
@@ -122,7 +134,7 @@ namespace WinGauntlet
             // _twithelp
             // 
             this._twithelp.Image = ((System.Drawing.Image)(resources.GetObject("_twithelp.Image")));
-            this._twithelp.Location = new System.Drawing.Point(68, 421);
+            this._twithelp.Location = new System.Drawing.Point(9, 421);
             this._twithelp.Name = "_twithelp";
             this._twithelp.Size = new System.Drawing.Size(31, 31);
             this._twithelp.TabIndex = 19;
@@ -169,7 +181,7 @@ namespace WinGauntlet
             this.queuebut.Location = new System.Drawing.Point(106, 421);
             this.queuebut.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.queuebut.Name = "queuebut";
-            this.queuebut.Size = new System.Drawing.Size(372, 31);
+            this.queuebut.Size = new System.Drawing.Size(308, 31);
             this.queuebut.TabIndex = 4;
             this.queuebut.Text = "Run the Gauntlet";
             this.toolTip1.SetToolTip(this.queuebut, "start the backtesting run");
@@ -377,6 +389,21 @@ namespace WinGauntlet
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
+            // _debugs
+            // 
+            this._debugs.AutoSize = true;
+            this._debugs.Checked = true;
+            this._debugs.CheckState = System.Windows.Forms.CheckState.Checked;
+            this._debugs.Location = new System.Drawing.Point(42, 189);
+            this._debugs.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this._debugs.Name = "_debugs";
+            this._debugs.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this._debugs.Size = new System.Drawing.Size(186, 24);
+            this._debugs.TabIndex = 2;
+            this._debugs.Text = "Response Debugging";
+            this.toolTip1.SetToolTip(this._debugs, "show your responses SendDebug messages in messages window");
+            this._debugs.UseVisualStyleBackColor = true;
+            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -411,21 +438,6 @@ namespace WinGauntlet
             this.messages.Size = new System.Drawing.Size(621, 509);
             this.messages.TabIndex = 0;
             this.messages.Text = "";
-            // 
-            // _debugs
-            // 
-            this._debugs.AutoSize = true;
-            this._debugs.Checked = true;
-            this._debugs.CheckState = System.Windows.Forms.CheckState.Checked;
-            this._debugs.Location = new System.Drawing.Point(42, 189);
-            this._debugs.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this._debugs.Name = "_debugs";
-            this._debugs.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this._debugs.Size = new System.Drawing.Size(186, 24);
-            this._debugs.TabIndex = 2;
-            this._debugs.Text = "Response Debugging";
-            this.toolTip1.SetToolTip(this._debugs, "show your responses SendDebug messages in messages window");
-            this._debugs.UseVisualStyleBackColor = true;
             // 
             // Gauntlet
             // 
@@ -482,6 +494,7 @@ namespace WinGauntlet
         private System.Windows.Forms.Button _twithelp;
         private System.Windows.Forms.Button _viewresults;
         private System.Windows.Forms.CheckBox _debugs;
+        private System.Windows.Forms.Button button5;
     }
 }
 

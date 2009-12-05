@@ -31,6 +31,18 @@ namespace TradeLink.AppKit
             debug(msg);
         }
 
+        public void Clear()
+        {
+            if (_msg.InvokeRequired)
+                Invoke(new VoidDelegate(Clear));
+            else
+            {
+
+                _msg.Items.Clear();
+                _msg.Invalidate(true);
+            }
+        }
+
         delegate void stringdel(string msg);
         void debug(string msg)
         {

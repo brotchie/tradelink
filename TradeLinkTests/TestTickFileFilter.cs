@@ -34,6 +34,8 @@ namespace TestTradeLink
             tff = new TickFileFilter();
             // request all matching files for a given year
             tff.DateFilter(20070000, DateMatchType.Year);
+            tff.isDateMatchUnion = true;
+            tff.isSymbolDateMatchUnion = true;
             // do the match
             result = tff.Allows(filenames);
             // make sure we found 3 files from this year

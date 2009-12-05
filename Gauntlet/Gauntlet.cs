@@ -667,6 +667,11 @@ namespace WinGauntlet
             System.Diagnostics.Process.Start(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
         }
 
+        private void button5_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start(Util.TLProgramDir + "\\Tattle.exe");
+        }
+
 
     }
 

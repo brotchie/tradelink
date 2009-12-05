@@ -31,10 +31,23 @@ namespace TradeLink.Common
         public TickFileFilter(List<TLDateFilter> datefilter) : this(null, datefilter) { }
         public TickFileFilter(List<string> namefilter, List<TLDateFilter> datefilter)
         {
-            if (namefilter != null)
+            if ((namefilter != null) && (datefilter != null))
+            {
                 namelist = namefilter;
-            if (datefilter != null)
                 datelist = datefilter;
+                isSymbolDateMatchUnion = false;
+            }
+            else if (namefilter != null)
+            {
+                namelist = namefilter;
+                isSymbolDateMatchUnion = true;
+            }
+            else if (datefilter != null)
+            {
+                datelist = datefilter;
+                isSymbolDateMatchUnion = true;
+            }
+             
         }
         public TickFileFilter(string[] symbols) : this(FilterSyms(symbols), null) { }
         private static List<string> FilterSyms(string[] allowedsymbols)

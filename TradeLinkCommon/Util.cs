@@ -341,9 +341,11 @@ namespace TradeLink.Common
         static int[] TLDateSplit(int fulltime)
         {
             int[] splittime = new int[3]; // year, month, day
-            splittime[2] = (fulltime - (fulltime % 10000))/10000;
-            splittime[1] = ((fulltime %10000) - ((fulltime % 10000) % 100));
-            splittime[0] = (fulltime-splittime[2]-splittime[1]);
+            splittime[2] = (int)((double)fulltime/10000);
+            splittime[1] = (int)((double)(fulltime - (splittime[2]*10000))/100);
+            double tmp = (int)((double)fulltime/100);
+            double tmp2 = (double)fulltime / 100;
+            splittime[0] = (int)(Math.Round(tmp2 - tmp,2, MidpointRounding.AwayFromZero) * 100);
             return splittime;
         }
 

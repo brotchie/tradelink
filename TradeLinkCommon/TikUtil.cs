@@ -36,6 +36,7 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="EXT"></param>
         /// <returns></returns>
+        public static string[] GetFiles() { return GetFiles(Util.TLTickDir, TikConst.WILDCARD_EXT); }
         public static string[] GetFiles(string EXT) { return GetFiles(Environment.CurrentDirectory, EXT); }
         public static string[] GetFiles(string path, string EXT)
         {

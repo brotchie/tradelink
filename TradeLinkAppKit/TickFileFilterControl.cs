@@ -30,8 +30,19 @@ namespace TradeLink.AppKit
         /// </summary>
         public TickFileFilterControl()
         {
+            ContextMenu = new ContextMenu();
+            ContextMenu.MenuItems.Add("View tickdata", new EventHandler(viewdata));
+            _dw.Text = "Selected Tickdata:";
+            _dw.TimeStamps = false;
+            _dw.GotDebug("No tickdata selected.");
             InitializeComponent();
         }
+
+        void viewdata(object o, EventArgs e)
+        {
+            _dw.Toggle();
+        }
+
         /// <summary>
         /// creates a tick file filter control from a tickfolder path
         /// </summary>
@@ -41,6 +52,7 @@ namespace TradeLink.AppKit
         {
             SetSymbols(path);
         }
+
         /// <summary>
         /// creates tickfilefilter control from an index
         /// </summary>
@@ -55,6 +67,7 @@ namespace TradeLink.AppKit
         /// <returns></returns>
         public TickFileFilter GetFilter()
         {
+            TickFileFilter tff = new TickFileFilter();
             // prepare date filter
             List<TickFileFilter.TLDateFilter> datefilter = new List<TickFileFilter.TLDateFilter>();
             if (usedates.Checked)
@@ -73,7 +86,12 @@ namespace TradeLink.AppKit
                     symfilter.Add(stocklist.Items[stocklist.SelectedIndices[j]].ToString());
 
             // build consolidated filter
-            TickFileFilter tff = new TickFileFilter(symfilter, datefilter);
+            if (usestocks.Checked && usedates.Checked)
+                tff = new TickFileFilter(symfilter, datefilter);
+            else if (usestocks.Checked)
+                tff = new TickFileFilter(symfilter);
+            else if (usedates.Checked)
+                tff = new TickFileFilter(datefilter);
             // set search options
             tff.isDateMatchUnion = _dateor.Checked;
             tff.isSymbolDateMatchUnion = !_symdateand.Checked;
@@ -175,16 +193,31 @@ namespace TradeLink.AppKit
 
         private void usestocks_CheckedChanged(object sender, EventArgs e)
         {
+            if (stocklist.Enabled)
+            {
+                stocklist.ClearSelected();
+                stocklist.Invalidate();
+            }
             stocklist.Enabled = !stocklist.Enabled;
-            fupdate(sender);
+            fupdate(sender,false);
         }
 
         private void usedates_CheckedChanged(object sender, EventArgs e)
         {
+
+            if (yearlist.Enabled)
+            {
+                yearlist.ClearSelected();
+                daylist.ClearSelected();
+                monthlist.ClearSelected();
+                yearlist.Invalidate();
+                daylist.Invalidate();
+                monthlist.Invalidate();
+            }
             yearlist.Enabled = !yearlist.Enabled;
             monthlist.Enabled = !monthlist.Enabled;
             daylist.Enabled = !daylist.Enabled;
-            fupdate(sender);
+            fupdate(sender,false);
         }
 
         private void stocklist_SelectedIndexChanged(object sender, EventArgs e)
@@ -205,9 +238,60 @@ namespace TradeLink.AppKit
         private void yearlist_SelectedIndexChanged(object sender, EventArgs e)
         {
             fupdate(sender);
-
         }
-        void fupdate(object sender) { if (FilterUpdate != null) FilterUpdate(sender, new EventArgs()); }
+
+        void fupdate(object sender) { fupdate(sender, true); }
+        void fupdate(object sender, bool setunions) 
+        {
+            // set default search options
+            if (setunions)
+            {
+                // if they have both dates and symbols selected, default
+                // to intersection of both sets
+                if (usedates.Checked && usestocks.Checked)
+                {
+                    _symdateand.Checked = true;
+                }
+                else
+                {
+                    _symdateand.Checked = false;
+                }
+
+                // if there are more than one year, more than one month,
+                // or more than one day selected... default to a union of sets
+                if ((yearlist.SelectedIndices.Count > 1)
+                    || (monthlist.SelectedIndices.Count > 1)
+                    || (daylist.SelectedIndices.Count > 1))
+                {
+                    _dateor.Checked = true;
+                }
+                // otherwise if dates are enabled, default to intersection only
+                else if (yearlist.Enabled)
+                {
+                    _dateand.Checked = true;
+                }
+            }
+            // if we're watching files
+            if (_dw.Visible)
+            {
+                // clear window
+                _dw.Clear();
+                // get current filter
+                TickFileFilter tff = GetFilter();
+                // get matching files
+                string [] files = tff.Allows(TikUtil.GetFiles());
+                // display in window
+                foreach (string file in files)
+                    _dw.GotDebug(System.IO.Path.GetFileNameWithoutExtension(file));
+
+            }
+
+
+
+            // notify listeners
+            if (FilterUpdate != null) 
+                FilterUpdate(sender, new EventArgs()); 
+        }
         void status(string msg)
         {
             if (SendDebug != null)
@@ -220,6 +304,34 @@ namespace TradeLink.AppKit
                 SendDebug(DebugImpl.Create(msg, DebugLevel.Debug));
 
         }
+
+        DebugWindow _dw = new DebugWindow();
+
+        private void _symdateand_CheckedChanged(object sender, EventArgs e)
+        {
+            _symdateor.Checked = !_symdateand.Checked;
+            fupdate(sender,false);
+        }
+
+        private void radioButton1_CheckedChanged(object sender, EventArgs e)
+        {
+            // sym date or
+            _symdateand.Checked = !_symdateor.Checked;
+            fupdate(sender,false);
+        }
+
+        private void _dateand_CheckedChanged(object sender, EventArgs e)
+        {
+            _dateor.Checked = !_dateand.Checked;
+            fupdate(sender,false);
+        }
+
+        private void _dateor_CheckedChanged(object sender, EventArgs e)
+        {
+            _dateand.Checked = !_dateor.Checked;
+            fupdate(sender,false);
+        }
+
 
 
 

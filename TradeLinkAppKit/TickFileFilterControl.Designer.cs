@@ -43,7 +43,7 @@ namespace TradeLink.AppKit
             this._datecond = new System.Windows.Forms.GroupBox();
             this._dateor = new System.Windows.Forms.RadioButton();
             this._dateand = new System.Windows.Forms.RadioButton();
-            this.radioButton1 = new System.Windows.Forms.RadioButton();
+            this._symdateor = new System.Windows.Forms.RadioButton();
             this._symdateand = new System.Windows.Forms.RadioButton();
             this._matchcond.SuspendLayout();
             this._datecond.SuspendLayout();
@@ -164,7 +164,7 @@ namespace TradeLink.AppKit
             // _matchcond
             // 
             this._matchcond.Controls.Add(this._datecond);
-            this._matchcond.Controls.Add(this.radioButton1);
+            this._matchcond.Controls.Add(this._symdateor);
             this._matchcond.Controls.Add(this._symdateand);
             this._matchcond.Location = new System.Drawing.Point(336, 136);
             this._matchcond.Name = "_matchcond";
@@ -188,6 +188,7 @@ namespace TradeLink.AppKit
             // _dateor
             // 
             this._dateor.AutoSize = true;
+            this._dateor.Checked = true;
             this._dateor.Location = new System.Drawing.Point(7, 45);
             this._dateor.Name = "_dateor";
             this._dateor.Size = new System.Drawing.Size(212, 24);
@@ -195,28 +196,29 @@ namespace TradeLink.AppKit
             this._dateor.TabStop = true;
             this._dateor.Text = "Dates matching any y/m/d";
             this._dateor.UseVisualStyleBackColor = true;
+            this._dateor.CheckedChanged += new System.EventHandler(this._dateor_CheckedChanged);
             // 
             // _dateand
             // 
             this._dateand.AutoSize = true;
-            this._dateand.Checked = true;
             this._dateand.Location = new System.Drawing.Point(7, 14);
             this._dateand.Name = "_dateand";
             this._dateand.Size = new System.Drawing.Size(194, 24);
             this._dateand.TabIndex = 0;
-            this._dateand.TabStop = true;
             this._dateand.Text = "Date matching all y/m/d";
             this._dateand.UseVisualStyleBackColor = true;
+            this._dateand.CheckedChanged += new System.EventHandler(this._dateand_CheckedChanged);
             // 
-            // radioButton1
+            // _symdateor
             // 
-            this.radioButton1.AutoSize = true;
-            this.radioButton1.Location = new System.Drawing.Point(7, 57);
-            this.radioButton1.Name = "radioButton1";
-            this.radioButton1.Size = new System.Drawing.Size(230, 24);
-            this.radioButton1.TabIndex = 1;
-            this.radioButton1.Text = "Any symbol or date matched";
-            this.radioButton1.UseVisualStyleBackColor = true;
+            this._symdateor.AutoSize = true;
+            this._symdateor.Location = new System.Drawing.Point(7, 57);
+            this._symdateor.Name = "_symdateor";
+            this._symdateor.Size = new System.Drawing.Size(230, 24);
+            this._symdateor.TabIndex = 1;
+            this._symdateor.Text = "Any symbol or date matched";
+            this._symdateor.UseVisualStyleBackColor = true;
+            this._symdateor.CheckedChanged += new System.EventHandler(this.radioButton1_CheckedChanged);
             // 
             // _symdateand
             // 
@@ -229,6 +231,7 @@ namespace TradeLink.AppKit
             this._symdateand.TabStop = true;
             this._symdateand.Text = "All selected criteria";
             this._symdateand.UseVisualStyleBackColor = true;
+            this._symdateand.CheckedChanged += new System.EventHandler(this._symdateand_CheckedChanged);
             // 
             // TickFileFilterControl
             // 
@@ -269,7 +272,7 @@ namespace TradeLink.AppKit
         private System.Windows.Forms.GroupBox _matchcond;
         private System.Windows.Forms.RadioButton _symdateand;
         private System.Windows.Forms.GroupBox _datecond;
-        private System.Windows.Forms.RadioButton radioButton1;
+        private System.Windows.Forms.RadioButton _symdateor;
         private System.Windows.Forms.RadioButton _dateor;
         private System.Windows.Forms.RadioButton _dateand;
 
