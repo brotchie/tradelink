@@ -419,10 +419,12 @@ namespace WinGauntlet
         {
             switch (type)
             {
-                case MessageTypes.DOMREQUEST :
+                case MessageTypes.DOMREQUEST:
                     int d = 0;
-                    if (int.TryParse(data, out d))
-                        _depth = d;
+                    string[] r = data.Split('+');
+                    if (r.Length > 1)
+                        if (int.TryParse(r[1], out d))
+                            _depth = d;
                     break;
             }
         }
