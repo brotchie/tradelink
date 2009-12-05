@@ -11,7 +11,7 @@ namespace TradeLink.Common
     {
         public PositionImpl() : this("") { }
         public PositionImpl(Position p) : this(p.Symbol, p.AvgPrice, p.Size, p.ClosedPL,p.Account) { }
-        public PositionImpl(string symbol) : this(symbol, 0m, 0,0,"") { }
+        public PositionImpl(string symbol) { _sym = symbol; }
         public PositionImpl(string symbol, decimal price, int size) : this(symbol, price, size, 0,"") { }
         public PositionImpl(string symbol, decimal price, int size, decimal closedpl) : this(symbol, price, size, closedpl, "") { }
         public PositionImpl(string symbol, decimal price, int size, decimal closedpl, string account) { _sym = symbol; if (size == 0) price = 0; _price = price; _size = size; _closedpl = closedpl; _acct = account; if (!this.isValid) throw new Exception("Can't construct invalid position!"); }

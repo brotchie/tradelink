@@ -140,5 +140,24 @@ namespace TestTradeLink
             Assert.That(c.Size == z, c.Size.ToString());
             Assert.That(c.ClosedPL == cpl, c.ClosedPL.ToString());
         }
+
+        [Test]
+        public void CreateInvalidFromSymbol()
+        {
+            const string sym = "TST";
+
+            bool except = false;
+            Position p = null;
+            try
+            {
+                p = new PositionImpl(sym);
+            }
+            catch { except = true; }
+
+            Assert.IsNotNull(p);
+            Assert.IsTrue(p.isValid);
+            Assert.IsFalse(except);
+                
+        }
     }
 }
