@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Net;
 using System.Xml;
-using System.ServiceModel.Web;
 using TradeLink.API;
 using TradeLink.Common;
 using System.IO;
@@ -21,7 +20,8 @@ namespace TradeLink.AppKit
             return "http://www.assembla.com/spaces/" + space + "/documents";
         }
         public static bool Create(string space, string user, string password, string filepath) { return Create(space, user, password, filepath, 0); }
-        public static bool Create(string space, string user, string password, string filename, int ticketid)
+        public static bool Create(string space, string user, string password, string filename, int ticketid) { return Create(space, user, password, filename, 0, true); }
+        public static bool Create(string space, string user, string password, string filename, int ticketid, bool prependdatetime)
         {
             string url = GetDocumentsUrl(space);
             try
@@ -33,7 +33,7 @@ namespace TradeLink.AppKit
 
                 // Generate post objects
                 Dictionary<string, object> postParameters = new Dictionary<string, object>();
-                string unique = Util.ToTLDate(DateTime.Now).ToString() +Util.ToTLTime(DateTime.Now)+ Path.GetFileName(filename);
+                string unique = prependdatetime ? Util.ToTLDate(DateTime.Now).ToString() +Util.DT2FT(DateTime.Now)+ Path.GetFileName(filename) : Path.GetFileName(filename);
                 postParameters.Add("document[name]", unique);
                 postParameters.Add("document[file]", data);
                 if (ticketid!=0)
@@ -62,6 +62,72 @@ namespace TradeLink.AppKit
 
         }
 
+        public static bool DownloadDocument(AssemblaDoc doc, string user, string password) { return DownloadDocument(doc, Environment.CurrentDirectory, user, password); }
+        public static bool DownloadDocument(AssemblaDoc doc, string path, string user, string password)
+        {
+            if (!doc.isValid) return false;
+            string url = doc.Url;
+            HttpWebRequest hr = WebRequest.Create(url) as HttpWebRequest;
+            hr.Credentials = new System.Net.NetworkCredential(user, password);
+            hr.PreAuthenticate = true;
+            hr.Method = "GET";
+            hr.ContentType = "application/xml";
+            HttpWebResponse wr = (HttpWebResponse)hr.GetResponse();
+            Stream stream = wr.GetResponseStream();
+            byte[] buff = new byte[(int)wr.ContentLength];
+            int n = stream.Read(buff, 0, (int)wr.ContentLength);
+            if (n == 0) return false;
+            try
+            {
+                stream.Close();
+                wr.Close();
+                FileStream fs = new FileStream(path + "//" + doc.Name, FileMode.Create);
+                fs.Write(buff, 0, (int)buff.Length);
+                fs.Close();
+                return true;
+            }
+            catch { }
+            return false;
+        }
+
+        public static List<AssemblaDoc> GetDocuments(string space, string user, string password)
+        {
+            string url = GetDocumentsUrl(space);
+            HttpWebRequest hr = WebRequest.Create(url) as HttpWebRequest;
+            hr.Credentials = new System.Net.NetworkCredential(user, password);
+            hr.PreAuthenticate = true;
+            hr.Method = "GET";
+            hr.ContentType = "application/xml";
+            HttpWebResponse wr = (HttpWebResponse)hr.GetResponse();
+            StreamReader sr = new StreamReader(wr.GetResponseStream());
+            XmlDocument xd = new XmlDocument();
+            string result = sr.ReadToEnd();
+            xd.LoadXml(result);
+            List<AssemblaDoc> docs = new List<AssemblaDoc>();
+            XmlNodeList xnl = xd.GetElementsByTagName("document");
+            foreach (XmlNode xn in xnl)
+            {
+                AssemblaDoc doc = new AssemblaDoc();
+                doc.Space = space;
+                foreach (XmlNode dc in xn.ChildNodes)
+                {
+                    string m = dc.InnerText;
+                    if (dc.Name == "id")
+                        doc.Id = m;
+                    else if (dc.Name == "filesize")
+                        doc.Size = Convert.ToInt32(m);
+                    else if (dc.Name == "description")
+                        doc.Desc = m;
+                    else if (dc.Name == "filename")
+                        doc.Name = m;
+                }
+                if (doc.isValid)
+                    docs.Add(doc);
+            }
+            return docs;
+
+        }
+
         static string contenttype(string filename)
         {
             string ext = Path.GetExtension(filename);
@@ -70,6 +136,8 @@ namespace TradeLink.AppKit
                 return @"image/jpeg";
             else if (ext == ".txt")
                 return @"text/plain";
+            else if (ext == ".zip")
+                return @"application/zip";
             return "application/octet-stream";
         }
 
@@ -198,5 +266,16 @@ namespace TradeLink.AppKit
 
             return formData;
         }
+    }
+
+    public struct AssemblaDoc
+    {
+        public bool isValid { get { return (Space != null) && (Id != null); } }
+        public string Url { get { return AssemblaDocument.GetDocumentsUrl(Space) + "/" + Id + "/download"; } }
+        public string Desc;
+        public string Space;
+        public string Id;
+        public int Size;
+        public string Name;
     }
 }
