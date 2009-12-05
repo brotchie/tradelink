@@ -105,6 +105,7 @@
     <Compile Include="IdTracker.cs" />
     <Compile Include="ImbalanceImpl.cs" />
     <Compile Include="InvalidResponse.cs" />
+    <Compile Include="LatencyTracker.cs" />
     <Compile Include="LimitOrder.cs" />
     <Compile Include="BasketImpl.cs" />
     <Compile Include="MarketOrderFlat.cs" />

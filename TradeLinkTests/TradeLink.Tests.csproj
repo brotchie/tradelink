@@ -122,6 +122,7 @@
     <Compile Include="TestGZip.cs" />
     <Compile Include="TestIdTracker.cs" />
     <Compile Include="TestImbalance.cs" />
+    <Compile Include="TestLatencyTracker.cs" />
     <Compile Include="TestOffsetInfo.cs" />
     <Compile Include="TestOffsetTracker.cs" />
     <Compile Include="TestPositionTracker.cs" />
