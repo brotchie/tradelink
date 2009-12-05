@@ -329,7 +329,14 @@ namespace TradeLink.Common
                     if (gotTick != null) gotTick(t);
                     break;
                 case MessageTypes.ORDERCANCELRESPONSE:
-                    if (gotOrderCancel != null) gotOrderCancel(Convert.ToUInt32(msg));
+                    {
+                        uint id = 0;
+                        if (gotOrderCancel != null)
+                            if (uint.TryParse(msg, out id))
+                                gotOrderCancel(id);
+                            else if (SendDebug!=null)
+                                SendDebug("Count not parse order cancel: " + msg);
+                    }
                     break;
                 case MessageTypes.EXECUTENOTIFY:
                     // date,time,symbol,side,size,price,comment
