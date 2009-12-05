@@ -487,8 +487,10 @@ namespace TradeLink.Common
         /// <param name="tradelist"></param>
         /// <param name="delimiter"></param>
         /// <param name="filepath"></param>
-        public static void ClosedPLToText(List<Trade> tradelist, char delimiter, string filepath)
+        public static void ClosedPLToText(List<Trade> tradelist, char delimiter, string filepath) { ClosedPLToText(tradelist, delimiter, filepath,false); }
+        public static void ClosedPLToText(List<Trade> tradelist, char delimiter, string filepath,bool generateheaderOnEmpty)
         {
+            if ((tradelist.Count == 0) && !generateheaderOnEmpty) return;
             StreamWriter sw = new StreamWriter(filepath, false);
             string header = string.Join(delimiter.ToString(), Enum.GetNames(typeof(TradePLField)));
             sw.WriteLine(header);
