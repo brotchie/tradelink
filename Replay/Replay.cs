@@ -307,6 +307,8 @@ namespace Replay
                 status("Playback stopped: " + e.Error.ToString());
             else
                 status("Playback completed successfully");
+            stopbut.Enabled = false;
+            playbut.Enabled = true;
             progressbar.Value = 0;
             h.Reset();
         }
