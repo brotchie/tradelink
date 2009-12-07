@@ -63,6 +63,7 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -169,6 +170,18 @@
     <Compile Include="TickFileFilterControl.Designer.cs">
       <DependentUpon>TickFileFilterControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="TradeResults.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TradeResults.Designer.cs">
+      <DependentUpon>TradeResults.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TradeResultsWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TradeResultsWindow.Designer.cs">
+      <DependentUpon>TradeResultsWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="Versions.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -218,6 +231,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="TickFileFilterControl.resx">
       <DependentUpon>TickFileFilterControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TradeResults.resx">
+      <DependentUpon>TradeResults.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TradeResultsWindow.resx">
+      <DependentUpon>TradeResultsWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Versions.resx">
       <DependentUpon>Versions.cs</DependentUpon>

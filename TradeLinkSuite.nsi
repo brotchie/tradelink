@@ -52,7 +52,6 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\Chartographer.lnk" "$INSTDIR\Chartographer.exe" "" "$INSTDIR\Chartographer.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Replay.lnk" "$INSTDIR\Replay.exe" "" "$INSTDIR\Replay.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Time and Sales.lnk" "$INSTDIR\TimeSales.exe" "" "$INSTDIR\TimeSales.exe" 0
-  CreateShortCut "$SMPROGRAMS\TradeLink\Tattle.lnk" "$INSTDIR\Tattle.exe" "" "$INSTDIR\Tattle.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Uninstall TradeLink.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Kadina.lnk" "$INSTDIR\Kadina.EXE" "" "$INSTDIR\Kadina.EXE" 0 
   CreateShortCut "$SMPROGRAMS\TradeLink\Record.lnk" "$INSTDIR\Record.EXE" "" "$INSTDIR\Record.EXE" 0  
@@ -90,7 +89,6 @@ Section "TradeLinkSuite"
   File "Chartographer\bin\release\Chartographer.exe.config"
   File "Chartographer\bin\release\Chartographer.exe"
   File "TimeAndSales\bin\release\TimeSales.exe"
-  File "Tattle\bin\release\Tattle.exe"
   File "ASP\bin\release\ASP.exe"
   File "TradeLinkResearch\bin\release\TradeLinkResearch.dll"
   File "Record\bin\release\Record.exe"
@@ -168,7 +166,6 @@ Section "Uninstall"
   Delete "$SMPROGRAMS\TradeLink\Record.lnk"
   Delete "$SMPROGRAMS\TradeLink\Sterling.lnk"
   Delete "$SMPROGRAMS\TradeLink\Gauntlet.lnk"
-  Delete "$SMPROGRAMS\TradeLink\Tattle.lnk"
   Delete "$SMPROGRAMS\TradeLink\TDServer.lnk"
   Delete "$SMPROGRAMS\TradeLink\Uninstall TradeLinkSuite"
   Delete "$SMPROGRAMS\TradeLink\MB.lnk"

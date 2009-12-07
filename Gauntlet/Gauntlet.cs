@@ -169,10 +169,10 @@ namespace WinGauntlet
             GauntArgs gargs = (GauntArgs)e.Result;
             if (!e.Cancelled)
             {
-
+                List<Trade> list = h.SimBroker.GetTradeList();
+                tradeResults1.NewResultTrades(LogFile("Trades"),list);
                 if (gargs.Trades)
                 {
-                    List<Trade> list = h.SimBroker.GetTradeList();
                     debug("writing "+list.Count+" trades...");
                     Util.ClosedPLToText(list, ',', LogFile("Trades"));
                 }

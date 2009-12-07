@@ -31,9 +31,8 @@ namespace WinGauntlet
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Gauntlet));
             this.button1 = new System.Windows.Forms.Button();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabs = new System.Windows.Forms.TabControl();
             this.studypage = new System.Windows.Forms.TabPage();
-            this.button5 = new System.Windows.Forms.Button();
             this._viewresults = new System.Windows.Forms.Button();
             this._twithelp = new System.Windows.Forms.Button();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -60,12 +59,15 @@ namespace WinGauntlet
             this.label1 = new System.Windows.Forms.Label();
             this.messagepage = new System.Windows.Forms.TabPage();
             this.messages = new System.Windows.Forms.RichTextBox();
+            this._resulttab = new System.Windows.Forms.TabPage();
+            this.tradeResults1 = new TradeLink.AppKit.TradeResults();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.tabControl1.SuspendLayout();
+            this.tabs.SuspendLayout();
             this.studypage.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.optionpage.SuspendLayout();
             this.messagepage.SuspendLayout();
+            this._resulttab.SuspendLayout();
             this.SuspendLayout();
             // 
             // button1
@@ -78,22 +80,22 @@ namespace WinGauntlet
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // tabControl1
+            // tabs
             // 
-            this.tabControl1.Controls.Add(this.studypage);
-            this.tabControl1.Controls.Add(this.optionpage);
-            this.tabControl1.Controls.Add(this.messagepage);
-            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControl1.Location = new System.Drawing.Point(0, 0);
-            this.tabControl1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(629, 542);
-            this.tabControl1.TabIndex = 1;
+            this.tabs.Controls.Add(this.studypage);
+            this.tabs.Controls.Add(this.optionpage);
+            this.tabs.Controls.Add(this.messagepage);
+            this.tabs.Controls.Add(this._resulttab);
+            this.tabs.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabs.Location = new System.Drawing.Point(0, 0);
+            this.tabs.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.tabs.Name = "tabs";
+            this.tabs.SelectedIndex = 0;
+            this.tabs.Size = new System.Drawing.Size(629, 542);
+            this.tabs.TabIndex = 1;
             // 
             // studypage
             // 
-            this.studypage.Controls.Add(this.button5);
             this.studypage.Controls.Add(this._viewresults);
             this.studypage.Controls.Add(this._twithelp);
             this.studypage.Controls.Add(this.statusStrip1);
@@ -110,23 +112,13 @@ namespace WinGauntlet
             this.studypage.Text = "Studies";
             this.studypage.UseVisualStyleBackColor = true;
             // 
-            // button5
-            // 
-            this.button5.Location = new System.Drawing.Point(421, 421);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(75, 31);
-            this.button5.TabIndex = 21;
-            this.button5.Text = "Results";
-            this.button5.UseVisualStyleBackColor = true;
-            this.button5.Click += new System.EventHandler(this.button5_Click);
-            // 
             // _viewresults
             // 
-            this._viewresults.Location = new System.Drawing.Point(502, 421);
+            this._viewresults.Location = new System.Drawing.Point(421, 421);
             this._viewresults.Name = "_viewresults";
-            this._viewresults.Size = new System.Drawing.Size(110, 31);
+            this._viewresults.Size = new System.Drawing.Size(191, 31);
             this._viewresults.TabIndex = 20;
-            this._viewresults.Text = "Raw Results";
+            this._viewresults.Text = "Raw Results Folder";
             this.toolTip1.SetToolTip(this._viewresults, "View Results Folder");
             this._viewresults.UseVisualStyleBackColor = true;
             this._viewresults.Click += new System.EventHandler(this._viewresults_Click);
@@ -439,18 +431,39 @@ namespace WinGauntlet
             this.messages.TabIndex = 0;
             this.messages.Text = "";
             // 
+            // _resulttab
+            // 
+            this._resulttab.Controls.Add(this.tradeResults1);
+            this._resulttab.Location = new System.Drawing.Point(4, 29);
+            this._resulttab.Name = "_resulttab";
+            this._resulttab.Padding = new System.Windows.Forms.Padding(3);
+            this._resulttab.Size = new System.Drawing.Size(621, 509);
+            this._resulttab.TabIndex = 5;
+            this._resulttab.Text = "Results";
+            this._resulttab.UseVisualStyleBackColor = true;
+            // 
+            // tradeResults1
+            // 
+            this.tradeResults1.BackColor = System.Drawing.Color.White;
+            this.tradeResults1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tradeResults1.Location = new System.Drawing.Point(3, 3);
+            this.tradeResults1.Name = "tradeResults1";
+            this.tradeResults1.Path = "C:\\Users\\jfranta\\Documents";
+            this.tradeResults1.Size = new System.Drawing.Size(615, 503);
+            this.tradeResults1.TabIndex = 0;
+            // 
             // Gauntlet
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(629, 542);
-            this.Controls.Add(this.tabControl1);
+            this.Controls.Add(this.tabs);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "Gauntlet";
             this.Text = "Gauntlet";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Gauntlet_FormClosing);
-            this.tabControl1.ResumeLayout(false);
+            this.tabs.ResumeLayout(false);
             this.studypage.ResumeLayout(false);
             this.studypage.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
@@ -458,6 +471,7 @@ namespace WinGauntlet
             this.optionpage.ResumeLayout(false);
             this.optionpage.PerformLayout();
             this.messagepage.ResumeLayout(false);
+            this._resulttab.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -465,7 +479,7 @@ namespace WinGauntlet
         #endregion
 
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabControl tabs;
         private System.Windows.Forms.TabPage studypage;
         private System.Windows.Forms.TabPage optionpage;
         private System.Windows.Forms.Label label1;
@@ -494,7 +508,8 @@ namespace WinGauntlet
         private System.Windows.Forms.Button _twithelp;
         private System.Windows.Forms.Button _viewresults;
         private System.Windows.Forms.CheckBox _debugs;
-        private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.TabPage _resulttab;
+        private TradeLink.AppKit.TradeResults tradeResults1;
     }
 }
 
