@@ -30,6 +30,13 @@ namespace TradeLink.AppKit
         {
             InitializeComponent();
             tradeResults1.SendDebug += new DebugDelegate(tradeResults1_SendDebug);
+            FormClosing += new FormClosingEventHandler(TradeResultsWindow_FormClosing);
+        }
+
+        void TradeResultsWindow_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            e.Cancel = true;
+            Toggle();
         }
 
         void tradeResults1_SendDebug(string msg)
