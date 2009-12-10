@@ -9,25 +9,27 @@ using BWCMessageLib;
 
 namespace ServerBlackwood
 {
+    public delegate void BWConnectedEventHandler(object sender, bool BWConnected);
 
     public class ServerBlackwood : TLServer_WM
     {
-
         // broker members
-        private BWStock m_Stock = null;
-        private BWSymbolData m_SymbolData = null;
+        //private BWStock m_Stock = null;
+        //private BWSymbolData m_SymbolData = null;
         private BWSession m_Session;
-        		private delegate void DisplaySymbolDataHandler(object sender, BWSymbolData symbolData);
-		private DisplaySymbolDataHandler SymbolDataHandler;
-		private delegate void DisplayLevel1Handler(object sender, BWLevel1Quote level1Quote);
-		private DisplayLevel1Handler Level1Handler;
-		private delegate void DisplayLevel2Handler(object sender, BWLevel2Quote level2Quote);
-		private DisplayLevel2Handler Level2Handler;
-		private delegate void DisplayTradeHandler(object sender, BWTrade trade);
-		private DisplayTradeHandler TradeHandler;
+        public event BWConnectedEventHandler BWConnectedEvent;
+        protected virtual void OnBWConnectedEvent(bool BWConnected) {BWConnectedEvent(this, BWConnected);}
+        //private delegate void DisplaySymbolDataHandler(object sender, BWSymbolData symbolData);
+        //private DisplaySymbolDataHandler SymbolDataHandler;
+        //private delegate void DisplayLevel1Handler(object sender, BWLevel1Quote level1Quote);
+        //private DisplayLevel1Handler Level1Handler;
+        //private delegate void DisplayLevel2Handler(object sender, BWLevel2Quote level2Quote);
+        //private DisplayLevel2Handler Level2Handler;
+        //private delegate void DisplayTradeHandler(object sender, BWTrade trade);
+        //private DisplayTradeHandler TradeHandler;
 	
-		private delegate void DisplayInfoHandler(object sender, BWStockInfo info);
-		private DisplayInfoHandler InfoHandler;
+        //private delegate void DisplayInfoHandler(object sender, BWStockInfo info);
+        //private DisplayInfoHandler InfoHandler;
 
         // tradelink members
         public event DebugFullDelegate SendDebug;
@@ -43,26 +45,28 @@ namespace ServerBlackwood
             m_Session.OnNYSEImbalanceMessage += new BWSession.NYSEImbalanceMessageHandler(m_Session_OnNYSEImbalanceMessage);
             m_Session.OnExecutionMessage += new BWSession.ExecutionMessageHandler(m_Session_OnExecutionMessage);
             m_Session.OnOrderMessage += new BWSession.OrderMessageHandler(m_Session_OnOrderMessage);
-            foreach (BWStock s in m_Session.GetOpenPositions())
-            {
-                Position p = new PositionImpl(s.Symbol, (decimal)s.Price, s.Size, (decimal)s.ClosedPNL);
-                pt.Adjust(p);
-            }
-                
-
+            
+            
+            
             // tradelink stuff
             newProviderName = Providers.Blackwood;
+            newAcctRequest += new StringDelegate(ServerBlackwood_newAcctRequest);
             newUnknownRequest += new UnknownMessageDelegate(ServerBlackwood_newUnknownRequest);
             newFeatureRequest += new MessageArrayDelegate(ServerBlackwood_newFeatureRequest);
             newOrderCancelRequest += new UIntDelegate(ServerBlackwood_newOrderCancelRequest);
             newSendOrderRequest += new OrderDelegate(ServerBlackwood_newSendOrderRequest);
-            newImbalanceRequest += new VoidDelegate(ServerBlackwood_newImbalanceRequest);
+            //newImbalanceRequest += new VoidDelegate(ServerBlackwood_newImbalanceRequest);
             newRegisterStocks += new DebugDelegate(ServerBlackwood_newRegisterStocks);
             newPosList += new PositionArrayDelegate(ServerBlackwood_newPosList);
         }
 
         Position[] ServerBlackwood_newPosList(string account)
         {
+            foreach (BWStock s in m_Session.GetOpenPositions())
+            {
+                Position p = new PositionImpl(s.Symbol, (decimal)s.Price, s.Size, (decimal)s.ClosedPNL);
+                pt.Adjust(p);
+            }
             return pt.ToArray();
         }
 
@@ -71,7 +75,7 @@ namespace ServerBlackwood
             Basket b = BasketImpl.FromString(msg);
             foreach (Security s in b)
             {
-                // make sure we don't already have a subscribption for this
+                // make sure we don't already have a subscription for this
                 if (_symstk.Contains(s.Symbol)) continue;
                 BWStock stk = m_Session.GetStock(s.Symbol);
                 stk.Subscribe();
@@ -81,45 +85,84 @@ namespace ServerBlackwood
                 _stocks.Add(stk);
                 _symstk.Add(s.Symbol);
             }
-            
-
-        }
-
-        void stk_OnLevel2Update(object sender, BWLevel2Quote quote)
-        {
-            Tick k = new TickImpl(quote.Symbol);
-            k.depth = quote.EcnOrder;
-            k.bid = (decimal)quote.Bid;
-            k.BidSize = quote.BidSize;
-            k.be = quote.MarketMaker;
-            k.ask = (decimal)quote.Ask;
-            k.os = quote.AskSize;
-            k.oe = quote.MarketMaker;
-            newTick(k);
-        }
-
-        void stk_OnLevel1Update(object sender, BWLevel1Quote quote)
-        {
-            if (_depth > 0) return;
-
-        }
-
-        void stk_OnTrade(object sender, BWTrade print)
-        {
-            Tick k = new TickImpl(print.Symbol);
-            k.trade = (decimal)print.Price;
-            k.size = print.Size;
-            k.ex = print.MarketMaker;
-            newTick(k);
         }
 
         void ServerBlackwood_newImbalanceRequest()
         {
             m_Session.RequestImbalances();
         }
-        int _depth = 0;
+
+        void ServerBlackwood_newSendOrderRequest(Order o)
+        {
+            string sSymbol = o.symbol;
+
+            ORDER_SIDE orderSide = (o.side ? ORDER_SIDE.SIDE_BUY : ORDER_SIDE.SIDE_SELL);
+            BWVenue orderVenue = getVenueFromBW(o);
+            BWOrderType orderType = (o.isStop ? (o.isStop ? BWOrderType.STOP_LIMIT : BWOrderType.STOP_MARKET) : (o.isLimit ? BWOrderType.LIMIT : BWOrderType.MARKET));
+            int orderTIF = (int)getDurationFromBW(o);
+
+            uint orderSize = (uint)o.UnsignedSize;
+            int orderReserve = o.UnsignedSize;
+            float orderPrice = (float)o.price;
+            float orderStopPrice = (float)o.stopp;
+
+            // create a new BWOrder with these parameters
+            BWOrder bwOrder = new BWOrder(m_Session, sSymbol, orderSide, orderSize, orderPrice, orderStopPrice, orderType, orderTIF, orderVenue, false, orderSize);
+
+            //if (chkPartDontInit.Checked)
+            //    bwOrder.PartDontInit = true;
+            // subscribe to this order's events
+            bwOrder.BWOrderUpdateEvent += new BWOrder.BWOrderUpdateHandler(bwOrder_BWOrderUpdateEvent);
+
+            // add a BWStock object for this symbol to the list of stocks that have had orders placed
+            // so that it can be referred to for position management
+            try
+            {
+                // GetStock throws an exception if not connected to Market Data
+                BWStock stock = m_Session.GetStock(bwOrder.Symbol);
+            }
+            catch (ClientPortalConnectionException)
+            {
+                debug("warning: Not connected to Market Data.  Unable to create BWStock object.  Position management through BWStock object will be unavailable.");
+            }
+            // send the order
+            bwOrder.Send();
+
+        }
+
+        void ServerBlackwood_newOrderCancelRequest(uint number)
+        {
+            foreach (BWOrder o in m_Session.GetOpenOrders())
+                if (o.CustomID == (int)number)
+                    o.Cancel();
+        }
+
+        MessageTypes[] ServerBlackwood_newFeatureRequest()
+        {
+            List<MessageTypes> f = new List<MessageTypes>();
+            f.Add(MessageTypes.EXECUTENOTIFY);
+            f.Add(MessageTypes.SENDORDER);
+            f.Add(MessageTypes.SENDORDERLIMIT);
+            f.Add(MessageTypes.SENDORDERMARKET);
+            f.Add(MessageTypes.SENDORDERSTOP);
+            f.Add(MessageTypes.ORDERCANCELREQUEST);
+            f.Add(MessageTypes.ORDERCANCELRESPONSE);
+            f.Add(MessageTypes.ORDERNOTIFY);
+            f.Add(MessageTypes.IMBALANCEREQUEST);
+            f.Add(MessageTypes.IMBALANCERESPONSE);
+            f.Add(MessageTypes.DOMREQUEST);
+            //f.Add(MessageTypes.DOMRESPONSE);
+            f.Add(MessageTypes.ISSHORTABLE);
+            f.Add(MessageTypes.POSITIONREQUEST);
+            f.Add(MessageTypes.POSITIONRESPONSE);
+           
+            return f.ToArray();
+
+        }
+
         long ServerBlackwood_newUnknownRequest(MessageTypes t, string msg)
         {
+            int _depth = 0;
             MessageTypes ret = MessageTypes.UNKNOWN_MESSAGE;
             switch (t)
             {
@@ -134,6 +177,45 @@ namespace ServerBlackwood
             return (long)ret;
         }
 
+        string ServerBlackwood_newAcctRequest()
+        {
+            return m_Session.Account;
+        }
+
+        void stk_OnLevel1Update(object sender, BWLevel1Quote quote)
+        {
+            Tick k = new TickImpl(quote.Symbol);
+            k.depth = 0;
+            k.bid = (decimal)quote.Bid;
+            k.BidSize = quote.BidSize;
+            k.ask = (decimal)quote.Ask;
+            k.os = quote.AskSize;
+            newTick(k);
+        }
+        
+        void stk_OnLevel2Update(object sender, BWLevel2Quote quote)
+        {
+            Tick k = new TickImpl(quote.Symbol);
+            k.depth = quote.EcnOrder;
+            k.bid = (decimal)quote.Bid;
+            k.BidSize = quote.BidSize;
+            k.be = quote.MarketMaker;
+            k.ask = (decimal)quote.Ask;
+            k.os = quote.AskSize;
+            k.oe = quote.MarketMaker;
+            newTick(k);
+        }
+
+        void stk_OnTrade(object sender, BWTrade print)
+        {
+            Tick k = new TickImpl(print.Symbol);
+            k.trade = (decimal)print.Price;
+            k.size = print.Size;
+            k.ex = print.MarketMaker;
+            newTick(k);
+        }
+
+
         void m_Session_OnOrderMessage(object sender, BWOrder orderMsg)
         {
             Order o = new OrderImpl(orderMsg.Symbol,(int)orderMsg.Size);
@@ -145,6 +227,7 @@ namespace ServerBlackwood
             o.ex = orderMsg.Venue.ToString();
             o.id = (uint)orderMsg.CustomID;
             newOrder(o);
+           
         }
 
         string _acct = string.Empty;
@@ -182,30 +265,21 @@ namespace ServerBlackwood
         }
 
 
-		private void stock_OnSymbolData(object sender, BWSymbolData symbolData)
-		{
-			object[] args = {sender, symbolData};
-			this.BeginInvoke(SymbolDataHandler, args);
-		}
-
-
-
-		private void DisplayLevel2(object sender, BWFeed Feed)
-		{		
-
-		}
-
+        //private void stock_OnSymbolData(object sender, BWSymbolData symbolData)
+        //{
+        //    object[] args = {sender, symbolData};
+        //    this.BeginInvoke(SymbolDataHandler, args);
+        //}
 
 
         public bool Start(string user, string pw, string ipaddress, int data2 )
         {
-            				// grab IP from textBox
-				System.Net.IPAddress bwIP = System.Net.IPAddress.Parse(ipaddress);
+            	System.Net.IPAddress bwIP = System.Net.IPAddress.Parse(ipaddress);
 			
 				// register for notification of a disconnection from the client portal
                 m_Session.OnMarketDataClientPortalConnectionChange += new Blackwood.Framework.BWSession.ClientPortalConnectionChangeHandler(OnMarketDataClientPortalConnectionChange);
                	// register for notification of a disconnection from the client portal
-			   //m_Session.OnOrdersClientPortalConnectionChange += new Blackwood.Framework.BWSession.ClientPortalConnectionChangeHandler(OnOrderClientPortalConnectionChange);
+			    //m_Session.OnOrdersClientPortalConnectionChange += new Blackwood.Framework.BWSession.ClientPortalConnectionChangeHandler(OnOrderClientPortalConnectionChange);
 
 				// equivalent to m_session.ConnectToMarketData
 				// calls the overload of ConnectionToMarketData that takes an IP but uses the default port
@@ -215,8 +289,8 @@ namespace ServerBlackwood
 					m_Session.ConnectToOrderRouting(user, pw, bwIP, Properties.Settings.Default.orderport,true, true, true);
 					m_Session.ConnectToHistoricData(user, pw, bwIP, Properties.Settings.Default.historicalport);
 					
-					//if (chkUseMulticast.Checked)
-					//	m_Session.ConnectToMulticast(System.Net.IPAddress.Parse(txtBoxMultiServerIP.Text), Convert.ToInt32(txtMultiDataPort.Text), true);	
+				//if (chkUseMulticast.Checked)
+				//	m_Session.ConnectToMulticast(System.Net.IPAddress.Parse(txtBoxMultiServerIP.Text), Convert.ToInt32(txtMultiDataPort.Text), true);	
 				}
 				catch (Blackwood.Framework.ClientPortalConnectionException) 
 				{
@@ -224,31 +298,37 @@ namespace ServerBlackwood
 				}
 				finally 
 				{
-					if (m_Session.ConnectedToMarketData)
-					{
-                        
-						debug("connected");
+                    if (m_Session.IsConnectedToMarketData && m_Session.IsConnectedToOrderRouting)
+                    {
                         _valid = true;
-					}
-				}
-
-				m_Session.DisconnectFromMarketData();
-				if (!m_Session.ConnectedToMarketData) 
-				{
-                    debug("disconnected");
-                    _valid = false;
-				}
-
+                    }
+                    else 
+                    {
+                        _valid = false;
+                    }
+                   
+          		}
 
                 return _valid;
         }
 
+        public void Stop()
+        {
+            try
+            {
+                m_Session.DisconnectFromMarketData();
+                m_Session.CloseSession();
+            }
+            catch { }
+        }
+
         private void OnMarketDataClientPortalConnectionChange(object sender, bool Connected)
         {
+            OnBWConnectedEvent(Connected);
             debug("connected: " + Connected);
         }
 
-        private BWTIF getDurationFromComboBox(Order o)
+        private BWTIF getDurationFromBW(Order o)
         {
             BWTIF bwTIF;
             string strTIF = o.TIF;
@@ -276,7 +356,7 @@ namespace ServerBlackwood
             return bwTIF;
         }
 
-        private BWVenue getVenueFromComboBox(Order o)
+        private BWVenue getVenueFromBW(Order o)
         {
             BWVenue bwVenue;
             string strFeed = o.ex;
@@ -317,47 +397,6 @@ namespace ServerBlackwood
         }
 
 
-        void ServerBlackwood_newSendOrderRequest(Order o)
-        {
-            string sSymbol = o.symbol;
-
-            ORDER_SIDE orderSide = (o.side ? ORDER_SIDE.SIDE_BUY : ORDER_SIDE.SIDE_SELL);
-            BWVenue orderVenue = getVenueFromComboBox(o);
-            BWOrderType orderType = (o.isStop ? (o.isStop ? BWOrderType.STOP_LIMIT : BWOrderType.STOP_MARKET) : (o.isLimit ? BWOrderType.LIMIT : BWOrderType.MARKET));
-            int orderTIF = (int)getDurationFromComboBox(o);
-
-            uint orderSize = (uint)o.UnsignedSize;
-            int orderReserve = o.UnsignedSize;
-            float orderPrice = (float)o.price;
-            float orderStopPrice = (float)o.stopp;
-
-            // create a new BWOrder with these parameters
-            BWOrder bwOrder = new BWOrder(m_Session, sSymbol, orderSide, orderSize, orderPrice, orderStopPrice, orderType, orderTIF, orderVenue, false, orderSize);
-
-            //if (chkPartDontInit.Checked)
-            //    bwOrder.PartDontInit = true;
-            // subsribe to this order's events
-            bwOrder.BWOrderUpdateEvent += new BWOrder.BWOrderUpdateHandler(bwOrder_BWOrderUpdateEvent);
-
-            // add a BWStock object for this symbol to the list of stocks that have had orders placed
-            // so that it can be referred to for position management
-            try
-            {
-                // GetStock throws an exception if not connected to Market Data
-                BWStock stock = m_Session.GetStock(bwOrder.Symbol);
-            }
-            catch (ClientPortalConnectionException)
-            {
-                debug("warning: Not connected to Market Data.  Unable to create BWStock object.  Position management through BWStock object will be unavailable.");
-            }
-            // send the order
-            bwOrder.Send();
-
-
-
-
-        }
-
         List<BWStock> _stocks = new List<BWStock>();
         List<string> _symstk = new List<string>();
 
@@ -384,44 +423,6 @@ namespace ServerBlackwood
                     break;
             }
 
-        }
-
-        void ServerBlackwood_newOrderCancelRequest(uint number)
-        {
-            foreach (BWOrder o in m_Session.GetOpenOrders())
-                if (o.CustomID == (int)number)
-                    o.Cancel();
-        }
-
-        public void Stop()
-        {
-            try
-            {
-                m_Session.CloseSession();
-            }
-            catch { }
-        }
-
-        MessageTypes[] ServerBlackwood_newFeatureRequest()
-        {
-            List<MessageTypes> f = new List<MessageTypes>();
-            f.Add(MessageTypes.EXECUTENOTIFY);
-            f.Add(MessageTypes.SENDORDER);
-            f.Add(MessageTypes.SENDORDERLIMIT);
-            f.Add(MessageTypes.SENDORDERMARKET);
-            f.Add(MessageTypes.SENDORDERSTOP);
-            f.Add(MessageTypes.ORDERCANCELREQUEST);
-            f.Add(MessageTypes.ORDERCANCELRESPONSE);
-            f.Add(MessageTypes.ORDERNOTIFY);
-            f.Add(MessageTypes.IMBALANCEREQUEST);
-            f.Add(MessageTypes.IMBALANCERESPONSE);
-            f.Add(MessageTypes.DOMREQUEST);
-            f.Add(MessageTypes.DOMRESPONSE);
-            f.Add(MessageTypes.ISSHORTABLE);
-            f.Add(MessageTypes.POSITIONREQUEST);
-            f.Add(MessageTypes.POSITIONRESPONSE);
-            return f.ToArray();
-            
         }
 
         void debug(string msg)

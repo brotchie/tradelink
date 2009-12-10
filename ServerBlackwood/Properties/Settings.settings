@@ -5,11 +5,8 @@
     <Setting Name="un" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="pw" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
     <Setting Name="ipaddress" Type="System.String" Scope="User">
-      <Value Profile="(Default)">10.10.0.35</Value>
+      <Value Profile="(Default)">72.5.42.102</Value>
     </Setting>
     <Setting Name="dataport" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">5200</Value>
