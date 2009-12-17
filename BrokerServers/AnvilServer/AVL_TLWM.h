@@ -8,7 +8,7 @@
 using namespace std;
 using namespace TradeLibFast;
 
-const int MAXTICKS = 10000;		
+
 
 	class AVL_TLWM :
 		public TLServer_WM,
@@ -23,14 +23,6 @@ const int MAXTICKS = 10000;
 		int RegisterStocks(CString clientname);
 		int DOMRequest(int depth);
 		static AVL_TLWM* GetInstance() { return instance; };
-		void SrvGotTickAsync(TLTick k);
-		vector<TLTick> tickcache;
-		volatile uint _writeticks;
-		volatile uint _readticks;
-		volatile bool _tickflip;
-		volatile bool _go;
-		volatile bool _startthread;
-		//HANDLE _tickswaiting;
 
 	protected:
 		double GetDouble(const Money* m);

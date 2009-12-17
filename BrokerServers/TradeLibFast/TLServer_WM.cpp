@@ -34,10 +34,33 @@ namespace TradeLibFast
 			file.close();
 		}
 
+				// thread setup stuff
+
+		for (uint i = 0; i<MAXTICKS; i++)
+		{
+			TLTick k;
+			_tickcache.push_back(k);
+		}
+
+		_tickflip = false;
+		_readticks = 0;
+		_writeticks = 0;
+		_go = true;
+		_startthread = false;
+
 	}
 
 	TLServer_WM::~TLServer_WM()
 	{
+		// ensure threads are marked to stop
+		_go = false;
+		// wait moment for them to stop
+		Sleep(100);
+		// clear tick cache
+		_tickcache.clear();
+
+		// signal threads to stop
+		//SetEvent(_tickswaiting);
 		debugbuffer = "";
 
 	}
@@ -411,6 +434,75 @@ namespace TradeLibFast
 	int TLServer_WM::CancelRequest(long order)
 	{
 		return FEATURE_NOT_IMPLEMENTED;
+	}
+
+	UINT __cdecl DoReadTickThread(LPVOID param)
+	{
+		// we need a queue object
+		TLServer_WM* tl = (TLServer_WM*)param;
+		// ensure it's present
+		if (tl==NULL)
+		{
+			return OK;
+		}
+
+		// process until quick req
+		while (tl->_go)
+		{
+			// process ticks in queue
+			while (tl->_go && (tl->_readticks < tl->_tickcache.size()))
+			{
+				// if we're done reading, quit trying
+				if ((tl->_readticks>=tl->_writeticks) && !tl->_tickflip)
+					break;
+				// read next tick from cache
+				TLTick k;
+				k = tl->_tickcache[tl->_readticks++];
+				// send it
+				tl->SrvGotTick(k);
+				// if we hit end of cache buffer, ring back around to start
+				if (tl->_readticks>=tl->_tickcache.size())
+				{
+					tl->_readticks = 0;
+					tl->_tickflip = false;
+				}
+				
+				// this is from asyncresponse, but may not be same
+				// functions because it doesn't appear to behave as nicely
+				//ResetEvent(tl->_tickswaiting);
+				//WaitForSingleObject(tl->_tickswaiting,INFINITE);
+			}
+			Sleep(100);
+		}
+		// mark thread as terminating
+		tl->_startthread = false;
+		// end thread
+		return OK;
+	}
+
+	void TLServer_WM::SrvGotTickAsync(TLTick k)
+	{
+		// if thread is stopped don't restart it
+		if (!_go) return;
+		// add tick to queue and increment
+		_tickcache[_writeticks++] = k;
+		// implement ringbuffer on queue
+		if (_writeticks>=_tickcache.size())
+		{
+			_writeticks = 0;
+			_tickflip = true;
+		}
+		// ensure that we're reading from thread
+		if (!_startthread)
+		{
+			AfxBeginThread(DoReadTickThread,this);
+			_startthread = true;
+		}
+		else
+		{
+			// signal read thread that ticks are ready (adapted from asyncresponse)
+			//SetEvent(_tickswaiting);
+		}
 	}
 
 	bool TLServer_WM::HaveSubscriber(CString stock)

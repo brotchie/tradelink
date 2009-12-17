@@ -5,7 +5,7 @@ using namespace std;
 
 namespace TradeLibFast
 {
-
+const int MAXTICKS = 10000;		
 	// TLServer_WM
 
 	[event_source(native)]
@@ -25,9 +25,17 @@ namespace TradeLibFast
 		void SrvGotOrder(TLOrder order);
 		void SrvGotFill(TLTrade trade);
 		void SrvGotTick(TLTick tick);
+		void SrvGotTickAsync(TLTick k);
 		void SrvGotCancel(int orderid);
 		CString Version();
 		int FindSym(CString sym);
+		// thread stuff
+		volatile uint _writeticks;
+		volatile uint _readticks;
+		volatile bool _tickflip;
+		volatile bool _go;
+		volatile bool _startthread;
+		vector<TLTick> _tickcache;
 
 	protected:
 		bool needStock(CString stock);
@@ -47,6 +55,9 @@ namespace TradeLibFast
 
 		bool ClientHasSymbol(int clientid, CString sym);
 		void IndexBaskets();
+
+
+
 		
 		DECLARE_MESSAGE_MAP()
 
