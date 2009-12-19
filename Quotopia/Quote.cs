@@ -589,16 +589,22 @@ namespace Quotopia
                     else // otherwise remove portion that was filled and leave rest on order
                         ordergrid["osize", oidx].Value = Math.Abs(signedosize - signedtsize) * osign;
                 }
-                
-                int[] rows = GetSymbolRows(t.Sec.FullName);
                 pt.Adjust(t);
-                for (int i = 0; i < rows.Length; i++)
-                {
-                    qt.Rows[rows[i]]["PosSize"] = pt[t.symbol].Size.ToString();
-                    qt.Rows[rows[i]]["AvgPrice"] = pt[t.symbol].AvgPrice.ToString(_dispdecpointformat);
-                    qt.Rows[rows[i]]["ClosedPL"] = pt[t.symbol].ClosedPL.ToString(_dispdecpointformat);
-                }
+                
+                UpdateSymbolTrade(GetSymbolRows(t.Sec.FullName),t);
+                UpdateSymbolTrade(GetSymbolRows(t.Sec.Symbol),t);
+
                 TradesView.Rows.Add(t.xdate, t.xtime, t.symbol, (t.side ? "BUY" : "SELL"), t.xsize, t.xprice.ToString(_dispdecpointformat), t.comment, t.Account.ToString()); // if we accept trade, add it to list
+            }
+        }
+
+        void UpdateSymbolTrade(int[] rows,Trade t)
+        {
+            for (int i = 0; i < rows.Length; i++)
+            {
+                qt.Rows[rows[i]]["PosSize"] = pt[t.symbol].Size.ToString();
+                qt.Rows[rows[i]]["AvgPrice"] = pt[t.symbol].AvgPrice.ToString(_dispdecpointformat);
+                qt.Rows[rows[i]]["ClosedPL"] = pt[t.symbol].ClosedPL.ToString(_dispdecpointformat);
             }
         }
 
