@@ -286,6 +286,9 @@ namespace ServerMB
             f.Add(MessageTypes.SENDORDERMARKET);
             f.Add(MessageTypes.SENDORDERLIMIT);
             f.Add(MessageTypes.SENDORDERSTOP);
+            f.Add(MessageTypes.LIVEDATA);
+            f.Add(MessageTypes.LIVETRADING);
+            f.Add(MessageTypes.SIMTRADING);
             return f.ToArray();
         }
 

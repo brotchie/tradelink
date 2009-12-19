@@ -176,9 +176,9 @@ namespace TradeLink.AppKit
         public static bool ExistsNewBS(TLClient_WM tl)
         {
             if (tl == null) return false;
-            if (tl.LinkType == TLTypes.NONE) return false;
+            if (tl.ProvidersAvailable.Length==0) return false;
             int latest = 0;
-            if (tl.LinkType == TLTypes.HISTORICALBROKER)
+            if (tl.RequestFeatureList.Contains(MessageTypes.HISTORICALDATA))
                 latest = LatestVersion(Util.PROGRAM);
             else
                 latest = LatestVersion(BROKERSERVER);

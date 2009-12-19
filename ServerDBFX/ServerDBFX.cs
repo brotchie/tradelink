@@ -41,6 +41,8 @@ namespace ServerDBFX
             f.Add(MessageTypes.SENDORDER);
             f.Add(MessageTypes.SENDORDERLIMIT);
             f.Add(MessageTypes.SENDORDERMARKET);
+            f.Add(MessageTypes.LIVETRADING);
+            f.Add(MessageTypes.SIMTRADING);
             f.Add(MessageTypes.ORDERCANCELREQUEST);
             return f.ToArray();
         }

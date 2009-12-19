@@ -59,7 +59,7 @@ namespace Quotopia
             ordergrid.ContextMenuStrip.Items.Add("Cancel", null, new EventHandler(cancelorder));
             FormClosing += new FormClosingEventHandler(Quote_FormClosing);
             Resize += new EventHandler(Quote_Resize);
-            if (tl.LinkType!= TLTypes.NONE)
+            if (tl.ProvidersAvailable.Length>0)
                 tl.RequestAccounts();
             else
                 
@@ -675,7 +675,7 @@ namespace Quotopia
                 status("Imported " + count + " instruments.");
             }
             else return;
-            if (tl.LinkType != TLTypes.NONE)
+            if (tl.ProvidersAvailable.Length>0)
                 tl.Subscribe(mb);
             else
                 status("no server running to obtain quotes from.");

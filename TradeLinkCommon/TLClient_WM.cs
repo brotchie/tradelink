@@ -77,10 +77,6 @@ namespace TradeLink.Common
         /// <value>Me H.</value>
         public IntPtr MeH { get { return this.Handle; } }
 
-        [Obsolete("you should check RequestFeatures list instead for this information.", false)]
-        public TLTypes LinkType { get { return _linktype; } }
-
-
         /// <summary>
         /// Sets the preferred communication channel of the link, if multiple channels are avaialble.
         /// Defaults to first provider found.

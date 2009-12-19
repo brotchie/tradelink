@@ -21,7 +21,7 @@ namespace Record
         public RecordMain()
         {
             InitializeComponent();
-            if ((tl.LinkType == TLTypes.LIVEBROKER) || (tl.LinkType == TLTypes.SIMBROKER))
+            if (tl.RequestFeatureList.Contains(MessageTypes.LIVEDATA) )
             {
                 if (Environment.ProcessorCount == 1)
                     tl.gotTick += new TickDelegate(tl_gotTick);

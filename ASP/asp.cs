@@ -61,7 +61,7 @@ namespace ASP
             _NEXTRESPONSEID = (_ASPINSTANCE-1) * MAXRESPONSEPERASP;
             _INITIALRESPONSEID = _NEXTRESPONSEID;
             // don't save ticks from replay since they're already saved
-            _ao.archivetickbox.Checked = tl.LinkType != TLTypes.HISTORICALBROKER;
+            _ao.archivetickbox.Checked = !tl.RequestFeatureList.Contains(MessageTypes.HISTORICALDATA);
             _remskin.Click+=new EventHandler(_remskin_Click);
             _saveskins.Click+=new EventHandler(_saveskins_Click);
             _skins.SelectedIndexChanged+=new EventHandler(_skins_SelectedIndexChanged);
@@ -84,7 +84,7 @@ namespace ASP
             status(Util.TLSIdentity());
             debug(Util.TLSIdentity());
             // if we have a server
-            if (tl.LinkType != TLTypes.NONE)
+            if (tl.ProvidersAvailable.Length>0)
             {
                 // get accounts
                 tl.RequestAccounts();

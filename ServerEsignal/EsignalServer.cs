@@ -82,6 +82,7 @@ namespace ServerEsignal
             List<MessageTypes> f = new List<MessageTypes>();
             f.Add(MessageTypes.REGISTERSTOCK);
             f.Add(MessageTypes.TICKNOTIFY);
+            f.Add(MessageTypes.LIVEDATA);
             return f.ToArray();
         }
 
