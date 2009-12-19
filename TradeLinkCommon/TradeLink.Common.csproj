@@ -114,6 +114,7 @@
     <Compile Include="OrderTIFTracker.cs" />
     <Compile Include="PositionTracker.cs" />
     <Compile Include="ResponseTemplate.cs" />
+    <Compile Include="RingBuffer.cs" />
     <Compile Include="SkinImpl.cs" />
     <Compile Include="TikConstants.cs" />
     <Compile Include="TikReader.cs" />
