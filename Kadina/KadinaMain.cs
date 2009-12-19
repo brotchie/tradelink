@@ -195,6 +195,7 @@ namespace Kadina
         void rightreset(object sender, EventArgs e)
         {
             if (h!=null) h.Reset();
+            _msg = new StringBuilder(10000);
             msgbox.Clear();
             dt.Clear();
             ptab.Clear();
@@ -631,7 +632,6 @@ namespace Kadina
         void PlayComplete(object sender, RunWorkerCompletedEventArgs e)
         {
             debug(_msg.ToString());
-            _msg = new StringBuilder(10000);
             SafeBindingSource.refreshgrid(dg, tbs);
             SafeBindingSource.refreshgrid(ig, ibs);
             SafeBindingSource.refreshgrid(og, obs);
@@ -658,7 +658,8 @@ namespace Kadina
 
         private void recent_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            if (e.ClickedItem.Text == "Browse") return;
+            if (e.ClickedItem.Text == BROWSEMENU) return;
+            if (e.ClickedItem.Text == CLEARRECENTDATA) return;
             if (System.IO.File.Exists(e.ClickedItem.Text))
                 loadfile(e.ClickedItem.Text);
             else
@@ -670,7 +671,7 @@ namespace Kadina
 
         private void libs_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            if (e.ClickedItem.Text == "Browse") return;
+            if (e.ClickedItem.Text == BROWSEMENU) return;
             if (System.IO.File.Exists(e.ClickedItem.Text))
                 loadfile(e.ClickedItem.Text);
             else
@@ -689,14 +690,25 @@ namespace Kadina
             Kadina.Properties.Settings.Default.recentfiles = s;
         }
 
+        const string BROWSEMENU = "Browse";
+        const string CLEARRECENTDATA = "Clear";
         void restorerecentfiles()
         {
-            recent.DropDownItems.Add("Browse", null, new EventHandler(browserecent));
+            recent.DropDownItems.Add(BROWSEMENU, null, new EventHandler(browserecent));
+            recent.DropDownItems.Add(CLEARRECENTDATA, null, new EventHandler(clearrecentdata));
             string[] r = Kadina.Properties.Settings.Default.recentfiles.Split(',');
             for (int i = 0; i < r.Length; i++)
                 if ((r[i]!="") && System.IO.File.Exists(r[i]))
                     if (isTIK(r[i]))
                         recent.DropDownItems.Add(r[i]);
+        }
+
+        void clearrecentdata(object o, EventArgs e)
+        {
+            recent.DropDownItems.Clear();
+            Properties.Settings.Default.recentfiles = string.Empty;
+            Properties.Settings.Default.Save();
+            restorerecentfiles();
         }
 
         void saverecentlibs()
@@ -710,7 +722,7 @@ namespace Kadina
 
         void restorerecentlibs()
         {
-            reslist.DropDownItems.Add("Browse", null, new EventHandler(browselibs));
+            reslist.DropDownItems.Add(BROWSEMENU, null, new EventHandler(browselibs));
             string[] r = Kadina.Properties.Settings.Default.recentresponselibs.Split(',');
             for (int i = 0; i < r.Length; i++)
                 if ((r[i] != "") && System.IO.File.Exists(r[i]))
