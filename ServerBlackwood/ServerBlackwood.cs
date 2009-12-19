@@ -137,28 +137,6 @@ namespace ServerBlackwood
                     o.Cancel();
         }
 
-        MessageTypes[] ServerBlackwood_newFeatureRequest()
-        {
-            List<MessageTypes> f = new List<MessageTypes>();
-            f.Add(MessageTypes.EXECUTENOTIFY);
-            f.Add(MessageTypes.SENDORDER);
-            f.Add(MessageTypes.SENDORDERLIMIT);
-            f.Add(MessageTypes.SENDORDERMARKET);
-            f.Add(MessageTypes.SENDORDERSTOP);
-            f.Add(MessageTypes.ORDERCANCELREQUEST);
-            f.Add(MessageTypes.ORDERCANCELRESPONSE);
-            f.Add(MessageTypes.ORDERNOTIFY);
-            f.Add(MessageTypes.IMBALANCEREQUEST);
-            f.Add(MessageTypes.IMBALANCERESPONSE);
-            f.Add(MessageTypes.DOMREQUEST);
-            //f.Add(MessageTypes.DOMRESPONSE);
-            f.Add(MessageTypes.ISSHORTABLE);
-            f.Add(MessageTypes.POSITIONREQUEST);
-            f.Add(MessageTypes.POSITIONRESPONSE);
-           
-            return f.ToArray();
-
-        }
 
         long ServerBlackwood_newUnknownRequest(MessageTypes t, string msg)
         {
@@ -298,15 +276,9 @@ namespace ServerBlackwood
 				}
 				finally 
 				{
-                    if (m_Session.IsConnectedToMarketData && m_Session.IsConnectedToOrderRouting)
-                    {
-                        _valid = true;
-                    }
-                    else 
-                    {
-                        _valid = false;
-                    }
-                   
+                    //if (m_Session.IsConnectedToMarketData && m_Session.IsConnectedToOrderRouting)
+                    _valid = m_Session.ConnectedToMarketData
+                        && m_Session.ConnectedToOrderRouting;
           		}
 
                 return _valid;
@@ -423,6 +395,36 @@ namespace ServerBlackwood
                     break;
             }
 
+        }
+
+
+        MessageTypes[] ServerBlackwood_newFeatureRequest()
+        {
+            List<MessageTypes> f = new List<MessageTypes>();
+            f.Add(MessageTypes.EXECUTENOTIFY);
+            f.Add(MessageTypes.REGISTERCLIENT);
+            f.Add(MessageTypes.REGISTERSTOCK);
+            f.Add(MessageTypes.TICKNOTIFY);
+            f.Add(MessageTypes.VERSION);
+            f.Add(MessageTypes.SIMTRADING);
+            f.Add(MessageTypes.LIVEDATA);
+            f.Add(MessageTypes.LIVETRADING);
+            f.Add(MessageTypes.SENDORDER);
+            f.Add(MessageTypes.SENDORDERLIMIT);
+            f.Add(MessageTypes.SENDORDERMARKET);
+            f.Add(MessageTypes.SENDORDERSTOP);
+            f.Add(MessageTypes.ORDERCANCELREQUEST);
+            f.Add(MessageTypes.ORDERCANCELRESPONSE);
+            f.Add(MessageTypes.ORDERNOTIFY);
+            f.Add(MessageTypes.IMBALANCEREQUEST);
+            f.Add(MessageTypes.IMBALANCERESPONSE);
+            f.Add(MessageTypes.DOMREQUEST);
+            f.Add(MessageTypes.DOMRESPONSE);
+            f.Add(MessageTypes.ISSHORTABLE);
+            f.Add(MessageTypes.POSITIONREQUEST);
+            f.Add(MessageTypes.POSITIONRESPONSE);
+            return f.ToArray();
+            
         }
 
         void debug(string msg)
