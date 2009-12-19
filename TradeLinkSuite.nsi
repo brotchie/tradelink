@@ -111,6 +111,10 @@ Section "TradeLinkSuite"
   File "ServerBlackwood\bin\release\BWCMessageLib.dll"
   File "LogViewer\bin\release\LogViewer.exe"
   File "LogViewer\bin\release\LogViewer.exe.config"
+  File "ServerRedi\bin\release\ServerRedi.exe"
+  File "ServerRedi\bin\release\ServerRedi.exe.config"
+  File "ServerRedi\bin\release\Interop.RediLib.dll"
+  File "ServerRedi\bin\release\VBRediClasses.dll"
 
   File "TikConverter\bin\release\TikConverter.exe"
   
