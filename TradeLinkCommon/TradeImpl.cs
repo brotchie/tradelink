@@ -65,7 +65,7 @@ namespace TradeLink.Common
 
         public TradeImpl() { }
         public TradeImpl(string symbol, decimal fillprice, int fillsize) : this(symbol, fillprice, fillsize, DateTime.Now) { }
-        public TradeImpl(string sym, decimal fillprice, int fillsize, DateTime tradedate) : this(sym,fillprice, fillsize, Util.ToTLDate(tradedate),Util.ToTLTime(tradedate)) {}
+        public TradeImpl(string sym, decimal fillprice, int fillsize, DateTime tradedate) : this(sym,fillprice, fillsize, Util.ToTLDate(tradedate),Util.DT2FT(tradedate)) {}
         public TradeImpl(string sym, decimal fillprice, int fillsize, int filldate, int filltime)
         {
             if (sym != null) symbol = sym.ToUpper();

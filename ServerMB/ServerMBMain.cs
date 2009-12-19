@@ -128,7 +128,7 @@ namespace ServerMB
             o.price = (decimal)pOrd.Price;
             o.stopp = (decimal)pOrd.StopLimit;
             o.TIF = pOrd.TimeInForce == MBConst.VALUE_DAY ? "DAY" : "GTC";
-            o.time = Util.ToTLTime(pOrd.UTCDateTime);
+            o.time = Util.DT2FT(pOrd.UTCDateTime);
             o.date = Util.ToTLDate(pOrd.UTCDateTime);
             o.sec = pOrd.UTCDateTime.Second;
             o.trail = (decimal)pOrd.TrailingOffset;

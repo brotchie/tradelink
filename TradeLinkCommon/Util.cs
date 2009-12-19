@@ -144,6 +144,11 @@ namespace TradeLink.Common
             return new DateTime(year, month, day, hour, min, sec);
         }
         /// <summary>
+        /// gets fasttime/tradelink time for now
+        /// </summary>
+        /// <returns></returns>
+        public static int DT2FT() { return DT2FT(DateTime.Now); }
+        /// <summary>
         /// converts datetime to fasttime format
         /// </summary>
         /// <param name="d"></param>
@@ -305,6 +310,11 @@ namespace TradeLink.Common
             return "TradeLinkSuite-" + TLVersion();
         }
         /// <summary>
+        /// gets TradeLink date for today
+        /// </summary>
+        /// <returns></returns>
+        public static int ToTLDate() { return ToTLDate(DateTime.Now); }
+        /// <summary>
         /// Converts a DateTime to TradeLink Date (eg July 11, 2006 = 20060711)
         /// </summary>
         /// <param name="dt"></param>
@@ -323,13 +333,18 @@ namespace TradeLink.Common
             return ToTLDate(new DateTime(DateTimeTicks));
         }
         /// <summary>
-        /// Converts a DateTime to TradeLink time (eg 4pm = 1600)
+        /// gets tradelink time for now
         /// </summary>
-        /// <param name="dt"></param>
         /// <returns></returns>
-        public static int ToTLTime(DateTime dt)
+        public static int ToTLTime() { return DT2FT(DateTime.Now); }
+        /// <summary>
+        /// gets tradelink time from date
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        public static int ToTLTime(DateTime date)
         {
-            return (dt.Hour * 100) + dt.Minute;
+            return DT2FT(date);
         }
 
 
