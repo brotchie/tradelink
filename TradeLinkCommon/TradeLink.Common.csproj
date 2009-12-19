@@ -98,6 +98,7 @@
     <Compile Include="Email.cs" />
     <Compile Include="eSigTick.cs" />
     <Compile Include="GauntletEngine.cs" />
+    <Compile Include="GenericTracker.cs" />
     <Compile Include="GZip.cs" />
     <Compile Include="HistSim.cs">
       <SubType>Component</SubType>
