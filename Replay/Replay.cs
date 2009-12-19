@@ -309,6 +309,7 @@ namespace Replay
                 status("Playback completed successfully");
             stopbut.Enabled = false;
             playbut.Enabled = true;
+            trackBar1.Enabled = true;
             progressbar.Value = 0;
             h.Reset();
         }
