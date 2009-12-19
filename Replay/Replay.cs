@@ -466,6 +466,8 @@ namespace Replay
         {
             // create a new filter
             TickFileFilter tff = new TickFileFilter();
+            // we dont' select any symbols, so just playback whatever we find on this day
+            tff.isSymbolDateMatchUnion = true;
             // populate the filter from user's calendar
             tff.DateFilter(Util.ToTLDate(monthCalendar1.SelectionEnd), DateMatchType.Day | DateMatchType.Month | DateMatchType.Year);
             // set the filter on the simulator

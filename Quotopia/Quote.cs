@@ -534,7 +534,7 @@ namespace Quotopia
                     else if (t.hasAsk)
                     {
                         qt.Rows[r]["Ask"] = t.ask.ToString(_dispdecpointformat);
-                        int os = t.bs / numSharesPerContract;
+                        int os = t.os / numSharesPerContract;
                         qt.Rows[r]["ASize"] = os;
                         qt.Rows[r]["AskEx"] = t.oe;
                         string s = qt.Rows[r]["BSize"].ToString();
