@@ -256,6 +256,7 @@ namespace TradeLink.AppKit
         {
             List<decimal> _MIU = new List<decimal>();
             List<decimal> _return = new List<decimal>();
+            List<int> days = new List<int>();
             //clear position tracker
             pt = new PositionTracker(results.Count);
             // setup new results
@@ -263,6 +264,8 @@ namespace TradeLink.AppKit
             r.RiskFreeRet = string.Format("{0:P2}", _rfr);
             foreach (TradeResult tr in results)
             {
+                if (!days.Contains(tr.Source.xdate))
+                    days.Add(tr.Source.xdate);
                 pt.Adjust(tr.Source);
                 // calculate MIU and store on array
                 decimal miu = Calc.Sum(Calc.MoneyInUse(pt));
@@ -303,6 +306,10 @@ namespace TradeLink.AppKit
                 r.MaxPL = Math.Round(Calc.Max(_return.ToArray()), 2);
                 r.MinPL = Math.Round(Calc.Min(_return.ToArray()), 2);
                 r.MaxDD = string.Format("{0:P1}", Calc.MaxDD(_return.ToArray()));
+                r.SymbolCount = pt.Count;
+                r.DaysTraded = days.Count;
+                r.GrossPerDay = Math.Round(r.GrossPL / days.Count, 2);
+                r.GrossPerSymbol = Math.Round(r.GrossPL / pt.Count, 2);
             }
             else
             {
@@ -310,6 +317,8 @@ namespace TradeLink.AppKit
                 r.MaxPL = 0;
                 r.MinPL = 0;
                 r.MaxDD = "0";
+                r.GrossPerDay = 0;
+                r.GrossPerSymbol = 0;
             }
 
             return r;
@@ -407,6 +416,10 @@ namespace TradeLink.AppKit
         public decimal MaxOpenLoss = 0;
         public int HundredLots = 0;
         public int Trades = 0;
+        public int SymbolCount = 0;
+        public int DaysTraded = 0;
+        public decimal GrossPerDay = 0;
+        public decimal GrossPerSymbol = 0;
         public decimal SharpeRatio = 0;
         public decimal ComPerShare = 0.01m;
         public string Commissions { get { return v2s(HundredLots * 100 * ComPerShare); } }
