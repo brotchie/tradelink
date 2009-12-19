@@ -29,9 +29,9 @@ namespace TradeLink.Common
         public event DebugDelegate SendDebug;
 
         // member fields
-        TLTypes _linktype = TLTypes.NONE;
         IntPtr himh = IntPtr.Zero;
-        public List<MessageTypes> RequestFeatureList = new List<MessageTypes>();
+        List<MessageTypes> _rfl = new List<MessageTypes>();
+        public List<MessageTypes> RequestFeatureList { get { return _rfl; } }
         Dictionary<string, decimal> chighs = new Dictionary<string, decimal>();
         Dictionary<string, decimal> clows = new Dictionary<string, decimal>();
         Dictionary<string, PositionImpl> cpos = new Dictionary<string, PositionImpl>();
@@ -56,17 +56,16 @@ namespace TradeLink.Common
             this.WindowState = FormWindowState.Minimized;
             this.ShowInTaskbar = false;
             this.Hide();
-            TLFound();
             this.Mode(ProviderIndex, showarmingonmissingserver);
         }
 
         void TLClient_WM_gotFeatures(MessageTypes[] messages)
         {
-            lock (RequestFeatureList)
+            lock (_rfl)
             {
-                RequestFeatureList.Clear();
+                _rfl.Clear();
                 foreach (MessageTypes mt in messages)
-                    RequestFeatureList.Add(mt);
+                    _rfl.Add(mt);
             }
         }
 
@@ -86,8 +85,7 @@ namespace TradeLink.Common
         public bool Mode() { return Mode(0, true); }
         public bool Mode(int ProviderIndex, bool showwarning)
         {
-
-            _linktype = TLTypes.NONE; // reset before changing link mode
+            TLFound();
             if ((ProviderIndex >= srvrwin.Count) || (ProviderIndex < 0))
             {
                 if (showwarning)
@@ -99,7 +97,6 @@ namespace TradeLink.Common
             {
                 Disconnect();
                 himh = WMUtil.HisHandle(srvrwin[ProviderIndex]);
-                _linktype = TLTypes.LIVEBROKER;
                 Register();
                 RequestFeatures();
                 _curprovider = ProviderIndex;
@@ -154,7 +151,7 @@ namespace TradeLink.Common
 
         public void RequestFeatures() 
         {
-            RequestFeatureList.Clear();
+            _rfl.Clear();
             TLSend(MessageTypes.FEATUREREQUEST,Text); 
         }
 

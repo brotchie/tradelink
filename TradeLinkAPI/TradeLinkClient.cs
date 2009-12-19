@@ -24,6 +24,9 @@ namespace TradeLink.API
         event DebugDelegate gotAccounts;
         event UIntDelegate gotOrderCancel;
         void RequestFeatures();
+        Providers[] ProvidersAvailable { get; }
+        int ProviderSelected { get; }
+        List<MessageTypes> RequestFeatureList { get; }
         event MessageTypesMsgDelegate gotFeatures;
         event PositionDelegate gotPosition;
         event ImbalanceDelegate gotImbalance;
