@@ -138,7 +138,7 @@ namespace TradeLink.AppKit
 
             for (int i = 0; i < count; i++)
             {
-                SecurityImpl s = Util.SecurityFromFileName(index[i,0]);
+                SecurityImpl s = SecurityImpl.SecurityFromFileName(index[i,0]);
                 if (!s.isValid) continue;
                 DateTime d = Util.ToDateTime(s.Date, 0);
                 if (!tmpstk.Contains(s.Symbol))

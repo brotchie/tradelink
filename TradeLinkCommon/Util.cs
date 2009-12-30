@@ -608,26 +608,7 @@ namespace TradeLink.Common
             return index;
         }
 
-        /// <summary>
-        /// determine security from the filename, without opening file
-        /// (use SecurityImpl.FromFile to actually read it in)
-        /// </summary>
-        /// <param name="filename"></param>
-        /// <returns></returns>
-        public static SecurityImpl SecurityFromFileName(string filename)
-        {
-            try
-            {
-                string ds = System.Text.RegularExpressions.Regex.Match(filename, "([0-9]{8})[.]", System.Text.RegularExpressions.RegexOptions.IgnoreCase).Result("$1");
-                string sym = filename.Replace(ds, "").Replace(TikConst.DOT_EXT, "");
-                SecurityImpl s = new SecurityImpl(sym);
-                s.Date = Convert.ToInt32(ds);
-                return s;
-            }
-            catch (Exception) { }
-            return new SecurityImpl();
 
-        }
 
         public static string decode(string data)
         {
