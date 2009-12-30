@@ -75,7 +75,7 @@ namespace TradeLink.Common
         /// </summary>
         /// <value>Me H.</value>
         public IntPtr MeH { get { return this.Handle; } }
-
+        delegate bool ModeDel(int pi, bool warn);
         /// <summary>
         /// Sets the preferred communication channel of the link, if multiple channels are avaialble.
         /// Defaults to first provider found.
@@ -85,32 +85,38 @@ namespace TradeLink.Common
         public bool Mode() { return Mode(0, true); }
         public bool Mode(int ProviderIndex, bool showwarning)
         {
-            TLFound();
-            if ((ProviderIndex >= srvrwin.Count) || (ProviderIndex < 0))
-            {
-                if (showwarning)
-                    System.Windows.Forms.MessageBox.Show("Invalid broker specified or no brokers running.", "TradeLink server not found");
-                return false;
-            }
-
-            try
-            {
-                Disconnect();
-                himh = WMUtil.HisHandle(srvrwin[ProviderIndex]);
-                Register();
-                RequestFeatures();
-                _curprovider = ProviderIndex;
-                return true;
-            }
-            catch (TLServerNotFound)
+            if (InvokeRequired)
+                Invoke(new ModeDel(Mode), new object[] { ProviderIndex, showwarning });
+            else
             {
 
-                if (showwarning)
-                    System.Windows.Forms.MessageBox.Show("No Live broker instance was found.  Make sure broker application + TradeLink server is running.", "TradeLink server not found");
-                return false;
-            }
-            catch (Exception) { return false; }
+                TLFound();
+                if ((ProviderIndex >= srvrwin.Count) || (ProviderIndex < 0))
+                {
+                    if (showwarning)
+                        System.Windows.Forms.MessageBox.Show("Invalid broker specified or no brokers running.", "TradeLink server not found");
+                    return false;
+                }
 
+                try
+                {
+                    Disconnect();
+                    himh = WMUtil.HisHandle(srvrwin[ProviderIndex]);
+                    Register();
+                    RequestFeatures();
+                    _curprovider = ProviderIndex;
+                    return true;
+                }
+                catch (TLServerNotFound)
+                {
+
+                    if (showwarning)
+                        System.Windows.Forms.MessageBox.Show("No Live broker instance was found.  Make sure broker application + TradeLink server is running.", "TradeLink server not found");
+                    return false;
+                }
+                catch (Exception) { return false; }
+            }
+            return false;
         }
 
         
