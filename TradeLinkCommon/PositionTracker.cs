@@ -64,6 +64,8 @@ namespace TradeLink.Common
             {
                 _poslist.Add(new PositionImpl(newpos));
                 _symidx.Add(newpos.Symbol,_poslist.Count-1);
+                if (NewSymbol != null)
+                    NewSymbol(newpos.Symbol);
             }
         }
 
@@ -83,10 +85,17 @@ namespace TradeLink.Common
             {
                 _poslist.Add(new PositionImpl(fill));
                 _symidx.Add(fill.symbol, _poslist.Count - 1);
+                if (NewSymbol != null)
+                    NewSymbol(fill.symbol);
             }
             _totalclosedpl += cpl;
             return cpl;
         }
+
+        /// <summary>
+        /// called when a new position is added to tracker.
+        /// </summary>
+        public event SymDelegate NewSymbol;
         /// <summary>
         /// overwrite existing position, or start new position
         /// </summary>

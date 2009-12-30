@@ -195,7 +195,7 @@ namespace TradeLink.Common
         /// <summary>
         /// this must be called once per position tracker, for each position update.
         /// if you are using your own position tracker with this trailing stop(eg from offset tracker, or somewhere else)
-        /// you only need to adjust it once, so if you adjust it directly you don't need to call again here.
+        /// you MUST call TrailTrackers Adjust and NOT call your position tracker's adjust
         /// </summary>
         /// <param name="fill"></param>
         public void Adjust(Trade fill)
