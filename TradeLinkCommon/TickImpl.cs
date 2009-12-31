@@ -125,7 +125,7 @@ namespace TradeLink.Common
                 k.be = a.be;
                 k.oe = a.oe;
             }
-            else if (b.hasAsk && b.hasBid)
+            if (b.hasAsk && b.hasBid)
             {
                 k.bid = b.bid;
                 k.ask = b.ask;

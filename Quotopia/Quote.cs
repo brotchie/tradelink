@@ -25,10 +25,16 @@ namespace Quotopia
         AsyncResponse _ar = new AsyncResponse();
         public const string PROGRAM = "Quotopia";
         DebugWindow _dw = new DebugWindow();
+        TLTracker _tlt;
 
         public Quote()
         {
             InitializeComponent();
+            int poll = (int)((double)Properties.Settings.Default.brokertimeoutsec*1000/2);
+            _tlt = new TLTracker(poll, (int)Properties.Settings.Default.brokertimeoutsec, tl, Providers.Unknown, true);
+            _tlt.GotConnectFail += new VoidDelegate(_tlt_GotConnectFail);
+            _tlt.GotConnect += new VoidDelegate(_tlt_GotConnect);
+            _tlt.GotDebug += new DebugDelegate(_tlt_GotDebug);
             if ((Location.X == 0) && (Location.Y == 0))
             {
                 Quotopia.Properties.Settings.Default.location = new Point(300, 300);
@@ -59,12 +65,43 @@ namespace Quotopia
             ordergrid.ContextMenuStrip.Items.Add("Cancel", null, new EventHandler(cancelorder));
             FormClosing += new FormClosingEventHandler(Quote_FormClosing);
             Resize += new EventHandler(Quote_Resize);
-            if (tl.ProvidersAvailable.Length>0)
-                tl.RequestAccounts();
-            else
-                
+            if (tl.ProvidersAvailable.Length > 0)
+                _tlt_GotConnect();
             TradeLink.AppKit.Versions.UpgradeAlert(tl);
 
+        }
+
+        void _tlt_GotDebug(string msg)
+        {
+            debug(msg);
+        }
+
+        void _tlt_GotConnect()
+        {
+            debug(tl.BrokerName + " "+tl.ServerVersion+" connected.");
+            status(tl.BrokerName + " connected.");
+            _brokertimeout.Enabled = tl.BrokerName != Providers.TradeLink;
+            try
+            {
+                // get accounts
+                tl.RequestAccounts();
+                // request positions
+                foreach (string acct in accts)
+                    tl.RequestPositions(acct);
+                // resubscribe
+                if (mb.Count > 0)
+                    tl.Subscribe(mb);
+            }
+            catch { }
+            if (tl.BrokerName == Providers.TradeLink)
+            {
+                _tlt.Stop();
+            }
+        }
+
+        void _tlt_GotConnectFail()
+        {
+            status("Broker disconnected");
         }
 
         void togdebug(object sender, EventArgs e)
@@ -168,32 +205,39 @@ namespace Quotopia
         {
             Properties.Settings.Default.Save();
             _ar.Stop();
+            _tlt.Stop();
             try
             {
                 tl.Unsubscribe();
                 tl.Disconnect();
             }
-            catch (TLServerNotFound) { }
+            catch { }
         }
 
         Timer statfade = new Timer();
         Multimedia.Timer ticker = new Multimedia.Timer();
         DataGridView qg = new DataGridView();
         DataTable qt = new DataTable();
+        const string SYMBOL = "Symbol";
+        const string LAST = "Last";
+        const string TSIZE = "TSize";
+        const string AVGPRICE = "AvgPrice";
+        const string POSSIZE = "PosSize";
+        const string CLOSEDPL = "ClosedPL";
 
         void QuoteGridSetup()
         {
-            qt.Columns.Add("Symbol");
-            qt.Columns.Add("Last");
-            qt.Columns.Add("TSize");
+            qt.Columns.Add(SYMBOL);
+            qt.Columns.Add(LAST);
+            qt.Columns.Add(TSIZE);
             qt.Columns.Add("Bid");
             qt.Columns.Add("Ask");
             qt.Columns.Add("BSize");
             qt.Columns.Add("ASize");
             qt.Columns.Add("Sizes");
-            qt.Columns.Add("AvgPrice");
-            qt.Columns.Add("PosSize");
-            qt.Columns.Add("ClosedPL");
+            qt.Columns.Add(AVGPRICE);
+            qt.Columns.Add(POSSIZE);
+            qt.Columns.Add(CLOSEDPL);
             qt.Columns.Add("High");
             qt.Columns.Add("Low");
             qt.Columns.Add("Exch");
@@ -432,6 +476,13 @@ namespace Quotopia
         {
             // SYM,LAST,TSIZE,BID,ASK,BSIZE,ASIZE,SIZES,OHLC(YEST),CHANGE
             DataRow r = qt.Rows.Add(sym, "", "", "", "", "", "", "", "", "", "", "");
+            try
+            {
+                qt.Rows[qt.Rows.Count - 1][AVGPRICE] = pt[sym].AvgPrice;
+                qt.Rows[qt.Rows.Count - 1][POSSIZE] = pt[sym].Size;
+                qt.Rows[qt.Rows.Count - 1][CLOSEDPL] = pt[sym].ClosedPL;
+            }
+            catch { }
             if (!bardict.ContainsKey(sym))
                 bardict.Add(sym, new BarListImpl(BarInterval.FiveMin, sym));
             status("Added " + sym);
@@ -612,6 +663,7 @@ namespace Quotopia
 
         void tl_gotTick(Tick t)
         {
+            _tlt.newTick(t);
             if (spillTick != null)
                 spillTick(t);
             RefreshRow(t);
@@ -720,6 +772,11 @@ namespace Quotopia
         private void _dispdecpoints_ValueChanged(object sender, EventArgs e)
         {
             _dispdecpointformat = "N" + ((int)_dispdecpoints.Value).ToString();
+        }
+
+        private void _brokertimeout_ValueChanged(object sender, EventArgs e)
+        {
+            _tlt.AlertThreshold = (int)_brokertimeout.Value;
         }
 
 

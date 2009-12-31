@@ -101,5 +101,8 @@
     <Setting Name="displaydecpoints" Type="System.Decimal" Scope="User">
       <Value Profile="(Default)">2</Value>
     </Setting>
+    <Setting Name="brokertimeoutsec" Type="System.Decimal" Scope="User">
+      <Value Profile="(Default)">10</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -29,6 +29,7 @@ namespace ASP
         TickArchiver _ta = new TickArchiver();
         BasketImpl _mb = new BasketImpl();
         ASPOptions _ao = new ASPOptions();
+        TLTracker _tlt;
 
         Dictionary<int, string> _resskinidx = new Dictionary<int, string>();
         Dictionary<string, string> _class2dll = new Dictionary<string, string>();
@@ -49,6 +50,12 @@ namespace ASP
         {
             // read designer options for gui
             InitializeComponent();
+            int poll = (int)((double)Properties.Settings.Default.brokertimeoutsec * 1000 / 2);
+            _tlt = new TLTracker(poll, (int)Properties.Settings.Default.brokertimeoutsec, tl, Providers.Unknown, true);
+            _tlt.GotConnectFail += new VoidDelegate(_tlt_GotConnectFail);
+            _tlt.GotConnect += new VoidDelegate(_tlt_GotConnect);
+            _tlt.GotDebug += new DebugDelegate(_tlt_GotDebug);
+            _ao.TimeoutChanged += new Int32Delegate(_ao_TimeoutChanged);
             // count instances of program
             _ASPINSTANCE = getprocesscount(PROGRAM);
             // ensure have not exceeded maximum
@@ -86,13 +93,7 @@ namespace ASP
             // if we have a server
             if (tl.ProvidersAvailable.Length>0)
             {
-                // get accounts
-                tl.RequestAccounts();
-                // request positions
-                foreach (string acct in _acct)
-                    tl.RequestPositions(acct);
-                // show broker
-                debug("broker: " + tl.BrokerName.ToString()+" "+tl.ServerVersion);
+                _tlt_GotConnect();
             }
             else
             {
@@ -113,6 +114,45 @@ namespace ASP
             LoadResponseDLL(Properties.Settings.Default.boxdll);
             // load any skins we can find
             findskins();
+        }
+
+        void _ao_TimeoutChanged(int val)
+        {
+            _tlt.AlertThreshold = val;
+        }
+
+        void _tlt_GotDebug(string msg)
+        {
+
+        }
+
+        void _tlt_GotConnect()
+        {
+            debug(tl.BrokerName + " " + tl.ServerVersion + " connected.");
+            status(tl.BrokerName + " connected.");
+            _ao._brokertimeout.Enabled = tl.BrokerName != Providers.TradeLink;
+            if (tl.BrokerName == Providers.TradeLink)
+            {
+                _tlt.Stop();
+            }
+            try
+            {
+                // get accounts
+                tl.RequestAccounts();
+                // request positions
+                foreach (string acct in _acct)
+                    tl.RequestPositions(acct);
+                // subscribe if we have a basket
+                if (_mb.Count>0)
+                    tl.Subscribe(_mb);
+            }
+            catch { }
+        }
+
+        void _tlt_GotConnectFail()
+        {
+            status("Broker disconnected");
+            debug("Broker disconnected");
         }
 
         void tl_gotUnknownMessage(MessageTypes type, uint id, string data)
@@ -618,6 +658,8 @@ namespace ASP
             // if we're using another thread to process ticks, stop it
             if (Environment.ProcessorCount>1)
                 _ar.Stop();
+            // stop watching ticks
+            _tlt.Stop();
             // stop archiving ticks
             _ta.Stop();
             // stop logging
@@ -658,6 +700,8 @@ namespace ASP
             foreach (int idx in idxs)
                 if (_reslist[idx].isValid) 
                     _reslist[idx].GotTick(t);
+            // watch for timeout
+            _tlt.newTick(t);
         }
 
 

@@ -154,7 +154,7 @@ namespace TestTradeLink
             bool foundsym = true;
             for (int i = 0; i < idx.GetLength(0); i++)
             {
-                Security s = Util.SecurityFromFileName(idx[i, 0]);
+                Security s = SecurityImpl.SecurityFromFileName(idx[i, 0]);
                 foundsym &= syms.Contains(s.Symbol);
             }
             Assert.IsTrue(foundsym);

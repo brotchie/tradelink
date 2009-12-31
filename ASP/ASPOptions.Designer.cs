@@ -30,26 +30,57 @@
         {
             this.components = new System.ComponentModel.Container();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this._brokertimeout = new System.Windows.Forms.NumericUpDown();
             this._virtids = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
             this.archivetickbox = new System.Windows.Forms.CheckBox();
             this._account = new System.Windows.Forms.TextBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._brokertimeout)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.label1);
+            this.groupBox1.Controls.Add(this._brokertimeout);
             this.groupBox1.Controls.Add(this._virtids);
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.archivetickbox);
             this.groupBox1.Controls.Add(this._account);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(381, 76);
+            this.groupBox1.Size = new System.Drawing.Size(381, 118);
             this.groupBox1.TabIndex = 20;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "General";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(15, 75);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(242, 20);
+            this.label1.TabIndex = 20;
+            this.label1.Text = "Broker Reconnect Timeout (sec):";
+            // 
+            // _brokertimeout
+            // 
+            this._brokertimeout.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::ASP.Properties.Settings.Default, "brokertimeoutsec", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this._brokertimeout.Location = new System.Drawing.Point(264, 73);
+            this._brokertimeout.Maximum = new decimal(new int[] {
+            10000000,
+            0,
+            0,
+            0});
+            this._brokertimeout.Name = "_brokertimeout";
+            this._brokertimeout.Size = new System.Drawing.Size(90, 26);
+            this._brokertimeout.TabIndex = 19;
+            this._brokertimeout.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.toolTip1.SetToolTip(this._brokertimeout, "0 disables timeout");
+            this._brokertimeout.Value = global::ASP.Properties.Settings.Default.brokertimeoutsec;
+            this._brokertimeout.ValueChanged += new System.EventHandler(this._brokertimeout_ValueChanged);
             // 
             // _virtids
             // 
@@ -102,13 +133,14 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(415, 105);
+            this.ClientSize = new System.Drawing.Size(415, 142);
             this.Controls.Add(this.groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "ASPOptions";
             this.Text = "Options";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._brokertimeout)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -121,5 +153,7 @@
         public System.Windows.Forms.CheckBox archivetickbox;
         public System.Windows.Forms.TextBox _account;
         public System.Windows.Forms.CheckBox _virtids;
+        private System.Windows.Forms.Label label1;
+        internal System.Windows.Forms.NumericUpDown _brokertimeout;
     }
 }

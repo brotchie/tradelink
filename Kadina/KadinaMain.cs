@@ -554,7 +554,7 @@ namespace Kadina
             else if (isTIK(f))
             {
                 if (System.IO.File.Exists(f))
-                    if (!isRecentTickfile(f) && Util.SecurityFromFileName(f).isValid)
+                    if (!isRecentTickfile(f) && SecurityImpl.SecurityFromFileName(f).isValid)
                         recent.DropDownItems.Add(f);
                 epffiles.Add(f);
                 h = new HistSim(epffiles.ToArray());

@@ -36,7 +36,7 @@ namespace TestTradeLink
             // trade
             data.Add(TickImpl.NewTrade(SYM, 10, 400));
             // full tick
-            Tick full = TickImpl.Copy((TickImpl)data[3], (TickImpl)data[2]);
+            Tick full = TickImpl.Copy((TickImpl)data[2], (TickImpl)data[3]);
             data.Add(full);
 
             // write and read the data

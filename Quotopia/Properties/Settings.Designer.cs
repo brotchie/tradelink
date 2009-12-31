@@ -399,5 +399,17 @@ namespace Quotopia.Properties {
                 this["displaydecpoints"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public decimal brokertimeoutsec {
+            get {
+                return ((decimal)(this["brokertimeoutsec"]));
+            }
+            set {
+                this["brokertimeoutsec"] = value;
+            }
+        }
     }
 }

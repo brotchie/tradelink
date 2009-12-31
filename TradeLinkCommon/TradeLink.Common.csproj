@@ -141,6 +141,7 @@
     <Compile Include="TickArchiver.cs" />
     <Compile Include="TickFileFilter.cs" />
     <Compile Include="TickWatcher.cs" />
+    <Compile Include="TLTracker.cs" />
     <Compile Include="TradeImpl.cs" />
     <Compile Include="TLClient_WM.cs">
       <SubType>Form</SubType>

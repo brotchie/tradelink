@@ -48,6 +48,8 @@ namespace Quotopia
             this._sharepercontract = new System.Windows.Forms.NumericUpDown();
             this._dispdecpoints = new System.Windows.Forms.NumericUpDown();
             this.Settings = new System.Windows.Forms.TabPage();
+            this.label5 = new System.Windows.Forms.Label();
+            this._brokertimeout = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -83,6 +85,7 @@ namespace Quotopia
             ((System.ComponentModel.ISupportInitialize)(this._sharepercontract)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._dispdecpoints)).BeginInit();
             this.Settings.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._brokertimeout)).BeginInit();
             this.TradeTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.TradesView)).BeginInit();
             this.ordertab.SuspendLayout();
@@ -176,6 +179,8 @@ namespace Quotopia
             // Settings
             // 
             this.Settings.BackColor = System.Drawing.Color.Transparent;
+            this.Settings.Controls.Add(this.label5);
+            this.Settings.Controls.Add(this._brokertimeout);
             this.Settings.Controls.Add(this.label4);
             this.Settings.Controls.Add(this.label3);
             this.Settings.Controls.Add(this._sharepercontract);
@@ -196,6 +201,32 @@ namespace Quotopia
             this.Settings.TabIndex = 1;
             this.Settings.Text = "Settings";
             this.Settings.UseVisualStyleBackColor = true;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(8, 214);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(156, 20);
+            this.label5.TabIndex = 35;
+            this.label5.Text = "Broker Timeout (sec)";
+            // 
+            // _brokertimeout
+            // 
+            this._brokertimeout.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::Quotopia.Properties.Settings.Default, "brokertimeoutsec", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this._brokertimeout.Location = new System.Drawing.Point(187, 212);
+            this._brokertimeout.Maximum = new decimal(new int[] {
+            100000000,
+            0,
+            0,
+            0});
+            this._brokertimeout.Name = "_brokertimeout";
+            this._brokertimeout.Size = new System.Drawing.Size(87, 26);
+            this._brokertimeout.TabIndex = 34;
+            this._brokertimeout.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.toolTip1.SetToolTip(this._brokertimeout, "0 disables timeout");
+            this._brokertimeout.Value = global::Quotopia.Properties.Settings.Default.brokertimeoutsec;
+            this._brokertimeout.ValueChanged += new System.EventHandler(this._brokertimeout_ValueChanged);
             // 
             // label4
             // 
@@ -582,6 +613,7 @@ namespace Quotopia
             ((System.ComponentModel.ISupportInitialize)(this._dispdecpoints)).EndInit();
             this.Settings.ResumeLayout(false);
             this.Settings.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._brokertimeout)).EndInit();
             this.TradeTab.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.TradesView)).EndInit();
             this.ordertab.ResumeLayout(false);
@@ -640,5 +672,7 @@ namespace Quotopia
         private System.Windows.Forms.NumericUpDown _dispdecpoints;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.NumericUpDown _brokertimeout;
+        private System.Windows.Forms.Label label5;
     }
 }
