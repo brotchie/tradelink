@@ -9,6 +9,7 @@ using System.Windows.Forms;
 
 namespace TradeLink.AppKit
 {
+
     public partial class AssemblaTicketWindow : Form
     {
         public AssemblaTicketWindow()
@@ -66,8 +67,8 @@ namespace TradeLink.AppKit
                 atw.Show();
         }
 
-        public delegate void LoginSucceedDel(string u, string p);
         public event LoginSucceedDel LoginSucceeded;
+        public delegate void LoginSucceedDel(string u, string p);
         void assemblaTicketControl1_TicketSucceed()
         {
             if (LoginSucceeded!=null)

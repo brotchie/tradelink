@@ -142,6 +142,30 @@
     <Compile Include="DebugWindow.designer.cs">
       <DependentUpon>DebugWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="Google\AsyncManager.cs" />
+    <Compile Include="Google\Example.cs" />
+    <Compile Include="Google\GAuthManager.cs" />
+    <Compile Include="Google\GDataCredentials.cs" />
+    <Compile Include="Google\GEntry.cs" />
+    <Compile Include="Google\GEntryElements.cs" />
+    <Compile Include="Google\GFeed.cs" />
+    <Compile Include="Google\GObject.cs" />
+    <Compile Include="Google\GoogleAuthentication.cs" />
+    <Compile Include="Google\GService.cs" />
+    <Compile Include="Google\IGQuery.cs" />
+    <Compile Include="Google\IssueCommentsEntry.cs" />
+    <Compile Include="Google\IssueCommentsEntryElements.cs" />
+    <Compile Include="Google\IssueCommentsFeed.cs" />
+    <Compile Include="Google\IssueQuery.cs" />
+    <Compile Include="Google\IssuesEntry.cs" />
+    <Compile Include="Google\IssuesEntryElements.cs" />
+    <Compile Include="Google\IssuesFeed.cs" />
+    <Compile Include="Google\IXObject.cs" />
+    <Compile Include="Google\ProjectHostingService.cs" />
+    <Compile Include="Google\QueryParamType.cs" />
+    <Compile Include="Google\TokenCollection.cs" />
+    <Compile Include="Google\Utility.cs" />
+    <Compile Include="Google\XObjectSerializer.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="LogViewer.cs">
       <SubType>Form</SubType>
