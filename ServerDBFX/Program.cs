@@ -25,18 +25,18 @@ namespace ServerDBFX
             }
             catch (Exception ex)
             {
-                TradeLink.AppKit.CrashReport.BugReport(ServerDBFXMain.PROGRAM, TradeLink.AppKit.CrashReport.Desc(ServerDBFXMain.PROGRAM), ex, app._dw.Content);
+                TradeLink.AppKit.CrashReport.Report(ServerDBFXMain.PROGRAM,string.Empty,string.Empty,string.Empty,ex,null,true);
             }
         }
 
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            TradeLink.AppKit.CrashReport.BugReport(ServerDBFXMain.PROGRAM,TradeLink.AppKit.CrashReport.Desc(ServerDBFXMain.PROGRAM),(Exception)e.ExceptionObject,app._dw.Content);
+            TradeLink.AppKit.CrashReport.Report(ServerDBFXMain.PROGRAM, (Exception)e.ExceptionObject);
         }
 
         static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
-            TradeLink.AppKit.CrashReport.BugReport(ServerDBFXMain.PROGRAM, TradeLink.AppKit.CrashReport.Desc(ServerDBFXMain.PROGRAM), e.Exception, app._dw.Content);
+            TradeLink.AppKit.CrashReport.Report(ServerDBFXMain.PROGRAM, e.Exception);
         }
     }
 }

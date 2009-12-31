@@ -288,7 +288,7 @@ namespace Quotopia
 
         void report(object o, EventArgs e)
         {
-            CrashReport.BugReport(PROGRAM, _dw.Content);
+            CrashReport.Report(PROGRAM, string.Empty,string.Empty,_dw.Content,null,null,false);
         }
 
         void qg_DoubleClick(object sender, EventArgs e)

@@ -25,18 +25,18 @@ namespace ServerBlackwood
             }
             catch (Exception ex)
             {
-                TradeLink.AppKit.CrashReport.BugReport(ServerBlackwoodMain.PROGRAM, TradeLink.AppKit.CrashReport.Desc(ServerBlackwoodMain.PROGRAM), ex, app._dw.Content);
+                TradeLink.AppKit.CrashReport.Report(ServerBlackwoodMain.PROGRAM, ex);
             }
         }
 
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            TradeLink.AppKit.CrashReport.BugReport(ServerBlackwoodMain.PROGRAM, TradeLink.AppKit.CrashReport.Desc(ServerBlackwoodMain.PROGRAM), (Exception)e.ExceptionObject, app._dw.Content);
+            TradeLink.AppKit.CrashReport.Report(ServerBlackwoodMain.PROGRAM, (Exception)e.ExceptionObject);
         }
 
         static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
-            TradeLink.AppKit.CrashReport.BugReport(ServerBlackwoodMain.PROGRAM, TradeLink.AppKit.CrashReport.Desc(ServerBlackwoodMain.PROGRAM), e.Exception, app._dw.Content);
+            TradeLink.AppKit.CrashReport.Report(ServerBlackwoodMain.PROGRAM, e.Exception);
         }
     }
 }

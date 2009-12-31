@@ -659,7 +659,7 @@ namespace WinGauntlet
 
         private void _twithelp_Click(object sender, EventArgs e)
         {
-            CrashReport.BugReport(PROGRAM, _log.Content);
+            CrashReport.Report(PROGRAM, string.Empty, string.Empty, _log.Content, null, null, false);
         }
 
         private void _viewresults_Click(object sender, EventArgs e)

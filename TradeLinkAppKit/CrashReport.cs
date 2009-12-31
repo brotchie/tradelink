@@ -100,13 +100,12 @@ namespace TradeLink.AppKit
 
 
 
-        public static void Report(string PROGRAM, string username, string password, System.Threading.ThreadExceptionEventArgs e, AssemblaTicketWindow.LoginSucceedDel success) { Report(PROGRAM, username, password, e.Exception,success,true); }
-        public static void Report(string PROGRAM, System.Threading.ThreadExceptionEventArgs e) { Report(PROGRAM, string.Empty, string.Empty, e.Exception, null, true); }
-        public static void Report(string PROGRAM, Exception ex) { Report(PROGRAM, string.Empty, string.Empty, ex, null, true); }
-        public static void Report(string PROGRAM, string username, string password, Exception ex) { Report(PROGRAM, username, password, ex, null, true); }
-        public static void Report(string PROGRAM, string username, string password, Exception ex,AssemblaTicketWindow.LoginSucceedDel success,bool pause)
+        public static void Report(string PROGRAM, string username, string password, System.Threading.ThreadExceptionEventArgs e, AssemblaTicketWindow.LoginSucceedDel success) { Report(PROGRAM, username, password, string.Empty,e.Exception,success,true); }
+        public static void Report(string PROGRAM, System.Threading.ThreadExceptionEventArgs e) { Report(PROGRAM, string.Empty, string.Empty, string.Empty,e.Exception, null, true); }
+        public static void Report(string PROGRAM, Exception ex) { Report(PROGRAM, string.Empty, string.Empty, string.Empty,ex, null, true); }
+        public static void Report(string PROGRAM, string username, string password, string data, Exception ex,AssemblaTicketWindow.LoginSucceedDel success,bool pause)
         {
-            CrashReport cr = new CrashReport(PROGRAM, username, password, ex);
+            CrashReport cr = new CrashReport(PROGRAM, username, password, ex,data);
             if (success!=null)
                 cr.TicketSucceed+=new AssemblaTicketWindow.LoginSucceedDel(success);
             if (pause)

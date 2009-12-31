@@ -386,7 +386,7 @@ namespace TDServer
 
         private void _report_Click(object sender, EventArgs e)
         {
-            CrashReport.BugReport(PROGRAM, _dw.Content);
+            CrashReport.Report(PROGRAM, string.Empty, string.Empty, _dw.Content, null, null, false);
         }
 
     }
