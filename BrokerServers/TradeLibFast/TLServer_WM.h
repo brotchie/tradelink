@@ -35,6 +35,7 @@ const int MAXTICKS = 10000;
 		volatile bool _tickflip;
 		volatile bool _go;
 		volatile bool _startthread;
+
 		vector<TLTick> _tickcache;
 
 	protected:

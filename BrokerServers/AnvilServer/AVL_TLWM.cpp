@@ -37,6 +37,16 @@
 
 		depth = 0;
 
+		_startimb = false;
+		_readimb = 0;
+		_writeimb = 0;
+		_imbflip = false;
+
+		for (uint i = 0; i<MAXTICKS; i++)
+		{
+			TLImbalance imb;
+			_imbcache.push_back(imb);
+		}
 
 
 	}
@@ -69,7 +79,7 @@
 			imbalance->Remove(this);
 			imbalance = NULL;
 		}
-
+		_imbcache.clear();
 
 		// stock stuff, close down hammer subscriptions
 		for (size_t i = 0; i<subs.size(); i++)
@@ -778,8 +788,7 @@
 						imb.Ex = CString("NYSE");
 						imb.ThisTime = sm->GetNyseImbalanceTime();
 						imb.PrevTime = sm->GetNysePreviousImbalanceTime();
-						for (uint i = 0; i<imbalance_clients.size(); i++)
-							TLSend(IMBALANCERESPONSE,TLImbalance::Serialize(imb),imbalance_clients[i]);
+						SrvGotImbAsync(imb);
 
 					}
 
@@ -800,8 +809,7 @@
 							imb.Ex = CString("NASDAQ");
 							imb.ThisTime = sm->GetNasdaqImbalanceTime();
 							imb.PrevTime = sm->GetNasdaqPreviousImbalanceTime();
-							for (uint i = 0; i<imbalance_clients.size(); i++)
-								TLSend(IMBALANCERESPONSE,TLImbalance::Serialize(imb),imbalance_clients[i]);
+							SrvGotImbAsync(imb);
 						}
 					}
 
@@ -813,6 +821,83 @@
 				}
 				break;
 		} // switchend
+	}
+
+		UINT __cdecl DoReadImbThread(LPVOID param)
+	{
+		// we need a queue object
+		AVL_TLWM* tl = (AVL_TLWM*)param;
+		// ensure it's present
+		if (tl==NULL)
+		{
+			return OK;
+		}
+
+		// process until quick req
+		while (tl->_go)
+		{
+			// process ticks in queue
+			while (tl->_go && (tl->_readimb < tl->_imbcache.size()))
+			{
+				// if we're done reading, quit trying
+				if ((tl->_readimb>=tl->_writeimb) && !tl->_imbflip)
+					break;
+				// read next tick from cache
+				TLImbalance imb;
+				imb = tl->_imbcache[tl->_readimb++];
+				// send it
+				tl->SrvGotImbalance(imb);
+				// if we hit end of cache buffer, ring back around to start
+				if (tl->_readimb>=tl->_imbcache.size())
+				{
+					tl->_readimb = 0;
+					tl->_imbflip = false;
+				}
+				
+				// this is from asyncresponse, but may not be same
+				// functions because it doesn't appear to behave as nicely
+				//ResetEvent(tl->_tickswaiting);
+				//WaitForSingleObject(tl->_tickswaiting,INFINITE);
+			}
+			Sleep(100);
+		}
+		// mark thread as terminating
+		tl->_startimb = false;
+		// end thread
+		return OK;
+	}
+
+
+	void AVL_TLWM::SrvGotImbAsync(TLImbalance imb)
+	{
+		// if thread is stopped don't restart it
+		if (!_go) return;
+		// add tick to queue and increment
+		_imbcache[_writeimb++] = imb;
+		// implement ringbuffer on queue
+		if (_writeimb>=_imbcache.size())
+		{
+			_writeimb = 0;
+			_imbflip  = true;
+		}
+		// ensure that we're reading from thread
+		if (!_startimb)
+		{
+			AfxBeginThread(DoReadImbThread,this);
+			_startimb = true;
+		}
+		else
+		{
+			// signal read thread that ticks are ready (adapted from asyncresponse)
+			//SetEvent(_tickswaiting);
+		}
+	}
+
+	void AVL_TLWM::SrvGotImbalance(TLImbalance imb)
+	{
+		for (uint i = 0; i<imbalance_clients.size(); i++)
+			TLSend(IMBALANCERESPONSE,TLImbalance::Serialize(imb),imbalance_clients[i]);
+
 	}
 
 	unsigned int AVL_TLWM::AnvilId(unsigned int TLOrderId)

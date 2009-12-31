@@ -23,8 +23,15 @@ using namespace TradeLibFast;
 		int RegisterStocks(CString clientname);
 		int DOMRequest(int depth);
 		static AVL_TLWM* GetInstance() { return instance; };
+		volatile uint _writeimb;
+		volatile uint _readimb;
+		volatile bool _imbflip;
+		vector<TLImbalance> _imbcache;
+		volatile bool _startimb;
+		void SrvGotImbalance(TLImbalance imb);
 
 	protected:
+		void SrvGotImbAsync(TLImbalance imb);
 		double GetDouble(const Money* m);
 		double GetDouble(Money m);
 		Money  Double2Money(double val);

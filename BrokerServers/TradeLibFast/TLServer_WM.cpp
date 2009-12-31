@@ -48,6 +48,7 @@ namespace TradeLibFast
 		_go = true;
 		_startthread = false;
 
+
 	}
 
 	TLServer_WM::~TLServer_WM()
@@ -56,9 +57,8 @@ namespace TradeLibFast
 		_go = false;
 		// wait moment for them to stop
 		Sleep(100);
-		// clear tick cache
+		// clear tick and imbalance cache
 		_tickcache.clear();
-
 		// signal threads to stop
 		//SetEvent(_tickswaiting);
 		debugbuffer = "";
@@ -504,6 +504,8 @@ namespace TradeLibFast
 			//SetEvent(_tickswaiting);
 		}
 	}
+
+
 
 	bool TLServer_WM::HaveSubscriber(CString stock)
 	{
