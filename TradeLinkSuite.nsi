@@ -10,6 +10,7 @@ Icon "InstallSuite\tradelinkinstaller.ico"
 !define SUPPORT_EMAIL "tradelink-users@googlegroups.com"
 !addplugindir InstallSuite
 !include "InstallSuite\DotNET.nsh"
+!include "InstallSuite\FileAssociation.nsh"
 
 ; The file to write
 OutFile "TradeLinkSuite.exe"
@@ -143,6 +144,9 @@ finishinstall:
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "NoModify" 1
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "NoRepair" 1
   WriteUninstaller "uninstall.exe"
+  
+  ; register tik extension
+  ${registerExtension} "$INSTDIR\TimeSales.exe" ".tik" "TradeLink TickData"
 
 SectionEnd
 ;--------------------------------
@@ -154,6 +158,8 @@ Section "Uninstall"
   ; Remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite"
   DeleteRegKey HKLM SOFTWARE\TradeLinkSuite
+  ; unregister tickdata
+  ${unregisterExtension} ".tik" "TradeLink TickData"
 
   ; Remove files and uninstaller
   Delete $INSTDIR\TradeLinkSuite.nsi

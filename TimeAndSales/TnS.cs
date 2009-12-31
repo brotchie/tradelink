@@ -31,7 +31,10 @@ namespace TimeSales
             bw.WorkerReportsProgress = true;
             bw.ProgressChanged += new ProgressChangedEventHandler(bw_ProgressChanged);
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_RunWorkerCompleted);
-            this.Shown +=new EventHandler(toolStripButton1_Click);
+            if (Environment.GetCommandLineArgs().Length == 1)
+                this.Shown += new EventHandler(toolStripButton1_Click);
+            else if (System.IO.File.Exists(Environment.GetCommandLineArgs()[1]))
+                LoadEPF(Environment.GetCommandLineArgs()[1]);
             status("Click 'Open' to load time and sales.    " + Util.TLSIdentity());
 
         }
@@ -140,17 +143,15 @@ namespace TimeSales
             od.CheckPathExists = true;
             if (od.ShowDialog() == DialogResult.OK)
             {
-                _dt.Clear();
-                SafeBindingSource.refreshgrid(_dg, _bs, false);
-                LoadEPF(od.FileName);
-                
-                od.Dispose();
+                string file = od.FileName;
+                LoadEPF(file);
             }
 
         }
 
         void LoadEPF(string file)
         {
+            _dt.Clear();
             SecurityImpl s = SecurityImpl.FromTIK(file);
             total = s.ApproxTicks;
             symbol = s.Symbol;
@@ -185,6 +186,7 @@ namespace TimeSales
 
         void bw_DoWork(object sender, DoWorkEventArgs e)
         {
+            SafeBindingSource.refreshgrid(_dg, _bs, false);
             SecurityImpl s = (SecurityImpl)e.Argument;
             s.HistSource.gotTick += new TickDelegate(HistSource_gotTick);
             line = 0;

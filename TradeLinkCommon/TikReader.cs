@@ -63,6 +63,7 @@ namespace TradeLink.Common
             _realsymbol = ReadString();
             // get security from symbol
             _sec = TradeLink.Common.SecurityImpl.Parse(_realsymbol);
+            _sec.Date = SecurityImpl.SecurityFromFileName(_path).Date;
             // get short symbol
             _sym = _sec.Symbol;
             // get end of header

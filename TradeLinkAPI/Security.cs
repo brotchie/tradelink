@@ -14,6 +14,7 @@ namespace TradeLink.API
         bool isValid { get; }
         bool hasDest { get; }
         bool hasType { get; }
+        int Date { get; set; }
     }
 
     public class InvalidSecurity : Exception { }
