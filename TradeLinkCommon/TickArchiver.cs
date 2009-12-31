@@ -19,14 +19,17 @@ namespace TradeLink.Common
         {
             _path = folderpath;
         }
+        bool _stopped = false;
         public void Stop()
         {
             foreach (string file in filedict.Keys)
                 filedict[file].Close();
+            _stopped = true;
         }
 
         public bool newTick(Tick t)
         {
+            if (_stopped) return false;
             if ((t.symbol==null) || (t.symbol=="")) return false;
             TikWriter tw;
             if (filedict.TryGetValue(t.symbol, out tw))
@@ -49,7 +52,7 @@ namespace TradeLink.Common
                 catch (Exception) { return false; }
             }
 
-            return true;
+            return false;
         }
 
     }
