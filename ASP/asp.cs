@@ -160,6 +160,7 @@ namespace ASP
             // send unknown messages to valid responses
             int idx = r2r(id);
             if (idx == ResponseTemplate.UNKNOWNRESPONSE) return;
+            if ((idx < 0) || (idx > _reslist.Count)) return;
             if (_reslist[idx].isValid)
                     _reslist[idx].GotMessage(type, id, data);
         }
