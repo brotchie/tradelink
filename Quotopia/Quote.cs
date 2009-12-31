@@ -413,9 +413,29 @@ namespace Quotopia
                     newsymbol = "";
                 }
             }
+            else if (e.Shift && (e.KeyCode == Keys.OemPipe))
+            {
+                newsymbol += "|";
+                status(preface + newsymbol);
+            }
+            else if (e.Shift && (e.KeyCode== Keys.OemQuestion))
+            {
+                newsymbol += "?";
+                status(preface + newsymbol);
+            }
+            else if ((e.KeyCode == Keys.OemPipe))
+            {
+                newsymbol += "\\";
+                status(preface + newsymbol);
+            }
             else if (e.KeyCode == Keys.OemQuestion)
             {
                 newsymbol += "/";
+                status(preface + newsymbol);
+            }
+            else if (e.KeyCode == Keys.OemPeriod)
+            {
+                newsymbol += ".";
                 status(preface + newsymbol);
             }
             else if ((e.KeyCode == Keys.D4) && e.Shift)
