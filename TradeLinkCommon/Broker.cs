@@ -70,8 +70,9 @@ namespace TradeLink.Common
         {
             Order best = new OrderImpl();
             if (!MasterOrders.ContainsKey(Account)) return best;
-            foreach (OrderImpl o in MasterOrders[Account])
+            for (int i = 0; i < MasterOrders[Account].Count; i++)
             {
+                Order o = MasterOrders[Account][i];
                 if (o.symbol != sym) continue;
                 if (o.Side != side) continue;
                 if (!best.isValid)
