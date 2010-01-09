@@ -104,6 +104,12 @@ namespace TradeLink.Common
             }
         }
 
+        public void Reset()
+        {
+            foreach (BarList bl in _bdict.Values)
+                bl.Reset();
+        }
+
         public IEnumerator GetEnumerator() { foreach (string sym in _bdict.Keys) yield return sym; }
 
         // pass bar events out of the barlist tracker
