@@ -139,9 +139,9 @@ namespace TradeLink.Common
             return t;
         }
 
-        public static string ToChartLabel(Trade t)
+        string ToChartLabel(Trade fill)
         {
-            return t.xsize+t.symbol;
+            return (fill.xsize * (fill.side ? 1 : -1)).ToString() + fill.symbol;
         }
 
         public Security Sec { get { return new SecurityImpl(symbol, ex, Security); } }
