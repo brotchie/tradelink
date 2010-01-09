@@ -36,7 +36,16 @@ namespace TradeLink.Common
         protected Dictionary<string, List<Trade>> MasterTrades = new Dictionary<string, List<Trade>>();
         protected List<Order> Orders { get { return MasterOrders[DEFAULT]; } set { MasterOrders[DEFAULT] = value; } }
         protected List<Trade> FillList { get { return MasterTrades[DEFAULT.ID]; } set { MasterTrades[DEFAULT.ID] = value; } }
-        public string[] Accounts { get { List<string> alist = new List<string>(); foreach (Account a in MasterOrders.Keys) alist.Add(a.ID); return alist.ToArray(); } }
+        public string[] Accounts 
+        { get 
+        { 
+            List<string> alist = new List<string>(); 
+            Account[] accts = new Account[MasterOrders.Count];
+            MasterOrders.Keys.CopyTo(accts, 0);
+            for (int i = 0; i<accts.Length; i++)
+                alist.Add(accts[i].ID); return alist.ToArray(); 
+        } 
+        }
         uint _nextorderid = OrderImpl.Unique;
 
         public Order BestBid(string symbol,Account account) { return BestBidOrOffer(symbol,true,account); }
@@ -48,8 +57,11 @@ namespace TradeLink.Common
         {
             Order best = new OrderImpl();
             Order next = new OrderImpl();
-            foreach (Account a in MasterOrders.Keys)
+            Account[] accts = new Account[MasterOrders.Count];
+            MasterOrders.Keys.CopyTo(accts, 0);
+            for (int i = 0; i < accts.Length; i++)
             {
+                Account a = accts[i];
                 // get our first order
                 if (!best.isValid)
                 {
@@ -70,9 +82,10 @@ namespace TradeLink.Common
         {
             Order best = new OrderImpl();
             if (!MasterOrders.ContainsKey(Account)) return best;
-            for (int i = 0; i < MasterOrders[Account].Count; i++)
+            List<Order> orders = MasterOrders[Account];
+            for (int i = 0; i<orders.Count; i++)
             {
-                Order o = MasterOrders[Account][i];
+                Order o = orders[i];
                 if (o.symbol != sym) continue;
                 if (o.Side != side) continue;
                 if (!best.isValid)
@@ -151,8 +164,10 @@ namespace TradeLink.Common
         public bool CancelOrder(uint orderid)
         {
             bool worked = false;
-            foreach (Account a in MasterOrders.Keys)
-                worked |= CancelOrder(a, orderid);
+            Account[] accts = new Account[MasterOrders.Count];
+            MasterOrders.Keys.CopyTo(accts,0);
+            for (int i = 0; i<accts.Length; i++)
+                worked |= CancelOrder(accts[i], orderid);
             return worked;
         }
         public bool CancelOrder(Account a, uint orderid)
@@ -229,8 +244,11 @@ namespace TradeLink.Common
             if (_pendorders == 0) return 0;
             if (!tick.isTrade) return 0;
             int filledorders = 0;
-            foreach (Account a in MasterOrders.Keys)
+            Account[] accts = new Account[MasterOrders.Count];
+            MasterOrders.Keys.CopyTo(accts, 0);
+            for (int idx = 0; idx < accts.Length; idx++)
             { // go through each account
+                Account a = accts[idx];
                 // if account has requested no executions, skip it
                 if (!a.Execute) continue;
                 // make sure we have a record for this account
@@ -290,8 +308,8 @@ namespace TradeLink.Common
                 if (_pendorders < 0) _pendorders = 0;
                 // notify subscribers of trade
                 if ((GotFill != null) && a.Notify)
-                    foreach (int tradeidx in notifytrade)
-                        GotFill(MasterTrades[a.ID][tradeidx]); 
+                    for (int tradeidx = 0; tradeidx<notifytrade.Count; tradeidx++)
+                        GotFill(MasterTrades[a.ID][notifytrade[tradeidx]]); 
 
             }
             return filledorders;
@@ -319,15 +337,21 @@ namespace TradeLink.Common
         }
         public void CancelOrders() 
         {
-            foreach (Account a in MasterOrders.Keys)
-                CancelOrders(a);
+            Account[] accts = new Account[MasterOrders.Count];
+            MasterOrders.Keys.CopyTo(accts, 0);
+            for (int idx = 0; idx < accts.Length; idx++)
+                CancelOrders(accts[idx]);
         }
         public void CancelOrders(Account a) 
         {
             if (!MasterOrders.ContainsKey(a)) return;
-            foreach (Order o in MasterOrders[a])
+            List<Order> orders = MasterOrders[a];
+            for (int i = 0; i < orders.Count; i++)
+            {
+                Order o = orders[i];
                 if ((GotOrderCancel != null) && a.Notify)
-                    GotOrderCancel(o.symbol,o.side,o.id); //send cancel notifcation to any subscribers
+                    GotOrderCancel(o.symbol, o.side, o.id); //send cancel notifcation to any subscribers
+            }
             MasterOrders[a].Clear();  // clear the account
         }
         /// <summary>
@@ -361,9 +385,10 @@ namespace TradeLink.Common
         {
             Position pos = new PositionImpl(symbol);
             if (!MasterTrades.ContainsKey(a.ID)) return pos;
-            foreach (TradeImpl trade in MasterTrades[a.ID]) 
-                if (trade.symbol==symbol) 
-                    pos.Adjust(trade);
+            List<Trade> trades = MasterTrades[a.ID];
+            for (int i = 0; i<trades.Count; i++)
+                if (trades[i].symbol==symbol) 
+                    pos.Adjust(trades[i]);
             return pos;
         }
 
@@ -378,10 +403,11 @@ namespace TradeLink.Common
             Position pos = new PositionImpl(symbol);
             decimal pl = 0;
             if (!MasterTrades.ContainsKey(a.ID)) return pl;
-            foreach (Trade trade in MasterTrades[a.ID])
+            List<Trade> trades = MasterTrades[a.ID];
+            for (int i = 0; i < trades.Count; i++)
             {
-                if (trade.symbol == pos.Symbol)
-                    pl += pos.Adjust(trade);
+                if (trades[i].symbol == pos.Symbol)
+                    pl += pos.Adjust(trades[i]);
             }
             return pl;
         }
@@ -408,8 +434,10 @@ namespace TradeLink.Common
             Dictionary<string, Position> poslist = new Dictionary<string, Position>();
             Dictionary<string,decimal> pllist = new Dictionary<string,decimal>();
             if (!MasterTrades.ContainsKey(a.ID)) return 0;
-            foreach (TradeImpl trade in MasterTrades[a.ID])
+            List<Trade> trades = MasterTrades[a.ID];
+            for (int i = 0; i < trades.Count; i++)
             {
+                Trade trade = trades[i];
                 if (!poslist.ContainsKey(trade.symbol))
                 {
                     poslist.Add(trade.symbol, new PositionImpl(trade.symbol));
@@ -418,8 +446,10 @@ namespace TradeLink.Common
                 pllist[trade.symbol] += poslist[trade.symbol].Adjust(trade);
             }
             decimal pl = 0;
-            foreach (string sym in pllist.Keys)
-                pl += pllist[sym];
+            string[] syms = new string[pllist.Count];
+            pllist.Keys.CopyTo(syms, 0);
+            for (int i = 0; i<syms.Length; i++)
+                pl += pllist[syms[i]];
             return pl;
         }
         /// <summary>
@@ -439,10 +469,11 @@ namespace TradeLink.Common
             PositionImpl pos = new PositionImpl(symbol);
             decimal points = 0;
             if (!MasterTrades.ContainsKey(account.ID)) return points;
-            foreach (TradeImpl t in MasterTrades[account.ID])
+            List<Trade> trades = MasterTrades[account.ID];
+            for (int i = 0; i < trades.Count; i++)
             {
-                points += Calc.ClosePT(pos, t);
-                pos.Adjust(t);
+                points += Calc.ClosePT(pos, trades[i]);
+                pos.Adjust(trades[i]);
             }
             return points;
         }
@@ -462,8 +493,10 @@ namespace TradeLink.Common
             Dictionary<string, PositionImpl> poslist = new Dictionary<string, PositionImpl>();
             Dictionary<string, decimal> ptlist = new Dictionary<string, decimal>();
             if (!MasterTrades.ContainsKey(account.ID)) return 0;
-            foreach (TradeImpl trade in MasterTrades[account.ID])
+            List<Trade> trades = MasterTrades[account.ID];
+            for (int i = 0; i < trades.Count; i++)
             {
+                Trade trade = trades[i];
                 if (!poslist.ContainsKey(trade.symbol))
                 {
                     poslist.Add(trade.symbol, new PositionImpl(trade.symbol));
@@ -473,8 +506,10 @@ namespace TradeLink.Common
                 poslist[trade.symbol].Adjust(trade);
             }
             decimal points = 0;
-            foreach (string sym in ptlist.Keys)
-                points += ptlist[sym];
+            string[] syms = new string[ptlist.Count];
+            ptlist.Keys.CopyTo(syms, 0);
+            for (int i = 0; i < syms.Length; i++)
+                points += ptlist[syms[i]];
             return points;
 
         }
