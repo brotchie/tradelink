@@ -31,7 +31,7 @@ namespace Responses
             // display it (gauntlet and kadina only)
             sendindicators(new string[] { tick.time.ToString(), avghl.ToString("N2") } );
             // plot it (in kadina only)
-            sendchartlabel(avghl+_blt[tick.symbol].RecentBar.Close, _blt[tick.symbol].Last);
+            sendchartlabel(avghl+_blt[tick.symbol].RecentBar.Close, tick.time);
         }
 
         public LessonIndicatorSimple()
