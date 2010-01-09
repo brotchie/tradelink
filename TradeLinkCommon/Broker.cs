@@ -154,10 +154,11 @@ namespace TradeLink.Common
                 }
             }
             // add any remaining order to book as new liquidity route
-            if (!MasterOrders.ContainsKey(a))  // see if we have a book for this account
+            List<Order> tmp;
+            if (!MasterOrders.TryGetValue(a,out tmp))  // see if we have a book for this account
                 MasterOrders.Add(a,new List<Order>()); // if not, create one
             o.Account = a.ID; // make sure order knows his account
-            MasterOrders[a].Add(o); // record the order
+            tmp.Add(o); // record the order
             // increment pending count
             _pendorders++; 
         }
@@ -202,15 +203,20 @@ namespace TradeLink.Common
         public int sendOrder(Order o) 
         {
             if (!o.isValid) return (int)MessageTypes.INVALID_ORDERSIZE;
-            if (o.Account == "") // make sure book is clearly stamped
+            // make sure book is clearly stamped
+            if (o.Account.Equals(string.Empty, StringComparison.OrdinalIgnoreCase)) 
             {
                 o.Account = DEFAULT.ID;
                 return sendOrder(o, DEFAULT);
             }
-            Account a = new Account();
-            if (!acctlist.TryGetValue(o.Account,out a))
-                AddAccount(new Account(o.Account));
-            return sendOrder(o, acctlist[o.Account]);
+            // get account
+            Account a;
+            if (!acctlist.TryGetValue(o.Account, out a))
+            {
+                a = new Account(o.Account);
+                AddAccount(a);
+            }
+            return sendOrder(o, a);
 
         }
         /// <summary>
