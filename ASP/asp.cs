@@ -81,6 +81,8 @@ namespace ASP
                 _ar.GotTick+=new TickDelegate(tl_gotTick);
             }
             // handle other tradelink events
+            tl.gotServerDown += new DebugDelegate(tl_gotServerDown);
+            tl.gotServerUp += new DebugDelegate(tl_gotServerUp);
             tl.gotFill += new FillDelegate(tl_gotFill);
             tl.gotOrder += new OrderDelegate(tl_gotOrder);
             tl.gotOrderCancel += new UIntDelegate(tl_gotOrderCancel);
@@ -114,6 +116,16 @@ namespace ASP
             LoadResponseDLL(Properties.Settings.Default.boxdll);
             // load any skins we can find
             findskins();
+        }
+
+        void tl_gotServerUp(string msg)
+        {
+            debug("Connector up: " + msg + " " + tl.BrokerName + " " + tl.ServerVersion);
+        }
+
+        void tl_gotServerDown(string msg)
+        {
+            debug("Connector down: " + msg);
         }
 
         void _ao_TimeoutChanged(int val)

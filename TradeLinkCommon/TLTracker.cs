@@ -71,11 +71,12 @@ namespace TradeLink.Common
             _connected = false;
             if (_tl == null) return;
             // attempt to reconnect
-            reconnect();
+            Reconnect();
 
         }
-
-        void reconnect()
+        bool _wait4firsttickreconnect = false;
+        public bool ReconnectOnlyAfterFirstTick { get { return _wait4firsttickreconnect; } set { _wait4firsttickreconnect = value; } }
+        public void Reconnect()
         {
             TLClient_WM tl = (TLClient_WM)_tl;
 

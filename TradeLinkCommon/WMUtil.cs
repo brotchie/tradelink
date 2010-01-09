@@ -51,6 +51,7 @@ namespace TradeLink.Common
         [DllImport("user32.dll")]
         static extern IntPtr SendMessage(System.IntPtr hwnd, int msg, int wparam, ref COPYDATASTRUCT lparam);
         const int WM_COPYDATA = 0x004A;
+        public const int HWND_BROADCAST = 0xffff;
 
         [DllImport("user32.dll")]
         static extern IntPtr FindWindow(string ClassName, string WindowName);

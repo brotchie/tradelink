@@ -27,6 +27,8 @@ namespace TradeLink.Common
         public event ImbalanceDelegate gotImbalance;
         public event MessageDelegate gotUnknownMessage;
         public event DebugDelegate SendDebug;
+        public event DebugDelegate gotServerUp;
+        public event DebugDelegate gotServerDown;
 
         // member fields
         IntPtr himh = IntPtr.Zero;
@@ -326,6 +328,11 @@ namespace TradeLink.Common
                     }
                     if (gotTick != null) gotTick(t);
                     break;
+                case MessageTypes.IMBALANCERESPONSE:
+                    Imbalance i = ImbalanceImpl.Deserialize(msg);
+                    if (gotImbalance != null)
+                        gotImbalance(i);
+                    break;
                 case MessageTypes.ORDERCANCELRESPONSE:
                     {
                         uint id = 0;
@@ -375,10 +382,13 @@ namespace TradeLink.Common
                     if (gotFeatures != null) 
                         gotFeatures(f.ToArray());
                     break;
-                case MessageTypes.IMBALANCERESPONSE:
-                    Imbalance i = ImbalanceImpl.Deserialize(msg);
-                    if (gotImbalance != null)
-                        gotImbalance(i);
+                case MessageTypes.SERVERDOWN:
+                    if (gotServerDown != null)
+                        gotServerDown(msg);
+                    break;
+                case MessageTypes.SERVERUP:
+                    if (gotServerUp != null)
+                        gotServerUp(msg);
                     break;
                 default:
                     if (gotUnknownMessage != null)

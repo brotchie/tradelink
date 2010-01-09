@@ -115,6 +115,8 @@ namespace TradeLink.API
         LOOPBACKCLIENT,
         STARTHISTORICALRUN,
         ENDHISTORICALRUN,
+        SERVERUP,
+        SERVERDOWN,
         // END TRADELINK MESSAGES
 
     }
