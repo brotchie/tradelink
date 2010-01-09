@@ -11,6 +11,7 @@ namespace TradeLink.Common
     public class OffsetTracker
     {
         public event DebugFullDelegate SendDebug;
+        public event HitOffsetDelegate HitOffset;
         void debug(string msg) { if (SendDebug != null) SendDebug(DebugImpl.Create(msg)); }
         OffsetInfo _default = new OffsetInfo();
         string[] _ignore = new string[0];
@@ -317,6 +318,10 @@ namespace TradeLink.Common
         {
             // update position
             _pt.Adjust(t);
+            // see if it's our order
+            OffsetInfo oi = GetOffset(t.symbol);
+            if (((oi.ProfitId==t.id) || (oi.StopId==t.id)) && (HitOffset!=null))
+                HitOffset(t.symbol,t.id);
             // if we're flat, nothing to do
             if (_pt[t.symbol].isFlat) return;
             // do we have events?
