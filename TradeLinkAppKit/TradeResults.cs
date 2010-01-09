@@ -95,6 +95,7 @@ namespace TradeLink.AppKit
                 Invoke(new VoidDelegate(Clear));
             else
             {
+                dt.Clear();
                 tradefiles.Items.Clear();
                 _resultlists.Clear();
                 refreshgrid();
