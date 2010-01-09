@@ -33,7 +33,7 @@ namespace Kadina
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.recent = new System.Windows.Forms.ToolStripDropDownButton();
             this.reslist = new System.Windows.Forms.ToolStripDropDownButton();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this._tabs = new System.Windows.Forms.TabControl();
             this.tabmsg = new System.Windows.Forms.TabPage();
             this.msgbox = new System.Windows.Forms.RichTextBox();
             this.ticktab = new System.Windows.Forms.TabPage();
@@ -41,12 +41,13 @@ namespace Kadina
             this.postab = new System.Windows.Forms.TabPage();
             this.ordertab = new System.Windows.Forms.TabPage();
             this.filltab = new System.Windows.Forms.TabPage();
+            this.charttab = new System.Windows.Forms.TabPage();
+            this._results = new System.Windows.Forms.TabPage();
             this.statusStrip2 = new System.Windows.Forms.StatusStrip();
             this._stat = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.charttab = new System.Windows.Forms.TabPage();
             this.statusStrip1.SuspendLayout();
-            this.tabControl1.SuspendLayout();
+            this._tabs.SuspendLayout();
             this.tabmsg.SuspendLayout();
             this.statusStrip2.SuspendLayout();
             this.SuspendLayout();
@@ -96,26 +97,27 @@ namespace Kadina
             this.reslist.ToolTipText = "Choose response library and a response to study";
             this.reslist.DropDownItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.libs_DropDownItemClicked);
             // 
-            // tabControl1
+            // _tabs
             // 
-            this.tabControl1.AllowDrop = true;
-            this.tabControl1.Appearance = System.Windows.Forms.TabAppearance.Buttons;
-            this.tabControl1.Controls.Add(this.tabmsg);
-            this.tabControl1.Controls.Add(this.ticktab);
-            this.tabControl1.Controls.Add(this.itab);
-            this.tabControl1.Controls.Add(this.postab);
-            this.tabControl1.Controls.Add(this.ordertab);
-            this.tabControl1.Controls.Add(this.filltab);
-            this.tabControl1.Controls.Add(this.charttab);
-            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControl1.Location = new System.Drawing.Point(0, 45);
-            this.tabControl1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(801, 310);
-            this.tabControl1.TabIndex = 2;
-            this.tabControl1.DragDrop += new System.Windows.Forms.DragEventHandler(this.kadinamain_DragDrop);
-            this.tabControl1.DragEnter += new System.Windows.Forms.DragEventHandler(this.kadinamain_DragEnter);
+            this._tabs.AllowDrop = true;
+            this._tabs.Appearance = System.Windows.Forms.TabAppearance.Buttons;
+            this._tabs.Controls.Add(this.tabmsg);
+            this._tabs.Controls.Add(this.ticktab);
+            this._tabs.Controls.Add(this.itab);
+            this._tabs.Controls.Add(this.postab);
+            this._tabs.Controls.Add(this.ordertab);
+            this._tabs.Controls.Add(this.filltab);
+            this._tabs.Controls.Add(this.charttab);
+            this._tabs.Controls.Add(this._results);
+            this._tabs.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._tabs.Location = new System.Drawing.Point(0, 45);
+            this._tabs.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this._tabs.Name = "_tabs";
+            this._tabs.SelectedIndex = 0;
+            this._tabs.Size = new System.Drawing.Size(801, 310);
+            this._tabs.TabIndex = 2;
+            this._tabs.DragDrop += new System.Windows.Forms.DragEventHandler(this.kadinamain_DragDrop);
+            this._tabs.DragEnter += new System.Windows.Forms.DragEventHandler(this.kadinamain_DragEnter);
             // 
             // tabmsg
             // 
@@ -191,6 +193,25 @@ namespace Kadina
             this.filltab.Text = "Fills";
             this.filltab.UseVisualStyleBackColor = true;
             // 
+            // charttab
+            // 
+            this.charttab.Location = new System.Drawing.Point(4, 32);
+            this.charttab.Name = "charttab";
+            this.charttab.Size = new System.Drawing.Size(793, 274);
+            this.charttab.TabIndex = 6;
+            this.charttab.Text = "Chart";
+            this.charttab.UseVisualStyleBackColor = true;
+            // 
+            // _results
+            // 
+            this._results.Location = new System.Drawing.Point(4, 32);
+            this._results.Name = "_results";
+            this._results.Padding = new System.Windows.Forms.Padding(3);
+            this._results.Size = new System.Drawing.Size(793, 274);
+            this._results.TabIndex = 7;
+            this._results.Text = "Results";
+            this._results.UseVisualStyleBackColor = true;
+            // 
             // statusStrip2
             // 
             this.statusStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -208,15 +229,6 @@ namespace Kadina
             this._stat.Size = new System.Drawing.Size(519, 25);
             this._stat.Text = "Kadina lets you see your response to a given set of market data.";
             // 
-            // charttab
-            // 
-            this.charttab.Location = new System.Drawing.Point(4, 32);
-            this.charttab.Name = "charttab";
-            this.charttab.Size = new System.Drawing.Size(793, 274);
-            this.charttab.TabIndex = 6;
-            this.charttab.Text = "Chart";
-            this.charttab.UseVisualStyleBackColor = true;
-            // 
             // kadinamain
             // 
             this.AllowDrop = true;
@@ -224,7 +236,7 @@ namespace Kadina
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(801, 355);
             this.Controls.Add(this.statusStrip2);
-            this.Controls.Add(this.tabControl1);
+            this.Controls.Add(this._tabs);
             this.Controls.Add(this.statusStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -234,7 +246,7 @@ namespace Kadina
             this.DragEnter += new System.Windows.Forms.DragEventHandler(this.kadinamain_DragEnter);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
-            this.tabControl1.ResumeLayout(false);
+            this._tabs.ResumeLayout(false);
             this.tabmsg.ResumeLayout(false);
             this.statusStrip2.ResumeLayout(false);
             this.statusStrip2.PerformLayout();
@@ -247,7 +259,7 @@ namespace Kadina
 
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripDropDownButton reslist;
-        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabControl _tabs;
         private System.Windows.Forms.TabPage tabmsg;
         private System.Windows.Forms.RichTextBox msgbox;
         private System.Windows.Forms.TabPage ticktab;
@@ -260,6 +272,7 @@ namespace Kadina
         private System.Windows.Forms.StatusStrip statusStrip2;
         private System.Windows.Forms.ToolStripStatusLabel _stat;
         private System.Windows.Forms.TabPage charttab;
+        private System.Windows.Forms.TabPage _results;
     }
 }
 

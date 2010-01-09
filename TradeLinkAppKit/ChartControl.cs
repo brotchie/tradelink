@@ -150,7 +150,7 @@ namespace TradeLink.AppKit
 
         void ChartControl_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            string s = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\" + Symbol + ".png";
+            string s = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\" + Symbol + bl.RecentBar.Bardate+".png";
             ScreenCapture sc = new ScreenCapture();
             sc.CaptureWindowToFile(Handle, s, System.Drawing.Imaging.ImageFormat.Png);
 

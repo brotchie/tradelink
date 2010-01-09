@@ -201,7 +201,7 @@ namespace Kadina
             ptab.Clear();
             ot.Clear();
             ft.Clear();
-            tabControl1.Refresh();
+            _tabs.Refresh();
             c.Reset();
             if (it != null) { it.Clear(); it.Columns.Clear(); }
             h.Reset();
