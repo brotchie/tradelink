@@ -155,8 +155,12 @@ namespace TradeLink.Common
             }
             // add any remaining order to book as new liquidity route
             List<Order> tmp;
-            if (!MasterOrders.TryGetValue(a,out tmp))  // see if we have a book for this account
-                MasterOrders.Add(a,new List<Order>()); // if not, create one
+            // see if we have a book for this account
+            if (!MasterOrders.TryGetValue(a, out tmp))
+            {
+                tmp = new List<Order>();
+                MasterOrders.Add(a, tmp); // if not, create one
+            }
             o.Account = a.ID; // make sure order knows his account
             tmp.Add(o); // record the order
             // increment pending count

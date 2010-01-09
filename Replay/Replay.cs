@@ -304,7 +304,11 @@ namespace Replay
             if (e.Cancelled)
                 status("Playback was canceled.");
             else if (e.Error != null)
-                status("Playback stopped: " + e.Error.ToString());
+            {
+                status("Playback stopped, see messages. ");
+                debug("Playback stopped: " + e.Error.ToString());
+                CrashReport.Report(PROGRAM, string.Empty, string.Empty, _dw.Content,e.Error, null, false);
+            }
             else
                 status("Playback completed successfully");
             stopbut.Enabled = false;
