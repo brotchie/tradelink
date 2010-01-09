@@ -822,7 +822,7 @@ namespace ASP
         }
 
         bool _charterror = false;
-        void tmp_SendChartLabel(decimal price, int bar, string label)
+        void tmp_SendChartLabel(decimal price, int bar, string label, System.Drawing.Color c)
         {
             if (!_charterror)
             {

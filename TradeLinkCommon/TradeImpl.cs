@@ -139,7 +139,12 @@ namespace TradeLink.Common
             return t;
         }
 
-        string ToChartLabel(Trade fill)
+        public string ToChartLabel()
+        {
+            return ToChartLabel(this);
+        }
+
+        public static string ToChartLabel(Trade fill)
         {
             return (fill.xsize * (fill.side ? 1 : -1)).ToString() + fill.symbol;
         }

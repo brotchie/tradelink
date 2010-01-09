@@ -44,7 +44,7 @@ namespace TradeLink.AppKit
             if (bl == null)
             {
                 Symbol = k.symbol;
-                bl = new BarListImpl(BarInterval.FiveMin, k.symbol);
+                bl = new BarListImpl(k.symbol);
             }
             bl.newTick(k);
             if (k.isTrade)
@@ -121,11 +121,12 @@ namespace TradeLink.AppKit
         decimal lowestl = BIGVAL;
         int barc = 0;
         Rectangle r;
-        const int border = 60;
+        int border = 60;
+        int hborder = 60;
         decimal pixperbar = 0;
         decimal  pixperdollar = 0;
 
-        List<Label> points = new List<Label>();
+
 
         
         public ChartControl() : this(null,false) { }
@@ -176,7 +177,7 @@ namespace TradeLink.AppKit
         // as we add bars and barindex gets higher, the xcoordinate moves right and gets higher
         int getX(int bar) { return (int)(bar * pixperbar) + (border/3); } 
         // as price goes up and pricemagnitude goes higher, the y coordinate moves up and goes lower
-        int getY(decimal price) { return (int)(border+((highesth-price) * pixperdollar)); }
+        int getY(decimal price) { return (int)(hborder+((highesth-price) * pixperdollar)); }
 
         /// <summary>
         /// Gets the title of this chart.
@@ -199,6 +200,7 @@ namespace TradeLink.AppKit
                 g.DrawString("Unknown symbol, or no data.", new Font(FontFamily.GenericSerif, 14, FontStyle.Bold), Brushes.Red, new PointF(r.Width / 3, r.Height / 2));
                 return;
             }
+            border = (int)(g.MeasureString(bl.RecentBar.High.ToString(), f.Font).Width);
             // setup to draw
             Pen p = new Pen(Color.Black);
             g.Clear(f.BackColor);
@@ -216,15 +218,15 @@ namespace TradeLink.AppKit
             // get dollar range for chart
             decimal range = (highesth - lowestl);
             // get pixels available for each dollar of movement
-            pixperdollar = range == 0 ? 0 : (((decimal)r.Height - (decimal)border * 2) / range);
+            pixperdollar = range == 0 ? 0 : (((decimal)r.Height - (decimal)hborder * 2) / range);
 
 
             Color fgcol = (f.BackColor == Color.Black) ? Color.White : Color.Black;
 
             // x-axis
-            g.DrawLine(new Pen(fgcol),(int)(border/3), r.Height-border, r.Width - border, r.Height - border);
+            g.DrawLine(new Pen(fgcol),(int)(border/3), r.Height-hborder, r.Width - border, r.Height - hborder);
             // y-axis
-            g.DrawLine(new Pen(fgcol), r.Width - border, r.Y + border, r.Width-border, r.Height - border);
+            g.DrawLine(new Pen(fgcol), r.Width - border, r.Y + hborder, r.Width-border, r.Height - hborder);
 
             const int minxlabelwidth = 30;
 
@@ -285,7 +287,7 @@ namespace TradeLink.AppKit
 
             // DRAW YLABELS
             // max number of even intervaled ylabels possible on yaxis
-            int numlabels = (int)((r.Height - border * 2) / (f.Font.GetHeight()*1.5));
+            int numlabels = (int)((r.Height - hborder) / (f.Font.GetHeight()*1.5));
             // nearest price units giving "pretty" even intervaled ylabels
             decimal priceunits = NearestPrettyPriceUnits(highesth - lowestl, numlabels);
             // starting price point from low end of range, including lowest low in barlist
@@ -311,22 +313,29 @@ namespace TradeLink.AppKit
         /// <param name="price"></param>
         /// <param name="bar"></param>
         /// <param name="label"></param>
-        public void DrawChartLabel(decimal price, int bar, string label)
+        public void DrawChartLabel(decimal price, int time, string label, Color color)
         {
             if (price < 0)
             {
-                points.Clear();
-                lineend.Clear();
+                _colpoints.Clear();
+                _collineend.Clear();
                 return;
             }
-            points.Add(new Label(bar,price,label));
+            List<Label> tmp;
+            if (!_colpoints.TryGetValue(color, out tmp))
+            {
+                tmp = new List<Label>();
+                _colpoints.Add(color, tmp);
+                _collineend.Add(color,new List<int>());
+            }
+            _colpoints[color].Add(new Label(time, price, label, color));
             if (_alwaysupdate)
                 refresh();
         }
 
         private decimal NearestPrettyPriceUnits(decimal pricerange,int maxlabels)
         {
-            decimal[] prettyunits = new decimal[] { .01m, .02m, .04m, .05m, .1m, .2m, .25m, .4m, .5m, 1,2,5,10 };
+            decimal[] prettyunits = new decimal[] { .01m, .02m, .04m, .05m, .1m, .2m, .25m, .4m, .5m, 1,2,5,10,25,50,100,1000,2000,4000,5000,10000 };
             for (int i = prettyunits.Length-1; i>=0; i--)
             {
                 int numprettylabels = (int)(pricerange / prettyunits[i]);
@@ -344,45 +353,53 @@ namespace TradeLink.AppKit
         struct Label
         {
             public bool isLineEnd { get { return (Text == null) || (Text == string.Empty); } }
-            public int Bar;
+            public int Time;
             public decimal Price;
             public string Text;
             public Color Color;
-            public Label(int bar, decimal price, string text)
+            public Label(int bar, decimal price, string text, Color color)
             {
-                Bar = bar;
+                Time = bar;
                 Price = price;
                 Text = text;
-                Color = Color.White;
+                Color = color;
             }
         }
-
-        List<int> lineend = new List<int>();
+        Dictionary<Color, List<Label>> _colpoints = new Dictionary<Color, List<Label>>();
+        Dictionary<Color, List<int>> _collineend = new Dictionary<Color,List<int>>();
         private void DrawLabels()
         {
-            if (points == null) return;
             Graphics gd = CreateGraphics();
             Font font = new Font(FontFamily.GenericSerif, 8,FontStyle.Regular);
             Font manfont = new Font(FontFamily.GenericSerif, 14,FontStyle.Bold);
-            for (int i = 0; i < points.Count; i++)
+            foreach (Color c in _colpoints.Keys)
             {
-                if (points[i].isLineEnd)
+                List<Label> points = _colpoints[c];
+                for (int i = 0; i < points.Count; i++)
                 {
-                    lineend.Add(i);
-                    // can't draw from first point
-                    if (i == 0) continue;
-                    // draw from previous point
-                    gd.DrawLine(new Pen(Color.Orange), getX(points[lineend[lineend.Count - 2]].Bar), getY(points[lineend[lineend.Count - 2]].Price), getX(points[i].Bar), getY(points[i].Price));
+                    if (points[i].isLineEnd)
+                    {
+                        _collineend[c].Add(i);
+                        // can't draw from first point
+                        if (i == 0) continue;
+                        // draw from previous point
+                        gd.DrawLine(new Pen(c), 
+                            getX(BarListImpl.GetNearestIntraBar(bl,points[_collineend[c][_collineend[c].Count - 2]].Time,bl.DefaultInterval)), 
+                            getY(points[_collineend[c][_collineend[c].Count - 2]].Price), 
+                            getX(BarListImpl.GetNearestIntraBar(bl,points[i].Time,bl.DefaultInterval)), 
+                            getY(points[i].Price));
 
+                    }
+                    else
+                        gd.DrawString(points[i].Text, font, new SolidBrush(c), getX(points[i].Time), getY(points[i].Price));
                 }
-                else
-                    gd.DrawString(points[i].Text, font, Brushes.Purple, getX(points[i].Bar), getY(points[i].Price));
+                for (int i = 0; i < manualpoints.Count; i++)
+                    gd.DrawString(manualpoints[i].Label, manfont, Brushes.Turquoise, manualpoints[i].X, manualpoints[i].Y);
             }
-            for (int i = 0; i<manualpoints.Count; i++)
-                gd.DrawString(manualpoints[i].Label,manfont, Brushes.Turquoise, manualpoints[i].X,manualpoints[i].Y);
 
 
         }
+
         List<TextLabel> manualpoints = new List<TextLabel>();
         private void Chart_MouseClick(object sender, MouseEventArgs e)
         {

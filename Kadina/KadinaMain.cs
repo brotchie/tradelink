@@ -475,9 +475,9 @@ namespace Kadina
             _sendbaskwarn = true;
         }
 
-        void myres_SendChartLabel(decimal price, int bar, string label)
+        void myres_SendChartLabel(decimal price, int bar, string label, System.Drawing.Color col)
         {
-            c.DrawChartLabel(price, bar, label);
+            c.DrawChartLabel(price, bar, label,col);
         }
         bool _sendmesswarn = false;
         void myres_SendMessage(MessageTypes type, uint id, string data)

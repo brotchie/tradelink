@@ -56,7 +56,7 @@ namespace Responses
             sendindicators(new string[] { time.ToString(),SMA.ToString("N2")});
 
             // draw the MA as a line
-            sendchartlabel(SMA, blt[symbol].Last);
+            sendchartlabel(SMA, time);
         }
 
         // turn on bar tracking
@@ -98,7 +98,7 @@ namespace Responses
             // make sure every fill is tracked against a position
             pt.Adjust(fill);
             // chart fills
-            sendchartlabel(fill.xprice,blt[fill.symbol].Last,TradeImpl.ToChartLabel(fill));
+            sendchartlabel(fill.xprice,time,TradeImpl.ToChartLabel(fill), fill.side ? System.Drawing.Color.Green : System.Drawing.Color.Red);
         }
 
         public override void GotPosition(Position p)

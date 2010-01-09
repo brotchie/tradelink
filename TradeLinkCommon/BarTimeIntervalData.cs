@@ -33,7 +33,7 @@ namespace TradeLink.Common
             vols.Clear();
             _Count = 0;
         }
-        void newbar()
+        void newbar(long id)
         {
             _Count++;
             opens.Add(0);
@@ -43,6 +43,7 @@ namespace TradeLink.Common
             vols.Add(0);
             times.Add(0);
             dates.Add(0);
+            ids.Add(id);
         }
         public void addbar(Bar mybar)
         {
@@ -54,6 +55,7 @@ namespace TradeLink.Common
             lows.Add(mybar.Low);
             vols.Add(mybar.Volume);
             times.Add(mybar.Bartime);
+            ids.Add(getbarid(mybar.Bartime, mybar.Bardate, intervallength));
         }
         long curr_barid = -1;
         int intervallength = 60;
@@ -65,6 +67,7 @@ namespace TradeLink.Common
         internal List<int> dates = new List<int>();
         internal List<int> times = new List<int>();
         internal List<int> ticks = new List<int>();
+        internal List<long> ids = new List<long>();
         internal int _Count = 0;
         internal bool _isRecentNew = false;
         public Bar GetBar(int index, string symbol)
@@ -81,12 +84,12 @@ namespace TradeLink.Common
             // ignore quotes
             if (k.trade == 0) return;
             // get the barcount
-            long barid = getbarid(k.time, k.date);
+            long barid = getbarid(k.time, k.date,intervallength);
             // if not current bar
             if (barid != curr_barid)
             {
                 // create a new one
-                newbar();
+                newbar(barid);
                 // mark it
                 _isRecentNew = true;
                 // make it current
@@ -117,12 +120,12 @@ namespace TradeLink.Common
         {
 
             // get the barcount
-            long barid = getbarid(time,date);
+            long barid = getbarid(time,date,intervallength);
             // if not current bar
             if (barid != curr_barid)
             {
                 // create a new one
-                newbar();
+                newbar(barid);
                 // mark it
                 _isRecentNew = true;
                 // make it current
@@ -149,7 +152,7 @@ namespace TradeLink.Common
 
         }
 
-        private long getbarid(int time, int date)
+        static internal long getbarid(int time, int date, int intervallength)
         {
             // get time elapsed to this point
             int elap = Util.FT2FTS(time);

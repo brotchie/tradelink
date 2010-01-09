@@ -410,7 +410,7 @@ namespace WinGauntlet
             _sendbaskwarn = true;
         }
 
-        void Response_SendChartLabel(decimal price, int bar, string label)
+        void Response_SendChartLabel(decimal price, int bar, string label, System.Drawing.Color c)
         {
             
         }
