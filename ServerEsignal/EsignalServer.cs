@@ -11,7 +11,7 @@ namespace ServerEsignal
     public class EsignalServer : TLServer_WM
     {
         Timer tt = new Timer();
-        Hooks esig = new Hooks();
+        Hooks esig;
         bool _valid = false;
 
         Basket _mb = new BasketImpl();
@@ -37,9 +37,20 @@ namespace ServerEsignal
 
         public void Start(string user, string password, string data1, int data2)
         {
+            try
+            {
+                esig = new Hooks();
+            }
+            catch (Exception ex) { debug("Exception loading esignal: " + ex.Message + ex.StackTrace); _valid = false;  return; }
             if ((user==null) || (user==string.Empty)) return;
             esig.SetApplication(user);
             _valid = esig.IsEntitled != 0;
+        }
+
+        void debug(string msg)
+        {
+            if (GotDebug != null)
+                GotDebug(DebugImpl.Create(msg));
         }
 
         string _tmpregister = string.Empty;
