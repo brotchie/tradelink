@@ -97,9 +97,11 @@ namespace Chartographer
             od.DefaultExt = TikConst.WILDCARD_EXT;
             od.Filter = "TickFiles|" + TikConst.WILDCARD_EXT;
             od.Multiselect = false;
-            od.ShowDialog();
-            BarList bl = BarListImpl.FromTIK(od.FileName);
-            newChart(bl);
+            if (od.ShowDialog() == DialogResult.OK)
+            {
+                BarList bl = BarListImpl.FromTIK(od.FileName);
+                newChart(bl);
+            }
 
         }
 
