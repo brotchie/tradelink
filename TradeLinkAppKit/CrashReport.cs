@@ -113,5 +113,11 @@ namespace TradeLink.AppKit
             else
                 cr.Show();
         }
+
+        private void _user_DoubleClick(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://www.google.com/accounts/NewAccount");
+        }
+
     }
 }

@@ -56,7 +56,8 @@
             this._user.Name = "_user";
             this._user.Size = new System.Drawing.Size(100, 26);
             this._user.TabIndex = 2;
-            this.toolTip1.SetToolTip(this._user, "Valid google account");
+            this.toolTip1.SetToolTip(this._user, "Valid google account (double-click to create one)");
+            this._user.DoubleClick += new System.EventHandler(this._user_DoubleClick);
             // 
             // _pass
             // 
