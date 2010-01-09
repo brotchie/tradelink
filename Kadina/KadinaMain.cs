@@ -494,6 +494,11 @@ namespace Kadina
 
         void myres_SendOrder(Order o)
         {
+            if (o.time == 0)
+            {
+                o.date = Util.ToTLDate();
+                o.time = Util.ToTLTime();
+            }
             h.SimBroker.sendOrder(o);
         }
 
