@@ -199,10 +199,12 @@ namespace Kadina
             msgbox.Clear();
             dt.Clear();
             ptab.Clear();
+            _tradelist.Clear();
             ot.Clear();
             ft.Clear();
             _tabs.Refresh();
             c.Reset();
+            _tr.Clear();
             if (it != null) { it.Clear(); it.Columns.Clear(); }
             h.Reset();
             loadboxname(resname);
@@ -364,7 +366,13 @@ namespace Kadina
             c.Parent = charttab;
             c.Dock = DockStyle.Fill;
 
+            // trade results
+            _tr.Parent = _results;
+            _tr.Dock = DockStyle.Fill;
+
         }
+
+        TradeResults _tr = new TradeResults();
 
         void igridinit()
         {
@@ -384,10 +392,12 @@ namespace Kadina
 
 
         Dictionary<string, PositionImpl> poslist = new Dictionary<string, PositionImpl>();
+        List<Trade> _tradelist = new List<Trade>();
         void broker_GotFill(Trade t)
         {
             if (myres != null)
                 myres.GotFill(t);
+            _tradelist.Add(t);
             PositionImpl mypos = new PositionImpl(t);
             decimal cpl = 0;
             decimal cpt = 0;
@@ -642,6 +652,9 @@ namespace Kadina
             SafeBindingSource.refreshgrid(og, obs);
             SafeBindingSource.refreshgrid(fg, fbs);
             c.refresh();
+            _tr.Clear();
+            _tr.NewResultTrades(resname +"."+PrettyEPF(), _tradelist);
+            _tr.Refresh();
             if (e.Error != null)
             {
                 debug(e.Error.Message+e.Error.StackTrace);
