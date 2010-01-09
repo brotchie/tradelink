@@ -151,11 +151,16 @@ namespace TimeSales
 
         void LoadEPF(string file)
         {
-            _dt.Clear();
-            SecurityImpl s = SecurityImpl.FromTIK(file);
-            total = s.ApproxTicks;
-            symbol = s.Symbol;
-            date = s.Date;
+            SecurityImpl s;
+            try
+            {
+                _dt.Clear();
+                s = SecurityImpl.FromTIK(file);
+                total = s.ApproxTicks;
+                symbol = s.Symbol;
+                date = s.Date;
+            }
+            catch (Exception ex) { status("Error.  Is file closed?"); return; }
             if (!bw.IsBusy)
                 bw.RunWorkerAsync(s);
             else 
