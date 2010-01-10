@@ -534,7 +534,7 @@ namespace TradeLink.Common
             Assembly a;
             try
             {
-                a = Assembly.LoadFrom(dllfilepath);
+                  a = Assembly.LoadFile(dllfilepath);
             }
             catch (Exception ex) { reslist.Add(ex.Message); return reslist; }
             return GetResponseList(a);
