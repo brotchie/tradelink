@@ -263,6 +263,8 @@ namespace TradeLink.AppKit
             // setup new results
             Results r = new Results();
             r.RiskFreeRet = string.Format("{0:P2}", _rfr);
+            int consecWinners = 0;
+            int consecLosers = 0;
             foreach (TradeResult tr in results)
             {
                 if (!days.Contains(tr.Source.xdate))
@@ -281,8 +283,20 @@ namespace TradeLink.AppKit
                 r.HundredLots += (int)(tr.Source.xsize / 100);
                 r.GrossPL += tr.ClosedPL;
                 
-                if (tr.ClosedPL > 0) r.Winners++;
-                if (tr.ClosedPL < 0) r.Losers++;
+                if (tr.ClosedPL > 0)
+                {
+                    r.Winners++;
+                    consecWinners++;
+                    consecLosers = 0;
+                }
+                else if (tr.ClosedPL < 0)
+                {
+                    r.Losers++;
+                    consecLosers++;
+                    consecWinners = 0;
+                }
+                if (consecWinners > r.ConsecWin) r.ConsecWin = consecWinners;
+                if (consecLosers > r.ConsecLose) r.ConsecLose = consecLosers;
                 if ((tr.OpenSize == 0) && (tr.ClosedPL == 0)) r.Flats++;
                 if (tr.ClosedPL > r.MaxWin) r.MaxWin = tr.ClosedPL;
                 if (tr.ClosedPL < r.MaxLoss) r.MaxLoss = tr.ClosedPL;
@@ -423,6 +437,10 @@ namespace TradeLink.AppKit
         public decimal GrossPerSymbol = 0;
         public decimal SharpeRatio = 0;
         public decimal ComPerShare = 0.01m;
+        public int ConsecWin = 0;
+        public int ConsecLose = 0;
+        public string ConsecWinProb { get { return v2s(Math.Min(100, ((decimal)Math.Pow(1 / 2.0, ConsecWin) * (Trades - Flats - ConsecWin + 1)) * 100)) + @" %"; } }
+        public string ConsecLoseProb { get { return v2s(Math.Min(100, ((decimal)Math.Pow(1 / 2.0, ConsecLose) * (Trades - Flats - ConsecLose + 1)) * 100)) + @" %"; } }
         public string Commissions { get { return v2s(HundredLots * 100 * ComPerShare); } }
         string v2s(decimal v) { return v.ToString("N2"); }
         public string WLRatio { get { return v2s((Losers == 0) ? 0 : (Winners / Losers)); } }
