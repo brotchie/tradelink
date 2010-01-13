@@ -93,6 +93,7 @@ namespace Record
         void RecordMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             Properties.Settings.Default.Save();
+            _ta.Stop();
             _tlt.Stop();
         }
 
@@ -118,6 +119,7 @@ namespace Record
             catch (TLServerNotFound) { }
             refreshlist();
             debug("Recording: " + mb.ToString());
+
         }
 
         void debug(string msg)
