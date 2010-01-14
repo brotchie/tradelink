@@ -95,6 +95,7 @@ namespace Record
             Properties.Settings.Default.Save();
             _ta.Stop();
             _tlt.Stop();
+            _ar.Stop();
         }
 
         void togdebug(object o, EventArgs e)
