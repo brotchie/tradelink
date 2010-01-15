@@ -38,7 +38,9 @@ namespace ASP
         AsyncResponse _ar = new AsyncResponse();
         Log _log = new Log(PROGRAM);
         DebugWindow _dw = new DebugWindow();
+        const int REMOVERES = 0;
         const int ENABLED = 1;
+        const int SAVESKIN = 2;
         const int EDITSYM = 3;
         const int MAXRESPONSEPERASP = 100;
         const int MAXASPINSTANCE = 3;
@@ -57,12 +59,14 @@ namespace ASP
             _tlt.GotDebug += new DebugDelegate(_tlt_GotDebug);
             _ao.TimeoutChanged += new Int32Delegate(_ao_TimeoutChanged);
             // count instances of program
-            _ASPINSTANCE = getprocesscount(PROGRAM);
+            _ASPINSTANCE = getprocesscount(PROGRAM)-1;
             // ensure have not exceeded maximum
             if (_ASPINSTANCE > MAXASPINSTANCE)
             {
-                MessageBox.Show("You have exceeded maximum # of running ASPs.  Please close one.", "too many ASPs");
-                Close();
+                    MessageBox.Show("You have exceeded maximum # of running ASPs ("+MAXASPINSTANCE+")."+Environment.NewLine+"Please close some.", "too many ASPs");
+                    status("Too many ASPs.  Disabled.");
+                    debug("Too many ASPs.  Disabled.");
+                    return;
             }
             // set next response id
             _NEXTRESPONSEID = (_ASPINSTANCE-1) * MAXRESPONSEPERASP;
@@ -213,11 +217,15 @@ namespace ASP
                 // disable stuff that only makes sense in context of one symbols
                 _resnames.ContextMenu.MenuItems[ENABLED].Visible = false;
                 _resnames.ContextMenu.MenuItems[EDITSYM].Visible = false;
+                _resnames.ContextMenu.MenuItems[SAVESKIN].Visible = false;
+                _resnames.ContextMenu.MenuItems[REMOVERES].Visible = false;
                 return;
             }
             // enable stuff that makes sense in context of one symbol
             _resnames.ContextMenu.MenuItems[ENABLED].Visible = true;
             _resnames.ContextMenu.MenuItems[EDITSYM].Visible = true;
+            _resnames.ContextMenu.MenuItems[SAVESKIN].Visible = true;
+            _resnames.ContextMenu.MenuItems[REMOVERES].Visible = true;
             // update check to reflect validity of response
             foreach (int dindex in _resnames.SelectedIndices)
             {
@@ -514,8 +522,12 @@ namespace ASP
             // go through every displayed response
             for (int disp = 0; disp<_disp2real.Count; disp++)
             {
+                // make sure display index good
+                if ((disp < 0) || (disp >= _disp2real.Count)) continue;
                 // get real index
                 int real = _disp2real[disp];
+                // make sure real index good
+                if ((real < 0) || (real >= _reslist.Count)) continue;
                 // update the displayed name and symlist
                 _resnames.Items[disp] = getrstat(real);
             }
@@ -849,6 +861,8 @@ namespace ASP
 
         string getrstat(int idx)
         {
+            if ((idx < 0) || (idx >= _reslist.Count)) 
+                return "Response status error: " + idx;
             Response tmp = _reslist[idx];
             return tmp.FullName + getsyms(idx);
         }
