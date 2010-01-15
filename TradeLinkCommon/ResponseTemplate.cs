@@ -152,28 +152,28 @@ namespace TradeLink.Common
         /// draws a label with default color (violet)
         /// </summary>
         /// <param name="price"></param>
-        /// <param name="bar"></param>
+        /// <param name="time"></param>
         /// <param name="text"></param>
-        public virtual void sendchartlabel(decimal price, int bar, string text) { if (SendChartLabel != null) SendChartLabel(price, bar, text, System.Drawing.Color.Purple); }
+        public virtual void sendchartlabel(decimal price, int time, string text) { if (SendChartLabel != null) SendChartLabel(price, time, text, System.Drawing.Color.Purple); }
         /// <summary>
         /// draws text directly on a point on chart
         /// </summary>
         /// <param name="price"></param>
-        /// <param name="bar"></param>
+        /// <param name="time"></param>
         /// <param name="text"></param>
-        public virtual void sendchartlabel(decimal price, int bar, string text,System.Drawing.Color c) { if (SendChartLabel != null) SendChartLabel(price, bar, text,c); }
+        public virtual void sendchartlabel(decimal price, int time, string text, System.Drawing.Color c) { if (SendChartLabel != null) SendChartLabel(price, time, text, c); }
         /// <summary>
         /// draws line with default color (orage)
         /// </summary>
         /// <param name="price"></param>
-        /// <param name="bar"></param>
-        public virtual void sendchartlabel(decimal price, int bar) { sendchartlabel(price, bar, null, System.Drawing.Color.Orange); }
+        /// <param name="time"></param>
+        public virtual void sendchartlabel(decimal price, int time) { sendchartlabel(price, time, null, System.Drawing.Color.Orange); }
         /// <summary>
         /// draws a line between this and previous point drawn
         /// </summary>
         /// <param name="price"></param>
-        /// <param name="bar"></param>
-        public virtual void sendchartlabel(decimal price, int bar, System.Drawing.Color c) { sendchartlabel(price, bar, null,c); }
+        /// <param name="time"></param>
+        public virtual void sendchartlabel(decimal price, int time, System.Drawing.Color c) { sendchartlabel(price, time, null, c); }
         /// <summary>
         /// same as sendchartlabel
         /// </summary>
@@ -182,15 +182,15 @@ namespace TradeLink.Common
         /// same as sendchartlabel
         /// </summary>
         /// <param name="price"></param>
-        /// <param name="bar"></param>
-        public virtual void CL(decimal price, int bar, System.Drawing.Color c) { sendchartlabel(price, bar,c); }
+        /// <param name="time"></param>
+        public virtual void CL(decimal price, int time, System.Drawing.Color c) { sendchartlabel(price, time, c); }
         /// <summary>
         /// same as sendchartlabel
         /// </summary>
         /// <param name="price"></param>
-        /// <param name="bar"></param>
+        /// <param name="time"></param>
         /// <param name="text"></param>
-        public virtual void CL(decimal price, int bar, string text, System.Drawing.Color c) { sendchartlabel(price, bar, text,c); }
+        public virtual void CL(decimal price, int time, string text, System.Drawing.Color c) { sendchartlabel(price, time, text, c); }
 
         /// <summary>
         /// called when a position update is received (usually only when the response is initially loaded)
