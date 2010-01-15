@@ -2,7 +2,7 @@
 Name "TradeLinkSuite"
 XPStyle on
 CRCCheck force
-ShowInstDetails show
+ShowInstDetails hide
 SetOverWrite on
 Icon "InstallSuite\tradelinkinstaller.ico"
 
@@ -63,6 +63,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\DBFX.lnk" "$INSTDIR\ServerDBFX.exe" "" "$INSTDIR\ServerDBFX.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\TikConverter.lnk" "$INSTDIR\TikConverter.exe" "" "$INSTDIR\TikConverter.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Blackwood.lnk" "$INSTDIR\ServerBlackwood.exe" "" "$INSTDIR\ServerBlackwood.exe" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink\REDI.lnk" "$INSTDIR\ServerRedi.exe" "" "$INSTDIR\ServerRedi.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\LogViewer.lnk" "$INSTDIR\LogViewer.exe" "" "$INSTDIR\LogViewer.exe" 0  
   
   
@@ -147,6 +148,9 @@ finishinstall:
   
   ; register tik extension
   ${registerExtension} "$INSTDIR\TimeSales.exe" ".tik" "TradeLink TickData"
+  
+  	HelpButton::show /NOUNLOAD "246,231" "blah blah blah" "built to the power of the llama ^o^" "/html=http://franta.com/index.html"
+
 
 SectionEnd
 ;--------------------------------
@@ -189,6 +193,11 @@ Section "Uninstall"
   RMDir "$INSTDIR"
 
   SectionEnd
+  
+  Function .onGUIEnd
+	# This needs to be called otherwise the dll will not be correctly unloaded and so will stay on the hd :o(
+	HelpButton::end
+FunctionEnd
   
 Function .onInit
 
