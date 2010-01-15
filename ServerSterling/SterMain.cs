@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using TradeLink.Common;
 using SterlingLib;
 using TradeLink.API;
+using TradeLink.AppKit;
 
 namespace SterServer
 {
@@ -22,11 +23,15 @@ namespace SterServer
         Timer tt = new Timer();
         bool imbalance = false;
         PositionTracker pt = new PositionTracker();
-
+        DebugControl _dc = new DebugControl(true);
         public SterMain()
         {
             InitializeComponent();
-            tt.Interval = 1000;
+            _dc.Parent = this;
+            _dc.Dock = DockStyle.Fill;
+            ContextMenu = new ContextMenu();
+            ContextMenu.MenuItems.Add("report", new EventHandler(report));
+            tt.Interval = 10;
             tt.Enabled = true;
             tt.Tick += new EventHandler(tt_Tick);
             tt.Start();
@@ -51,6 +56,22 @@ namespace SterServer
             tl.newImbalanceRequest += new VoidDelegate(tl_newImbalanceRequest);
             debug(PROGRAM + Util.TLSIdentity());
             FormClosing += new FormClosingEventHandler(SterMain_FormClosing);
+        }
+
+        void report(object sender, EventArgs e)
+        {
+            CrashReport.Report(PROGRAM, string.Empty, string.Empty, _msgs.ToString(), null, new AssemblaTicketWindow.LoginSucceedDel(success), false);
+        }
+
+        StringBuilder _msgs = new StringBuilder();
+        void success(string u, string p)
+        {
+            _msgs = new StringBuilder();
+        }
+
+        void debug(string msg)
+        {
+            _dc.GotDebug(msg);
         }
 
         void tl_newImbalanceRequest()
@@ -130,6 +151,9 @@ namespace SterServer
             throw new NotImplementedException();
         }
 
+        const int MAXRECORD = 5000;
+        RingBuffer<Order> _orderq = new RingBuffer<Order>(MAXRECORD);
+        RingBuffer<uint> _cancelq = new RingBuffer<uint>(MAXRECORD);
 
 
         void tl_RegisterStocks(string msg)
@@ -141,18 +165,16 @@ namespace SterServer
         int qr = 0;
         string symquotes = "";
 
-        uint or = 0;
         Dictionary<uint, string> idacct = new Dictionary<uint, string>();
         void tt_Tick(object sender, EventArgs e)
         {
             try
             {
                 // orders
-                while (or < oc)
+                while (!_orderq.isEmpty)
                 {
                     STIOrder order = new STIOrder();
-                    if (or == oq.Length) or = 0;
-                    Order o = oq[or++];
+                    Order o = _orderq.Read();
                     order.LmtPrice = (double)o.price;
                     order.StpPrice = (double)o.stopp;
                     order.Destination = o.Exchange;
@@ -184,10 +206,9 @@ namespace SterServer
                 }
 
                 // cancels
-                if (ic > ir)
+                if (!_cancelq.isEmpty)
                 {
-                    if (ir == idq.Length) ir = 0;
-                    uint number = idq[ir++];
+                    uint number = _cancelq.Read();
                     string acct = "";
                     if (idacct.TryGetValue(number, out acct))
                     {
@@ -200,19 +221,15 @@ namespace SterServer
             }
             catch (Exception ex)
             {
-                debug(ex.Message);
+                debug(ex.Message+ex.StackTrace);
             }
 
 
             
         }
-        uint[] idq = new uint[MAXRECORD];
-        uint ic = 0;
-        uint ir = 0;
         void tl_OrderCancelRequest(uint number)
         {
-            if (ic == idq.Length) ic = 0;
-            idq[ic++] = number;
+            _cancelq.Write(number);
         }
 
 
@@ -312,14 +329,12 @@ namespace SterServer
             k.size = q.nLastSize;
             tl.newTick(k);
         }
-
-        const int MAXRECORD = 5000;
-        Order[] oq = new OrderImpl[MAXRECORD];
-        uint oc = 0;
+        IdTracker _idt = new IdTracker();
         void tl_gotSrvFillRequest(Order o)
         {
-            if (o.id ==0 ) o.id = (uint)(DateTime.Now.TimeOfDay.Ticks);
-            oq[oc++] = o;
+
+            if (o.id == 0) o.id = _idt.AssignId ;
+            _orderq.Write(o);
         }
 
         List<string> accts = new List<string>();
@@ -345,15 +360,6 @@ namespace SterServer
         }
 
 
-        void debug(string msg)
-        {
-            if (msgbox.InvokeRequired)
-                msgbox.Invoke(new DebugDelegate(debug), new object[] { msg });
-            else
-            {
-                msgbox.Items.Add(msg);
-                msgbox.SelectedIndex = msgbox.Items.Count - 1;
-            }
-        }
+
     }
 }

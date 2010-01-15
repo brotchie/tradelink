@@ -29,25 +29,13 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SterMain));
-            this.msgbox = new System.Windows.Forms.ListBox();
             this.SuspendLayout();
-            // 
-            // msgbox
-            // 
-            this.msgbox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.msgbox.FormattingEnabled = true;
-            this.msgbox.ItemHeight = 20;
-            this.msgbox.Location = new System.Drawing.Point(0, 0);
-            this.msgbox.Name = "msgbox";
-            this.msgbox.Size = new System.Drawing.Size(278, 244);
-            this.msgbox.TabIndex = 0;
             // 
             // SterMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(278, 248);
-            this.Controls.Add(this.msgbox);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "SterMain";
             this.Text = "SterServer";
@@ -58,7 +46,6 @@
 
         #endregion
 
-        private System.Windows.Forms.ListBox msgbox;
     }
 }
 

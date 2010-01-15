@@ -7,7 +7,7 @@ using TradeLink.Common;
 
 namespace ServerRedi
 {
-    public class ServerRedi
+    public class ServerRedi : TLServer_WM
     {
         public const string PROGRAM = "RediServer";
         VBCacheClass _cc;
@@ -16,7 +16,7 @@ namespace ServerRedi
         public bool isConnected { get { return _conn; } }
         public ServerRedi()
         {
-
+            newProviderName = Providers.REDI;
         }
         public event DebugDelegate SendDebug;
         void debug(string msg)
@@ -48,13 +48,14 @@ namespace ServerRedi
             return true;
         }
 
-        public void Stop()
+        public override void Stop()
         {
             try
             {
 
             }
             catch { }
+            base.Stop();
         }
 
         void VBRediCache_CacheEvent(int action, int row)
