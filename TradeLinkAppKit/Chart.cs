@@ -24,6 +24,7 @@ namespace TradeLink.AppKit
         public Chart(BarList b,bool allowtype)
         {
             InitializeComponent();
+            chartControl1.DisplayInterval = false;
             MouseUp +=new MouseEventHandler(chartControl1.Chart_MouseUp);
             MouseWheel += new MouseEventHandler(Chart_MouseUp);
             if (allowtype) this.KeyUp += new KeyEventHandler(Chart_KeyUp);

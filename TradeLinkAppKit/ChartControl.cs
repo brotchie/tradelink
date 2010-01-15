@@ -149,6 +149,28 @@ namespace TradeLink.AppKit
             }
         }
 
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            if (DisplayCursor && (bl != null))
+            {
+                ChartControl f = this;
+                g = CreateGraphics();
+                float size = g.MeasureString(highesth.ToString(), f.Font).Width + g.MeasureString("255000 ", f.Font).Width;
+                string time = _curbar == 0 ? string.Empty : bl[_curbar].Bartime.ToString();
+                string price = _curprice == 0 ? string.Empty : _curprice.ToString("F2");
+                g.DrawString(time + " " + price, f.Font, new SolidBrush(f.BackColor), r.Width - size, r.Height - f.Font.Height);
+                _curbar = getBar(MousePosition.X);
+                _curprice = getPrice(MousePosition.Y);
+                size = g.MeasureString(highesth.ToString(), f.Font).Width + g.MeasureString("255000 ", f.Font).Width;
+                time = _curbar == 0 ? string.Empty : bl[_curbar].Bartime.ToString();
+                price = _curprice == 0 ? string.Empty : _curprice.ToString("F2");
+                g.DrawString(time + " " + price, f.Font, new SolidBrush(Color.Black), r.Width - size, r.Height - f.Font.Height);
+
+            }
+            base.OnMouseMove(e);
+        }
+
+
         void ChartControl_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             string s = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\" + Symbol + bl.RecentBar.Bardate+".png";
@@ -178,6 +200,21 @@ namespace TradeLink.AppKit
         int getX(int bar) { return (int)(bar * pixperbar) + (border/3); } 
         // as price goes up and pricemagnitude goes higher, the y coordinate moves up and goes lower
         int getY(decimal price) { return (int)(hborder+((highesth-price) * pixperdollar)); }
+
+        int getBar(int X) 
+        {
+            if (bl == null) return 0;
+            int b = (int)((X - (border / 3)) / pixperbar);
+            if ((b < 0) || (b >= bl.Count)) return 0;
+            return b;
+        }
+        decimal getPrice(int Y) 
+        {
+            if (bl == null) return 0;
+            decimal p = (((Y - hborder)/pixperdollar)-highesth)*-1;
+            if ((p > highesth) || (p < lowestl)) return 0;
+            return p;
+        }
 
         /// <summary>
         /// Gets the title of this chart.
@@ -303,6 +340,11 @@ namespace TradeLink.AppKit
                 g.DrawString(price.ToString("C"),f.Font,new SolidBrush(fgcol), r.Width-border,getY(price)-f.Font.GetHeight());
                 g.DrawLine(priceline, border/3, getY(price), r.Width - border, getY(price));
             }
+            if (DisplayInterval && (bl!=null))
+            {
+                g.DrawString(bl.DefaultInterval.ToString(), f.Font, new SolidBrush(Color.Black), 3, 3);
+            }
+
             DrawLabels();
         }
 
@@ -450,12 +492,19 @@ namespace TradeLink.AppKit
             refresh();
 
         }
+        bool _dispint = true;
+        public bool DisplayInterval { get { return _dispint; } set { _dispint = value; } }
 
+        bool _dispcur = true;
+        public bool DisplayCursor { get { return _dispcur; } set { _dispcur = value; } }
+
+        int _curbar = 0;
+        decimal _curprice = 0;
 
         public void Chart_MouseUp(object sender, MouseEventArgs e)
         {
-            if (e.Delta == 0) return;
             if (bl == null) return;
+            if (e.Delta == 0) return;
             BarInterval old = bl.DefaultInterval;
             BarInterval [] v = bl.Intervals;
             int biord = 0;
