@@ -49,6 +49,7 @@ namespace Kadina
             InitializeComponent();
             initgrids();
             InitContext();
+
             restorerecentfiles();
             restorerecentlibs();
             FormClosing += new FormClosingEventHandler(kadinamain_FormClosing);
@@ -57,7 +58,16 @@ namespace Kadina
             bw.WorkerSupportsCancellation = true;
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(PlayComplete);
             debug(Util.TLSIdentity());
+
+            // grid errors
+            dg.DataError += new DataGridViewDataErrorEventHandler(dg_DataError);
+            ig.DataError += new DataGridViewDataErrorEventHandler(ig_DataError);
+            fg.DataError += new DataGridViewDataErrorEventHandler(fg_DataError);
+            og.DataError += new DataGridViewDataErrorEventHandler(og_DataError);
+            pg.DataError += new DataGridViewDataErrorEventHandler(pg_DataError);
         }
+
+
 
 
         void h_GotTick(Tick t)
@@ -169,6 +179,7 @@ namespace Kadina
                 if (list[i]!="LastPlayTo")
                     ContextMenu.MenuItems.Add(PLAYTO+list[i]+PLAYTOUNIT,new EventHandler(rightplay));
             ContextMenu.MenuItems.Add("Reset", new EventHandler(rightreset));
+            //ContextMenu.MenuItems.Add("NewStudy", new EventHandler(rightstudy));
             msgbox.ContextMenu = ContextMenu;
             
         }
@@ -194,7 +205,17 @@ namespace Kadina
 
         void rightreset(object sender, EventArgs e)
         {
-            if (h!=null) h.Reset();
+            reset(true);
+        }
+
+        void rightstudy(object sender, EventArgs e)
+        {
+            reset(false);
+        }
+
+        void reset(bool keepparams)
+        {
+            // clear all GUIs
             _msg = new StringBuilder(10000);
             msgbox.Clear();
             dt.Clear();
@@ -205,21 +226,34 @@ namespace Kadina
             _tabs.Refresh();
             c.Reset();
             _tr.Clear();
-            if (it != null) { it.Clear(); it.Columns.Clear(); }
-            h.Reset();
-            loadboxname(resname);
-            if (myres != null)
+            if (it != null) { it.Clear(); it.Columns.Clear(); ig.Invalidate(); }
+            // see if we are keeping study or not
+            if (keepparams)
             {
-                try
+                if (h != null) 
+                    h.Reset();
+                loadboxname(resname);
+                if (myres != null)
                 {
-                    myres.Reset();
+                    try
+                    {
+                        myres.Reset();
+                    }
+                    catch (Exception ex)
+                    {
+                        debug(ex.Message + ex.StackTrace);
+                    }
                 }
-                catch (Exception ex)
-                {
-                    debug(ex.Message + ex.StackTrace);
-                }
+                status("Reset box " + myres.Name + " " + PrettyEPF());
             }
-            status("Reset box " + myres.Name + " "+PrettyEPF());
+            else
+            {
+                myres = null;
+                h = new HistSim();
+                epffiles.Clear();
+                resname = string.Empty;
+                updatetitle();
+            }
         }
 
 
@@ -343,7 +377,11 @@ namespace Kadina
 
             // indicators
             ig.Parent = itab;
+            itab.Resize += new EventHandler(itab_Resize);
+            itab.HorizontalScroll.Enabled = true;
+            itab.HorizontalScroll.Visible = true;
             ibs.DataSource = it;
+            ig.ScrollBars = ScrollBars.Both;
             ig.DataSource = ibs;
             ig.RowHeadersVisible = false;
             ig.ContextMenu = this.ContextMenu;
@@ -370,6 +408,13 @@ namespace Kadina
             _tr.Parent = _results;
             _tr.Dock = DockStyle.Fill;
 
+        }
+
+        void itab_Resize(object sender, EventArgs e)
+        {
+            ig.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
+            ig.ScrollBars = ScrollBars.Both;
+            itab.HorizontalScroll.Visible = true;
         }
 
         TradeResults _tr = new TradeResults();
@@ -647,6 +692,7 @@ namespace Kadina
         void PlayComplete(object sender, RunWorkerCompletedEventArgs e)
         {
             debug(_msg.ToString());
+            ig.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
             SafeBindingSource.refreshgrid(dg, tbs);
             SafeBindingSource.refreshgrid(ig, ibs);
             SafeBindingSource.refreshgrid(og, obs);
@@ -769,6 +815,31 @@ namespace Kadina
                 foreach (string f in of.FileNames)
                     loadfile(f);
             }
+        }
+
+        void pg_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            e.Cancel = true;
+        }
+
+        void og_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            e.Cancel = true;
+        }
+
+        void fg_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            e.Cancel = true;
+        }
+
+        void ig_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            e.Cancel = true;
+        }
+
+        void dg_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            e.Cancel = true;
         }
     }
 
