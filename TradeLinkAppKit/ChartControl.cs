@@ -156,14 +156,12 @@ namespace TradeLink.AppKit
                 ChartControl f = this;
                 g = CreateGraphics();
                 float size = g.MeasureString(highesth.ToString(), f.Font).Width + g.MeasureString("255000 ", f.Font).Width;
-                string time = _curbar == 0 ? string.Empty : bl[_curbar].Bartime.ToString();
-                string price = _curprice == 0 ? string.Empty : _curprice.ToString("F2");
-                g.DrawString(time + " " + price, f.Font, new SolidBrush(f.BackColor), r.Width - size, r.Height - f.Font.Height);
+                g.FillRectangle(new SolidBrush(f.BackColor), r.Width - size, r.Height - f.Font.Height, size, f.Font.Height);
                 _curbar = getBar(MousePosition.X);
                 _curprice = getPrice(MousePosition.Y);
                 size = g.MeasureString(highesth.ToString(), f.Font).Width + g.MeasureString("255000 ", f.Font).Width;
-                time = _curbar == 0 ? string.Empty : bl[_curbar].Bartime.ToString();
-                price = _curprice == 0 ? string.Empty : _curprice.ToString("F2");
+                string time = _curbar == 0 ? string.Empty : bl[_curbar].Bartime.ToString();
+                string price = _curprice == 0 ? string.Empty : _curprice.ToString("F2");
                 g.DrawString(time + " " + price, f.Font, new SolidBrush(Color.Black), r.Width - size, r.Height - f.Font.Height);
 
             }
@@ -413,12 +411,12 @@ namespace TradeLink.AppKit
         {
             Graphics gd = CreateGraphics();
             Font font = new Font(FontFamily.GenericSerif, 8,FontStyle.Regular);
-            Font manfont = new Font(FontFamily.GenericSerif, 14,FontStyle.Bold);
             foreach (Color c in _colpoints.Keys)
             {
                 List<Label> points = _colpoints[c];
                 for (int i = 0; i < points.Count; i++)
                 {
+                    // draw lines
                     if (points[i].isLineEnd)
                     {
                         _collineend[c].Add(i);
@@ -432,12 +430,19 @@ namespace TradeLink.AppKit
                             getY(points[i].Price));
 
                     }
-                    else
-                        gd.DrawString(points[i].Text, font, new SolidBrush(c), getX(points[i].Time), getY(points[i].Price));
+                    else // draw labels
+                        gd.DrawString(points[i].Text, font, new SolidBrush(c), getX(BarListImpl.GetNearestIntraBar(bl,points[i].Time,bl.DefaultInterval)), getY(points[i].Price));
                 }
+            }
+
+            // draw user markups
+            if (manualpoints.Count > 0)
+            {
+                Font manfont = new Font(FontFamily.GenericSerif, 14, FontStyle.Bold);
                 for (int i = 0; i < manualpoints.Count; i++)
                     gd.DrawString(manualpoints[i].Label, manfont, Brushes.Turquoise, manualpoints[i].X, manualpoints[i].Y);
             }
+
 
 
         }

@@ -109,12 +109,11 @@ namespace Kadina
             this._tabs.Controls.Add(this.filltab);
             this._tabs.Controls.Add(this.charttab);
             this._tabs.Controls.Add(this._results);
-            this._tabs.Dock = System.Windows.Forms.DockStyle.Fill;
             this._tabs.Location = new System.Drawing.Point(0, 45);
             this._tabs.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this._tabs.Name = "_tabs";
             this._tabs.SelectedIndex = 0;
-            this._tabs.Size = new System.Drawing.Size(801, 310);
+            this._tabs.Size = new System.Drawing.Size(801, 282);
             this._tabs.TabIndex = 2;
             this._tabs.DragDrop += new System.Windows.Forms.DragEventHandler(this.kadinamain_DragDrop);
             this._tabs.DragEnter += new System.Windows.Forms.DragEventHandler(this.kadinamain_DragEnter);
@@ -126,7 +125,7 @@ namespace Kadina
             this.tabmsg.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tabmsg.Name = "tabmsg";
             this.tabmsg.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.tabmsg.Size = new System.Drawing.Size(793, 274);
+            this.tabmsg.Size = new System.Drawing.Size(793, 246);
             this.tabmsg.TabIndex = 0;
             this.tabmsg.Text = "Messages";
             this.tabmsg.UseVisualStyleBackColor = true;
@@ -138,7 +137,7 @@ namespace Kadina
             this.msgbox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.msgbox.Name = "msgbox";
             this.msgbox.ReadOnly = true;
-            this.msgbox.Size = new System.Drawing.Size(785, 264);
+            this.msgbox.Size = new System.Drawing.Size(785, 236);
             this.msgbox.TabIndex = 0;
             this.msgbox.Text = "";
             // 

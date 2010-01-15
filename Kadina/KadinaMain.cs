@@ -53,6 +53,7 @@ namespace Kadina
             restorerecentfiles();
             restorerecentlibs();
             FormClosing += new FormClosingEventHandler(kadinamain_FormClosing);
+            Resize += new EventHandler(kadinamain_Resize);
             bw.DoWork += new DoWorkEventHandler(Play);
             bw.WorkerReportsProgress = false;
             bw.WorkerSupportsCancellation = true;
@@ -65,6 +66,12 @@ namespace Kadina
             fg.DataError += new DataGridViewDataErrorEventHandler(fg_DataError);
             og.DataError += new DataGridViewDataErrorEventHandler(og_DataError);
             pg.DataError += new DataGridViewDataErrorEventHandler(pg_DataError);
+        }
+
+        void kadinamain_Resize(object sender, EventArgs e)
+        {
+            _tabs.Size = new Size(Width,Height - (statusStrip1.Height + (int)(statusStrip2.Height*2.5)));
+            _tabs.Invalidate();
         }
 
 
