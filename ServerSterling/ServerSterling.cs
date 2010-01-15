@@ -368,6 +368,16 @@ namespace SterServer
                 accts.Add(ac);
         }
 
+        void stiEvents_OnSTIOrderUpdateMsg(STIOrderUpdateMsg oSTIOrderUpdateMsg)
+        {
+            throw new NotImplementedException();
+        }
+
+        void stiEvents_OnSTIOrderConfirmMsg(STIOrderConfirmMsg oSTIOrderConfirmMsg)
+        {
+            throw new NotImplementedException();
+        }
+
 
 
         void debug(string msg)
