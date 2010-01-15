@@ -148,9 +148,6 @@ finishinstall:
   
   ; register tik extension
   ${registerExtension} "$INSTDIR\TimeSales.exe" ".tik" "TradeLink TickData"
-  
-  	HelpButton::show /NOUNLOAD "246,231" "blah blah blah" "built to the power of the llama ^o^" "/html=http://franta.com/index.html"
-
 
 SectionEnd
 ;--------------------------------
@@ -194,10 +191,6 @@ Section "Uninstall"
 
   SectionEnd
   
-  Function .onGUIEnd
-	# This needs to be called otherwise the dll will not be correctly unloaded and so will stay on the hd :o(
-	HelpButton::end
-FunctionEnd
   
 Function .onInit
 
