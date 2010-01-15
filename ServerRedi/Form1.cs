@@ -23,7 +23,7 @@ namespace Redi_CSharp_Test
 		private System.Windows.Forms.ListBox listBox1;
 
 //Initialize Redi VB Class Library
-		VBRediClasses.VBCacheClass CacheClass = new VBRediClasses.VBCacheClass();
+        VBRediClasses.VBCacheClass CacheClass;
 		bool IsMsgTableOpen=false;
 
 		public Form1()
@@ -137,12 +137,22 @@ namespace Redi_CSharp_Test
 
 		private void Form1_Load(object sender, System.EventArgs e)
 		{
-//Define/Map local Event Handler for Redi Cache Events
-			this.CacheClass.VBRediCache.CacheEvent += new RediLib.ECacheControl_CacheEventEventHandler(this.RediCacheEvent);
+            try
+            {
+                CacheClass = new VBRediClasses.VBCacheClass();
+                //Define/Map local Event Handler for Redi Cache Events
+                this.CacheClass.VBRediCache.CacheEvent += new RediLib.ECacheControl_CacheEventEventHandler(this.RediCacheEvent);
+            }
+            catch (Exception ex)
+            {
+                listBox1.Items.Add("Error.   Did you forget to login to Redi?");
+                listBox1.Items.Add(ex.Message + ex.StackTrace);
+            }
 		}
 
 		private void btnSendOrder_Click(object sender, System.EventArgs e)
 		{
+            if (CacheClass == null) return;
 //Initialize Redi VB Class Library
 			VBRediClasses.VBOrderClass OrderClss = new VBRediClasses.VBOrderClass();
 			string errstring="";
@@ -155,6 +165,7 @@ namespace Redi_CSharp_Test
 
 		private void btnOpenMsg_Click(object sender, System.EventArgs e)
 		{
+            if (CacheClass == null) return;
 			string errstring="";
 			if (IsMsgTableOpen)
 			{
@@ -167,6 +178,7 @@ namespace Redi_CSharp_Test
 		}
 		public void RediCacheEvent(int action, int row)
 		{
+            if (CacheClass == null) return;
 			lblConsole.Text=row + " --- " + action;
 			object CellValue = new object();
 			int ErrCode = 0;

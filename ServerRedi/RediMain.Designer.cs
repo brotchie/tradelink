@@ -38,7 +38,7 @@
             this.ClientSize = new System.Drawing.Size(278, 248);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "RediMain";
-            this.Text = "Form1";
+            this.Text = "RediServer";
             this.ResumeLayout(false);
 
         }
