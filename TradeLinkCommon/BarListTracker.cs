@@ -95,7 +95,10 @@ namespace TradeLink.Common
             {
                 BarListImpl bl;
                 if (_bdict.TryGetValue(sym, out bl))
+                {
+                    bl.DefaultCustomInterval = interval;
                     return (BarList)bl;
+                }
                 bl = new BarListImpl(sym, _requested, _reqtype);
                 bl.DefaultCustomInterval = interval;
                 bl.GotNewBar += new SymBarIntervalDelegate(bl_GotNewBar);
