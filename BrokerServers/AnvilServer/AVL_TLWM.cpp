@@ -731,8 +731,15 @@
 				// don't process null orders
 				if (order==NULL) return; 
 
-				// don't notify on dead orders
-				if (order->isDead()) return; 
+				// send cancel for a dead order update
+				if (order->isDead()) 
+				{
+					//const MsgUpdateOrder* msg2 = (const MsgUpdateOrder*)message;
+					uint id = fetchOrderIdAndRemove(order);
+					if (id>0)
+						SrvGotCancel(id);
+					return;
+				}
 
 				// try to save this order
 				bool isnew = saveOrder(order,0);
