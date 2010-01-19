@@ -13,22 +13,13 @@ namespace ServerRedi
     public partial class RediMain : Form
     {
         ServerRedi tl = new ServerRedi();
-        DebugControl _dc = new DebugControl(true);
+        DebugWindow _dw = new DebugWindow();
         public RediMain()
         {
             InitializeComponent();
-            _dc.Parent = this;
-            _dc.Dock = DockStyle.Fill;
             tl.SendDebug += new TradeLink.API.DebugDelegate(tl_SendDebug);
-            tl.Start();
-            ContextMenu = new ContextMenu();
-            ContextMenu.MenuItems.Add("report", new EventHandler(report));
-            FormClosing += new FormClosingEventHandler(RediMain_FormClosing);
-        }
 
-        void report(object sender, EventArgs e)
-        {
-            CrashReport.Report(ServerRedi.PROGRAM, string.Empty, string.Empty, _msgs.ToString(),null, new AssemblaTicketWindow.LoginSucceedDel(success),false);
+            FormClosing += new FormClosingEventHandler(RediMain_FormClosing);
         }
 
         void success(string u, string p)
@@ -38,6 +29,7 @@ namespace ServerRedi
 
         void RediMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            Properties.Settings.Default.Save();
             tl.Stop();
         }
 
@@ -51,7 +43,26 @@ namespace ServerRedi
         public void debug(string msg)
         {
             _msgs.AppendLine(msg);
-            _dc.GotDebug(msg);
+            _dw.GotDebug(msg);
+        }
+
+        private void _login_Click(object sender, EventArgs e)
+        {
+            if (tl.Start(_user.Text, _pass.Text))
+                BackColor = Color.Green;
+            else
+                BackColor = Color.Red;
+            Invalidate(true);
+        }
+
+        private void _msg_Click(object sender, EventArgs e)
+        {
+            _dw.Toggle();
+        }
+
+        private void _report_Click(object sender, EventArgs e)
+        {
+            CrashReport.Report(ServerRedi.PROGRAM, string.Empty, string.Empty, _msgs.ToString(), null, new AssemblaTicketWindow.LoginSucceedDel(success), false);
         }
     }
 }
