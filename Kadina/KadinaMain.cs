@@ -49,7 +49,7 @@ namespace Kadina
             InitializeComponent();
             initgrids();
             InitContext();
-
+            sizetabs();
             restorerecentfiles();
             restorerecentlibs();
             FormClosing += new FormClosingEventHandler(kadinamain_FormClosing);
@@ -70,8 +70,39 @@ namespace Kadina
 
         void kadinamain_Resize(object sender, EventArgs e)
         {
-            _tabs.Size = new Size(Width,Height - (statusStrip1.Height + (int)(statusStrip2.Height*2.5)));
-            _tabs.Invalidate();
+            sizetabs();
+        }
+
+        void sizetabs()
+        {
+            _tabs.Size = new Size(Width, Height - (statusStrip1.Height + (int)(statusStrip2.Height * 2.5)));
+            ordertab.Width = _tabs.Width;
+            ordertab.Height = _tabs.Height;
+            itab.Width = _tabs.Width;
+            itab.Height = _tabs.Height;
+            filltab.Height = _tabs.Height;
+            filltab.Width = _tabs.Width;
+            postab.Width = _tabs.Width;
+            postab.Height = _tabs.Height;
+            ticktab.Width = _tabs.Width;
+            ticktab.Height = _tabs.Height;
+            msgtab.Width = _tabs.Width;
+            msgtab.Height = _tabs.Height;
+            ig.Width = itab.Width - SystemInformation.VerticalScrollBarWidth;
+            ig.Height = itab.Height;
+            og.Width = ordertab.Width - SystemInformation.VerticalScrollBarWidth;
+            og.Height = ordertab.Height;
+            fg.Width = filltab.Width - SystemInformation.VerticalScrollBarWidth;
+            fg.Height = filltab.Height;
+            pg.Height = postab.Height;
+            pg.Width = postab.Width - SystemInformation.VerticalScrollBarWidth;
+            dg.Height = ticktab.Height;
+            dg.Width = ticktab.Width - SystemInformation.VerticalScrollBarWidth;
+
+            ig.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
+            ig.ScrollBars = ScrollBars.Both;
+
+            Invalidate(true);
         }
 
 
@@ -287,7 +318,6 @@ namespace Kadina
             pg.AllowUserToDeleteRows = false;
             pg.ShowEditingIcon = false;
             pg.BackgroundColor = BackColor;
-            pg.Dock = DockStyle.Fill;
             pg.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
             pg.RowHeadersDefaultCellStyle.BackColor = BackColor;
             pg.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
@@ -311,7 +341,6 @@ namespace Kadina
             og.AllowUserToAddRows = false;
             og.AllowUserToDeleteRows = false;
             og.ShowEditingIcon = false;
-            og.Dock = DockStyle.Fill;
             og.BackgroundColor = BackColor;
             og.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
             og.RowHeadersDefaultCellStyle.BackColor = BackColor;
@@ -334,7 +363,6 @@ namespace Kadina
             fg.RowHeadersVisible = false;
             fg.ContextMenu = ContextMenu;
             fg.ReadOnly = true;
-            fg.Dock = DockStyle.Fill;
             fg.AllowUserToAddRows = false;
             fg.AllowUserToDeleteRows = false;
             fg.ShowEditingIcon = false;
@@ -379,21 +407,20 @@ namespace Kadina
             dg.RowHeadersDefaultCellStyle.BackColor = BackColor;
 
             dg.ReadOnly = true;
-            dg.Dock = DockStyle.Fill;
             dg.Show();
 
             // indicators
             ig.Parent = itab;
-            itab.Resize += new EventHandler(itab_Resize);
-            itab.HorizontalScroll.Enabled = true;
-            itab.HorizontalScroll.Visible = true;
+            //itab.HorizontalScroll.Enabled = true;
+            //itab.HorizontalScroll.Visible = true;
             ibs.DataSource = it;
             ig.ScrollBars = ScrollBars.Both;
             ig.DataSource = ibs;
             ig.RowHeadersVisible = false;
             ig.ContextMenu = this.ContextMenu;
             ig.ReadOnly = true;
-            ig.Dock = DockStyle.Fill;
+            ig.Width = itab.Width;
+            ig.Height = itab.Height;
             ig.AllowUserToAddRows = false;
             ig.AllowUserToDeleteRows = false;
             ig.ShowEditingIcon = false;
@@ -417,12 +444,6 @@ namespace Kadina
 
         }
 
-        void itab_Resize(object sender, EventArgs e)
-        {
-            ig.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
-            ig.ScrollBars = ScrollBars.Both;
-            itab.HorizontalScroll.Visible = true;
-        }
 
         TradeResults _tr = new TradeResults();
 

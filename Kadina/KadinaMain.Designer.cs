@@ -34,7 +34,7 @@ namespace Kadina
             this.recent = new System.Windows.Forms.ToolStripDropDownButton();
             this.reslist = new System.Windows.Forms.ToolStripDropDownButton();
             this._tabs = new System.Windows.Forms.TabControl();
-            this.tabmsg = new System.Windows.Forms.TabPage();
+            this.msgtab = new System.Windows.Forms.TabPage();
             this.msgbox = new System.Windows.Forms.RichTextBox();
             this.ticktab = new System.Windows.Forms.TabPage();
             this.itab = new System.Windows.Forms.TabPage();
@@ -48,7 +48,7 @@ namespace Kadina
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.statusStrip1.SuspendLayout();
             this._tabs.SuspendLayout();
-            this.tabmsg.SuspendLayout();
+            this.msgtab.SuspendLayout();
             this.statusStrip2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -101,7 +101,7 @@ namespace Kadina
             // 
             this._tabs.AllowDrop = true;
             this._tabs.Appearance = System.Windows.Forms.TabAppearance.Buttons;
-            this._tabs.Controls.Add(this.tabmsg);
+            this._tabs.Controls.Add(this.msgtab);
             this._tabs.Controls.Add(this.ticktab);
             this._tabs.Controls.Add(this.itab);
             this._tabs.Controls.Add(this.postab);
@@ -118,17 +118,17 @@ namespace Kadina
             this._tabs.DragDrop += new System.Windows.Forms.DragEventHandler(this.kadinamain_DragDrop);
             this._tabs.DragEnter += new System.Windows.Forms.DragEventHandler(this.kadinamain_DragEnter);
             // 
-            // tabmsg
+            // msgtab
             // 
-            this.tabmsg.Controls.Add(this.msgbox);
-            this.tabmsg.Location = new System.Drawing.Point(4, 32);
-            this.tabmsg.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.tabmsg.Name = "tabmsg";
-            this.tabmsg.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.tabmsg.Size = new System.Drawing.Size(793, 246);
-            this.tabmsg.TabIndex = 0;
-            this.tabmsg.Text = "Messages";
-            this.tabmsg.UseVisualStyleBackColor = true;
+            this.msgtab.Controls.Add(this.msgbox);
+            this.msgtab.Location = new System.Drawing.Point(4, 32);
+            this.msgtab.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.msgtab.Name = "msgtab";
+            this.msgtab.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.msgtab.Size = new System.Drawing.Size(793, 246);
+            this.msgtab.TabIndex = 0;
+            this.msgtab.Text = "Messages";
+            this.msgtab.UseVisualStyleBackColor = true;
             // 
             // msgbox
             // 
@@ -147,7 +147,7 @@ namespace Kadina
             this.ticktab.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.ticktab.Name = "ticktab";
             this.ticktab.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.ticktab.Size = new System.Drawing.Size(793, 274);
+            this.ticktab.Size = new System.Drawing.Size(793, 246);
             this.ticktab.TabIndex = 1;
             this.ticktab.Text = "Ticks";
             this.ticktab.UseVisualStyleBackColor = true;
@@ -157,7 +157,7 @@ namespace Kadina
             this.itab.Location = new System.Drawing.Point(4, 32);
             this.itab.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.itab.Name = "itab";
-            this.itab.Size = new System.Drawing.Size(793, 274);
+            this.itab.Size = new System.Drawing.Size(793, 246);
             this.itab.TabIndex = 2;
             this.itab.Text = "Indicators";
             this.itab.UseVisualStyleBackColor = true;
@@ -167,7 +167,7 @@ namespace Kadina
             this.postab.Location = new System.Drawing.Point(4, 32);
             this.postab.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.postab.Name = "postab";
-            this.postab.Size = new System.Drawing.Size(793, 274);
+            this.postab.Size = new System.Drawing.Size(793, 246);
             this.postab.TabIndex = 3;
             this.postab.Text = "Position";
             this.postab.UseVisualStyleBackColor = true;
@@ -177,7 +177,7 @@ namespace Kadina
             this.ordertab.Location = new System.Drawing.Point(4, 32);
             this.ordertab.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.ordertab.Name = "ordertab";
-            this.ordertab.Size = new System.Drawing.Size(793, 274);
+            this.ordertab.Size = new System.Drawing.Size(793, 246);
             this.ordertab.TabIndex = 4;
             this.ordertab.Text = "Orders";
             this.ordertab.UseVisualStyleBackColor = true;
@@ -187,7 +187,7 @@ namespace Kadina
             this.filltab.Location = new System.Drawing.Point(4, 32);
             this.filltab.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.filltab.Name = "filltab";
-            this.filltab.Size = new System.Drawing.Size(793, 274);
+            this.filltab.Size = new System.Drawing.Size(793, 246);
             this.filltab.TabIndex = 5;
             this.filltab.Text = "Fills";
             this.filltab.UseVisualStyleBackColor = true;
@@ -196,7 +196,7 @@ namespace Kadina
             // 
             this.charttab.Location = new System.Drawing.Point(4, 32);
             this.charttab.Name = "charttab";
-            this.charttab.Size = new System.Drawing.Size(793, 274);
+            this.charttab.Size = new System.Drawing.Size(793, 246);
             this.charttab.TabIndex = 6;
             this.charttab.Text = "Chart";
             this.charttab.UseVisualStyleBackColor = true;
@@ -206,7 +206,7 @@ namespace Kadina
             this._results.Location = new System.Drawing.Point(4, 32);
             this._results.Name = "_results";
             this._results.Padding = new System.Windows.Forms.Padding(3);
-            this._results.Size = new System.Drawing.Size(793, 274);
+            this._results.Size = new System.Drawing.Size(793, 246);
             this._results.TabIndex = 7;
             this._results.Text = "Results";
             this._results.UseVisualStyleBackColor = true;
@@ -246,7 +246,7 @@ namespace Kadina
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this._tabs.ResumeLayout(false);
-            this.tabmsg.ResumeLayout(false);
+            this.msgtab.ResumeLayout(false);
             this.statusStrip2.ResumeLayout(false);
             this.statusStrip2.PerformLayout();
             this.ResumeLayout(false);
@@ -259,7 +259,7 @@ namespace Kadina
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripDropDownButton reslist;
         private System.Windows.Forms.TabControl _tabs;
-        private System.Windows.Forms.TabPage tabmsg;
+        private System.Windows.Forms.TabPage msgtab;
         private System.Windows.Forms.RichTextBox msgbox;
         private System.Windows.Forms.TabPage ticktab;
         private System.Windows.Forms.ToolStripDropDownButton recent;
