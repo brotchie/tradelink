@@ -107,5 +107,15 @@ namespace TradeLink.Common
                 yield return _tracked[i];
         }
 
+        public T[] ToArray()
+        {
+            return _tracked.ToArray();
+        }
+
+    }
+
+    public static class GenericTracker
+    {
+        public const int UNKNOWN = -1;
     }
 }
