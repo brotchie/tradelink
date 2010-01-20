@@ -181,7 +181,13 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="barnumber"></param>
         /// <returns></returns>
-        public Bar this[int barnumber] { get { return _intdata[_intdataidx[_defaultint]].GetBar(barnumber,Symbol); } }
+        public Bar this[int barnumber] 
+        { 
+            get 
+            { 
+                return _intdata[_intdataidx[_defaultint]].GetBar(barnumber,Symbol); 
+            } 
+        }
         /// <summary>
         /// gets a specific bar in specified interval
         /// </summary>

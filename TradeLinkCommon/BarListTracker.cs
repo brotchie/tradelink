@@ -107,10 +107,14 @@ namespace TradeLink.Common
             }
         }
 
+        /// <summary>
+        /// clears all data from tracker
+        /// </summary>
         public void Reset()
         {
             foreach (BarList bl in _bdict.Values)
                 bl.Reset();
+            _bdict.Clear();
         }
 
         public IEnumerator GetEnumerator() { foreach (string sym in _bdict.Keys) yield return sym; }

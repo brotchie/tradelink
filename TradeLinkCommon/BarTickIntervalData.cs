@@ -71,7 +71,12 @@ namespace TradeLink.Common
         public Bar GetBar(int index, string symbol)
         {
             Bar b = new BarImpl();
-            if ((index < 0) || (index >= _Count)) return b;
+            if (index >= _Count) return b;
+            else if (index < 0)
+            {
+                index = _Count - 1 + index;
+                if (index < 0) return b;
+            }
             b = new BarImpl(opens[index], highs[index], lows[index], closes[index], vols[index], dates[index], times[index], symbol);
             if (index == Last()) b.isNew = _isRecentNew;
             return b;

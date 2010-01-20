@@ -272,6 +272,22 @@ namespace TestTradeLink
         }
 
         [Test]
+        public void NegativeBars()
+        {
+            // get sample tick data
+            BarList bl = BarListImpl.FromEPF("FTI20070926.EPF");
+            // verify expected number of 5min bars exist (78 in 9:30-4p)
+            Assert.AreEqual(83, bl.Count);
+            // verify that 5th bar from end is same as 77th bar
+            Assert.AreEqual(bl[-5].High, bl[77].High);
+            Assert.AreEqual(bl[-5].Open, bl[77].Open);
+            Assert.AreEqual(bl[-5].Low, bl[77].Low);
+            Assert.AreEqual(bl[-5].Close, bl[77].Close);
+            Assert.AreEqual(bl[-5].Bardate, bl[77].Bardate);
+            Assert.AreEqual(bl[-5].Bartime, bl[77].Bartime);
+        }
+
+        [Test]
         public void CustomInterval()
         {
             // request 5 second bars
