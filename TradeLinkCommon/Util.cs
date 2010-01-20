@@ -55,7 +55,12 @@ namespace TradeLink.Common
         }
 
         public static string TLBaseDir 
-        { get { return Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)+@"\tradelink\"; } }
+        { 
+            get 
+            {
+                return ProgramPath(Util.PROGRAM) + "\\..\\";
+            } 
+        }
         public static string TLProgramDir 
         { 
             get 
