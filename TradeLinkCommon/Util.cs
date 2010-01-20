@@ -54,19 +54,33 @@ namespace TradeLink.Common
             return Environment.CurrentDirectory;
         }
 
-        public static string TLBaseDir 
-        { 
-            get 
-            {
-                return ProgramPath(Util.PROGRAM) + "\\..\\";
-            } 
+        public static string TLBaseDir
+        {
+            get
+            {                                  
+                string s = ProgramFilesx86() + @"\tradelink\";
+                return ProgramFilesx86() + @"\tradelink\";
+            }
         }
-        public static string TLProgramDir 
-        { 
-            get 
+
+        static string ProgramFilesx86()
+        {
+            if (8 == IntPtr.Size
+                || (!String.IsNullOrEmpty(Environment.GetEnvironmentVariable("PROCESSOR_ARCHITEW6432"))))
+            {
+                return Environment.GetEnvironmentVariable("ProgramFiles(x86)");
+            }
+
+            return Environment.GetEnvironmentVariable("ProgramFiles");
+        }
+
+
+        public static string TLProgramDir
+        {
+            get
             {
                 return ProgramPath(PROGRAM);
-            } 
+            }
         }
         public static string TLTickDir 
         { get { return TLBaseDir + "TickData\\"; } }
