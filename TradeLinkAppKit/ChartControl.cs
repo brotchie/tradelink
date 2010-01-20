@@ -111,10 +111,10 @@ namespace TradeLink.AppKit
             barc = 0;
             refresh();
         }
-        string sym = "";
+        string sym = string.Empty;
         public string Symbol { get { return sym; } set { sym = value; Text = Title; } }
         Graphics g = null;
-        string mlabel = "";
+        string mlabel = null;
         decimal highesth = 0;
         const decimal SMALLVAL = -100000000000000;
         const decimal BIGVAL = 10000000000000000000;
@@ -151,29 +151,48 @@ namespace TradeLink.AppKit
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            if (DisplayCursor && (bl != null))
+            try
             {
-                ChartControl f = this;
-                g = CreateGraphics();
-                float size = g.MeasureString(highesth.ToString(), f.Font).Width + g.MeasureString("255000 ", f.Font).Width;
-                g.FillRectangle(new SolidBrush(f.BackColor), r.Width - size, r.Height - f.Font.Height, size, f.Font.Height);
-                _curbar = getBar(MousePosition.X);
-                _curprice = getPrice(MousePosition.Y);
-                size = g.MeasureString(highesth.ToString(), f.Font).Width + g.MeasureString("255000 ", f.Font).Width;
-                string time = _curbar == 0 ? string.Empty : bl[_curbar].Bartime.ToString();
-                string price = _curprice == 0 ? string.Empty : _curprice.ToString("F2");
-                g.DrawString(time + " " + price, f.Font, new SolidBrush(Color.Black), r.Width - size, r.Height - f.Font.Height);
+                if (DisplayCursor && (bl != null))
+                {
+                    ChartControl f = this;
+                    g = CreateGraphics();
+                    float size = g.MeasureString(highesth.ToString(), f.Font).Width + g.MeasureString("255000 ", f.Font).Width;
+                    g.FillRectangle(new SolidBrush(f.BackColor), r.Width - size, r.Height - f.Font.Height, size, f.Font.Height);
+                    _curbar = getBar(MousePosition.X);
+                    _curprice = getPrice(MousePosition.Y);
+                    size = g.MeasureString(highesth.ToString(), f.Font).Width + g.MeasureString("255000 ", f.Font).Width;
+                    string time = _curbar == 0 ? string.Empty : bl[_curbar].Bartime.ToString();
+                    string price = _curprice == 0 ? string.Empty : _curprice.ToString("F2");
+                    g.DrawString(time + " " + price, f.Font, new SolidBrush(Color.Black), r.Width - size, r.Height - f.Font.Height);
 
+                }
             }
+            catch { }
             base.OnMouseMove(e);
         }
 
+        public event DebugDelegate SendDebug;
+        internal void debug(string msg)
+        {
+            if (SendDebug != null)
+                SendDebug(msg);
+        }
 
         void ChartControl_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            string s = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\" + Symbol + bl.RecentBar.Bardate+".png";
-            ScreenCapture sc = new ScreenCapture();
-            sc.CaptureWindowToFile(Handle, s, System.Drawing.Imaging.ImageFormat.Png);
+            string fn = string.Empty;
+            try
+            {
+                fn = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\" + Symbol + bl.Date()[bl.Last]+ ".png";
+                ScreenCapture sc = new ScreenCapture();
+                sc.CaptureWindowToFile(Handle, fn, System.Drawing.Imaging.ImageFormat.Png);
+            }
+            catch (Exception ex)
+            {
+                debug("Error writing: " + fn);
+                debug(ex.Message + ex.StackTrace);
+            }
 
 
         }
@@ -235,7 +254,7 @@ namespace TradeLink.AppKit
                 g.DrawString("Unknown symbol, or no data.", new Font(FontFamily.GenericSerif, 14, FontStyle.Bold), Brushes.Red, new PointF(r.Width / 3, r.Height / 2));
                 return;
             }
-            border = (int)(g.MeasureString(bl.RecentBar.High.ToString(), f.Font).Width);
+            border = (int)(g.MeasureString(bl.High()[0].ToString(), f.Font).Width);
             // setup to draw
             Pen p = new Pen(Color.Black);
             g.Clear(f.BackColor);
@@ -270,33 +289,33 @@ namespace TradeLink.AppKit
             for (int i = 0; i < barc; i++)
             {
                 // get bar color
-                Color bcolor = (bl[i].Close > bl[i].Open) ? Color.Green : Color.Red;
+                Color bcolor = (bl.Close()[i] > bl.Open()[i]) ? Color.Green : Color.Red;
                 p = new Pen(bcolor);
                 try
                 {
                     // draw high/low bar
-                    g.DrawLine(p, getX(i), getY(bl[i].Low), getX(i), getY(bl[i].High));
+                    g.DrawLine(p, getX(i), getY(bl.Low()[i]), getX(i), getY(bl.High()[i]));
                     // draw open bar
-                    g.DrawLine(p, getX(i), getY(bl[i].Open), getX(i) - (int)(pixperbar / 3), getY(bl[i].Open));
+                    g.DrawLine(p, getX(i), getY(bl.Open()[i]), getX(i) - (int)(pixperbar / 3), getY(bl.Open()[i]));
                     // draw close bar
-                    g.DrawLine(p, getX(i), getY(bl[i].Close), getX(i) + (int)(pixperbar / 3), getY(bl[i].Close));
+                    g.DrawLine(p, getX(i), getY(bl.Close()[i]), getX(i) + (int)(pixperbar / 3), getY(bl.Close()[i]));
                     // draw time labels (time @30min and date@noon)
 
                     // if interval is intra-day
                     if (bl.DefaultInterval != BarInterval.Day)
                     {
                         // every 6 bars draw the bartime
-                        if ((i % labeleveryX) == 0) g.DrawString((bl[i].Bartime/100).ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (f.Font.GetHeight() * 3));
+                        if ((i % labeleveryX) == 0) g.DrawString((bl.Time()[i]/100).ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (f.Font.GetHeight() * 3));
                         // if it's noon, draw the date
-                        if (bl[i].Bartime == 120000) g.DrawString(bl[i].Bardate.ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (float)(f.Font.GetHeight() * 1.5));
+                        if (bl.Time()[i]== 120000) g.DrawString(bl.Date()[i].ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (float)(f.Font.GetHeight() * 1.5));
                     }
                     else // otherwise it's daily data
                     {
                         // get date
-                        int[] date = Calc.Date(bl[i].Bardate);
+                        int[] date = Calc.Date(bl.Date()[i]);
                         int[] lastbardate = date;
                         // get previous bar date if we have one
-                        if ((i - 1) > 0) lastbardate = Calc.Date(bl[i-1].Bardate);
+                        if ((i - 1) > 0) lastbardate = Calc.Date(bl.Date()[i]);
                         // if we have room since last time we drew the year
                         if ((getX(lastlabelcoord) + minxlabelwidth) <= getX(i))
                         {
@@ -357,8 +376,8 @@ namespace TradeLink.AppKit
         {
             if (price < 0)
             {
-                _colpoints.Clear();
-                _collineend.Clear();
+                _colpoints.Remove(color);
+                _collineend.Remove(color);
                 return;
             }
             List<Label> tmp;
@@ -435,28 +454,27 @@ namespace TradeLink.AppKit
                 }
             }
 
-            // draw user markups
-            if (manualpoints.Count > 0)
-            {
-                Font manfont = new Font(FontFamily.GenericSerif, 14, FontStyle.Bold);
-                for (int i = 0; i < manualpoints.Count; i++)
-                    gd.DrawString(manualpoints[i].Label, manfont, Brushes.Turquoise, manualpoints[i].X, manualpoints[i].Y);
-            }
-
 
 
         }
 
-        List<TextLabel> manualpoints = new List<TextLabel>();
+        Color _mancolor = Color.Turquoise;
+        /// <summary>
+        /// color used for manual chart drawings
+        /// </summary>
+        public Color ManualColor { get { return _mancolor; } set { _mancolor = value; } }
+
         private void Chart_MouseClick(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
-                manualpoints.Add(new TextLabel(mlabel, e.X, e.Y));
+                if (mlabel == null) return;
+                DrawChartLabel(getPrice(e.Y), bl.Time()[getBar(e.X)],mlabel,ManualColor);
             }
             else if (e.Button == MouseButtons.Middle) 
             {
-                manualpoints.Clear();
+
+                DrawChartLabel(-1, 0, string.Empty, ManualColor);
             }
             refresh();
         }
@@ -488,12 +506,12 @@ namespace TradeLink.AppKit
 
         private void offToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            mlabel = "";
+            mlabel = null;
         }
 
         private void clearAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            manualpoints.Clear();
+            DrawChartLabel(-1, 0, string.Empty, ManualColor);
             refresh();
 
         }
@@ -525,6 +543,16 @@ namespace TradeLink.AppKit
             }
             if ((bl.DefaultInterval != old) && bl.Has(1,bl.DefaultInterval)) 
                 NewBarList(this.bl);
+        }
+
+        private void _custom_Click(object sender, EventArgs e)
+        {
+            mlabel = Microsoft.VisualBasic.Interaction.InputBox("Enter label: ", "Custom chart label", "?", Location.X + 5, Location.Y + 5);
+        }
+
+        private void _point_Click(object sender, EventArgs e)
+        {
+            mlabel = string.Empty;
         }
     }
     public class TextLabel
