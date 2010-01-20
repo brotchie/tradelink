@@ -68,6 +68,13 @@ namespace ASP
                     debug("Too many ASPs.  Disabled.");
                     return;
             }
+            if (_ASPINSTANCE < 0)
+            {
+                debug("Error: This ASP instance could not find itself.");
+                debug("Do you have latest .net framework?");
+                debug("Resetting ASP instance to zero, do not use multiple ASPs.");
+                _ASPINSTANCE = 0;
+            }
             // set next response id
             _NEXTRESPONSEID = (_ASPINSTANCE-1) * MAXRESPONSEPERASP;
             _INITIALRESPONSEID = _NEXTRESPONSEID;
@@ -909,7 +916,8 @@ namespace ASP
 
         bool isBadResponse(int idx)
         {
-            return ((_reslist[idx] == null) || !_reslist[idx].isValid ||
+
+            return ((idx<0) || (idx>=_reslist.Count) || (_reslist[idx] == null) || !_reslist[idx].isValid ||
                 (_reslist[idx].FullName == new InvalidResponse().FullName) || !_disp2real.Contains(idx));
         }
 
