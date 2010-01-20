@@ -110,6 +110,7 @@
     <Compile Include="LimitOrder.cs" />
     <Compile Include="BasketImpl.cs" />
     <Compile Include="MarketOrderFlat.cs" />
+    <Compile Include="MessageTracker.cs" />
     <Compile Include="OffsetInfo.cs" />
     <Compile Include="OffsetTracker.cs" />
     <Compile Include="OrderTIFTracker.cs" />

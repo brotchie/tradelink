@@ -415,15 +415,16 @@ namespace WinGauntlet
             
         }
         int _depth = 0;
-        void Response_SendMessage(MessageTypes type, uint id, string data)
+        void Response_SendMessage(MessageTypes type, uint source, uint dest, uint id, string data, ref string response)
         {
             switch (type)
             {
                 case MessageTypes.DOMREQUEST:
+                    
                     int d = 0;
-                    string[] r = data.Split('+');
+                    string[] r = MessageTracker.ParseRequest(data);
                     if (r.Length > 1)
-                        if (int.TryParse(r[1], out d))
+                        if (int.TryParse(MessageTracker.RequestParam(data,1), out d))
                             _depth = d;
                     break;
             }

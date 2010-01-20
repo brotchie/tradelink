@@ -42,6 +42,8 @@ namespace TradeLink.Common
         const int MAXSERVER = 10;
         int _curprovider = -1;
 
+        public string Name { get { return Text; } set { Text = WMUtil.GetUniqueWindow(value); Mode(_curprovider, false); } }
+
         public Providers[] ProvidersAvailable { get { return servers.ToArray(); } }
         public int ProviderSelected { get { return _curprovider; } }
         public TLClient_WM() : this(0,WMUtil.CLIENTWINDOW,true) { }
@@ -392,7 +394,9 @@ namespace TradeLink.Common
                     break;
                 default:
                     if (gotUnknownMessage != null)
-                        gotUnknownMessage(tlm.type, 0, tlm.body);
+                    {
+                        gotUnknownMessage(tlm.type, 0, 0, 0, string.Empty, ref tlm.body);
+                    }
                     break;
             }
             result = 0;

@@ -56,7 +56,7 @@ namespace TradeLink.Common
         /// <param name="type"></param>
         /// <param name="id"></param>
         /// <param name="data"></param>
-        public virtual void GotMessage(MessageTypes type, uint id, string data)
+        public virtual void GotMessage(MessageTypes type, uint source, uint dest, uint msgid, string request,ref string response)
         {
         }
         /// <summary>
@@ -138,7 +138,8 @@ namespace TradeLink.Common
         /// <param name="type"></param>
         /// <param name="id"></param>
         /// <param name="data"></param>
-        public virtual void sendmessage(MessageTypes type, string data) { if (SendMessage!=null) SendMessage(type, (uint)ID, data); }
+        public virtual void sendmessage(MessageTypes type, uint msgid,string request,string response) { if (SendMessage!=null) SendMessage(type, (uint)ID, 0,msgid,request,ref response); }
+        public virtual void sendmessage(MessageTypes type, string data) { sendmessage(type, 0,data, string.Empty); }
         /// <summary>
         /// sends a debug message about what your response is doing at the moment.
         /// </summary>

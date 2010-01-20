@@ -33,6 +33,7 @@ namespace TradeLink.API
         event MessageDelegate gotUnknownMessage;
         bool Mode(int ProviderIndex, bool showwarning);
         bool Mode();
+        string Name { get; set; }
     }
 
     /// <summary>

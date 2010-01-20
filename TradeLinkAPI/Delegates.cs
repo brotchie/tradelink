@@ -13,6 +13,8 @@ namespace TradeLink.API
     public delegate void IntDelegate(Int64 number);
     public delegate void UIntDelegate(UInt32 number);
     public delegate void SecurityDelegate(Security sec);
+    public delegate void StringDecimalDelegate(string txt, decimal val);
+    public delegate void DecimalDelgate(decimal val);
     public delegate void MessageTypesMsgDelegate(MessageTypes[] messages);
     public delegate void DebugDelegate(string msg);
     public delegate void ObjectArrayDelegate(object[] parameters);
@@ -24,12 +26,14 @@ namespace TradeLink.API
     public delegate Position[] PositionArrayDelegate(string account);
     public delegate void OrderCancelDelegate(string sym, bool side, uint id);
     public delegate MessageTypes[] MessageArrayDelegate();
+    public delegate void MessageArrayDel(MessageTypes[] messages);
     public delegate long UnknownMessageDelegate(MessageTypes t, string msg);
     public delegate void SymBarIntervalDelegate(string symbol, int interval);
     public delegate void ImbalanceDelegate(Imbalance imb);
     public delegate void VoidDelegate();
-    public delegate void MessageDelegate(MessageTypes type, uint id, string data);
+    public delegate void MessageDelegate(MessageTypes type, uint source, uint dest, uint msgid, string request,ref string response);
     public delegate void BasketDelegate(Basket b, int id);
     public delegate void BarListDelegate(BarList b);
     public delegate void ChartLabelDelegate(decimal price, int time, string label, System.Drawing.Color c);
+    public delegate void ProviderDelegate(Providers p);
 }

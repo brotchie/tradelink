@@ -553,7 +553,7 @@ namespace Kadina
             c.DrawChartLabel(price, bar, label,col);
         }
         bool _sendmesswarn = false;
-        void myres_SendMessage(MessageTypes type, uint id, string data)
+        void myres_SendMessage(MessageTypes type, uint source, uint dest, uint id, string data, ref string response)
         {
             if (_sendmesswarn) return;
             _sendmesswarn = true;

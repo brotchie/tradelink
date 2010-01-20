@@ -30,6 +30,7 @@ namespace ASP
         BasketImpl _mb = new BasketImpl();
         ASPOptions _ao = new ASPOptions();
         TLTracker _tlt;
+        MessageTracker _mt;
 
         Dictionary<int, string> _resskinidx = new Dictionary<int, string>();
         Dictionary<string, string> _class2dll = new Dictionary<string, string>();
@@ -43,7 +44,7 @@ namespace ASP
         const int SAVESKIN = 2;
         const int EDITSYM = 3;
         const int MAXRESPONSEPERASP = 100;
-        const int MAXASPINSTANCE = 3;
+        const int MAXASPINSTANCE = 4;
         int _ASPINSTANCE = 0;
         int _INITIALRESPONSEID = 0;
         int _NEXTRESPONSEID = 0;
@@ -58,25 +59,21 @@ namespace ASP
             _tlt.GotConnect += new VoidDelegate(_tlt_GotConnect);
             _tlt.GotDebug += new DebugDelegate(_tlt_GotDebug);
             _ao.TimeoutChanged += new Int32Delegate(_ao_TimeoutChanged);
+            _mt = new MessageTracker(tl);
+            _mt.SendMessageResponse += new MessageDelegate(tl_gotUnknownMessage);
+            _mt.SendDebug += new DebugDelegate(_mt_SendDebug);
             // count instances of program
             _ASPINSTANCE = getprocesscount(PROGRAM)-1;
             // ensure have not exceeded maximum
-            if (_ASPINSTANCE > MAXASPINSTANCE)
+            if ((_ASPINSTANCE+1) > MAXASPINSTANCE)
             {
                     MessageBox.Show("You have exceeded maximum # of running ASPs ("+MAXASPINSTANCE+")."+Environment.NewLine+"Please close some.", "too many ASPs");
                     status("Too many ASPs.  Disabled.");
                     debug("Too many ASPs.  Disabled.");
                     return;
             }
-            if (_ASPINSTANCE < 0)
-            {
-                debug("Error: This ASP instance could not find itself.");
-                debug("Do you have latest .net framework?");
-                debug("Resetting ASP instance to zero, do not use multiple ASPs.");
-                _ASPINSTANCE = 0;
-            }
             // set next response id
-            _NEXTRESPONSEID = (_ASPINSTANCE-1) * MAXRESPONSEPERASP;
+            _NEXTRESPONSEID = _ASPINSTANCE * MAXRESPONSEPERASP;
             _INITIALRESPONSEID = _NEXTRESPONSEID;
             // don't save ticks from replay since they're already saved
             _ao.archivetickbox.Checked = !tl.RequestFeatureList.Contains(MessageTypes.HISTORICALDATA);
@@ -129,6 +126,12 @@ namespace ASP
             findskins();
         }
 
+
+        void _mt_SendDebug(string msg)
+        {
+            debug(msg);
+        }
+
         void tl_gotServerUp(string msg)
         {
             debug("Connector up: " + msg + " " + tl.BrokerName + " " + tl.ServerVersion);
@@ -178,14 +181,14 @@ namespace ASP
             debug("Broker disconnected");
         }
 
-        void tl_gotUnknownMessage(MessageTypes type, uint id, string data)
+        void tl_gotUnknownMessage(MessageTypes type, uint source, uint dest, uint id, string request, ref string response)
         {
             // send unknown messages to valid responses
-            int idx = r2r(id);
+            int idx = r2r(source);
             if (idx == ResponseTemplate.UNKNOWNRESPONSE) return;
             if ((idx < 0) || (idx > _reslist.Count)) return;
             if (_reslist[idx].isValid)
-                    _reslist[idx].GotMessage(type, id, data);
+                    _reslist[idx].GotMessage(type, source, dest, id, request, ref response);
         }
 
         /// <summary>
@@ -824,10 +827,15 @@ namespace ASP
             tmp.SendOrder += new OrderDelegate(workingres_SendOrder);
             tmp.SendDebug += new DebugFullDelegate(workingres_GotDebug);
             tmp.SendCancel += new UIntDelegate(workingres_CancelOrderSource);
-            tmp.SendMessage += new MessageDelegate(_workingres_SendMessage);
+            tmp.SendMessage += new MessageDelegate(tmp_SendMessage);
             tmp.SendBasket += new BasketDelegate(_workingres_SendBasket);
             tmp.SendChartLabel += new ChartLabelDelegate(tmp_SendChartLabel);
             tmp.SendIndicators += new StringParamDelegate(tmp_SendIndicators);
+        }
+
+        void tmp_SendMessage(MessageTypes type, uint source, uint dest, uint msgid, string request, ref string response)
+        {
+            _mt.SendMessage(type, source, dest, msgid, request, response);
         }
 
         bool _inderror = false;
@@ -931,25 +939,7 @@ namespace ASP
 
         
 
-        void _workingres_SendMessage(MessageTypes type, uint id, string data)
-        {
-            try
-            {
-                // extra message processing
-                switch (type)
-                {
-                    case MessageTypes.DOMREQUEST:
-                        data.Replace(Book.EMPTYREQUESTOR, tl.Text);
-                        break;
-                }
-                long result = tl.TLSend(type, data);
-                tl_gotUnknownMessage(type, id, result.ToString());
-            }
-            catch (Exception ex)
-            {
-                bigexceptiondump(ex);   
-            }
-        }
+
 
         uint responseid2asp(uint responseorderid)
         {

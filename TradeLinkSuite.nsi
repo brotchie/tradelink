@@ -148,6 +148,8 @@ finishinstall:
   
   ; register tik extension
   ${registerExtension} "$INSTDIR\TimeSales.exe" ".tik" "TradeLink TickData"
+  
+  ExecShell "open" "http://franta.com/support"
 
 SectionEnd
 ;--------------------------------

@@ -26,7 +26,7 @@ namespace Responses
         public void GotOrderCancel(uint cancelid)
         {
         }
-        public void GotMessage(MessageTypes type, uint id, string data) { }
+        public void GotMessage(MessageTypes type, uint source, uint dest, uint id, string request, ref string response) { }
         public void Reset() { }
         public void GotPosition(Position p) { }
         public bool isValid { get { return true; } set { } }
