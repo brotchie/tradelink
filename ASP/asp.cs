@@ -48,6 +48,7 @@ namespace ASP
         int _ASPINSTANCE = 0;
         int _INITIALRESPONSEID = 0;
         int _NEXTRESPONSEID = 0;
+        BackgroundWorker bw = new BackgroundWorker();
 
         public ASP()
         {
@@ -65,12 +66,17 @@ namespace ASP
             // count instances of program
             _ASPINSTANCE = getprocesscount(PROGRAM)-1;
             // ensure have not exceeded maximum
-            if ((_ASPINSTANCE+1) > MAXASPINSTANCE)
+            if ((_ASPINSTANCE + 1) > MAXASPINSTANCE)
             {
-                    MessageBox.Show("You have exceeded maximum # of running ASPs ("+MAXASPINSTANCE+")."+Environment.NewLine+"Please close some.", "too many ASPs");
-                    status("Too many ASPs.  Disabled.");
-                    debug("Too many ASPs.  Disabled.");
-                    return;
+                MessageBox.Show("You have exceeded maximum # of running ASPs (" + MAXASPINSTANCE + ")." + Environment.NewLine + "Please close some.", "too many ASPs");
+                status("Too many ASPs.  Disabled.");
+                debug("Too many ASPs.  Disabled.");
+                return;
+            }
+            else
+            {
+                status("ASP " + (_ASPINSTANCE+1) + "/" + MAXASPINSTANCE);
+                debug("ASP " + (_ASPINSTANCE+1) + "/" + MAXASPINSTANCE);
             }
             // set next response id
             _NEXTRESPONSEID = _ASPINSTANCE * MAXRESPONSEPERASP;
@@ -103,6 +109,8 @@ namespace ASP
             // if we have a server
             if (tl.ProvidersAvailable.Length>0)
             {
+                debug(tl.BrokerName + " " + tl.ServerVersion + " connected.");
+                status(tl.BrokerName + " connected.");
                 _tlt_GotConnect();
             }
             else
@@ -118,12 +126,18 @@ namespace ASP
             _resnames.ContextMenu.MenuItems.Add("edit symbols", new EventHandler(editsyms));
             // make sure we exit properly
             this.FormClosing += new FormClosingEventHandler(ASP_FormClosing);
-            // check for new versions
-            Versions.UpgradeAlert(tl);
+            bw.DoWork += new DoWorkEventHandler(bw_DoWork);
+            bw.RunWorkerAsync();
             // get last loaded response library
             LoadResponseDLL(Properties.Settings.Default.boxdll);
             // load any skins we can find
             findskins();
+        }
+
+        void bw_DoWork(object sender, DoWorkEventArgs e)
+        {
+            // check for new versions
+            Versions.UpgradeAlert(tl);
         }
 
 
@@ -197,17 +211,21 @@ namespace ASP
                     _reslist[idx].GotMessage(type, source, dest, id, request, ref response);
         }
 
-        /// <summary>
-        /// converts a response's local id to it's storage location in ASP
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        int r2r(uint id) { return r2r((int)id); }
-        int r2r(int id)
-        {
-            return (int)id + _INITIALRESPONSEID;
-        }
 
+        Dictionary<int, int> _rid2local = new Dictionary<int, int>();
+        /// <summary>
+        /// gets local storage location from response id
+        /// </summary>
+        /// <param name="responseid"></param>
+        /// <returns></returns>
+        int r2r(uint responseid)
+        {
+            int idx = -1;
+            if (_rid2local.TryGetValue((int)responseid, out idx))
+                return idx;
+            return -1;
+        }
+        int r2r(int responseid) { return r2r((uint)responseid); }
 
         void tl_gotTickasync(Tick t)
         {
@@ -246,7 +264,7 @@ namespace ASP
             foreach (int dindex in _resnames.SelectedIndices)
             {
                 if ((dindex < 0) || (dindex > _resnames.Items.Count)) continue;
-                int index = _disp2real[dindex];
+                int index = getrindx(dindex);
                 _resnames.ContextMenu.MenuItems[ENABLED].Checked = !isBadResponse(index);
             }
 
@@ -409,8 +427,8 @@ namespace ASP
             {
                 // set the id
                 r.ID = id;
-                // save the index
-                int idx = r2r(id);
+                // get local response index
+                int idx = _reslist.Count;
                 // bind events
                 bindresponseevents(r);
                 // show it to user
@@ -420,6 +438,8 @@ namespace ASP
                 {
                     _reslist.Add(r);
                 }
+                // save id to local relationship
+                _rid2local.Add(r.ID, idx);
                 // setup place for it's symbols
                 _rsym.Add(id, string.Empty);
                 // map name to response
@@ -447,6 +467,13 @@ namespace ASP
         {
             // make sure something is selected
             if (_availresponses.SelectedIndex == -1) return;
+            // make sure we haven't maxed our responses
+            if (_NEXTRESPONSEID - _INITIALRESPONSEID >= MAXRESPONSEPERASP)
+            {
+                status("Exceeded maximum responses: " + MAXRESPONSEPERASP);
+                debug("Exceeded maximum responses: " + MAXRESPONSEPERASP);
+                return;
+            }
             // get selected response
             string resname = (string)_availresponses.SelectedItem;
             // load it into working response
@@ -502,6 +529,7 @@ namespace ASP
             Dictionary<string, List<int>> newidx = new Dictionary<string, List<int>>(_mb.Count);
             foreach (int r in _rsym.Keys)
             {
+                
                 // get all syms response is subscribed to
                 string [] syms = _rsym[r].Split(',');
                 // go through every sym
@@ -542,8 +570,11 @@ namespace ASP
                 if ((disp < 0) || (disp >= _disp2real.Count)) continue;
                 // get real index
                 int real = _disp2real[disp];
-                // make sure real index good
-                if ((real < 0) || (real >= _reslist.Count)) continue;
+                // if real index is bad
+                if ((real < 0) || (real >= _reslist.Count))
+                {
+                    continue;
+                }
                 // update the displayed name and symlist
                 _resnames.Items[disp] = getrstat(real);
             }
@@ -584,9 +615,12 @@ namespace ASP
                 if ((dispidx<0) || (dispidx>_disp2real.Count))
                     continue;
                 // get actual index
-                int selbox = _disp2real[dispidx];
+                int selbox = getrindx(dispidx);
                 // get name
                 string name = _reslist[selbox].FullName;
+                // remove id to local association
+                int responseID = _reslist[selbox].ID;
+                _rid2local.Remove(responseID);
                 // remove the response
                 _reslist[selbox] = new InvalidResponse();
                 // clear it's symbols
@@ -594,7 +628,7 @@ namespace ASP
                 // mark it's UI element for removal
                 remdidx.Add(dispidx);
                 // notify user
-                debug("removed #"+dispidx+": "+name+" id:"+selbox);
+                debug("removed #"+dispidx+": "+name+" id:"+responseID);
             }
             // remove response from screen
             for (int i = remdidx.Count -1; i>=0; i--)
@@ -627,8 +661,11 @@ namespace ASP
             {
                 // make sure it's valid
                 if ((dbox < 0) || (dbox > _resnames.Items.Count)) continue;
+
                 // get selected box
-                int selbox = _disp2real[dbox];
+                int selbox = getrindx(dbox);
+                // ensure index is good
+                if ((selbox < 0) || (selbox > _reslist.Count)) continue;
                 // invert current response's validity
                 bool valid = !_reslist[selbox].isValid;
                 // save it back
@@ -659,10 +696,9 @@ namespace ASP
                 }
             }
             // send order cancel notification to every valid box
-            foreach (string sym in _symidx.Keys)
-                foreach (int idx in _symidx[sym])
-                    if (_reslist[idx].isValid)
-                        _reslist[idx].GotOrderCancel(number);
+            for (int idx = 0; idx<_reslist.Count; idx++)
+                if (!isBadResponse(idx))
+                    _reslist[idx].GotOrderCancel(number);
         }
 
         void tl_gotOrder(Order o)
@@ -687,9 +723,9 @@ namespace ASP
                 o.id = rorderid;
             }
             // send order notification to any valid responses
-            for (int i = 0; i < _reslist.Count; i++)
-                if (_reslist[i].isValid)
-                    _reslist[i].GotOrder(o);
+            foreach (int id in _symidx[o.symbol])
+                if (!isBadResponse(id))
+                    _reslist[id].GotOrder(o);
         }
 
         void ASP_FormClosing(object sender, FormClosingEventArgs e)
@@ -921,7 +957,7 @@ namespace ASP
             }
             // if good response, notify 
             if (!isBadResponse(idx))
-                debug("got basket request: " + basket+ " from: " + _reslist[idx].FullName+ " "+(idx-_INITIALRESPONSEID));
+                debug("got basket request: " + basket+ " from: " + _reslist[idx].FullName+ " "+_reslist[idx].ID);
             // save symbols
             _rsym[idx] = basket;
             // update everything
@@ -932,7 +968,7 @@ namespace ASP
         {
 
             return ((idx<0) || (idx>=_reslist.Count) || (_reslist[idx] == null) || !_reslist[idx].isValid ||
-                (_reslist[idx].FullName == new InvalidResponse().FullName) || !_disp2real.Contains(idx));
+                !_disp2real.Contains(idx));
         }
 
         void _workingres_SendBasket(Basket b, int id)
