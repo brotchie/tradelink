@@ -43,8 +43,8 @@ namespace ServerBlackwood
             newRegisterStocks += new DebugDelegate(ServerBlackwood_newRegisterStocks);
             newPosList += new PositionArrayDelegate(ServerBlackwood_newPosList);
             //newImbalanceRequest += new VoidDelegate(ServerBlackwood_newImbalanceRequest);
-
             //DOMRequest += new IntDelegate(ServerBlackwood_DOMRequest);
+
         }
 
         Position[] ServerBlackwood_newPosList(string account)
@@ -59,7 +59,7 @@ namespace ServerBlackwood
 
         List<BWStock> _stocks = new List<BWStock>();
         List<string> _symstk = new List<string>();
-
+        
         void ServerBlackwood_newRegisterStocks(string msg)
         {
             Basket b = BasketImpl.FromString(msg);
@@ -112,7 +112,8 @@ namespace ServerBlackwood
             // create a new BWOrder with these parameters
             BWOrder bwOrder = new BWOrder(m_Session, sSymbol, orderSide, orderSize, orderPrice, orderType, orderTIF, orderVenue, false, orderSize);
             bwOrder.CustomID = orderCID;
-            
+            bwOrder.SmartID = orderCID;
+
             // subscribe to this order's events
             bwOrder.BWOrderUpdateEvent += new BWOrder.BWOrderUpdateHandler(bwOrder_BWOrderUpdateEvent);
 
@@ -143,7 +144,6 @@ namespace ServerBlackwood
                         o.Cancel();
                 }
             }
-            
         }
 
         MessageTypes[] ServerBlackwood_newFeatureRequest()
@@ -178,7 +178,6 @@ namespace ServerBlackwood
             f.Add(MessageTypes.SENDORDERLIMIT);
             f.Add(MessageTypes.EXECUTENOTIFY);
             return f.ToArray();
-
         }
 
         long ServerBlackwood_newUnknownRequest(MessageTypes t, string msg)
@@ -256,7 +255,9 @@ namespace ServerBlackwood
         string _acct = string.Empty;
         void m_Session_OnAccountMessage(object sender, BWAccount accountMsg)
         {
-            _acct = accountMsg.UserID.ToString();
+            string str = m_Session.Account;
+            string[] strArr = str.Split('~');
+            _acct = strArr[0];
             _cpl = accountMsg.ClosedProfit;
         }
 
@@ -271,7 +272,7 @@ namespace ServerBlackwood
                     t.xdate = TradeLink.Common.Util.ToTLDate(executionMsg.ExecutionTime);
                     t.Account = executionMsg.UserID.ToString();
                     t.id = ordID.Key;
-                    t.ex = ""; //passing anything else seems to break position display in quotopia.
+                    t.ex = executionMsg.MarketMaker; 
                     newFill(t);
                 }
         }
@@ -295,8 +296,8 @@ namespace ServerBlackwood
             int size = positionMsg.Size;
             decimal price = (decimal)positionMsg.Price;
             decimal cpl = (decimal)positionMsg.CloseProfit;
-            string ac = positionMsg.UserID.ToString();
-            Position p = new PositionImpl(sym, price, size, cpl, ac);
+            //string ac = positionMsg.UserID.ToString();
+            Position p = new PositionImpl(sym, price, size, cpl, _acct);
             pt.NewPosition(p);
         }
 
@@ -305,17 +306,13 @@ namespace ServerBlackwood
             System.Net.IPAddress bwIP = System.Net.IPAddress.Parse(ipaddress);
 
             // register for notification of a disconnection from the client portal
-            m_Session.OnMarketDataClientPortalConnectionChange += new Blackwood.Framework.BWSession.ClientPortalConnectionChangeHandler(OnMarketDataClientPortalConnectionChange);
-            // register for notification of a disconnection from the client portal
-            //m_Session.OnOrdersClientPortalConnectionChange += new Blackwood.Framework.BWSession.ClientPortalConnectionChangeHandler(OnOrderClientPortalConnectionChange);
-
-            // equivalent to m_session.ConnectToMarketData
-            // calls the overload of ConnectionToMarketData that takes an IP but uses the default port
+            m_Session.OnMarketDataClientPortalConnectionChange += new BWSession.ClientPortalConnectionChangeHandler(OnMarketConnectionChange);
+            
             try
             {
-                m_Session.ConnectToMarketData(user, pw, bwIP, Properties.Settings.Default.dataport, true);
                 m_Session.ConnectToOrderRouting(user, pw, bwIP, Properties.Settings.Default.orderport, true, true, true);
                 m_Session.ConnectToHistoricData(user, pw, bwIP, Properties.Settings.Default.historicalport);
+                m_Session.ConnectToMarketData(user, pw, bwIP, Properties.Settings.Default.dataport, true);
 
                 //if (chkUseMulticast.Checked)
                 //	m_Session.ConnectToMulticast(System.Net.IPAddress.Parse(txtBoxMultiServerIP.Text), Convert.ToInt32(txtMultiDataPort.Text), true);	
@@ -323,20 +320,11 @@ namespace ServerBlackwood
             catch (Blackwood.Framework.ClientPortalConnectionException)
             {
                 debug("error: Unable to connect to market data client portal.");
+                _valid = false;
+                return _valid;
             }
-            finally
-            {
-                if (m_Session.IsConnectedToMarketData && m_Session.IsConnectedToOrderRouting)
-                {
-                    _valid = true;
-                }
-                else
-                {
-                    _valid = false;
-                }
-
-            }
-
+       
+            _valid = true;
             return _valid;
         }
 
@@ -344,16 +332,31 @@ namespace ServerBlackwood
         {
             try
             {
+                m_Session.DisconnectFromOrders();
+                m_Session.DisconnectFromHistoricData();
                 m_Session.DisconnectFromMarketData();
                 m_Session.CloseSession();
+                m_Session.OnMarketDataClientPortalConnectionChange -= new BWSession.ClientPortalConnectionChangeHandler(OnMarketConnectionChange);
             }
             catch { }
         }
 
-        private void OnMarketDataClientPortalConnectionChange(object sender, bool Connected)
+        private void OnMarketConnectionChange(object sender, bool Connected)
         {
-            OnBWConnectedEvent(Connected);
-            debug("connected: " + Connected);
+            
+            //Make sure both market data and order routing is alive before connected is true.
+            if (m_Session.IsConnectedToMarketData & m_Session.IsConnectedToOrderRouting)
+            {
+                OnBWConnectedEvent(Connected);
+            }
+            else
+            {
+                OnBWConnectedEvent(false);
+            }
+            //Send to debug window detailed connection info.
+            debug("connected market data: " + m_Session.IsConnectedToMarketData.ToString());
+            debug("connected order port: " + m_Session.IsConnectedToOrderRouting.ToString());
+            debug("connected history port: " + m_Session.IsConnectedToHistoricData.ToString());
         }
 
         private BWTIF getDurationFromBW(Order o)
@@ -429,6 +432,8 @@ namespace ServerBlackwood
         void bwOrder_BWOrderUpdateEvent(object sender, BWOrderStatus BWOrderStatus)
         {
             BWOrder bwo = (BWOrder)sender;
+            uint id = (uint)bwo.CustomID;
+        
             switch (BWOrderStatus)
             {
                 case BWOrderStatus.ACCEPTED:
@@ -447,10 +452,30 @@ namespace ServerBlackwood
                             } 
                     }
                     break;
-                case BWOrderStatus.CANCELED|BWOrderStatus.REJECTED:
+                case BWOrderStatus.CANCELED:
                     {
-                        uint id = (uint)bwo.CustomID;
-                        newOrderCancel(id);
+                        if (this.InvokeRequired)
+                        {
+                           this.Invoke(new LongDelegate(newOrderCancel),new object[] {id}); 
+                        }    
+                        else
+                        {
+                            newOrderCancel(id); 
+                        }
+                        
+                    }
+                    break;
+                case BWOrderStatus.REJECTED:
+                    {
+                        if (this.InvokeRequired)
+                        {
+                            this.Invoke(new LongDelegate(newOrderCancel), new object[] { id });
+                        }
+                        else
+                        {
+                            newOrderCancel(id);
+                        }
+                        debug("Rejected: " + bwo.CustomID.ToString() + bwo.RejectReason);
                     }
                     break;
             }

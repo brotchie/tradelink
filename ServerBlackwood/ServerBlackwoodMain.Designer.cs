@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ServerBlackwoodMain));
-            this._report = new System.Windows.Forms.Button();
             this._togmsg = new System.Windows.Forms.Button();
             this._login = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
@@ -38,18 +37,8 @@
             this._un = new System.Windows.Forms.TextBox();
             this._ipaddress = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
+            this._report = new System.Windows.Forms.Button();
             this.SuspendLayout();
-            // 
-            // _report
-            // 
-            this._report.Image = ((System.Drawing.Image)(resources.GetObject("_report.Image")));
-            this._report.Location = new System.Drawing.Point(145, 69);
-            this._report.Margin = new System.Windows.Forms.Padding(2);
-            this._report.Name = "_report";
-            this._report.Size = new System.Drawing.Size(22, 22);
-            this._report.TabIndex = 15;
-            this._report.UseVisualStyleBackColor = true;
-            this._report.Click += new System.EventHandler(this._report_Click);
             // 
             // _togmsg
             // 
@@ -133,24 +122,39 @@
             this.label3.TabIndex = 17;
             this.label3.Text = "Address:";
             // 
+            // _report
+            // 
+            this._report.Image = ((System.Drawing.Image)(resources.GetObject("_report.Image")));
+            this._report.Location = new System.Drawing.Point(143, 69);
+            this._report.Margin = new System.Windows.Forms.Padding(2);
+            this._report.Name = "_report";
+            this._report.Size = new System.Drawing.Size(22, 22);
+            this._report.TabIndex = 21;
+            this._report.UseVisualStyleBackColor = true;
+            this._report.Click += new System.EventHandler(this._report_Click);
+            // 
             // ServerBlackwoodMain
             // 
             this.AcceptButton = this._login;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(185, 95);
+            this.Controls.Add(this._report);
             this.Controls.Add(this.label3);
             this.Controls.Add(this._ipaddress);
-            this.Controls.Add(this._report);
             this.Controls.Add(this._togmsg);
             this.Controls.Add(this._login);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this._pw);
             this.Controls.Add(this._un);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(2);
+            this.MaximizeBox = false;
             this.Name = "ServerBlackwoodMain";
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Blackwood";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ServerBlackwoodMain_FormClosing);
             this.ResumeLayout(false);
@@ -160,7 +164,6 @@
 
         #endregion
 
-        private System.Windows.Forms.Button _report;
         private System.Windows.Forms.Button _togmsg;
         private System.Windows.Forms.Button _login;
         private System.Windows.Forms.Label label2;
@@ -169,6 +172,7 @@
         private System.Windows.Forms.TextBox _un;
         private System.Windows.Forms.TextBox _ipaddress;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button _report;
     }
 }
 

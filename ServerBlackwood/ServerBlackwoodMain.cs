@@ -20,9 +20,19 @@ namespace ServerBlackwood
         {
             InitializeComponent();
             _con.BWConnectedEvent += new BWConnectedEventHandler(_con_BWConnectedEvent);
-            _con.SendDebug+=new DebugFullDelegate(_dw.GotDebug);
+            _con.SendDebug += new DebugFullDelegate(_dw.GotDebug);
 
             StatusHandler = new DisplayStatusHandler(DisplayStatus);
+
+            Location = Properties.Settings.Default.wlocation;
+            
+            //Avoid painting window off screen.
+            Point screen = new Point (SystemInformation.VirtualScreen.Bottom,SystemInformation.VirtualScreen.Right) ;
+            if (this.Top > screen.X - this.Height | this.Left > screen.Y - this.Width) 
+            {
+                this.Location = new Point(300, 300);
+            }
+
         }
 
         void _con_BWConnectedEvent(object sender, bool BWConnected)
@@ -38,19 +48,19 @@ namespace ServerBlackwood
                 if (_con.Start(_un.Text, _pw.Text, _ipaddress.Text, 0))
                 {
                     BackColor = Color.Green;
-                    _dw.GotDebug("login successful");
+                    _dw.GotDebug("logging in...");
                     Invalidate();
                 }
                 else
                 { 
                     BackColor = Color.Red;
-                    _dw.GotDebug("login failed.");
+                    _dw.GotDebug("Problem connecting to Blackwood!");
                 }
             }
             else
             {
+                _dw.GotDebug("logging off...");
                 _con.Stop();
-                _dw.GotDebug("logoff successful.");
             }
         }
 
@@ -66,6 +76,7 @@ namespace ServerBlackwood
 
         private void ServerBlackwoodMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            Properties.Settings.Default.wlocation = this.Location ;
             Properties.Settings.Default.Save();
             _con.Stop();
         }

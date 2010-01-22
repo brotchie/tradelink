@@ -31,7 +31,7 @@ namespace ServerBlackwood
 
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            TradeLink.AppKit.CrashReport.Report(ServerBlackwoodMain.PROGRAM, (Exception)e.ExceptionObject);
+            TradeLink.AppKit.CrashReport.Report(ServerBlackwoodMain.PROGRAM,  (Exception)e.ExceptionObject);
         }
 
         static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
