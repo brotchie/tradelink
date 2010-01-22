@@ -28,69 +28,46 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.dg = new System.Windows.Forms.DataGridView();
-            this.butsell = new System.Windows.Forms.Button();
-            this.butbuy = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.dg)).BeginInit();
+            this.components = new System.ComponentModel.Container();
+            this._dg = new System.Windows.Forms.DataGridView();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            ((System.ComponentModel.ISupportInitialize)(this._dg)).BeginInit();
             this.SuspendLayout();
             // 
-            // dg
+            // _dg
             // 
-            this.dg.AllowUserToAddRows = false;
-            this.dg.AllowUserToDeleteRows = false;
-            this.dg.AllowUserToOrderColumns = true;
-            this.dg.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dg.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dg.Location = new System.Drawing.Point(0, 0);
-            this.dg.Name = "dg";
-            this.dg.ReadOnly = true;
-            this.dg.RowHeadersVisible = false;
-            this.dg.RowTemplate.Height = 28;
-            this.dg.ShowEditingIcon = false;
-            this.dg.Size = new System.Drawing.Size(459, 369);
-            this.dg.TabIndex = 0;
-            // 
-            // butsell
-            // 
-            this.butsell.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.butsell.Location = new System.Drawing.Point(0, 346);
-            this.butsell.Name = "butsell";
-            this.butsell.Size = new System.Drawing.Size(459, 23);
-            this.butsell.TabIndex = 1;
-            this.butsell.Text = "Sell";
-            this.butsell.UseVisualStyleBackColor = true;
-            this.butsell.Click += new System.EventHandler(this.butsell_Click);
-            // 
-            // butbuy
-            // 
-            this.butbuy.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.butbuy.Location = new System.Drawing.Point(0, 323);
-            this.butbuy.Name = "butbuy";
-            this.butbuy.Size = new System.Drawing.Size(459, 23);
-            this.butbuy.TabIndex = 2;
-            this.butbuy.Text = "Buy";
-            this.butbuy.UseVisualStyleBackColor = true;
-            this.butbuy.Click += new System.EventHandler(this.butbuy_Click);
+            this._dg.AllowUserToAddRows = false;
+            this._dg.AllowUserToDeleteRows = false;
+            this._dg.AllowUserToOrderColumns = true;
+            this._dg.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this._dg.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._dg.Location = new System.Drawing.Point(0, 0);
+            this._dg.Name = "_dg";
+            this._dg.ReadOnly = true;
+            this._dg.RowHeadersVisible = false;
+            this._dg.RowTemplate.Height = 28;
+            this._dg.ShowEditingIcon = false;
+            this._dg.Size = new System.Drawing.Size(532, 369);
+            this._dg.TabIndex = 0;
+            this.toolTip1.SetToolTip(this._dg, "List of 10-biggest trades occuring.   Right click to access buy/sell functions.");
             // 
             // BigTradeUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(459, 369);
-            this.Controls.Add(this.butbuy);
-            this.Controls.Add(this.butsell);
-            this.Controls.Add(this.dg);
+            this.ClientSize = new System.Drawing.Size(532, 369);
+            this.Controls.Add(this._dg);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "BigTradeUI";
             this.Text = "BigTradeUI";
-            ((System.ComponentModel.ISupportInitialize)(this.dg)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._dg)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.Button butsell;
-        private System.Windows.Forms.Button butbuy;
-        public System.Windows.Forms.DataGridView dg;
+        public System.Windows.Forms.DataGridView _dg;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }
