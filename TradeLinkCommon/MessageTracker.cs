@@ -87,6 +87,7 @@ namespace TradeLink.Common
                     {
                         if ((GotIntraLowPrice != null) && long.TryParse(response, out lv))
                             GotIntraLowPrice(request, WMUtil.unpack(lv));
+                        return true;
                     }
 
                 case MessageTypes.BROKERNAME:
