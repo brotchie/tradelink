@@ -154,8 +154,11 @@ namespace ASP
 
         void _tlt_GotConnect()
         {
-            debug(tl.BrokerName + " " + tl.ServerVersion + " connected.");
-            status(tl.BrokerName + " connected.");
+            if (_tlt.tw.RecentTime != 0)
+            {
+                debug(tl.BrokerName + " " + tl.ServerVersion + " connected.");
+                status(tl.BrokerName + " connected.");
+            }
             _ao._brokertimeout.Enabled = tl.BrokerName != Providers.TradeLink;
             if (tl.BrokerName == Providers.TradeLink)
             {
@@ -177,8 +180,11 @@ namespace ASP
 
         void _tlt_GotConnectFail()
         {
-            status("Broker disconnected");
-            debug("Broker disconnected");
+            if (_tlt.tw.RecentTime != 0)
+            {
+                status("Broker disconnected");
+                debug("Broker disconnected");
+            }
         }
 
         void tl_gotUnknownMessage(MessageTypes type, uint source, uint dest, uint id, string request, ref string response)
