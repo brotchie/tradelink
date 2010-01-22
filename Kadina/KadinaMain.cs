@@ -41,6 +41,7 @@ namespace Kadina
         
 
         BackgroundWorker bw = new BackgroundWorker();
+        BackgroundWorker bw2 = new BackgroundWorker();
         HistSim h = new HistSim();
         ChartControl c = new ChartControl();
 
@@ -58,6 +59,9 @@ namespace Kadina
             bw.WorkerReportsProgress = false;
             bw.WorkerSupportsCancellation = true;
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(PlayComplete);
+
+            bw2.DoWork += new DoWorkEventHandler(bw2_DoWork);
+            bw2.RunWorkerAsync();
             debug(Util.TLSIdentity());
 
             // grid errors
@@ -66,6 +70,11 @@ namespace Kadina
             fg.DataError += new DataGridViewDataErrorEventHandler(fg_DataError);
             og.DataError += new DataGridViewDataErrorEventHandler(og_DataError);
             pg.DataError += new DataGridViewDataErrorEventHandler(pg_DataError);
+        }
+
+        void bw2_DoWork(object sender, DoWorkEventArgs e)
+        {
+            Versions.UpgradeAlert();
         }
 
         void kadinamain_Resize(object sender, EventArgs e)
