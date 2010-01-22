@@ -154,13 +154,14 @@ namespace TradeLink.Common
                     if (alert)
                         GotMassAlert(_lasttime);
                 }
-                System.Threading.Thread.Sleep(_pollint);
+                System.Threading.Thread.Sleep((int)_pollint);
             }
         }
         public event Int32Delegate PollProcess;
-        volatile int _pollint = 0;
-        public int BackgroundPollInterval { get { return _pollint; } set { _pollint = value; if (_pollint == 0) Stop(); } }
-        public TickWatcher() : this(1000) { }
+        uint _pollint = 0;
+        public const int DEFAULTPOLLINT = 1000;
+        public int BackgroundPollInterval { get { return (int)_pollint; } set { _pollint = (uint)Math.Abs(value); if (_pollint == 0) Stop(); } }
+        public TickWatcher() : this(DEFAULTPOLLINT) { }
         /// <summary>
         /// creates a tickwatcher and polls specificed millseconds
         /// if timer has expired, sends alert.
@@ -169,7 +170,7 @@ namespace TradeLink.Common
         /// <param name="BackgroundPollIntervalms">Value in millseconds to wait between checks.  0 = disable background checks</param>
         public TickWatcher(int BackgroundPollIntervalms)
         {
-            _pollint = BackgroundPollIntervalms;
+            _pollint = (uint)Math.Abs(BackgroundPollIntervalms);
             if (_pollint != 0)
                 Start();
         }
