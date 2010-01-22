@@ -25,6 +25,10 @@ namespace TradeLink.Common
         public event StringDecimalDelegate GotClosePrice;
         public event StringDecimalDelegate GotHighPrice;
         public event StringDecimalDelegate GotLowPrice;
+        public event StringDecimalDelegate GotNyseHighPrice;
+        public event StringDecimalDelegate GotNyseLowPrice;
+        public event StringDecimalDelegate GotIntraHighPrice;
+        public event StringDecimalDelegate GotIntraLowPrice;
         public event MessageArrayDel GotFeatures;
         public event DebugDelegate SendDebug;
         public event MessageDelegate SendMessageResponse;
@@ -61,6 +65,30 @@ namespace TradeLink.Common
                             GotLowPrice(request, WMUtil.unpack(lv));
                         return true;
                     }
+                case MessageTypes.NYSEDAYHIGH:
+                    {
+                        if ((GotNyseHighPrice != null) && long.TryParse(response, out lv))
+                            GotNyseHighPrice(request, WMUtil.unpack(lv));
+                        return true;
+                    }
+                case MessageTypes.NYSEDAYLOW:
+                    {
+                        if ((GotNyseLowPrice != null) && long.TryParse(response, out lv))
+                            GotNyseLowPrice(request, WMUtil.unpack(lv));
+                        return true;
+                    }
+                case MessageTypes.INTRADAYHIGH:
+                    {
+                        if ((GotIntraHighPrice != null) && long.TryParse(response, out lv))
+                            GotIntraHighPrice(request, WMUtil.unpack(lv));
+                        return true;
+                    }
+                case MessageTypes.INTRADAYLOW:
+                    {
+                        if ((GotIntraLowPrice != null) && long.TryParse(response, out lv))
+                            GotIntraLowPrice(request, WMUtil.unpack(lv));
+                    }
+
                 case MessageTypes.BROKERNAME:
                     {
                         if (GotProvider != null)

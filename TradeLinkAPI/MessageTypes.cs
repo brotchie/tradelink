@@ -74,6 +74,8 @@ namespace TradeLink.API
         POSSIZEREQUEST,
         SENDORDEROCO,
         SENDORDEROSO,
+        INTRADAYHIGH,
+        INTRADAYLOW,
         // END CUSTOM MESSAGES
         // START TRADELINK MESSAGES
         // requests
