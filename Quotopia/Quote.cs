@@ -78,8 +78,11 @@ namespace Quotopia
 
         void _tlt_GotConnect()
         {
-            debug(tl.BrokerName + " "+tl.ServerVersion+" connected.");
-            status(tl.BrokerName + " connected.");
+            if (_tlt.tw.RecentTime != 0)
+            {
+                debug(tl.BrokerName + " " + tl.ServerVersion + " connected.");
+                status(tl.BrokerName + " connected.");
+            }
             _brokertimeout.Enabled = tl.BrokerName != Providers.TradeLink;
             try
             {
@@ -101,7 +104,11 @@ namespace Quotopia
 
         void _tlt_GotConnectFail()
         {
-            status("Broker disconnected");
+            if (_tlt.tw.RecentTime != 0)
+            {
+                debug("Broker disconnected");
+                status("Broker disconnected");
+            }
         }
 
         void togdebug(object sender, EventArgs e)
