@@ -26,6 +26,7 @@ namespace Quotopia
         public const string PROGRAM = "Quotopia";
         DebugWindow _dw = new DebugWindow();
         TLTracker _tlt;
+        BackgroundWorker bw = new BackgroundWorker();
 
         public Quote()
         {
@@ -66,9 +67,19 @@ namespace Quotopia
             FormClosing += new FormClosingEventHandler(Quote_FormClosing);
             Resize += new EventHandler(Quote_Resize);
             if (tl.ProvidersAvailable.Length > 0)
+            {
+                debug(tl.BrokerName + " " + tl.ServerVersion + " connected.");
+                status(tl.BrokerName + " connected.");
                 _tlt_GotConnect();
-            TradeLink.AppKit.Versions.UpgradeAlert(tl);
+            }
+            bw.DoWork += new DoWorkEventHandler(bw_DoWork);
+            bw.RunWorkerAsync();
 
+        }
+
+        void bw_DoWork(object sender, DoWorkEventArgs e)
+        {
+            TradeLink.AppKit.Versions.UpgradeAlert(tl);
         }
 
         void _tlt_GotDebug(string msg)
