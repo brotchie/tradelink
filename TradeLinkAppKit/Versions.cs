@@ -26,7 +26,7 @@ namespace TradeLink.AppKit
             urlloclab.Links.Add(0, 100, ProgramUrl);
             urlloclab.LinkClicked += new LinkLabelLinkClickedEventHandler(urlloclab_LinkClicked);
         }
-
+        public static void UpgradeAlert() { UpgradeAlert(null, null, true, false, null); }
         public static void UpgradeAlert(TLClient_WM tl) { UpgradeAlert(null, null, true, true, tl); }
         public static void UpgradeAlert(string Program, string ProgramUrl, TLClient_WM tl) { UpgradeAlert(Program, ProgramUrl, true, true, tl); }
         public static void UpgradeAlert(string Program, string ProgramUrl) {  UpgradeAlert(Program, ProgramUrl, true,false,null); }
