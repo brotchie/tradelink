@@ -723,9 +723,9 @@ namespace ASP
                 o.id = rorderid;
             }
             // send order notification to any valid responses
-            foreach (int id in _symidx[o.symbol])
-                if (!isBadResponse(id))
-                    _reslist[id].GotOrder(o);
+            for (int i = 0; i<_reslist.Count; i++)
+                if (!isBadResponse(i))
+                    _reslist[i].GotOrder(o);
         }
 
         void ASP_FormClosing(object sender, FormClosingEventArgs e)
