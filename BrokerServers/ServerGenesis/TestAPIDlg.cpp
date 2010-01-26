@@ -153,7 +153,7 @@ void CTestAPIDlg::OnCancel()
 
 void CTestAPIDlg::OnClose() 
 {
-
+	EndDialog(IDCANCEL);
 }
 
 void CTestAPIDlg::OnStart() 
