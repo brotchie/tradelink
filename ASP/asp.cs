@@ -137,7 +137,7 @@ namespace ASP
         void bw_DoWork(object sender, DoWorkEventArgs e)
         {
             // check for new versions
-            Versions.UpgradeAlert(tl);
+            Versions.UpgradeAlert(tl,true);
         }
 
 

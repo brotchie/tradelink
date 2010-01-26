@@ -79,7 +79,7 @@ namespace Quotopia
 
         void bw_DoWork(object sender, DoWorkEventArgs e)
         {
-            TradeLink.AppKit.Versions.UpgradeAlert(tl);
+            TradeLink.AppKit.Versions.UpgradeAlert(tl,true);
         }
 
         void _tlt_GotDebug(string msg)

@@ -27,7 +27,9 @@ namespace TradeLink.AppKit
             urlloclab.LinkClicked += new LinkLabelLinkClickedEventHandler(urlloclab_LinkClicked);
         }
         public static void UpgradeAlert() { UpgradeAlert(null, null, true, false, null); }
+        public static void UpgradeAlert(bool pause) { UpgradeAlert(null, null, true, false, null,pause); }
         public static void UpgradeAlert(TLClient_WM tl) { UpgradeAlert(null, null, true, true, tl); }
+        public static void UpgradeAlert(TLClient_WM tl,bool pause) { UpgradeAlert(null, null, true, true, tl,pause); }
         public static void UpgradeAlert(string Program, string ProgramUrl, TLClient_WM tl) { UpgradeAlert(Program, ProgramUrl, true, true, tl); }
         public static void UpgradeAlert(string Program, string ProgramUrl) {  UpgradeAlert(Program, ProgramUrl, true,false,null); }
         /// <summary>
@@ -39,7 +41,8 @@ namespace TradeLink.AppKit
         /// <param name="path"></param>
         /// <param name="checktradelink"></param>
         /// <param name="checkbrokerserver"></param>
-        public static void UpgradeAlert(string Program, string ProgramUrl, bool checktradelink, bool checkbrokerserver, TLClient_WM tl)
+        public static void UpgradeAlert(string Program, string ProgramUrl, bool checktradelink, bool checkbrokerserver, TLClient_WM tl) { UpgradeAlert(Program, ProgramUrl, checktradelink, checkbrokerserver, tl,false); }
+        public static void UpgradeAlert(string Program, string ProgramUrl, bool checktradelink, bool checkbrokerserver, TLClient_WM tl,bool pause)
         {
  
             if (Program != null)
@@ -53,7 +56,7 @@ namespace TradeLink.AppKit
                     current = Util.BuildFromFile(path + "\\VERSION.txt");
                 }
                 if (current != 0)
-                    wc.DownloadStringAsync(new Uri(ProgramUrl), new verstate(Program, ProgramUrl, current));
+                    wc.DownloadStringAsync(new Uri(ProgramUrl), new verstate(Program, ProgramUrl, current,pause));
             }
             if (checktradelink)
             {
@@ -62,7 +65,7 @@ namespace TradeLink.AppKit
 
                 int current = Util.BuildFromRegistry(Util.PROGRAM);
                 if (current!=0)
-                    wc.DownloadStringAsync(new Uri(TLSITEURL), new verstate(Util.PROGRAM,TLSITEURL, current));
+                    wc.DownloadStringAsync(new Uri(TLSITEURL), new verstate(Util.PROGRAM,TLSITEURL, current,pause));
             }
             if (checkbrokerserver)
             {
@@ -71,16 +74,17 @@ namespace TradeLink.AppKit
 
                 int current = ((tl == null) || (tl.ProvidersAvailable.Length==0)) ? 0 : tl.ServerVersion;
                 if (current!=0)
-                    wc.DownloadStringAsync(new Uri(TLSITEURL), new verstate(BROKERSERVER, TLSITEURL, current));
+                    wc.DownloadStringAsync(new Uri(TLSITEURL), new verstate(BROKERSERVER, TLSITEURL, current,pause));
             }
         }
         public const string VERSIONFILE = @"\VERSION.txt";
         internal struct verstate
         {
+            public bool pause;
             public string program;
             public int current;
             public string url;
-            public verstate(string Program, string URL, int currentversion) { url = URL; program = Program; current = currentversion; }
+            public verstate(string Program, string URL, int currentversion, bool pauseafter) { url = URL; program = Program; current = currentversion; pause = pauseafter; }
         }
 
         private static int latest(string res, string Program)
@@ -109,10 +113,13 @@ namespace TradeLink.AppKit
             if ((res != null) && (res != string.Empty))
             {
                 int ver = latest(res, vs.program);
-                if ((ver > vs.current) && (vs.current * ver != 0))
+                if ((ver > vs.current) && ((vs.current * ver) != 0))
                 {
                     Versions nv = new Versions(vs.program, vs.url);
-                    nv.Show();
+                    if (vs.pause)
+                        nv.ShowDialog();
+                    else
+                        nv.Show();
                 }
             }
         }
