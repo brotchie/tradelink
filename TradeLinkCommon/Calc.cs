@@ -76,8 +76,8 @@ namespace TradeLink.Common
         /// <returns></returns>
         public static decimal ClosePL(Position existing, Trade adjust)
         {
-            int closedsize = Math.Abs(adjust.xsize + existing.Size);
-            return ClosePT(existing, adjust) * (closedsize==0 ? Math.Abs(adjust.xsize) : closedsize);
+            int closedsize = Math.Abs(adjust.xsize) > existing.UnsignedSize ? existing.UnsignedSize : Math.Abs(adjust.xsize);
+            return ClosePT(existing, adjust) * closedsize;
         }
 
         /// <summary>

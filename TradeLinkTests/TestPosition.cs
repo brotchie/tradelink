@@ -159,5 +159,24 @@ namespace TestTradeLink
             Assert.IsFalse(except);
                 
         }
+
+        [Test]
+        public void ClosedPL()
+        {
+            const string sym = "RYN";
+            PositionTracker pt = new PositionTracker();
+            Position p = new PositionImpl(sym, 44.39m, 800, 0);
+            pt.Adjust(p);
+            System.IO.StreamReader sr = new System.IO.StreamReader("TestPositionClosedPL.txt");
+            string[] file = sr.ReadToEnd().Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            foreach (string line in file)
+            {
+                Trade t = TradeImpl.FromString(line);
+                pt.Adjust(t);
+            }
+            Assert.AreEqual(-66, pt[sym].ClosedPL);
+
+
+        }
     }
 }
