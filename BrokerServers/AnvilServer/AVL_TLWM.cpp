@@ -236,6 +236,31 @@
 			break;			// GetDayLow
 
 		///
+		/// GetIntraDayHigh
+		///
+		case INTRADAYHIGH:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				Money money ;
+				money = stock->GetIntradayHigh() ;
+				return MoneyToPacked(money) ;
+			}
+			break;		
+		///
+		/// GetIntraDayLow
+		///
+		case INTRADAYLOW:
+			{
+				const StockBase* stock = preload(msg) ;	// Returns from B_GetStockHandle
+				if ((stock == NULL)|| !stock->isLoaded()) return -1 ;
+				Money money ;
+				money = stock->GetIntradayLow() ;
+				return MoneyToPacked(money) ;
+			}
+			break;			
+
+		///
 		/// GetDayHigh
 		///
 		case DAYHIGH:
@@ -958,6 +983,34 @@
 		f.push_back(SENDORDERTRAIL);
 		f.push_back(DOMREQUEST);
 		f.push_back(LIVEDATA);
+		f.push_back(ISSHORTABLE);
+		f.push_back(IMBALANCEREQUEST);
+		f.push_back(VWAP);
+		f.push_back(LASTTRADESIZE);
+		f.push_back(LASTTRADEPRICE);
+		f.push_back(LASTBID);
+		f.push_back(LASTASK);
+		f.push_back(BIDSIZE);
+		f.push_back(ASKSIZE);
+		f.push_back(DAYLOW);
+		f.push_back(DAYHIGH);
+		f.push_back(OPENPRICE);
+		f.push_back(CLOSEPRICE);
+		f.push_back(LRPBUY);
+		f.push_back(LRPSELL);
+		f.push_back(AMEXLASTTRADE);
+		f.push_back(NASDAQLASTTRADE);
+		f.push_back(NYSEBID);
+		f.push_back(NYSEASK);
+		f.push_back(NYSEDAYHIGH);
+		f.push_back(NYSEDAYLOW);
+		f.push_back(NYSELASTTRADE);
+		f.push_back(NASDAQIMBALANCE);
+		f.push_back(NASDAQPREVIOUSIMBALANCE);
+		f.push_back(NYSEIMBALACE);
+		f.push_back(NYSEPREVIOUSIMBALANCE);
+		f.push_back(INTRADAYHIGH);
+		f.push_back(INTRADAYLOW);
 		bool sim = B_IsAccountSimulation();
 		if (sim)
 			f.push_back(SIMTRADING);

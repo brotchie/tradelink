@@ -84,13 +84,15 @@
         POSSIZEREQUEST,
         SENDORDEROCO,
         SENDORDEROSO,
+        INTRADAYHIGH,
+        INTRADAYLOW,
         // END CUSTOM MESSAGES
         // START TRADELINK MESSAGES
-		// requests
+        // requests
         SENDORDER = 5000,
         BROKERNAME,
         VERSION,
-		REGISTERCLIENT,
+        REGISTERCLIENT,
         REGISTERSTOCK,
         CLEARSTOCKS,
         CLEARCLIENT,
@@ -101,12 +103,12 @@
         FEATUREREQUEST,
         DOMREQUEST,
         IMBALANCEREQUEST,
-		SENDORDERMARKET,
+        SENDORDERMARKET,
         SENDORDERLIMIT,
         SENDORDERSTOP,
         SENDORDERTRAIL,
         SENDORDERMARKETONCLOSE,
-		// responses or acks
+        // responses or acks
         TICKNOTIFY,
         EXECUTENOTIFY,
         ORDERNOTIFY,
@@ -125,6 +127,8 @@
         LOOPBACKCLIENT,
         STARTHISTORICALRUN,
         ENDHISTORICALRUN,
+        SERVERUP,
+        SERVERDOWN,
         // END TRADELINK MESSAGES
 	};
 
