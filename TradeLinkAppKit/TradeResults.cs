@@ -439,8 +439,8 @@ namespace TradeLink.AppKit
         public decimal ComPerShare = 0.01m;
         public int ConsecWin = 0;
         public int ConsecLose = 0;
-        public string ConsecWinProb { get { return v2s(Math.Min(100, ((decimal)Math.Pow(1 / 2.0, ConsecWin) * (Trades - Flats - ConsecWin + 1)) * 100)) + @" %"; } }
-        public string ConsecLoseProb { get { return v2s(Math.Min(100, ((decimal)Math.Pow(1 / 2.0, ConsecLose) * (Trades - Flats - ConsecLose + 1)) * 100)) + @" %"; } }
+        public string WinSeqProbEffHyp { get { return v2s(Math.Min(100, ((decimal)Math.Pow(1 / 2.0, ConsecWin) * (Trades - Flats - ConsecWin + 1)) * 100)) + @" %"; } }
+        public string LoseSeqProbEffHyp { get { return v2s(Math.Min(100, ((decimal)Math.Pow(1 / 2.0, ConsecLose) * (Trades - Flats - ConsecLose + 1)) * 100)) + @" %"; } }
         public string Commissions { get { return v2s(HundredLots * 100 * ComPerShare); } }
         string v2s(decimal v) { return v.ToString("N2"); }
         public string WLRatio { get { return v2s((Losers == 0) ? 0 : (Winners / Losers)); } }
