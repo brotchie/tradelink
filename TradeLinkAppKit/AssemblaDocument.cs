@@ -118,7 +118,7 @@ namespace TradeLink.AppKit
                         doc.Size = Convert.ToInt32(m);
                     else if (dc.Name == "description")
                         doc.Desc = m;
-                    else if (dc.Name == "filename")
+                    else if (dc.Name == "name")
                         doc.Name = m;
                 }
                 if (doc.isValid)
@@ -277,5 +277,9 @@ namespace TradeLink.AppKit
         public string Id;
         public int Size;
         public string Name;
+        public override string ToString()
+        {
+            return !isValid ? "<empty>" : Name;
+        }
     }
 }
