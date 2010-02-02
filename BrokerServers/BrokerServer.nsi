@@ -18,7 +18,7 @@ OutFile "BrokerServer.exe"
 InstallDir $PROGRAMFILES\TradeLink\BrokerServer\
 
 ; anvil release
-!define ANVILDIRNAME "AnvilRelease_x32_2_7_7_2"
+!define ANVILDIRNAME "AnvilRelease_x32_2_8_2_0"
 
 
 ; Registry key to check for directory (so if you install again, it will 
