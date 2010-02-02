@@ -8,7 +8,7 @@
 #include "MessageIds.h"
 #include "ObserverApi.h"
 
-const char* const ReceiverHeaderVersion = "2.7.6.5";
+const char* const ReceiverHeaderVersion = "2.7.9.6";
 
 const unsigned int totallyVisibleSizeHundreds = 999;
 
@@ -123,7 +123,7 @@ public:
 class MsgMulticastPacket : public Message 
 {
 public:
-    MsgMulticastPacket():Message(M_RESP_RESEND_PACKET, sizeof(MsgMulticastPacket)){}
+    MsgMulticastPacket(unsigned int sequenceNumber):Message(M_RESP_RESEND_PACKET, sizeof(MsgMulticastPacket)), m_sequenceNumber(sequenceNumber){}
 	unsigned int m_sequenceNumber;
 };
 
@@ -1023,26 +1023,7 @@ public:
 	MsgMarketOpen() : Message(M_MARKET_OPEN, sizeof(MsgMarketOpen)){}
 } ;
 
-class MsgSoesSnetExecution : public Message
-{
-public:
-	MsgSoesSnetExecution() : Message(M_SOES_SNET_EXECUTION, sizeof(MsgSoesSnetExecution)), m_bDecimal(1){}
-
-	char x_BranchId[4];
-	unsigned short x_SequenceNumber;
-	char x_Side; // 'B' = Bot, 'S' = Sld, 'T' = Sld Shrt
-    char m_bDecimal;
-	unsigned int x_ExecutedShares;
-	char x_Symbol[ LENGTH_SYMBOL ];
-	int x_Price;
-	unsigned int x_RemainingQuantity;
-//	char x_OrderReference[5];
-	char x_OrderReference[8];//to prpperly align
-	char x_Contra[ LENGTH_SYMBOL ];
-};
-
-
-
+/*
 class MsgInvalidRequest : public Message  
 {
 public:
@@ -1054,7 +1035,7 @@ class MsgInvalidSymbol : public Message
 public:
 	MsgInvalidSymbol() : Message(M_ERR_INVALID_SYMBOL, sizeof(MsgInvalidSymbol)){}
 };
-
+*/
 class MsgItch100VisibleExecution : public SymbolMessage
 {
 public:
@@ -1077,13 +1058,13 @@ public:
     char m_reservedField[3];
 	int m_Price;
 };
-
+/*
 class MsgAggregatedBook : public Message
 {
 public:
     MsgAggregatedBook() : Message(M_AGGREGATED_BOOK, sizeof(MsgAggregatedBook)){}
 };
-
+*/
 
 class MsgFlushAll : public SymbolMessage
 {
@@ -1091,13 +1072,13 @@ public:
 	MsgFlushAll() : SymbolMessage(M_FLUSH_ALL, sizeof(MsgFlushAll)){}
 };
 
-
+/*
 class MsgFlushCrossedLocked : public Message
 {
 public:
 	MsgFlushCrossedLocked() : Message(M_FLUSH_CROSSED_LOCKED, sizeof(MsgFlushCrossedLocked)){}
 };
-
+*/
 
 class MsgFlushAllOpenBooks : public SymbolMessage
 {
@@ -1138,6 +1119,27 @@ public:
 	const BNasdaqStock* m_pNasdaqStock;
 };
 */
+class MsgKeepAliveFrequency : public Message
+{
+public:
+	MsgKeepAliveFrequency(unsigned int keepAliveFrequencyMilliseconds = 0, unsigned int keepAliveSlackMilliseconds = 0):
+		Message(M_KEEPALIVE_FREQUENCY, sizeof(MsgKeepAliveFrequency)),
+		m_keepAliveFrequencyMilliseconds(keepAliveFrequencyMilliseconds),
+		m_keepAliveSlackMilliseconds(keepAliveSlackMilliseconds)
+	{}
+	unsigned int m_keepAliveFrequencyMilliseconds;//0 - no KeepAlive message will be sent
+	unsigned int m_keepAliveSlackMilliseconds;//allowable delay; 0 - do not disconnect if the message does not arrive at all.
+};
+
+class MsgKeepAliveResponseWaitTime : public Message
+{
+public:
+	MsgKeepAliveResponseWaitTime(unsigned int keepAliveResponseWaitMilliseconds = 0):
+		Message(M_KEEPALIVE_RESPONSE_WAIT_TIME, sizeof(MsgKeepAliveResponseWaitTime)),
+		m_keepAliveResponseWaitMilliseconds(keepAliveResponseWaitMilliseconds)
+	{}
+	unsigned int m_keepAliveResponseWaitMilliseconds;//0 - no response expected
+};
 
 class MsgTimeStamp : public Message
 {
@@ -1165,19 +1167,6 @@ public:
 	MsgTransactionsKeepalive() : MsgTimeStamp(M_TRANSACTIONS_KEEPALIVE , sizeof(MsgTransactionsKeepalive)){}
 };
 
-class MsgRemoteServer : public Message
-{
-public:
-    MsgRemoteServer(unsigned char aProductNumber, unsigned long aIp):
-		Message( M_REMOTE_SERVER , sizeof(MsgRemoteServer)),
-		x_ProductNumber(aProductNumber),
-		x_IpAddress(aIp){}
-	
-	unsigned char x_ProductNumber;
-	unsigned long x_IpAddress;
-};
-
-
 class MsgSyncTime : public Message
 {
 public :
@@ -1200,6 +1189,36 @@ public:
 	MsgResetSequenceNumbers() : Message(M_RESET_SEQUENCE_NUMBERS, sizeof(MsgResetSequenceNumbers)){}
 };
 
+/*
+class MsgSoesSnetExecution : public Message
+{
+public:
+	MsgSoesSnetExecution() : Message(M_SOES_SNET_EXECUTION, sizeof(MsgSoesSnetExecution)), m_bDecimal(1){}
+
+	char x_BranchId[4];
+	unsigned short x_SequenceNumber;
+	char x_Side; // 'B' = Bot, 'S' = Sld, 'T' = Sld Shrt
+    char m_bDecimal;
+	unsigned int x_ExecutedShares;
+	char x_Symbol[ LENGTH_SYMBOL ];
+	int x_Price;
+	unsigned int x_RemainingQuantity;
+//	char x_OrderReference[5];
+	char x_OrderReference[8];//to prpperly align
+	char x_Contra[ LENGTH_SYMBOL ];
+};
+
+class MsgRemoteServer : public Message
+{
+public:
+    MsgRemoteServer(unsigned char aProductNumber, unsigned long aIp):
+		Message( M_REMOTE_SERVER , sizeof(MsgRemoteServer)),
+		x_ProductNumber(aProductNumber),
+		x_IpAddress(aIp){}
+	
+	unsigned char x_ProductNumber;
+	unsigned long x_IpAddress;
+};
 
 class MsgFlushAllIsland : public Message
 {
@@ -1217,7 +1236,7 @@ public:
 	char x_Symbol[LENGTH_SYMBOL];
 	char x_Party[LENGTH_SYMBOL];
 };
-
+*/
 
 class MsgFlushVolume : public SymbolMessage
 {
@@ -1708,6 +1727,20 @@ public:
 	MsgRefreshUnderlierFailed(unsigned __int64 symbol = 0, unsigned int flags = 0) : SymbolAsUIntMessage(M_RESP_REFRESH_UNDERLIER_FAILED, sizeof(MsgRefreshUnderlierFailed), symbol, flags){}
 };
 
+class MsgNewOption : public SymbolAsUIntMessage
+{
+public:
+	MsgNewOption(unsigned __int64 symbol = 0, unsigned int flags = 0, unsigned __int64 underlier = 0, unsigned char expirationDay = 0):
+		SymbolAsUIntMessage(M_NEW_OPTION, sizeof(MsgNewOption), symbol, flags),
+		m_underlier(underlier),
+		m_expirationDay(expirationDay)
+	{}
+	unsigned __int64 m_underlier;
+	unsigned char m_expirationDay;
+};
+
+
+
 //////
 
 class MsgRefreshSymbolFailed : public SymbolMessage
@@ -1737,7 +1770,7 @@ public:
 class MsgHeartbeat : public Message
 {
 public:
-	MsgHeartbeat() : Message(M_RESP_HEARTBEAT){}
+	MsgHeartbeat() : Message(M_RESP_HEARTBEAT, sizeof(MsgHeartbeat)){}
 };
 
 // Client calculates data and sends as message to transengine
@@ -2017,6 +2050,18 @@ public:
 	 // struct MM_QUOTE	x_MMQuotes[ 1 ];
 };
 
+class MsgPreMarketIndicators : public SymbolMessage
+{
+public:
+	MsgPreMarketIndicators(const char* symbol, unsigned int bid, unsigned int ask):
+		SymbolMessage(M_NW2_PREMARKET_INDICATOR, sizeof(MsgPreMarketIndicators), symbol),
+		m_bid(bid),
+		m_ask(ask)
+	{}
+	unsigned int m_bid;
+	unsigned int m_ask;
+};
+
 class MsgInsideQuote : public Message
 {
 public:
@@ -2239,7 +2284,7 @@ public:
 	unsigned __int64			x_SessionVolume;
 	char			m_PrimaryExchange;
 };
-
+/*
 class MsgSoesInfo : public Message
 {
 public:
@@ -2263,7 +2308,7 @@ public:
 
 	char x_Symbol[ LENGTH_SYMBOL ];//BSymbol
 };
-
+*/
 class MsgIndexDetails : public SymbolMessage
 {
 public:
@@ -2343,7 +2388,7 @@ public:
 	int m_price;
 //	unsigned int m_flags;
 protected:
-    MsgLRP(unsigned short type, unsigned short size):SymbolMessage(type, sizeof(size)){}
+    MsgLRP(unsigned short type, unsigned short size):SymbolMessage(type, size){}
 };
 
 class MsgLRPBid : public MsgLRP
@@ -3531,6 +3576,34 @@ class MsgLegacyVersion : public MsgMsUpgradeVersion
 public:
 	MsgLegacyVersion(unsigned int version, unsigned int legacyVersion):MsgMsUpgradeVersion(version, MS_LEGACY_VERSION, sizeof(MsgLegacyVersion)), m_legacyVersion(legacyVersion){}
 	unsigned int m_legacyVersion;
+};
+
+class ReqEncryptionLogin : public Message
+{
+public:
+	ReqEncryptionLogin(char* pRequestBuffer, int requestBufferSize):
+		Message(M_PUBLIC_KEY_OF_ENCRYPTION, (MsgLength)(sizeof(Message) + requestBufferSize))
+	{
+		ASSERT(requestBufferSize <= MAX_EXCHANGE_SIZE);
+		if (pRequestBuffer != m_encrLoginData)
+		{
+			memset(m_encrLoginData, 0, MAX_EXCHANGE_SIZE);
+			memmove(m_encrLoginData, pRequestBuffer, requestBufferSize);
+		}
+	}
+
+	enum{ MAX_EXCHANGE_SIZE = 300 };
+
+	char		m_encrLoginData[MAX_EXCHANGE_SIZE];
+};
+
+class MsgEncrypted : public Message
+{
+public:
+    MsgEncrypted(unsigned int unencryptedSizeOfContent = 0):
+        Message(M_ENCRYPTED_MESSAGE, sizeof(MsgEncrypted)),
+        m_unencryptedSizeOfContent(unencryptedSizeOfContent){}
+    unsigned int  m_unencryptedSizeOfContent;
 };
 
 #endif

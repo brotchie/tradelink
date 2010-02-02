@@ -17,7 +17,7 @@
 #define BUSINESS_API __declspec(dllimport)
 #endif
 
-const char* const BusinessHeaderVersion = "2.7.6.5";
+const char* const BusinessHeaderVersion = "2.7.8.12";
 
 #include "ObserverApi.h"
 #include "CommonIds.h"
@@ -50,6 +50,10 @@ const int MONEY_FRACTION = (int)B_DECMULTIPLIER;
 const unsigned int MONEY_DEC_DIGITS = 3;
 
 class MoneyPrecise;
+
+class MultiEcnExpandedBook;
+class MultiEcnAggregatedBook;
+class MultiEcnAggregatedBookTop;
 
 class BUSINESS_API Money
 {
@@ -663,6 +667,14 @@ enum SendOrderError
 	SO_MAX_LOSS_PER_POSITION_OPTIONS_EXCEEDED,
     SO_MAX_OPEN_LOSS_PER_POSITION_OPTIONS_EXCEEDED,
 
+	SO_LEAPS_CONTRACTS_BLOCKED,
+
+    SO_MAX_NET_MARKED_PNL_EXCEEDED,
+
+	SO_MARKET_NOT_OPEN,
+
+	SO_MAX_TRADED_SHARES_OPTIONS_EXCEEDED
+
 };
 
 class BUSINESS_API TradePack : public MoneySize
@@ -1257,6 +1269,9 @@ public:
 	void SetOptionOrderTraderStatus(OptionOrderStatus ooStatus, OptionTraderStatus otStatus){m_optionOrderTraderStatus = (unsigned char)((otStatus << 4) | ooStatus);}
 	int GetPositionSize() const{return m_positionSize;}
 	unsigned __int64 GetCmta() const{return m_cmta;}
+
+	virtual const Money& GetLowerBracketPriceOffset() const;
+	virtual const Money& GetUpperBracketPriceOffset() const;
 protected:
     Order(const char* symbol, char stockExchange,
 		const OptionData* optionData,
@@ -1459,7 +1474,7 @@ public:
 	virtual unsigned short GetExpirationYear() const{return 0;}
 	virtual unsigned char GetExpirationMonth() const{return 0;}
 	virtual unsigned char GetExpirationDay() const{return 0;}
-	int GetDaysToExpiration() const{return 0;}
+	virtual int GetDaysToExpiration() const{return 0;}
 	virtual const char* GetUnderlierSymbol() const{return NULL;}
 	virtual const Underlier* GetUnderlier() const{return NULL;}//Can return NULL if the Option does not belong to any Underlier yet.
 	virtual SecurityType GetSecurityType() const{return ST_STOCK;}
@@ -1607,6 +1622,10 @@ public:
     const Money& GetCloseAsk() const{return m_closeAsk;}
 	const Money& GetCloseQuote(bool side) const{return side ? m_closeBid : m_closeAsk;}
 
+	const Money& GetCloseBidPx() const{return m_closeBidPx;}
+    const Money& GetCloseAskPx() const{return m_closeAskPx;}
+	const Money& GetCloseQuotePx(bool side) const{return side ? m_closeBidPx : m_closeAskPx;}
+
 	virtual unsigned int GetHistoryPrintCount() const{return 0;}
 	virtual unsigned int GetPrintPointCount() const{return 0;}
 	virtual unsigned int GetFirstPrintSecond() const{return 0;}
@@ -1661,6 +1680,10 @@ public:
     virtual unsigned int GetPreMarketIndicatorTime() const = 0;
     virtual unsigned int GetPreMarketIndicatorOrdinal() const = 0;
     const Money& GetExchangeOpenPrice() const{return m_exchangeOpenPrice;}
+	virtual const MultiEcnExpandedBook* GetMultiMmExpandedBook() const{return NULL;}
+	virtual const MultiEcnExpandedBook* GetMultiMmExpandedBookFiltered() const{return NULL;}
+	virtual const MultiEcnAggregatedBook* GetMultiMmAggregatedBook() const{return NULL;}
+	virtual const MultiEcnAggregatedBookTop* GetMultiMmAggregatedBookTop() const{return NULL;}
 protected:
     StockBase(const char* symbol);
     void UpdateVwap();
@@ -1702,6 +1725,12 @@ protected:
 
 	Money m_closeBid;
 	Money m_closeAsk;
+
+	Money m_closeBidPx;
+	Money m_closeAskPx;
+
+	Money m_BidPx;
+	Money m_AskPx;
 
     mutable bool m_tradable;
     bool m_foreignNotTradable;
@@ -1852,6 +1881,7 @@ enum ClosePositionMethod
     CPM_SWIPE,
     CPM_SMART_SWIPE,
     CPM_ON_CLOSE,
+	CPM_ON_OPEN,
 };
 
 class BUSINESS_API Position : public Observable
@@ -1930,6 +1960,7 @@ public:
 	bool isOrderValidInStagingContext(const Money& orderPrice, unsigned int size, char side) const;
 
 	virtual unsigned int GetTotalPendingSize(bool buy) const = 0;
+	virtual unsigned int GetTotalPendingSizeLessMoc(bool buy) const = 0;
     virtual unsigned int GetPendingOrderCount(bool buy) const = 0;
     virtual unsigned int GetTotalSellSize() const = 0;
     virtual unsigned int GetSellOrderCount() const = 0;
@@ -4818,7 +4849,8 @@ Observable* WINAPI B_SendPeggedOrder(const StockBase* stockHandle,
 	bool institutionalDisclaimerVisible = false,
 	OptionOrderStatus ooStatus = OOS_DEFAULT,
 	OptionTraderStatus otStatus = OTS_DEFAULT,
-	const StagingOrder* stagingOrder = NULL);
+	const StagingOrder* stagingOrder = NULL,
+	bool multiplePegged = false);
 
 Observable* WINAPI B_SendSmartBracketOrder(const StockBase* stockHandle,
     char side,
@@ -4845,8 +4877,9 @@ Observable* WINAPI B_SendSmartBracketOrder(const StockBase* stockHandle,
     unsigned int block,
     const Money* from,
 	unsigned __int64 cmta,
-	Money& LowerBracketLimitPrice,
-	Money& UpperBracketLimitPrice,
+	Money& LowerBracketLimitPriceOffset,
+	Money& UpperBracketLimitPriceOffset,
+	unsigned int TimeInForceSecondary,
 	const char* destination,
 	unsigned int orderIdToReplace,
 	const Money* discretionPrice,
@@ -5175,6 +5208,9 @@ bool WINAPI B_IsExecutionExchangeRegionalOrNas(unsigned int index);
 bool WINAPI B_IsMmidRegional(const char* mmid);
 bool WINAPI B_IsMmidRegionalOrNas(const char* mmid);
 bool WINAPI B_IsMmidCaes(const char* mmid);
+
+void WINAPI B_SetUseLevel2ForPrintsGraphics(bool bUse);
+bool WINAPI B_IsUseLevel2ForPrintsGraphics();
 //bool WINAPI B_IsMmidCaesOrSize(const char* mmid);
 
 //void WINAPI B_SendInitialRequests();
@@ -5526,6 +5562,14 @@ bool WINAPI B_IsMaxPositionPendingOrdersUserCapSet(const Observable* account = N
 unsigned int WINAPI B_SetMaxPositionPendingOrdersUserCap(unsigned int value, const Observable* account = NULL);
 unsigned int WINAPI B_RemoveMaxPositionPendingOrdersUserCap(const Observable* account = NULL);
 
+const Money& WINAPI B_GetAccountMaxNetMpnl(const Observable* account = NULL);
+const Money& WINAPI B_GetAccountMaxNetMpnlCap(const Observable* account = NULL);
+const Money& WINAPI B_GetAccountMaxNetMpnlUserCap(const Observable* account = NULL);
+bool WINAPI B_IsAccountMaxNetMpnlUserCapSet(const Observable* account = NULL);
+const Money& WINAPI B_SetAccountMaxNetMpnlUserCap(const Money& money, const Observable* account = NULL);
+const Money& WINAPI B_RemoveAccountMaxNetMpnlUserCap(const Observable* account = NULL);
+bool WINAPI B_IsAccountMaxNetMpnlConstrained(const Observable* account = NULL);
+
 enum AccountConstraints
 {
     AC_BUYING_POWER = 0,
@@ -5556,6 +5600,11 @@ enum AccountConstraints
     AC_MAX_TOTAL_SHARES_OPTIONS,
     AC_MAX_LOSS_PER_POSITION_OPTIONS,
     AC_MAX_OPEN_LOSS_PER_POSITION_OPTIONS,
+
+    AC_MAX_NET_MPNL,
+	
+	AC_MAX_TRADED_SHARES_OPTIONS,
+
 };
 
 unsigned int WINAPI B_SetAccountConstraints(const Money* buyingPowerUserCap,
@@ -5575,6 +5624,7 @@ unsigned int WINAPI B_SetAccountConstraints(const Money* buyingPowerUserCap,
     const Money* warnMaxMarkedNetLossUserCap,
     const Money* warnMaxOpenLossUserCap,
     bool institutional,
+    const Money* maxNetMpnlUserCap,
     Observable* account = NULL);
 
 
@@ -6250,6 +6300,7 @@ unsigned int WINAPI B_SetAccountConstraintsOptions(
     const Money* maxLossPerPositionUserCap,
     const Money* maxOpenLossPerPositionUserCap,
     bool institutional,
+	unsigned int* maxTradedSharesUserCap,
     Observable* account = NULL);
 
 const Money& WINAPI B_GetAccountMaxLossPerPositionOptions(const Observable* account);
@@ -6299,6 +6350,23 @@ unsigned int WINAPI B_RemoveMaxTotalSharesUserCapOptions(const Observable* accou
 const Money& WINAPI B_GetAccountMaxOpenPositionValueOptions(const Observable* account = NULL);
 unsigned int WINAPI B_GetMaxOpenPositionSizeOptions(const Observable* account = NULL);
 unsigned int WINAPI B_GetMaxOrderSizeOptions(const Observable* account = NULL);
+
+void WINAPI B_SetAccountInventoryView(bool inventoryView, const Observable* account = NULL);bool WINAPI B_GetAccountInventoryView(const Observable* account = NULL);void WINAPI B_ShowInventoryPnL(bool show);
+bool WINAPI B_IsInventoryPnLVisible();
+
+unsigned int WINAPI B_GetMaxStockCount();
+unsigned int WINAPI B_GetOverflowSubscriptionAttempts();
+
+const Money& WINAPI B_GetMaxOpenLossPerPositionOptions(const Observable* account);
+unsigned int WINAPI B_GetMaxOpenContractsCapOptions(const Observable* account);
+
+
+unsigned int WINAPI B_GetMaxTradedSharesOptions(const Observable* account = NULL);
+unsigned int WINAPI B_GetMaxTradedSharesCapOptions(const Observable* account = NULL);
+unsigned int WINAPI B_GetMaxTradedSharesUserCapOptions(const Observable* account = NULL);
+bool WINAPI B_IsMaxTradedSharesUserCapSetOptions(const Observable* account = NULL);
+unsigned int WINAPI B_SetMaxTradedSharesUserCapOptions(unsigned int value, const Observable* account = NULL);
+unsigned int WINAPI B_RemoveMaxTradedSharesUserCapOptions(const Observable* account = NULL);
 
 #ifdef __cplusplus
 } //extern "C"

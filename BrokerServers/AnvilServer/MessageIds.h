@@ -5,6 +5,8 @@
 
 enum MessageIds
 {
+	M_ENCRYPTED_MESSAGE =										27,
+
     M_TEXT_ASCII =                                              500,
 	// message from the Crossed Locked list to the observers
 	// whenever there is a change in the lists.
@@ -12,51 +14,51 @@ enum MessageIds
 
 	// An invalid request ID was sent - something that is not supported by an object.
 	// This indicates a programmatic error.
-    M_INVALID_REQUEST,
+//    M_INVALID_REQUEST,
 
 	// Changes to the Island OpenBook.
-    M_ISLAND_UPDATE,
+//    M_ISLAND_UPDATE,
 
 	// When an invalid symbol is entered into the stock cache.
-    M_ERR_INVALID_SYMBOL,
+//    M_ERR_INVALID_SYMBOL,
 	
 	// When a refresh message should be sent to all the clients.
-    M_REFRESH_STOCK,
+//    M_REFRESH_STOCK,
 
 	// Changes to Level 1 Quote.
-    M_LEVEL1_QUOTE,
+//    M_LEVEL1_QUOTE,
 
 	// Changes to the Nasdaq Stock - Soes changes.
-    M_NASDAQ_STOCK =                                            2008,
+//    M_NASDAQ_STOCK =                                            2008,
 
 	// Changes to the Aggregated Book <see AggregatedBook.h>
-    M_AGGREGATED_BOOK =                                         2010,
+//    M_AGGREGATED_BOOK =                                         2010,
 
 	// Ticker
-    M_TICKER,
+//    M_TICKER,
 
 	// A Generic Flush All Message for 
 	// objects in our Stock Cache.
-    M_FLUSH_ALL,
+    M_FLUSH_ALL =												2012,
 	// Message to flush the Crossed Locked History entries.
-    M_FLUSH_CROSSED_LOCKED,
+//    M_FLUSH_CROSSED_LOCKED,
 
-    M_FLUSH_ALL_OPEN_BOOKS,
+    M_FLUSH_ALL_OPEN_BOOKS =									2014,
 
 	// FYI message ( primary for SELECTNET FYIs )
-    M_FYI,
+//    M_FYI,
 
 	// heart beat message sent out by the server to all the
 	// connected clients.
-    M_HEARTBEAT,
+    M_HEARTBEAT =												2016,
 
 	// A remote server sends this message to identify itself
 	// so that the core market server can forward all messages
 	// to it.
-    M_REMOTE_SERVER,
+//    M_REMOTE_SERVER,
 
 	//message sent to sync time
-    M_SYNC_TIME,
+    M_SYNC_TIME =												2018,
 
     M_FLUSH_BOOK_FOR_STOCK,
 
@@ -66,13 +68,14 @@ enum MessageIds
 	// message sent out when a new Symbol gets added dynamically
 	// to stock cache.
     M_NEW_SYMBOL,
-
+    M_NEW_OPTION,
+/*
     M_FLUSH_ALL_ISLAND =                                        2023,
     M_UPDATE_ISLAND_PARTY,
-
+*/
 	// A Generic Flush All Message for 
 	// objects in our Stock Cache.
-    M_FLUSH_VOLUME,
+    M_FLUSH_VOLUME =											2025,
 
     M_KEEPALIVE =                                               2027,
     M_TRANSACTIONS_KEEPALIVE =                                  2028,
@@ -118,23 +121,23 @@ enum MessageIds
 	M_ITCH_1_00_HiddenAttributedOrderExecution,
 	M_ITCH_1_00_BrokenAttributedTrade,
 
-    M_NW2_DATABASE_INIT =                       4001,
-    M_NW2_SELECTNET403,
-    M_NW2_SELECTNET402,
-    M_NW2_MM_QUOTE,
+//    M_NW2_DATABASE_INIT =                       4001,
+//    M_NW2_SELECTNET403,
+//    M_NW2_SELECTNET402,
+    M_NW2_MM_QUOTE =							4004,
     M_NW2_INSIDE_QUOTE,
     M_NW2_LAST_TRADE,
-    M_NW2_SOES_INFO,
+//    M_NW2_SOES_INFO,
 // Request to NW2 to refresh Symbols
 //    M_NW2_REFRESH_SYMBOLS,
 // SelectNet Order messages.
-    M_SELECTNET_ORDER_ENTRY =					4009,
-    M_SELECTNET_ORDER_CANCEL,
-    M_SELECTNET_ENTRY_RESPONSE,
-    M_SELECTNET_CANCEL_RESPONSE,
-    M_SELECTNET_CANCEL_SQL,
+//    M_SELECTNET_ORDER_ENTRY =					4009,
+//    M_SELECTNET_ORDER_CANCEL,
+//    M_SELECTNET_ENTRY_RESPONSE,
+//    M_SELECTNET_CANCEL_RESPONSE,
+//    M_SELECTNET_CANCEL_SQL,
 //TAL Specific messages
-    M_TAL_LAST_TRADE,
+    M_TAL_LAST_TRADE =							4014,
     M_NW2_INDEX_DETAILS,
     M_SELECTNET_ORDER_WAS_NOT_SENT,
     M_SELECTNET_ORDER_UPDATE,
@@ -162,6 +165,8 @@ enum MessageIds
     M_LRP_BID										= 4046,
     M_LRP_ASK										= 4047,
     M_LRP_BIDASK									= 4048,
+
+	M_NW2_PREMARKET_INDICATOR						= 4060,
 // Market Session Open & Close message 
 // from NQDS.
 
@@ -171,17 +176,19 @@ enum MessageIds
     M_MARKET_CLOSE                              = 5001,
     M_MARKET_OPEN,
     M_NQDS_SEQUENCE,
-
+/*
     M_SOES_ENTRY		     = 6501,
     M_SOES_CANCEL,
     M_SOES_EXECUTION,
     M_SOES_CANCEL_RESPONSE,
     M_SOES_SNET_EXECUTION,
     M_SOES_ENTRY_REJECT,
-
+*/
 	M_FEED_ID_ADD								= 7201,
 	M_FEED_ID_REMOVE							= 7202,
 
+    M_KEEPALIVE_FREQUENCY						= 7203,
+    M_KEEPALIVE_RESPONSE_WAIT_TIME				= 7204,
 /*
 
     M_SOES_SYSTEM_CHECK	     = 6510;
@@ -210,18 +217,20 @@ enum MessageIds
 
     M_REQ_LOGON	=                               10001,
     M_RESP_LOGON,
-    M_REQ_LAYOUT_LOAD,
-    M_RESP_LAYOUT_LOAD,
-    M_REQ_LAYOUT_SAVE,
-    M_RESP_LAYOUT_SAVE,
-    M_CLIENT_LOGON_AUTHENTICATED, // message is defined in the BClientHandler.h
-    M_REQ_RECONNECT,
+//    M_REQ_LAYOUT_LOAD,
+//    M_RESP_LAYOUT_LOAD,
+//    M_REQ_LAYOUT_SAVE,
+//    M_RESP_LAYOUT_SAVE,
+//    M_CLIENT_LOGON_AUTHENTICATED, // message is defined in the BClientHandler.h
+    M_REQ_RECONNECT =							10008,
     M_REQ_LOGON_EX,
     M_RESP_LOGON_EX,
-    M_CLIENT_LOGON_AUTHENTICATED_EX, // message is defined in the BClientHandler.h
+//    M_CLIENT_LOGON_AUTHENTICATED_EX, // message is defined in the BClientHandler.h
 
     M_REQ_LOGON_EX_1 =                          10016,
     M_RESP_LOGON_EX_1 =                         10017,
+
+    M_PUBLIC_KEY_OF_ENCRYPTION =				10022,
 
 //Orders
     M_POOL_ORDER_ADDED =                        11001,
