@@ -1,0 +1,24 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="IQFeedBroker.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="UserID" Type="System.String" Scope="User">
+      <Value Profile="(Default)">myUserID</Value>
+    </Setting>
+    <Setting Name="Password" Type="System.String" Scope="User">
+      <Value Profile="(Default)">myPassword</Value>
+    </Setting>
+    <Setting Name="PROGRAM_NAME" Type="System.String" Scope="User">
+      <Value Profile="(Default)">IQFEED_DEMO</Value>
+    </Setting>
+    <Setting Name="ADMINISTRATION_SOCKET_NAME" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Admin</Value>
+    </Setting>
+    <Setting Name="LEVEL_ONE_SOCKET_NAME" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Level1</Value>
+    </Setting>
+    <Setting Name="IP_LOCAL_HOST" Type="System.String" Scope="User">
+      <Value Profile="(Default)">127.0.0.1</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
