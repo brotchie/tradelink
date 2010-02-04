@@ -139,6 +139,11 @@ namespace TradeLink.Common
             {
                 // get parameters
                 refp = _ref[idx];
+                // in case tracker started after trail stop should have been broken.
+                if (refp == 0 && _pt[k.symbol].isValid)
+                {
+                    refp = _pt[k.symbol].AvgPrice;
+                }
                 // just in case user tries to modify on seperate thread
                 lock (_trail)
                 {
