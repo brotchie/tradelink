@@ -82,5 +82,56 @@ namespace TestTradeLink
             oc++;
             trail = o;
         }
+
+        [Test]
+        public void Basics2()
+        {
+            // setup trail tracker
+            TrailTracker tt = new TrailTracker();
+            tt.isValid = true;
+            tt.SendOrder += new OrderDelegate(tt_SendOrder);
+            // set 15c trailing stop
+            tt.DefaultTrail = new OffsetInfo(0, .15m);
+            // verify it's set
+            Assert.AreEqual(.15m, tt.DefaultTrail.StopDist);
+            // 
+            tt.TrailByDefault = true;
+            // put in a position to track
+            tt.Adjust(new PositionImpl(SYM, 11.00m, 100, 0m));
+            // check position in tt-pt
+            Assert.AreEqual(1, tt.pt.Count);
+            // manually enter a trail
+            tt[SYM] = new OffsetInfo(0m, .25m);
+            // check if trail entered for symbol
+            Assert.AreEqual(.25m, tt[SYM].StopDist);
+
+
+            // get feed
+            Tick[] tape = SampleData();
+            // test broker
+            Broker b = new Broker();
+            // get fills over to trail tracker
+            b.GotFill += new FillDelegate(tt.Adjust);
+            // get orders from trail tracker
+            tt.SendOrder += new OrderDelegate(b.SendOrder);
+            // no orders to start
+            oc = 0;
+            // iterate through feed
+            for (int i = 0; i < tape.Length; i++)
+            {
+                Tick k = tape[i];
+                // set a date and time
+                k.date = 20070926;
+                k.time = 95500;
+                // execute orders, nothing to do on first two ticks
+                b.Execute(k);
+                // pass every tick to tracker
+                tt.GotTick(k);
+
+            }
+
+            Assert.AreEqual(1, oc);
+        }
+        
     }
 }
