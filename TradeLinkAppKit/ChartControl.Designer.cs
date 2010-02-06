@@ -41,6 +41,7 @@ namespace TradeLink.AppKit
             this.chartContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this._custom = new System.Windows.Forms.ToolStripMenuItem();
             this._point = new System.Windows.Forms.ToolStripMenuItem();
+            this.invertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.chartContextMenu.SuspendLayout();
             this.SuspendLayout();
@@ -113,11 +114,12 @@ namespace TradeLink.AppKit
             this.offToolStripMenuItem,
             this._custom,
             this._point,
-            this.clearAllToolStripMenuItem});
+            this.clearAllToolStripMenuItem,
+            this.invertToolStripMenuItem});
             this.chartContextMenu.Name = "chartContextMenu";
             this.chartContextMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             this.chartContextMenu.ShowImageMargin = false;
-            this.chartContextMenu.Size = new System.Drawing.Size(128, 296);
+            this.chartContextMenu.Size = new System.Drawing.Size(128, 326);
             // 
             // _custom
             // 
@@ -134,6 +136,13 @@ namespace TradeLink.AppKit
             this._point.Text = "Point";
             this._point.ToolTipText = "Add point for custom line.";
             this._point.Click += new System.EventHandler(this._point_Click);
+            // 
+            // invertToolStripMenuItem
+            // 
+            this.invertToolStripMenuItem.Name = "invertToolStripMenuItem";
+            this.invertToolStripMenuItem.Size = new System.Drawing.Size(127, 30);
+            this.invertToolStripMenuItem.Text = "Invert";
+            this.invertToolStripMenuItem.Click += new System.EventHandler(this.invertToolStripMenuItem_Click);
             // 
             // ChartControl
             // 
@@ -165,5 +174,6 @@ namespace TradeLink.AppKit
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.ToolStripMenuItem _custom;
         private System.Windows.Forms.ToolStripMenuItem _point;
+        private System.Windows.Forms.ToolStripMenuItem invertToolStripMenuItem;
     }
 }

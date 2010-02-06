@@ -87,7 +87,7 @@ namespace TradeLink.AppKit
         }
 
         /// <summary>
-        /// force a manual refresh of the grid
+        /// force a manual refresh of the chart
         /// </summary>
         public void refresh()
         {
@@ -126,7 +126,19 @@ namespace TradeLink.AppKit
         decimal pixperbar = 0;
         decimal  pixperdollar = 0;
 
-
+        public void InvertColors()
+        {
+            if (InvokeRequired)
+                Invoke(new VoidDelegate(InvertColors));
+            else
+            {
+                if (BackColor == Color.Black)
+                    BackColor = Color.White;
+                else
+                    BackColor = Color.Black;
+                refresh();
+            }
+        }
 
         
         public ChartControl() : this(null,false) { }
@@ -164,7 +176,7 @@ namespace TradeLink.AppKit
                     size = g.MeasureString(highesth.ToString(), f.Font).Width + g.MeasureString("255000 ", f.Font).Width;
                     string time = _curbar == 0 ? string.Empty : bl[_curbar].Bartime.ToString();
                     string price = _curprice == 0 ? string.Empty : _curprice.ToString("F2");
-                    g.DrawString(time + " " + price, f.Font, new SolidBrush(Color.Black), r.Width - size, r.Height - f.Font.Height);
+                    g.DrawString(time + " " + price, f.Font, new SolidBrush(fgcol), r.Width - size, r.Height - f.Font.Height);
 
                 }
             }
@@ -233,6 +245,8 @@ namespace TradeLink.AppKit
             return p;
         }
 
+        Color fgcol { get { return (BackColor == Color.Black) ? Color.White : Color.Black; } }
+
         /// <summary>
         /// Gets the title of this chart.
         /// </summary>
@@ -256,7 +270,8 @@ namespace TradeLink.AppKit
             }
             border = (int)(g.MeasureString(bl.High()[0].ToString(), f.Font).Width);
             // setup to draw
-            Pen p = new Pen(Color.Black);
+
+            Pen p = new Pen(fgcol);
             g.Clear(f.BackColor);
             // get number of pixels available for each bar, based on screensize and barcount
             pixperbar = (((decimal)r.Width - (decimal)border - ((decimal)border/3)) / (decimal)barc);
@@ -274,8 +289,6 @@ namespace TradeLink.AppKit
             // get pixels available for each dollar of movement
             pixperdollar = range == 0 ? 0 : (((decimal)r.Height - (decimal)hborder * 2) / range);
 
-
-            Color fgcol = (f.BackColor == Color.Black) ? Color.White : Color.Black;
 
             // x-axis
             g.DrawLine(new Pen(fgcol),(int)(border/3), r.Height-hborder, r.Width - border, r.Height - hborder);
@@ -553,6 +566,11 @@ namespace TradeLink.AppKit
         private void _point_Click(object sender, EventArgs e)
         {
             mlabel = string.Empty;
+        }
+
+        private void invertToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            InvertColors();
         }
     }
     public class TextLabel
