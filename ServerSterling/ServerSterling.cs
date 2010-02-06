@@ -179,7 +179,16 @@ namespace SterServer
                         order.LmtPrice = (double)o.price;
                         order.StpPrice = (double)o.stopp;
                         order.Destination = o.Exchange;
-                        order.Side = o.side ? "B" : "S";
+                        // use by and sell as default
+                        string side = o.side ? "B" : "S";
+                        // if we're flat or short and selling, mark as a short
+                        if ((pt[o.symbol].isFlat || pt[o.symbol].isShort) && !o.side)
+                            side = "T";
+                            // if short and buying, mark as cover
+                        else if (pt[o.symbol].isShort && o.side)
+                            side = "C";
+                        // apply side
+                        order.Side = side;
                         order.Symbol = o.symbol;
                         order.Quantity = o.UnsignedSize;
                         string acct = accts.Count > 0 ? accts[0] : "";
@@ -259,8 +268,11 @@ namespace SterServer
             f.side = t.bstrSide == "B";
             f.xtime = ((int)(rem % 10000)) * 100 + xsec;
             f.xdate = (int)((now - f.xtime) / 1000000);
+            pt.Adjust(f);
             newFill(f);
         }
+
+        
 
         void stiEvents_OnSTIOrderUpdate(ref structSTIOrderUpdate structOrderUpdate)
         {
