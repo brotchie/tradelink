@@ -52,6 +52,12 @@ namespace TradeLink.Research
             return p;
         }
         /// <summary>
+        /// creates ticks from list of symbols and a seed value
+        /// </summary>
+        /// <param name="symbols"></param>
+        /// <param name="seed"></param>
+        public RandomTicks(string[] symbols, int seed) : this(symbols, RandomPrices(symbols.Length,seed), seed) { }
+        /// <summary>
         /// creates random ticks from a list of symbols, with randomized initial prices
         /// </summary>
         /// <param name="symbols"></param>
