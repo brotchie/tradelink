@@ -115,15 +115,18 @@ namespace Kadina
         }
 
 
-
+        int _time = 0;
+        int _date = 0;
 
         void h_GotTick(Tick t)
         {
+            _date = t.date;
+            _time = t.time;
             // get time for display
             nowtime = t.time.ToString();
             
             // don't display ticks for unmatched exchanges
-            string time = t.time.ToString();
+            string time = nowtime;
             string trade = "";
             string bid = "";
             string ask = "";
@@ -588,8 +591,8 @@ namespace Kadina
         {
             if (o.time == 0)
             {
-                o.date = Util.ToTLDate();
-                o.time = Util.ToTLTime();
+                o.date = _date;
+                o.time = _time;
             }
             h.SimBroker.sendOrder(o);
         }
