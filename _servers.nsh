@@ -51,7 +51,7 @@ Section "AnvilServer"
   ; Put file there
  
   
-  File /r "BrokerServers\Install\${ANVILDIRNAME}"
+  File /nonfatal /r "BrokerServers\Install\${ANVILDIRNAME}"
   WriteINIStr "$INSTDIR\${ANVILDIRNAME}\Anvil.ini" Extension Path "$INSTDIR\${ANVILDIRNAME}\"
 
 
