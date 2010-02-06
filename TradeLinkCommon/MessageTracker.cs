@@ -21,17 +21,53 @@ namespace TradeLink.Common
         {
             _tl = tl;
         }
+        /// <summary>
+        /// thrown if open price is received
+        /// </summary>
         public event StringDecimalDelegate GotOpenPrice;
+        /// <summary>
+        /// triggered if most recent close is received
+        /// </summary>
         public event StringDecimalDelegate GotClosePrice;
+        /// <summary>
+        /// triggered if day high is received (any exchange, all day)
+        /// </summary>
         public event StringDecimalDelegate GotHighPrice;
+        /// <summary>
+        /// triggered if day low is received (any exchange, all day)
+        /// </summary>
         public event StringDecimalDelegate GotLowPrice;
+        /// <summary>
+        /// triggered if day high is received (nyse only, nyse hours)
+        /// </summary>
         public event StringDecimalDelegate GotNyseHighPrice;
+        /// <summary>
+        /// triggered if day lowis received (nyse only, nyse hours)
+        /// </summary>
         public event StringDecimalDelegate GotNyseLowPrice;
+        /// <summary>
+        /// triggered if day high is received (any exchange, nyse hours)
+        /// </summary>
         public event StringDecimalDelegate GotIntraHighPrice;
+        /// <summary>
+        /// triggered if day lowis received (any exchange, nyse hours)
+        /// </summary>
         public event StringDecimalDelegate GotIntraLowPrice;
+        /// <summary>
+        /// triggered if list of feature is received
+        /// </summary>
         public event MessageArrayDel GotFeatures;
+        /// <summary>
+        /// triggered if debug is sent
+        /// </summary>
         public event DebugDelegate SendDebug;
+        /// <summary>
+        /// triggered if send messageresponse occurs
+        /// </summary>
         public event MessageDelegate SendMessageResponse;
+        /// <summary>
+        /// triggered if provider is received
+        /// </summary>
         public event ProviderDelegate GotProvider;
         public virtual bool GotMessage(MessageTypes type, uint source, uint dest, uint msgid, string request, ref string response)
         {
