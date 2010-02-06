@@ -100,6 +100,11 @@ namespace TradeLink.AppKit
         }
 
         /// <summary>
+        /// controls whether right click menu can be selected
+        /// </summary>
+        public bool DisplayRightClick { get { return chartContextMenu.Enabled; } set { chartContextMenu.Enabled = !chartContextMenu.Enabled; refresh(); } }
+
+        /// <summary>
         /// reset the chart and underlying data structures
         /// </summary>
         public void Reset()
