@@ -57,8 +57,11 @@ namespace Record
 
         void _tlt_GotConnectFail()
         {
-            debug("Broker disconnected.");
-            status("stopped");
+            if (_tlt.tw.RecentTime != 0)
+            {
+                debug("Broker disconnected.");
+                status("Stopped");
+            }
         }
 
         void status(string msg)
