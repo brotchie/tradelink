@@ -15,11 +15,17 @@ namespace TradeLink.AppKit
         public AssemblaTicketWindow()
         {
             InitializeComponent();
+            
         }
-        public AssemblaTicketWindow(string space, string user, string pass, string description, string data)
+        static string Desc(string space)
+        {
+            return space + " " + TradeLink.Common.Util.ToTLDate(DateTime.Now).ToString() + ":" + TradeLink.Common.Util.DT2FT(DateTime.Now).ToString();
+        }
+        public AssemblaTicketWindow(string space, string user, string pass, string description, string data) : this(space, user, pass, description, data, Desc(space)) { }
+        
+        public AssemblaTicketWindow(string space, string user, string pass, string description, string data,string summary)
         {
             InitializeComponent();
-            string summary = space+" "+TradeLink.Common.Util.ToTLDate(DateTime.Now).ToString()+":"+TradeLink.Common.Util.DT2FT(DateTime.Now).ToString();
             assemblaTicketControl1.TicketFailed += new TradeLink.API.VoidDelegate(assemblaTicketControl1_TicketFailed);
             assemblaTicketControl1.TicketSucceed += new TradeLink.API.VoidDelegate(assemblaTicketControl1_TicketSucceed);
             assemblaTicketControl1.Update(space, summary, data, description,user,pass);
@@ -49,9 +55,13 @@ namespace TradeLink.AppKit
         public static void Report(string space, string data, Exception ex, bool showtemplate) { Report(space, data, ex, showtemplate, string.Empty, string.Empty,null,false); }
         public static void Report(string space, string data, Exception ex, bool showtemplate, string user, string pass, LoginSucceedDel handlesuceed, bool pause)
         {
+            Report(space, data, ex, showtemplate, user, pass, handlesuceed, pause,Desc(space));
+        }
+        public static void Report(string space, string data, Exception ex, bool showtemplate, string user, string pass, LoginSucceedDel handlesuceed, bool pause,string summary)
+        {
             string[] r = new string[] { "Product:" + space, "Exception:" + (ex != null ? ex.Message : "n/a"), "StackTrace:" + (ex != null ? ex.StackTrace : "n/a"), "CommandLine:" + Environment.CommandLine, "OS:" + Environment.OSVersion.VersionString + " " + (IntPtr.Size * 8).ToString() + "bit", "CLR:" + Environment.Version.ToString(4), "TradeLink:" + TradeLink.Common.Util.TLSIdentity(), "Memory:" + Environment.WorkingSet.ToString(), "Processors:" + Environment.ProcessorCount.ToString() };
             string desc = string.Join(Environment.NewLine, r);
-            AssemblaTicketWindow atw = new AssemblaTicketWindow(space, user, pass, showtemplate ? templatequest(desc) : desc,data);
+            AssemblaTicketWindow atw = new AssemblaTicketWindow(space, user, pass, showtemplate ? templatequest(desc) : desc,data,summary);
             if (ex != null)
             {
                 atw.Text = "Create ticket for crash report";

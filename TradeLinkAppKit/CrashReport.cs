@@ -20,7 +20,8 @@ namespace TradeLink.AppKit
         Exception EX = null;
         string DATA = string.Empty;
         public CrashReport(string program, string username, string password, Exception ex) : this(program, username,password,ex, string.Empty) { }
-        public CrashReport(string program, string username, string password, Exception ex, string data)
+        public CrashReport(string program, string username, string password, Exception ex, string data) : this(program, username, password, ex, data, Desc(program)) { }
+        public CrashReport(string program, string username, string password, Exception ex, string data, string desc)
         {
             InitializeComponent();
             PROGRAM = program;
@@ -28,7 +29,7 @@ namespace TradeLink.AppKit
             EX = ex;
             _user.Text = username;
             _pass.Text = password;
-            _desc.Text = Desc(PROGRAM);
+            _desc.Text = desc;
             _body.Text = DecodedBody(PROGRAM, EX, DATA, true);
             FormClosing += new FormClosingEventHandler(CrashReport_FormClosing);
             SizeChanged += new EventHandler(CrashReport_SizeChanged);
@@ -103,9 +104,13 @@ namespace TradeLink.AppKit
         public static void Report(string PROGRAM, string username, string password, System.Threading.ThreadExceptionEventArgs e, AssemblaTicketWindow.LoginSucceedDel success) { Report(PROGRAM, username, password, string.Empty,e.Exception,success,true); }
         public static void Report(string PROGRAM, System.Threading.ThreadExceptionEventArgs e) { Report(PROGRAM, string.Empty, string.Empty, string.Empty,e.Exception, null, true); }
         public static void Report(string PROGRAM, Exception ex) { Report(PROGRAM, string.Empty, string.Empty, string.Empty,ex, null, true); }
-        public static void Report(string PROGRAM, string username, string password, string data, Exception ex,AssemblaTicketWindow.LoginSucceedDel success,bool pause)
+        public static void Report(string PROGRAM, string username, string password, string data, Exception ex, AssemblaTicketWindow.LoginSucceedDel success, bool pause)
         {
-            CrashReport cr = new CrashReport(PROGRAM, username, password, ex,data);
+            Report(PROGRAM, username, password, data, ex, success, pause, Desc(PROGRAM));
+        }
+        public static void Report(string PROGRAM, string username, string password, string data, Exception ex,AssemblaTicketWindow.LoginSucceedDel success,bool pause,string desc)
+        {
+            CrashReport cr = new CrashReport(PROGRAM, username, password, ex,data,desc);
             if (success!=null)
                 cr.TicketSucceed+=new AssemblaTicketWindow.LoginSucceedDel(success);
             if (pause)
