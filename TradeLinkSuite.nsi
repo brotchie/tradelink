@@ -4,13 +4,13 @@ XPStyle on
 CRCCheck force
 ShowInstDetails hide
 SetOverWrite on
-Icon "InstallSuite\tradelinkinstaller.ico"
+Icon "Install\tradelinkinstaller.ico"
 
 !define SHORT_APP_NAME "TradeLink"
 !define SUPPORT_EMAIL "tradelink-users@googlegroups.com"
-!addplugindir InstallSuite
-!include "InstallSuite\DotNET.nsh"
-!include "InstallSuite\FileAssociation.nsh"
+!addplugindir Install
+!include "Install\DotNET.nsh"
+!include "Install\FileAssociation.nsh"
 
 ; The file to write
 OutFile "TradeLinkSuite.exe"
@@ -101,7 +101,8 @@ Section "TradeLinkSuite"
   File "ServerMB\bin\release\Interop.MBTHISTLib.dll"    
   File "ServerMB\bin\release\Interop.MBTORDERSLib.dll"    
   File "ServerMB\bin\release\Interop.MBTQUOTELib.dll"   
-  File "InstallSuite\VCRedistInstall.exe"
+  File "Install\VCRedistInstall.exe"
+  File "Install\TickDataInstall.exe"
   File "ServerEsignal\bin\release\Interop.IESignal.dll"
   File "ServerEsignal\bin\release\ServerEsignal.exe"
   File "ServerEsignal\bin\release\ServerEsignal.exe.config"
@@ -129,15 +130,24 @@ Section "TradeLinkSuite"
   
   ; Write the installation path into the registry
   WriteRegStr HKLM SOFTWARE\TradeLinkSuite "Install_Dir" "$INSTDIR"
-  
-  DetailPrint "Checking for VCRedistributable..."
-  Call CheckVCRedist
-  Pop $0
-  IntCmp $0 -1 finishinstall
-  DetailPrint "VCRedistributable was installed."
-  
+    
   ; make sure TickData folder is present
   CreateDirectory $PROGRAMFILES\TradeLink\TickData
+  
+  DetailPrint "Checking for TickData..."
+  ReadRegStr $0 HKLM SOFTWARE\TradeLinkSuite "InstalledTickData"
+  StrCmp $0 "Yes" vcredistinstall
+  ExecWait "TickDataInstall.exe"
+  WriteRegStr HKLM SOFTWARE\TradeLinkSuite "InstalledTickData" "Yes"
+  DetailPrint "TickData was installed."
+  
+ vcredistinstall:
+  DetailPrint "Checking for VCRedistributable..."
+  ReadRegStr $0 HKLM SOFTWARE\TradeLinkSuite "InstalledVcRedist"
+  StrCmp $0 "Yes" finishinstall
+  ExecWait "VCRedistInstall.exe"
+  DetailPrint "VCRedistributable was installed."
+  WriteRegStr HKLM SOFTWARE\TradeLinkSuite "InstalledVcRedist" "Yes"
   
 finishinstall:  
   ; Write the uninstall keys for Windows
@@ -156,6 +166,13 @@ finishinstall:
 
 SectionEnd
 ;--------------------------------
+
+!if $%INCLUDEBS% == "BS"
+!define VERSION "{PVERSION}"
+!include "_servers.nsh"
+!else
+
+!endif
 
 ; Uninstaller
 
@@ -201,33 +218,14 @@ Function .onInit
 
   ; plugins dir should be automatically removed after installer runs
   InitPluginsDir
-  File /oname=$PLUGINSDIR\splash.bmp "InstallSuite\tradelinklogo.bmp"
+  File /oname=$PLUGINSDIR\splash.bmp "Install\tradelinklogo.bmp"
   splash::show 1000 $PLUGINSDIR\splash
 
   Pop $0 ; $0 has '1' if the user closed the splash screen early,
          ; '0' if everything closed normally, and '-1' if some error occurred.
 FunctionEnd
 
-;-------------------------------
-; Test if Visual Studio Redistributables 2005+ SP1 installed
-; Returns -1 if there is no VC redistributables intstalled
-Function CheckVCRedist
-   Push $R0
-   ClearErrors
-   ReadRegDword $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{7299052b-02a4-4627-81f2-1818da5d550d}" "Version"
 
-   ; if VS 2005+ redist SP1 not installed, install it
-   IfErrors 0 VSRedistInstalled
-   DetailPrint "Spawning download of VC redistributable..."
-   StrCpy $R0 "-1"
-   ExecWait "$INSTDIR\VCRedistInstall.exe"
-   IfErrors 0 VSRedistInstalled
-   DetailPrint "VCRedistributable download+install failed."
-   DetailPrint "See http://code.google.com/p/tradelink/wiki/VcRedist to install manually"
-   
-VSRedistInstalled:
-   Exch $R0
-FunctionEnd
 
 
 

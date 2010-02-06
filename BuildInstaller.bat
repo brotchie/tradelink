@@ -6,6 +6,13 @@ FOR /F "tokens=2 skip=4" %%G IN ('svn info --revision HEAD') DO ^
 IF NOT DEFINED REVISION SET REVISION=%%G
 echo %REVISION% > VERSION.txt
 cls
+if exist "Install\_includebs.txt" (
+SET INCLUDEBS=BS
+echo Including BrokerServer...
+) else (
+SET INCLUDEBS=NOBS
+echo Ignoring BrokerServer...
+)
 echo Checking for NSIS...
 if not exist "c:\progra~1\nsis\makensis.exe" (
 echo You must install NSIS to build an installer...
@@ -26,9 +33,8 @@ echo.
 echo.
 echo Removing last installer...
 del /q TradeLinkSuite*.exe > NUL
-
 echo Building TradeLink executable...
-c:\progra~1\nsis\makensis.exe /v1 /DPVERSION=%REVISION% TradeLinkSuite.nsi  > NUL
+c:\progra~1\nsis\makensis.exe /v1 /DPVERSION=%REVISION% /DINCLUDEBS=%INCLUDEBS% TradeLinkSuite.nsi  > NUL
 if ERRORLEVEL 1 (
 echo.
 echo ERROR Building installer...  did you compile the solution?
