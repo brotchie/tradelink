@@ -44,7 +44,23 @@ namespace Chartographer
             Chartographer.Properties.Settings.Default.startwindow = Location;
         }
 
+        private void ChartMain_DragDrop(object sender, DragEventArgs e)
+        {
+            e.Effect = DragDropEffects.Copy;
+            string[] s = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+            string f = s[0];
+            if (!f.Contains(TikConst.DOT_EXT)) return;
+            BarList bl = BarListImpl.FromTIK(f);
+            newChart(bl);
+        }
 
+        private void ChartMain_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                e.Effect = DragDropEffects.All;
+            else
+                e.Effect = DragDropEffects.None;
+        }
 
         void c_Move(object sender, EventArgs e)
         {

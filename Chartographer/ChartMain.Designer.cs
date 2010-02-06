@@ -127,6 +127,7 @@ namespace Chartographer
             // 
             // ChartMain
             // 
+            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
@@ -144,6 +145,8 @@ namespace Chartographer
             this.Name = "ChartMain";
             this.Text = "Chart";
             this.TopMost = true;
+            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.ChartMain_DragDrop);
+            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.ChartMain_DragEnter);
             this.ResumeLayout(false);
             this.PerformLayout();
 
