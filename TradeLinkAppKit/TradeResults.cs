@@ -38,6 +38,7 @@ namespace TradeLink.AppKit
             dg.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             ContextMenu = new ContextMenu();
             ContextMenu.MenuItems.Add("RiskFreeRate", new EventHandler(changerfr));
+            ContextMenu.MenuItems.Add("Comission", new EventHandler(changecomm));
             dg.ReadOnly = true;
             dg.BackColor = Color.White;
             dg.AutoGenerateColumns = true;
@@ -58,14 +59,28 @@ namespace TradeLink.AppKit
         }
 
         decimal _rfr = .001m;
+        decimal _comm = .01m;
         void changerfr(object sender, EventArgs e)
         {
             string input = Microsoft.VisualBasic.Interaction.InputBox("Risk Free Rate: ", "Update RfR", _rfr.ToString("P2"), 0, 0);
             decimal rfr = 0;
             input.Replace("%", "");
             if (decimal.TryParse(input, out rfr))
+            {
                 _rfr = (rfr / 100);
-            tradefiles_SelectedIndexChanged(null, null);
+                tradefiles_SelectedIndexChanged(null, null);
+            }
+        }
+
+        void changecomm(object s, EventArgs e)
+        {
+            string input = Microsoft.VisualBasic.Interaction.InputBox("Per Contract Comission: ", "Update Comission", _comm.ToString("F3"), 0, 0);
+            decimal c = 0;
+            if (decimal.TryParse(input, out c))
+            {
+                _comm = c;
+                tradefiles_SelectedIndexChanged(null, null);
+            }
         }
         void TattleMain_MouseEnter(object sender, EventArgs e)
         {
@@ -262,6 +277,7 @@ namespace TradeLink.AppKit
             pt = new PositionTracker(results.Count);
             // setup new results
             Results r = new Results();
+            r.ComPerShare = _comm;
             r.RiskFreeRet = string.Format("{0:P2}", _rfr);
             int consecWinners = 0;
             int consecLosers = 0;
