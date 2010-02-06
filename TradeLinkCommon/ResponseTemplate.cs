@@ -128,6 +128,17 @@ namespace TradeLink.Common
         /// <param name="syms"></param>
         public virtual void sendbasket(string[] syms) { if (SendBasket != null) SendBasket(new BasketImpl(syms), ID); else senddebug("SendBasket not supported in this application."); }
         /// <summary>
+        /// request ticks for a basket of securities
+        /// </summary>
+        /// <param name="syms"></param>
+        public virtual void sendbasket(Basket syms)
+        {
+            if (SendBasket != null)
+                SendBasket(syms, ID);
+            else
+                senddebug("SendBasket not supported in this application.");
+        }
+        /// <summary>
         /// requests ticks for basket of securities
         /// </summary>
         /// <param name="syms"></param>
