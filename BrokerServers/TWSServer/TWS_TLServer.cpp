@@ -106,6 +106,7 @@ namespace TradeLibFast
 	std::vector<int> TWS_TLServer::GetFeatures()
 	{
 		std::vector<int> f;
+		f.push_back(SENDORDERMODIFY);
 		f.push_back(SENDORDER);
 		f.push_back(BROKERNAME);
 		f.push_back(REGISTERCLIENT);
