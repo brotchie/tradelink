@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using TradeLink.Common;
 using TradeLink.API;
+using TradeLink.AppKit;
 
 namespace IQFeedBroker
 {
@@ -15,6 +16,7 @@ namespace IQFeedBroker
     {
         private TLServer_WM _tl;
         private IQFeedHelper _helper;
+        DebugWindow _dw = new DebugWindow();
 
         public bool IsConnected
         {
@@ -29,9 +31,14 @@ namespace IQFeedBroker
         {
             InitializeComponent();
             this.FormClosing += IQFeedFrm_FormClosing;
-#if DEBUG
-            btnDebug.Enabled = true;
-#endif
+            _helper = new IQFeedHelper();
+            _helper.SendDebug += new DebugDelegate(_dw.GotDebug);
+            _tl = new TLServer_WM();
+
+            _helper.TickReceived += TickReceived;
+            _helper.ConnectToAdmin();
+            _helper.ConnectToLevelOne();
+            _tl.newRegisterStocks += new DebugDelegate(tl_newRegisterStocks);
         }
 
 
@@ -69,23 +76,6 @@ namespace IQFeedBroker
         }
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        private void Init()
-        {
-            _tl = new TLServer_WM();
-
-            string uID = Properties.Settings.Default.UserID;
-            string pass = Properties.Settings.Default.Password;           
-            _helper = new IQFeedHelper(uID, pass);
-
-            _helper.TickReceived += TickReceived;
-            _helper.ConnectToAdmin();
-            _helper.ConnectToLevelOne();
-            _tl.newRegisterStocks += new DebugDelegate(tl_newRegisterStocks);
-        }
-
 
 
         private void tl_newRegisterStocks(string msg)
@@ -102,17 +92,28 @@ namespace IQFeedBroker
 
         private void IQFeedFrm_Load(object sender, EventArgs e)
         {
-            Init();
+            // auto login if username and password are already present
+            if ((_user.Text != string.Empty) && (_pass.Text != string.Empty))
+                _login_Click(null, null);
         }
 
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Basket basket = new BasketImpl();
-            basket.Add("IBM");
-            basket.Add("JNJ");
-            basket.Add("GOOG");
-            AddBasket(basket);
+            // toggle log message viewing
+            _dw.Toggle();
+        }
+
+        private void _report_Click(object sender, EventArgs e)
+        {
+            // report bugs
+            CrashReport.Report(Global.PROGRAM_NAME, string.Empty, string.Empty, _dw.Content, null, null, false);
+        }
+
+        private void _login_Click(object sender, EventArgs e)
+        {
+            _helper.Start(_user.Text, _pass.Text);
+            BackColor = _helper.IsConnected ? Color.Green : Color.Red;
         }
     }
 }

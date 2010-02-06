@@ -65,6 +65,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\Blackwood.lnk" "$INSTDIR\ServerBlackwood.exe" "" "$INSTDIR\ServerBlackwood.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\REDI.lnk" "$INSTDIR\ServerRedi.exe" "" "$INSTDIR\ServerRedi.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\LogViewer.lnk" "$INSTDIR\LogViewer.exe" "" "$INSTDIR\LogViewer.exe" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink\IQFeed.lnk" "$INSTDIR\IQFeedBroker.exe" "" "$INSTDIR\IQFeedBroker.exe" 0  
   
   
   ; Put file there
@@ -117,6 +118,8 @@ Section "TradeLinkSuite"
   File "ServerRedi\bin\release\ServerRedi.exe.config"
   File "ServerRedi\bin\release\Interop.RediLib.dll"
   File "ServerRedi\bin\release\VBRediClasses.dll"
+  File "ServerIQ-DTN\bin\Release\IQFeedBroker.exe"
+  File "ServerIQ-DTN\bin\Release\IQFeedBroker.exe.config"
 
   File "TikConverter\bin\release\TikConverter.exe"
   

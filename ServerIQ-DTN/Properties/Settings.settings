@@ -3,10 +3,10 @@
   <Profiles />
   <Settings>
     <Setting Name="UserID" Type="System.String" Scope="User">
-      <Value Profile="(Default)">myUserID</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="Password" Type="System.String" Scope="User">
-      <Value Profile="(Default)">myPassword</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="PROGRAM_NAME" Type="System.String" Scope="User">
       <Value Profile="(Default)">IQFEED_DEMO</Value>

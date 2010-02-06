@@ -51,25 +51,25 @@ namespace IQFeedBroker
 
         public IQFeedHelper()
         {
-            Init(string.Empty, string.Empty);
             _basket = new BasketImpl();
+            
         }
 
         public IQFeedHelper(string username, string password)
         {
-            Init(username, password);
+            Start(username, password);
             _basket = new BasketImpl();
         }
 
         public IQFeedHelper(Basket basket, string username, string password)
         {
-            Init(username, password);
+            Start(username, password);
             _basket = basket;
         }
 
         public IQFeedHelper(Basket basket)
         {
-            Init(string.Empty, string.Empty);
+            Start(string.Empty, string.Empty);
             _basket = basket;
         }
 
@@ -81,7 +81,7 @@ namespace IQFeedBroker
         public void Close()
         {
             Array.ForEach(System.Diagnostics.Process.GetProcessesByName(IQ_FEED), iqProcess => iqProcess.Kill());
-            Console.WriteLine("QUITTING****************************");
+            debug("QUITTING****************************");
         }
 
 
@@ -102,7 +102,7 @@ namespace IQFeedBroker
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                debug(ex.ToString());
             }
         }
 
@@ -158,7 +158,7 @@ namespace IQFeedBroker
 
 
 
-        private void Init(string username, string password)
+        public void Start(string username, string password)
         {
             _registered = false;
 
@@ -166,7 +166,10 @@ namespace IQFeedBroker
             // IQFeed Installation directory is stored in the registry key
             RegistryKey key = Registry.LocalMachine.OpenSubKey(IQ_FEED_REGISTRY_LOCATION);
             if (key == null)
-                throw new ApplicationException("IQ Feed is not installed");
+            {
+                debug("IQ Feed is not installed");
+                return;
+            }
 
             // close the key since we don't need it anymore
             key.Close();
@@ -181,10 +184,10 @@ namespace IQFeedBroker
                 switch (iqConnectProcessCount)
                 {
                     case 1:
-                        Console.WriteLine("IQ Connect price feed is already running");
+                        debug("IQ Connect price feed is already running");
                         break;
                     case 0:
-                        Console.WriteLine("Need to start IQ Connect first");
+                        debug("Need to start IQ Connect first");
                         string args = string.Empty;
                         if (HaveUserCredentials)
                             args += String.Format("-product {0} -version 1.0.0.0 -login {1} -password {2} -savelogininfo -autoconnect", Global.PROGRAM_NAME, _user, _pswd);
@@ -218,8 +221,7 @@ namespace IQFeedBroker
             }
             catch (Exception ex)
             {
-                Console.WriteLine(String.Format("ADMIN SOCKET ERROR: {0}", ex.Message));
-                throw ex;
+                debug(String.Format("ADMIN SOCKET ERROR: {0}", ex.Message));
             }
         }
 
@@ -241,7 +243,7 @@ namespace IQFeedBroker
             }
             catch (Exception ex)
             {
-                Console.WriteLine(String.Format("LEVEL ONE ERROR: {0}", ex.Message));
+                debug(String.Format("LEVEL ONE ERROR: {0}", ex.Message));
                 throw ex;
             }
         }
@@ -273,7 +275,7 @@ namespace IQFeedBroker
             {
                 try
                 {
-                    Console.WriteLine(String.Format("Result State: {0}", result.AsyncState));
+                    debug(String.Format("Result State: {0}", result.AsyncState));
                     int bytesReceived = m_sockAdmin.EndReceive(result);
                     string rawData = Encoding.ASCII.GetString(m_szAdminSocketBuffer, 0, bytesReceived);
                     bool connectToLevelOne = _registered;
@@ -281,7 +283,7 @@ namespace IQFeedBroker
                     while (rawData.Length > 0)
                     {
                         string data = rawData.Substring(0, rawData.IndexOf("\n"));
-                        Console.WriteLine(String.Format("ADMIN: {0}", data));
+                        debug(String.Format("ADMIN: {0}", data));
                         if (data.StartsWith("S,STATS,"))
                         {
                             #region Register this application (if necessary)...May want to extract this into a separate function as it's only called once.
@@ -300,7 +302,7 @@ namespace IQFeedBroker
                         {
                             #region Set the login and other attribute settings...KRJ: Not written this yet to see if can do on start up
                             string command = "S,SET LOGINID,244023\r\nS,SET PASSWORD,8488\r\nS,SET SAVE LOGIN INFO,On\r\nS,SET AUTOCONNECT,On\r\nS,CONNECT\r\n";
-                            Console.WriteLine(String.Format("ADMIN: Register Client Completed: Command: {0}", command));
+                            debug(String.Format("ADMIN: Register Client Completed: Command: {0}", command));
                             byte[] size = new byte[command.Length];
                             size = Encoding.ASCII.GetBytes(command);
                             int bytesToSend = size.Length;
@@ -316,11 +318,11 @@ namespace IQFeedBroker
                 }
                 catch (SocketException ex)
                 {
-                    Console.WriteLine(String.Format("ADMIN: Socket Exception: {0}", ex.Message));
+                    debug(String.Format("ADMIN: Socket Exception: {0}", ex.Message));
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(String.Format("ADMIN: Full Exception: {0}", ex.Message));
+                    debug(String.Format("ADMIN: Full Exception: {0}", ex.Message));
                     throw ex;
                 }
             }
@@ -349,12 +351,12 @@ namespace IQFeedBroker
                 }
                 catch (SocketException ex)
                 {
-                    Console.WriteLine(String.Format("LEVEL ONE: Socket Exception: {0}", ex.Message));
+                    debug(String.Format("LEVEL ONE: Socket Exception: {0}", ex.Message));
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(String.Format("LEVEL ONE: Full Exception: {0}", ex.Message));
-                    Console.WriteLine(ex.ToString());
+                    debug(String.Format("LEVEL ONE: Full Exception: {0}", ex.Message));
+                    debug(ex.ToString());
                 }
 
                 WaitForData(Global.LEVEL_ONE_SOCKET_NAME);
@@ -368,7 +370,7 @@ namespace IQFeedBroker
             {
                 try
                 {
-                    Console.WriteLine(String.Format("Got Tick: {0} - {1} - {2}", actualData[0], actualData[1], actualData[3]));
+                    debug(String.Format("Got Tick: {0} - {1} - {2}", actualData[0], actualData[1], actualData[3]));
                     if ((actualData[0] == "P") || (actualData[0] == "Q"))
                     {
                         Tick tick = new TickImpl();
@@ -413,16 +415,29 @@ namespace IQFeedBroker
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.ToString());
+                    debug(ex.ToString());
                 }
             }
+
+                        
+
+
         }
+
+        void debug(string msg)
+        {
+            if (SendDebug != null)
+                SendDebug(msg);
+        }
+        public event TradeLink.API.DebugDelegate SendDebug;
+
+        
 
         #endregion
     }
     public class Global
     {
-        public const string PROGRAM_NAME = "IQFEED_DEMO";
+        public const string PROGRAM_NAME = "IQFEED-SERVER";
         public const string ADMINISTRATION_SOCKET_NAME = "Admin";
         public const string LEVEL_ONE_SOCKET_NAME = "Level1";
         public const string IP_LOCAL_HOST = "127.0.0.1";
