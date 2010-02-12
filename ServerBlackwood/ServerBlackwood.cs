@@ -8,22 +8,28 @@ using TradeLink.Common;
 namespace ServerBlackwood
 {
     public delegate void BWConnectedEventHandler(object sender, bool BWConnected);
-
+    public delegate void TLSendDelegate(string message, MessageTypes type, string client);
+   
     public class ServerBlackwood : TLServer_WM
     {
         // broker members
         private BWSession m_Session;
+        private System.ComponentModel.IContainer components;
+        private uint bwHistReqID = 5000;
         public event BWConnectedEventHandler BWConnectedEvent;
         protected virtual void OnBWConnectedEvent(bool BWConnected) { BWConnectedEvent(this, BWConnected); }
+        
        
         // tradelink members
         public event DebugFullDelegate SendDebug;
         private bool _valid = false;
         public bool isValid { get { return _valid; } }
         PositionTracker pt = new PositionTracker();
-
+        
         public ServerBlackwood()
         {
+            InitializeComponent();
+
             // broker stuff
             m_Session = new BWSession();
             m_Session.OnAccountMessage += new BWSession.AccountMessageHandler(m_Session_OnAccountMessage);
@@ -31,6 +37,7 @@ namespace ServerBlackwood
             m_Session.OnExecutionMessage += new BWSession.ExecutionMessageHandler(m_Session_OnExecutionMessage);
             //m_Session.OnOrderMessage += new BWSession.OrderMessageHandler(m_Session_OnOrderMessage);
             m_Session.OnPositionMessage += new BWSession.PositionMessageHandler(m_Session_OnPositionMessage);
+            m_Session.OnHistMessage += new BWSession.HistoricMessageHandler(m_Session_OnHistMessage);
 
 
             // tradelink stuff
@@ -44,7 +51,8 @@ namespace ServerBlackwood
             newPosList += new PositionArrayDelegate(ServerBlackwood_newPosList);
             //newImbalanceRequest += new VoidDelegate(ServerBlackwood_newImbalanceRequest);
             //DOMRequest += new IntDelegate(ServerBlackwood_DOMRequest);
-
+            
+            
         }
 
         Position[] ServerBlackwood_newPosList(string account)
@@ -177,6 +185,8 @@ namespace ServerBlackwood
             f.Add(MessageTypes.SENDORDERMARKET);
             f.Add(MessageTypes.SENDORDERLIMIT);
             f.Add(MessageTypes.EXECUTENOTIFY);
+            f.Add(MessageTypes.BARREQUEST);
+            f.Add(MessageTypes.BARRESPONSE);
             return f.ToArray();
         }
 
@@ -192,7 +202,25 @@ namespace ServerBlackwood
                     break;
                 case MessageTypes.ISSHORTABLE:
                     return (long)(m_Session.GetStock(msg).IsHardToBorrow() ? 0 : 1);
-
+                case MessageTypes.BARREQUEST:
+                    string[] r = msg.Split(',');
+                    DBARTYPE barType = getBarTypeFromBW(r[(int)BarRequestField.BarInt]);
+                    int tlDateS = int.Parse(r[(int)BarRequestField.StartDate]);
+                    int tlTimeS = int.Parse(r[(int)BarRequestField.StartTime]);
+                    DateTime dtStart = TradeLink.Common.Util.ToDateTime(tlDateS,tlTimeS);
+                    int tlDateE = int.Parse(r[(int)BarRequestField.StartDate]);
+                    int tlTimeE = int.Parse(r[(int)BarRequestField.StartTime]);
+                    DateTime dtEnd = TradeLink.Common.Util.ToDateTime(tlDateE, tlTimeE);
+                    uint custInt = 1;
+                    bool result = uint.TryParse(r[(int)BarRequestField.CustomInterval], out custInt);
+                    if (!result)
+                    {
+                       custInt = 1;
+                    }
+                 
+                    m_Session.RequestHistoricData(r[(int)BarRequestField.Symbol], barType, dtStart, dtEnd, custInt, ++bwHistReqID);
+                    ret = MessageTypes.OK;
+                    break;
             }
             return (long)ret;
         }
@@ -304,7 +332,7 @@ namespace ServerBlackwood
         public bool Start(string user, string pw, string ipaddress, int data2)
         {
             System.Net.IPAddress bwIP = System.Net.IPAddress.Parse(ipaddress);
-
+            
             // register for notification of a disconnection from the client portal
             m_Session.OnMarketDataClientPortalConnectionChange += new BWSession.ClientPortalConnectionChangeHandler(OnMarketConnectionChange);
             
@@ -323,12 +351,13 @@ namespace ServerBlackwood
                 _valid = false;
                 return _valid;
             }
-       
+
             _valid = true;
             return _valid;
+
         }
 
-        public void Stop()
+        public new void Stop()
         {
             try
             {
@@ -357,6 +386,54 @@ namespace ServerBlackwood
             debug("connected market data: " + m_Session.IsConnectedToMarketData.ToString());
             debug("connected order port: " + m_Session.IsConnectedToOrderRouting.ToString());
             debug("connected history port: " + m_Session.IsConnectedToHistoricData.ToString());
+        }
+
+        private void m_Session_OnHistMessage(object sender, BWHistResponse histMsg)
+        {
+            if (histMsg.Error.Length > 0)
+            {
+                debug("ERROR: " + histMsg.Error);
+            }
+            else
+            {
+                if (histMsg.bars != null && histMsg.bars.Length > 0)
+                {
+                    string sym = histMsg.Symbol;
+                                        
+                    foreach (BWBar bar in histMsg.bars)
+                    {
+                        int tlDate = TradeLink.Common.Util.ToTLDate(bar.time);
+                        int tlTime = TradeLink.Common.Util.ToTLTime(bar.time);
+                        Bar tlBar = new BarImpl((decimal)bar.open, (decimal)bar.high, (decimal)bar.low, (decimal)bar.close, (int)bar.volume, tlDate, tlTime);
+
+                        
+                        if (this.InvokeRequired)
+                        {
+                            for (int i = 0; i < this.NumClients ; i++)
+                            this.Invoke(new TLSendDelegate(TLSend), new object [] { BarImpl.Serialize(tlBar), MessageTypes.BARRESPONSE, i.ToString() });
+                        }
+                        else
+                        { 
+                            for (int i = 0; i < this.NumClients; i++)
+                                TLSend(BarImpl.Serialize(tlBar), MessageTypes.BARRESPONSE, i.ToString());
+                        }
+                       
+                    }
+                }
+                //else if (histMsg.ticks != null && histMsg.ticks.Length > 0)
+                //{
+                //    foreach (BWTickData tick in histMsg.ticks)
+                //    {
+                //        Tick tlTick = new TickImpl(tick.symbol);
+                //        tlTick.ask = (decimal)tick.askprice;
+                //        tlTick.AskSize = (int)tick.asksize;
+                //        tlTick.bid = (decimal)tick.bidprice;
+                //        tlTick.BidSize = (int)tick.bidsize;
+                //        tlTick.trade = (decimal)tick.price;
+                //        tlTick.size = (int)tick.size;
+                //    }
+                //}
+            }
         }
 
         private BWTIF getDurationFromBW(Order o)
@@ -427,6 +504,31 @@ namespace ServerBlackwood
             return bwVenue;
         }
 
+        private DBARTYPE getBarTypeFromBW(string str)
+        {
+            DBARTYPE bwType;
+            switch (str)
+            {
+                case "DAILY":
+                    bwType = DBARTYPE.DAILY;
+                    break;
+                case "WEEKLY":
+                    bwType = DBARTYPE.WEEKLY;
+                    break;
+                case "MONTHLY":
+                    bwType = DBARTYPE.MONTHLY;
+                    break;
+                case "TICK":
+                    bwType = DBARTYPE.TICK;
+                    break;
+                case "INTRADAY":
+                default:
+                    bwType = DBARTYPE.INTRADAY;
+                    break;
+            }
+            return bwType;
+        }
+
         //Keep cross reference list between TL order ID and BW order ID.
         Dictionary<uint, int> _bwOrdIds = new Dictionary<uint, int>();
         void bwOrder_BWOrderUpdateEvent(object sender, BWOrderStatus BWOrderStatus)
@@ -486,5 +588,19 @@ namespace ServerBlackwood
             if (SendDebug != null)
                 SendDebug(DebugImpl.Create(msg));
         }
-    }
+
+        private void InitializeComponent()
+        {
+            this.SuspendLayout();
+            // 
+            // ServerBlackwood
+            // 
+            this.ClientSize = new System.Drawing.Size(284, 264);
+            this.Location = new System.Drawing.Point(0, 0);
+            this.Name = "ServerBlackwood";
+            this.ResumeLayout(false);
+
+        }
+
+     }
 }

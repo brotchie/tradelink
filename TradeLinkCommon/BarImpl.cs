@@ -143,6 +143,42 @@ namespace TradeLink.Common
             return new BarImpl(open,high,low,close,vol,date,0,symbol);
         }
 
+        public static string Serialize(Bar b)
+        {
+            const char d = ',';
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            sb.Append(b.Open);
+            sb.Append(d);
+            sb.Append(b.High);
+            sb.Append(d);
+            sb.Append(b.Low);
+            sb.Append(d);
+            sb.Append(b.Close);
+            sb.Append(d);
+            sb.Append(b.Volume);
+            sb.Append(d);
+            sb.Append(b.Bardate);
+            sb.Append(d);
+            sb.Append(b.Bartime);
+            sb.Append(d);
+            sb.Append(b.Symbol);
+            
+            return sb.ToString();
+        }
+
+        public static Bar Deserialize(string msg)
+        {
+            string[] r = msg.Split(',');
+            decimal open = Convert.ToDecimal(r[0], System.Globalization.CultureInfo.InvariantCulture);
+            decimal high = Convert.ToDecimal(r[1], System.Globalization.CultureInfo.InvariantCulture);
+            decimal low = Convert.ToDecimal(r[2], System.Globalization.CultureInfo.InvariantCulture);
+            decimal close = Convert.ToDecimal(r[3], System.Globalization.CultureInfo.InvariantCulture);
+            long vol = Convert.ToInt64(r[4]);
+            int date = Convert.ToInt32(r[5]);
+            int time = Convert.ToInt32(r[6]);
+            string symbol = r[7];
+            return new BarImpl(open, high, low, close, vol, date, time, symbol);
+        }
     }
 
 
