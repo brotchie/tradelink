@@ -343,7 +343,9 @@ namespace Kadina
             ot.Columns.Add("Symbol");
             ot.Columns.Add("Side");
             ot.Columns.Add("Size");
+            ot.Columns.Add("Type");
             ot.Columns.Add("Price");
+            ot.Columns.Add("Id");
             og.Parent = ordertab;
             obs.DataSource = ot;
             og.DataSource = obs;
@@ -369,6 +371,7 @@ namespace Kadina
             ft.Columns.Add("xSide");
             ft.Columns.Add("xSize");
             ft.Columns.Add("xPrice");
+            ft.Columns.Add("Id");
             fg.Parent = filltab;
             fbs.DataSource = ft;
             fg.DataSource = fbs;
@@ -499,14 +502,14 @@ namespace Kadina
             }
 
             ptab.Rows.Add(nowtime, mypos.Symbol,(mypos.isFlat ? "FLAT" : (mypos.isLong ? "LONG" : "SHORT")), mypos.Size, mypos.AvgPrice.ToString("N2"), cpl.ToString("C2"), cpt.ToString("N1"));
-            ft.Rows.Add(t.xtime.ToString(), t.symbol,(t.side ? "BUY" : "SELL"),t.xsize, t.xprice.ToString("N2"));
+            ft.Rows.Add(t.xtime.ToString(), t.symbol,(t.side ? "BUY" : "SELL"),t.xsize, t.xprice.ToString("N2"),t.id);
         }
 
         void broker_GotOrder(Order o)
         {
             if (myres != null)
                 myres.GotOrder(o);
-            ot.Rows.Add(o.time, o.symbol,(o.side ? "BUY" : "SELL"), o.size, o.isStop? o.stopp : (o.isTrail ? o.trail : o.price));
+            ot.Rows.Add(o.time, o.symbol,(o.side ? "BUY" : "SELL"), o.size, (o.isMarket ? "Mkt" : (o.isLimit ? "Lmt" : "Stp")),o.isStop? o.stopp : (o.isTrail ? o.trail : o.price),o.id);
         }
         string nowtime = "0";
 
