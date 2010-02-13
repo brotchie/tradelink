@@ -51,6 +51,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerRedi", "ServerRedi\Se
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerIQFeed", "ServerIQ-DTN\ServerIQFeed.csproj", "{EA653000-7D68-443A-8AD1-C6EE764B4A0B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerTDX", "ServerTDX\ServerTDX.csproj", "{80AECC55-15BA-43DA-9ED3-924A6D311698}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -349,6 +351,18 @@ Global
 		{EA653000-7D68-443A-8AD1-C6EE764B4A0B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EA653000-7D68-443A-8AD1-C6EE764B4A0B}.Release|x64.ActiveCfg = Release|Any CPU
 		{EA653000-7D68-443A-8AD1-C6EE764B4A0B}.Release|x86.ActiveCfg = Release|Any CPU
+		{80AECC55-15BA-43DA-9ED3-924A6D311698}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80AECC55-15BA-43DA-9ED3-924A6D311698}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80AECC55-15BA-43DA-9ED3-924A6D311698}.Debug|x64.ActiveCfg = Debug|x64
+		{80AECC55-15BA-43DA-9ED3-924A6D311698}.Debug|x64.Build.0 = Debug|x64
+		{80AECC55-15BA-43DA-9ED3-924A6D311698}.Debug|x86.ActiveCfg = Debug|x86
+		{80AECC55-15BA-43DA-9ED3-924A6D311698}.Debug|x86.Build.0 = Debug|x86
+		{80AECC55-15BA-43DA-9ED3-924A6D311698}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80AECC55-15BA-43DA-9ED3-924A6D311698}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80AECC55-15BA-43DA-9ED3-924A6D311698}.Release|x64.ActiveCfg = Release|x64
+		{80AECC55-15BA-43DA-9ED3-924A6D311698}.Release|x64.Build.0 = Release|x64
+		{80AECC55-15BA-43DA-9ED3-924A6D311698}.Release|x86.ActiveCfg = Release|x86
+		{80AECC55-15BA-43DA-9ED3-924A6D311698}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

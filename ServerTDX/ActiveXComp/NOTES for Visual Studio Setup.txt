@@ -1,0 +1,11 @@
+I am not sure how transportable this will be, I had some issues checking it out on a differnt computer.
+If there is an issue, its an easy fix.
+
+1) Go to the ActiveX directory and run the .cmd file to register the dll on the current system.
+2) add the com reference in Visual studio project
+3) In the form code where the api object is defined comment it out. This will give an error
+4) Go to form design view, right click on toolbox and add choose items
+5) Add the TDAPIICom object (this should place an ameritrade logo on your form)
+6) change the name of the object to api.
+
+Code should build now. 
