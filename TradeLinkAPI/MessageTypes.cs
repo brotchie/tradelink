@@ -8,7 +8,8 @@ namespace TradeLink.API
     /// </summary>
     public enum MessageTypes
     {
-        // START TRADELINK STATUS MESSAGES
+        // START TRADELINK STATUS MESSAGES - DO NOT REMOVE OR RENAME MESSAGES (only add/insert)
+        // IF CHANGED, MUST COPY THIS ENUM'S CONTENTS TO BROKERSERVERS\TRADELIBFAST\TRADELINK.H
         ORDER_NOT_FOUND = -112,
         TLCLIENT_NOT_FOUND = -111,
         INVALID_ACCOUNT = -110,
@@ -24,7 +25,7 @@ namespace TradeLink.API
         SYMBOL_NOT_LOADED = -100,
         OK = 0,
         // END STATUS MESSAGES
-        // START CUSTOM MESSAGES
+        // START CUSTOM MESSAGES  - DO NOT REMOVE OR RENAME MESSAGES
         CUSTOM1 = 1,
         CUSTOM2,
         CUSTOM3,
@@ -43,8 +44,8 @@ namespace TradeLink.API
         CUSTOM16,
         CUSTOM17,
         CUSTOM18,
-        BARREQUEST,
-        BARRESPONSE,
+        CUSTOM19,
+        CUSTOM20,
         ISSHORTABLE,
         VWAP,
         LASTTRADESIZE,
@@ -92,6 +93,7 @@ namespace TradeLink.API
         ORDERCANCELREQUEST,
         POSITIONREQUEST,
         FEATUREREQUEST,
+        BARREQUEST,
         DOMREQUEST,
         IMBALANCEREQUEST,
         SENDORDERMARKET,
@@ -120,7 +122,9 @@ namespace TradeLink.API
         ENDHISTORICALRUN,
         SERVERUP,
         SERVERDOWN,
-        // END TRADELINK MESSAGES
+        BARRESPONSE,
+        // END TRADELINK MESSAGES - DO NOT REMOVE OR RENAME MESSAGES (ONLY ADD/INSERT)
+        // IF CHANGED, MUST COPY THIS ENUM TO BROKERSERVERS\TRADELIBFAST\TRADELINK.H
 
     }
 }
