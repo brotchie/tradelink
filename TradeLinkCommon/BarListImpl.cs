@@ -567,6 +567,46 @@ histperiod=daily&startdate=" + startdate + "&enddate=" + enddate + "&output=csv&
             return new BarImpl();
         }
 
+        /// <summary>
+        /// Populate the day-interval barlist using google finance as the source.
+        /// </summary>
+        /// <returns></returns>
+        ///
+        public static BarList DayFromYahoo(string symbol) { return DayFromYahoo(symbol, null, null); }
+        public static BarList DayFromYahoo(string symbol, DateTime? startDate, DateTime? endDate)
+        {
+            string urlTemplate =
+           @"http://ichart.finance.yahoo.com/table.csv?s=[symbol]&a=" +
+             "[startMonth]&b=[startDay]&c=[startYear]&d=[endMonth]&e=" +
+                "[endDay]&f=[endYear]&g=d&ignore=.csv";
+
+            if (!endDate.HasValue) endDate = DateTime.Now;
+            if (!startDate.HasValue) startDate = DateTime.Now.AddYears(-5);
+            if (symbol == null || symbol.Length < 1)
+                throw new ArgumentException("Symbol invalid: " + symbol);
+            // NOTE: Yahoo's scheme uses a month number 1 less than actual e.g. Jan. ="0"
+            int strtMo = startDate.Value.Month - 1;
+            string startMonth = strtMo.ToString();
+            string startDay = startDate.Value.Day.ToString();
+            string startYear = startDate.Value.Year.ToString();
+
+            int endMo = endDate.Value.Month - 1;
+            string endMonth = endMo.ToString();
+            string endDay = endDate.Value.Day.ToString();
+            string endYear = endDate.Value.Year.ToString();
+
+            urlTemplate = urlTemplate.Replace("[symbol]", symbol);
+
+            urlTemplate = urlTemplate.Replace("[startMonth]", startMonth);
+            urlTemplate = urlTemplate.Replace("[startDay]", startDay);
+            urlTemplate = urlTemplate.Replace("[startYear]", startYear);
+
+            urlTemplate = urlTemplate.Replace("[endMonth]", endMonth);
+            urlTemplate = urlTemplate.Replace("[endDay]", endDay);
+            urlTemplate = urlTemplate.Replace("[endYear]", endYear);
+            return DayFromURL(urlTemplate, symbol);
+        }
+
 
     }
 
