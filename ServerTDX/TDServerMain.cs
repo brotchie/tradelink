@@ -82,8 +82,8 @@ namespace TDServer
         {
             DateTime DT = new DateTime(1970, 1, 1);
             //Axtdaactx.AxTDAL1Quote quote = (Axtdaactx.AxTDAL1Quote)e.quote;
-            
 
+            Tick t = new TickImpl();
             t.date = Util.ToTLDate(DateTime.Now);
             t.time = Util.DT2FT(DateTime.Now);
             t.symbol = e.quote.Symbol;
@@ -95,8 +95,6 @@ namespace TDServer
             t.bs = Convert.ToInt32(e.quote.BidSize);
             t.os = Convert.ToInt32(e.quote.AskSize);
             tl.newTick(t);
-            
-            //debug(t.symbol + " " + t.ltrade + "\n");
 
         }
     
@@ -246,49 +244,38 @@ namespace TDServer
             string cResultMessage                               = string.Empty;
             string cEnteredOrderID                              = string.Empty;
             StringBuilder cOrderString                          = new StringBuilder();
-            if (!chkboxProdEnabled.Checked)
-            {
-                TradelinkMySQL db = new TradelinkMySQL();                
-                brokerReplyargs.ResultsCode = db.OrderToDatabase(o);
-                debug("DEBUG ORDER: " + brokerReplyargs.ResultsCode + " " + o.symbol + " " + o.size + "@" + o.price + "\n");
-                Trade t = new TradeImpl();
-            
-            }
+
+            /*
+            cOrderString.Append("action=" + api.Encode_URL(action));
+            cOrderString.Append("~clientorderid=" + api.Encode_URL(o.id.ToString()));
+            cOrderString.Append("~accountid=" + api.Encode_URL(api._accountid));
+            cOrderString.Append("~actprice=" + api.Encode_URL(string.Empty));
+            cOrderString.Append("~expire=" + api.Encode_URL(o.TIF));
+            cOrderString.Append("~ordtype=" + api.Encode_URL(otype));
+            cOrderString.Append("~price=" + api.Encode_URL(o.price.ToString()));
+            cOrderString.Append("~quantity=" + api.Encode_URL(o.size.ToString()));
+            cOrderString.Append("~spinstructions=" + api.Encode_URL("none"));
+            cOrderString.Append("~symbol=" + api.Encode_URL(o.symbol));
+            cOrderString.Append("~routing=" + api.Encode_URL(route));
+
+            cOrderString.Append("~tsparam=" + api.Encode_URL(string.Empty));
+            cOrderString.Append("~exmonth=" + api.Encode_URL(string.Empty));
+            cOrderString.Append("~exday=" + api.Encode_URL(string.Empty));
+            cOrderString.Append("~exyear=" + api.Encode_URL(string.Empty));
+            cOrderString.Append("~displaysize=" + api.Encode_URL(string.Empty));
+            brokerReplyargs.ResultsCode =
+                api.TD_sendOrder(_user.Text, _pass.Text, AmeritradeBrokerAPI.SOURCEID, APIVER, cOrderString.ToString(), ref cResultMessage, ref cEnteredOrderID);
+
+            if (brokerReplyargs.ResultsCode != OK)
+                debug(cResultMessage);
             else
             {
-
-                //cOrderString.Append("action=" + api.Encode_URL(action));
-                //cOrderString.Append("~clientorderid=" + api.Encode_URL(o.id.ToString()));
-                //cOrderString.Append("~accountid=" + api.Encode_URL(api._accountid));
-                //cOrderString.Append("~actprice=" + api.Encode_URL(string.Empty));
-                //cOrderString.Append("~expire=" + api.Encode_URL(o.TIF));
-                //cOrderString.Append("~ordtype=" + api.Encode_URL(otype));
-                //cOrderString.Append("~price=" + api.Encode_URL(o.price.ToString()));
-                //cOrderString.Append("~quantity=" + api.Encode_URL(o.size.ToString()));
-                //cOrderString.Append("~spinstructions=" + api.Encode_URL("none"));
-                //cOrderString.Append("~symbol=" + api.Encode_URL(o.symbol));
-                //cOrderString.Append("~routing=" + api.Encode_URL(route));
-
-                //cOrderString.Append("~tsparam=" + api.Encode_URL(string.Empty));
-                //cOrderString.Append("~exmonth=" + api.Encode_URL(string.Empty));
-                //cOrderString.Append("~exday=" + api.Encode_URL(string.Empty));
-                //cOrderString.Append("~exyear=" + api.Encode_URL(string.Empty));
-                //cOrderString.Append("~displaysize=" + api.Encode_URL(string.Empty));
-                //brokerReplyargs.ResultsCode =
-                //    api.TD_sendOrder(_user.Text, _pass.Text, AmeritradeBrokerAPI.SOURCEID, APIVER, cOrderString.ToString(), ref cResultMessage, ref cEnteredOrderID);
-
-                //if (brokerReplyargs.ResultsCode != OK)
-                //    debug(cResultMessage);
-                //else
-                //{
-                //    long tdid = 0;
-                //    if (long.TryParse(cEnteredOrderID, out tdid))
-                //        idmap.Add(o.id, tdid);
-                //    tl.newOrder(o);
-                //}
-
-                debug("PROD ORDER: " + brokerReplyargs.ResultsCode + " " + o.symbol + " " + o.size + "@" + o.price + "\n");  
-            }
+                long tdid = 0;
+                if (long.TryParse(cEnteredOrderID, out tdid))
+                    idmap.Add(o.id, tdid);
+                tl.newOrder(o);
+            }*/
+            debug("order not presently hooked up in TDX: "+o.ToString());
 
             
         }

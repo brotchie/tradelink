@@ -58,6 +58,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\Record.lnk" "$INSTDIR\Record.EXE" "" "$INSTDIR\Record.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\SterlingPro.lnk" "$INSTDIR\SterServer.EXE" "" "$INSTDIR\SterServer.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\TDAmeritrade.lnk" "$INSTDIR\TDServer.EXE" "" "$INSTDIR\TDServer.EXE" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink\TDAmeritradeX.lnk" "$INSTDIR\TDServerX.EXE" "" "$INSTDIR\TDServerX.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\MBTrading.lnk" "$INSTDIR\ServerMB.EXE" "" "$INSTDIR\ServerMB.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\Esignal.lnk" "$INSTDIR\ServerEsignal.exe" "" "$INSTDIR\ServerEsignal.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\DBFX.lnk" "$INSTDIR\ServerDBFX.exe" "" "$INSTDIR\ServerDBFX.exe" 0  
@@ -79,6 +80,15 @@ Section "TradeLinkSuite"
   File /nonfatal "ServerTD\bin\release\TDServer.exe"
   File /nonfatal "ServerTD\bin\release\Interop.MSXML2.dll"
   File /nonfatal "ServerTD\bin\release\NZipLib.dll"
+  File /nonfatal "ServerTDX\bin\release\TDServerX.exe"
+  File /nonfatal "ServerTDX\bin\release\AxInterop.tdaactx.dll"
+  File /nonfatal "ServerTDX\bin\release\Interop.tdaactx.dll"
+  File /nonfatal "ServerTDX\bin\release\Interop.MSXML2.dll"
+  File /nonfatal "ServerTDX\bin\release\Interop.MSXML2.dll"
+  File /nonfatal "ServerTDX\ActiveXComp\ActiveX\TDAACTX.ocx"
+  RegDLL "$INSTDIR\TDAACTX.ocx"
+  
+  
   File "Responses\bin\release\Responses.dll"
   File "Quotopia\bin\release\Quotopia.exe"
   File "Quotopia\bin\release\Quotopia.exe.config"
@@ -179,6 +189,8 @@ SectionEnd
 
 Section "Uninstall"
   
+  ; unregister com components
+  UnRegDLL "$INSTDIR\TDAACTX.ocx"
   ; Remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite"
   DeleteRegKey HKLM SOFTWARE\TradeLinkSuite
