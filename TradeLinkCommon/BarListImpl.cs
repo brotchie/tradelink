@@ -413,6 +413,53 @@ namespace TradeLink.Common
             return true;
         }
 
+
+        public static BarList DayFromGoogle(string symbol, int startdate)
+        {
+            return
+                DayFromGoogle(symbol, startdate, Util.ToTLDate());
+        }
+        /// <summary>
+        /// gets specific date range of bars from google
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <param name="startdate"></param>
+        /// <param name="enddate"></param>
+        /// <returns></returns>
+        public static BarList DayFromGoogle(string symbol, int startdate, int enddate)
+        {
+            const string AMEX = ":AMEX";
+            if ((symbol == null) || (symbol == string.Empty)) return new
+BarListImpl();
+            string url = @"http://finance.google.com/finance/historical?
+histperiod=daily&startdate=" + startdate + "&enddate=" + enddate + "&output=csv&q=" + symbol;
+            BarListImpl bl = new BarListImpl(BarInterval.Day, symbol);
+            System.Net.WebClient wc = new System.Net.WebClient();
+            string res = "";
+            try
+            {
+                res = wc.DownloadString(url);
+            }
+            catch (Exception)
+            {
+                if (!symbol.Contains(AMEX))
+                    DayFromGoogle(symbol + AMEX, startdate, enddate);
+                return bl;
+
+            }
+            string[] line = res.Split(Environment.NewLine.ToCharArray());
+            for (int i = line.Length - 1; i > 0; i--)
+            {
+                if (line[i] == "") continue;
+                Bar b = BarImpl.FromCSV(line[i]);
+                foreach (Tick k in BarImpl.ToTick(b))
+                    bl.newTick(k);
+            }
+            return bl;
+        }
+
+
+
         static void wc_DownloadStringCompleted(object sender, System.Net.DownloadStringCompletedEventArgs e)
         {
             string res = string.Empty;

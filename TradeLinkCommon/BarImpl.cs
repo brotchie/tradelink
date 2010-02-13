@@ -179,6 +179,26 @@ namespace TradeLink.Common
             string symbol = r[7];
             return new BarImpl(open, high, low, close, vol, date, time, symbol);
         }
+
+        /// <summary>
+        /// convert a bar into an array of ticks
+        /// </summary>
+        /// <param name="bar"></param>
+        /// <returns></returns>
+        public static Tick[] ToTick(Bar bar)
+        {
+            if (!bar.isValid) return new Tick[0];
+            List<Tick> list = new List<Tick>();
+            list.Add(TickImpl.NewTrade(bar.Symbol, bar.Bardate, bar.Bartime, bar.Open,
+(int)((double)bar.Volume / 4), string.Empty));
+            list.Add(TickImpl.NewTrade(bar.Symbol, bar.Bardate, bar.Bartime,
+bar.High, (int)((double)bar.Volume / 4), string.Empty));
+            list.Add(TickImpl.NewTrade(bar.Symbol, bar.Bardate, bar.Bartime, bar.Low,
+(int)((double)bar.Volume / 4), string.Empty));
+            list.Add(TickImpl.NewTrade(bar.Symbol, bar.Bardate, bar.Bartime,
+bar.Close, (int)((double)bar.Volume / 4), string.Empty));
+            return list.ToArray();
+        }
     }
 
 
