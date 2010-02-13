@@ -204,10 +204,8 @@ namespace ASP
         void tl_gotUnknownMessage(MessageTypes type, uint source, uint dest, uint id, string request, ref string response)
         {
             // send unknown messages to valid responses
-            int idx = r2r(source);
-            if (idx == ResponseTemplate.UNKNOWNRESPONSE) return;
-            if ((idx < 0) || (idx > _reslist.Count)) return;
-            if (_reslist[idx].isValid)
+            for (int idx= 0; idx<_reslist.Count; idx++)
+                if (!isBadResponse(idx))
                     _reslist[idx].GotMessage(type, source, dest, id, request, ref response);
         }
 

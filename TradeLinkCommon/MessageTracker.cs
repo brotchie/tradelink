@@ -148,7 +148,7 @@ namespace TradeLink.Common
                     {
                         if (GotFeatures != null)
                         {
-                            string[] r = response.Split(delim);
+                            string[] r = response.Split(',');
                             List<MessageTypes> f = new List<MessageTypes>();
                             foreach (string rs in r)
                             {
@@ -183,6 +183,9 @@ namespace TradeLink.Common
                 {
                     case MessageTypes.DOMREQUEST:
                         request.Replace(Book.EMPTYREQUESTOR, _tl.Name);
+                        break;
+                    case MessageTypes.FEATUREREQUEST:
+                        request = _tl.Name;
                         break;
                 }
                 // send it

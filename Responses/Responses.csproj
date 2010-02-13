@@ -73,6 +73,7 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BrokerFeatureList.cs" />
     <Compile Include="LessonBoxHello.cs" />
     <Compile Include="LessonIndicators.cs" />
     <Compile Include="LessonParamPrompt.cs" />

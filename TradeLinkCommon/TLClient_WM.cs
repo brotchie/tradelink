@@ -403,6 +403,8 @@ namespace TradeLink.Common
                     }
                     if (gotFeatures != null) 
                         gotFeatures(f.ToArray());
+                    if (gotUnknownMessage != null)
+                        gotUnknownMessage(tlm.type, 0, 0, 0, string.Empty, ref tlm.body);
                     break;
                 case MessageTypes.SERVERDOWN:
                     if (gotServerDown != null)
