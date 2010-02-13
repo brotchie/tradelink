@@ -272,7 +272,7 @@ namespace SterServer
             newFill(f);
         }
 
-        
+        List<uint> _onotified = new List<uint>(MAXRECORD);
 
         void stiEvents_OnSTIOrderUpdate(ref structSTIOrderUpdate structOrderUpdate)
         {
@@ -281,6 +281,10 @@ namespace SterServer
             uint id = 0;
             if (!uint.TryParse(structOrderUpdate.bstrClOrderId, out id))
                 id = (uint)structOrderUpdate.nOrderRecordId;
+            // don't notify for same order more than once
+            if (_onotified.Contains(id)) return;
+            if (structOrderUpdate.bstrLogMessage.Contains("REJ"))
+                debug(o.id+" "+structOrderUpdate.bstrLogMessage);
             o.id = id;
             o.size = structOrderUpdate.nQuantity;
             o.side = o.size > 0;
@@ -294,6 +298,7 @@ namespace SterServer
             long rem = (now - xsec) / 100;
             o.time = ((int)(rem % 10000)) * 100 + xsec;
             o.date = (int)((rem - o.time) / 10000);
+            _onotified.Add(o.id);
             newOrder(o);
 
         }
