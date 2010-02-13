@@ -18,6 +18,8 @@ namespace TradeLink.API
         void Remove(Security s);
         void Remove(string symbol);
         void Clear();
+        Security[] ToArray();
+        string[] ToSymArray();
         IEnumerator GetEnumerator();
     }
 }

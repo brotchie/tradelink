@@ -146,5 +146,18 @@ namespace TradeLink.Common
         public static BasketImpl FromString(string serialbasket) { return Deserialize(serialbasket); }
         public IEnumerator GetEnumerator() { foreach (SecurityImpl s in symbols) yield return s; }
 
+        public Security[] ToArray()
+        {
+            return symbols.ToArray();
+        }
+
+        public string[] ToSymArray()
+        {
+            string[] syms = new string[symbols.Count];
+            for (int i = 0; i < syms.Length; i++)
+                syms[i] = symbols[i].Symbol;
+            return syms;
+        }
+
     }
 }
