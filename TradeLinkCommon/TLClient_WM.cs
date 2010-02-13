@@ -299,6 +299,13 @@ namespace TradeLink.Common
             return true;
         }
 
+        void debug(string msg)
+        {
+            if (SendDebug != null)
+                SendDebug(msg);
+        }
+
+        int _tickerrors = 0;
 
         protected override void WndProc(ref System.Windows.Forms.Message m)
         {
@@ -309,12 +316,25 @@ namespace TradeLink.Common
                 base.WndProc(ref m); // let form process it
                 return; // we're done
             }
-
+            
             string msg = tlm.body;
             switch (tlm.type)
             {
                 case MessageTypes.TICKNOTIFY:
-                    Tick t = TickImpl.Deserialize(msg);
+                    Tick t;
+                    try
+                    {
+                        t = TickImpl.Deserialize(msg);
+
+                    }
+                    catch (Exception ex)
+                    {
+                        _tickerrors++;
+                        debug("Error processing tick: " + msg);
+                        debug("TickErrors: " + _tickerrors);
+                        debug("Error: " + ex.Message + ex.StackTrace);
+                        break;
+                    }
                     if (t.isTrade)
                     {
                         try
