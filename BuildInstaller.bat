@@ -63,20 +63,7 @@ ren TradeLinkSuite.exe TLS.tmp > NUL
 echo Removing working files...
 del VERSION.txt > NUL
 ren TLS.tmp TradeLinkSuite-%REVISION%.exe > NUL
-if exist InstallSuite\_zipresponses (
-del /q *.zip > NUL
-echo Zipping responses...
-echo .\Responses\*.cs >> _pat.txt
-echo .\Responses\*.resx >> _pat.txt
-echo .\Responses\*.settings >> _pat.txt
-echo .\Responses\*.sln >> _pat.txt
-echo .\Responses\*.csproj >> _pat.txt
-echo .\Responses\*.config >> _pat.txt
-echo .\Responses\*.ico >> _pat.txt
-echo .\Responses\*.cmd >> _pat.txt
-zip -R Responses-%REVISION%.zip .\Responses -i@_pat.txt > NUL
-del _pat.txt
-)
+
 
 if exist InstallSuite\_gendocs (
 echo Generating documentation from source code... (may take a moment)

@@ -69,7 +69,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\IQFeed.lnk" "$INSTDIR\IQFeedBroker.exe" "" "$INSTDIR\IQFeedBroker.exe" 0  
   
   
-  ; Put file there
+  ; install these files
   File "VERSION.txt"
   File "Kadina\bin\release\Kadina.exe"
   File "Kadina\bin\release\Kadina.exe.config"
@@ -145,6 +145,9 @@ Section "TradeLinkSuite"
   ; make sure TickData folder is present
   CreateDirectory $PROGRAMFILES\TradeLink\TickData
   
+  ; skip tickdata and vcredistuble installs if running in silent mode
+  StrCmp $SILENT "YES" finishinstall
+  
   DetailPrint "Checking for TickData..."
   ReadRegStr $0 HKLM SOFTWARE\TradeLinkSuite "InstalledTickData"
   StrCmp $0 "Yes" vcredistinstall
@@ -173,8 +176,16 @@ finishinstall:
   ; register tik extension
   ${registerExtension} "$INSTDIR\TimeSales.exe" ".tik" "TradeLink TickData"
   
+  ; don't open browser on silent
+  StrCmp $SILENT "YES" final
   ExecShell "open" "http://franta.com/support"
+  final:
 
+SectionEnd
+
+Section "ResponseExamples"
+  File /r /x *.user /x *.xml /x *.dll /x *.pdf /x *.csv /x *.txt /x *.Cache /x .svn /x obj /x bin Responses
+  CreateShortCut "$SMPROGRAMS\TradeLink\ResponseExamples.lnk" "$INSTDIR\Responses\Responses.csproj" "" "$INSTDIR\Responses\Responses.csproj" 0
 SectionEnd
 ;--------------------------------
 
@@ -236,6 +247,53 @@ Function .onInit
 
   Pop $0 ; $0 has '1' if the user closed the splash screen early,
          ; '0' if everything closed normally, and '-1' if some error occurred.
+		 Call IsSilent
+FunctionEnd
+
+Function IsSilent
+  Var /GLOBAL SILENT
+  StrCpy $SILENT "No"
+  Push $0
+  Push $CMDLINE
+  Push "/S"
+  Call StrStr
+  Pop $0
+  StrCpy $0 $0 3
+  StrCmp $0 "/S" silent
+  StrCmp $0 "/S " silent
+    StrCpy $0 0
+    Goto notsilent
+  silent: StrCpy $SILENT "YES"
+  notsilent: StrCpy $SILENT "NO"
+FunctionEnd
+
+Function StrStr
+  Exch $R1 ; st=haystack,old$R1, $R1=needle
+  Exch    ; st=old$R1,haystack
+  Exch $R2 ; st=old$R1,old$R2, $R2=haystack
+  Push $R3
+  Push $R4
+  Push $R5
+  StrLen $R3 $R1
+  StrCpy $R4 0
+  ; $R1=needle
+  ; $R2=haystack
+  ; $R3=len(needle)
+  ; $R4=cnt
+  ; $R5=tmp
+  loop:
+    StrCpy $R5 $R2 $R3 $R4
+    StrCmp $R5 $R1 done
+    StrCmp $R5 "" done
+    IntOp $R4 $R4 + 1
+    Goto loop
+  done:
+  StrCpy $R1 $R2 "" $R4
+  Pop $R5
+  Pop $R4
+  Pop $R3
+  Pop $R2
+  Exch $R1
 FunctionEnd
 
 

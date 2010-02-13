@@ -3,7 +3,6 @@
 
 Section "BrokerServer"
 
-  SectionIn RO
     ; Set output path to the installation directory.
 	DetailPrint "Installing version ${VERSION}..."
   SetOutPath $INSTDIR
