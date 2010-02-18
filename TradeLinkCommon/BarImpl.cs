@@ -147,13 +147,13 @@ namespace TradeLink.Common
         {
             const char d = ',';
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
-            sb.Append(b.Open);
+            sb.Append(b.Open.ToString(System.Globalization.CultureInfo.InvariantCulture));
             sb.Append(d);
-            sb.Append(b.High);
+            sb.Append(b.High.ToString(System.Globalization.CultureInfo.InvariantCulture));
             sb.Append(d);
-            sb.Append(b.Low);
+            sb.Append(b.Low.ToString(System.Globalization.CultureInfo.InvariantCulture));
             sb.Append(d);
-            sb.Append(b.Close);
+            sb.Append(b.Close.ToString(System.Globalization.CultureInfo.InvariantCulture));
             sb.Append(d);
             sb.Append(b.Volume);
             sb.Append(d);
