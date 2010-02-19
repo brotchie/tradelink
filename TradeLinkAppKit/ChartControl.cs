@@ -172,14 +172,17 @@ namespace TradeLink.AppKit
             {
                 if (DisplayCursor && (bl != null))
                 {
+                    int x = e.X;
+                    int y = e.Y;
                     ChartControl f = this;
                     g = CreateGraphics();
                     float size = g.MeasureString(highesth.ToString(), f.Font).Width + g.MeasureString("255000 ", f.Font).Width;
                     g.FillRectangle(new SolidBrush(f.BackColor), r.Width - size, r.Height - f.Font.Height, size, f.Font.Height);
-                    _curbar = getBar(MousePosition.X);
-                    _curprice = getPrice(MousePosition.Y);
+                    _curbar = getBar(x);
+                    _curprice = getPrice(y);
                     size = g.MeasureString(highesth.ToString(), f.Font).Width + g.MeasureString("255000 ", f.Font).Width;
-                    string time = _curbar == 0 ? string.Empty : bl[_curbar].Bartime.ToString();
+                    int time = (_curbar<0)||(_curbar>bl.Last) ? 0 : (bl.DefaultInterval== BarInterval.Day ? bl[_curbar].Bardate :  (int)((double)bl[_curbar].Bartime/100));
+                    string times = time == 0 ? string.Empty : time.ToString();
                     string price = _curprice == 0 ? string.Empty : _curprice.ToString("F2");
                     g.DrawString(time + " " + price, f.Font, new SolidBrush(fgcol), r.Width - size, r.Height - f.Font.Height);
 
@@ -239,13 +242,14 @@ namespace TradeLink.AppKit
         {
             if (bl == null) return 0;
             int b = (int)((X - (border / 3)) / pixperbar);
-            if ((b < 0) || (b >= bl.Count)) return 0;
+            if (b < 0) return 0;
+            if (b >= bl.Count) return bl.Last;
             return b;
         }
         decimal getPrice(int Y) 
         {
             if (bl == null) return 0;
-            decimal p = (((Y - hborder)/pixperdollar)-highesth)*-1;
+            decimal p = (((decimal)(Y-hborder)/pixperdollar)-highesth)*-1;
             if ((p > highesth) || (p < lowestl)) return 0;
             return p;
         }
@@ -377,7 +381,7 @@ namespace TradeLink.AppKit
             }
             if (DisplayInterval && (bl!=null))
             {
-                g.DrawString(bl.DefaultInterval.ToString(), f.Font, new SolidBrush(Color.Black), 3, 3);
+                g.DrawString(bl.DefaultInterval.ToString(), f.Font, new SolidBrush(fgcol), 3, 3);
             }
 
             DrawLabels();
