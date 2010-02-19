@@ -116,7 +116,7 @@ namespace TradeLink.Common
             c = t.ltrade;
             return true;
         }
-        public override string ToString() { return "OHLC ("+bartime+") " + o + "," + h + "," + l + "," + c; }
+        public override string ToString() { return "OHLC (" + bartime + ") " + Open.ToString("F2") + "," + High.ToString("F2") + "," + Low.ToString("F2") + "," + Close.ToString("F2"); }
         /// <summary>
         /// Create bar object from a CSV file providing OHLC+Volume data.
         /// </summary>
