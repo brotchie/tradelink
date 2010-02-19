@@ -409,7 +409,10 @@ namespace TradeLink.AppKit
                 _colpoints.Add(color, tmp);
                 _collineend.Add(color,new List<int>());
             }
-            _colpoints[color].Add(new Label(time, price, label, color));
+            Label l = new Label(time, price, label, color);
+            _colpoints[color].Add(l);
+            if (l.isLine)
+                _collineend[color].Add(_colpoints[color].Count-1);
             if (_alwaysupdate)
                 refresh();
         }
@@ -433,7 +436,7 @@ namespace TradeLink.AppKit
 
         struct Label
         {
-            public bool isLineEnd { get { return (Text == null) || (Text == string.Empty); } }
+            public bool isLine { get { return (Text == null) || (Text == string.Empty); } }
             public int Time;
             public decimal Price;
             public string Text;
@@ -457,24 +460,38 @@ namespace TradeLink.AppKit
                 List<Label> points = _colpoints[c];
                 for (int i = 0; i < points.Count; i++)
                 {
-                    // draw lines
-                    if (points[i].isLineEnd)
+                    // draw labels
+                    if (!points[i].isLine)
                     {
-                        _collineend[c].Add(i);
-                        // can't draw from first point
-                        if (i == 0) continue;
-                        // draw from previous point
-                        gd.DrawLine(new Pen(c), 
-                            getX(BarListImpl.GetNearestIntraBar(bl,points[_collineend[c][_collineend[c].Count - 2]].Time,bl.DefaultInterval)), 
-                            getY(points[_collineend[c][_collineend[c].Count - 2]].Price), 
-                            getX(BarListImpl.GetNearestIntraBar(bl,points[i].Time,bl.DefaultInterval)), 
-                            getY(points[i].Price));
-
-                    }
-                    else // draw labels
                         gd.DrawString(points[i].Text, font, new SolidBrush(c), getX(BarListImpl.GetNearestIntraBar(bl,points[i].Time,bl.DefaultInterval)), getY(points[i].Price));
+                    }
+
+                        
+                }
+
+            }
+            // draw lines
+            foreach (Color c in _collineend.Keys)
+            {
+                List<Label> points = _colpoints[c];
+                List<int> lineidx = _collineend[c];
+                for (int i = 0; i < lineidx.Count; i++)
+                {
+                    // can't draw from first point
+                    if (i==0) continue;
+                    // get point indicies
+                    int p1i = lineidx[i-1];
+                    int p2i = lineidx[i];
+                    // get points
+                    int x1 = getX(BarListImpl.GetNearestIntraBar(bl, points[p1i].Time, bl.DefaultInterval));
+                    int y1 = getY(points[p1i].Price);
+                    int x2 = getX(BarListImpl.GetNearestIntraBar(bl, points[p2i].Time, bl.DefaultInterval));
+                    int y2 = getY(points[p2i].Price);
+                    // draw from previous point
+                    gd.DrawLine(new Pen(c), x1, y1, x2, y2);
                 }
             }
+
 
 
 
