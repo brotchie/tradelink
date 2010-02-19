@@ -12,7 +12,7 @@ using namespace std;
 namespace TradeLibFast
 {
 
-	const char* VERFILE = "\\tradelink\\brokerserver\\VERSION.txt";
+	const char* VERFILE = "\\tradelink\\tradelinksuite\\VERSION.txt";
 	TLServer_WM::TLServer_WM(void)
 	{
 		MajorVer = 0.1;

@@ -67,15 +67,6 @@ namespace TradeLink.AppKit
                 if (current!=0)
                     wc.DownloadStringAsync(new Uri(TLSITEURL), new verstate(Util.PROGRAM,TLSITEURL, current,pause));
             }
-            if (checkbrokerserver)
-            {
-                WebClient wc = new WebClient();
-                wc.DownloadStringCompleted += new DownloadStringCompletedEventHandler(wc_DownloadStringCompleted);
-
-                int current = ((tl == null) || (tl.ProvidersAvailable.Length==0)) ? 0 : tl.ServerVersion;
-                if (current!=0)
-                    wc.DownloadStringAsync(new Uri(TLSITEURL), new verstate(BROKERSERVER, TLSITEURL, current,pause));
-            }
         }
         public const string VERSIONFILE = @"\VERSION.txt";
         internal struct verstate
@@ -130,12 +121,12 @@ namespace TradeLink.AppKit
         }
 
         public const string TLSITEURL = "http://code.google.com/p/tradelink/";
-        public const string BROKERSERVER = "BrokerServer";
+
         /// <summary>
         /// Gets latest version number of an application's exe file, when version is embedded in file name like 'MyAppName-123.exe', and can be found at URL.
         /// </summary>
         /// <param name="URL">URL of the location to get versions from</param>
-        /// <param name="Application">Util.BROKERSERVER|Util.TRADELINKSUITE</param>
+        /// <param name="Application">application name</param>
         /// <returns></returns>
         public static int LatestVersion(string Application)
         {
@@ -163,10 +154,8 @@ namespace TradeLink.AppKit
 
 
 
-        /// <summary>
-        /// Returns true if a newer version of suite exists on website
-        /// </summary>
-        /// <returns></returns>
+
+        [Obsolete("Use LatestVersion(Util.PROGRAM) instead.")]
         public static bool ExistsNewTLS()
         {
             int latest = LatestVersion(Util.PROGRAM);
@@ -175,20 +164,13 @@ namespace TradeLink.AppKit
                 build = Util.BuildFromFile(Util.TLProgramDir + @"\VERSION.txt");
             return latest > build;
         }
-        /// <summary>
-        /// Returns true if a newer version of brokerserver exists.
-        /// </summary>
-        /// <param name="tl"></param>
-        /// <returns></returns>
+
+        [Obsolete("Brokerserver is part of TradeLink.  Use LatestVersion(Util.PROGRAM) instead.")]
         public static bool ExistsNewBS(TLClient_WM tl)
         {
             if (tl == null) return false;
             if (tl.ProvidersAvailable.Length==0) return false;
-            int latest = 0;
-            if (tl.RequestFeatureList.Contains(MessageTypes.HISTORICALDATA))
-                latest = LatestVersion(Util.PROGRAM);
-            else
-                latest = LatestVersion(BROKERSERVER);
+            int latest = latest = LatestVersion(Util.PROGRAM);
             int thisver = tl.ServerVersion;
             return latest > thisver;
         }
