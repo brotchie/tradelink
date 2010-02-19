@@ -9,7 +9,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="PROGRAM_NAME" Type="System.String" Scope="User">
-      <Value Profile="(Default)">IQFEED_DEMO</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="ADMINISTRATION_SOCKET_NAME" Type="System.String" Scope="User">
       <Value Profile="(Default)">Admin</Value>

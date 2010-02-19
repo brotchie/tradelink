@@ -11,7 +11,7 @@ using TradeLink.Common;
 
 namespace IQFeedBroker
 {
-    public class IQFeedHelper
+    public class IQFeedHelper : TLServer_WM
     {
         #region Variables
 
@@ -34,7 +34,7 @@ namespace IQFeedBroker
 
         #region Properties
 
-        public bool IsConnected { get; private set; }
+        public bool IsConnected { get { return _registered; } }
 
         private bool HaveUserCredentials
         {
@@ -52,25 +52,73 @@ namespace IQFeedBroker
         public IQFeedHelper()
         {
             _basket = new BasketImpl();
+            newProviderName = Providers.IQFeed;
+            newRegisterStocks += new DebugDelegate(IQFeedHelper_newRegisterStocks);
+            newFeatureRequest += new MessageArrayDelegate(IQFeedHelper_newFeatureRequest);
+            newUnknownRequest += new UnknownMessageDelegate(IQFeedHelper_newUnknownRequest);
             
         }
 
-        public IQFeedHelper(string username, string password)
+        long IQFeedHelper_newUnknownRequest(MessageTypes t, string msg)
         {
-            Start(username, password);
-            _basket = new BasketImpl();
+            switch (t)
+            {
+                case MessageTypes.DAYHIGH:
+                    {
+                        // get index for request
+                        int idx = _highs.getindex(msg);
+                        // ignore if no index
+                        if (idx == GenericTracker.UNKNOWN) return 0;
+                        decimal v = _highs[idx];
+                        // ensure we have a high
+                        if (v == decimal.MinValue) return 0;
+                        return WMUtil.pack(v);
+                    }
+                case MessageTypes.DAYLOW:
+                    {
+                        // get index for request
+                        int idx = _highs.getindex(msg);
+                        // ignore if no index
+                        if (idx == GenericTracker.UNKNOWN) return 0;
+                        decimal v = _highs[idx];
+                        // ensure we have a high
+                        if (v == decimal.MaxValue) return 0;
+                        return WMUtil.pack(v);
+                    }
+                    break;
+            }
+            return (long)MessageTypes.UNKNOWN_MESSAGE;
         }
 
-        public IQFeedHelper(Basket basket, string username, string password)
+        public delegate void booldel(bool v);
+        public event booldel Connected;
+
+        MessageTypes[] IQFeedHelper_newFeatureRequest()
         {
-            Start(username, password);
-            _basket = basket;
+            List<MessageTypes> f = new List<MessageTypes>();
+            // add features supported by this connector
+            f.Add(MessageTypes.LIVEDATA);
+            f.Add(MessageTypes.TICKNOTIFY);
+            f.Add(MessageTypes.BROKERNAME);
+            f.Add(MessageTypes.REGISTERSTOCK);
+            f.Add(MessageTypes.VERSION);
+
+            
+            f.Add(MessageTypes.DAYHIGH);
+            f.Add(MessageTypes.DAYLOW);
+            return f.ToArray();
         }
 
-        public IQFeedHelper(Basket basket)
+        void IQFeedHelper_newRegisterStocks(string msg)
         {
-            Start(string.Empty, string.Empty);
-            _basket = basket;
+            AddBasket(BasketImpl.FromString(msg));
+        }
+
+        void connect(bool iscon)
+        {
+            if (Connected != null)
+                Connected(iscon);
+            debug(iscon ? "Connected." : "Connection failed.");
         }
 
         #endregion
@@ -78,7 +126,7 @@ namespace IQFeedBroker
 
         #region IQFeedHelper Members
 
-        public void Close()
+        public void Stop()
         {
             Array.ForEach(System.Diagnostics.Process.GetProcessesByName(IQ_FEED), iqProcess => iqProcess.Kill());
             debug("QUITTING****************************");
@@ -115,11 +163,7 @@ namespace IQFeedBroker
         {
             foreach (Security security in basket)
             {
-               /* You need to modify BaskeImpl for the contains to work*/
-               // if (!((BasketImpl)_basket).contains(security.Symbol))
-               // {
-                    AddSecurityToBasket(security);
-               // }
+                AddSecurity(security);
             }
         }
 
@@ -130,11 +174,15 @@ namespace IQFeedBroker
         /// <param name="security"></param>
         internal void AddSecurity(Security security)
         {
-            /* You need to modify BaskeImpl for the contains to work*/
-            //if (!((BasketImpl)_basket).contains(security.Symbol))
-            //{
+            if (!havesymbol(security.Symbol))
+            {
+                _highs.addindex(security.Symbol,decimal.MinValue);
+                _lows.addindex(security.Symbol,decimal.MaxValue);
+
+                _basket.Add(security);
                 AddSecurityToBasket(security);
-            //}
+                debug("Added subscription: " + security.Symbol);
+            }
         }
 
 
@@ -145,7 +193,6 @@ namespace IQFeedBroker
         /// <param name="security"></param>
         private void AddSecurityToBasket(Security security)
         {
-            _basket.Add(security);
 
             // we form a watch command in the form of wSYMBOL\r\n
             string command = String.Format("w{0}\r\n", security.Symbol);
@@ -156,9 +203,16 @@ namespace IQFeedBroker
             m_sockIQConnect.Send(watchCommand, watchCommand.Length, SocketFlags.None);
         }
 
+        bool havesymbol(string sym)
+        {
+            for (int i = 0; i < _basket.Count; i++)
+                if (_basket[i].Symbol == sym) return true;
+            return false;
+        }
 
 
-        public void Start(string username, string password)
+
+        public void Start(string username, string password, string data1, int data2)
         {
             _registered = false;
 
@@ -170,6 +224,9 @@ namespace IQFeedBroker
                 debug("IQ Feed is not installed");
                 return;
             }
+
+            ConnectToAdmin();
+            ConnectToLevelOne();
 
             // close the key since we don't need it anymore
             key.Close();
@@ -190,7 +247,8 @@ namespace IQFeedBroker
                         debug("Need to start IQ Connect first");
                         string args = string.Empty;
                         if (HaveUserCredentials)
-                            args += String.Format("-product {0} -version 1.0.0.0 -login {1} -password {2} -savelogininfo -autoconnect", Global.PROGRAM_NAME, _user, _pswd);
+                            
+                            args += String.Format("-product {0} -version 1.0.0.0 -login {1} -password {2} -savelogininfo -autoconnect", data1, _user, _pswd);
                         System.Diagnostics.Process.Start(IQ_FEED_PROGRAM, args);
                         break;
                     default:
@@ -212,12 +270,12 @@ namespace IQFeedBroker
             try
             {
                 m_sockAdmin = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                IPAddress ipLocalHost = IPAddress.Parse(Global.IP_LOCAL_HOST);
+                IPAddress ipLocalHost = IPAddress.Parse(Properties.Settings.Default.IP_LOCAL_HOST);
                 RegistryKey key = Registry.CurrentUser.OpenSubKey(String.Format("{0}\\Startup", IQ_FEED_REGISTRY_LOCATION));
-                int port = int.Parse(key.GetValue(String.Format("{0}Port", Global.ADMINISTRATION_SOCKET_NAME), "9300").ToString());
+                int port = int.Parse(key.GetValue(String.Format("{0}Port", Properties.Settings.Default.ADMINISTRATION_SOCKET_NAME), "9300").ToString());
                 IPEndPoint endPoint = new IPEndPoint(ipLocalHost, port);
                 m_sockAdmin.Connect(endPoint);
-                WaitForData(Global.ADMINISTRATION_SOCKET_NAME);
+                WaitForData(Properties.Settings.Default.ADMINISTRATION_SOCKET_NAME);
             }
             catch (Exception ex)
             {
@@ -234,12 +292,12 @@ namespace IQFeedBroker
             try
             {
                 m_sockIQConnect = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                IPAddress ipLocalHost = IPAddress.Parse(Global.IP_LOCAL_HOST);
+                IPAddress ipLocalHost = IPAddress.Parse(Properties.Settings.Default.IP_LOCAL_HOST);
                 RegistryKey key = Registry.CurrentUser.OpenSubKey(String.Format("{0}\\Startup", IQ_FEED_REGISTRY_LOCATION));
-                int port = int.Parse(key.GetValue(String.Format("{0}Port", Global.LEVEL_ONE_SOCKET_NAME), "5009").ToString());
+                int port = int.Parse(key.GetValue(String.Format("{0}Port", Properties.Settings.Default.LEVEL_ONE_SOCKET_NAME), "5009").ToString());
                 IPEndPoint endPoint = new IPEndPoint(ipLocalHost, port);
                 m_sockIQConnect.Connect(endPoint);
-                WaitForData(Global.LEVEL_ONE_SOCKET_NAME);
+                WaitForData(Properties.Settings.Default.LEVEL_ONE_SOCKET_NAME);
             }
             catch (Exception ex)
             {
@@ -254,12 +312,12 @@ namespace IQFeedBroker
             if (m_pfnCallback == null)
                 m_pfnCallback = new AsyncCallback(OnReceiveData);
 
-            if (socketName == Global.LEVEL_ONE_SOCKET_NAME)
+            if (socketName == Properties.Settings.Default.LEVEL_ONE_SOCKET_NAME)
             {
                 if (m_sockIQConnect != null)
                     m_sockIQConnect.BeginReceive(m_szLevel1SocketBuffer, 0, m_szLevel1SocketBuffer.Length, SocketFlags.None, m_pfnCallback, socketName);
             }
-            else if (socketName == Global.ADMINISTRATION_SOCKET_NAME)
+            else if (socketName == Properties.Settings.Default.ADMINISTRATION_SOCKET_NAME)
                 m_sockAdmin.BeginReceive(m_szAdminSocketBuffer, 0, m_szAdminSocketBuffer.Length, SocketFlags.None, m_pfnCallback, socketName);
         }
 
@@ -271,7 +329,7 @@ namespace IQFeedBroker
         private void OnReceiveData(IAsyncResult result)
         {
             // first verify we received data from the correct socket.
-            if (result.AsyncState.ToString().Equals(Global.ADMINISTRATION_SOCKET_NAME))
+            if (result.AsyncState.ToString().Equals(Properties.Settings.Default.ADMINISTRATION_SOCKET_NAME))
             {
                 try
                 {
@@ -289,12 +347,13 @@ namespace IQFeedBroker
                             #region Register this application (if necessary)...May want to extract this into a separate function as it's only called once.
                             if (!_registered)
                             {
-                                string command = String.Format("S,REGISTER CLIENT APP,{0},{1}\r\n", Global.PROGRAM_NAME, Assembly.GetExecutingAssembly().GetName().Version);
+                                string command = String.Format("S,REGISTER CLIENT APP,{0},{1}\r\n", Properties.Settings.Default.PROGRAM_NAME, Assembly.GetExecutingAssembly().GetName().Version);
                                 byte[] size = new byte[command.Length];
                                 int bytesToSend = size.Length;
                                 size = Encoding.ASCII.GetBytes(command);
                                 m_sockAdmin.Send(size, bytesToSend, SocketFlags.None);
                                 _registered = true;
+                                connect(_registered);
                             }
                             #endregion
                         }
@@ -314,19 +373,18 @@ namespace IQFeedBroker
                         rawData = rawData.Substring(data.Length + 1);
                     }
 
-                    WaitForData(Global.ADMINISTRATION_SOCKET_NAME);
+                    WaitForData(Properties.Settings.Default.ADMINISTRATION_SOCKET_NAME);
                 }
                 catch (SocketException ex)
                 {
-                    debug(String.Format("ADMIN: Socket Exception: {0}", ex.Message));
+                    debug(ex.Message+ex.StackTrace);
                 }
                 catch (Exception ex)
                 {
-                    debug(String.Format("ADMIN: Full Exception: {0}", ex.Message));
-                    throw ex;
+                    debug(ex.Message + ex.StackTrace);
                 }
             }
-            else if (result.AsyncState.ToString().Equals(Global.LEVEL_ONE_SOCKET_NAME))
+            else if (result.AsyncState.ToString().Equals(Properties.Settings.Default.LEVEL_ONE_SOCKET_NAME))
             {
                 try
                 {
@@ -345,7 +403,6 @@ namespace IQFeedBroker
                         if ((actualData.Length >= 15) && (!sentTicks.TryGetValue(actualData[1], out val)))
                         {
                             FireTick(actualData);
-                            sentTicks.Add(actualData[1], 0);
                         }
                     });
                 }
@@ -359,15 +416,15 @@ namespace IQFeedBroker
                     debug(ex.ToString());
                 }
 
-                WaitForData(Global.LEVEL_ONE_SOCKET_NAME);
+                WaitForData(Properties.Settings.Default.LEVEL_ONE_SOCKET_NAME);
             }
         }
 
+        GenericTracker<decimal> _highs = new GenericTracker<decimal>();
+        GenericTracker<decimal> _lows = new GenericTracker<decimal>();
 
         private void FireTick(string[] actualData)
         {
-            if (TickReceived != null)
-            {
                 try
                 {
                     debug(String.Format("Got Tick: {0} - {1} - {2}", actualData[0], actualData[1], actualData[3]));
@@ -384,17 +441,18 @@ namespace IQFeedBroker
                         tick.size = Convert.ToInt32(actualData[7]);
                         tick.bs = Convert.ToInt32(actualData[12]);
                         tick.os = Convert.ToInt32(actualData[13]);
+                        // get symbol index for custom data requests
+                        int idx = _highs.getindex(tick.symbol);
+
+                        // update custom data
+                        decimal v = 0;
+                        if (decimal.TryParse(actualData[8], out v))
+                            _highs[idx] = v;
+                        if (decimal.TryParse(actualData[9], out v))
+                            _lows[idx] = v;
                         
-                        /* Josh does not prefer it done this way. If you need to pass High/Low,
-                         * here is the suggestion from Josh...
-                         * ------------------------------------
-                         * whenenver you startup or reconnect, send DAYHIGH/DAYLOW request messages and take the response and replace  whatever current high/low is at this point.
-                         * after this initial population, calculate new high/low from tick data. */
 
-                        //tick.DayHigh = Convert.ToDecimal(actualData[8]);
-                        //tick.DayLow = Convert.ToDecimal(actualData[9]);
-
-                        TickReceived(tick);
+                        newTick(tick);
                     }
                     //else if (actualData[0] == "F")
                     //{
@@ -417,7 +475,7 @@ namespace IQFeedBroker
                 {
                     debug(ex.ToString());
                 }
-            }
+
 
                         
 
@@ -435,12 +493,6 @@ namespace IQFeedBroker
 
         #endregion
     }
-    public class Global
-    {
-        public const string PROGRAM_NAME = "IQFEED-SERVER";
-        public const string ADMINISTRATION_SOCKET_NAME = "Admin";
-        public const string LEVEL_ONE_SOCKET_NAME = "Level1";
-        public const string IP_LOCAL_HOST = "127.0.0.1";
-    }
+
 
 }

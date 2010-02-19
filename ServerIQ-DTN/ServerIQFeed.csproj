@@ -58,6 +58,7 @@
       <DependentUpon>IQFeedFrm.cs</DependentUpon>
     </Compile>
     <Compile Include="IQFeedHelper.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

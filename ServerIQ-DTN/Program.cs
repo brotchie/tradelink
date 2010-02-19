@@ -23,18 +23,18 @@ namespace IQFeedBroker
             }
             catch (Exception ex)
             {
-                TradeLink.AppKit.CrashReport.Report(Global.PROGRAM_NAME, string.Empty, string.Empty, string.Empty, ex, null, true);
+                TradeLink.AppKit.CrashReport.Report(IQFeedFrm.PROGRAM, string.Empty, string.Empty, string.Empty, ex, null, true);
             }
         }
 
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            TradeLink.AppKit.CrashReport.Report(Global.PROGRAM_NAME, string.Empty, string.Empty, string.Empty, (Exception)e.ExceptionObject, null, true);
+            TradeLink.AppKit.CrashReport.Report(IQFeedFrm.PROGRAM, string.Empty, string.Empty, string.Empty, (Exception)e.ExceptionObject, null, true);
         }
 
         static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
-            TradeLink.AppKit.CrashReport.Report(Global.PROGRAM_NAME, string.Empty, string.Empty, string.Empty, e.Exception, null, true);
+            TradeLink.AppKit.CrashReport.Report(IQFeedFrm.PROGRAM, string.Empty, string.Empty, string.Empty, e.Exception, null, true);
         }
     }
 }

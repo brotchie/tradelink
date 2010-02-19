@@ -49,7 +49,7 @@ namespace IQFeedBroker.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("IQFEED_DEMO")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string PROGRAM_NAME {
             get {
                 return ((string)(this["PROGRAM_NAME"]));
