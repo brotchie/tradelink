@@ -8,6 +8,7 @@ using System.Threading;
 using Microsoft.Win32;
 using TradeLink.API;
 using TradeLink.Common;
+using System.ComponentModel;
 
 namespace IQFeedBroker
 {
@@ -15,7 +16,6 @@ namespace IQFeedBroker
     {
         #region Variables
 
-        internal event TickDelegate TickReceived;
         private const string IQ_FEED = "iqconnect";
         private readonly string IQ_FEED_PROGRAM = "IQConnect.exe";
         private const string IQ_FEED_REGISTRY_LOCATION = "SOFTWARE\\DTN\\IQFeed";
@@ -27,8 +27,10 @@ namespace IQFeedBroker
         private Basket _basket;
         private string _user;
         private string _pswd;
+        string _prod;
         private bool _registered;
 
+        BackgroundWorker _connect;
         #endregion
 
 
@@ -52,11 +54,23 @@ namespace IQFeedBroker
         public IQFeedHelper()
         {
             _basket = new BasketImpl();
+            _connect = new BackgroundWorker();
+            _connect.DoWork += new DoWorkEventHandler(bw_DoWork);
             newProviderName = Providers.IQFeed;
             newRegisterStocks += new DebugDelegate(IQFeedHelper_newRegisterStocks);
             newFeatureRequest += new MessageArrayDelegate(IQFeedHelper_newFeatureRequest);
             newUnknownRequest += new UnknownMessageDelegate(IQFeedHelper_newUnknownRequest);
             
+        }
+
+        void bw_DoWork(object sender, DoWorkEventArgs e)
+        {
+            // start iqfeed and try to connect in background so it doesn't delay UI
+            debug("wait a moment...");
+            Connect();
+
+            ConnectToAdmin();
+            ConnectToLevelOne();
         }
 
         long IQFeedHelper_newUnknownRequest(MessageTypes t, string msg)
@@ -85,9 +99,32 @@ namespace IQFeedBroker
                         if (v == decimal.MaxValue) return 0;
                         return WMUtil.pack(v);
                     }
-                    break;
+                case MessageTypes.BARREQUEST:
+                    {
+                        BarRequest br = BarImpl.ParseBarRequest(msg);
+                        RequestBars(br);
+                        return (long)MessageTypes.OK;
+                    }
             }
-            return (long)MessageTypes.UNKNOWN_MESSAGE;
+            return (long)MessageTypes.FEATURE_NOT_IMPLEMENTED;
+        }
+
+        void RequestBars(BarRequest br)
+        {
+            string command;
+            if (br.Interval == (int)BarInterval.Day)
+            {
+                command = String.Format("HDT,{0},{1}{\r\n", br.Symbol,br.StartDateTime.ToLongDateString(),br.EndDateTime.ToLongDateString());
+            }
+            else
+            {
+                command = String.Format("HIT,{0},{1} {2},{3} {4}{\r\n", br.Symbol,br.Interval,br.StartDateTime.ToLongDateString(),br.StartDateTime.ToLongTimeString(),br.EndDateTime.ToLongDateString(),br.EndDateTime.ToLongTimeString());
+            }
+            // we form a watch command in the form of wSYMBOL\r\n
+            byte[] watchCommand = new byte[command.Length];
+            watchCommand = Encoding.ASCII.GetBytes(command);
+            m_sockIQConnect.Send(watchCommand, watchCommand.Length, SocketFlags.None);
+
         }
 
         public delegate void booldel(bool v);
@@ -136,7 +173,7 @@ namespace IQFeedBroker
         internal void ConnectToAdmin()
         {
             // Establish a connection to the admin socket in IQ Feed
-            Thread.Sleep(new TimeSpan(0, 0, 5));
+            Thread.Sleep(5000);
             ConnectToAdminSocket();
         }
 
@@ -145,8 +182,9 @@ namespace IQFeedBroker
         {
             try
             {
-                Thread.Sleep(new TimeSpan(0, 0, 5));
+                Thread.Sleep(5000);
                 ConnectToLevelOneSocket();
+                Thread.Sleep(5000);
             }
             catch (Exception ex)
             {
@@ -224,17 +262,23 @@ namespace IQFeedBroker
                 debug("IQ Feed is not installed");
                 return;
             }
-
-            ConnectToAdmin();
-            ConnectToLevelOne();
-
             // close the key since we don't need it anymore
             key.Close();
-            key = null;
-
             _user = username;
             _pswd = password;
+            _prod = data1;
+            _connect.RunWorkerAsync();
 
+
+
+
+            
+
+
+        }
+
+        void Connect()
+        {
             try
             {
                 int iqConnectProcessCount = System.Diagnostics.Process.GetProcessesByName(IQ_FEED).Length;
@@ -247,8 +291,7 @@ namespace IQFeedBroker
                         debug("Need to start IQ Connect first");
                         string args = string.Empty;
                         if (HaveUserCredentials)
-                            
-                            args += String.Format("-product {0} -version 1.0.0.0 -login {1} -password {2} -savelogininfo -autoconnect", data1, _user, _pswd);
+                            args += String.Format("-product {0} -version 1.0.0.0 -login {1} -password {2} -savelogininfo -autoconnect", _prod, _user, _pswd);
                         System.Diagnostics.Process.Start(IQ_FEED_PROGRAM, args);
                         break;
                     default:
@@ -439,12 +482,12 @@ namespace IQFeedBroker
                         tick.ex = actualData[2];
                         tick.trade = Convert.ToDecimal(actualData[3]);
                         tick.size = Convert.ToInt32(actualData[7]);
-                        tick.bs = Convert.ToInt32(actualData[12]);
-                        tick.os = Convert.ToInt32(actualData[13]);
+                        tick.BidSize = Convert.ToInt32(actualData[12]);
+                        tick.AskSize= Convert.ToInt32(actualData[13]);
                         // get symbol index for custom data requests
                         int idx = _highs.getindex(tick.symbol);
 
-                        // update custom data
+                        // update custom data (tryparse is faster than convert)
                         decimal v = 0;
                         if (decimal.TryParse(actualData[8], out v))
                             _highs[idx] = v;
