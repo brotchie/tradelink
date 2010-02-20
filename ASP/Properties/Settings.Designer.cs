@@ -70,5 +70,41 @@ namespace ASP.Properties {
                 this["brokertimeoutsec"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("TradeLink")]
+        public global::TradeLink.API.Providers prefquote {
+            get {
+                return ((global::TradeLink.API.Providers)(this["prefquote"]));
+            }
+            set {
+                this["prefquote"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("TradeLink")]
+        public global::TradeLink.API.Providers prefexecute {
+            get {
+                return ((global::TradeLink.API.Providers)(this["prefexecute"]));
+            }
+            set {
+                this["prefexecute"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool feedfallback {
+            get {
+                return ((bool)(this["feedfallback"]));
+            }
+            set {
+                this["feedfallback"] = value;
+            }
+        }
     }
 }

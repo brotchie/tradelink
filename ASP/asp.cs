@@ -22,7 +22,8 @@ namespace ASP
         public string SKINPATH = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)+"\\";
 
         // working variables
-        TLClient_WM tl = new TLClient_WM(false);
+        TLClient_WM execute;
+        TLClient_WM quote;
         Dictionary<string, SecurityImpl> _seclist = new Dictionary<string, SecurityImpl>();
         Dictionary<string, int[]> _symidx = new Dictionary<string, int[]>();
         List<Response> _reslist = new List<Response>();
@@ -54,15 +55,16 @@ namespace ASP
         {
             // read designer options for gui
             InitializeComponent();
-            int poll = (int)((double)Properties.Settings.Default.brokertimeoutsec * 1000 / 2);
-            _tlt = new TLTracker(poll, (int)Properties.Settings.Default.brokertimeoutsec, tl, Providers.Unknown, true);
-            _tlt.GotConnectFail += new VoidDelegate(_tlt_GotConnectFail);
-            _tlt.GotConnect += new VoidDelegate(_tlt_GotConnect);
-            _tlt.GotDebug += new DebugDelegate(_tlt_GotDebug);
+            TLClient_WM tl = new TLClient_WM(false);
+            _ao._execsel.DataSource = tl.ProvidersAvailable;
+            _ao._datasel.DataSource = tl.ProvidersAvailable;
             _ao.TimeoutChanged += new Int32Delegate(_ao_TimeoutChanged);
-            _mt = new MessageTracker(tl);
-            _mt.SendMessageResponse += new MessageDelegate(tl_gotUnknownMessage);
-            _mt.SendDebug += new DebugDelegate(_mt_SendDebug);
+            _ao._datasel.SelectedIndexChanged += new EventHandler(_prefquot_SelectedIndexChanged);
+            _ao._execsel.SelectedIndexChanged += new EventHandler(_prefexec_SelectedIndexChanged);
+            initfeeds();
+            _ao._datasel.Text = Properties.Settings.Default.prefquote.ToString();
+            _ao._execsel.Text = Properties.Settings.Default.prefexecute.ToString();
+            feedready = true;
             // count instances of program
             _ASPINSTANCE = getprocesscount(PROGRAM)-1;
             // ensure have not exceeded maximum
@@ -81,42 +83,14 @@ namespace ASP
             // set next response id
             _NEXTRESPONSEID = _ASPINSTANCE * MAXRESPONSEPERASP;
             _INITIALRESPONSEID = _NEXTRESPONSEID;
-            // don't save ticks from replay since they're already saved
-            _ao.archivetickbox.Checked = !tl.RequestFeatureList.Contains(MessageTypes.HISTORICALDATA);
             _remskin.Click+=new EventHandler(_remskin_Click);
             _saveskins.Click+=new EventHandler(_saveskins_Click);
             _skins.SelectedIndexChanged+=new EventHandler(_skins_SelectedIndexChanged);
-            // if our machine is multi-core we use seperate thread to process ticks
-            if (Environment.ProcessorCount == 1)
-                tl.gotTick += new TickDelegate(tl_gotTick);
-            else
-            {
-                tl.gotTick += new TickDelegate(tl_gotTickasync);
-                _ar.GotTick+=new TickDelegate(tl_gotTick);
-            }
-            // handle other tradelink events
-            tl.gotServerDown += new DebugDelegate(tl_gotServerDown);
-            tl.gotServerUp += new DebugDelegate(tl_gotServerUp);
-            tl.gotFill += new FillDelegate(tl_gotFill);
-            tl.gotOrder += new OrderDelegate(tl_gotOrder);
-            tl.gotOrderCancel += new UIntDelegate(tl_gotOrderCancel);
-            tl.gotPosition += new PositionDelegate(tl_gotPosition);
-            tl.gotAccounts += new DebugDelegate(tl_gotAccounts);
-            tl.gotUnknownMessage += new MessageDelegate(tl_gotUnknownMessage);
+            _ar.GotTick += new TickDelegate(tl_gotTick);
             // show status
             status(Util.TLSIdentity());
             debug(Util.TLSIdentity());
-            // if we have a server
-            if (tl.ProvidersAvailable.Length>0)
-            {
-                debug(tl.BrokerName + " " + tl.ServerVersion + " connected.");
-                status(tl.BrokerName + " connected.");
-                _tlt_GotConnect();
-            }
-            else
-            {
-                status("no broker found.  start broker, then restart ASP.");
-            }
+
             // setup right click menu
             _resnames.ContextMenu= new ContextMenu();
             _resnames.ContextMenu.Popup += new EventHandler(ContextMenu_Popup);
@@ -134,8 +108,109 @@ namespace ASP
             findskins();
         }
 
+        void initfeeds()
+        {
+            bool setquote = false;
+            bool setexec = false;
+            TLClient_WM tl = new TLClient_WM(false);
+            // detect feeds
+            if (_ao._providerfallback.Checked)
+            {
+
+                for (int i = 0; i < tl.ProvidersAvailable.Length; i++)
+                {
+                    // switch to provider
+                    bool ok = tl.Mode(i, false);
+                    // see if he has quotes
+                    if (ok && !setquote && (tl.BrokerName== Properties.Settings.Default.prefquote) 
+                        && tl.RequestFeatureList.Contains(MessageTypes.LIVEDATA))
+                    {
+                        setquote |= true;
+                        quote = new TLClient_WM(i,PROGRAM,false);
+                        debug("have quote provider: " + quote.BrokerName + " " + quote.ServerVersion);
+                    }
+                    if (ok && !setexec && (tl.BrokerName== Properties.Settings.Default.prefexecute) 
+                        && (tl.RequestFeatureList.Contains(MessageTypes.SIMTRADING) || tl.RequestFeatureList.Contains(MessageTypes.LIVETRADING)))
+                    {
+                        setexec |= true;
+                        execute = new TLClient_WM(i, PROGRAM, false);
+                        debug("have execute provider: " + execute.BrokerName + " " + execute.ServerVersion);
+                    }
+                    if (setexec && setquote)
+                        break;
+                }
+                if (!setexec && !setquote)
+                    debug("no preferred provider found");
+            }
+            else if (!_ao._providerfallback.Checked)
+            {
+                for (int i = 0; i < tl.ProvidersAvailable.Length; i++)
+                {
+                    // switch to provider
+                    bool ok = tl.Mode(i, false) ;
+                    // see if he has quotes
+                    if (ok && !setquote && tl.RequestFeatureList.Contains(MessageTypes.LIVEDATA))
+                    {
+                        setquote |= true;
+                        quote = new TLClient_WM(i, PROGRAM, false);
+                        debug("have quote provider: " + quote.BrokerName + " " + quote.ServerVersion);
+                    }
+                    if (ok && !setquote && (tl.RequestFeatureList.Contains(MessageTypes.SIMTRADING) || tl.RequestFeatureList.Contains(MessageTypes.LIVETRADING)))
+                    {
+                        setexec |= true;
+                        execute = new TLClient_WM(i, PROGRAM, false);
+                        debug("have execute provider: " + execute.BrokerName + " " + execute.ServerVersion);
+                    }
+                    if (setexec && setquote)
+                        break;
+                }
+                if (!setexec && !setquote)
+                    debug("no provider found");
+            }
+
+            // map handlers
+            if (setquote)
+            {
+                // clear any leftover subscriptions
+                quote.Unsubscribe();
+                // handle new ticks
+                quote.gotTick += new TickDelegate(_ar.newTick);
+                // handle unknown messages
+                quote.gotUnknownMessage += new MessageDelegate(tl_gotUnknownMessage);
+                // don't save ticks from replay since they're already saved
+                _ao.archivetickbox.Checked = !quote.RequestFeatureList.Contains(MessageTypes.HISTORICALDATA);
+                // monitor quote feed
+                int poll = (int)((double)Properties.Settings.Default.brokertimeoutsec * 1000 / 2);
+                _tlt = new TLTracker(poll, (int)Properties.Settings.Default.brokertimeoutsec, quote, Providers.Unknown, true);
+                _tlt.GotConnectFail += new VoidDelegate(_tlt_GotConnectFail);
+                _tlt.GotConnect += new VoidDelegate(_tlt_GotConnect);
+                _tlt.GotDebug += new DebugDelegate(_tlt_GotDebug);
+            }
+            if (setexec)
+            {
+                execute.gotAccounts += new DebugDelegate(tl_gotAccounts);
+                execute.gotFill += new FillDelegate(tl_gotFill);
+                execute.gotOrder += new OrderDelegate(tl_gotOrder);
+                execute.gotPosition += new PositionDelegate(tl_gotPosition);
+                execute.gotOrderCancel += new UIntDelegate(tl_gotOrderCancel);
+                execute.gotUnknownMessage+=new MessageDelegate(tl_gotUnknownMessage);
+                // pass messages through
+                _mt = new MessageTracker(execute);
+                _mt.SendMessageResponse += new MessageDelegate(tl_gotUnknownMessage);
+                _mt.SendDebug += new DebugDelegate(_mt_SendDebug);
+            }
+            // startup
+            _tlt_GotConnect();
+
+
+
+
+
+        }
+
         void bw_DoWork(object sender, DoWorkEventArgs e)
         {
+            TLClient_WM tl = new TLClient_WM(false);
             // check for new versions
             Versions.UpgradeAlert(tl,true);
         }
@@ -144,16 +219,6 @@ namespace ASP
         void _mt_SendDebug(string msg)
         {
             debug(msg);
-        }
-
-        void tl_gotServerUp(string msg)
-        {
-            debug("Connector up: " + msg + " " + tl.BrokerName + " " + tl.ServerVersion);
-        }
-
-        void tl_gotServerDown(string msg)
-        {
-            debug("Connector down: " + msg);
         }
 
         void _ao_TimeoutChanged(int val)
@@ -168,36 +233,38 @@ namespace ASP
 
         void _tlt_GotConnect()
         {
-            if (_tlt.tw.RecentTime != 0)
-            {
-                debug(tl.BrokerName + " " + tl.ServerVersion + " connected.");
-                status(tl.BrokerName + " connected.");
-            }
-            _ao._brokertimeout.Enabled = tl.BrokerName != Providers.TradeLink;
-            if (tl.BrokerName == Providers.TradeLink)
-            {
-                _tlt.Stop();
-            }
             try
             {
+                if (_tlt.tw.RecentTime != 0)
+                {
+                    debug(quote.BrokerName + " " + quote.ServerVersion + " connected.");
+                    status(quote.BrokerName + " connected.");
+                }
+                _ao._brokertimeout.Enabled = quote.BrokerName != Providers.TradeLink;
+                if (quote.BrokerName == Providers.TradeLink)
+                {
+                    _tlt.Stop();
+                }
+
                 // get accounts
-                tl.RequestAccounts();
+                execute.RequestAccounts();
                 // request positions
                 foreach (string acct in _acct)
-                    tl.RequestPositions(acct);
+                    execute.RequestPositions(acct);
                 // subscribe if we have a basket
                 if (_mb.Count>0)
-                    tl.Subscribe(_mb);
+                    quote.Subscribe(_mb);
             }
             catch { }
         }
 
         void _tlt_GotConnectFail()
         {
+            if (_tlt == null) return;
             if (_tlt.tw.RecentTime != 0)
             {
-                status("Broker disconnected");
-                debug("Broker disconnected");
+                status("Quotes disconnected.");
+                debug("Quotes disconnected");
             }
         }
 
@@ -590,11 +657,12 @@ namespace ASP
             bool subscribe = old != _mb.ToString();
 
             if (!subscribe) return;
+            if (quote == null) return;
 
             try
             {
                 // resubscribe
-                tl.Subscribe(_mb);
+                quote.Subscribe(_mb);
             }
             catch (TLServerNotFound)
             {
@@ -730,24 +798,25 @@ namespace ASP
         {
             if (_resskinidx.Count>0) 
                 _saveskins_Click(null, null);
-            // if we're using another thread to process ticks, stop it
-            if (Environment.ProcessorCount>1)
-                _ar.Stop();
-            // stop watching ticks
-            _tlt.Stop();
-            // stop archiving ticks
-            _ta.Stop();
-            // stop logging
-            _log.Stop();
             // save ASP properties
             Properties.Settings.Default.Save();
 
-            // shut down tradelink client
             try
             {
-                tl.Disconnect();
+                // stop tick thread
+                _ar.Stop();
+                // stop watching ticks
+                _tlt.Stop();
+                // stop archiving ticks
+                _ta.Stop();
+                // stop logging
+                _log.Stop();
+                // shutdown clients
+                quote.Disconnect();
+                execute.Disconnect();
+
             }
-            catch (TLServerNotFound) { }
+            catch { }
             
         }
 
@@ -1006,7 +1075,12 @@ namespace ASP
         void workingres_SendOrder(Order o)
         {
             // process order coming from a response
-
+            if (execute == null)
+            {
+                debug("Can't send orders, no execution broker available.");
+                status("No execution broker found.");
+                return;
+            }
             // set account on order
             if (o.Account==string.Empty)
                 o.Account = _ao._account.Text;
@@ -1037,10 +1111,10 @@ namespace ASP
             // assign master order if necessary
             assignmasterorderid(ref o);
             // send order and get error message
-            int res = tl.SendOrder(o);
+            int res = execute.SendOrder(o);
             // if error, display it
             if (res != (int)MessageTypes.OK)
-                debug(Util.PrettyError(tl.BrokerName, res) + " " + o.ToString());
+                debug(Util.PrettyError(execute.BrokerName, res) + " " + o.ToString());
         }
 
         void assignmasterorderid(ref Order o)
@@ -1075,7 +1149,7 @@ namespace ASP
                 number = responseid2asp(number);
             }
             // pass cancels along to tradelink
-            tl.CancelOrder((long)number);
+            execute.CancelOrder((long)number);
         }
 
         void workingres_GotDebug(Debug d)
@@ -1208,6 +1282,71 @@ namespace ASP
                 if (p.ProcessName.ToLower().Contains(PROGRAM.ToLower()))
                     count++;
             return count;
+        }
+
+        bool feedready = false;
+        private void _prefquot_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!feedready) return;
+            TLClient_WM tl = new TLClient_WM(false);
+            try
+            {
+                Providers p = (Providers)Enum.Parse(typeof(Providers), _ao._datasel.Text);
+                int provider = _ao._datasel.SelectedIndex;
+                if ((provider < 0) || (provider > _ao._datasel.Items.Count)) return;
+                if (!hasminquote(tl, provider))
+                {
+                    MessageBox.Show(p.ToString() + " does not implement features required by SpreadLord execution.   Try another provider.");
+                    return;
+                }
+                Properties.Settings.Default.prefquote = p;
+                initfeeds();
+                Properties.Settings.Default.Save();
+            }
+            catch { }
+        }
+
+        private void _prefexec_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!feedready) return;
+            TLClient_WM tl = new TLClient_WM(false);
+            try
+            {
+                Providers p = (Providers)Enum.Parse(typeof(Providers), _ao._execsel.Text);
+                int provider = _ao._execsel.SelectedIndex;
+                if ((provider < 0) || (provider > _ao._execsel.Items.Count)) return;
+                if (!hasminexec(tl, provider))
+                {
+                    MessageBox.Show(p.ToString() + " does not implement features required by SpreadLord execution.   Try another provider.");
+                    return;
+                }
+                Properties.Settings.Default.prefexecute = p;
+                initfeeds();
+                Properties.Settings.Default.Save();
+            }
+            catch { }
+        }
+
+        bool hasminquote(TLClient_WM tl, int provider)
+        {
+            if (!tl.Mode(provider, false)) return false;
+            bool test = true;
+            test &= tl.RequestFeatureList.Contains(MessageTypes.TICKNOTIFY);
+            return test;
+        }
+
+        bool hasminexec(TLClient_WM tl, int provider)
+        {
+            if (!tl.Mode(provider, false)) return false;
+            bool test = true;
+            test &= tl.RequestFeatureList.Contains(MessageTypes.EXECUTENOTIFY);
+            test &= tl.RequestFeatureList.Contains(MessageTypes.SENDORDER);
+            test &= tl.RequestFeatureList.Contains(MessageTypes.SENDORDERLIMIT);
+            test &= tl.RequestFeatureList.Contains(MessageTypes.SENDORDERMARKET);
+            test &= tl.RequestFeatureList.Contains(MessageTypes.SENDORDERSTOP);
+            test &= tl.RequestFeatureList.Contains(MessageTypes.ORDERCANCELREQUEST);
+            test &= tl.RequestFeatureList.Contains(MessageTypes.ORDERCANCELRESPONSE);
+            return test;
         }
 
                                          

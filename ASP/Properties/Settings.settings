@@ -14,5 +14,14 @@
     <Setting Name="brokertimeoutsec" Type="System.Decimal" Scope="User">
       <Value Profile="(Default)">20</Value>
     </Setting>
+    <Setting Name="prefquote" Type="TradeLink.API.Providers" Scope="User">
+      <Value Profile="(Default)">TradeLink</Value>
+    </Setting>
+    <Setting Name="prefexecute" Type="TradeLink.API.Providers" Scope="User">
+      <Value Profile="(Default)">TradeLink</Value>
+    </Setting>
+    <Setting Name="feedfallback" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
