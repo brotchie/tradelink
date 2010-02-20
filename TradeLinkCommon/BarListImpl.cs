@@ -71,6 +71,47 @@ namespace TradeLink.Common
         /// <param name="symbol"></param>
         /// <param name="intervals"></param>
         public BarListImpl(string symbol, BarInterval[] intervals) : this(symbol,BarInterval2Int(intervals), intervals) {}
+        /// <summary>
+        /// make copy of a barlist
+        /// </summary>
+        /// <param name="original"></param>
+        public BarListImpl(BarList original) : this(original.Symbol,original.CustomIntervals,original.Intervals) 
+        {
+
+            for (int j = 0; j<original.Intervals.Length; j++)
+            {
+                original.DefaultInterval = original.Intervals[j];
+                for (int i = 0; i < original.Count; i++)
+                {
+                    addbar(this, original[i, original.Intervals[j]], j);
+                }
+            }
+        }
+        /// <summary>
+        /// insert a bar at particular place in the list
+        /// </summary>
+        /// <param name="bl"></param>
+        /// <param name="b"></param>
+        /// <param name="position"></param>
+        /// <returns></returns>
+        public static BarListImpl InsertBar(BarList bl, Bar b, int position)
+        {
+            BarListImpl copy = new BarListImpl(bl);
+            for (int j = 0; j < bl.CustomIntervals.Length; j++)
+            {
+                if (bl.CustomIntervals[j] != b.Interval)
+                    continue;
+                for (int i = 0; i < bl.Count; i++)
+                {
+                    if (i == position)
+                    {
+                        addbar(copy, b, j);
+                    }
+                    addbar(copy, bl[i], j);
+                }
+            }
+            return copy;
+        }
 
         /// <summary>
         /// creates a barlist with array of custom intervals
@@ -83,31 +124,31 @@ namespace TradeLink.Common
             // set intervals requested
             _availint = intervals;
             // size length of interval data to # of requested intervals
-            _intdata = new IntervalData[intervals.Length];
+            _intdata = new IntervalData[_availint.Length];
             // create interval data object for each interval
-            for (int i = 0; i < intervals.Length; i++)
+            for (int i = 0; i < _availint.Length; i++)
             {
                 try
                 {
                     // save index to this data for the interval
-                    _intdataidx.Add(intervals[i], i);
+                    _intdataidx.Add(_availint[i], i);
                 }
                 // if key was already present, already had this interval
                 catch (Exception) { continue; }
                 // set default interval to first one
                 if (i == 0)
-                    _defaultint = intervals[0];
+                    _defaultint = _availint[0];
                 // create data object appropriate for type of interval
                 switch (types[i])
                 {
                     case BarInterval.CustomTicks:
-                        _intdata[i] = new TickIntervalData(intervals[i]);
+                        _intdata[i] = new TickIntervalData(_availint[i]);
                         break;
                     case BarInterval.CustomVol:
-                        _intdata[i] = new VolIntervalData(intervals[i]);
+                        _intdata[i] = new VolIntervalData(_availint[i]);
                         break;
                     default:
-                        _intdata[i] = new TimeIntervalData(intervals[i]);
+                        _intdata[i] = new TimeIntervalData(_availint[i]);
                         break;
                 }
             
@@ -540,7 +581,51 @@ histperiod=daily&startdate=" + startdate + "&enddate=" + enddate + "&output=csv&
         {
             _fromepf.newTick(t);
         }
-
+        /// <summary>
+        /// gets index of bar that preceeds given date
+        /// </summary>
+        /// <param name="chart"></param>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        public static int GetBarIndexPreceeding(BarList chart, int date)
+        {
+            // look for previous day's close
+            for (int j = chart.Last; (j >= chart.First); j--)
+            {
+                if (chart.Date()[j] < date)
+                {
+                    return j;
+                }
+            }
+            // first bar
+            return -1;
+        }
+        /// <summary>
+        /// gets preceeding bar by time (assumes same day)
+        /// </summary>
+        /// <param name="chart"></param>
+        /// <param name="time"></param>
+        /// <returns></returns>
+        public static int GetBarIndexPreceeding(BarList chart, int date, int time)
+        {
+            // look for previous day's close
+            for (int j = chart.Last; (j >= chart.First); j--)
+            {
+                if (chart.Date()[j] > date) continue;
+                if (chart.Time()[j] < time)
+                {
+                    return j;
+                }
+            }
+            // first bar
+            return -1;
+        }
+        /// <summary>
+        /// gets bar that preceeds a given date (invalid if no preceeding bar)
+        /// </summary>
+        /// <param name="chart"></param>
+        /// <param name="date"></param>
+        /// <returns></returns>
         public static Bar GetBarPreceeding(BarList chart, int date)
         {
             // look for previous day's close

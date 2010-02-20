@@ -409,7 +409,32 @@ namespace IQFeedBroker
             {
                 int bytesReceived = m_hist.EndReceive(result);
                 string rawData = Encoding.ASCII.GetString(m_buffhist, 0, bytesReceived);
-                debug(rawData);
+                string[] bars = rawData.Split(Environment.NewLine.ToCharArray());
+                foreach (string bar in bars)
+                {
+                    string[] r = bar.Split(',');
+                    // this should get hit on ENDMSG
+                    if (r.Length < 8) 
+                        continue;
+                    // get request id
+                    uint rid = 0;
+                    if (!uint.TryParse(r[0], out rid))
+                        continue;
+                    BarRequest br;
+                    if (!reqid2req.TryGetValue(rid, out br))
+                        continue;
+                    DateTime dt = DateTime.Parse(r[1]);
+                    decimal h = Convert.ToDecimal(r[2]);
+                    decimal l = Convert.ToDecimal(r[3]);
+                    decimal o = Convert.ToDecimal(r[4]);
+                    decimal c = Convert.ToDecimal(r[5]);
+                    long v = Convert.ToInt64(r[7]);
+                    // build bar
+                    Bar b = new BarImpl(o, h, l, c, v, Util.ToTLDate(dt), Util.ToTLTime(dt), br.Symbol, br.Interval);
+                    // send it
+                    TLSend(BarImpl.Serialize(b), MessageTypes.BARRESPONSE, br.Client);
+                }
+                // wait for more historical data
                 WaitForData(HISTSOCKET);
             }
             catch (Exception ex)

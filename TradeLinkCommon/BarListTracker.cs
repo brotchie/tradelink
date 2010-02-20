@@ -87,6 +87,17 @@ namespace TradeLink.Common
             {
                 return this[sym, _default];
             }
+
+
+            set
+            {
+                BarListImpl bl;
+                if (_bdict.TryGetValue(sym, out bl))
+                    _bdict[sym] = (BarListImpl)value;
+                else
+                    _bdict.Add(sym, (BarListImpl)value);
+
+            }
         }
 
         public BarList this[string sym, int interval]
@@ -105,6 +116,7 @@ namespace TradeLink.Common
                 _bdict.Add(sym, bl);
                 return bl;
             }
+
         }
 
         /// <summary>

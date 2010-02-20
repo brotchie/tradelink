@@ -14,5 +14,6 @@ namespace TradeLink.API
         EndTime, //TLTime
         ID, //Unique request ID
         CustomInterval, //Custom interval period
+        Client,// name of requesting application
     }
 }

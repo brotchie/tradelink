@@ -20,7 +20,7 @@ namespace TradeLink.Common
         private long v = 0;
         private int tradesinbar = 0;
         private bool _new = false;
-        private BarInterval tunits = BarInterval.FiveMin; //5min bar default
+        private int units = 300;
         private int bartime = 0;
         private int bardate = 0;
         private bool DAYEND = false;
@@ -49,8 +49,11 @@ namespace TradeLink.Common
             bardate = date;
             bartime = time;
         }
-        public BarImpl(decimal open, decimal high, decimal low, decimal close, long vol, int date, int time, string symbol)
+        public int Interval { get { return units; } }
+        public BarImpl(decimal open, decimal high, decimal low, decimal close, long vol, int date, int time, string symbol) : this(open, high, low, close, vol, date, time, symbol, (int)BarInterval.FiveMin) { }
+        public BarImpl(decimal open, decimal high, decimal low, decimal close, long vol, int date, int time, string symbol, int interval)
         {
+            units = interval;
             h = (ulong)(high * Const.IPREC);
             o = (ulong)(open * Const.IPREC);
             l = (ulong)(low * Const.IPREC);
@@ -75,7 +78,7 @@ namespace TradeLink.Common
         
         public BarImpl(BarInterval tu) 
         {
-            tunits = tu;
+            units = (int)tu;
         }
         public int Bartime { get { return bartime; } }
         public int Bardate { get { return bardate; } }
@@ -84,7 +87,7 @@ namespace TradeLink.Common
             // get time elapsed to this point
             int elap = Util.FT2FTS(time);
             // get seconds per bar
-            int secperbar = (int)tunits;
+            int secperbar = Interval;
             // get number of this bar in the day for this interval
             int bcount = (int)((double)elap / secperbar);
             return bcount;
@@ -217,6 +220,7 @@ bar.Close, (int)((double)bar.Volume / 4), string.Empty));
             br.EndTime = int.Parse(r[(int)BarRequestField.EndTime]);
             br.CustomInterval = int.Parse(r[(int)BarRequestField.CustomInterval]);
             br.ID = long.Parse(r[(int)BarRequestField.ID]);
+            br.Client = r[(int)BarRequestField.Client];
             return br;
         }
 
@@ -228,7 +232,7 @@ bar.Close, (int)((double)bar.Volume / 4), string.Empty));
         /// <returns></returns>
         public static string BuildBarRequest(string symbol, BarInterval interval)
         {
-            return BuildBarRequest(new BarRequest(symbol, (int)interval, Util.ToTLDate(), 0, Util.ToTLDate(), Util.ToTLTime()));
+            return BuildBarRequest(new BarRequest(symbol, (int)interval, Util.ToTLDate(), 0, Util.ToTLDate(), Util.ToTLTime(),string.Empty));
         }
         /// <summary>
         /// bar request for symbol and interval from previous date through present time
@@ -239,7 +243,7 @@ bar.Close, (int)((double)bar.Volume / 4), string.Empty));
         /// <returns></returns>
         public static string BuildBarRequest(string symbol, BarInterval interval, int startdate)
         {
-            return BuildBarRequest(new BarRequest(symbol, (int)interval, startdate, 0, Util.ToTLDate(), Util.ToTLTime()));
+            return BuildBarRequest(new BarRequest(symbol, (int)interval, startdate, 0, Util.ToTLDate(), Util.ToTLTime(),string.Empty));
         }
         /// <summary>
         /// builds bar request
@@ -258,6 +262,7 @@ bar.Close, (int)((double)bar.Volume / 4), string.Empty));
                 br.EndTime.ToString(),
                 br.ID.ToString(),
                 br.CustomInterval.ToString(),
+                br.Client,
             };
             return string.Join(",", r);
             
@@ -267,6 +272,7 @@ bar.Close, (int)((double)bar.Volume / 4), string.Empty));
 
     public struct BarRequest
     {
+        public string Client;
         public int StartDate;
         public int EndDate;
         public int StartTime;
@@ -277,8 +283,9 @@ bar.Close, (int)((double)bar.Volume / 4), string.Empty));
         public long ID;
         public DateTime StartDateTime { get { return Util.ToDateTime(StartDate,StartTime); } }
         public DateTime EndDateTime { get { return Util.ToDateTime(EndDate, EndTime); } }
-        public BarRequest(string symbol, int interval, int startdate, int starttime, int enddate, int endtime)
+        public BarRequest(string symbol, int interval, int startdate, int starttime, int enddate, int endtime, string client)
         {
+            Client = client;
             Symbol = symbol;
             Interval = interval;
             StartDate = startdate;

@@ -69,6 +69,17 @@ namespace TradeLink.Common
         /// triggered if provider is received
         /// </summary>
         public event ProviderDelegate GotProvider;
+        /// <summary>
+        /// called if new bar passes through tracker
+        /// </summary>
+        public event SymBarIntervalDelegate GotNewBar;
+
+        BarListTracker _blt = null;
+        /// <summary>
+        /// bar list tracker to be updated when bars arrive
+        /// </summary>
+        public BarListTracker BLT { get { return _blt; } set { _blt = value; } }
+
         public virtual bool GotMessage(MessageTypes type, uint source, uint dest, uint msgid, string request, ref string response)
         {
             decimal v = 0;
@@ -164,6 +175,32 @@ namespace TradeLink.Common
                         }
                         return true;
                     }
+                case MessageTypes.BARRESPONSE:
+                    {
+                        // get bar
+                        Bar b = BarImpl.Deserialize(response);
+                        // quit if bar is invalid
+                        if (!b.isValid) 
+                            return true;
+                        // notify bar was received
+                        if (GotNewBar!=null)
+                            GotNewBar(b.Symbol,b.Interval);
+                        // update blt if desired
+                        if (BLT != null)
+                        {
+                            // get bar list
+                            BarList bl = BLT[b.Symbol,b.Interval];
+                            // get nearest intrday bar
+                            int preceed = BarListImpl.GetBarIndexPreceeding(bl, b.Bardate, b.Bartime);
+                            // increment by one to get new position
+                            int newpos = preceed + 1;
+                            // insert bar
+                            BLT[b.Symbol] = BarListImpl.InsertBar(bl, b, newpos);
+                            
+                        }
+
+                    }
+                    break;
             }
             return false;
         }
@@ -183,6 +220,13 @@ namespace TradeLink.Common
                 {
                     case MessageTypes.DOMREQUEST:
                         request.Replace(Book.EMPTYREQUESTOR, _tl.Name);
+                        break;
+                    case MessageTypes.BARREQUEST:
+                        {
+                            BarRequest br = BarImpl.ParseBarRequest(request);
+                            br.Client = _tl.Name;
+                            request = BarImpl.BuildBarRequest(br);
+                        }
                         break;
                     case MessageTypes.FEATUREREQUEST:
                         request = _tl.Name;
