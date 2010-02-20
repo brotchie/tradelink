@@ -22,8 +22,10 @@ namespace IQFeedBroker
         private AsyncCallback m_pfnCallback;
         private Socket m_sockAdmin;
         private Socket m_sockIQConnect;
+        private Socket m_hist;
         private byte[] m_szAdminSocketBuffer = new byte[8096];
         private byte[] m_szLevel1SocketBuffer = new byte[8096];
+        private byte[] m_buffhist = new byte[8096];
         private Basket _basket;
         private string _user;
         private string _pswd;
@@ -60,7 +62,7 @@ namespace IQFeedBroker
             newRegisterStocks += new DebugDelegate(IQFeedHelper_newRegisterStocks);
             newFeatureRequest += new MessageArrayDelegate(IQFeedHelper_newFeatureRequest);
             newUnknownRequest += new UnknownMessageDelegate(IQFeedHelper_newUnknownRequest);
-            
+            _cb_hist = new AsyncCallback(OnReceiveHist);
         }
 
         void bw_DoWork(object sender, DoWorkEventArgs e)
@@ -71,6 +73,7 @@ namespace IQFeedBroker
 
             ConnectToAdmin();
             ConnectToLevelOne();
+            ConnectHist();
         }
 
         long IQFeedHelper_newUnknownRequest(MessageTypes t, string msg)
@@ -108,18 +111,21 @@ namespace IQFeedBroker
             }
             return (long)MessageTypes.FEATURE_NOT_IMPLEMENTED;
         }
-
+        IdTracker _idt = new IdTracker();
+        Dictionary<uint, BarRequest> reqid2req = new Dictionary<uint, BarRequest>();
         void RequestBars(BarRequest br)
         {
             string command;
+            uint id = _idt.AssignId;
             if (br.Interval == (int)BarInterval.Day)
             {
-                command = String.Format("HDT,{0},{1}{\r\n", br.Symbol,br.StartDateTime.ToLongDateString(),br.EndDateTime.ToLongDateString());
+                command = String.Format("HDT,{0},{1},50000,1,{2}\r\n", br.Symbol,br.StartDateTime.ToLongDateString(),br.EndDateTime.ToLongDateString(),id);
             }
             else
             {
-                command = String.Format("HIT,{0},{1} {2},{3} {4}{\r\n", br.Symbol,br.Interval,br.StartDateTime.ToLongDateString(),br.StartDateTime.ToLongTimeString(),br.EndDateTime.ToLongDateString(),br.EndDateTime.ToLongTimeString());
+                command = String.Format("HIT,{0},{1},{2} {3},{4} {5},50000,000000,235959,1,{6}\r\n", br.Symbol, br.Interval, br.StartDateTime.ToString("yyyyMMdd"), br.StartDateTime.ToString("HHmmss"), br.EndDateTime.ToString("yyyyMMdd"), br.EndDateTime.ToString("HHmmss"),id);
             }
+            reqid2req.Add(id, br);
             // we form a watch command in the form of wSYMBOL\r\n
             byte[] watchCommand = new byte[command.Length];
             watchCommand = Encoding.ASCII.GetBytes(command);
@@ -140,7 +146,8 @@ namespace IQFeedBroker
             f.Add(MessageTypes.REGISTERSTOCK);
             f.Add(MessageTypes.VERSION);
 
-            
+            f.Add(MessageTypes.BARREQUEST);
+            f.Add(MessageTypes.BARRESPONSE);
             f.Add(MessageTypes.DAYHIGH);
             f.Add(MessageTypes.DAYLOW);
             return f.ToArray();
@@ -173,7 +180,7 @@ namespace IQFeedBroker
         internal void ConnectToAdmin()
         {
             // Establish a connection to the admin socket in IQ Feed
-            Thread.Sleep(5000);
+            Thread.Sleep(2000);
             ConnectToAdminSocket();
         }
 
@@ -182,9 +189,9 @@ namespace IQFeedBroker
         {
             try
             {
-                Thread.Sleep(5000);
+                Thread.Sleep(2000);
                 ConnectToLevelOneSocket();
-                Thread.Sleep(5000);
+                Thread.Sleep(2000);
             }
             catch (Exception ex)
             {
@@ -348,7 +355,35 @@ namespace IQFeedBroker
                 throw ex;
             }
         }
+        const string HISTSOCKET = "HISTPORT";
+        void ConnectHist()
+        {
+            try
+            {
+                debug("Attempting to connect to historical feed.");
+                m_hist = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                IPAddress local = IPAddress.Loopback;
+                RegistryKey rk = Registry.CurrentUser.OpenSubKey(IQ_FEED_REGISTRY_LOCATION + "\\Startup");
+                int port = 0;
+                if (!int.TryParse(rk.GetValue("LookupPort").ToString(), out port))
+                {
+                    debug("could not find historical data port.");
+                    return;
+                }
+                m_hist.Connect(new IPEndPoint(local, port));
+                if (m_hist.Connected)
+                    debug("historical connected.");
+                WaitForData(HISTSOCKET);
+            }
+            catch (Exception ex)
+            {
+                debug("historical connect failed.");
+                debug(ex.Message + ex.StackTrace);
+            }
 
+        }
+
+        AsyncCallback _cb_hist = null;
 
         private void WaitForData(string socketName)
         {
@@ -362,6 +397,25 @@ namespace IQFeedBroker
             }
             else if (socketName == Properties.Settings.Default.ADMINISTRATION_SOCKET_NAME)
                 m_sockAdmin.BeginReceive(m_szAdminSocketBuffer, 0, m_szAdminSocketBuffer.Length, SocketFlags.None, m_pfnCallback, socketName);
+            else if (socketName == HISTSOCKET)
+            {
+                m_hist.BeginReceive(m_buffhist, 0, m_buffhist.Length, SocketFlags.None, _cb_hist, socketName);
+            }
+        }
+
+        void OnReceiveHist(IAsyncResult result)
+        {
+            try
+            {
+                int bytesReceived = m_sockAdmin.EndReceive(result);
+                string rawData = Encoding.ASCII.GetString(m_szAdminSocketBuffer, 0, bytesReceived);
+                debug(rawData);
+                WaitForData(HISTSOCKET);
+            }
+            catch (Exception ex)
+            {
+                debug(ex.Message + ex.StackTrace);
+            }
         }
 
 
@@ -376,7 +430,7 @@ namespace IQFeedBroker
             {
                 try
                 {
-                    debug(String.Format("Result State: {0}", result.AsyncState));
+                    //debug(String.Format("Result State: {0}", result.AsyncState));
                     int bytesReceived = m_sockAdmin.EndReceive(result);
                     string rawData = Encoding.ASCII.GetString(m_szAdminSocketBuffer, 0, bytesReceived);
                     bool connectToLevelOne = _registered;
@@ -384,7 +438,7 @@ namespace IQFeedBroker
                     while (rawData.Length > 0)
                     {
                         string data = rawData.Substring(0, rawData.IndexOf("\n"));
-                        debug(String.Format("ADMIN: {0}", data));
+                        //debug(String.Format("ADMIN: {0}", data));
                         if (data.StartsWith("S,STATS,"))
                         {
                             #region Register this application (if necessary)...May want to extract this into a separate function as it's only called once.
@@ -461,6 +515,10 @@ namespace IQFeedBroker
 
                 WaitForData(Properties.Settings.Default.LEVEL_ONE_SOCKET_NAME);
             }
+            else
+            {
+                debug(result.AsyncState.ToString());
+            }
         }
 
         GenericTracker<decimal> _highs = new GenericTracker<decimal>();
@@ -470,7 +528,6 @@ namespace IQFeedBroker
         {
                 try
                 {
-                    debug(String.Format("Got Tick: {0} - {1} - {2}", actualData[0], actualData[1], actualData[3]));
                     if ((actualData[0] == "P") || (actualData[0] == "Q"))
                     {
                         Tick tick = new TickImpl();
@@ -516,7 +573,8 @@ namespace IQFeedBroker
                 }
                 catch (Exception ex)
                 {
-                    debug(ex.ToString());
+                    debug("Exception on tick: " + string.Join(",", actualData));
+                    debug(ex.Message+ex.StackTrace);
                 }
 
 

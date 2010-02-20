@@ -199,6 +199,97 @@ bar.High, (int)((double)bar.Volume / 4), string.Empty));
 bar.Close, (int)((double)bar.Volume / 4), string.Empty));
             return list.ToArray();
         }
+
+        /// <summary>
+        /// parses message into a structured bar request
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <returns></returns>
+        public static BarRequest ParseBarRequest(string msg)
+        {
+            string[] r = msg.Split(',');
+            BarRequest br  = new BarRequest();
+            br.Symbol = r[(int)BarRequestField.Symbol];
+            br.Interval = Convert.ToInt32(r[(int)BarRequestField.BarInt]);
+            br.StartDate = int.Parse(r[(int)BarRequestField.StartDate]);
+            br.StartTime = int.Parse(r[(int)BarRequestField.StartTime]);
+            br.EndDate= int.Parse(r[(int)BarRequestField.EndDate]);
+            br.EndTime = int.Parse(r[(int)BarRequestField.EndTime]);
+            br.CustomInterval = int.Parse(r[(int)BarRequestField.CustomInterval]);
+            br.ID = long.Parse(r[(int)BarRequestField.ID]);
+            return br;
+        }
+
+        /// <summary>
+        /// request historical data for today
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <param name="interval"></param>
+        /// <returns></returns>
+        public static string BuildBarRequest(string symbol, BarInterval interval)
+        {
+            return BuildBarRequest(new BarRequest(symbol, (int)interval, Util.ToTLDate(), 0, Util.ToTLDate(), Util.ToTLTime()));
+        }
+        /// <summary>
+        /// bar request for symbol and interval from previous date through present time
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <param name="interval"></param>
+        /// <param name="startdate"></param>
+        /// <returns></returns>
+        public static string BuildBarRequest(string symbol, BarInterval interval, int startdate)
+        {
+            return BuildBarRequest(new BarRequest(symbol, (int)interval, startdate, 0, Util.ToTLDate(), Util.ToTLTime()));
+        }
+        /// <summary>
+        /// builds bar request
+        /// </summary>
+        /// <param name="br"></param>
+        /// <returns></returns>
+        public static string BuildBarRequest(BarRequest br)
+        {
+            string[] r = new string[] 
+            {
+                br.Symbol,
+                br.Interval.ToString(),
+                br.StartDate.ToString(),
+                br.StartTime.ToString(),
+                br.EndDate.ToString(),
+                br.EndTime.ToString(),
+                br.ID.ToString(),
+                br.CustomInterval.ToString(),
+            };
+            return string.Join(",", r);
+            
+        }
+        
+    }
+
+    public struct BarRequest
+    {
+        public int StartDate;
+        public int EndDate;
+        public int StartTime;
+        public int EndTime;
+        public int CustomInterval;
+        public string Symbol;
+        public int Interval;
+        public long ID;
+        public DateTime StartDateTime { get { return Util.ToDateTime(StartDate,StartTime); } }
+        public DateTime EndDateTime { get { return Util.ToDateTime(EndDate, EndTime); } }
+        public BarRequest(string symbol, int interval, int startdate, int starttime, int enddate, int endtime)
+        {
+            Symbol = symbol;
+            Interval = interval;
+            StartDate = startdate;
+            StartTime = starttime;
+            EndDate = enddate;
+            EndTime = endtime;
+            ID = 0;
+            CustomInterval = 0;
+
+        }
+        
     }
 
 
