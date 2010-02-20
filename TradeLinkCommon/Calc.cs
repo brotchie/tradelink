@@ -1,6 +1,7 @@
 using System;
 using TradeLink.API;
 using System.Collections.Generic;
+[assembly: CLSCompliant(true)]
 
 namespace TradeLink.Common
 {

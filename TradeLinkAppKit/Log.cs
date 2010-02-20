@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using TradeLink.API;
 using TradeLink.Common;
+[assembly: CLSCompliant(true)]
 
 namespace TradeLink.AppKit
 {

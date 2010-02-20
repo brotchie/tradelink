@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Web;
 using System.Net;
-
+[assembly: CLSCompliant(true)]
 namespace TradeLink.Research
 {
     /// <summary>

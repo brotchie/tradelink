@@ -1,4 +1,5 @@
 ﻿using System;
+[assembly: CLSCompliant(true)]
 
 namespace TradeLink.API
 {
