@@ -134,10 +134,10 @@ Section "TradeLinkSuite"
   File "ServerIQ-DTN\bin\Release\IQFeedBroker.exe.config"
 
   File "TikConverter\bin\release\TikConverter.exe"
-  
-  Delete "$SMPROGRAMS\TradeLink\Update*.lnk"  
-  Delete "$INSTDIR\Update.exe"
 
+  ; removing brokerserver folder as people transition to single installer
+  Delete "$PROGRAMFILES\TradeLink\BrokerServer\*.*"  
+  RMDir /r "$PROGRAMFILES\TradeLink\BrokerServer"
   
   ; Write the installation path into the registry
   WriteRegStr HKLM SOFTWARE\TradeLinkSuite "Install_Dir" "$INSTDIR"
