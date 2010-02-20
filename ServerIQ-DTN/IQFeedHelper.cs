@@ -129,7 +129,7 @@ namespace IQFeedBroker
             // we form a watch command in the form of wSYMBOL\r\n
             byte[] watchCommand = new byte[command.Length];
             watchCommand = Encoding.ASCII.GetBytes(command);
-            m_sockIQConnect.Send(watchCommand, watchCommand.Length, SocketFlags.None);
+            m_hist.Send(watchCommand, watchCommand.Length, SocketFlags.None);
 
         }
 
@@ -407,8 +407,8 @@ namespace IQFeedBroker
         {
             try
             {
-                int bytesReceived = m_sockAdmin.EndReceive(result);
-                string rawData = Encoding.ASCII.GetString(m_szAdminSocketBuffer, 0, bytesReceived);
+                int bytesReceived = m_hist.EndReceive(result);
+                string rawData = Encoding.ASCII.GetString(m_buffhist, 0, bytesReceived);
                 debug(rawData);
                 WaitForData(HISTSOCKET);
             }
