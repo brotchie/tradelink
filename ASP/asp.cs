@@ -31,7 +31,8 @@ namespace ASP
         BasketImpl _mb = new BasketImpl();
         ASPOptions _ao = new ASPOptions();
         TLTracker _tlt;
-        MessageTracker _mt;
+        MessageTracker _mtexec;
+        MessageTracker _mtquote;
 
         Dictionary<int, string> _resskinidx = new Dictionary<int, string>();
         Dictionary<string, string> _class2dll = new Dictionary<string, string>();
@@ -55,16 +56,6 @@ namespace ASP
         {
             // read designer options for gui
             InitializeComponent();
-            TLClient_WM tl = new TLClient_WM(false);
-            _ao._execsel.DataSource = tl.ProvidersAvailable;
-            _ao._datasel.DataSource = tl.ProvidersAvailable;
-            _ao.TimeoutChanged += new Int32Delegate(_ao_TimeoutChanged);
-            _ao._datasel.SelectedIndexChanged += new EventHandler(_prefquot_SelectedIndexChanged);
-            _ao._execsel.SelectedIndexChanged += new EventHandler(_prefexec_SelectedIndexChanged);
-            initfeeds();
-            _ao._datasel.Text = Properties.Settings.Default.prefquote.ToString();
-            _ao._execsel.Text = Properties.Settings.Default.prefexecute.ToString();
-            feedready = true;
             // count instances of program
             _ASPINSTANCE = getprocesscount(PROGRAM)-1;
             // ensure have not exceeded maximum
@@ -90,6 +81,17 @@ namespace ASP
             // show status
             status(Util.TLSIdentity());
             debug(Util.TLSIdentity());
+            // get providers
+            TLClient_WM tl = new TLClient_WM(false);
+            _ao._execsel.DataSource = tl.ProvidersAvailable;
+            _ao._datasel.DataSource = tl.ProvidersAvailable;
+            _ao.TimeoutChanged += new Int32Delegate(_ao_TimeoutChanged);
+            _ao._datasel.SelectedIndexChanged += new EventHandler(_prefquot_SelectedIndexChanged);
+            _ao._execsel.SelectedIndexChanged += new EventHandler(_prefexec_SelectedIndexChanged);
+            initfeeds();
+            _ao._datasel.Text = Properties.Settings.Default.prefquote.ToString();
+            _ao._execsel.Text = Properties.Settings.Default.prefexecute.ToString();
+            feedready = true;
 
             // setup right click menu
             _resnames.ContextMenu= new ContextMenu();
@@ -185,6 +187,10 @@ namespace ASP
                 _tlt.GotConnectFail += new VoidDelegate(_tlt_GotConnectFail);
                 _tlt.GotConnect += new VoidDelegate(_tlt_GotConnect);
                 _tlt.GotDebug += new DebugDelegate(_tlt_GotDebug);
+                // pass messages through
+                _mtquote = new MessageTracker(quote);
+                _mtquote.SendMessageResponse += new MessageDelegate(tl_gotUnknownMessage);
+                _mtquote.SendDebug += new DebugDelegate(_mt_SendDebug);
             }
             if (setexec)
             {
@@ -195,9 +201,9 @@ namespace ASP
                 execute.gotOrderCancel += new UIntDelegate(tl_gotOrderCancel);
                 execute.gotUnknownMessage+=new MessageDelegate(tl_gotUnknownMessage);
                 // pass messages through
-                _mt = new MessageTracker(execute);
-                _mt.SendMessageResponse += new MessageDelegate(tl_gotUnknownMessage);
-                _mt.SendDebug += new DebugDelegate(_mt_SendDebug);
+                _mtexec = new MessageTracker(execute);
+                _mtexec.SendMessageResponse += new MessageDelegate(tl_gotUnknownMessage);
+                _mtexec.SendDebug += new DebugDelegate(_mt_SendDebug);
             }
             // startup
             _tlt_GotConnect();
@@ -944,7 +950,8 @@ namespace ASP
 
         void tmp_SendMessage(MessageTypes type, uint source, uint dest, uint msgid, string request, ref string response)
         {
-            _mt.SendMessage(type, source, dest, msgid, request, response);
+            _mtquote.SendMessage(type, source, dest, msgid, request, response);
+            _mtexec.SendMessage(type, source, dest, msgid, request, response);
         }
 
         bool _inderror = false;
@@ -1296,7 +1303,7 @@ namespace ASP
                 if ((provider < 0) || (provider > _ao._datasel.Items.Count)) return;
                 if (!hasminquote(tl, provider))
                 {
-                    MessageBox.Show(p.ToString() + " does not implement features required by SpreadLord execution.   Try another provider.");
+                    MessageBox.Show(p.ToString() + " does not implement features required by ASP execution.   Try another provider.");
                     return;
                 }
                 Properties.Settings.Default.prefquote = p;
@@ -1317,7 +1324,7 @@ namespace ASP
                 if ((provider < 0) || (provider > _ao._execsel.Items.Count)) return;
                 if (!hasminexec(tl, provider))
                 {
-                    MessageBox.Show(p.ToString() + " does not implement features required by SpreadLord execution.   Try another provider.");
+                    MessageBox.Show(p.ToString() + " does not implement features required by ASP execution.   Try another provider.");
                     return;
                 }
                 Properties.Settings.Default.prefexecute = p;
