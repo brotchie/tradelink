@@ -90,7 +90,15 @@ namespace TradeLink.Common
         public bool Mode(int ProviderIndex, bool showwarning)
         {
             if (InvokeRequired)
-                return (bool)Invoke(new ModeDel(Mode), new object[] { ProviderIndex, showwarning });
+            {
+                bool v = false;
+                try
+                {
+                    v = (bool)Invoke(new ModeDel(Mode), new object[] { ProviderIndex, showwarning });
+                }
+                catch { v = false; }
+                return v;
+            }
             else
             {
 
