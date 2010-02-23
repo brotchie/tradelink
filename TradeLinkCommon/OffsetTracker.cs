@@ -10,9 +10,9 @@ namespace TradeLink.Common
     /// </summary>
     public class OffsetTracker
     {
-        public event DebugFullDelegate SendDebug;
+        public event DebugDelegate SendDebug;
         public event HitOffsetDelegate HitOffset;
-        void debug(string msg) { if (SendDebug != null) SendDebug(DebugImpl.Create(msg)); }
+        void debug(string msg) { if (SendDebug != null) SendDebug(msg); }
         OffsetInfo _default = new OffsetInfo();
         string[] _ignore = new string[0];
         /// <summary>
@@ -29,7 +29,7 @@ namespace TradeLink.Common
         /// </summary>
         public string[] IgnoreSyms { get { return _ignore; } set { _ignore = value; } }
         bool _hasevents = false;
-        public event OrderDelegate SendOffset;
+        public event OrderDelegate SendOrder;
         public event UIntDelegate SendCancel;
         PositionTracker _pt = new PositionTracker();
         /// <summary>
@@ -114,7 +114,7 @@ namespace TradeLink.Common
                 {
                     profit.id = Ids.AssignId;
                     off.ProfitId = profit.id;
-                    SendOffset(profit);
+                    SendOrder(profit);
                     // notify
                     debug(string.Format("sent new profit: {0} {1}", profit.id, profit.ToString()));
                 }
@@ -132,7 +132,7 @@ namespace TradeLink.Common
                 {
                     stop.id = Ids.AssignId;
                     off.StopId = stop.id;
-                    SendOffset(stop);
+                    SendOrder(stop);
                     // notify
                     debug(string.Format("sent new stop: {0} {1}", stop.id, stop.ToString()));
                 }
@@ -256,7 +256,7 @@ namespace TradeLink.Common
         bool HasEvents()
         {
             if (_hasevents) return true;
-            if ((SendCancel == null) || (SendOffset == null))
+            if ((SendCancel == null) || (SendOrder == null))
                 throw new Exception("You must define targets for SendCancel and SendOffset events.");
             _hasevents = true;
             return _hasevents;
@@ -393,7 +393,7 @@ namespace TradeLink.Common
         /// If cancels are not processed on fill updates, they will be resent each tick until they are processed.
         /// </summary>
         /// <param name="k"></param>
-        public void GotTick(Tick k)
+        public void newTick(Tick k)
         {
             // otherwise update the offsets for this tick's symbol
             doupdate(k.symbol);

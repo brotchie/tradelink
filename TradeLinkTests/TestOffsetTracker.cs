@@ -13,13 +13,13 @@ namespace TestTradeLink
         public TestOffsetTracker() 
         {
             ot.SendCancel += new UIntDelegate(ot_SendCancel);
-            ot.SendOffset += new OrderDelegate(ot_SendOffset);
-            ot.SendDebug += new DebugFullDelegate(ot_SendDebug);
+            ot.SendOrder += new OrderDelegate(ot_SendOffset);
+            ot.SendDebug += new DebugDelegate(ot_SendDebug);
         }
 
-        void ot_SendDebug(Debug debug)
+        void ot_SendDebug(string msg)
         {
-            //Console.WriteLine(debug.Msg);
+            //Console.WriteLine(msg);
         }
 
         OffsetTracker ot = new OffsetTracker();
@@ -137,7 +137,7 @@ namespace TestTradeLink
             // send position update
             ot.Adjust(new TradeImpl(SYM, PRICE+2, SIZE));
             // tick
-            ot.GotTick(nt());
+            ot.newTick(nt());
             // verify only one order exists
             Assert.AreEqual(1, profits.Count);
             Assert.AreEqual(1, stops.Count);
@@ -156,7 +156,7 @@ namespace TestTradeLink
             // partial hit the profit order
             ot.Adjust(new TradeImpl(SYM, PRICE + 1, -1 * SIZE));
             // tick
-            ot.GotTick(nt());
+            ot.newTick(nt());
             // verify only one order exists on each side
             Assert.AreEqual(1, profits.Count);
             Assert.AreEqual(1, stops.Count);
