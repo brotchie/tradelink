@@ -31,9 +31,16 @@ namespace IQFeedBroker
 
         }
 
+        delegate void booldel(bool v);
         void _helper_Connected(bool v)
         {
-            BackColor = v ? Color.Green : Color.Red;
+            if (InvokeRequired)
+                Invoke(new booldel(_helper_Connected), new object[] { v });
+            else
+            {
+                BackColor = v ? Color.Green : Color.Red;
+                Invalidate(true);
+            }
         }
 
 

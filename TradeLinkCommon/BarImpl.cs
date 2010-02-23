@@ -296,6 +296,11 @@ bar.Close, (int)((double)bar.Volume / 4), string.Empty));
             CustomInterval = 0;
 
         }
+
+        public override string ToString()
+        {
+            return Symbol + " " + Interval + " " + StartDateTime + "->" + EndDateTime;
+        }
         
     }
 

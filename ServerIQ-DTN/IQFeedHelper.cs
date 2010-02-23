@@ -9,6 +9,7 @@ using Microsoft.Win32;
 using TradeLink.API;
 using TradeLink.Common;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace IQFeedBroker
 {
@@ -129,7 +130,15 @@ namespace IQFeedBroker
             // we form a watch command in the form of wSYMBOL\r\n
             byte[] watchCommand = new byte[command.Length];
             watchCommand = Encoding.ASCII.GetBytes(command);
-            m_hist.Send(watchCommand, watchCommand.Length, SocketFlags.None);
+            try
+            {
+                m_hist.Send(watchCommand, watchCommand.Length, SocketFlags.None);
+            }
+            catch (Exception ex)
+            {
+                debug("Exception sending barrequest: " + br.ToString());
+                debug(ex.Message + ex.StackTrace);
+            }
 
         }
 
@@ -295,11 +304,13 @@ namespace IQFeedBroker
                         debug("IQ Connect price feed is already running");
                         break;
                     case 0:
-                        debug("Need to start IQ Connect first");
+                        debug("IQFeed not running, attempting to start...");
                         string args = string.Empty;
                         if (HaveUserCredentials)
+                        {
                             args += String.Format("-product {0} -version 1.0.0.0 -login {1} -password {2} -savelogininfo -autoconnect", _prod, _user, _pswd);
-                        System.Diagnostics.Process.Start(IQ_FEED_PROGRAM, args);
+                            Process p = Process.Start(IQ_FEED_PROGRAM, args);
+                        }
                         break;
                     default:
                         throw new ApplicationException(string.Format("IQ Connect Feed has {0} instances currently running", iqConnectProcessCount));
@@ -355,7 +366,7 @@ namespace IQFeedBroker
                 throw ex;
             }
         }
-        const string HISTSOCKET = "HISTPORT";
+        const string HISTSOCKET = "HISTSOCK";
         void ConnectHist()
         {
             try
@@ -387,19 +398,27 @@ namespace IQFeedBroker
 
         private void WaitForData(string socketName)
         {
-            if (m_pfnCallback == null)
-                m_pfnCallback = new AsyncCallback(OnReceiveData);
+            try
+            {
+                if (m_pfnCallback == null)
+                    m_pfnCallback = new AsyncCallback(OnReceiveData);
 
-            if (socketName == Properties.Settings.Default.LEVEL_ONE_SOCKET_NAME)
-            {
-                if (m_sockIQConnect != null)
-                    m_sockIQConnect.BeginReceive(m_szLevel1SocketBuffer, 0, m_szLevel1SocketBuffer.Length, SocketFlags.None, m_pfnCallback, socketName);
+                if (socketName == Properties.Settings.Default.LEVEL_ONE_SOCKET_NAME)
+                {
+                    if (m_sockIQConnect != null)
+                        m_sockIQConnect.BeginReceive(m_szLevel1SocketBuffer, 0, m_szLevel1SocketBuffer.Length, SocketFlags.None, m_pfnCallback, socketName);
+                }
+                else if (socketName == Properties.Settings.Default.ADMINISTRATION_SOCKET_NAME)
+                    m_sockAdmin.BeginReceive(m_szAdminSocketBuffer, 0, m_szAdminSocketBuffer.Length, SocketFlags.None, m_pfnCallback, socketName);
+                else if (socketName == HISTSOCKET)
+                {
+                    m_hist.BeginReceive(m_buffhist, 0, m_buffhist.Length, SocketFlags.None, _cb_hist, socketName);
+                }
             }
-            else if (socketName == Properties.Settings.Default.ADMINISTRATION_SOCKET_NAME)
-                m_sockAdmin.BeginReceive(m_szAdminSocketBuffer, 0, m_szAdminSocketBuffer.Length, SocketFlags.None, m_pfnCallback, socketName);
-            else if (socketName == HISTSOCKET)
+            catch (Exception ex)
             {
-                m_hist.BeginReceive(m_buffhist, 0, m_buffhist.Length, SocketFlags.None, _cb_hist, socketName);
+                debug("socket error on: " + socketName);
+                debug(ex.Message + ex.StackTrace);
             }
         }
 
