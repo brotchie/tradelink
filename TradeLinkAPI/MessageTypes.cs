@@ -76,6 +76,7 @@ namespace TradeLink.API
         SENDORDEROCO,
         SENDORDEROSO,
         SENDORDERMODIFY,
+        SENDORDERPEGMIDPOINT,
         INTRADAYHIGH,
         INTRADAYLOW,
         // END CUSTOM MESSAGES
