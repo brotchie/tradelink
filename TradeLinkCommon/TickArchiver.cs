@@ -14,6 +14,7 @@ namespace TradeLink.Common
         string _path;
 
         Dictionary<string, TikWriter> filedict = new Dictionary<string, TikWriter>();
+        Dictionary<string, int> datedict = new Dictionary<string, int>();
         public TickArchiver() : this(Util.TLTickDir) { }
         public TickArchiver(string folderpath)
         {
@@ -32,7 +33,19 @@ namespace TradeLink.Common
             if (_stopped) return false;
             if ((t.symbol==null) || (t.symbol=="")) return false;
             TikWriter tw;
-            if (filedict.TryGetValue(t.symbol, out tw))
+            // prepare last date of tick
+            int lastdate = 0;
+            // get last date
+            bool havedate = datedict.TryGetValue(t.symbol, out lastdate);
+            // if we don't have date, use present date
+            if (!havedate)
+                lastdate = t.date; 
+            // see if we need a new day
+            bool samedate = lastdate == t.date;
+            // see if we have stream already
+            bool havestream = filedict.TryGetValue(t.symbol, out tw);
+            // if no changes, just save tick
+            if (samedate && havestream)
             {
                 try 
                 {
@@ -44,9 +57,32 @@ namespace TradeLink.Common
             {
                 try 
                 {
+                    // if new date, close stream
+                    if (!samedate)
+                    {
+                        try
+                        {
+                            tw.Close();
+                        }
+                        catch (IOException) { }
+                    }
+                    // open new stream
                     tw = new TikWriter(_path, t.symbol, t.date);
+                    // save tick
                     tw.newTick(t);
-                    filedict.Add(t.symbol, tw);
+                    // save stream
+                    if (!havestream)
+                        filedict.Add(t.symbol, tw);
+                    else
+                        filedict[t.symbol] = tw;
+                    // save date if changed
+                    if (!samedate)
+                    {
+                        if (havedate)
+                            datedict[t.symbol] = t.date;
+                        else
+                            datedict.Add(t.symbol, t.date);
+                    }
                 }
                 catch (IOException) { return false; }
                 catch (Exception) { return false; }
