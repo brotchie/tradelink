@@ -83,6 +83,10 @@ namespace ASP
             _ar.GotTick += new TickDelegate(tl_gotTick);
             // get providers
             initfeeds();
+            // get asp option events
+            _ao.TimeoutChanged += new Int32Delegate(_ao_TimeoutChanged);
+            _ao._datasel.SelectedIndexChanged += new EventHandler(_prefquot_SelectedIndexChanged);
+            _ao._execsel.SelectedIndexChanged += new EventHandler(_prefexec_SelectedIndexChanged);
             // setup right click menu
             _resnames.ContextMenu= new ContextMenu();
             _resnames.ContextMenu.Popup += new EventHandler(ContextMenu_Popup);
@@ -105,9 +109,6 @@ namespace ASP
             TLClient_WM tl = new TLClient_WM(false);
             _ao._execsel.DataSource = tl.ProvidersAvailable;
             _ao._datasel.DataSource = tl.ProvidersAvailable;
-            _ao.TimeoutChanged += new Int32Delegate(_ao_TimeoutChanged);
-            _ao._datasel.SelectedIndexChanged += new EventHandler(_prefquot_SelectedIndexChanged);
-            _ao._execsel.SelectedIndexChanged += new EventHandler(_prefexec_SelectedIndexChanged);
 
             bool setquote = false;
             bool setexec = false;
@@ -118,8 +119,6 @@ namespace ASP
 
                 for (int i = 0; i < tl.ProvidersAvailable.Length; i++)
                 {
-                    tl.Unsubscribe();
-                    tl.Disconnect();
                     // switch to provider
                     bool ok = tl.Mode(i, false);
                     // see if he has quotes
@@ -137,21 +136,22 @@ namespace ASP
                         execute = new TLClient_WM(i, PROGRAM, false);
                         debug("Executions: " + execute.BrokerName + " " + execute.ServerVersion);
                     }
+                    // clear connections
+                    tl.Unsubscribe();
+                    tl.Disconnect();
+                    // if we're done, stop scanning providers
                     if (setexec && setquote)
-                    {
-                        status("Connected: " + quote.BrokerName + " " + execute.BrokerName);
                         break;
-                    }
                 }
-                if (!setexec && !setquote)
-                    debug("no preferred provider found");
+                if (setquote)
+                    status("Connected: " + quote.BrokerName);
+                else if (!setexec)
+                    debug("No preferred providers running.");
             }
             else if (_ao._providerfallback.Checked)
             {
                 for (int i = 0; i < tl.ProvidersAvailable.Length; i++)
                 {
-                    tl.Unsubscribe();
-                    tl.Disconnect();
                     // switch to provider
                     bool ok = tl.Mode(i, false) ;
                     // see if he has quotes
@@ -161,22 +161,21 @@ namespace ASP
                         quote = new TLClient_WM(i, PROGRAM+"quote", false);
                         debug("DataFeed: " + quote.BrokerName + " " + quote.ServerVersion);
                     }
-                    if (ok && !setquote && (tl.RequestFeatureList.Contains(MessageTypes.SIMTRADING) || tl.RequestFeatureList.Contains(MessageTypes.LIVETRADING)))
+                    if (ok && !setexec && (tl.RequestFeatureList.Contains(MessageTypes.SIMTRADING) || tl.RequestFeatureList.Contains(MessageTypes.LIVETRADING)))
                     {
                         setexec |= true;
                         execute = new TLClient_WM(i, PROGRAM+"exec", false);
                         debug("Executions: " + execute.BrokerName + " " + execute.ServerVersion);
                     }
+                    // clear connections
+                    tl.Unsubscribe();
+                    tl.Disconnect();
+                    // if we're done, stop scanning providers
                     if (setexec && setquote)
-                    {
-                        status("Connected: " + quote.BrokerName + " " + execute.BrokerName);
                         break;
-                    }
                 }
-                if (!setexec && !setquote)
-                    debug("no provider found");
-
-
+                if (setquote)
+                    status("Connected: " + quote.BrokerName);
             }
 
             // map handlers
@@ -1370,9 +1369,6 @@ namespace ASP
             bool test = true;
             test &= tl.RequestFeatureList.Contains(MessageTypes.EXECUTENOTIFY);
             test &= tl.RequestFeatureList.Contains(MessageTypes.SENDORDER);
-            test &= tl.RequestFeatureList.Contains(MessageTypes.SENDORDERLIMIT);
-            test &= tl.RequestFeatureList.Contains(MessageTypes.SENDORDERMARKET);
-            test &= tl.RequestFeatureList.Contains(MessageTypes.SENDORDERSTOP);
             test &= tl.RequestFeatureList.Contains(MessageTypes.ORDERCANCELREQUEST);
             test &= tl.RequestFeatureList.Contains(MessageTypes.ORDERCANCELRESPONSE);
             return test;
