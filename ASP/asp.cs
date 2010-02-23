@@ -56,6 +56,9 @@ namespace ASP
         {
             // read designer options for gui
             InitializeComponent();
+            // show status
+            status(Util.TLSIdentity());
+            debug(Util.TLSIdentity());
             // count instances of program
             _ASPINSTANCE = getprocesscount(PROGRAM)-1;
             // ensure have not exceeded maximum
@@ -78,21 +81,8 @@ namespace ASP
             _saveskins.Click+=new EventHandler(_saveskins_Click);
             _skins.SelectedIndexChanged+=new EventHandler(_skins_SelectedIndexChanged);
             _ar.GotTick += new TickDelegate(tl_gotTick);
-            // show status
-            status(Util.TLSIdentity());
-            debug(Util.TLSIdentity());
             // get providers
-            TLClient_WM tl = new TLClient_WM(false);
-            _ao._execsel.DataSource = tl.ProvidersAvailable;
-            _ao._datasel.DataSource = tl.ProvidersAvailable;
-            _ao.TimeoutChanged += new Int32Delegate(_ao_TimeoutChanged);
-            _ao._datasel.SelectedIndexChanged += new EventHandler(_prefquot_SelectedIndexChanged);
-            _ao._execsel.SelectedIndexChanged += new EventHandler(_prefexec_SelectedIndexChanged);
             initfeeds();
-            _ao._datasel.Text = Properties.Settings.Default.prefquote.ToString();
-            _ao._execsel.Text = Properties.Settings.Default.prefexecute.ToString();
-            feedready = true;
-
             // setup right click menu
             _resnames.ContextMenu= new ContextMenu();
             _resnames.ContextMenu.Popup += new EventHandler(ContextMenu_Popup);
@@ -112,15 +102,24 @@ namespace ASP
 
         void initfeeds()
         {
+            TLClient_WM tl = new TLClient_WM(false);
+            _ao._execsel.DataSource = tl.ProvidersAvailable;
+            _ao._datasel.DataSource = tl.ProvidersAvailable;
+            _ao.TimeoutChanged += new Int32Delegate(_ao_TimeoutChanged);
+            _ao._datasel.SelectedIndexChanged += new EventHandler(_prefquot_SelectedIndexChanged);
+            _ao._execsel.SelectedIndexChanged += new EventHandler(_prefexec_SelectedIndexChanged);
+
             bool setquote = false;
             bool setexec = false;
-            TLClient_WM tl = new TLClient_WM(false);
+
             // detect feeds
-            if (_ao._providerfallback.Checked)
+            if (!_ao._providerfallback.Checked)
             {
 
                 for (int i = 0; i < tl.ProvidersAvailable.Length; i++)
                 {
+                    tl.Unsubscribe();
+                    tl.Disconnect();
                     // switch to provider
                     bool ok = tl.Mode(i, false);
                     // see if he has quotes
@@ -129,45 +128,55 @@ namespace ASP
                     {
                         setquote |= true;
                         quote = new TLClient_WM(i,PROGRAM,false);
-                        debug("have quote provider: " + quote.BrokerName + " " + quote.ServerVersion);
+                        debug("DataFeed: " + quote.BrokerName + " " + quote.ServerVersion);
                     }
                     if (ok && !setexec && (tl.BrokerName== Properties.Settings.Default.prefexecute) 
                         && (tl.RequestFeatureList.Contains(MessageTypes.SIMTRADING) || tl.RequestFeatureList.Contains(MessageTypes.LIVETRADING)))
                     {
                         setexec |= true;
                         execute = new TLClient_WM(i, PROGRAM, false);
-                        debug("have execute provider: " + execute.BrokerName + " " + execute.ServerVersion);
+                        debug("Executions: " + execute.BrokerName + " " + execute.ServerVersion);
                     }
                     if (setexec && setquote)
+                    {
+                        status("Connected: " + quote.BrokerName + " " + execute.BrokerName);
                         break;
+                    }
                 }
                 if (!setexec && !setquote)
                     debug("no preferred provider found");
             }
-            else if (!_ao._providerfallback.Checked)
+            else if (_ao._providerfallback.Checked)
             {
                 for (int i = 0; i < tl.ProvidersAvailable.Length; i++)
                 {
+                    tl.Unsubscribe();
+                    tl.Disconnect();
                     // switch to provider
                     bool ok = tl.Mode(i, false) ;
                     // see if he has quotes
                     if (ok && !setquote && tl.RequestFeatureList.Contains(MessageTypes.LIVEDATA))
                     {
                         setquote |= true;
-                        quote = new TLClient_WM(i, PROGRAM, false);
-                        debug("have quote provider: " + quote.BrokerName + " " + quote.ServerVersion);
+                        quote = new TLClient_WM(i, PROGRAM+"quote", false);
+                        debug("DataFeed: " + quote.BrokerName + " " + quote.ServerVersion);
                     }
                     if (ok && !setquote && (tl.RequestFeatureList.Contains(MessageTypes.SIMTRADING) || tl.RequestFeatureList.Contains(MessageTypes.LIVETRADING)))
                     {
                         setexec |= true;
-                        execute = new TLClient_WM(i, PROGRAM, false);
-                        debug("have execute provider: " + execute.BrokerName + " " + execute.ServerVersion);
+                        execute = new TLClient_WM(i, PROGRAM+"exec", false);
+                        debug("Executions: " + execute.BrokerName + " " + execute.ServerVersion);
                     }
                     if (setexec && setquote)
+                    {
+                        status("Connected: " + quote.BrokerName + " " + execute.BrokerName);
                         break;
+                    }
                 }
                 if (!setexec && !setquote)
                     debug("no provider found");
+
+
             }
 
             // map handlers
@@ -176,7 +185,7 @@ namespace ASP
                 // clear any leftover subscriptions
                 quote.Unsubscribe();
                 // handle new ticks
-                quote.gotTick += new TickDelegate(_ar.newTick);
+                quote.gotTick += new TickDelegate(quote_gotTick);
                 // handle unknown messages
                 quote.gotUnknownMessage += new MessageDelegate(tl_gotUnknownMessage);
                 // don't save ticks from replay since they're already saved
@@ -187,10 +196,6 @@ namespace ASP
                 _tlt.GotConnectFail += new VoidDelegate(_tlt_GotConnectFail);
                 _tlt.GotConnect += new VoidDelegate(_tlt_GotConnect);
                 _tlt.GotDebug += new DebugDelegate(_tlt_GotDebug);
-                // pass messages through
-                _mtquote = new MessageTracker(quote);
-                _mtquote.SendMessageResponse += new MessageDelegate(tl_gotUnknownMessage);
-                _mtquote.SendDebug += new DebugDelegate(_mt_SendDebug);
             }
             if (setexec)
             {
@@ -200,18 +205,35 @@ namespace ASP
                 execute.gotPosition += new PositionDelegate(tl_gotPosition);
                 execute.gotOrderCancel += new UIntDelegate(tl_gotOrderCancel);
                 execute.gotUnknownMessage+=new MessageDelegate(tl_gotUnknownMessage);
-                // pass messages through
-                _mtexec = new MessageTracker(execute);
-                _mtexec.SendMessageResponse += new MessageDelegate(tl_gotUnknownMessage);
-                _mtexec.SendDebug += new DebugDelegate(_mt_SendDebug);
             }
+
+            // pass messages through
+            _mtquote = new MessageTracker(quote);
+            _mtquote.SendMessageResponse += new MessageDelegate(tl_gotUnknownMessage);
+            _mtquote.SendDebug += new DebugDelegate(_mt_SendDebug);
+            _mtexec = new MessageTracker(execute);
+            _mtexec.SendMessageResponse += new MessageDelegate(tl_gotUnknownMessage);
+            _mtexec.SendDebug += new DebugDelegate(_mt_SendDebug);
+
+            _ao._datasel.Text = Properties.Settings.Default.prefquote.ToString();
+            _ao._execsel.Text = Properties.Settings.Default.prefexecute.ToString();
+            feedready = true;
+
             // startup
             _tlt_GotConnect();
 
+            tl.Disconnect();
+            tl = null;
 
 
 
 
+
+        }
+
+        void quote_gotTick(Tick t)
+        {
+            _ar.newTick(t);
         }
 
         void bw_DoWork(object sender, DoWorkEventArgs e)
