@@ -502,7 +502,6 @@ namespace IQFeedBroker
                         {
                             #region Set the login and other attribute settings...KRJ: Not written this yet to see if can do on start up
                             string command = "S,SET LOGINID,244023\r\nS,SET PASSWORD,8488\r\nS,SET SAVE LOGIN INFO,On\r\nS,SET AUTOCONNECT,On\r\nS,CONNECT\r\n";
-                            debug(String.Format("ADMIN: Register Client Completed: Command: {0}", command));
                             byte[] size = new byte[command.Length];
                             size = Encoding.ASCII.GetBytes(command);
                             int bytesToSend = size.Length;
