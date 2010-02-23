@@ -36,15 +36,15 @@ namespace ASP
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
             this._newrespbox = new System.Windows.Forms.GroupBox();
+            this._skins = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this._saveskins = new System.Windows.Forms.Button();
             this._librarysel = new System.Windows.Forms.Button();
+            this._remskin = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this._twithelp = new System.Windows.Forms.Button();
             this._opttog = new System.Windows.Forms.Button();
             this._togglemsgs = new System.Windows.Forms.Button();
-            this._saveskins = new System.Windows.Forms.Button();
-            this._skins = new System.Windows.Forms.ComboBox();
-            this._remskin = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
             this.statusStrip1.SuspendLayout();
             this._newrespbox.SuspendLayout();
             this.SuspendLayout();
@@ -112,9 +112,38 @@ namespace ASP
             this._newrespbox.TabStop = false;
             this._newrespbox.Text = "Start new Response (strategy)";
             // 
+            // _skins
+            // 
+            this._skins.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this._skins.FormattingEnabled = true;
+            this._skins.Location = new System.Drawing.Point(68, 65);
+            this._skins.Name = "_skins";
+            this._skins.Size = new System.Drawing.Size(301, 28);
+            this._skins.TabIndex = 20;
+            this.toolTip1.SetToolTip(this._skins, "Skins you have saved");
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(6, 69);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(56, 20);
+            this.label1.TabIndex = 23;
+            this.label1.Text = "Skins: ";
+            // 
+            // _saveskins
+            // 
+            this._saveskins.Location = new System.Drawing.Point(410, 64);
+            this._saveskins.Name = "_saveskins";
+            this._saveskins.Size = new System.Drawing.Size(31, 29);
+            this._saveskins.TabIndex = 22;
+            this._saveskins.Text = "S";
+            this.toolTip1.SetToolTip(this._saveskins, "save current settings from running skins");
+            this._saveskins.UseVisualStyleBackColor = true;
+            // 
             // _librarysel
             // 
-            this._librarysel.Location = new System.Drawing.Point(385, 31);
+            this._librarysel.Location = new System.Drawing.Point(409, 30);
             this._librarysel.Name = "_librarysel";
             this._librarysel.Size = new System.Drawing.Size(32, 28);
             this._librarysel.TabIndex = 21;
@@ -122,6 +151,16 @@ namespace ASP
             this.toolTip1.SetToolTip(this._librarysel, "Change library where responses are obtained");
             this._librarysel.UseVisualStyleBackColor = true;
             this._librarysel.Click += new System.EventHandler(this.LoadDLL_Click);
+            // 
+            // _remskin
+            // 
+            this._remskin.Location = new System.Drawing.Point(375, 65);
+            this._remskin.Name = "_remskin";
+            this._remskin.Size = new System.Drawing.Size(29, 28);
+            this._remskin.TabIndex = 21;
+            this._remskin.Text = "-";
+            this.toolTip1.SetToolTip(this._remskin, "delete current skin");
+            this._remskin.UseVisualStyleBackColor = true;
             // 
             // _twithelp
             // 
@@ -154,45 +193,6 @@ namespace ASP
             this._togglemsgs.Text = "!";
             this._togglemsgs.UseVisualStyleBackColor = true;
             this._togglemsgs.Click += new System.EventHandler(this._togglemsgs_Click);
-            // 
-            // _saveskins
-            // 
-            this._saveskins.Location = new System.Drawing.Point(410, 64);
-            this._saveskins.Name = "_saveskins";
-            this._saveskins.Size = new System.Drawing.Size(31, 29);
-            this._saveskins.TabIndex = 22;
-            this._saveskins.Text = "S";
-            this.toolTip1.SetToolTip(this._saveskins, "save current settings from running skins");
-            this._saveskins.UseVisualStyleBackColor = true;
-            // 
-            // _skins
-            // 
-            this._skins.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this._skins.FormattingEnabled = true;
-            this._skins.Location = new System.Drawing.Point(189, 65);
-            this._skins.Name = "_skins";
-            this._skins.Size = new System.Drawing.Size(180, 28);
-            this._skins.TabIndex = 20;
-            this.toolTip1.SetToolTip(this._skins, "Skins you have saved");
-            // 
-            // _remskin
-            // 
-            this._remskin.Location = new System.Drawing.Point(375, 65);
-            this._remskin.Name = "_remskin";
-            this._remskin.Size = new System.Drawing.Size(29, 28);
-            this._remskin.TabIndex = 21;
-            this._remskin.Text = "-";
-            this.toolTip1.SetToolTip(this._remskin, "delete current skin");
-            this._remskin.UseVisualStyleBackColor = true;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 69);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(188, 20);
-            this.label1.TabIndex = 23;
-            this.label1.Text = "Pre-set Response Skins: ";
             // 
             // ASP
             // 

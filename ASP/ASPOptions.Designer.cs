@@ -30,12 +30,12 @@
         {
             this.components = new System.ComponentModel.Container();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this._brokertimeout = new System.Windows.Forms.NumericUpDown();
             this._virtids = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
             this.archivetickbox = new System.Windows.Forms.CheckBox();
             this._account = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this._brokertimeout = new System.Windows.Forms.NumericUpDown();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this._providerfallback = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -60,32 +60,6 @@
             this.groupBox1.TabIndex = 20;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "General";
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(14, 139);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(146, 20);
-            this.label1.TabIndex = 20;
-            this.label1.Text = "FeedTimeout (sec):";
-            // 
-            // _brokertimeout
-            // 
-            this._brokertimeout.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::ASP.Properties.Settings.Default, "brokertimeoutsec", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this._brokertimeout.Location = new System.Drawing.Point(263, 133);
-            this._brokertimeout.Maximum = new decimal(new int[] {
-            10000000,
-            0,
-            0,
-            0});
-            this._brokertimeout.Name = "_brokertimeout";
-            this._brokertimeout.Size = new System.Drawing.Size(90, 26);
-            this._brokertimeout.TabIndex = 19;
-            this._brokertimeout.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.toolTip1.SetToolTip(this._brokertimeout, "0 disables timeout");
-            this._brokertimeout.Value = global::ASP.Properties.Settings.Default.brokertimeoutsec;
-            this._brokertimeout.ValueChanged += new System.EventHandler(this._brokertimeout_ValueChanged);
             // 
             // _virtids
             // 
@@ -134,13 +108,39 @@
             this._account.Text = global::ASP.Properties.Settings.Default.accountname;
             this.toolTip1.SetToolTip(this._account, "destination account orders and executions are sent for");
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(14, 139);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(146, 20);
+            this.label1.TabIndex = 20;
+            this.label1.Text = "FeedTimeout (sec):";
+            // 
+            // _brokertimeout
+            // 
+            this._brokertimeout.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::ASP.Properties.Settings.Default, "brokertimeoutsec", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this._brokertimeout.Location = new System.Drawing.Point(263, 133);
+            this._brokertimeout.Maximum = new decimal(new int[] {
+            10000000,
+            0,
+            0,
+            0});
+            this._brokertimeout.Name = "_brokertimeout";
+            this._brokertimeout.Size = new System.Drawing.Size(90, 26);
+            this._brokertimeout.TabIndex = 19;
+            this._brokertimeout.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.toolTip1.SetToolTip(this._brokertimeout, "0 disables timeout");
+            this._brokertimeout.Value = global::ASP.Properties.Settings.Default.brokertimeoutsec;
+            this._brokertimeout.ValueChanged += new System.EventHandler(this._brokertimeout_ValueChanged);
+            // 
             // _providerfallback
             // 
             this._providerfallback.AutoSize = true;
             this._providerfallback.Checked = global::ASP.Properties.Settings.Default.feedfallback;
             this._providerfallback.CheckState = System.Windows.Forms.CheckState.Checked;
             this._providerfallback.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::ASP.Properties.Settings.Default, "feedfallback", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this._providerfallback.Location = new System.Drawing.Point(14, 99);
+            this._providerfallback.Location = new System.Drawing.Point(14, 103);
             this._providerfallback.Name = "_providerfallback";
             this._providerfallback.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this._providerfallback.Size = new System.Drawing.Size(137, 24);
@@ -160,7 +160,7 @@
             this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Location = new System.Drawing.Point(13, 92);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(380, 179);
+            this.groupBox2.Size = new System.Drawing.Size(380, 180);
             this.groupBox2.TabIndex = 21;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Providers";
@@ -203,7 +203,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(415, 290);
+            this.ClientSize = new System.Drawing.Size(415, 284);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;

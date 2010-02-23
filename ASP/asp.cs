@@ -106,6 +106,7 @@ namespace ASP
 
         void initfeeds()
         {
+            feedready = false;
             TLClient_WM tl = new TLClient_WM(false);
             _ao._execsel.DataSource = tl.ProvidersAvailable;
             _ao._datasel.DataSource = tl.ProvidersAvailable;
@@ -113,74 +114,44 @@ namespace ASP
             bool setquote = false;
             bool setexec = false;
 
-            // detect feeds
+            // see if we can get preferred providers
+            int xi = getproviderindex(tl,Properties.Settings.Default.prefexecute);
+            int qi = getproviderindex(tl,Properties.Settings.Default.prefquote);
+            bool prefq = qi != -1;
+            bool prefx = xi != -1;
+            if (!prefq)
+                debug("preferred quote not available: " + Properties.Settings.Default.prefquote);
+            if (!prefx)
+                debug("preferred execute not available: " + Properties.Settings.Default.prefexecute);
+            // see if we're allowed to fallback
+
+            // not allowed
             if (!_ao._providerfallback.Checked)
             {
-
-                for (int i = 0; i < tl.ProvidersAvailable.Length; i++)
-                {
-                    // switch to provider
-                    bool ok = tl.Mode(i, false);
-                    // see if he has quotes
-                    if (ok && !setquote && (tl.BrokerName== Properties.Settings.Default.prefquote) 
-                        && tl.RequestFeatureList.Contains(MessageTypes.LIVEDATA))
-                    {
-                        setquote |= true;
-                        quote = new TLClient_WM(i,PROGRAM,false);
-                        debug("DataFeed: " + quote.BrokerName + " " + quote.ServerVersion);
-                    }
-                    if (ok && !setexec && (tl.BrokerName== Properties.Settings.Default.prefexecute) 
-                        && (tl.RequestFeatureList.Contains(MessageTypes.SIMTRADING) || tl.RequestFeatureList.Contains(MessageTypes.LIVETRADING)))
-                    {
-                        setexec |= true;
-                        execute = new TLClient_WM(i, PROGRAM, false);
-                        debug("Executions: " + execute.BrokerName + " " + execute.ServerVersion);
-                    }
-                    // clear connections
-                    tl.Unsubscribe();
-                    tl.Disconnect();
-                    // if we're done, stop scanning providers
-                    if (setexec && setquote)
-                        break;
-                }
-                if (setquote)
-                    status("Connected: " + quote.BrokerName);
-                else if (!setexec)
-                    debug("No preferred providers running.");
+                setquote = prefq && hasminquote(tl, qi);
+                setexec = prefx && hasminexec(tl, xi);
             }
-            else if (_ao._providerfallback.Checked)
+            else // ok to fallback,but where
             {
+                // see if we need to search
                 for (int i = 0; i < tl.ProvidersAvailable.Length; i++)
                 {
+                    if ((qi != -1) && (xi != -1)) break;
                     // switch to provider
-                    bool ok = tl.Mode(i, false) ;
-                    // see if he has quotes
-                    if (ok && !setquote && tl.RequestFeatureList.Contains(MessageTypes.LIVEDATA))
-                    {
-                        setquote |= true;
-                        quote = new TLClient_WM(i, PROGRAM+"quote", false);
-                        debug("DataFeed: " + quote.BrokerName + " " + quote.ServerVersion);
-                    }
-                    if (ok && !setexec && (tl.RequestFeatureList.Contains(MessageTypes.SIMTRADING) || tl.RequestFeatureList.Contains(MessageTypes.LIVETRADING)))
-                    {
-                        setexec |= true;
-                        execute = new TLClient_WM(i, PROGRAM+"exec", false);
-                        debug("Executions: " + execute.BrokerName + " " + execute.ServerVersion);
-                    }
-                    // clear connections
-                    tl.Unsubscribe();
-                    tl.Disconnect();
-                    // if we're done, stop scanning providers
-                    if (setexec && setquote)
-                        break;
+                    if ((qi == -1) && hasminquote(tl, i))
+                        qi = i;
+                    if ((xi == -1) && hasminexec(tl, i))
+                        xi = i;
                 }
-                if (setquote)
-                    status("Connected: " + quote.BrokerName);
+                setquote = (qi != -1) && hasminquote(tl, qi);
+                setexec = (xi != -1) && hasminexec(tl, xi);
             }
 
             // map handlers
             if (setquote)
             {
+                quote = new TLClient_WM(qi, PROGRAM+"quote", false);
+                debug("DataFeed: " + quote.BrokerName + " " + quote.ServerVersion);
                 // clear any leftover subscriptions
                 quote.Unsubscribe();
                 // handle new ticks
@@ -195,15 +166,22 @@ namespace ASP
                 _tlt.GotConnectFail += new VoidDelegate(_tlt_GotConnectFail);
                 _tlt.GotConnect += new VoidDelegate(_tlt_GotConnect);
                 _tlt.GotDebug += new DebugDelegate(_tlt_GotDebug);
+                _ao._datasel.SelectedIndex = quote.ProviderSelected;
+                _ao._datasel.Text = quote.BrokerName.ToString();
             }
             if (setexec)
             {
+                execute = new TLClient_WM(xi, PROGRAM+"exec", false);
+                debug("Executions: " + execute.BrokerName + " " + execute.ServerVersion);
                 execute.gotAccounts += new DebugDelegate(tl_gotAccounts);
                 execute.gotFill += new FillDelegate(tl_gotFill);
                 execute.gotOrder += new OrderDelegate(tl_gotOrder);
                 execute.gotPosition += new PositionDelegate(tl_gotPosition);
                 execute.gotOrderCancel += new UIntDelegate(tl_gotOrderCancel);
                 execute.gotUnknownMessage+=new MessageDelegate(tl_gotUnknownMessage);
+                _ao._execsel.SelectedIndex = execute.ProviderSelected;
+                _ao._execsel.Text = execute.BrokerName.ToString();
+
             }
 
             // pass messages through
@@ -214,13 +192,9 @@ namespace ASP
             _mtexec.SendMessageResponse += new MessageDelegate(tl_gotUnknownMessage);
             _mtexec.SendDebug += new DebugDelegate(_mt_SendDebug);
 
-            _ao._datasel.Text = Properties.Settings.Default.prefquote.ToString();
-            _ao._execsel.Text = Properties.Settings.Default.prefexecute.ToString();
-            feedready = true;
-
             // startup
             _tlt_GotConnect();
-
+            feedready = true;
             tl.Disconnect();
             tl = null;
 
@@ -228,6 +202,13 @@ namespace ASP
 
 
 
+        }
+
+        int getproviderindex(TLClient tl, Providers p)
+        {
+            for (int i = 0; i < tl.ProvidersAvailable.Length; i++)
+                if (tl.ProvidersAvailable[i] == p) return i;
+            return -1;
         }
 
         void quote_gotTick(Tick t)
@@ -267,20 +248,21 @@ namespace ASP
                     debug(quote.BrokerName + " " + quote.ServerVersion + " connected.");
                     status(quote.BrokerName + " connected.");
                 }
-                _ao._brokertimeout.Enabled = quote.BrokerName != Providers.TradeLink;
-                if (quote.BrokerName == Providers.TradeLink)
+                // if we have a quote provider
+                if (quote != null)
                 {
-                    _tlt.Stop();
-                }
+                    // disable timeouts on tradelink provider
+                    _ao._brokertimeout.Enabled = quote.BrokerName != Providers.TradeLink;
+                    // don't track tradelink
+                    if (quote.BrokerName == Providers.TradeLink)
+                    {
+                        _tlt.Stop();
+                    }
 
-                // get accounts
-                execute.RequestAccounts();
-                // request positions
-                foreach (string acct in _acct)
-                    execute.RequestPositions(acct);
-                // subscribe if we have a basket
-                if (_mb.Count>0)
-                    quote.Subscribe(_mb);
+                    // if we have a quote provid
+                    if (_mb.Count > 0)
+                        quote.Subscribe(_mb);
+                }
             }
             catch { }
         }
@@ -830,10 +812,10 @@ namespace ASP
 
             try
             {
-                // stop tick thread
-                _ar.Stop();
                 // stop watching ticks
                 _tlt.Stop();
+                // stop tick thread
+                _ar.Stop();
                 // stop archiving ticks
                 _ta.Stop();
                 // stop logging
@@ -841,6 +823,8 @@ namespace ASP
                 // shutdown clients
                 quote.Disconnect();
                 execute.Disconnect();
+                quote = null;
+                execute = null;
 
             }
             catch { }
@@ -1319,17 +1303,18 @@ namespace ASP
             TLClient_WM tl = new TLClient_WM(false);
             try
             {
-                Providers p = (Providers)Enum.Parse(typeof(Providers), _ao._datasel.Text);
                 int provider = _ao._datasel.SelectedIndex;
-                if ((provider < 0) || (provider > _ao._datasel.Items.Count)) return;
+                if ((provider < 0) || (provider > tl.ProvidersAvailable.Length)) return;
+                Providers p = tl.ProvidersAvailable[provider];
                 if (!hasminquote(tl, provider))
                 {
-                    MessageBox.Show(p.ToString() + " does not implement features required by ASP execution.   Try another provider.");
+                    MessageBox.Show(p.ToString() + " does not support quotes.");
                     return;
                 }
                 Properties.Settings.Default.prefquote = p;
-                initfeeds();
                 Properties.Settings.Default.Save();
+                initfeeds();
+                
             }
             catch { }
         }
@@ -1340,38 +1325,41 @@ namespace ASP
             TLClient_WM tl = new TLClient_WM(false);
             try
             {
-                Providers p = (Providers)Enum.Parse(typeof(Providers), _ao._execsel.Text);
-                int provider = _ao._execsel.SelectedIndex;
-                if ((provider < 0) || (provider > _ao._execsel.Items.Count)) return;
+                int provider = _ao._datasel.SelectedIndex;
+                if ((provider < 0) || (provider > tl.ProvidersAvailable.Length)) return;
+                Providers p = tl.ProvidersAvailable[provider];
                 if (!hasminexec(tl, provider))
                 {
-                    MessageBox.Show(p.ToString() + " does not implement features required by ASP execution.   Try another provider.");
+                    MessageBox.Show(p.ToString() + " does not support execution.");
                     return;
                 }
                 Properties.Settings.Default.prefexecute = p;
-                initfeeds();
                 Properties.Settings.Default.Save();
+                initfeeds();
+                
             }
             catch { }
         }
 
         bool hasminquote(TLClient_WM tl, int provider)
         {
-            if (!tl.Mode(provider, false)) return false;
+            bool v = tl.Mode(provider, false);
             bool test = true;
             test &= tl.RequestFeatureList.Contains(MessageTypes.TICKNOTIFY);
-            return test;
+            tl.Disconnect();
+            return test && v;
         }
 
         bool hasminexec(TLClient_WM tl, int provider)
         {
-            if (!tl.Mode(provider, false)) return false;
+            bool v = tl.Mode(provider, false);
             bool test = true;
             test &= tl.RequestFeatureList.Contains(MessageTypes.EXECUTENOTIFY);
             test &= tl.RequestFeatureList.Contains(MessageTypes.SENDORDER);
             test &= tl.RequestFeatureList.Contains(MessageTypes.ORDERCANCELREQUEST);
             test &= tl.RequestFeatureList.Contains(MessageTypes.ORDERCANCELRESPONSE);
-            return test;
+            tl.Disconnect();
+            return test && v;
         }
 
                                          
