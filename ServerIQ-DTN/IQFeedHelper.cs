@@ -440,16 +440,23 @@ namespace IQFeedBroker
                     BarRequest br;
                     if (!reqid2req.TryGetValue(rid, out br))
                         continue;
-                    DateTime dt = DateTime.Parse(r[1]);
-                    decimal h = Convert.ToDecimal(r[2]);
-                    decimal l = Convert.ToDecimal(r[3]);
-                    decimal o = Convert.ToDecimal(r[4]);
-                    decimal c = Convert.ToDecimal(r[5]);
-                    long v = Convert.ToInt64(r[7]);
-                    // build bar
-                    Bar b = new BarImpl(o, h, l, c, v, Util.ToTLDate(dt), Util.ToTLTime(dt), br.Symbol, br.Interval);
+                    bool errorfree = true;
+                    Bar b = new BarImpl();
+                    try
+                    {
+                        DateTime dt = DateTime.Parse(r[1]);
+                        decimal h = Convert.ToDecimal(r[2]);
+                        decimal l = Convert.ToDecimal(r[3]);
+                        decimal o = Convert.ToDecimal(r[4]);
+                        decimal c = Convert.ToDecimal(r[5]);
+                        long v = Convert.ToInt64(r[7]);
+                        // build bar
+                        b = new BarImpl(o, h, l, c, v, Util.ToTLDate(dt), Util.ToTLTime(dt), br.Symbol, br.Interval);
+                    }
+                    catch { errorfree = false; }
                     // send it
-                    TLSend(BarImpl.Serialize(b), MessageTypes.BARRESPONSE, br.Client);
+                    if (errorfree)
+                        TLSend(BarImpl.Serialize(b), MessageTypes.BARRESPONSE, br.Client);
                 }
                 string lastrecord = bars[bars.Length-1];
                 if (lastrecord.Contains(HISTEND))
@@ -619,7 +626,7 @@ namespace IQFeedBroker
                 }
                 catch (Exception ex)
                 {
-                    debug("Exception on tick: " + string.Join(",", actualData));
+                    debug("Tick error: " + string.Join(",", actualData));
                     debug(ex.Message+ex.StackTrace);
                 }
 
