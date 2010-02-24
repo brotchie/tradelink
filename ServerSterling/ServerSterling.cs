@@ -89,6 +89,14 @@ namespace SterServer
 
         long tl_newUnknownRequest(MessageTypes t, string msg)
         {
+            // message will be handled on main thread for com security
+            _msgq.Write(new GenericMessage(t, msg));
+            // we say ok for any supported messages
+            switch (t)
+            {
+                case MessageTypes.SENDORDERPEGMIDPOINT:
+                    return (long)MessageTypes.OK;
+            }
             return (long)MessageTypes.UNKNOWN_MESSAGE;
         }
 
@@ -124,6 +132,7 @@ namespace SterServer
             f.Add(MessageTypes.SENDORDERMARKET);
             f.Add(MessageTypes.SENDORDERLIMIT);
             f.Add(MessageTypes.EXECUTENOTIFY);
+            f.Add(MessageTypes.SENDORDERPEGMIDPOINT);
             return f.ToArray();
         }
 
@@ -160,6 +169,7 @@ namespace SterServer
         RingBuffer<Order> _orderq = new RingBuffer<Order>(MAXRECORD);
         RingBuffer<uint> _cancelq = new RingBuffer<uint>(MAXRECORD);
         RingBuffer<bool> _symsq = new RingBuffer<bool>(5);
+        RingBuffer<GenericMessage> _msgq = new RingBuffer<GenericMessage>(100);
         string symquotes = "";
         Dictionary<uint, string> idacct = new Dictionary<uint, string>();
 
@@ -179,16 +189,7 @@ namespace SterServer
                         order.LmtPrice = (double)o.price;
                         order.StpPrice = (double)o.stopp;
                         order.Destination = o.Exchange;
-                        // use by and sell as default
-                        string side = o.side ? "B" : "S";
-                        // if we're flat or short and selling, mark as a short
-                        if ((pt[o.symbol].isFlat || pt[o.symbol].isShort) && !o.side)
-                            side = "T";
-                            // if short and buying, mark as cover
-                        else if (pt[o.symbol].isShort && o.side)
-                            side = "C";
-                        // apply side
-                        order.Side = side;
+                        order.Side = getside(o.symbol,o.side);
                         order.Symbol = o.symbol;
                         order.Quantity = o.UnsignedSize;
                         string acct = accts.Count > 0 ? accts[0] : "";
@@ -228,6 +229,45 @@ namespace SterServer
                         else
                             debug("No record of id: " + number.ToString());
                     }
+
+                    // messages
+                    if (_msgq.hasItems)
+                    {
+                        GenericMessage gm = _msgq.Read();
+                        switch (gm.Type)
+                        {
+                            case MessageTypes.SENDORDERPEGMIDPOINT:
+                                {
+                                    // create order
+                                    STIOrder order = new STIOrder();
+                                    // pegged 2 midmarket
+                                    order.ExecInst = "M";
+                                    // get order
+                                    Peg2Midpoint o = Peg2Midpoint.Deserialize(gm.Request);
+                                    if (!o.isValid) break;
+                                    order.Symbol = o.symbol;
+                                    order.PegDiff = (double)o.pegdiff;
+                                    order.PriceType = STIPriceTypes.ptSTIPegged;
+                                    bool side = o.size > 0;
+                                    order.Side = getside(o.symbol, side);
+                                    order.Quantity = Math.Abs(o.size);
+                                    order.Destination = o.ex;
+                                    order.ClOrderID = o.id.ToString();
+                                    string acct = accts.Count > 0 ? accts[0] : "";
+                                    order.Account = o.Account != "" ? o.Account : acct;
+                                    int err = order.SubmitOrder();
+                                    string tmp = "";
+                                    if ((err == 0) && (!idacct.TryGetValue(o.id, out tmp)))
+                                        idacct.Add(o.id, order.Account);
+                                    if (err < 0)
+                                        debug("Error sending order: " + Util.PrettyError(newProviderName, err) + o.ToString());
+                                    if (err == -1)
+                                        debug("Make sure you have set the account in sending program.");
+
+                                }
+                                break;
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -236,6 +276,19 @@ namespace SterServer
                 if (_symsq.isEmpty && _orderq.isEmpty && _cancelq.isEmpty)
                     Thread.Sleep(_SLEEP);
             }
+        }
+
+        string getside(string symbol, bool side)
+        {
+            // use by and sell as default
+            string r = side ? "B" : "S";
+            // if we're flat or short and selling, mark as a short
+            if ((pt[symbol].isFlat || pt[symbol].isShort) && !side)
+                r = "T";
+            // if short and buying, mark as cover
+            else if (pt[symbol].isShort && side)
+                r = "C";
+            return r;
         }
 
         void tl_RegisterStocks(string msg)

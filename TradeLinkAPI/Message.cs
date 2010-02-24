@@ -9,6 +9,15 @@ namespace TradeLink.API
         public string Request;
         public string Response;
         public uint ID;
+        public GenericMessage(MessageTypes type, string request)
+        {
+            Type = type;
+            Request = request;
+            Source = 0;
+            Dest = 0;
+            Response = string.Empty;
+            ID = 0;
+        }
         public GenericMessage(MessageTypes type, uint source, uint dest, uint msgid, string request, string response)
         {
             Type = type;
