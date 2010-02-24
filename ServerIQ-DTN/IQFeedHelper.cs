@@ -285,12 +285,6 @@ namespace IQFeedBroker
             _prod = data1;
             _connect.RunWorkerAsync();
 
-
-
-
-            
-
-
         }
 
         void Connect()
@@ -457,7 +451,10 @@ namespace IQFeedBroker
                     TLSend(BarImpl.Serialize(b), MessageTypes.BARRESPONSE, br.Client);
                 }
                 string lastrecord = bars[bars.Length-1];
-                _histbuff = lastrecord.Contains(HISTEND) ? string.Empty : lastrecord;
+                if (lastrecord.Contains(HISTEND))
+                    _histbuff = string.Empty;
+                else
+                    _histbuff += lastrecord;
                 // wait for more historical data
                 WaitForData(HISTSOCKET);
             }
