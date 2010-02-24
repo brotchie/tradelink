@@ -27,6 +27,7 @@ namespace Responses
                 D(k.symbol + " no bars found, requesting...");
                 sendmessage(MessageTypes.BARREQUEST, BarImpl.BuildBarRequest(k.symbol, BarInterval.Hour));
             }
+            D(k.symbol + " bar count: " + _blt[k.symbol].Count);
             // update whatever data we have with ticks
             _blt.newTick(k);
 
@@ -34,7 +35,8 @@ namespace Responses
 
         public override void GotMessage(MessageTypes type, uint source, uint dest, uint msgid, string request, ref string response)
         {
-            D(type.ToString() + response);
+            if (type== MessageTypes.BARRESPONSE)
+                D(response);
             _mt.GotMessage(type, source, dest, msgid, request, ref response);
         }
 

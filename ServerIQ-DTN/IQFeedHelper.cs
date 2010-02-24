@@ -133,6 +133,7 @@ namespace IQFeedBroker
             try
             {
                 m_hist.Send(watchCommand, watchCommand.Length, SocketFlags.None);
+                debug("Requested historical bars for: " + br.Symbol);
             }
             catch (Exception ex)
             {
@@ -454,7 +455,7 @@ namespace IQFeedBroker
                 if (lastrecord.Contains(HISTEND))
                     _histbuff = string.Empty;
                 else
-                    _histbuff += lastrecord;
+                    _histbuff = lastrecord;
                 // wait for more historical data
                 WaitForData(HISTSOCKET);
             }

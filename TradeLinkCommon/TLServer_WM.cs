@@ -97,11 +97,17 @@ namespace TradeLink.Common
                         WMUtil.SendMsg(TickImpl.Serialize(tick), hims[i],Handle, (int)MessageTypes.TICKNOTIFY );
             }
         }
-
-        public void TLSend(string message, MessageTypes type, string client)
+        delegate void tlsenddel(string m, MessageTypes t, string c);
+        public void TLSend(string message, MessageTypes type, string clientname)
         {
-            if (client == "") return;
-            WMUtil.SendMsg(message, type, Handle, client);
+            if (InvokeRequired)
+                Invoke(new tlsenddel(TLSend), new object[] { message, type, clientname });
+            else
+            {
+                int id = client.IndexOf(clientname);
+                if (id == -1) return;
+                WMUtil.SendMsg(message, hims[id], Handle, (int)type);
+            }
         }
 
         delegate void tlnewfilldelegate(TradeImpl t, bool allclients);
