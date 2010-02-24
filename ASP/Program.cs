@@ -14,16 +14,23 @@ namespace ASP
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            ASP app = null;
             try
             {
                 Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
                 AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
-                Application.Run(new ASP());
+                app = new ASP();
+                Application.Run(app);
             }
             catch (Exception ex)
             {
                 TradeLink.AppKit.CrashReport.Report(ASP.PROGRAM, ex);
             }
+            try
+            {
+                app.Stop();
+            }
+            catch { }
         }
 
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

@@ -145,18 +145,26 @@ namespace TradeLink.Common
 
         public void Stop()
         {
-            if ((_readtickthread!=null) && ((_readtickthread.ThreadState != ThreadState.Stopped) && (_readtickthread.ThreadState != ThreadState.StopRequested)))
-                _readtickthread.Abort();
-            if ((_readimbthread != null) && ((_readimbthread.ThreadState != ThreadState.Stopped) && (_readimbthread.ThreadState != ThreadState.StopRequested)))
-                _readimbthread.Abort();
-            _tickcache = new Tick[MAXTICK];
-            _imbcache = new Imbalance[MAXIMB];
-            _readimbs = 0;
-            _writeimbs = 0;
-            _imbswaiting.Reset();
-            _writeticks = 0;
-            _readticks = 0;
-            _tickswaiting.Reset();
+            try
+            {
+                if ((_readtickthread != null) && ((_readtickthread.ThreadState != ThreadState.Stopped) && (_readtickthread.ThreadState != ThreadState.StopRequested)))
+                    _readtickthread.Abort();
+                if ((_readimbthread != null) && ((_readimbthread.ThreadState != ThreadState.Stopped) && (_readimbthread.ThreadState != ThreadState.StopRequested)))
+                    _readimbthread.Abort();
+            }
+            catch { }
+            try
+            {
+                _tickcache = new Tick[MAXTICK];
+                _imbcache = new Imbalance[MAXIMB];
+                _readimbs = 0;
+                _writeimbs = 0;
+                _imbswaiting.Reset();
+                _writeticks = 0;
+                _readticks = 0;
+                _tickswaiting.Reset();
+            }
+            catch { }
         }
     }
 }

@@ -80,6 +80,7 @@ namespace ASP
             _skins.SelectedIndexChanged+=new EventHandler(_skins_SelectedIndexChanged);
             _ar.GotTick += new TickDelegate(tl_gotTick);
             _bf = new BrokerFeed(Properties.Settings.Default.prefquote, Properties.Settings.Default.prefexecute,_ao._providerfallback.Checked,true);
+            _bf.SendDebug+=new DebugDelegate(debug);
             // get providers
             initfeeds();
             // get asp option events
@@ -106,9 +107,9 @@ namespace ASP
         void initfeeds()
         {
 
+            _bf.Reset();
             _ao._execsel.DataSource = _bf.ProvidersAvailable;
             _ao._datasel.DataSource = _bf.ProvidersAvailable;
-            _bf.Reset();
             // if we have quotes
             // don't save ticks from replay since they're already saved
             _ao.archivetickbox.Checked = ( _bf.ProvidersAvailable.Length>0) && !_bf.FeedClient.RequestFeatureList.Contains(MessageTypes.HISTORICALDATA);
@@ -122,7 +123,7 @@ namespace ASP
                 _tlt.GotDebug += new DebugDelegate(_tlt_GotDebug);
                 _ao._datasel.SelectedIndex = _bf.FeedClient.ProviderSelected;
                 _ao._datasel.Text = _bf.FeedClient.BrokerName.ToString();
-
+                status("Connected: " + _bf.Feed);
             }
 
             if (_bf.isBrokerConnected)
@@ -757,6 +758,12 @@ namespace ASP
             // save ASP properties
             Properties.Settings.Default.Save();
 
+            Stop();
+            
+        }
+
+        public void Stop()
+        {
             try
             {
                 // stop gui-safe broker-feed operations
@@ -772,7 +779,6 @@ namespace ASP
 
             }
             catch { }
-            
         }
 
         void skinexit()

@@ -23,9 +23,13 @@ namespace TradeLink.Common
         bool _stopped = false;
         public void Stop()
         {
-            foreach (string file in filedict.Keys)
-                filedict[file].Close();
-            _stopped = true;
+            try
+            {
+                foreach (string file in filedict.Keys)
+                    filedict[file].Close();
+                _stopped = true;
+            }
+            catch { }
         }
 
         public bool newTick(Tick t)

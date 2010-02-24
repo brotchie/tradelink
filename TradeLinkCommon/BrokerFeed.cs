@@ -16,6 +16,10 @@ namespace TradeLink.Common
         Providers _feed;
         Providers _broker;
         bool _reqpref = true;
+        bool _isprefq = false;
+        bool _isprefx = false;
+        public bool isPreferredFeed { get { return _isprefq; } }
+        public bool isPreferredBroker { get { return _isprefx; } }
         public TLClient FeedClient { get { return quote; } set { quote = value; }  }
         public TLClient BrokerClient { get { return execute; } set { execute = value; } }
         public Providers Feed { get { return _feed; } }
@@ -39,6 +43,7 @@ namespace TradeLink.Common
             if (_threadsafe)
             {
                 _reader = new Thread(new ParameterizedThreadStart(readdata));
+                _reader.Start();
             }
         }
 
@@ -113,9 +118,16 @@ namespace TradeLink.Common
                         gotAccounts(acct);
                 }
 
-                Thread.Sleep(100);
+                try
+                {
+                    Thread.Sleep(100);
+                }
+                catch (ThreadInterruptedException) { _interrupts++; }
             }
         }
+
+        int _interrupts = 0;
+        public int SafeThreadInterrupts { get { return _interrupts; } }
 
         public void Subscribe(Basket b)
         {
@@ -184,26 +196,30 @@ namespace TradeLink.Common
 
         public void Stop()
         {
-            Disconnect();
-            if (_threadsafe)
+            try
             {
-                _readergo = false;
-                try
+                Disconnect();
+                if (_threadsafe)
                 {
-                    _reader.Interrupt();
+                    _readergo = false;
+                    try
+                    {
+                        _reader.Interrupt();
+                    }
+                    catch { }
                 }
-                catch { }
             }
+            catch { }
         }
 
-        public Providers[] _ProvidersAvailable = new Providers[0];
-        public Providers[] ProvidersAvailable { get { return _ProvidersAvailable; } }
+        Providers[] _pavail = new Providers[0];
+        public Providers[] ProvidersAvailable { get { return _pavail; } }
         public int ProviderSelected { get { return -1; } }
         public List<MessageTypes> RequestFeatureList { get { return _RequestFeaturesList; } }
         public void ProvidersUpdate()
         {
             TLClient_WM tl = new TLClient_WM(false);
-            _ProvidersAvailable = tl.ProvidersAvailable;
+            _pavail = tl.ProvidersAvailable;
             tl.Disconnect();
         }
 
@@ -212,7 +228,7 @@ namespace TradeLink.Common
 
             feedready = false;
             TLClient_WM tl = new TLClient_WM(false);
-            _ProvidersAvailable = tl.ProvidersAvailable;
+            _pavail = tl.ProvidersAvailable;
 
             bool setquote = false;
             bool setexec = false;
@@ -220,19 +236,19 @@ namespace TradeLink.Common
             // see if we can get preferred providers
             int xi = getproviderindex(_broker);
             int qi = getproviderindex(_feed);
-            bool prefq = qi != -1;
-            bool prefx = xi != -1;
-            if (!prefq)
-                debug("preferred quote not available: " + _feed);
-            if (!prefx)
+            _isprefq = qi != -1;
+            _isprefx = xi != -1;
+            if (!isPreferredFeed)
+                debug("preferred data not available: " + _feed);
+            if (!isPreferredBroker)
                 debug("preferred execute not available: " + _broker);
             // see if we're allowed to fallback
 
             // not allowed
             if (RequirePreferred)
             {
-                setquote = prefq && hasminquote(tl, qi);
-                setexec = prefx && hasminexec(tl, xi);
+                setquote = isPreferredFeed && hasminquote(tl, qi);
+                setexec = isPreferredBroker && hasminexec(tl, xi);
             }
             else // ok to fallback,but where
             {
@@ -256,6 +272,7 @@ namespace TradeLink.Common
                 quote = new TLClient_WM(qi, PROGRAM + "quote", false);
                 quote.gotFeatures += new MessageTypesMsgDelegate(quote_gotFeatures);
                 debug("DataFeed: " + quote.BrokerName + " " + quote.ServerVersion);
+                _feed = quote.BrokerName;
                 // clear any leftover subscriptions
                 quote.Unsubscribe();
                 if (isThreadSafe)
@@ -268,6 +285,7 @@ namespace TradeLink.Common
             if (setexec)
             {
                 execute = new TLClient_WM(xi, PROGRAM + "exec", false);
+                _broker = execute.BrokerName;
                 execute.gotFeatures += new MessageTypesMsgDelegate(execute_gotFeatures);
                 if (isThreadSafe)
                 {
