@@ -422,12 +422,15 @@ namespace IQFeedBroker
             }
         }
 
+        string _histbuff = string.Empty;
+        const string HISTEND = "!ENDMSG!";
         void OnReceiveHist(IAsyncResult result)
         {
             try
             {
                 int bytesReceived = m_hist.EndReceive(result);
-                string rawData = Encoding.ASCII.GetString(m_buffhist, 0, bytesReceived);
+                string recvdata = Encoding.ASCII.GetString(m_buffhist, 0, bytesReceived);
+                string rawData = _histbuff ==string.Empty ? recvdata : _histbuff+recvdata;
                 string[] bars = rawData.Split(Environment.NewLine.ToCharArray());
                 foreach (string bar in bars)
                 {
@@ -453,6 +456,8 @@ namespace IQFeedBroker
                     // send it
                     TLSend(BarImpl.Serialize(b), MessageTypes.BARRESPONSE, br.Client);
                 }
+                string lastrecord = bars[bars.Length-1];
+                _histbuff = lastrecord.Contains(HISTEND) ? string.Empty : lastrecord;
                 // wait for more historical data
                 WaitForData(HISTSOCKET);
             }
