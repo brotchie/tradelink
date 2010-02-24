@@ -92,6 +92,7 @@
     <Compile Include="BarVolIntervalData.cs" />
     <Compile Include="Book.cs" />
     <Compile Include="BookTracker.cs" />
+    <Compile Include="BrokerFeed.cs" />
     <Compile Include="Calc.cs" />
     <Compile Include="Broker.cs" />
     <Compile Include="DebugImpl.cs" />

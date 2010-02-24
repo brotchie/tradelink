@@ -74,6 +74,7 @@
   <ItemGroup>
     <Compile Include="Bar.cs" />
     <Compile Include="BarList.cs" />
+    <Compile Include="Message.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="CurrencyType.cs" />
     <Compile Include="Debug.cs" />

@@ -40,6 +40,10 @@ namespace TradeLink.Common
         /// </summary>
         public bool isEmpty { get { return (_rc >= _wc) && !_flipped; } }
         /// <summary>
+        /// returns false if there is more to be read
+        /// </summary>
+        public bool hasItems { get { return (_rc < _wc) || _flipped; } }
+        /// <summary>
         /// reads next unread element from buffer
         /// </summary>
         /// <returns></returns>

@@ -11,13 +11,15 @@ namespace TradeLink.API
     public interface TLClient
     {
         int SendOrder(Order order);
+        void CancelOrder(long id);
         void Disconnect();
         void Register();
         void Subscribe(Basket mb);
         void Unsubscribe();
         long TLSend(MessageTypes type, string message);
         int HeartBeat();
-        void RequestDOM();
+        int ServerVersion { get; }
+        Providers BrokerName { get; }
         event TickDelegate gotTick;
         event FillDelegate gotFill;
         event OrderDelegate gotOrder;

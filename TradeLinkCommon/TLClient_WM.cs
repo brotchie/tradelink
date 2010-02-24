@@ -14,9 +14,7 @@ namespace TradeLink.Common
     {
 
         // clients that want notifications for subscribed stocks can override these methods
-        /// <summary>
-        /// Occurs when TradeLink receives any type of message [got message].
-        /// </summary>
+
         public event TickDelegate gotTick;
         public event FillDelegate gotFill;
         public event OrderDelegate gotOrder;

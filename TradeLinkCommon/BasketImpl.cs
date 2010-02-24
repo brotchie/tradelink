@@ -92,9 +92,24 @@ namespace TradeLink.Common
             for (int i = remove.Count - 1; i >= 0; i--)
                 symbols.RemoveAt(remove[i]);
         }
+        /// <summary>
+        /// remove single symbol from basket
+        /// </summary>
+        /// <param name="symbol"></param>
         public void Remove(string symbol) { int i = -1; for (int j = 0; j < symbols.Count; j++) if (symbols[j].Symbol == symbol) i = j; if (i != -1) symbols.RemoveAt(i); }
+        /// <summary>
+        /// remove index of a particular symbol
+        /// </summary>
+        /// <param name="i"></param>
         public void Remove(int i) { symbols.RemoveAt(i); }
+        /// <summary>
+        /// remove security from basket
+        /// </summary>
+        /// <param name="s"></param>
         public void Remove(Security s) { symbols.Remove(s); }
+        /// <summary>
+        /// empty basket
+        /// </summary>
         public void Clear() { symbols.Clear(); }
         public static string Serialize(Basket b)
         {

@@ -33,6 +33,7 @@ namespace TradeLink.API
     public delegate void ImbalanceDelegate(Imbalance imb);
     public delegate void VoidDelegate();
     public delegate void MessageDelegate(MessageTypes type, uint source, uint dest, uint msgid, string request,ref string response);
+    public delegate void MessageFullDelegate(GenericMessage m);
     public delegate void BasketDelegate(Basket b, int id);
     public delegate void BarListDelegate(BarList b);
     public delegate void ChartLabelDelegate(decimal price, int time, string label, System.Drawing.Color c);
