@@ -43,7 +43,10 @@ namespace TradeLink.Common
             bool havedate = datedict.TryGetValue(t.symbol, out lastdate);
             // if we don't have date, use present date
             if (!havedate)
-                lastdate = t.date; 
+            {
+                lastdate = t.date;
+                datedict.Add(t.symbol, t.date);
+            }
             // see if we need a new day
             bool samedate = lastdate == t.date;
             // see if we have stream already
@@ -54,6 +57,7 @@ namespace TradeLink.Common
                 try 
                 {
                     tw.newTick(t);
+                    return true;
                 }
                 catch (IOException) { return false; }
             }
@@ -82,10 +86,7 @@ namespace TradeLink.Common
                     // save date if changed
                     if (!samedate)
                     {
-                        if (havedate)
-                            datedict[t.symbol] = t.date;
-                        else
-                            datedict.Add(t.symbol, t.date);
+                        datedict[t.symbol] = t.date;
                     }
                 }
                 catch (IOException) { return false; }
