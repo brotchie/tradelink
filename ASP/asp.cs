@@ -79,6 +79,7 @@ namespace ASP
             _saveskins.Click+=new EventHandler(_saveskins_Click);
             _skins.SelectedIndexChanged+=new EventHandler(_skins_SelectedIndexChanged);
             _ar.GotTick += new TickDelegate(tl_gotTick);
+            _bf = new BrokerFeed(Properties.Settings.Default.prefquote, Properties.Settings.Default.prefexecute,_ao._providerfallback.Checked,true);
             // get providers
             initfeeds();
             // get asp option events
@@ -110,19 +111,34 @@ namespace ASP
             _bf.Reset();
             // if we have quotes
             // don't save ticks from replay since they're already saved
-            _ao.archivetickbox.Checked = !_bf.FeedClient.RequestFeatureList.Contains(MessageTypes.HISTORICALDATA);
+            _ao.archivetickbox.Checked = ( _bf.ProvidersAvailable.Length>0) && !_bf.FeedClient.RequestFeatureList.Contains(MessageTypes.HISTORICALDATA);
             // monitor quote feed
-            int poll = (int)((double)Properties.Settings.Default.brokertimeoutsec * 1000 / 2);
-            _tlt = new TLTracker(poll, (int)Properties.Settings.Default.brokertimeoutsec, _bf.FeedClient, Providers.Unknown, true);
-            _tlt.GotConnectFail += new VoidDelegate(_tlt_GotConnectFail);
-            _tlt.GotConnect += new VoidDelegate(_tlt_GotConnect);
-            _tlt.GotDebug += new DebugDelegate(_tlt_GotDebug);
-            _ao._datasel.SelectedIndex = _bf.FeedClient.ProviderSelected;
-            _ao._datasel.Text = _bf.FeedClient.BrokerName.ToString();
+            if (_bf.isFeedConnected)
+            {
+                int poll = (int)((double)Properties.Settings.Default.brokertimeoutsec * 1000 / 2);
+                _tlt = new TLTracker(poll, (int)Properties.Settings.Default.brokertimeoutsec, _bf.FeedClient, Providers.Unknown, true);
+                _tlt.GotConnectFail += new VoidDelegate(_tlt_GotConnectFail);
+                _tlt.GotConnect += new VoidDelegate(_tlt_GotConnect);
+                _tlt.GotDebug += new DebugDelegate(_tlt_GotDebug);
+                _ao._datasel.SelectedIndex = _bf.FeedClient.ProviderSelected;
+                _ao._datasel.Text = _bf.FeedClient.BrokerName.ToString();
 
-            // if we have execs
-            _ao._execsel.SelectedIndex = _bf.BrokerClient.ProviderSelected;
-            _ao._execsel.Text = _bf.BrokerName.ToString();
+            }
+
+            if (_bf.isBrokerConnected)
+            {
+                // if we have execs
+                _ao._execsel.SelectedIndex = _bf.BrokerClient.ProviderSelected;
+                _ao._execsel.Text = _bf.BrokerName.ToString();
+
+            }
+            // hook up events
+            _bf.gotFill += new FillDelegate(tl_gotFill);
+            _bf.gotOrder += new OrderDelegate(tl_gotOrder);
+            _bf.gotOrderCancel += new UIntDelegate(tl_gotOrderCancel);
+            _bf.gotPosition += new PositionDelegate(tl_gotPosition);
+            _bf.gotTick += new TickDelegate(quote_gotTick);
+            _bf.gotUnknownMessage += new MessageDelegate(tl_gotUnknownMessage);
 
 
             // pass messages through
@@ -602,7 +618,7 @@ namespace ASP
             try
             {
                 // resubscribe
-                _bf.FeedClient.Subscribe(_mb);
+                _bf.Subscribe(_mb);
             }
             catch (TLServerNotFound)
             {
@@ -1051,7 +1067,7 @@ namespace ASP
             // assign master order if necessary
             assignmasterorderid(ref o);
             // send order and get error message
-            int res = _bf.BrokerClient.SendOrder(o);
+            int res = _bf.SendOrder(o);
             // if error, display it
             if (res != (int)MessageTypes.OK)
                 debug(Util.PrettyError(_bf.BrokerClient.BrokerName, res) + " " + o.ToString());
@@ -1089,7 +1105,7 @@ namespace ASP
                 number = responseid2asp(number);
             }
             // pass cancels along to tradelink
-            _bf.BrokerClient.CancelOrder((long)number);
+            _bf.CancelOrder((long)number);
         }
 
         void workingres_GotDebug(Debug d)
@@ -1231,7 +1247,7 @@ namespace ASP
                 Properties.Settings.Default.prefquote = _bf.Feed;
         }
 
-        BrokerFeed _bf = new BrokerFeed();
+        BrokerFeed _bf;
 
         private void _prefexec_SelectedIndexChanged(object sender, EventArgs e)
         {
