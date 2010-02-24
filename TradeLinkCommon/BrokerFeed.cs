@@ -61,6 +61,7 @@ namespace TradeLink.Common
         {
             while (_readergo)
             {
+                try {
                 while (_kbuf.hasItems)
                 {
                     Tick k = _kbuf.Read();
@@ -118,8 +119,7 @@ namespace TradeLink.Common
                         gotAccounts(acct);
                 }
 
-                try
-                {
+
                     Thread.Sleep(100);
                 }
                 catch (ThreadInterruptedException) { _interrupts++; }
