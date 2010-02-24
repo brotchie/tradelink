@@ -240,19 +240,20 @@ Section "Uninstall"
   
 Function .onInit
 
+  Call IsSilent
   ; plugins dir should be automatically removed after installer runs
   InitPluginsDir
   File /oname=$PLUGINSDIR\splash.bmp "Install\tradelinklogo.bmp"
   splash::show 1000 $PLUGINSDIR\splash
 
+  		 
   Pop $0 ; $0 has '1' if the user closed the splash screen early,
          ; '0' if everything closed normally, and '-1' if some error occurred.
-		 Call IsSilent
 FunctionEnd
 
 Function IsSilent
   Var /GLOBAL SILENT
-  StrCpy $SILENT "No"
+  StrCpy $SILENT "NO"
   Push $0
   Push $CMDLINE
   Push "/S"

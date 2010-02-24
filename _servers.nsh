@@ -5,40 +5,20 @@ Section "BrokerServer"
 
     ; Set output path to the installation directory.
 	DetailPrint "Installing version ${VERSION}..."
+  SectionIn RO
   SetOutPath $INSTDIR
   CreateDirectory "$SMPROGRAMS\TradeLink"
   
   ; files included in install
-  File "VERSION.txt"
-  File "Install\VCRedistInstall.exe"
   File "BrokerServers\release\TradeLibFast.dll"
-  
-  DetailPrint "Checking for VCRedistributable..."
-  ReadRegStr $0 HKLM SOFTWARE\TradeLinkSuite "InstalledVcRedist"
-  StrCmp $0 "Yes" finishinstall
-  ExecWait "VCRedistInstall.exe"
-  DetailPrint "VCRedistributable was installed."
-  WriteRegStr HKLM SOFTWARE\TradeLinkSuite "InstalledVcRedist" "Yes"
+
   
 finishinstall:  
   
   ; write path for TradeLibFast.dll
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\App Paths\TradeLibFast.dll" "Path" "$INSTDIR\"
   
-  ; Write the installation path into the registry
-  WriteRegStr HKLM Software\NSIS_TLBrokerServer "Install_Dir" "$INSTDIR"
 
-
-  ; shortcut to uninstaller
-  CreateShortCut "$SMPROGRAMS\TradeLink\Uninstall BrokerServer.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
-  ; Write the uninstall keys for Windows
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BrokerServer" "DisplayName" "BrokerServer"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BrokerServer" "Path" "$INSTDIR\"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BrokerServer" "Version" "${VERSION}"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BrokerServer" "UninstallString" '"$INSTDIR\uninstall.exe"'
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BrokerServer" "NoModify" 1
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BrokerServer" "NoRepair" 1
-  WriteUninstaller "uninstall.exe"  
 
 SectionEnd
 
@@ -48,9 +28,8 @@ Section "AnvilServer"
 
   CreateShortCut "$SMPROGRAMS\TradeLink\Assent.lnk" "$INSTDIR\${ANVILDIRNAME}\Anvil.exe" "" "$INSTDIR\${ANVILDIRNAME}\Anvil.exe" 0
   ; Put file there
- 
-  
-  File /nonfatal /r "BrokerServers\Install\${ANVILDIRNAME}"
+  File /nonfatal /r "BrokerServers\Install\${ANVILDIRNAME}" 
+  File "/oname=$INSTDIR\${ANVILDIRNAME}\AnvilServer.dll" "BrokerServers\AnvilServer\Release\AnvilServer.dll"
   WriteINIStr "$INSTDIR\${ANVILDIRNAME}\Anvil.ini" Extension Path "$INSTDIR\${ANVILDIRNAME}\"
 
 

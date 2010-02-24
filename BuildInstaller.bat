@@ -41,8 +41,6 @@ echo ERROR Building installer...  did you compile the solution?
 echo.
 echo Try right clicking on TradeLinkSuite.nsi and choosing compile, 
 echo then see what errors come up...  perhaps a project did not compile.
-echo Also see this URL with instructions for obtaining TDAmeritrade api :
-echo http://code.google.com/p/tradelink/wiki/TDConfig
 echo. 
 echo quitting...
 echo.
