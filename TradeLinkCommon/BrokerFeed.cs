@@ -280,6 +280,11 @@ namespace TradeLink.Common
                     quote.gotTick += new TickDelegate(quote_gotTick);
                     quote.gotUnknownMessage += new MessageDelegate(quote_gotUnknownMessage);
                 }
+                else
+                {
+                    quote.gotTick += new TickDelegate(quote_gotTick2);
+                    quote.gotUnknownMessage += new MessageDelegate(quote_gotUnknownMessage2);
+                }
 
             }
             if (setexec)
@@ -297,12 +302,70 @@ namespace TradeLink.Common
                     execute.gotUnknownMessage += new MessageDelegate(execute_gotUnknownMessage);
 
                 }
+                else
+                {
+                    execute.gotAccounts += new DebugDelegate(execute_gotAccounts2);
+                    execute.gotFill += new FillDelegate(execute_gotFill2);
+                    execute.gotOrder += new OrderDelegate(execute_gotOrder2);
+                    execute.gotOrderCancel += new UIntDelegate(execute_gotOrderCancel2);
+                    execute.gotPosition += new PositionDelegate(execute_gotPosition2);
+                    execute.gotUnknownMessage += new MessageDelegate(execute_gotUnknownMessage2);
+                }
                 debug("Executions: " + execute.BrokerName + " " + execute.ServerVersion);
             }
 
             feedready = true;
             tl.Disconnect();
             tl = null;
+        }
+
+        void quote_gotUnknownMessage2(MessageTypes type, uint source, uint dest, uint msgid, string request, ref string response)
+        {
+            if (gotUnknownMessage != null)
+                gotUnknownMessage(type, source, dest, msgid, request, ref response);
+        }
+
+        void quote_gotTick2(Tick t)
+        {
+            if (gotTick != null)
+                gotTick(t);
+        }
+
+        void execute_gotUnknownMessage2(MessageTypes type, uint source, uint dest, uint msgid, string request, ref string response)
+        {
+            if (gotUnknownMessage != null)
+                gotUnknownMessage(type, source, dest, msgid, request, ref response);
+        }
+
+        void execute_gotPosition2(Position pos)
+        {
+            if (gotPosition != null)
+                gotPosition(pos);
+        }
+
+        void execute_gotOrderCancel2(uint number)
+        {
+            if (gotOrderCancel != null)
+                gotOrderCancel(number);
+        }
+
+        void execute_gotOrder2(Order o)
+        {
+            if (gotOrder != null)
+                gotOrder(o);
+        }
+
+        void execute_gotFill2(Trade t)
+        {
+            if (gotFill != null)
+                gotFill(t);
+        }
+
+        void execute_gotAccounts2(string msg)
+        {
+            if (gotAccounts != null)
+                gotAccounts(msg);
+
         }
 
         void quote_gotFeatures(MessageTypes[] messages)
