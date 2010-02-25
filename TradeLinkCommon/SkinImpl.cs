@@ -44,7 +44,8 @@ namespace TradeLink.Common
         /// <param name="t"></param>
         /// <param name="responsename"></param>
         /// <param name="dll"></param>
-        public SkinImpl(object response, string responsename, string dll)
+        public SkinImpl(object response, string responsename, string dll) : this(response, responsename, dll, (DebugDelegate)null) { }
+        public SkinImpl(object response, string responsename, string dll, DebugDelegate deb)
         {
             // save class name
             _class = responsename;
@@ -52,14 +53,15 @@ namespace TradeLink.Common
             if (havedll(dll))
                 _dll = dll;
             // serialize props and save
-            _props = serializeprops(GetType(_class, _dll), response);
+            _props = serializeprops(GetType(_class, _dll), response,deb);
         }
         /// <summary>
         /// create a skin with an existing response and dll
         /// </summary>
         /// <param name="response"></param>
         /// <param name="dll"></param>
-        public SkinImpl(object response, string dll)
+        public SkinImpl(object response, string dll) : this(response, dll, (DebugDelegate)null) { }
+        public SkinImpl(object response, string dll,DebugDelegate deb)
         {
             // cast to a response
             Response r = (Response)response;
@@ -72,7 +74,7 @@ namespace TradeLink.Common
             if (havedll(dll))
                 _dll = dll;
             // get properties
-            _props = serializeprops(GetType(_class, _dll), response);
+            _props = serializeprops(GetType(_class, _dll), response,deb);
         }
 
 
@@ -81,29 +83,51 @@ namespace TradeLink.Common
         public string ResponseDLL { get { return _dll; } set { _dll = value; } }
         public string ResponseName { get { return _class; } set { _class=value; } }
 
-        public static string Skin(object response, string classname, string dll)
+        public static string Skin(object response, string classname, string dll) { return Skin(response, classname, dll, null); }
+        public static string Skin(object response, string classname, string dll, DebugDelegate deb)
         {
-            return Serialize(new SkinImpl(response, classname, dll));
+            return Serialize(new SkinImpl(response, classname, dll),deb);
         }
-        public static string Skin(object response, string dll)
+        public static string Skin(object response, string dll) { return Skin(response, dll, (DebugDelegate)null); }
+        public static string Skin(object response, string dll,DebugDelegate deb)
         {
-            return Serialize(new SkinImpl(response, dll));
+            return Serialize(new SkinImpl(response, dll),deb);
         }
 
-        public static object Deskin(string skin_msg)
+        public static object Deskin(string skin_msg) { return Deskin(skin_msg, null); }
+        public static object Deskin(string skin_msg, DebugDelegate deb)
         {
             // first get a skin
-            Skin s = Deserialize(skin_msg);
-            // return the deserialized properties
-            return deserializeprops(GetType(s), s.Properties);
+            Skin s = Deserialize(skin_msg,deb);
+            Type t = GetType(s);
+            // check for properties
+            if (s.Properties.Length > 0)
+                // return object with deserialized properties
+                return deserializeprops(t, s.Properties, deb);
+            else
+            {
+                try
+                {
+                    object o = Activator.CreateInstance(t);
+                    return o;
+                }
+                catch (Exception ex)
+                {
+                    debug(deb,"Error creating object: " + t.ToString());
+                    debug(deb, ex.Message + ex.StackTrace);
+                }
+
+            }
+            return null;
         }
 
-        public static bool SkinFile(object response, string classname, string dll, string filename)
+        public static bool SkinFile(object response, string classname, string dll, string filename) { return SkinFile(response,classname,dll,filename,null); }
+        public static bool SkinFile(object response, string classname, string dll, string filename, DebugDelegate deb)
         {
             try
             {
                 // get string data representing response
-                string data = Skin(response, classname, dll);
+                string data = Skin(response, classname, dll,deb);
                 // prepare to write to file
                 StreamWriter sw = new StreamWriter(filename, false);
                 // write it
@@ -113,14 +137,20 @@ namespace TradeLink.Common
                 // report good status
                 return true;
             }
-            catch (Exception) { }
+            catch (Exception ex)
+            {
+                debug(deb,"Error skinning: " + classname);
+                debug(deb,ex.Message + ex.StackTrace);
+            }
+
             // only way we got here if there was a problem
             return false;
 
         }
 
 
-        public static object DeskinFile(string filename)
+        public static object DeskinFile(string filename) { return DeskinFile(filename, null); }
+        public static object DeskinFile(string filename,DebugDelegate deb)
         {
             try
             {
@@ -131,14 +161,19 @@ namespace TradeLink.Common
                 // close file
                 sw.Close();
                 // deskin data
-                return Deskin(data);
+                return Deskin(data,deb);
             }
-            catch (Exception) { }
+            catch (Exception ex) 
+            {
+                debug(deb, "Error deskining: " + filename);
+                debug(deb,ex.Message + ex.StackTrace);
+            }
             // if we got here it's cause ane xception was thrown, so return null
             return null;
         }
 
-        public static string Serialize(Skin skin)
+        public static string Serialize(Skin skin) { return Serialize(skin, null); }
+        public static string Serialize(Skin skin,DebugDelegate deb)
         {
             if (!skin.isValid) return string.Empty;
             try
@@ -151,11 +186,15 @@ namespace TradeLink.Common
                 sw.Close();
                 return sw.GetStringBuilder().ToString();
             }
-            catch (Exception) { }
+            catch (Exception ex) 
+            { 
+                debug(deb,"Error saving skin: "+ex.Message+ex.StackTrace);
+            }
             return string.Empty;
         }
 
-        public static Skin Deserialize(string msg)
+        public static Skin Deserialize(string msg) { return Deserialize(msg, null); }
+        public static Skin Deserialize(string msg, DebugDelegate deb)
         {
             try
             {
@@ -172,7 +211,11 @@ namespace TradeLink.Common
                 // return result
                 return s;
             }
-            catch (Exception) { }
+            catch (Exception ex) 
+            {
+                debug(deb,"Error on: " + msg);
+                debug(deb,ex.Message + ex.StackTrace);
+            }
             return new SkinImpl();
         }
 
@@ -193,7 +236,8 @@ namespace TradeLink.Common
         }
 
 
-        private static string serializeprops(Type type, object o)
+        static string serializeprops(Type type, object o) { return serializeprops(type, o, null); }
+        private static string serializeprops(Type type, object o,DebugDelegate deb)
         {
             string props = string.Empty;
             try
@@ -209,11 +253,17 @@ namespace TradeLink.Common
                 // close writer
                 sw.Close();
             }
-            catch (Exception ex) { return string.Empty; }
+            catch (Exception ex) 
+            {
+                debug(deb, "Error saving props: " + type.ToString() + " " + o.ToString());
+                debug(deb, ex.Message + ex.StackTrace);
+                return string.Empty; 
+            }
             return props;
         }
 
-        private static object deserializeprops(Type type, string msg)
+        static object deserializeprops(Type type, string msg) { return deserializeprops(type, msg, null); }
+        private static object deserializeprops(Type type, string msg, DebugDelegate deb)
         {
             try
             {
@@ -230,8 +280,18 @@ namespace TradeLink.Common
                 // return result
                 return myo;
             }
-            catch (Exception) { }
+            catch (Exception ex) 
+            {
+                debug(deb, "Can't apply skin properties: " + type.ToString() + " " + msg);
+                debug(deb, ex.Message + ex.StackTrace);
+            }
             return null;
+        }
+
+        static void debug(DebugDelegate deb, string msg)
+        {
+            if (deb == null) return;
+            deb(msg);
         }
     }
 }

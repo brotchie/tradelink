@@ -102,6 +102,16 @@ namespace ASP
             LoadResponseDLL(Properties.Settings.Default.boxdll);
             // load any skins we can find
             findskins();
+            // process command line
+            processcommands();
+
+        }
+
+        void processcommands()
+        {
+            string [] args = Environment.GetCommandLineArgs();
+            if (args.Length <2) return;
+            loadskin(args[1]);
         }
 
         void initfeeds()
@@ -308,7 +318,7 @@ namespace ASP
                 //get response index from display index
                 int idx = getrindx(didx);
                 // save them as skin
-                bool worked = SkinImpl.SkinFile(_reslist[idx], _reslist[idx].FullName, _class2dll[_reslist[idx].FullName], SKINPATH+name + "." + startidx.ToString() + SKINEXT);
+                bool worked = SkinImpl.SkinFile(_reslist[idx], _reslist[idx].FullName, _class2dll[_reslist[idx].FullName], SKINPATH + name + "." + startidx.ToString() + SKINEXT, new DebugDelegate(debug));
                 // notify errors
                 if (!worked)
                     debug("skin failed on: " + _reslist[idx].FullName + " " + _reslist[idx].ID);
@@ -423,23 +433,31 @@ namespace ASP
                     // if it's the skin we want to trade
                     if (skinfromfile(fn) == name)
                     {
-                        // get it along with it's persisted settings
-                        Response r = (Response)SkinImpl.DeskinFile(SKINPATH + fn);
-                        // add it
-                        int id = addresponse(r);
-                        // check if it was added
-                        bool added = id != -1;
-                        // update status
-                        worked &= added;
-                        // mark it as loaded
-                        if (added)
-                            _resskinidx.Add(id, name);
+                        worked &= loadskin(SKINPATH+fn);
                     }
                 }
-                return true;
+                return worked;
             }
             catch (Exception) { }
             return false;
+        }
+
+        bool loadskin(string skinfullpath)
+        {
+            // get it along with it's persisted settings
+            Response r = (Response)SkinImpl.DeskinFile(skinfullpath,new DebugDelegate(debug));
+            // add it
+            int id = addresponse(r);
+            // check if it was added
+            bool added = id != -1;
+            // mark it as loaded
+            if (added)
+                _resskinidx.Add(id, skinfromfile(skinfullpath));
+            if (added)
+                debug("Loaded skin: " + skinfullpath);
+            else
+                debug("unable to load skin: " + skinfullpath);
+            return added;
         }
 
         int addresponse(Response r)
@@ -449,6 +467,9 @@ namespace ASP
             {
                 // set the id
                 r.ID = id;
+                // ensure it has a full name
+                if (r.FullName == string.Empty)
+                    r.FullName = r.GetType().ToString();
                 // get local response index
                 int idx = _reslist.Count;
                 // bind events
@@ -1214,7 +1235,7 @@ namespace ASP
                         // remove skin first
                         remskin(name);
                         // then re-add it
-                        worked &= SkinImpl.SkinFile(r, r.FullName, _class2dll[r.FullName], SKINPATH + name + "." + nextskinidx(SKINPATH, name).ToString() + SKINEXT);
+                        worked &= SkinImpl.SkinFile(r, r.FullName, _class2dll[r.FullName], SKINPATH + name + "." + nextskinidx(SKINPATH, name).ToString() + SKINEXT, new DebugDelegate(debug));
                     }
                     catch (Exception ex)
                     {

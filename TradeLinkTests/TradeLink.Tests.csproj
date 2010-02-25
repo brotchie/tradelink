@@ -240,6 +240,6 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>rem CALL "$(ProjectDir)runtests.cmd" $(ConfigurationName) "$(TargetPath)"</PostBuildEvent>
+    <PostBuildEvent>CALL "$(ProjectDir)runtests.cmd" $(ConfigurationName) "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
 </Project>
