@@ -13,9 +13,13 @@ namespace TradeLink.AppKit
         public bool isAuthorized() { return isAuthorized(Auth.GetCPUId()); }
         public bool isAuthorized(string key)
         {
-            return isAuthorized(key, true, false, true);
+            return isAuthorized(key, true, false, true, false);
         }
-        public bool isAuthorized(string key, bool appendrandom, bool throwexception, bool showerrorbox)
+        public bool isAuthorized(string key,bool pause)
+        {
+            return isAuthorized(key, true, false, true,pause);
+        }
+        public bool isAuthorized(string key, bool appendrandom, bool throwexception, bool showerrorbox, bool pause)
         {
             WebClient wc = new WebClient();
             string rurl = url;
@@ -40,7 +44,7 @@ namespace TradeLink.AppKit
             if (throwexception && !reg)
                 throw new UnregisteredException(err);
             if (showerrorbox && !reg)
-                PopupWindow.Show("Registration Error", err);
+                PopupWindow.Show("Registration Error", err,true,pause);
             return reg;
         }
 
