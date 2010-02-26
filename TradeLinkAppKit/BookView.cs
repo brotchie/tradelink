@@ -42,6 +42,11 @@ namespace TradeLink.AppKit
             Invalidate(true);
         }
 
+        public void Toggle(object sender, EventArgs e)
+        {
+            Toggle();
+        }
+
 
     }
 }
