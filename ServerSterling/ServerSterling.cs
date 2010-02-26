@@ -311,7 +311,7 @@ namespace SterServer
             f.symbol = t.bstrSymbol;
             f.Account = t.bstrAccount;
             uint id = 0;
-            if (!uint.TryParse(t.bstrClOrderId, out id))
+            if (uint.TryParse(t.bstrClOrderId, out id))
                 f.id = id;
             f.xprice = (decimal)t.fExecPrice;
             f.xsize = t.nQuantity;
