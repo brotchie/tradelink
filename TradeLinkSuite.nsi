@@ -178,7 +178,7 @@ finishinstall:
   
   ; don't open browser on silent
   StrCmp $SILENT "YES" final
-  ExecShell "open" "http://franta.com/support"
+  ExecShell "open" "http://www.pracplay.com/support"
   final:
 
 SectionEnd

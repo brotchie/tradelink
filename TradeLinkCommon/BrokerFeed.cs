@@ -27,15 +27,17 @@ namespace TradeLink.Common
         public bool RequirePreferred { get { return !_reqpref; } }
         bool _threadsafe = true;
         public bool isThreadSafe { get { return _threadsafe; } }
-        public BrokerFeed() : this(Providers.Unknown, Providers.Unknown, true,true) { }
+        public BrokerFeed() : this(Providers.Unknown, Providers.Unknown, true,false) { }
         Thread _reader;
         bool _readergo = true;
 
         public int ServerVersion { get { return 0; } }
         public Providers BrokerName { get { return Providers.Unknown; } }
 
-        public BrokerFeed(Providers feed, Providers broker, bool useany, bool threadsafe)
+        public BrokerFeed(Providers feed, Providers broker, bool useany, bool threadsafe) : this(feed, broker, useany, threadsafe, "BrokerFeed") { }
+        public BrokerFeed(Providers feed, Providers broker, bool useany, bool threadsafe,string program)
         {
+            PROGRAM = program;
             _feed = feed;
             _broker = broker;
             _reqpref = useany;

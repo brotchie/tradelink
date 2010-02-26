@@ -79,7 +79,7 @@ namespace ASP
             _saveskins.Click+=new EventHandler(_saveskins_Click);
             _skins.SelectedIndexChanged+=new EventHandler(_skins_SelectedIndexChanged);
             _ar.GotTick += new TickDelegate(tl_gotTick);
-            _bf = new BrokerFeed(Properties.Settings.Default.prefquote, Properties.Settings.Default.prefexecute,_ao._providerfallback.Checked,true);
+            _bf = new BrokerFeed(Properties.Settings.Default.prefquote, Properties.Settings.Default.prefexecute,_ao._providerfallback.Checked,false,PROGRAM);
             _bf.SendDebug+=new DebugDelegate(debug);
             // get providers
             initfeeds();
@@ -176,9 +176,10 @@ namespace ASP
 
         void bw_DoWork(object sender, DoWorkEventArgs e)
         {
-            TLClient_WM tl = new TLClient_WM(false);
+            TLClient tl = new TLClient_WM(false);
             // check for new versions
             Versions.UpgradeAlert(tl,true);
+            tl.Disconnect();
         }
 
 

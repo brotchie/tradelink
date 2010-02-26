@@ -28,9 +28,9 @@ namespace TradeLink.AppKit
         }
         public static void UpgradeAlert() { UpgradeAlert(null, null, true, false, null); }
         public static void UpgradeAlert(bool pause) { UpgradeAlert(null, null, true, false, null,pause); }
-        public static void UpgradeAlert(TLClient_WM tl) { UpgradeAlert(null, null, true, true, tl); }
-        public static void UpgradeAlert(TLClient_WM tl,bool pause) { UpgradeAlert(null, null, true, true, tl,pause); }
-        public static void UpgradeAlert(string Program, string ProgramUrl, TLClient_WM tl) { UpgradeAlert(Program, ProgramUrl, true, true, tl); }
+        public static void UpgradeAlert(TLClient tl) { UpgradeAlert(null, null, true, true, tl); }
+        public static void UpgradeAlert(TLClient tl,bool pause) { UpgradeAlert(null, null, true, true, tl,pause); }
+        public static void UpgradeAlert(string Program, string ProgramUrl, TLClient tl) { UpgradeAlert(Program, ProgramUrl, true, true, tl); }
         public static void UpgradeAlert(string Program, string ProgramUrl) {  UpgradeAlert(Program, ProgramUrl, true,false,null); }
         /// <summary>
         /// checks a url for all EXEs with version numbers.
@@ -41,8 +41,8 @@ namespace TradeLink.AppKit
         /// <param name="path"></param>
         /// <param name="checktradelink"></param>
         /// <param name="checkbrokerserver"></param>
-        public static void UpgradeAlert(string Program, string ProgramUrl, bool checktradelink, bool checkbrokerserver, TLClient_WM tl) { UpgradeAlert(Program, ProgramUrl, checktradelink, checkbrokerserver, tl,false); }
-        public static void UpgradeAlert(string Program, string ProgramUrl, bool checktradelink, bool checkbrokerserver, TLClient_WM tl,bool pause)
+        public static void UpgradeAlert(string Program, string ProgramUrl, bool checktradelink, bool checkbrokerserver, TLClient tl) { UpgradeAlert(Program, ProgramUrl, checktradelink, checkbrokerserver, tl,false); }
+        public static void UpgradeAlert(string Program, string ProgramUrl, bool checktradelink, bool checkbrokerserver, TLClient tl,bool pause)
         {
  
             if (Program != null)
