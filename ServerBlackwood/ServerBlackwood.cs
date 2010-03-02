@@ -404,7 +404,7 @@ namespace ServerBlackwood
                     {
                         int tlDate = TradeLink.Common.Util.ToTLDate(bar.time);
                         int tlTime = TradeLink.Common.Util.ToTLTime(bar.time);
-                        Bar tlBar = new BarImpl((decimal)bar.open, (decimal)bar.high, (decimal)bar.low, (decimal)bar.close, (int)bar.volume, tlDate, tlTime);
+                        Bar tlBar = new BarImpl((decimal)bar.open, (decimal)bar.high, (decimal)bar.low, (decimal)bar.close, (int)bar.volume, tlDate, tlTime,sym,(int)histMsg.Interval);
 
                         
                         if (this.InvokeRequired)

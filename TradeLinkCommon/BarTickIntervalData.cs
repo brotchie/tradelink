@@ -77,7 +77,7 @@ namespace TradeLink.Common
                 index = _Count - 1 + index;
                 if (index < 0) return b;
             }
-            b = new BarImpl(opens[index], highs[index], lows[index], closes[index], vols[index], dates[index], times[index], symbol);
+            b = new BarImpl(opens[index], highs[index], lows[index], closes[index], vols[index], dates[index], times[index], symbol,intervallength);
             if (index == Last()) b.isNew = _isRecentNew;
             return b;
         }

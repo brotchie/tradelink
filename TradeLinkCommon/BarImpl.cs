@@ -39,18 +39,9 @@ namespace TradeLink.Common
         public int TradeCount { get { return tradesinbar; } }
 
         public BarImpl() : this(BarInterval.FiveMin) { }
-        public BarImpl(decimal open, decimal high, decimal low, decimal close, int vol, int date, int time)
-        {
-            h = (ulong)(high*Const.IPREC);
-            o = (ulong)(open * Const.IPREC);
-            l = (ulong)(low * Const.IPREC);
-            c = (ulong)(close * Const.IPREC);
-            v = vol;
-            bardate = date;
-            bartime = time;
-        }
+
         public int Interval { get { return units; } }
-        public BarImpl(decimal open, decimal high, decimal low, decimal close, long vol, int date, int time, string symbol) : this(open, high, low, close, vol, date, time, symbol, (int)BarInterval.FiveMin) { }
+        //public BarImpl(decimal open, decimal high, decimal low, decimal close, long vol, int date, int time, string symbol) : this(open, high, low, close, vol, date, time, symbol) { }
         public BarImpl(decimal open, decimal high, decimal low, decimal close, long vol, int date, int time, string symbol, int interval)
         {
             units = interval;
@@ -125,8 +116,8 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="record">The record in comma-delimited format.</param>
         /// <returns>The equivalent Bar</returns>
-        public static Bar FromCSV(string record) { return FromCSV(record, string.Empty); }
-        public static Bar FromCSV(string record,string symbol)
+        public static Bar FromCSV(string record) { return FromCSV(record, string.Empty, (int)BarInterval.Day); }
+        public static Bar FromCSV(string record,string symbol,int interval)
         {
             // google used as example
             string[] r = record.Split(',');
@@ -143,7 +134,7 @@ namespace TradeLink.Common
             decimal low = Convert.ToDecimal(r[3], System.Globalization.CultureInfo.InvariantCulture);
             decimal close = Convert.ToDecimal(r[4], System.Globalization.CultureInfo.InvariantCulture);
             long vol = Convert.ToInt64(r[5]);
-            return new BarImpl(open,high,low,close,vol,date,0,symbol);
+            return new BarImpl(open,high,low,close,vol,date,0,symbol,interval);
         }
 
         public static string Serialize(Bar b)
@@ -165,6 +156,7 @@ namespace TradeLink.Common
             sb.Append(b.Bartime);
             sb.Append(d);
             sb.Append(b.Symbol);
+            sb.Append(b.Interval.ToString(System.Globalization.CultureInfo.InvariantCulture));
             
             return sb.ToString();
         }
@@ -180,7 +172,8 @@ namespace TradeLink.Common
             int date = Convert.ToInt32(r[5]);
             int time = Convert.ToInt32(r[6]);
             string symbol = r[7];
-            return new BarImpl(open, high, low, close, vol, date, time, symbol);
+            int interval = Convert.ToInt32(r[8]);
+            return new BarImpl(open, high, low, close, vol, date, time, symbol,interval);
         }
 
         /// <summary>
