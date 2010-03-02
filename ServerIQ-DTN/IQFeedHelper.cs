@@ -120,11 +120,11 @@ namespace IQFeedBroker
             uint id = _idt.AssignId;
             if (br.Interval == (int)BarInterval.Day)
             {
-                command = String.Format("HDT,{0},{1},50000,1,{2}\r\n", br.Symbol,br.StartDateTime.ToLongDateString(),br.EndDateTime.ToLongDateString(),id);
+                command = String.Format("HDT,{0},{1},,1,{2}\r\n", br.Symbol,br.StartDateTime.ToLongDateString(),br.EndDateTime.ToLongDateString(),id);
             }
             else
             {
-                command = String.Format("HIT,{0},{1},{2} {3},{4} {5},50000,000000,235959,1,{6}\r\n", br.Symbol, br.Interval, br.StartDateTime.ToString("yyyyMMdd"), br.StartDateTime.ToString("HHmmss"), br.EndDateTime.ToString("yyyyMMdd"), br.EndDateTime.ToString("HHmmss"),id);
+                command = String.Format("HIT,{0},{1},{2} {3},{4} {5},,000000,235959,1,{6}\r\n", br.Symbol, br.Interval, br.StartDateTime.ToString("yyyyMMdd"), br.StartDateTime.ToString("HHmmss"), br.EndDateTime.ToString("yyyyMMdd"), br.EndDateTime.ToString("HHmmss"),id);
             }
             reqid2req.Add(id, br);
             // we form a watch command in the form of wSYMBOL\r\n
