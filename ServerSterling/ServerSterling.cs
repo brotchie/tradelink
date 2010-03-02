@@ -21,6 +21,8 @@ namespace SterServer
         bool imbalance = false;
         PositionTracker pt = new PositionTracker();
         int _SLEEP = 50;
+        bool _supportcover = true;
+        public bool CoverEnabled { get { return _supportcover; } set { _supportcover = value; } }
         public ServerSterling() : this(50) { }
         public ServerSterling(int sleepOnNodata)
         {
@@ -282,12 +284,15 @@ namespace SterServer
         {
             // use by and sell as default
             string r = side ? "B" : "S";
-            // if we're flat or short and selling, mark as a short
-            if ((pt[symbol].isFlat || pt[symbol].isShort) && !side)
-                r = "T";
-            // if short and buying, mark as cover
-            else if (pt[symbol].isShort && side)
-                r = "C";
+            if (CoverEnabled)
+            {
+                // if we're flat or short and selling, mark as a short
+                if ((pt[symbol].isFlat || pt[symbol].isShort) && !side)
+                    r = "T";
+                // if short and buying, mark as cover
+                else if (pt[symbol].isShort && side)
+                    r = "C";
+            }
             return r;
         }
 

@@ -24,6 +24,7 @@ namespace SterServer
             ContextMenu = new ContextMenu();
             ContextMenu.MenuItems.Add("report", new EventHandler(report));
             tl.SendDebug += new DebugDelegate(tl_SendDebug);
+            tl.CoverEnabled = Properties.Settings.Default.CoverEnabled;
             tl.Start();
             FormClosing += new FormClosingEventHandler(SterMain_FormClosing);
         }
