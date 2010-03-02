@@ -63,7 +63,7 @@ namespace TestTradeLink
                 // execute orders, nothing to do on first two ticks
                 b.Execute(k);
                 // pass every tick to tracker
-                tt.GotTick(k);
+                tt.newTick(k);
 
             }
             // get position
@@ -126,7 +126,7 @@ namespace TestTradeLink
                 // execute orders, nothing to do on first two ticks
                 b.Execute(k);
                 // pass every tick to tracker
-                tt.GotTick(k);
+                tt.newTick(k);
 
             }
 

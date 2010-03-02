@@ -100,7 +100,7 @@ namespace TradeLink.Common
         /// must pass ticks as received to this function, in order to have trailing stops executed at proper time.
         /// </summary>
         /// <param name="k"></param>
-        public void GotTick(Tick k)
+        public void newTick(Tick k)
         {
             // see if we're turned on
             if (!isValid) return;
