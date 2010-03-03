@@ -11,17 +11,6 @@ using TradeLink.AppKit;
 using AMTD_API;
 
 
-/*
- * TO BUILD THIS PROJECT, you must email 
- * 1) apidev@tdameritrade.com
- * 2) request their NDA, sign and return it
- * 3) login to their api site and look in the tradelink forum
- * 4) first intro post contains a file, download it and put it in this directory
- * 5) remove TXT extension from file name
- * 
- * You should then be able to build this project.
- */
-
 namespace TDServer
 {
     public partial class TDServerMain : Form
@@ -91,7 +80,7 @@ namespace TDServer
             t.ask = Convert.ToDecimal(e.quote.Ask);
             t.ex = e.quote.Exchange.ToString();
             t.trade = Convert.ToDecimal(e.quote.Last);
-            t.size = Convert.ToInt32(e.quote.LastSize) * 100;
+            t.size = !isidx(e.quote.Symbol) ? Convert.ToInt32(e.quote.LastSize) * 100 : -1;
             t.bs = Convert.ToInt32(e.quote.BidSize);
             t.os = Convert.ToInt32(e.quote.AskSize);
             tl.newTick(t);
@@ -147,16 +136,27 @@ namespace TDServer
             
         }
 
+        Dictionary<string, bool> _isidx = new Dictionary<string, bool>();
+        bool isidx(string sym)
+        {
+            bool y = false;
+            if (_isidx.TryGetValue(sym, out y))
+                return y;
+            return false;
+        }
         void tl_newRegisterStocks(string msg)
         {
             api.UnsubscribeAll();
             Basket mb = BasketImpl.Deserialize(msg);
+            // clear idx values
+            _isidx.Clear();
             //Close_Connections(false);
             foreach (Security s in mb)
             {                
                 //if (api.SymbTD_IsStockSymbolValid(s.Symbol))
-                {    
-
+                {
+                    if (s.Symbol.Contains("$"))
+                        _isidx.Add(s.Symbol, true);
                     api.Subscribe(s.Symbol, tdaactx.TxTDASubTypes.TDAPI_SUB_L1);//, service, this);
 
                 }
