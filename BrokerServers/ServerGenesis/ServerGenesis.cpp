@@ -7,6 +7,8 @@ using namespace TradeLibFast;
 const char* CONFIGFILE = "GenesisServer.Config.txt";
 const char* AUTOFILE = "GenesisServer.Login.txt";
 const int MINSERVERS = 3;
+#define METHOD_STOP	MAKE_MMID('S', 'T', 'O', 'P')
+
 enum GENESISSERVERTYPE
 {
 	GTEXEC,
@@ -333,12 +335,25 @@ int ServerGenesis::SendOrder(TradeLibFast::TLOrder o)
 	GTOrder go;
 	go = pStock->m_defOrder;
 	go.dwUserData = o.id;
-	if(pStock->PlaceOrder(go, (o.side ? 'B' : 'S'), o.size, o.price, getmethod(o.exchange), getTIF(o.TIF))==0)
+	if (o.isStop())
 	{
-		go.chPriceIndicator = getPI(o);
-		go.dblStopLimitPrice = o.stop;
-		//go.place = getplace(o.exchange);
-		err = pStock->PlaceOrder(go);
+		if(pStock->PlaceOrder(go, (o.side ? 'B' : 'S'), o.size, o.price, METHOD_STOP, getTIF(o.TIF))==0)
+		{
+			go.chPriceIndicator = getPI(o);
+			go.dblStopLimitPrice = o.stop;
+			//go.place = getplace(o.exchange);
+			err = pStock->PlaceOrder(go);
+		}
+	}
+	else
+	{
+		if(pStock->PlaceOrder(go, (o.side ? 'B' : 'S'), o.size, o.price, getmethod(o.exchange), getTIF(o.TIF))==0)
+		{
+			go.chPriceIndicator = getPI(o);
+			go.dblStopLimitPrice = o.stop;
+			//go.place = getplace(o.exchange);
+			err = pStock->PlaceOrder(go);
+		}
 	}
 	
 	// save order so it can be canceled later
