@@ -21,9 +21,10 @@ namespace TradeLink.Common
         private int tradesinbar = 0;
         private bool _new = false;
         private int units = 300;
-        private int bartime = 0;
+        private int _time = 0;
         private int bardate = 0;
         private bool DAYEND = false;
+        public int time { get { return _time; } }
         public bool DayEnd { get { return DAYEND; } }
         public ulong lHigh { get { return h; } }
         public ulong lLow { get { return l; } }
@@ -51,7 +52,7 @@ namespace TradeLink.Common
             c = (ulong)(close * Const.IPREC);
             v = vol;
             bardate = date;
-            bartime = time;
+            _time = time;
             _sym = symbol;
         }
         public BarImpl(BarImpl b)
@@ -62,7 +63,7 @@ namespace TradeLink.Common
             o = b.lOpen;
             c = b.lClose;
             DAYEND = b.DAYEND;
-            bartime = b.bartime;
+            _time = b._time;
             bardate = b.bardate;
         }
         
@@ -71,9 +72,25 @@ namespace TradeLink.Common
         {
             units = (int)tu;
         }
-        public int Bartime { get { return bartime; } }
+        public int Bartime 
+        { 
+            get 
+            { 
+                // get num of seconds elaps
+                int elap = Util.FT2FTS(_time); 
+                // get remainder of dividing by interval
+                int rem = elap % Interval;
+                // get datetime
+                DateTime dt = Util.TLD2DT(bardate);
+                // add rounded down result
+                dt = dt.AddSeconds(elap-rem);
+                // conver back to normal time
+                int bt = Util.ToTLTime(dt);
+                return bt;
+            } 
+        }
         public int Bardate { get { return bardate; } }
-        private int BarTime(int time) 
+        private int bt(int time) 
         {
             // get time elapsed to this point
             int elap = Util.FT2FTS(time);
@@ -93,11 +110,11 @@ namespace TradeLink.Common
         {
             if (_sym == "") _sym = t.symbol;
             if (_sym != t.symbol) throw new InvalidTick();
-            if (bartime == 0) { bartime = BarTime(t.time); bardate = t.date;}
+            if (_time == 0) { _time = bt(t.time); bardate = t.date;}
             if (bardate != t.date) DAYEND = true;
             else DAYEND = false;
             // check if this bar's tick
-            if ((BarTime(t.time) != bartime) || (bardate!=t.date)) return false; 
+            if ((bt(t.time) != _time) || (bardate!=t.date)) return false; 
             // if tick doesn't have trade or index, ignore
             if (!t.isTrade && !t.isIndex) return true; 
             tradesinbar++; // count it
@@ -110,7 +127,7 @@ namespace TradeLink.Common
             c = t.ltrade;
             return true;
         }
-        public override string ToString() { return "OHLC (" + bartime + ") " + Open.ToString("F2") + "," + High.ToString("F2") + "," + Low.ToString("F2") + "," + Close.ToString("F2"); }
+        public override string ToString() { return "OHLC (" + _time + ") " + Open.ToString("F2") + "," + High.ToString("F2") + "," + Low.ToString("F2") + "," + Close.ToString("F2"); }
         /// <summary>
         /// Create bar object from a CSV file providing OHLC+Volume data.
         /// </summary>

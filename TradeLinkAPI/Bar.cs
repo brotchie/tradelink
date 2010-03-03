@@ -22,6 +22,7 @@ namespace TradeLink.API
         int Bardate { get; }
         bool isValid { get; }
         int Interval { get; }
+        int time { get; }
     }
 
     /// <summary>
