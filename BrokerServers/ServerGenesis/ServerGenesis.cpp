@@ -137,6 +137,7 @@ int ServerGenesis::RegisterStocks(CString client)
 		if (!subscribed(sym))
 		{
 			StkWrap* stk = (StkWrap*)gtw->CreateStock(sym);
+			stk->SetupDepth(_depth);
 			//stk->tl = this;
 			m_stk.push_back(stk);
 			CString m;
