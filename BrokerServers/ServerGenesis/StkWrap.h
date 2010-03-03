@@ -4,6 +4,18 @@
 #include "ServerGenesis.h"
 using namespace TradeLibFast;
 
+// number of orders to maintain in GTAPI
+#define MAXDEPTH 30
+
+// number of aggregated price levels to send
+#define SENDDEPTH 10
+
+// server can send 10 miliseconds accuracy, but TradeLink doesn't like
+#undef LONGTIME
+
+// verbose mode
+#undef VERB
+
 class ServerGenesis;
 
 class StkWrap : public GTStock  
@@ -15,6 +27,18 @@ public:
 	StkWrap(GTSession &session, LPCSTR pszStock,int symid);
 	virtual ~StkWrap();
 	int _symid;
+	int _depth;
+
+	double prevBids[SENDDEPTH];
+	double prevAsks[SENDDEPTH];
+	long prevBidShares[SENDDEPTH];
+	long prevAskShares[SENDDEPTH];
+
+	int prevTradeTime;
+	int maxTime;
+
+	void SendData();
+	void SetupDepth(int depth);
 
 public:
 	ServerGenesis* tl;

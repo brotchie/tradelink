@@ -242,6 +242,8 @@ char getPI(TLOrder o)
 int ServerGenesis::DOMRequest(int depth)
 {
 	_depth = depth;
+	if (_depth>SENDDEPTH)
+		_depth = SENDDEPTH;
 	return OK;
 }
 
