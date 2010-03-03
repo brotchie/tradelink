@@ -119,6 +119,7 @@
     <Compile Include="TestBarListTracker.cs" />
     <Compile Include="TestBook.cs" />
     <Compile Include="TestBookTracker.cs" />
+    <Compile Include="TestGenericTracker.cs" />
     <Compile Include="TestGZip.cs" />
     <Compile Include="TestIdTracker.cs" />
     <Compile Include="TestImbalance.cs" />

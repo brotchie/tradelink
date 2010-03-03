@@ -15,6 +15,7 @@ namespace TradeLink.Common
         int _estcount = 0;
         List<T> _tracked;
         Dictionary<string, int> _txtidx;
+        List<string> _txt;
         /// <summary>
         /// gets count of items being tracked
         /// </summary>
@@ -33,6 +34,7 @@ namespace TradeLink.Common
             _estcount = EstCount;
             _tracked = new List<T>(EstCount);
             _txtidx = new Dictionary<string, int>(EstCount);
+            _txt = new List<string>(EstCount);
         }
 
         /// <summary>
@@ -70,9 +72,16 @@ namespace TradeLink.Common
             return UNKNOWN;
         }
         /// <summary>
+        /// gets a label given an index
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <returns></returns>
+        public string getlabel(int idx) { return _txt[idx]; }
+        /// <summary>
         /// gets index of label, adding it if it doesn't exist.
         /// </summary>
-        /// <param name="txt"></param>
+        /// <param name="txtidx">label</param>
+        /// <param name="initialval">initial value to associate with label</param>
         /// <returns></returns>
         public int addindex(string txtidx, T initialval)
         {
@@ -80,6 +89,7 @@ namespace TradeLink.Common
             if (!_txtidx.TryGetValue(txtidx, out idx))
             {
                 idx = _tracked.Count;
+                _txt.Add(txtidx);
                 _txtidx.Add(txtidx, idx);
                 _tracked.Add(initialval);
                 if (NewTxt != null)
