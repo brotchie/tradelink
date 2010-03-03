@@ -84,5 +84,24 @@ namespace TestTradeLink
             Assert.AreEqual(90000, b.Bartime);
             Assert.AreEqual(93533, b.time);
         }
+
+        [Test]
+        public void SerializeDeseralize()
+        {
+            Bar b = new BarImpl(1, 1, 1, 1, 1, 20100302, 93533, "IBM", (int)BarInterval.FiveMin);
+            string msg = BarImpl.Serialize(b);
+            Bar cb = BarImpl.Deserialize(msg);
+
+            Assert.AreEqual(b.Symbol, cb.Symbol);
+            Assert.AreEqual(b.time, cb.time);
+            Assert.AreEqual(b.Interval, cb.Interval);
+            Assert.AreEqual(b.High, cb.High);
+            Assert.AreEqual(b.Low, cb.Low);
+            Assert.AreEqual(b.Open, cb.Open);
+            Assert.AreEqual(b.Close, cb.Close);
+            Assert.AreEqual(b.Volume, cb.Volume);
+            Assert.AreEqual(b.Bardate, cb.Bardate);
+
+        }
     }
 }

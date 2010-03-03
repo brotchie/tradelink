@@ -170,9 +170,10 @@ namespace TradeLink.Common
             sb.Append(d);
             sb.Append(b.Bardate);
             sb.Append(d);
-            sb.Append(b.Bartime);
+            sb.Append(b.time);
             sb.Append(d);
             sb.Append(b.Symbol);
+            sb.Append(d);
             sb.Append(b.Interval.ToString(System.Globalization.CultureInfo.InvariantCulture));
             
             return sb.ToString();
