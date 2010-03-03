@@ -234,6 +234,16 @@ namespace Kadina
             
         }
 
+        bool hasprereq() { return hasprereq(true); }
+        bool hasprereq(bool stat)
+        {
+            if (bw.IsBusy) { if (stat) status("Still playing, please wait..."); return false; }
+            if (myres == null) { if (stat) status("Add response."); return false; }
+            if (epffiles.Count == 0) { if (stat) status("Add study data."); return false; }
+            if (stat)
+                status("Right click to choose play duration.");
+            return true;
+        }
 
         void rightplay(object sender, EventArgs e)
         {
@@ -244,9 +254,8 @@ namespace Kadina
             PlayTo pttmp = (PlayTo)Enum.Parse(typeof(PlayTo), tmp);
             if (pttmp != PlayTo.LastPlayTo)
                 pt = pttmp;
-            if (epffiles.Count==0) { status("No data selected."); return; }
-            if (myres == null) { status("No response selected."); return; }
-            if (bw.IsBusy) { status("Still playing, please wait..."); return; }
+            if (!hasprereq(true))
+                return;
             bw.RunWorkerAsync(pt);
             ContextMenu.MenuItems.Add("Cancel", new EventHandler(rightcancel));
             status("Playing...");
@@ -551,6 +560,7 @@ namespace Kadina
                 myres.Reset();
             }
             else status("Response did not load.");
+            hasprereq();
 
         }
 
@@ -639,6 +649,7 @@ namespace Kadina
          private bool loadfile(string path)
          {
             string f = path;
+            bool success = false;
             if (isResponse(f))
             {
                 responsedll = f;
@@ -651,8 +662,8 @@ namespace Kadina
                 _rl.ResponseSelected+=new DebugDelegate(loadboxname);
                 if (_rl.ShowDialog() != DialogResult.OK)
                     status("no response was selected.");
-                
-                return true;
+
+                success = true;
             }
             else if (isTIK(f))
             {
@@ -668,10 +679,11 @@ namespace Kadina
                 h.Initialize();
                 updatetitle();
                 status("Loaded tickdata: "+PrettyEPF());
-                return true;
+                success = true;
             }
+            hasprereq();
 
-            return false;
+            return success;
 
         }
 
