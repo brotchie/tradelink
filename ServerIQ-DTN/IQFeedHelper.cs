@@ -538,6 +538,8 @@ namespace IQFeedBroker
             {
                 try
                 {
+                    // only ticks should be handled on this socket...
+                    // create a new socket for other types of data
                     int bytesReceived = 0;
                     bytesReceived = m_sockIQConnect.EndReceive(result);
                     string rawData = Encoding.ASCII.GetString(m_szLevel1SocketBuffer, 0, bytesReceived);
@@ -581,15 +583,19 @@ namespace IQFeedBroker
         {
                 try
                 {
-                    if ((actualData[0] == "P") || (actualData[0] == "Q"))
-                    {
                         Tick tick = new TickImpl();
-                        tick.date = Util.ToTLDate(DateTime.Now);
-                        tick.time = Util.DT2FT(DateTime.Now);
+                        tick.date = Util.ToTLDate();
+                        tick.time = Util.DT2FT(DateTime.Parse(actualData[68]));
+                        int v = 0;
+                        if (int.TryParse(actualData[66],out v))
+                            tick.oe = getmarket(v);
+                        if (int.TryParse(actualData[65],out v))
+                            tick.be = getmarket(v);
+                        if (int.TryParse(actualData[64], out v))
+                            tick.ex = getmarket(v);
                         tick.symbol = actualData[1];
                         tick.bid = Convert.ToDecimal(actualData[10]);
                         tick.ask = Convert.ToDecimal(actualData[11]);
-                        tick.ex = actualData[2];
                         tick.trade = Convert.ToDecimal(actualData[3]);
                         tick.size = Convert.ToInt32(actualData[7]);
                         tick.BidSize = Convert.ToInt32(actualData[12]);
@@ -598,31 +604,15 @@ namespace IQFeedBroker
                         int idx = _highs.getindex(tick.symbol);
 
                         // update custom data (tryparse is faster than convert)
-                        decimal v = 0;
-                        if (decimal.TryParse(actualData[8], out v))
-                            _highs[idx] = v;
-                        if (decimal.TryParse(actualData[9], out v))
-                            _lows[idx] = v;
+                        decimal d = 0;
+                        if (decimal.TryParse(actualData[8], out d))
+                            _highs[idx] = d;
+                        if (decimal.TryParse(actualData[9], out d))
+                            _lows[idx] = d;
                         
 
                         newTick(tick);
-                    }
-                    //else if (actualData[0] == "F")
-                    //{
-                    //    Tick tick = new TickImpl();
-                    //    tick.date = Util.ToTLDate(DateTime.Now);
-                    //    tick.time = Util.DT2FT(DateTime.Now);
-                    //    tick.symbol = actualData[1];
-                    //    tick.bid = Convert.ToDecimal(0.00);
-                    //    tick.ask = Convert.ToDecimal(0.00);
-                    //    tick.ex = null;
-                    //    tick.trade = Convert.ToDecimal(0.00);
-                    //    tick.size = 1;
-                    //    tick.bs = Convert.ToInt32(0.00);
-                    //    tick.os = Convert.ToInt32(0.00);
 
-                    //    TickReceived(tick);
-                    //}
                 }
                 catch (Exception ex)
                 {
@@ -634,6 +624,14 @@ namespace IQFeedBroker
                         
 
 
+        }
+        Dictionary<int, string> _code2mkt = new Dictionary<int, string>();
+        public Dictionary<int, string> MktCodes { get { return _code2mkt; } set { _code2mkt = value; } }
+        string getmarket(int code)
+        {
+            string mkt = string.Empty;
+            if (!_code2mkt.TryGetValue(code,out mkt)) return string.Empty;
+            return mkt;
         }
 
         void debug(string msg)

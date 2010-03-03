@@ -59,5 +59,30 @@ namespace IQFeedBroker.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 1	NMS	NASDAQ National market
+        ///2	SMCAP	Small Capital Market
+        ///3	OTC	NASDAQ other OTC
+        ///4	OTCBB	NASDAQ OTC Bulletin Board
+        ///5	NASDAQ	NASDAQ
+        ///6	NYSE_AMEX	NYSE American Exchange
+        ///7	NYSE	New York Stock Exchange
+        ///8	CHX	Chicago Stock Exchange
+        ///9	PHLX	Philadelphia Stock Exchange
+        ///10	NSX	National Stock Exchange
+        ///11	ARCA	NYSE Archipelago
+        ///12	BX	Boston Stock Exchange
+        ///13	CBOE	Chicago Board Options Exchange
+        ///14	OPRA	OPRA System
+        ///15	NASD_ADF	NASDAQ Alternate Display facility
+        ///16	ISE	International Stock Exchange
+        ///17	BOX	Bos [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string marketcenters {
+            get {
+                return ResourceManager.GetString("marketcenters", resourceCulture);
+            }
+        }
     }
 }

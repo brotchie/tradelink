@@ -25,10 +25,25 @@ namespace IQFeedBroker
             InitializeComponent();
             this.FormClosing += IQFeedFrm_FormClosing;
             _helper = new IQFeedHelper();
+            _helper.MktCodes = parsemkts(Properties.Resources.marketcenters);
             _helper.SendDebug += new DebugDelegate(_dw.GotDebug);
             _helper.Connected += new IQFeedHelper.booldel(_helper_Connected);
 
 
+        }
+
+        public static Dictionary<int, string> parsemkts(string data)
+        {
+            string[] lines = data.Split(Environment.NewLine.ToCharArray(),  StringSplitOptions.RemoveEmptyEntries);
+            Dictionary<int, string> c2m = new Dictionary<int, string>();
+            foreach (string line in lines)
+            {
+                string [] r = line.Split('\t');
+                int c = 0;
+                if (int.TryParse(r[0], out c))
+                    c2m.Add(c, r[1]);
+            }
+            return c2m;
         }
 
         delegate void booldel(bool v);

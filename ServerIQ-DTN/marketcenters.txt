@@ -1,0 +1,61 @@
+1	NMS	NASDAQ National market
+2	SMCAP	Small Capital Market
+3	OTC	NASDAQ other OTC
+4	OTCBB	NASDAQ OTC Bulletin Board
+5	NASDAQ	NASDAQ
+6	NYSE_AMEX	NYSE American Exchange
+7	NYSE	New York Stock Exchange
+8	CHX	Chicago Stock Exchange
+9	PHLX	Philadelphia Stock Exchange
+10	NSX	National Stock Exchange
+11	ARCA	NYSE Archipelago
+12	BX	Boston Stock Exchange
+13	CBOE	Chicago Board Options Exchange
+14	OPRA	OPRA System
+15	NASD_ADF	NASDAQ Alternate Display facility
+16	ISE	International Stock Exchange
+17	BOX	Boston Options Exchange
+18	BATS	Better Alternative Trading System
+20	PBOT	Philadelphia Board of Trade
+25	NYSE_AMEX	NYSE_AMEX Options
+27	DTN	DTN(Calculated/Index/Statistic)
+30	CBOT	Chicago Board Of Trade
+31	DJ	Dow Jones (CBOT)
+32	CFE	CBOE Futures Exchange
+33	KCBOT	Kansas City Board Of Trade
+34	CME	Chicago Mercantile Exchange
+35	MGE	Minneapolis Grain Exchange
+36	NYMEX	New York Mercantile Exchange
+37	COMEX	Commodities Exchange Center
+38	ICEFU	International Commodities Exchange Futures US
+39	NYSE_LIFFE	NYSE LIFFE Metals
+40	NYMEX_ECM	NYMEX Exempt Commercial Market LCH
+41	NYMEX_MTF	NYMEX Multilateral trading Facility LCH
+42	CBOTMINI	Chicago Board Of Trade Mini Sized Contracts
+43	CMEMINI	Chicago Mercantile Exchange Mini Sized Contracts
+44	USFE	US Futures Exchange
+45	NYMEXMINI	New York Mercantile Exchange Mini Sized Contracts
+46	GREENX	The Green Exchange
+50	TSE	Toronto Stock Exchange
+51	MSE	Montreal Stock Exchange
+52	CVE	Canadian Venture Exchange
+53	WSE	Winnipeg Stock Exchange
+54	ICEFC	International Commodities Exchange Futures Canada
+60	MDEX	Bursa Malaysia Derivatives
+61	ICEFI	International Commodities Exchange Futures Derivatives
+62	LME	London Metals Exchange
+63	ICEFE	International Commodities Exchange Futures Europe
+65	DME	Dubai Mercantile Exchange
+66	BMF	Brazilian Mercantile & Future Exchange
+67	SGX	Singapore International Monetary Exchange
+68	EUREX	European Exchange
+69	ENID	EuroNext Index Derivatives
+70	ENIR	EuroNext Interest Rates
+71	ENCOM	EuroNext Commodities
+72	TULLETT	Tullett Liberty
+73	BARCLAYS	Barclays Bank
+74	FXCM	Forex Capital Markets
+75	WTB	Warenterminborse Hannover
+76	EUREXNDX	EUREX Indexes
+77	EURNXTNDX	EuroNext Indexes
+78	TENFORE	Tenfore Systems

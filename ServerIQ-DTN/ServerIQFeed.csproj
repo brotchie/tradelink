@@ -104,6 +104,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="marketcenters.txt" />
     <Content Include="tradelinkinstaller.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
