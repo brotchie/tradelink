@@ -165,7 +165,7 @@ namespace TradeLink.Common
             return filenames.ToArray();
         }
 
-        public string[] Allows(string[,] index)
+        public string[] AllowsIndex(string[,] index)
         {
             List<string> keep = new List<string>();
             for (int i = 0; i < index.GetLength(0); i++)
@@ -174,7 +174,7 @@ namespace TradeLink.Common
             return keep.ToArray();
         }
 
-        public string[,] AllowsIndex(string[,] index)
+        public string[,] AllowsIndexAndSize(string[,] index)
         {
             List<int> keep = new List<int>();
             for (int i = 0; i < index.GetLength(0); i++)
@@ -233,11 +233,11 @@ namespace TradeLink.Common
             }
             catch (FileNotFoundException ex)
             {
-                return "";
+                return string.Empty;
             }
             catch (Exception ex)
             {
-                return "";
+                return string.Empty;
             }
             if (fs == null) return "";
             return fs.GetStringBuilder().ToString();

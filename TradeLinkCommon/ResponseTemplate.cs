@@ -71,70 +71,70 @@ namespace TradeLink.Common
         /// short form of senddebug
         /// </summary>
         /// <param name="msg"></param>
-        public virtual void D(string msg) { SendDebug(DebugImpl.Create(msg)); }
+        public virtual void D(string msg) { SendDebugEvent(DebugImpl.Create(msg)); }
         /// <summary>
         /// short form of sendorder
         /// </summary>
         /// <param name="o"></param>
-        public virtual void O(Order o) { o.VirtualOwner = ID;  SendOrder(o); }
+        public virtual void O(Order o) { o.VirtualOwner = ID;  SendOrderEvent(o); }
         /// <summary>
         /// short form of sendcancel
         /// </summary>
         /// <param name="id"></param>
-        public virtual void C(uint id) { SendCancel(id); }
+        public virtual void C(uint id) { SendCancelEvent(id); }
         /// <summary>
         /// short form of sendindicator
         /// </summary>
         /// <param name="indicators"></param>
-        public virtual void I(string indicators) { SendIndicators(indicators); }
+        public virtual void I(string indicators) { SendIndicatorsEvent(indicators); }
         /// <summary>
         /// short form of sendindicator
         /// </summary>
         /// <param name="indicators"></param>
-        public virtual void I(object[] indicators) { string[] s = new string[indicators.Length]; for (int i = 0; i < indicators.Length; i++) s[i] = indicators[i].ToString(); SendIndicators(string.Join(",", s)); }
+        public virtual void I(object[] indicators) { string[] s = new string[indicators.Length]; for (int i = 0; i < indicators.Length; i++) s[i] = indicators[i].ToString(); SendIndicatorsEvent(string.Join(",", s)); }
         /// <summary>
         /// short form of sendindicator
         /// </summary>
         /// <param name="indicators"></param>
-        public virtual void I(string[] indicators) { SendIndicators(string.Join(",", indicators)); }
+        public virtual void I(string[] indicators) { SendIndicatorsEvent(string.Join(",", indicators)); }
         /// <summary>
         /// sends an order
         /// </summary>
         /// <param name="o"></param>
-        public virtual void sendorder(Order o) { o.VirtualOwner = ID;  SendOrder(o); }
+        public virtual void sendorder(Order o) { o.VirtualOwner = ID;  SendOrderEvent(o); }
         /// <summary>
         /// cancels an order (must have the id)
         /// </summary>
         /// <param name="id"></param>
-        public virtual void sendcancel(uint id) { SendCancel(id); }
+        public virtual void sendcancel(uint id) { SendCancelEvent(id); }
         /// <summary>
         /// sends indicators as array of objects for later analysis
         /// </summary>
         /// <param name="indicators"></param>
-        public virtual void sendindicators(object[] indicators) { string[] s = new string[indicators.Length]; for (int i = 0; i < indicators.Length; i++) s[i] = indicators[i].ToString(); SendIndicators(string.Join(",", s)); }
+        public virtual void sendindicators(object[] indicators) { string[] s = new string[indicators.Length]; for (int i = 0; i < indicators.Length; i++) s[i] = indicators[i].ToString(); SendIndicatorsEvent(string.Join(",", s)); }
         /// <summary>
         /// send indicators as array of strings for later analysis
         /// </summary>
         /// <param name="indicators"></param>
-        public virtual void sendindicators(string[] indicators) { SendIndicators(string.Join(",", indicators)); }
+        public virtual void sendindicators(string[] indicators) { SendIndicatorsEvent(string.Join(",", indicators)); }
         /// <summary>
         /// sends indicators as a comma seperated string (for later analsis)
         /// </summary>
         /// <param name="indicators"></param>
-        public virtual void sendindicators(string indicators) { SendIndicators(indicators); }
+        public virtual void sendindicators(string indicators) { SendIndicatorsEvent(indicators); }
         /// <summary>
         /// requests ticks for a basket of securities
         /// </summary>
         /// <param name="syms"></param>
-        public virtual void sendbasket(string[] syms) { if (SendBasket != null) SendBasket(new BasketImpl(syms), ID); else senddebug("SendBasket not supported in this application."); }
+        public virtual void sendbasket(string[] syms) { if (SendBasketEvent != null) SendBasketEvent(new BasketImpl(syms), ID); else senddebug("SendBasket not supported in this application."); }
         /// <summary>
         /// request ticks for a basket of securities
         /// </summary>
         /// <param name="syms"></param>
         public virtual void sendbasket(Basket syms)
         {
-            if (SendBasket != null)
-                SendBasket(syms, ID);
+            if (SendBasketEvent != null)
+                SendBasketEvent(syms, ID);
             else
                 senddebug("SendBasket not supported in this application.");
         }
@@ -149,13 +149,13 @@ namespace TradeLink.Common
         /// <param name="type"></param>
         /// <param name="id"></param>
         /// <param name="data"></param>
-        public virtual void sendmessage(MessageTypes type, uint msgid,string request,string response) { if (SendMessage!=null) SendMessage(type, (uint)ID, 0,msgid,request,ref response); }
+        public virtual void sendmessage(MessageTypes type, uint msgid,string request,string response) { if (SendMessageEvent!=null) SendMessageEvent(type, (uint)ID, 0,msgid,request,ref response); }
         public virtual void sendmessage(MessageTypes type, string data) { sendmessage(type, 0,data, string.Empty); }
         /// <summary>
         /// sends a debug message about what your response is doing at the moment.
         /// </summary>
         /// <param name="msg"></param>
-        public virtual void senddebug(string msg) { if (SendDebug!=null) SendDebug(DebugImpl.Create(msg)); }
+        public virtual void senddebug(string msg) { if (SendDebugEvent!=null) SendDebugEvent(DebugImpl.Create(msg)); }
         /// <summary>
         /// clears the chart
         /// </summary>
@@ -166,14 +166,14 @@ namespace TradeLink.Common
         /// <param name="price"></param>
         /// <param name="time"></param>
         /// <param name="text"></param>
-        public virtual void sendchartlabel(decimal price, int time, string text) { if (SendChartLabel != null) SendChartLabel(price, time, text, System.Drawing.Color.Purple); }
+        public virtual void sendchartlabel(decimal price, int time, string text) { if (SendChartLabelEvent != null) SendChartLabelEvent(price, time, text, System.Drawing.Color.Purple); }
         /// <summary>
         /// draws text directly on a point on chart
         /// </summary>
         /// <param name="price"></param>
         /// <param name="time"></param>
         /// <param name="text"></param>
-        public virtual void sendchartlabel(decimal price, int time, string text, System.Drawing.Color c) { if (SendChartLabel != null) SendChartLabel(price, time, text, c); }
+        public virtual void sendchartlabel(decimal price, int time, string text, System.Drawing.Color c) { if (SendChartLabelEvent != null) SendChartLabelEvent(price, time, text, c); }
         /// <summary>
         /// draws line with default color (orage)
         /// </summary>
@@ -238,12 +238,12 @@ namespace TradeLink.Common
         /// Full name of this response set by programs (includes namespace)
         /// </summary>
         public string FullName { get { return _full; } set { _full = value; } }
-        public event DebugFullDelegate SendDebug;
-        public event OrderDelegate SendOrder;
-        public event UIntDelegate SendCancel;
-        public event StringParamDelegate SendIndicators;
-        public event MessageDelegate SendMessage;
-        public event BasketDelegate SendBasket;
-        public event ChartLabelDelegate SendChartLabel;
+        public event DebugFullDelegate SendDebugEvent;
+        public event OrderDelegate SendOrderEvent;
+        public event UIntDelegate SendCancelEvent;
+        public event StringParamDelegate SendIndicatorsEvent;
+        public event MessageDelegate SendMessageEvent;
+        public event BasketDelegate SendBasketEvent;
+        public event ChartLabelDelegate SendChartLabelEvent;
     }
 }

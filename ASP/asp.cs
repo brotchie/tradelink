@@ -916,13 +916,13 @@ namespace ASP
         void bindresponseevents(Response tmp)
         {
             // handle all the outgoing events from the response
-            tmp.SendOrder += new OrderDelegate(workingres_SendOrder);
-            tmp.SendDebug += new DebugFullDelegate(workingres_GotDebug);
-            tmp.SendCancel += new UIntDelegate(workingres_CancelOrderSource);
-            tmp.SendMessage += new MessageDelegate(tmp_SendMessage);
-            tmp.SendBasket += new BasketDelegate(_workingres_SendBasket);
-            tmp.SendChartLabel += new ChartLabelDelegate(tmp_SendChartLabel);
-            tmp.SendIndicators += new StringParamDelegate(tmp_SendIndicators);
+            tmp.SendOrderEvent += new OrderDelegate(workingres_SendOrder);
+            tmp.SendDebugEvent += new DebugFullDelegate(workingres_GotDebug);
+            tmp.SendCancelEvent += new UIntDelegate(workingres_CancelOrderSource);
+            tmp.SendMessageEvent += new MessageDelegate(tmp_SendMessage);
+            tmp.SendBasketEvent += new BasketDelegate(_workingres_SendBasket);
+            tmp.SendChartLabelEvent += new ChartLabelDelegate(tmp_SendChartLabel);
+            tmp.SendIndicatorsEvent += new StringParamDelegate(tmp_SendIndicators);
         }
 
         void tmp_SendMessage(MessageTypes type, uint source, uint dest, uint msgid, string request, ref string response)

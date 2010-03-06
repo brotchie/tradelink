@@ -42,7 +42,7 @@ namespace TradeLink.AppKit
 
             osize.Text = work.ToString();
             oprice.Text = work.price.ToString();
-            if (work.Side) { obuybut.Checked = true; osellbut.Checked = false; }
+            if (work.side) { obuybut.Checked = true; osellbut.Checked = false; }
             else { osellbut.Checked = true; obuybut.Checked = false; }
             oprice.MouseWheel += new MouseEventHandler(order_MouseWheel);
             osize.MouseWheel += new MouseEventHandler(osize_MouseWheel);

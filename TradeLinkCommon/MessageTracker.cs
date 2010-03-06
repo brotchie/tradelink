@@ -82,7 +82,6 @@ namespace TradeLink.Common
 
         public virtual bool GotMessage(MessageTypes type, uint source, uint dest, uint msgid, string request, ref string response)
         {
-            decimal v = 0;
             long lv = 0;
             switch (type)
             {

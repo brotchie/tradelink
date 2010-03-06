@@ -22,12 +22,12 @@ namespace TradeLink.Common
             if (_size>0) _size *= t.side ? 1 : -1;
         }
         string _acct = "";
-        protected string _sym = "";
-        protected int _size = 0;
-        protected decimal _price = 0;
-        protected int _date = 0;
-        protected int _time = 0;
-        protected decimal _closedpl = 0;
+        string _sym = "";
+        int _size = 0;
+        decimal _price = 0;
+        int _date = 0;
+        int _time = 0;
+        decimal _closedpl = 0;
         public bool isValid
         {
             get { return (_sym!="") && (((AvgPrice == 0) && (Size == 0)) || ((AvgPrice != 0) && (Size != 0))); }

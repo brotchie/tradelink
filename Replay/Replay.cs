@@ -26,12 +26,11 @@ namespace Replay
         {
             InitializeComponent();
             tl.newSendOrderRequest += new OrderDelegate(tl_gotSrvFillRequest);
-            tl.newDayHighRequest += new DecimalStringDelegate(tl_DayHighRequest);
-            tl.newDayLowRequest += new DecimalStringDelegate(tl_DayLowRequest);
             tl.newOrderCancelRequest += new UIntDelegate(tl_OrderCancelRequest);
             tl.newAcctRequest += new StringDelegate(tl_gotSrvAcctRequest);
             tl.newPosList += new PositionArrayDelegate(tl_gotSrvPosList);
             tl.newFeatureRequest+=new MessageArrayDelegate(GetFeatures);
+            tl.newUnknownRequest += new UnknownMessageDelegate(tl_newUnknownRequest);
             tl.DOMRequest += new IntDelegate(tl_DOMRequest);
             h.GotTick += new TickDelegate(h_GotTick);
             h.SimBroker.GotOrder += new OrderDelegate(SimBroker_GotOrder);
@@ -52,6 +51,26 @@ namespace Replay
             // (this is for determining top of book between historical sources and our own orders)
             HISTBOOK.Execute = false; // make sure our special book is never executed by simulator
             HISTBOOK.Notify = false; // don't notify 
+        }
+
+        long tl_newUnknownRequest(MessageTypes t, string msg)
+        {
+            switch (t)
+            {
+                case MessageTypes.DAYHIGH:
+                    {
+                        decimal price = 0;
+                        highs.TryGetValue(msg, out price);
+                        return WMUtil.pack(price);
+                    }
+                case MessageTypes.DAYLOW:
+                    {
+                        decimal price = 0;
+                        lows.TryGetValue(msg, out price);
+                        return WMUtil.pack(price);
+                    }
+            }
+            return (long)MessageTypes.UNKNOWN_MESSAGE;
         }
 
         int tickdepth = 0;
@@ -80,6 +99,8 @@ namespace Replay
             f.Add(MessageTypes.POSITIONRESPONSE);
             f.Add(MessageTypes.FEATUREREQUEST);
             f.Add(MessageTypes.FEATURERESPONSE);
+            f.Add(MessageTypes.DAYHIGH);
+            f.Add(MessageTypes.DAYLOW);
             return f.ToArray();
         }
 
@@ -149,19 +170,6 @@ namespace Replay
             h.SimBroker.CancelOrder(number); // send cancel request to broker
         }
 
-        decimal tl_DayLowRequest(string s)
-        {
-            decimal price = 0;
-            lows.TryGetValue(s, out price);
-            return price;
-        }
-
-        decimal tl_DayHighRequest(string s)
-        {
-            decimal price = 0;
-            highs.TryGetValue(s, out price);
-            return price;
-        }
 
         int tl_PositionSizeRequest(string s)
         {
@@ -274,7 +282,7 @@ namespace Replay
                 oldbbo.Account = "";
 
                 // then send the order
-                h.SimBroker.sendOrder(o);
+                h.SimBroker.SendOrderStatus(o);
 
                 // get the new top of book
                 Order newbbo = h.SimBroker.BestBidOrOffer(o.symbol,o.side);
@@ -429,7 +437,7 @@ namespace Replay
                 o.date = t.date;
                 o.time = t.time;
                 o.Exchange = t.oe;
-                h.SimBroker.sendOrder(o,HISTBOOK);
+                h.SimBroker.SendOrderAccount(o,HISTBOOK);
             }
             if (t.hasBid)
             {
@@ -440,7 +448,7 @@ namespace Replay
                 o.date = t.date;
                 o.time = t.time;
                 o.Exchange = t.be;
-                h.SimBroker.sendOrder(o, HISTBOOK);
+                h.SimBroker.SendOrderAccount(o, HISTBOOK);
             }
             
         }

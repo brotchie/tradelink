@@ -390,13 +390,13 @@ namespace WinGauntlet
             if ((args.Response== null) || !args.Response.isValid)
                 return false;
             if (_boundonce) return true;
-            args.Response.SendMessage += new MessageDelegate(Response_SendMessage);
-            args.Response.SendIndicators += new StringParamDelegate(Response_SendIndicators);
-            args.Response.SendDebug += new DebugFullDelegate(Response_GotDebug);
-            args.Response.SendCancel += new UIntDelegate(Response_CancelOrderSource);
-            args.Response.SendOrder += new OrderDelegate(Response_SendOrder);
-            args.Response.SendBasket += new BasketDelegate(Response_SendBasket);
-            args.Response.SendChartLabel += new ChartLabelDelegate(Response_SendChartLabel);
+            args.Response.SendMessageEvent += new MessageDelegate(Response_SendMessage);
+            args.Response.SendIndicatorsEvent += new StringParamDelegate(Response_SendIndicators);
+            args.Response.SendDebugEvent += new DebugFullDelegate(Response_GotDebug);
+            args.Response.SendCancelEvent += new UIntDelegate(Response_CancelOrderSource);
+            args.Response.SendOrderEvent += new OrderDelegate(Response_SendOrder);
+            args.Response.SendBasketEvent += new BasketDelegate(Response_SendBasket);
+            args.Response.SendChartLabelEvent += new ChartLabelDelegate(Response_SendChartLabel);
             _boundonce = true;
             return true;
         }
@@ -447,7 +447,7 @@ namespace WinGauntlet
         void Response_SendOrder(Order o)
         {
             if (h!=null)
-                h.SimBroker.sendOrder(o);
+                h.SimBroker.SendOrderStatus(o);
         }
 
         void mybroker_GotOrderCancel(string sym, bool side, uint id)

@@ -547,13 +547,13 @@ namespace Kadina
             if ((myres != null) && (myres.FullName == name))
             {
                 resname = name;
-                myres.SendDebug += new DebugFullDelegate(myres_GotDebug);
-                myres.SendCancel += new UIntDelegate(myres_CancelOrderSource);
-                myres.SendOrder += new OrderDelegate(myres_SendOrder);
-                myres.SendIndicators += new StringParamDelegate(myres_SendIndicators);
-                myres.SendMessage += new MessageDelegate(myres_SendMessage);
-                myres.SendBasket += new BasketDelegate(myres_SendBasket);
-                myres.SendChartLabel += new ChartLabelDelegate(myres_SendChartLabel);
+                myres.SendDebugEvent += new DebugFullDelegate(myres_GotDebug);
+                myres.SendCancelEvent += new UIntDelegate(myres_CancelOrderSource);
+                myres.SendOrderEvent += new OrderDelegate(myres_SendOrder);
+                myres.SendIndicatorsEvent += new StringParamDelegate(myres_SendIndicators);
+                myres.SendMessageEvent += new MessageDelegate(myres_SendMessage);
+                myres.SendBasketEvent += new BasketDelegate(myres_SendBasket);
+                myres.SendChartLabelEvent += new ChartLabelDelegate(myres_SendChartLabel);
                 status(resname + " is current response.");
                 updatetitle();
                 igridinit();
@@ -607,7 +607,7 @@ namespace Kadina
                 o.date = _date;
                 o.time = _time;
             }
-            h.SimBroker.sendOrder(o);
+            h.SimBroker.SendOrderStatus(o);
         }
 
         void broker_GotOrderCancel(string sym, bool side, uint id)

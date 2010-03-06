@@ -24,12 +24,12 @@ namespace TestTradeLink
             broker.GotFill += new FillDelegate(broker_GotFill);
             broker.GotOrder += new OrderDelegate(broker_GotOrder);
             OrderImpl o = new OrderImpl();
-            int error = broker.sendOrder(o);
+            int error = broker.SendOrderStatus(o);
             Assert.AreNotEqual((int)MessageTypes.OK,error);
             Assert.That(orders == 0);
             Assert.That(fills == 0);
             o = new BuyMarket(s, 100);
-            broker.sendOrder(o);
+            broker.SendOrderStatus(o);
             Assert.That(orders == 1);
             Assert.That(fills == 0);
             Assert.That(broker.Execute(TickImpl.NewTrade(s,10,200)) == 1);
@@ -37,7 +37,7 @@ namespace TestTradeLink
 
             // test that a limit order is not filled outside the market
             o = new BuyLimit(s, 100, 9);
-            broker.sendOrder(o);
+            broker.SendOrderStatus(o);
             Assert.AreEqual(0, broker.Execute(TickImpl.NewTrade(s, 10, 100)));
             Assert.That(fills == 1); // redudant but for counting
 
@@ -51,8 +51,8 @@ namespace TestTradeLink
             x = new BuyMarket(s, 100);
             const string t2 = "trader2";
             x.Account = t2;
-            broker.sendOrder(o);
-            broker.sendOrder(x);
+            broker.SendOrderStatus(o);
+            broker.SendOrderStatus(x);
             Assert.AreEqual(3, fills); 
 
             // test that a market order is not filled when no book exists
@@ -62,7 +62,7 @@ namespace TestTradeLink
             broker.CancelOrders();
             o = new SellMarket(s, 100);
             o.Account = t2;
-            broker.sendOrder(o);
+            broker.SendOrderStatus(o);
             Assert.AreEqual(3, fills);
             
 
@@ -81,7 +81,6 @@ namespace TestTradeLink
         }
 
         int gottickDP = 0;
-        Tick receivedtickDP;
 
 
 
@@ -96,7 +95,7 @@ namespace TestTradeLink
             Order bid,offer;
 
             // send bid, make sure it's BBO (since it's only order on any book)
-            broker.sendOrder(new BuyLimit(s, x, p1));
+            broker.SendOrderStatus(new BuyLimit(s, x, p1));
             bid = broker.BestBid(s);
             offer = broker.BestOffer(s);
             Assert.That(bid.isValid && (bid.price==p1) && (bid.size==x), bid.ToString());
@@ -106,7 +105,7 @@ namespace TestTradeLink
             Order o;
             // Order#1... 100 shares buy at $11 
             o = new BuyLimit(s, x, p2,1);
-            broker.sendOrder(o);
+            broker.SendOrderStatus(o);
             bid = broker.BestBid(s);
             offer = broker.BestOffer(s);
             Assert.IsTrue(bid.isValid);
@@ -118,7 +117,7 @@ namespace TestTradeLink
             //order #2... 100 shares buy at $11
             o = new BuyLimit(s, x, p2,2);
             o.Account = "ANOTHER_ACCOUNT";
-            broker.sendOrder(o);
+            broker.SendOrderStatus(o);
             bid = broker.BestBid(s);
             offer = broker.BestOffer(s);
             Assert.IsTrue(bid.isValid);
@@ -169,8 +168,8 @@ namespace TestTradeLink
             oa.Account = me;
             ob.Account = other;
             // send order to account for jfranta
-            broker.sendOrder(oa);
-            broker.sendOrder(ob);
+            broker.SendOrderStatus(oa);
+            broker.SendOrderStatus(ob);
             TickImpl t = new TickImpl(sym);
             t.trade = 100m;
             t.size = 200;
@@ -197,7 +196,7 @@ namespace TestTradeLink
             const string s = "TST";
             // build and send an OPG order
             OrderImpl opg = new BuyOPG(s, 200, 10);
-            broker.sendOrder(opg);
+            broker.SendOrderStatus(opg);
 
             // build a tick on another exchange
             TickImpl it = TickImpl.NewTrade(s, 9, 100);
@@ -222,7 +221,7 @@ namespace TestTradeLink
             next.ex = "NYS";
 
             OrderImpl late = new BuyOPG(s, 200, 10);
-            broker.sendOrder(late);
+            broker.SendOrderStatus(late);
             c = broker.Execute(next);
             Assert.AreEqual(0, c);
 

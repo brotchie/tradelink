@@ -115,7 +115,7 @@ namespace TradeLink.Common
             bw.OutStream = new FileStream(bw.Filepath, FileMode.Create, FileAccess.Write, FileShare.Read);
             // version
             bw.Write(TikConst.Version);
-            bw.Write(TikConst.VERSION);
+            bw.Write(TikConst.FILECURRENTVERSION);
             // full symbol name
             bw.Write(realsymbol); // 
             // fields end

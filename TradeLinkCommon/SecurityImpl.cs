@@ -21,9 +21,9 @@ namespace TradeLink.Common
         public SecurityImpl() : this("", "", SecurityType.NIL) { }
         public SecurityImpl(string sym) : this(sym, "", SecurityType.STK) { }
         public SecurityImpl(string sym, SecurityType type) : this(sym, "", type) { }
-        protected string _sym = "";
-        protected SecurityType _type = SecurityType.NIL;
-        protected string _destex = "";
+        string _sym = "";
+        SecurityType _type = SecurityType.NIL;
+        string _destex = "";
         public bool hasType { get { return _type != SecurityType.NIL; } }
         public virtual string Symbol { get { return _sym; } set { _sym = value; } }
         public virtual string Name { get { return _sym; } set { } }

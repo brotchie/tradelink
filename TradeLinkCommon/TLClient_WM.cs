@@ -40,7 +40,7 @@ namespace TradeLink.Common
         const int MAXSERVER = 10;
         int _curprovider = -1;
 
-        public string Name { get { return Text; } set { Text = WMUtil.GetUniqueWindow(value); Mode(_curprovider, false); } }
+        public new string Name { get { return Text; } set { Text = WMUtil.GetUniqueWindow(value); Mode(_curprovider, false); } }
 
         public Providers[] ProvidersAvailable { get { return servers.ToArray(); } }
         public int ProviderSelected { get { return _curprovider; } }

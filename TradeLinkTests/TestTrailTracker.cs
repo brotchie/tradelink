@@ -48,7 +48,7 @@ namespace TestTradeLink
             // get fills over to trail tracker
             b.GotFill += new FillDelegate(tt.Adjust);
             // take initial position
-            b.sendOrder(new MarketOrder(SYM, 100));
+            b.SendOrderStatus(new MarketOrder(SYM, 100));
             // get orders from trail tracker
             tt.SendOrder += new OrderDelegate(b.SendOrder);
             // no orders to start

@@ -33,12 +33,12 @@ namespace TradeLink.Common
         public string[] Indicators { get { return new string[0]; } set { } }
         public string Name { get { return _name; } set { _name = value; } }
         public string FullName { get { return _fn; } set { _fn = value; } }
-        public event BasketDelegate SendBasket;
-        public event DebugFullDelegate SendDebug;
-        public event OrderDelegate SendOrder;
-        public event UIntDelegate SendCancel;
-        public event StringParamDelegate SendIndicators;
-        public event MessageDelegate SendMessage;
-        public event ChartLabelDelegate SendChartLabel;
+        public event BasketDelegate SendBasketEvent;
+        public event DebugFullDelegate SendDebugEvent;
+        public event OrderDelegate SendOrderEvent;
+        public event UIntDelegate SendCancelEvent;
+        public event StringParamDelegate SendIndicatorsEvent;
+        public event MessageDelegate SendMessageEvent;
+        public event ChartLabelDelegate SendChartLabelEvent;
     }
 }

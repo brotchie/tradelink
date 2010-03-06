@@ -130,7 +130,6 @@ namespace ServerMB
             o.TIF = pOrd.TimeInForce == MBConst.VALUE_DAY ? "DAY" : "GTC";
             o.time = Util.DT2FT(pOrd.UTCDateTime);
             o.date = Util.ToTLDate(pOrd.UTCDateTime);
-            o.sec = pOrd.UTCDateTime.Second;
             o.trail = (decimal)pOrd.TrailingOffset;
             //o.ex = pOrd.Route;
             o.id = Convert.ToUInt32(pOrd.OrderNumber);

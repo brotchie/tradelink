@@ -33,13 +33,13 @@ namespace Responses
         public string[] Indicators { get { return new string[0]; } set { } }
         public string Name { get { return ""; } set { } }
         public string FullName { get { return ""; } set { } }
-        public event DebugFullDelegate SendDebug;
-        public event OrderDelegate SendOrder;
-        public event UIntDelegate SendCancel;
-        public event StringParamDelegate SendIndicators;
-        public event MessageDelegate SendMessage;
-        public event BasketDelegate SendBasket;
-        public event ChartLabelDelegate SendChartLabel;
+        public event DebugFullDelegate SendDebugEvent;
+        public event OrderDelegate SendOrderEvent;
+        public event UIntDelegate SendCancelEvent;
+        public event StringParamDelegate SendIndicatorsEvent;
+        public event MessageDelegate SendMessageEvent;
+        public event BasketDelegate SendBasketEvent;
+        public event ChartLabelDelegate SendChartLabelEvent;
         public int ID { get; set; }
     }
 }

@@ -380,7 +380,7 @@ namespace TradeLink.Common
             _RequestFeaturesList.AddRange(messages);
         }
 
-        public List<MessageTypes> _RequestFeaturesList = new List<MessageTypes>();
+        List<MessageTypes> _RequestFeaturesList = new List<MessageTypes>();
 
         public void RequestFeatures()
         {
@@ -456,7 +456,6 @@ namespace TradeLink.Common
 
         int getproviderindex(Providers p)
         {
-            if (p == null) return -1;
             if (p == Providers.Unknown) return -1;
             for (int i = 0; i < ProvidersAvailable.Length; i++)
                 if (ProvidersAvailable[i] == p) return i;

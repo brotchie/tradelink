@@ -40,10 +40,10 @@ namespace TradeLink.Common
             }
 
             // chain order
-            if (SendOrder != null)
-                SendOrder(o);
+            if (SendOrderEvent != null)
+                SendOrderEvent(o);
         }
-        public event UIntDelegate SendCancel;
+        public event UIntDelegate SendCancelEvent;
         public void sendcancel(uint id)
         {
             long time = gettime();
@@ -53,8 +53,8 @@ namespace TradeLink.Common
                 _ctime.Add(id,time);
 
             // chain
-            if (SendCancel != null)
-                SendCancel(id);
+            if (SendCancelEvent != null)
+                SendCancelEvent(id);
         }
 
         long gettime()
@@ -63,7 +63,7 @@ namespace TradeLink.Common
         }
 
         public event LatencyDelegate SendLatency;
-        public event OrderDelegate SendOrder;
+        public event OrderDelegate SendOrderEvent;
 
         public void GotFill(Trade t)
         {

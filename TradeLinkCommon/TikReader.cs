@@ -57,8 +57,8 @@ namespace TradeLink.Common
             ReadByte();
             // get version
             _filever = ReadInt32();
-            if (_filever != TikConst.VERSION)
-                throw new BadTikFile("version: " + _filever + " expected: " + TikConst.VERSION);
+            if (_filever != TikConst.FILECURRENTVERSION)
+                throw new BadTikFile("version: " + _filever + " expected: " + TikConst.FILECURRENTVERSION);
             // get real symbol
             _realsymbol = ReadString();
             // get security from symbol

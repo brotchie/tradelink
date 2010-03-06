@@ -123,7 +123,7 @@ namespace TestTradeLink
             if (tickcount % 50 == 0)
             {
                 bool side = fillcount % 2 == 0;
-                h.SimBroker.sendOrder(new MarketOrder(t.symbol, side, 100));
+                h.SimBroker.SendOrderStatus(new MarketOrder(t.symbol, side, 100));
             }
         }
 

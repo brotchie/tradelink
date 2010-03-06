@@ -87,7 +87,7 @@ namespace TradeLink.Common
             {
                 Order o = orders[i];
                 if (o.symbol != sym) continue;
-                if (o.Side != side) continue;
+                if (o.side != side) continue;
                 if (!best.isValid)
                 {
                     best = new OrderImpl(o);
@@ -115,7 +115,7 @@ namespace TradeLink.Common
 
             // if order is matching then add the sizes
             OrderImpl add = new OrderImpl(first);
-            add.size = add.UnSignedSize + second.UnsignedSize * (add.Side ? 1 : -1);
+            add.size = add.UnsignedSize + second.UnsignedSize * (add.side? 1 : -1);
             return add;
         }
 
@@ -197,21 +197,21 @@ namespace TradeLink.Common
         /// <param name="o"></param>
         public void SendOrder(Order o)
         {
-            sendOrder(o);
+            SendOrderStatus(o);
         }
         /// <summary>
         /// Sends the order to the broker. (uses the default account)
         /// </summary>
         /// <param name="o">The order to be send.</param>
         /// <returns>status code</returns>
-        public int sendOrder(Order o) 
+        public int SendOrderStatus(Order o) 
         {
             if (!o.isValid) return (int)MessageTypes.INVALID_ORDERSIZE;
             // make sure book is clearly stamped
             if (o.Account.Equals(string.Empty, StringComparison.OrdinalIgnoreCase)) 
             {
                 o.Account = DEFAULT.ID;
-                return sendOrder(o, DEFAULT);
+                return SendOrderAccount(o, DEFAULT);
             }
             // get account
             Account a;
@@ -220,7 +220,7 @@ namespace TradeLink.Common
                 a = new Account(o.Account);
                 AddAccount(a);
             }
-            return sendOrder(o, a);
+            return SendOrderAccount(o, a);
 
         }
         /// <summary>
@@ -229,7 +229,7 @@ namespace TradeLink.Common
         /// <param name="o">The order to be sent.</param>
         /// <param name="a">the account to send with the order.</param>
         /// <returns>status code</returns>
-        public int sendOrder(Order o,Account a)
+        public int SendOrderAccount(Order o,Account a)
         {
             if (o.id == 0) // if order id isn't set, set it
                 o.id = _nextorderid++;

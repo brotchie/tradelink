@@ -10,7 +10,7 @@ namespace TradeLink.Common
         public const string DOT_EXT = ".TIK";
         public const string WILDCARD_EXT = "*.TIK";
 
-        public const int VERSION = 2;
+        public const int FILECURRENTVERSION = 2;
 
         // file field identifiers
         public const byte Version = 0; // two bytes of version follow

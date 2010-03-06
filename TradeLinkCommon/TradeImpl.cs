@@ -9,19 +9,19 @@ namespace TradeLink.Common
     [Serializable]
     public class TradeImpl : Trade
     {
-        protected uint _id = 0;
-        protected CurrencyType cur = CurrencyType.USD;
-        protected SecurityType type = SecurityType.STK;
-        protected string _localsymbol = "";
-        protected string accountid = "";
-        protected string _sym = "";
-        protected bool _side = true;
-        protected string _comment = "";
-        protected int _xsize = 0;
-        protected int _xdate = 0;
-        protected int _xtime = 0;
-        protected decimal _xprice = 0;
-        protected string _ex = "NYSE";
+        uint _id = 0;
+        CurrencyType cur = CurrencyType.USD;
+        SecurityType type = SecurityType.STK;
+        string _localsymbol = "";
+        string accountid = "";
+        string _sym = "";
+        bool _side = true;
+        string _comment = "";
+        int _xsize = 0;
+        int _xdate = 0;
+        int _xtime = 0;
+        decimal _xprice = 0;
+        string _ex = "NYSE";
         public int UnsignedSize { get { return Math.Abs(_xsize); } }
         public string ex { get { return _ex; } set { _ex = value; } }
         public uint id { get { return _id; } set { _id = value; } }
@@ -30,7 +30,6 @@ namespace TradeLink.Common
         public SecurityType Security { get { return type; } set { type = value; } }
         public string Exchange { get { return ex; } set { ex = value; } }
         public string Account { get { return accountid; } set { accountid = value; } }
-        public string Symbol { get { return _sym; } }
         public string symbol { get { return _sym; } set { _sym = value; } }
         public bool side { get { return _side; } set { _side = value; } }
         public string comment { get { return _comment; } set { _comment = value; } }
@@ -39,7 +38,6 @@ namespace TradeLink.Common
         public int xdate { get { return _xdate; } set { _xdate = value; } }
         public int xtime { get { return _xtime; } set { _xtime = value; } }
         public bool isFilled { get { return (xprice * xsize) != 0; } }
-        public bool Side { get { return side; } }
         public int Size { get { return xsize; } }
         public TradeImpl(Trade copytrade)
         {

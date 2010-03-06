@@ -56,7 +56,6 @@ namespace TradeLink.Common
         public void NewPosition(Position newpos)
         {
             _totalclosedpl += newpos.ClosedPL;
-            Position p;
             int idx = 0;
             if (_symidx.TryGetValue(newpos.Symbol,out idx))
                 _poslist[idx] = new PositionImpl(newpos);
@@ -76,7 +75,6 @@ namespace TradeLink.Common
         /// <returns>any closed PL for adjustment</returns>
         public decimal Adjust(Trade fill)
         {
-            Position p;
             decimal cpl = 0;
             int idx = -1;
             if (_symidx.TryGetValue(fill.symbol, out idx))

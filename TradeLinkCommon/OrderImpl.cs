@@ -10,16 +10,15 @@ namespace TradeLink.Common
     public class OrderImpl : TradeImpl, Order
     {
         string _tif = "DAY";
-        int _sec, _date, _time,_size;
+        int  _date, _time,_size;
         decimal _price,_stopp,_trail;
         int _virtowner = 0;
         public int VirtualOwner { get { return _virtowner; } set { _virtowner = value; } }
         public new int UnsignedSize { get { return Math.Abs(_size); } }
         public string TIF { get { return _tif; } set { _tif = value; } }
         public decimal trail { get { return _trail; } set { _trail = value; } }
-        public new string ex { get { return _ex; } set { _ex = value; } }
+
         public int size { get { return _size; } set { _size = value; } }
-        public int sec { get { return _sec; } set { _sec = value; } }
         public decimal price { get { return _price; } set { _price = value; } }
         public decimal stopp { get { return _stopp; } set { _stopp = value; } }
         public int date { get { return _date; } set { _date = value; } }
@@ -39,7 +38,6 @@ namespace TradeLink.Common
         public bool isStop { get { return (stopp != 0); } }
         public bool isTrail { get { return trail != 0; } }
         public int SignedSize { get { return Math.Abs(size) * (side ? 1 : -1); } }
-        public int UnSignedSize { get { return Math.Abs(size); } }
         public override decimal Price
         {
             get
@@ -124,7 +122,7 @@ namespace TradeLink.Common
         public override string ToString()
         {
             if (this.isFilled) return base.ToString();
-            return (side ? " BUY" : " SELL") + UnSignedSize + " " + this.symbol + "@" + (isMarket ? "Mkt" : (isLimit ? this.price.ToString("N2") : this.stopp.ToString("N2")+"stp")) + " ["+this.Account+"] " +id.ToString() ;
+            return (side ? " BUY" : " SELL") + UnsignedSize + " " + this.symbol + "@" + (isMarket ? "Mkt" : (isLimit ? this.price.ToString("N2") : this.stopp.ToString("N2")+"stp")) + " ["+this.Account+"] " +id.ToString() ;
         }
 
         /// <summary>
@@ -137,10 +135,10 @@ namespace TradeLink.Common
         {
             if (!t.isTrade) return false;
             if (!fillOPG && TIF=="OPG") return false;
-            if ((isLimit && Side && (t.trade <= price)) // buy limit
-                || (isLimit && !Side && (t.trade>=price))// sell limit
-                || (isStop && Side && (t.trade>=stopp)) // buy stop
-                || (isStop && !Side && (t.trade<=stopp)) // sell stop
+            if ((isLimit && side && (t.trade <= price)) // buy limit
+                || (isLimit && !side && (t.trade >= price))// sell limit
+                || (isStop && side && (t.trade >= stopp)) // buy stop
+                || (isStop && !side && (t.trade <= stopp)) // sell stop
                 || isMarket)
             {
                 this.xprice = t.trade;
@@ -159,15 +157,15 @@ namespace TradeLink.Common
         public bool Fill(Order o)
         {
             // sides must match
-            if (Side==o.side) return false;
+            if (side==o.side) return false;
             // orders must be valid
             if (!o.isValid || !this.isValid) return false;
             // acounts must be different
             if (o.Account == Account) return false;
-            if ((isLimit && Side && (o.price<=price)) // buy limit cross
-                || (isLimit && !Side && (o.price>=price))// sell limit cross
-                || (isStop && Side && (o.price>=stopp)) // buy stop
-                || (isStop && !Side && (o.price<=stopp)) // sell stop
+            if ((isLimit && side && (o.price <= price)) // buy limit cross
+                || (isLimit && !side && (o.price >= price))// sell limit cross
+                || (isStop && side && (o.price >= stopp)) // buy stop
+                || (isStop && !side && (o.price <= stopp)) // sell stop
                 || isMarket)
             {
                 this.xprice = o.isLimit ? o.price : o.stopp;

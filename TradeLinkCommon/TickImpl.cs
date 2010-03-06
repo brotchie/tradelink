@@ -41,7 +41,7 @@ namespace TradeLink.Common
         public int AskSize { get { return _os * 100; } set { _os = (int)(value / 100); } }
         public int TradeSize { get { return ts*100; } set { _size = (int)(value / 100); } }
         public int ts { get { return _size / 100; } } // normalized to bs/os
-        public long _datetime;
+        internal long _datetime;
         Security _Sec;
         string _sym;
         string _be;
