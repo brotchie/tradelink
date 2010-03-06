@@ -1,7 +1,7 @@
 
 !define ANVILDIRNAME "AnvilRelease_x32_2_8_2_0"
 
-Section "BrokerServer"
+Section "TradeLibFast"
 
     ; Set output path to the installation directory.
 	DetailPrint "Installing version ${VERSION}..."

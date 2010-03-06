@@ -192,10 +192,6 @@ finishinstall:
 
 SectionEnd
 
-Section "ResponseExamples"
-  File /r /x *.user /x *.xml /x *.dll /x *.pdf /x *.csv /x *.txt /x *.Cache /x .svn /x obj /x bin Responses
-  CreateShortCut "$SMPROGRAMS\TradeLink\ResponseExamples.lnk" "$INSTDIR\Responses\Responses.csproj" "" "$INSTDIR\Responses\Responses.csproj" 0
-SectionEnd
 ;--------------------------------
 
 !if $%INCLUDEBS% == "BS"
@@ -206,6 +202,28 @@ SectionEnd
 !endif
 
 ; Uninstaller
+
+Section "ResponseExamples"
+  File /r /x *.user /x *.xml /x *.dll /x *.pdf /x *.csv /x *.txt /x *.Cache /x .svn /x obj /x bin Responses
+  CreateShortCut "$SMPROGRAMS\TradeLink\ResponseExamples.lnk" "$INSTDIR\Responses\Responses.csproj" "" "$INSTDIR\Responses\Responses.csproj" 0
+SectionEnd
+
+Section "CSharpIde (Write Strategies)"
+
+ File "Install\CsharpIdeInstall.exe"
+   
+ vcredistinstall:
+  DetailPrint "Checking for CSharpIDE..."
+  ReadRegStr $0 HKLM SOFTWARE\TradeLinkSuite "InstalledCSharpIDE"
+  StrCmp $0 "Yes" finishinstall
+  ExecWait "CsharpIdeInstall.exe"
+  DetailPrint "CSharpIDE was installed."
+  WriteRegStr HKLM SOFTWARE\TradeLinkSuite "InstalledCSharpIDE" "Yes"
+  
+finishinstall:  
+
+SectionEnd
+
 
 Section "Uninstall"
   
