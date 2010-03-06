@@ -257,6 +257,10 @@ bar.Close, (int)((double)bar.Volume / 4), string.Empty));
         {
             return BuildBarRequest(new BarRequest(symbol, (int)interval, startdate, 0, Util.ToTLDate(), Util.ToTLTime(),string.Empty));
         }
+        public static string BuildBarRequest(string symbol, int interval, int startdate)
+        {
+            return BuildBarRequest(new BarRequest(symbol, interval, startdate, 0, Util.ToTLDate(), Util.ToTLTime(), string.Empty));
+        }
         /// <summary>
         /// builds bar request
         /// </summary>
@@ -279,11 +283,35 @@ bar.Close, (int)((double)bar.Volume / 4), string.Empty));
             return string.Join(",", r);
             
         }
+
+        public DateTime DateFromBarsBack(int barsback, BarInterval intv) { return DateFromBarsBack(barsback, intv, DateTime.Now); }
+        public DateTime DateFromBarsBack(int barsback, BarInterval intv, DateTime enddate) { return DateFromBarsBack(barsback, (int)intv, enddate); }
+        public DateTime DateFromBarsBack(int barsback, int interval) { return DateFromBarsBack(barsback,interval,DateTime.Now); }
+        public DateTime DateFromBarsBack(int barsback, int interval, DateTime enddate)
+        {
+           return enddate.Subtract(new TimeSpan(0,0,interval*barsback));
+        }
+
+        /// <summary>
+        /// build bar request for certain # of bars back from present
+        /// </summary>
+        /// <param name="sym"></param>
+        /// <param name="barsback"></param>
+        /// <param name="interval"></param>
+        /// <returns></returns>
+        public string BuildBarRequestBarsBack(string sym, int barsback, int interval)
+        {
+            DateTime n = DateTime.Now;
+            return BuildBarRequest(new BarRequest(sym, interval, Util.ToTLDate(DateFromBarsBack(barsback, interval, n)), Util.ToTLTime(DateFromBarsBack(barsback, interval, n)), Util.ToTLDate(n), Util.ToTLTime(n), string.Empty));
+        }
         
     }
 
     public struct BarRequest
     {
+        /// <summary>
+        /// client making request
+        /// </summary>
         public string Client;
         public int StartDate;
         public int EndDate;
