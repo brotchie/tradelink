@@ -106,8 +106,9 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="t">The tick you want to add to the bar.</param>
         /// <returns>true if the tick is accepted, false if it belongs to another bar.</returns>
-        public bool newTick(Tick t)
+        public bool newTick(Tick k)
         {
+            TickImpl t = (TickImpl)k;
             if (_sym == "") _sym = t.symbol;
             if (_sym != t.symbol) throw new InvalidTick();
             if (_time == 0) { _time = bt(t.time); bardate = t.date;}
@@ -121,10 +122,10 @@ namespace TradeLink.Common
             _new = tradesinbar == 1;
             // only count volume on trades, not indicies
             if (!t.isIndex) v += t.size; // add trade size to bar volume
-            if (o == 0) o = t.ltrade;
-            if (t.ltrade > h) h = t.ltrade;
-            if (t.ltrade < l) l = t.ltrade;
-            c = t.ltrade;
+            if (o == 0) o = t._trade;
+            if (t._trade > h) h = t._trade;
+            if (t._trade < l) l = t._trade;
+            c = t._trade;
             return true;
         }
         public override string ToString() { return "OHLC (" + _time + ") " + Open.ToString("F2") + "," + High.ToString("F2") + "," + Low.ToString("F2") + "," + Close.ToString("F2"); }

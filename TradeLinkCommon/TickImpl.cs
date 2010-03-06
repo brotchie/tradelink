@@ -18,9 +18,6 @@ namespace TradeLink.Common
         public long datetime { get { return _datetime; } set { _datetime = value; } }
         public int bs { get { return _bs; } set { _bs = value; } }
         public int os { get { return _os; } set { _os = value; } }
-        public ulong ltrade { get { return _trade; } set { _trade = value; } }
-        public ulong lbid { get { return _bid; } set { _bid = value; } }
-        public ulong lask { get { return _ask; } set { _ask = value; } }
         public decimal trade { get { return _trade*Const.IPRECV; } set { _trade = (ulong)(value*Const.IPREC); } }
         public decimal bid { get { return _bid * Const.IPRECV; } set { _bid = (ulong)(value * Const.IPREC); } }
         public decimal ask { get { return _ask * Const.IPRECV; } set { _ask = (ulong)(value * Const.IPREC); } }
@@ -54,9 +51,9 @@ namespace TradeLink.Common
 
         int _date;
         int _time;
-        ulong _trade;
-        ulong _bid;
-        ulong _ask;
+        internal ulong _trade;
+        internal ulong _bid;
+        internal ulong _ask;
 
         public TickImpl(string symbol) 
         {

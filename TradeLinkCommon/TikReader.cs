@@ -92,7 +92,7 @@ namespace TradeLink.Common
                 // get tick type
                 byte type = ReadByte();
                 // prepare a tick
-                Tick k = new TradeLink.Common.TickImpl(_realsymbol);
+                TickImpl k = new TradeLink.Common.TickImpl(_realsymbol);
                 // get the tick
                 switch (type)
                 {
@@ -105,7 +105,7 @@ namespace TradeLink.Common
                             k.date = ReadInt32();
                             k.time = ReadInt32();
                             k.datetime = ((long)k.date * 1000000) + (long)k.time;
-                            k.lask = ReadUInt64();
+                            k._ask = ReadUInt64();
                             k.os = ReadInt32();
                             k.oe = ReadString();
                             k.depth = ReadInt32();
@@ -116,7 +116,7 @@ namespace TradeLink.Common
                             k.date = ReadInt32();
                             k.time = ReadInt32();
                             k.datetime = ((long)k.date * 1000000) + (long)k.time;
-                            k.lbid = ReadUInt64();
+                            k._bid = ReadUInt64();
                             k.bs = ReadInt32();
                             k.be = ReadString();
                             k.depth = ReadInt32();
@@ -127,13 +127,13 @@ namespace TradeLink.Common
                             k.date = ReadInt32();
                             k.time = ReadInt32();
                             k.datetime = ((long)k.date * 1000000) + (long)k.time;
-                            k.ltrade = ReadUInt64();
+                            k._trade = ReadUInt64();
                             k.size = ReadInt32();
                             k.ex = ReadString();
-                            k.lbid = ReadUInt64();
+                            k._bid = ReadUInt64();
                             k.bs = ReadInt32();
                             k.be = ReadString();
-                            k.lask = ReadUInt64();
+                            k._ask = ReadUInt64();
                             k.os = ReadInt32();
                             k.oe = ReadString();
                             k.depth = ReadInt32();
@@ -144,10 +144,10 @@ namespace TradeLink.Common
                             k.date = ReadInt32();
                             k.time = ReadInt32();
                             k.datetime = ((long)k.date * 1000000) + (long)k.time;
-                            k.lbid = ReadUInt64();
+                            k._bid = ReadUInt64();
                             k.bs = ReadInt32();
                             k.be = ReadString();
-                            k.lask = ReadUInt64();
+                            k._ask = ReadUInt64();
                             k.os = ReadInt32();
                             k.oe = ReadString();
                             k.depth = ReadInt32();
@@ -158,7 +158,7 @@ namespace TradeLink.Common
                             k.date = ReadInt32();
                             k.time = ReadInt32();
                             k.datetime = ((long)k.date * 1000000) + (long)k.time;
-                            k.ltrade = ReadUInt64();
+                            k._trade = ReadUInt64();
                             k.size = ReadInt32();
                             k.ex = ReadString();
                         }

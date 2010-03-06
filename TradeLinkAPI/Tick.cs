@@ -32,6 +32,7 @@ namespace TradeLink.API
         /// depth of last bid/ask quote
         /// </summary>
         int depth { get; set; } 
+        /*
         /// <summary>
         /// long representation of last trade
         /// </summary>
@@ -44,6 +45,7 @@ namespace TradeLink.API
         /// long representation of ask price
         /// </summary>
         ulong lask { get; set; }
+         */
         /// <summary>
         /// trade price
         /// </summary>

@@ -56,7 +56,7 @@ namespace TradeLink.Common
             {
                 try 
                 {
-                    tw.newTick(t);
+                    tw.newTick((TickImpl)t);
                     return true;
                 }
                 catch (IOException) { return false; }
@@ -77,7 +77,7 @@ namespace TradeLink.Common
                     // open new stream
                     tw = new TikWriter(_path, t.symbol, t.date);
                     // save tick
-                    tw.newTick(t);
+                    tw.newTick((TickImpl)t);
                     // save stream
                     if (!havestream)
                         filedict.Add(t.symbol, tw);

@@ -85,16 +85,31 @@ namespace TradeLink.Common
 
         }
 
+        /// <summary>
+        /// close a tickfile
+        /// </summary>
         public override void Close()
         {
             base.Close();
         }
 
+        /// <summary>
+        /// gets symbol safe to use as filename
+        /// </summary>
+        /// <param name="realsymbol"></param>
+        /// <param name="path"></param>
+        /// <param name="date"></param>
+        /// <returns></returns>
         public static string SafeFilename(string realsymbol, string path, int date)
         {
             return path + "\\" + SafeSymbol(realsymbol) + date.ToString() + TikConst.DOT_EXT;
         }
 
+        /// <summary>
+        /// gets symbol that is safe to use as filename
+        /// </summary>
+        /// <param name="realsymbol"></param>
+        /// <returns></returns>
         public static string SafeSymbol(string realsymbol)
         {
             foreach (char c in Path.GetInvalidPathChars())
@@ -110,6 +125,12 @@ namespace TradeLink.Common
             return realsymbol;
         }
 
+        /// <summary>
+        /// write header for tick file
+        /// </summary>
+        /// <param name="bw"></param>
+        /// <param name="realsymbol"></param>
+        /// <returns></returns>
         public static bool Header(TikWriter bw, string realsymbol)
         {
             bw.OutStream = new FileStream(bw.Filepath, FileMode.Create, FileAccess.Write, FileShare.Read);
@@ -125,7 +146,16 @@ namespace TradeLink.Common
             return true;
         }
 
-        public void newTick(Tick k)
+        /// <summary>
+        /// write a tick to file
+        /// </summary>
+        /// <param name="k"></param>
+        public void newTick(Tick k) { newTick((TickImpl)k); }
+        /// <summary>
+        /// write a tick to file
+        /// </summary>
+        /// <param name="k"></param>
+        public void newTick(TickImpl k)
         {
             // make sure we have a header
             if (!_hasheader) init(k.symbol, k.date, _path);
@@ -142,7 +172,7 @@ namespace TradeLink.Common
                 Write(TikConst.TickBid);
                 Write(k.date);
                 Write(k.time);
-                Write(k.lbid);
+                Write(k._bid);
                 Write(k.bs);
                 Write(k.be);
                 Write(k.depth);
@@ -152,7 +182,7 @@ namespace TradeLink.Common
                 Write(TikConst.TickAsk);
                 Write(k.date);
                 Write(k.time);
-                Write(k.lask);
+                Write(k._ask);
                 Write(k.os);
                 Write(k.oe);
                 Write(k.depth);
@@ -162,7 +192,7 @@ namespace TradeLink.Common
                 Write(TikConst.TickTrade);
                 Write(k.date);
                 Write(k.time);
-                Write(k.ltrade);
+                Write(k._trade);
                 Write(k.size);
                 Write(k.ex);
             }
@@ -171,13 +201,13 @@ namespace TradeLink.Common
                 Write(TikConst.TickFull);
                 Write(k.date);
                 Write(k.time);
-                Write(k.ltrade);
+                Write(k._trade);
                 Write(k.size);
                 Write(k.ex);
-                Write(k.lbid);
+                Write(k._bid);
                 Write(k.bs);
                 Write(k.be);
-                Write(k.lask);
+                Write(k._ask);
                 Write(k.os);
                 Write(k.oe);
                 Write(k.depth);
@@ -188,10 +218,10 @@ namespace TradeLink.Common
                 Write(TikConst.TickQuote);
                 Write(k.date);
                 Write(k.time);
-                Write(k.lbid);
+                Write(k._bid);
                 Write(k.bs);
                 Write(k.be);
-                Write(k.lask);
+                Write(k._ask);
                 Write(k.os);
                 Write(k.oe);
                 Write(k.depth);

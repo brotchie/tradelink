@@ -26,7 +26,7 @@ namespace TradeLink.Common
 
         static void HistSource_gotTick(TradeLink.API.Tick t)
         {
-            _tw.newTick(t);
+            _tw.newTick((TickImpl)t);
         }
 
         private static TikWriter _tw;
