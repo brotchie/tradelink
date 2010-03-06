@@ -12,13 +12,29 @@ namespace TradeLink.Common
     /// </summary>
     public class PositionTracker
     {
+        /// <summary>
+        /// create a tracker
+        /// </summary>
         public PositionTracker() : this(3) { }
+        /// <summary>
+        /// create tracker with approximate # of positions
+        /// </summary>
+        /// <param name="estimatedPositions"></param>
         public PositionTracker(int estimatedPositions) 
         {
             _poslist = new List<Position>(estimatedPositions);
         }
         List<Position> _poslist = null;
         Dictionary<string, int> _symidx = new Dictionary<string, int>();
+
+        /// <summary>
+        /// clear all positions.  use with caution.
+        /// </summary>
+        public void Clear()
+        {
+            _poslist.Clear();
+            _symidx.Clear();
+        }
 
         public Position this[int idx] { get { return _poslist[idx]; } }
         public Position this[string symbol] 
