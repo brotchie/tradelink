@@ -321,7 +321,7 @@ namespace TradeLink.Common
             // see if it's our order
             OffsetInfo oi = GetOffset(t.symbol);
             if (((oi.ProfitId==t.id) || (oi.StopId==t.id)) && (HitOffset!=null))
-                HitOffset(t.symbol,t.id);
+                HitOffset(t.symbol,t.id,t.xprice);
             // if we're flat, nothing to do
             if (_pt[t.symbol].isFlat) return;
             // do we have events?
