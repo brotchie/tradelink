@@ -694,6 +694,7 @@ namespace TradeLink.Common
         For_Internal_Use_Only2 = -30,
         Sell_to_Open_Position_Not_Enabled_for_Options = -31,
         Allow_Close_and_Cancel_Only = -32,
+        Symbol_Violates_Account_MinMax_PriceSettings = -39,
     }
 
 
