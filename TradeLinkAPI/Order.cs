@@ -102,7 +102,7 @@ namespace TradeLink.API
         /// <summary>
         /// order id
         /// </summary>
-        uint id { get; set; }
+        long id { get; set; }
         /// <summary>
         /// try to fill order against another order
         /// </summary>

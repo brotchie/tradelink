@@ -46,7 +46,7 @@ namespace TradeLink.Common
         /// Called if a cancel has been processed
         /// </summary>
         /// <param name="cancelid"></param>
-        public virtual void GotOrderCancel(uint cancelid)
+        public virtual void GotOrderCancel(long cancelid)
         {
 
         }
@@ -56,7 +56,7 @@ namespace TradeLink.Common
         /// <param name="type"></param>
         /// <param name="id"></param>
         /// <param name="data"></param>
-        public virtual void GotMessage(MessageTypes type, uint source, uint dest, uint msgid, string request,ref string response)
+        public virtual void GotMessage(MessageTypes type, long source, long dest, long msgid, string request,ref string response)
         {
         }
         /// <summary>
@@ -81,7 +81,7 @@ namespace TradeLink.Common
         /// short form of sendcancel
         /// </summary>
         /// <param name="id"></param>
-        public virtual void C(uint id) { SendCancelEvent(id); }
+        public virtual void C(long id) { SendCancelEvent(id); }
         /// <summary>
         /// short form of sendindicator
         /// </summary>
@@ -106,7 +106,7 @@ namespace TradeLink.Common
         /// cancels an order (must have the id)
         /// </summary>
         /// <param name="id"></param>
-        public virtual void sendcancel(uint id) { SendCancelEvent(id); }
+        public virtual void sendcancel(long id) { SendCancelEvent(id); }
         /// <summary>
         /// sends indicators as array of objects for later analysis
         /// </summary>
@@ -149,7 +149,7 @@ namespace TradeLink.Common
         /// <param name="type"></param>
         /// <param name="id"></param>
         /// <param name="data"></param>
-        public virtual void sendmessage(MessageTypes type, uint msgid,string request,string response) { if (SendMessageEvent!=null) SendMessageEvent(type, (uint)ID, 0,msgid,request,ref response); }
+        public virtual void sendmessage(MessageTypes type, long msgid,string request,string response) { if (SendMessageEvent!=null) SendMessageEvent(type, (long)ID, 0,msgid,request,ref response); }
         public virtual void sendmessage(MessageTypes type, string data) { sendmessage(type, 0,data, string.Empty); }
         /// <summary>
         /// sends a debug message about what your response is doing at the moment.
@@ -240,7 +240,7 @@ namespace TradeLink.Common
         public string FullName { get { return _full; } set { _full = value; } }
         public event DebugFullDelegate SendDebugEvent;
         public event OrderDelegate SendOrderEvent;
-        public event UIntDelegate SendCancelEvent;
+        public event LongDelegate SendCancelEvent;
         public event StringParamDelegate SendIndicatorsEvent;
         public event MessageDelegate SendMessageEvent;
         public event BasketDelegate SendBasketEvent;

@@ -12,10 +12,10 @@ namespace TradeLink.Common
     /// </summary>
     public class AsyncResponse
     {
-        const uint MAXTICK = 10000;
+        const long MAXTICK = 10000;
         Tick[] _tickcache = new Tick[MAXTICK];
-        uint _readticks = 0;
-        uint _writeticks = 0;
+        long _readticks = 0;
+        long _writeticks = 0;
         public event TickDelegate GotTick;
         public event VoidDelegate GotTickQueueEmpty;
         public event VoidDelegate GotTickQueued;
@@ -75,10 +75,10 @@ namespace TradeLink.Common
             }
         }
 
-        const uint MAXIMB = 100000;
+        const long MAXIMB = 100000;
         Imbalance[] _imbcache = new Imbalance[MAXIMB];
-        uint _readimbs = 0;
-        uint _writeimbs = 0;
+        long _readimbs = 0;
+        long _writeimbs = 0;
         public event ImbalanceDelegate GotImbalance;
         public event VoidDelegate GotImbalanceQueued;
         public event VoidDelegate GotImbalanceQueueEmpty;

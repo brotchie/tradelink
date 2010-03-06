@@ -34,8 +34,8 @@ namespace TradeLink.Common
         public int MinimumLotSize = 1;
         public OffsetInfo(decimal profitdist, decimal stopdist) : this(profitdist, stopdist, 1, 1, false, 1) { }
         public OffsetInfo() : this(0, 0, 1, 1, false, 1) { }
-        public uint ProfitId = 0;
-        public uint StopId = 0;
+        public long ProfitId = 0;
+        public long StopId = 0;
         public decimal ProfitDist = 0;
         public decimal StopDist = 0;
         public decimal ProfitPercent = 1;

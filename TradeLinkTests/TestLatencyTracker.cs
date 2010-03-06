@@ -21,7 +21,7 @@ namespace TestTradeLink
             reset();
 
             // create tests
-            uint id = 1;
+            long id = 1;
             Order o = new BuyMarket(sym, 2*size);
             o.id = id++;
             // start measuring
@@ -70,8 +70,8 @@ namespace TestTradeLink
         }
         double lastlatency = 0;
         MessageTypes lasttype = MessageTypes.OK;
-        uint lastid = 0;
-        void lt_SendLatency(MessageTypes type, uint id, double time)
+        long lastid = 0;
+        void lt_SendLatency(MessageTypes type, long id, double time)
         {
             lastid = id;
             lasttype = type;

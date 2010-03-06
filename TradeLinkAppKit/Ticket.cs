@@ -7,7 +7,6 @@ using System.Text;
 using System.Windows.Forms;
 using TradeLink.Common;
 using TradeLink.API;
-using TradeLink.Common;
 
 namespace TradeLink.AppKit
 {

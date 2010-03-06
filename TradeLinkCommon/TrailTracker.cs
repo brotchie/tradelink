@@ -6,7 +6,7 @@ using TradeLink.API;
 
 namespace TradeLink.Common
 {
-    public delegate void HitOffsetDelegate(string sym, uint id);
+    public delegate void HitOffsetDelegate(string sym, long id);
     /// <summary>
     /// simulate a trailing stop for a number of positions
     /// </summary>

@@ -434,7 +434,7 @@ namespace TradeLink.Common
             return long2decimal(s2);
         }
 
-        const uint D2L_MULT = 65536;
+        const long D2L_MULT = 65536;
         static long[] decimal2long(decimal[] a) { return decimal2long(a, a.Length); }
         static long[] decimal2long(decimal[] a, int length)
         {

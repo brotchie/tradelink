@@ -14,13 +14,13 @@ namespace TradeLink.Common
     {
         public event StringDelegate newAcctRequest;
         public event OrderDelegate newSendOrderRequest;
-        public event UIntDelegate newOrderCancelRequest;
+        public event LongDelegate newOrderCancelRequest;
         public event PositionArrayDelegate newPosList;
         public event DebugDelegate newRegisterStocks;
         public event MessageArrayDelegate newFeatureRequest;
         public event UnknownMessageDelegate newUnknownRequest;
         public event VoidDelegate newImbalanceRequest;
-        public event IntDelegate DOMRequest;
+        public event Int64Delegate DOMRequest;
 
         public string Version() { return Util.TLSIdentity(); }
         protected int MinorVer = 0;

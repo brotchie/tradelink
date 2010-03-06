@@ -56,7 +56,7 @@ namespace TradeLink.AppKit
             }
             barc = bl.Count;
             if (_alwaysupdate)
-                refresh();
+                redraw();
         }
         /// <summary>
         /// create bars from points
@@ -83,16 +83,16 @@ namespace TradeLink.AppKit
             }
             barc = bl.Count;
             if (_alwaysupdate)
-                refresh();
+                redraw();
         }
 
         /// <summary>
         /// force a manual refresh of the chart
         /// </summary>
-        public void refresh()
+        public void redraw()
         {
             if (InvokeRequired)
-                Invoke(new VoidDelegate(refresh));
+                Invoke(new VoidDelegate(redraw));
             else
             {
                 Invalidate(true);
@@ -102,7 +102,7 @@ namespace TradeLink.AppKit
         /// <summary>
         /// controls whether right click menu can be selected
         /// </summary>
-        public bool DisplayRightClick { get { return chartContextMenu.Enabled; } set { chartContextMenu.Enabled = !chartContextMenu.Enabled; refresh(); } }
+        public bool DisplayRightClick { get { return chartContextMenu.Enabled; } set { chartContextMenu.Enabled = !chartContextMenu.Enabled; redraw(); } }
 
         /// <summary>
         /// reset the chart and underlying data structures
@@ -114,7 +114,7 @@ namespace TradeLink.AppKit
             highesth = 0;
             lowestl = BIGVAL;
             barc = 0;
-            refresh();
+            redraw();
         }
         string sym = string.Empty;
         public string Symbol { get { return sym; } set { sym = value; Text = Title; } }
@@ -141,7 +141,7 @@ namespace TradeLink.AppKit
                     BackColor = Color.White;
                 else
                     BackColor = Color.Black;
-                refresh();
+                redraw();
             }
         }
 
@@ -229,7 +229,7 @@ namespace TradeLink.AppKit
             highesth = Calc.HH(bl);
             lowestl = Calc.LL(bl);
             barc = bl.Count;
-            refresh();
+            redraw();
         }
 
 
@@ -414,7 +414,7 @@ namespace TradeLink.AppKit
             if (l.isLine)
                 _collineend[color].Add(_colpoints[color].Count-1);
             if (_alwaysupdate)
-                refresh();
+                redraw();
         }
 
         private decimal NearestPrettyPriceUnits(decimal pricerange,int maxlabels)
@@ -431,7 +431,7 @@ namespace TradeLink.AppKit
 
         private void Chart_Resize(object sender, EventArgs e)
         {
-            refresh();
+            redraw();
         }
 
         struct Label
@@ -515,7 +515,7 @@ namespace TradeLink.AppKit
 
                 DrawChartLabel(-1, 0, string.Empty, ManualColor);
             }
-            refresh();
+            redraw();
         }
 
         private void redToolStripMenuItem_Click(object sender, EventArgs e)
@@ -551,7 +551,7 @@ namespace TradeLink.AppKit
         private void clearAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
             DrawChartLabel(-1, 0, string.Empty, ManualColor);
-            refresh();
+            redraw();
 
         }
         bool _dispint = true;

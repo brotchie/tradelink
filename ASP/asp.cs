@@ -146,7 +146,7 @@ namespace ASP
             // hook up events
             _bf.gotFill += new FillDelegate(tl_gotFill);
             _bf.gotOrder += new OrderDelegate(tl_gotOrder);
-            _bf.gotOrderCancel += new UIntDelegate(tl_gotOrderCancel);
+            _bf.gotOrderCancel += new LongDelegate(tl_gotOrderCancel);
             _bf.gotPosition += new PositionDelegate(tl_gotPosition);
             _bf.gotTick += new TickDelegate(quote_gotTick);
             _bf.gotUnknownMessage += new MessageDelegate(tl_gotUnknownMessage);
@@ -236,7 +236,7 @@ namespace ASP
             }
         }
 
-        void tl_gotUnknownMessage(MessageTypes type, uint source, uint dest, uint id, string request, ref string response)
+        void tl_gotUnknownMessage(MessageTypes type, long source, long dest, long id, string request, ref string response)
         {
             // send unknown messages to valid responses
             for (int idx= 0; idx<_reslist.Count; idx++)
@@ -251,14 +251,14 @@ namespace ASP
         /// </summary>
         /// <param name="responseid"></param>
         /// <returns></returns>
-        int r2r(uint responseid)
+        int r2r(long responseid)
         {
             int idx = -1;
             if (_rid2local.TryGetValue((int)responseid, out idx))
                 return idx;
             return -1;
         }
-        int r2r(int responseid) { return r2r((uint)responseid); }
+        int r2r(int responseid) { return r2r((long)responseid); }
 
         void tl_gotTickasync(Tick t)
         {
@@ -722,12 +722,12 @@ namespace ASP
             _resnames.Invalidate(true);
         }
 
-        void tl_gotOrderCancel(uint number)
+        void tl_gotOrderCancel(long number)
         {
             // see if we need to remap
             if (_ao._virtids.Checked)
             {
-                uint master = number;
+                long master = number;
                 number = aspid2responseid(number);
                 // if we don't have one, assign one
                 if (number == 0)
@@ -752,7 +752,7 @@ namespace ASP
             if (_ao._virtids.Checked && (o.id!=0))
             {
                 // see if we already have a map
-                uint rorderid = aspid2responseid(o.id);
+                long rorderid = aspid2responseid(o.id);
                 // if we don't create one
                 if (rorderid == 0)
                 {
@@ -841,7 +841,7 @@ namespace ASP
             if (_ao._virtids.Checked && (t.id != 0))
             {
                 // get the map
-                uint rorderid = aspid2responseid(t.id);
+                long rorderid = aspid2responseid(t.id);
                 // if we don't have a map, create one
                 if (rorderid == 0)
                 {
@@ -918,14 +918,14 @@ namespace ASP
             // handle all the outgoing events from the response
             tmp.SendOrderEvent += new OrderDelegate(workingres_SendOrder);
             tmp.SendDebugEvent += new DebugFullDelegate(workingres_GotDebug);
-            tmp.SendCancelEvent += new UIntDelegate(workingres_CancelOrderSource);
+            tmp.SendCancelEvent += new LongDelegate(workingres_CancelOrderSource);
             tmp.SendMessageEvent += new MessageDelegate(tmp_SendMessage);
             tmp.SendBasketEvent += new BasketDelegate(_workingres_SendBasket);
             tmp.SendChartLabelEvent += new ChartLabelDelegate(tmp_SendChartLabel);
             tmp.SendIndicatorsEvent += new StringParamDelegate(tmp_SendIndicators);
         }
 
-        void tmp_SendMessage(MessageTypes type, uint source, uint dest, uint msgid, string request, ref string response)
+        void tmp_SendMessage(MessageTypes type, long source, long dest, long msgid, string request, ref string response)
         {
             _mtquote.SendMessage(type, source, dest, msgid, request, response);
             _mtexec.SendMessage(type, source, dest, msgid, request, response);
@@ -1034,9 +1034,9 @@ namespace ASP
 
 
 
-        uint responseid2asp(uint responseorderid)
+        long responseid2asp(long responseorderid)
         {
-            uint id = 0;
+            long id = 0;
             if (_r2a.TryGetValue(responseorderid, out id))
                 return id;
             return 0;
@@ -1045,12 +1045,12 @@ namespace ASP
 
         const int EXPECTORDERS = 3000;
         IdTracker _masteridt = new IdTracker();
-        Dictionary<uint, uint> _r2a = new Dictionary<uint, uint>(EXPECTORDERS);
-        Dictionary<uint, uint> _a2r = new Dictionary<uint, uint>(EXPECTORDERS);
+        Dictionary<long, long> _r2a = new Dictionary<long, long>(EXPECTORDERS);
+        Dictionary<long, long> _a2r = new Dictionary<long, long>(EXPECTORDERS);
 
-        uint aspid2responseid(uint aspid)
+        long aspid2responseid(long aspid)
         {
-            uint id = 0;
+            long id = 0;
             if (_a2r.TryGetValue(aspid, out id))
                 return id;
             return 0;
@@ -1107,7 +1107,7 @@ namespace ASP
             if (_ao._virtids.Checked && (o.id != 0))
             {
                 // get master id for this order
-                uint master = responseid2asp(o.id) ;
+                long master = responseid2asp(o.id) ;
                 // if we don't have a master, assign one
                 if (master == 0)
                 {
@@ -1125,7 +1125,7 @@ namespace ASP
             }
         }
 
-        void workingres_CancelOrderSource(uint number)
+        void workingres_CancelOrderSource(long number)
         {
             // see if we need to remap
             if (_ao._virtids.Checked)

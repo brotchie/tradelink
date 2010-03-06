@@ -8,7 +8,7 @@ namespace TradeLink.Common
     public class TIFTracker
     {
 
-        uint this[string symbol] 
+        long this[string symbol] 
         { 
             get 
             {
@@ -33,17 +33,17 @@ namespace TradeLink.Common
         {
             _idt = id;
         }
-        public event UIntDelegate SendCancel;
+        public event LongDelegate SendCancel;
         public event OrderDelegate SendOrder;
         public event DebugDelegate SendDebug;
-        uint _tif = 300;
-        public uint DefaultTif { get { return _tif; } set { _tif = value; } }
+        long _tif = 300;
+        public long DefaultTif { get { return _tif; } set { _tif = value; } }
         IdTracker _idt = null;
         Dictionary<string, int> _symidx = new Dictionary<string, int>();
-        Dictionary<uint, int> _ididx = new Dictionary<uint, int>();
+        Dictionary<long, int> _ididx = new Dictionary<long, int>();
         List<int> _senttime = new List<int>();
-        List<uint> _tifs = new List<uint>(); 
-        List<uint> _id = new List<uint>();
+        List<long> _tifs = new List<long>(); 
+        List<long> _id = new List<long>();
         const int NOIDX = -1;
         int _lasttime = 0;
 

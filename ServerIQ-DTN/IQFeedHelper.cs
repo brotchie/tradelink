@@ -113,11 +113,11 @@ namespace IQFeedBroker
             return (long)MessageTypes.FEATURE_NOT_IMPLEMENTED;
         }
         IdTracker _idt = new IdTracker();
-        Dictionary<uint, BarRequest> reqid2req = new Dictionary<uint, BarRequest>();
+        Dictionary<long, BarRequest> reqid2req = new Dictionary<long, BarRequest>();
         void RequestBars(BarRequest br)
         {
             string command;
-            uint id = _idt.AssignId;
+            long id = _idt.AssignId;
             if (br.Interval == (int)BarInterval.Day)
             {
                 command = String.Format("HDT,{0},{1},,1,{2}\r\n", br.Symbol,br.StartDateTime.ToLongDateString(),br.EndDateTime.ToLongDateString(),id);
@@ -434,8 +434,8 @@ namespace IQFeedBroker
                     if (r.Length < 8) 
                         continue;
                     // get request id
-                    uint rid = 0;
-                    if (!uint.TryParse(r[0], out rid))
+                    long rid = 0;
+                    if (!long.TryParse(r[0], out rid))
                         continue;
                     BarRequest br;
                     if (!reqid2req.TryGetValue(rid, out br))

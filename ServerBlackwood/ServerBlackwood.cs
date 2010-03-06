@@ -45,7 +45,7 @@ namespace ServerBlackwood
             newAcctRequest += new StringDelegate(ServerBlackwood_newAcctRequest);
             newUnknownRequest += new UnknownMessageDelegate(ServerBlackwood_newUnknownRequest);
             newFeatureRequest += new MessageArrayDelegate(ServerBlackwood_newFeatureRequest);
-            newOrderCancelRequest += new UIntDelegate(ServerBlackwood_newOrderCancelRequest);
+            newOrderCancelRequest += new LongDelegate(ServerBlackwood_newOrderCancelRequest);
             newSendOrderRequest += new OrderDelegate(ServerBlackwood_newSendOrderRequest);
             newRegisterStocks += new DebugDelegate(ServerBlackwood_newRegisterStocks);
             newPosList += new PositionArrayDelegate(ServerBlackwood_newPosList);
@@ -112,7 +112,7 @@ namespace ServerBlackwood
             BWOrderType orderType = (o.isStop ? (o.isStop ? BWOrderType.STOP_LIMIT : BWOrderType.STOP_MARKET) : (o.isLimit ? BWOrderType.LIMIT : BWOrderType.MARKET));
             int orderTIF = (int)getDurationFromBW(o);
 
-            uint orderSize = (uint)o.UnsignedSize;
+            uint  orderSize = (uint)o.UnsignedSize;
             int orderReserve = o.UnsignedSize;
             float orderPrice = (float)o.price;
             float orderStopPrice = (float)o.stopp;
@@ -141,7 +141,7 @@ namespace ServerBlackwood
             _bwOrdIds.Add(o.id, 0);
         }
 
-        void ServerBlackwood_newOrderCancelRequest(uint tlID)
+        void ServerBlackwood_newOrderCancelRequest(long tlID)
         {
             int bwID = 0;
             if (_bwOrdIds.TryGetValue(tlID, out bwID))
@@ -212,8 +212,7 @@ namespace ServerBlackwood
                     int tlTimeE = int.Parse(r[(int)BarRequestField.StartTime]);
                     DateTime dtEnd = TradeLink.Common.Util.ToDateTime(tlDateE, tlTimeE);
                     uint custInt = 1;
-                    bool result = uint.TryParse(r[(int)BarRequestField.CustomInterval], out custInt);
-                    if (!result)
+                    if (!uint.TryParse(r[(int)BarRequestField.CustomInterval], out custInt))
                     {
                        custInt = 1;
                     }
@@ -273,7 +272,7 @@ namespace ServerBlackwood
         //    o.time = TradeLink.Common.Util.DT2FT(orderMsg.OrderTime);
         //    o.date = TradeLink.Common.Util.ToTLDate(orderMsg.OrderTime);
         //    o.ex = orderMsg.Venue.ToString();
-        //    o.id = (uint)orderMsg.CustomID;
+        //    o.id = (long)orderMsg.CustomID;
         //    o.Account = _acct;
         //    newOrder(o);
 
@@ -291,7 +290,7 @@ namespace ServerBlackwood
 
         void m_Session_OnExecutionMessage(object sender, BWExecution executionMsg)
         {
-            foreach (KeyValuePair<uint,int> ordID in _bwOrdIds)
+            foreach (KeyValuePair<long,int> ordID in _bwOrdIds)
                 if ( ordID.Value == executionMsg.OrderID)
                 {
                     Trade t = new TradeImpl(executionMsg.Symbol, (decimal)executionMsg.Price, executionMsg.Size);
@@ -530,18 +529,18 @@ namespace ServerBlackwood
         }
 
         //Keep cross reference list between TL order ID and BW order ID.
-        Dictionary<uint, int> _bwOrdIds = new Dictionary<uint, int>();
+        Dictionary<long, int> _bwOrdIds = new Dictionary<long, int>();
         void bwOrder_BWOrderUpdateEvent(object sender, BWOrderStatus BWOrderStatus)
         {
             BWOrder bwo = (BWOrder)sender;
-            uint id = (uint)bwo.CustomID;
+            long id = (long)bwo.CustomID;
         
             switch (BWOrderStatus)
             {
                 case BWOrderStatus.ACCEPTED:
                     {
                         Order o = new OrderImpl(bwo.Symbol, (int)bwo.Size);
-                        o.id = (uint)bwo.CustomID;
+                        o.id = (long)bwo.CustomID;
                         o.side = (bwo.OrderSide == ORDER_SIDE.SIDE_BUY) || (bwo.OrderSide == ORDER_SIDE.SIDE_COVER);
                         o.price = (decimal)bwo.LimitPrice;
                         o.stopp = (decimal)bwo.StopPrice;

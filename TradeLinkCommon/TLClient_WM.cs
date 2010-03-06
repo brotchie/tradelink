@@ -19,7 +19,7 @@ namespace TradeLink.Common
         public event FillDelegate gotFill;
         public event OrderDelegate gotOrder;
         public event DebugDelegate gotAccounts;
-        public event UIntDelegate gotOrderCancel;
+        public event LongDelegate gotOrderCancel;
         public event MessageTypesMsgDelegate gotFeatures;
         public event PositionDelegate gotPosition;
         public event ImbalanceDelegate gotImbalance;
@@ -363,9 +363,9 @@ namespace TradeLink.Common
                     break;
                 case MessageTypes.ORDERCANCELRESPONSE:
                     {
-                        uint id = 0;
+                        long id = 0;
                         if (gotOrderCancel != null)
-                            if (uint.TryParse(msg, out id))
+                            if (long.TryParse(msg, out id))
                                 gotOrderCancel(id);
                             else if (SendDebug!=null)
                                 SendDebug("Count not parse order cancel: " + msg);

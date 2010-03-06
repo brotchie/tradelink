@@ -20,14 +20,14 @@ namespace TradeLink.Common
         public void GotFill(Trade fill)
         {
         }
-        public void GotOrderCancel(uint cancelid)
+        public void GotOrderCancel(long cancelid)
         {
         }
         string _name = "";
         string _fn = "InvalidResponse";
         public int ID { get { return -1; } set { } }
         public void Reset() { }
-        public void GotMessage(MessageTypes t, uint source, uint dest, uint id, string data, ref string data2) { }
+        public void GotMessage(MessageTypes t, long source, long dest, long id, string data, ref string data2) { }
         public void GotPosition(Position p) { }
         public bool isValid { get { return false; } set { } }
         public string[] Indicators { get { return new string[0]; } set { } }
@@ -36,7 +36,7 @@ namespace TradeLink.Common
         public event BasketDelegate SendBasketEvent;
         public event DebugFullDelegate SendDebugEvent;
         public event OrderDelegate SendOrderEvent;
-        public event UIntDelegate SendCancelEvent;
+        public event LongDelegate SendCancelEvent;
         public event StringParamDelegate SendIndicatorsEvent;
         public event MessageDelegate SendMessageEvent;
         public event ChartLabelDelegate SendChartLabelEvent;

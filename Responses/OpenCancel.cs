@@ -79,7 +79,7 @@ namespace Responses
             }
         }
 
-        public override void GotOrderCancel(uint cancelid)
+        public override void GotOrderCancel(long cancelid)
         {
             // once our order has been canceled, we don't need to track it anymore
             if (cancelid == profitid)
@@ -87,10 +87,10 @@ namespace Responses
         }
 
         // working variable that holds pending profit order
-        uint profitid = 0;
+        long profitid = 0;
 
         // working variable that keeps track of next order id
-        uint nextid = OrderImpl.Unique;
+        long nextid = OrderImpl.Unique;
 
         // default profit target before user sets it
         decimal _profit = .3m;

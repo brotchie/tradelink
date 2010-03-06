@@ -87,7 +87,7 @@ namespace Responses
             sendorder(new MarketOrderFlat(pt[pairs.Bsym]));
             isValid= false;
         }
-        public override void GotOrderCancel(uint cancelid)
+        public override void GotOrderCancel(long cancelid)
         {
             senddebug("canceled: " + cancelid);
         }

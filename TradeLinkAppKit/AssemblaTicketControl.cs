@@ -20,13 +20,13 @@ namespace TradeLink.AppKit
 
         public void Update(string SPACE, string summary, string description) { Update(SPACE, summary, description, string.Empty, string.Empty); }
         public void Update(string SPACE, string summary, string description, string user, string pass) { Update(SPACE, summary, null, description, user, pass); }
-        public void Update(string SPACE, string summary,  string data, string description, string user, string pass)
+        public void Update(string SPACE, string summary,  string data, string description, string username, string password)
         {
-            _summ.Text = summary;
-            _space.Text = SPACE;
-            _desc.Text = description;
-            _user.Text = user;
-            _pass.Text = pass;
+            summ.Text = summary;
+            space.Text = SPACE;
+            desc.Text = description;
+            user.Text = username;
+            pass.Text = password;
             if (data != null)
             {
                 try
@@ -52,21 +52,21 @@ namespace TradeLink.AppKit
         const string SSFILE = "ScreenShot.jpg";
         private void _create_Click(object sender, EventArgs e)
         {
-            if (_summ.Text.Length == 0)
+            if (summ.Text.Length == 0)
             {
                 status("missing subject.");
                 return;
             }
-            int id = AssemblaTicket.Create(_space.Text, _user.Text, _pass.Text, _summ.Text,_desc.Text, AssemblaStatus.New, AssemblaPriority.Normal);
+            int id = AssemblaTicket.Create(space.Text, user.Text, pass.Text, summ.Text,desc.Text, AssemblaStatus.New, AssemblaPriority.Normal);
             if (id!=0)
             {
                 if (attach)
-                    if (!AssemblaDocument.Create(_space.Text, _user.Text, _pass.Text, path+SSFILE,id))
+                    if (!AssemblaDocument.Create(space.Text, user.Text, pass.Text, path+SSFILE,id))
                         status("screenshot failed.");
                 if (_attachdataasfile)
-                    if (!AssemblaDocument.Create(_space.Text, _user.Text, _pass.Text, path + DATAFILE, id))
+                    if (!AssemblaDocument.Create(space.Text, user.Text, pass.Text, path + DATAFILE, id))
                         status("data attach failed.");
-                System.Diagnostics.Process.Start(AssemblaTicket.GetTicketsUrl(_space.Text));
+                System.Diagnostics.Process.Start(AssemblaTicket.GetTicketsUrl(space.Text));
                 if (TicketSucceed != null)
                     TicketSucceed();
 
@@ -97,18 +97,18 @@ namespace TradeLink.AppKit
         {
             int neww = (int)(ClientRectangle.Width * delta);
             if (neww != 0)
-                _desc.Width = neww;
+                desc.Width = neww;
             int newh = (int)(ClientRectangle.Height - hdelta);
             if (newh != 0)
-                _desc.Height = newh - (int)(_summ.Height*1.5);
+                desc.Height = newh - (int)(summ.Height*1.5);
             Invalidate(true);
         }
 
         private void AssemblaTicketControl_Load(object sender, EventArgs e)
         {
-            if (_desc.Height!=0)
-                hdelta = (double)ClientRectangle.Height - _desc.Height;
-            delta = (double)_desc.Width / ClientRectangle.Width;
+            if (desc.Height!=0)
+                hdelta = (double)ClientRectangle.Height - desc.Height;
+            delta = (double)desc.Width / ClientRectangle.Width;
         }
         bool attach = false;
         private void _ss_Click(object sender, EventArgs e)

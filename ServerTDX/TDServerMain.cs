@@ -32,7 +32,7 @@ namespace TDServer
             tl.newFeatureRequest += new MessageArrayDelegate(tl_newFeatureRequest);
             tl.newSendOrderRequest += new OrderDelegate(tl_gotSrvFillRequest);
             tl.newAcctRequest += new StringDelegate(tl_gotSrvAcctRequest);
-            tl.newOrderCancelRequest += new UIntDelegate(tl_newOrderCancelRequest);
+            tl.newOrderCancelRequest += new LongDelegate(tl_newOrderCancelRequest);
             tl.newUnknownRequest += new UnknownMessageDelegate(tl_newUnknownRequest);
             tl.newRegisterStocks += new DebugDelegate(tl_newRegisterStocks);
             tl.newPosList += new PositionArrayDelegate(tl_newPosList);
@@ -186,7 +186,7 @@ namespace TDServer
         }
 
 
-        void tl_newOrderCancelRequest(uint number)
+        void tl_newOrderCancelRequest(long number)
         {
             string result ="error";
             long id;
@@ -224,7 +224,7 @@ namespace TDServer
             return (ok ? api.AccountID(0) : "");
          }
             bool ok { get { return api.LoggedIn; } }
-            Dictionary<uint, long> idmap = new Dictionary<uint, long>();
+            Dictionary<long, long> idmap = new Dictionary<long, long>();
         
         void tl_gotSrvFillRequest(Order o)
         {

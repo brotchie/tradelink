@@ -46,7 +46,7 @@ namespace TradeLink.Common
                 alist.Add(accts[i].ID); return alist.ToArray(); 
         } 
         }
-        uint _nextorderid = OrderImpl.Unique;
+        long _nextorderid = OrderImpl.Unique;
 
         public Order BestBid(string symbol,Account account) { return BestBidOrOffer(symbol,true,account); }
         public Order BestBid(string symbol) { return BestBidOrOffer(symbol,true); }
@@ -166,7 +166,12 @@ namespace TradeLink.Common
             // increment pending count
             _pendorders++; 
         }
-        public bool CancelOrder(uint orderid)
+        /// <summary>
+        /// cancel order from any account
+        /// </summary>
+        /// <param name="orderid"></param>
+        /// <returns></returns>
+        public bool CancelOrder(long orderid)
         {
             bool worked = false;
             Account[] accts = new Account[MasterOrders.Count];
@@ -175,7 +180,13 @@ namespace TradeLink.Common
                 worked |= CancelOrder(accts[i], orderid);
             return worked;
         }
-        public bool CancelOrder(Account a, uint orderid)
+        /// <summary>
+        /// cancel order for specific account only
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="orderid"></param>
+        /// <returns></returns>
+        public bool CancelOrder(Account a, long orderid)
         {
             List<Order> orderlist = new List<Order>();
             if (!MasterOrders.TryGetValue(a, out orderlist)) return false;

@@ -61,7 +61,7 @@ namespace SterServer
                 newSendOrderRequest += new OrderDelegate(tl_gotSrvFillRequest);
                 newPosList += new PositionArrayDelegate(tl_gotSrvPosList);
                 newRegisterStocks += new DebugDelegate(tl_RegisterStocks);
-                newOrderCancelRequest += new UIntDelegate(tl_OrderCancelRequest);
+                newOrderCancelRequest += new LongDelegate(tl_OrderCancelRequest);
                 newFeatureRequest += new MessageArrayDelegate(tl_newFeatureRequest);
                 newUnknownRequest += new UnknownMessageDelegate(tl_newUnknownRequest);
                 newImbalanceRequest += new VoidDelegate(tl_newImbalanceRequest);
@@ -169,11 +169,11 @@ namespace SterServer
         }
         const int MAXRECORD = 5000;
         RingBuffer<Order> _orderq = new RingBuffer<Order>(MAXRECORD);
-        RingBuffer<uint> _cancelq = new RingBuffer<uint>(MAXRECORD);
+        RingBuffer<long> _cancelq = new RingBuffer<long>(MAXRECORD);
         RingBuffer<bool> _symsq = new RingBuffer<bool>(5);
         RingBuffer<GenericMessage> _msgq = new RingBuffer<GenericMessage>(100);
         string symquotes = "";
-        Dictionary<uint, string> idacct = new Dictionary<uint, string>();
+        Dictionary<long, string> idacct = new Dictionary<long, string>();
 
 
         bool _runbg = false;
@@ -221,7 +221,7 @@ namespace SterServer
                     // cancels
                     if (!_cancelq.isEmpty)
                     {
-                        uint number = _cancelq.Read();
+                        long number = _cancelq.Read();
                         string acct = "";
                         if (idacct.TryGetValue(number, out acct))
                         {
@@ -303,7 +303,7 @@ namespace SterServer
         }
 
 
-        void tl_OrderCancelRequest(uint number)
+        void tl_OrderCancelRequest(long number)
         {
             _cancelq.Write(number);
         }
@@ -315,8 +315,8 @@ namespace SterServer
             Trade f = new TradeImpl();
             f.symbol = t.bstrSymbol;
             f.Account = t.bstrAccount;
-            uint id = 0;
-            if (uint.TryParse(t.bstrClOrderId, out id))
+            long id = 0;
+            if (long.TryParse(t.bstrClOrderId, out id))
                 f.id = id;
             f.xprice = (decimal)t.fExecPrice;
             f.xsize = t.nQuantity;
@@ -330,15 +330,15 @@ namespace SterServer
             newFill(f);
         }
 
-        List<uint> _onotified = new List<uint>(MAXRECORD);
+        List<long> _onotified = new List<long>(MAXRECORD);
 
         void stiEvents_OnSTIOrderUpdate(ref structSTIOrderUpdate structOrderUpdate)
         {
             Order o = new OrderImpl();
             o.symbol = structOrderUpdate.bstrSymbol;
-            uint id = 0;
-            if (!uint.TryParse(structOrderUpdate.bstrClOrderId, out id))
-                id = (uint)structOrderUpdate.nOrderRecordId;
+            long id = 0;
+            if (!long.TryParse(structOrderUpdate.bstrClOrderId, out id))
+                id = (long)structOrderUpdate.nOrderRecordId;
             // don't notify for same order more than once
             if (_onotified.Contains(id)) return;
             if (structOrderUpdate.bstrLogMessage.Contains("REJ"))

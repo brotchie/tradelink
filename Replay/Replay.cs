@@ -26,12 +26,12 @@ namespace Replay
         {
             InitializeComponent();
             tl.newSendOrderRequest += new OrderDelegate(tl_gotSrvFillRequest);
-            tl.newOrderCancelRequest += new UIntDelegate(tl_OrderCancelRequest);
+            tl.newOrderCancelRequest += new LongDelegate(tl_OrderCancelRequest);
             tl.newAcctRequest += new StringDelegate(tl_gotSrvAcctRequest);
             tl.newPosList += new PositionArrayDelegate(tl_gotSrvPosList);
             tl.newFeatureRequest+=new MessageArrayDelegate(GetFeatures);
             tl.newUnknownRequest += new UnknownMessageDelegate(tl_newUnknownRequest);
-            tl.DOMRequest += new IntDelegate(tl_DOMRequest);
+            tl.DOMRequest += new Int64Delegate(tl_DOMRequest);
             h.GotTick += new TickDelegate(h_GotTick);
             h.SimBroker.GotOrder += new OrderDelegate(SimBroker_GotOrder);
             h.SimBroker.GotFill += new FillDelegate(SimBroker_GotFill);
@@ -164,7 +164,7 @@ namespace Replay
             return string.Join(",", h.SimBroker.Accounts);
         }
 
-        void tl_OrderCancelRequest(uint number)
+        void tl_OrderCancelRequest(long number)
         {
             if (h == null) return;
             h.SimBroker.CancelOrder(number); // send cancel request to broker
@@ -255,7 +255,7 @@ namespace Replay
             trackBar1.Enabled = false;
         }
 
-        void SimBroker_GotOrderCancel(string sym, bool side,uint id)
+        void SimBroker_GotOrderCancel(string sym, bool side,long id)
         {
             // if we get an order cancel notify from the broker, pass along to our clients
             tl.newOrderCancel(id);
@@ -431,7 +431,7 @@ namespace Replay
             if (t.hasAsk)
             {
                 // if we already have a book for this side we can get rid of it
-                foreach (uint oid in hasHistBook(t.symbol, false))
+                foreach (long oid in hasHistBook(t.symbol, false))
                     h.SimBroker.CancelOrder(oid); 
                 OrderImpl o = new SellLimit(t.symbol, t.AskSize, t.ask);
                 o.date = t.date;
@@ -442,7 +442,7 @@ namespace Replay
             if (t.hasBid)
             {
                 // if we already have a book for this side we can get rid of it
-                foreach (uint oid in hasHistBook(t.symbol, true))
+                foreach (long oid in hasHistBook(t.symbol, true))
                     h.SimBroker.CancelOrder(oid);
                 OrderImpl o = new BuyLimit(t.symbol, t.BidSize, t.bid);
                 o.date = t.date;
@@ -453,11 +453,11 @@ namespace Replay
             
         }
 
-        uint[] hasHistBook(string sym, bool side)
+        long[] hasHistBook(string sym, bool side)
             // this function tests whether replay's special "historical" book
             // exits for a given market symbol and side
         {
-            List<uint> idxlist = new List<uint>();
+            List<long> idxlist = new List<long>();
             List<Order> olist = h.SimBroker.GetOrderList(HISTBOOK);
             for (int i = 0; i < olist.Count; i++)
                 if ((olist[i].symbol == sym) && (olist[i].side == side))

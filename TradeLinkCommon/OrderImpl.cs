@@ -74,7 +74,7 @@ namespace TradeLink.Common
             this.time = time;
             this.date = date;
         }
-        public OrderImpl(string sym, bool side, int size, decimal p, decimal s, string c, int time, int date, uint orderid)
+        public OrderImpl(string sym, bool side, int size, decimal p, decimal s, string c, int time, int date, long orderid)
         {
             this.symbol = sym;
             this.side = side;
@@ -219,7 +219,7 @@ namespace TradeLink.Common
             return o;
         }
 
-        public static uint Unique { get { return (uint)((decimal)DateTime.Now.TimeOfDay.TotalMilliseconds); } }
+        public static long Unique { get { return (long)((decimal)DateTime.Now.TimeOfDay.TotalMilliseconds); } }
     }
 
 

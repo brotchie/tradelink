@@ -33,7 +33,7 @@ namespace Responses
 
         }
 
-        public override void GotMessage(MessageTypes type, uint source, uint dest, uint msgid, string request, ref string response)
+        public override void GotMessage(MessageTypes type, long source, long dest, long msgid, string request, ref string response)
         {
             if (type== MessageTypes.BARRESPONSE)
                 D(response);

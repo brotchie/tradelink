@@ -4,11 +4,11 @@ namespace TradeLink.API
     public struct GenericMessage
     {
         public MessageTypes Type;
-        public uint Source;
-        public uint Dest;
+        public long Source;
+        public long Dest;
         public string Request;
         public string Response;
-        public uint ID;
+        public long ID;
         public GenericMessage(MessageTypes type, string request)
         {
             Type = type;
@@ -18,7 +18,7 @@ namespace TradeLink.API
             Response = string.Empty;
             ID = 0;
         }
-        public GenericMessage(MessageTypes type, uint source, uint dest, uint msgid, string request, string response)
+        public GenericMessage(MessageTypes type, long source, long dest, long msgid, string request, string response)
         {
             Type = type;
             Source = source;

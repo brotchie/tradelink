@@ -8,13 +8,13 @@ namespace TradeLink.Common
     {
         public string symbol = string.Empty;
         public string ex = string.Empty;
-        public uint id = 0;
+        public long id = 0;
         public int size = 0;
         public decimal pegdiff = 0;
         public string Account = string.Empty;
         public bool isValid { get { return (symbol != string.Empty) && (size != 0); } }
         public Peg2Midpoint() { }
-        public Peg2Midpoint(string Symbol, int Size, decimal Diff, string dest, uint ID)
+        public Peg2Midpoint(string Symbol, int Size, decimal Diff, string dest, long ID)
         {
             size = Size;
             ex = dest;

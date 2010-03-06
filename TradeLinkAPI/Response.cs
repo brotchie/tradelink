@@ -10,14 +10,14 @@ namespace TradeLink.API
         void GotTick(Tick tick);
         void GotOrder(Order order);
         void GotFill(Trade fill);
-        void GotOrderCancel(uint orderid);
+        void GotOrderCancel(long orderid);
         void GotPosition(Position pos);
-        void GotMessage(MessageTypes type, uint source, uint dest, uint msgid, string request,ref string response);
+        void GotMessage(MessageTypes type, long source, long dest, long msgid, string request,ref string response);
 
         // Response output
         event StringParamDelegate SendIndicatorsEvent;
         event OrderDelegate SendOrderEvent;
-        event UIntDelegate SendCancelEvent;
+        event LongDelegate SendCancelEvent;
         event DebugFullDelegate SendDebugEvent;
         event MessageDelegate SendMessageEvent;
         event BasketDelegate SendBasketEvent;

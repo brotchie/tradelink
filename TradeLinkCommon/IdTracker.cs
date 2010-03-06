@@ -9,17 +9,17 @@ namespace TradeLink.Common
     /// </summary>
     public class IdTracker
     {
-        const uint DEFAULTOWNER = 0;
-        const uint MAXOWNER = 512;
+        const long DEFAULTOWNER = 0;
+        const long MAXOWNER = 512;
         // calculate mask length
         // 512 is 2^9.   32bits - 9bits for top = 23bits
-        const int MASKLEN = 23;
+        const int MASKLEN = 55;
 
-        uint _first = 0;
-        uint _nextid = 0;
-        uint _owner = 0;
-        uint _maxid = uint.MaxValue;
-        public uint Count = 0;
+        long _first = 0;
+        long _nextid = 0;
+        long _owner = 0;
+        long _maxid = long.MaxValue;
+        public long Count = 0;
         /// <summary>
         /// creates an object to assign unique order ids
         /// </summary>
@@ -28,14 +28,14 @@ namespace TradeLink.Common
         /// creates an object to assign unique ids
         /// </summary>
         /// <param name="OwnerId"></param>
-        public IdTracker(uint OwnerId) : this(true,OwnerId, OrderImpl.Unique) { }
+        public IdTracker(long OwnerId) : this(true,OwnerId, OrderImpl.Unique) { }
 
         /// <summary>
         /// creates an object to assign unique order ids to one or more owners.
         /// </summary>
         /// <param name="OwnerId">A unique number identifying this owner</param>
         /// <param name="initialId">Owners first order id</param>
-        public IdTracker(bool virtualids,uint OwnerId, uint initialId)
+        public IdTracker(bool virtualids,long OwnerId, long initialId)
         {
             _owner = OwnerId;
             if (virtualids)
@@ -46,15 +46,15 @@ namespace TradeLink.Common
                 unchecked
                 {
                     // create a mask to strip off lower portion of id
-                    const uint lowermask = (MAXOWNER - 1) << MASKLEN;
+                    const long lowermask = (MAXOWNER - 1) << MASKLEN;
                     // get inverse to mask out top part
-                    const uint topmask = ~lowermask;
+                    const long topmask = ~lowermask;
                     // top mask is also the count
                     Count = (topmask + 1);
                     // get seed as lower part
-                    uint seed = initialId & topmask;
+                    long seed = initialId & topmask;
                     // get high bits of first id
-                    uint highbits = _owner << MASKLEN;
+                    long highbits = _owner << MASKLEN;
                     // calculate first id
                     _first = highbits + seed;
                     // calculate max value
@@ -71,11 +71,11 @@ namespace TradeLink.Common
         /// <summary>
         /// obtains a new id permanently
         /// </summary>
-        public uint AssignId { get { if (NextOverflows) throw new IdTrackerOverflow(); return _nextid++; } }
+        public long AssignId { get { if (NextOverflows) throw new IdTrackerOverflow(); return _nextid++; } }
         /// <summary>
         /// provides what next id will be without assigning it
         /// </summary>
-        public uint NextId { get { return _nextid; } }
+        public long NextId { get { return _nextid; } }
         /// <summary>
         /// return true if next id will overflow
         /// </summary>

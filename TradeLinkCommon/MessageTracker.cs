@@ -80,7 +80,7 @@ namespace TradeLink.Common
         /// </summary>
         public BarListTracker BLT { get { return _blt; } set { _blt = value; } }
 
-        public virtual bool GotMessage(MessageTypes type, uint source, uint dest, uint msgid, string request, ref string response)
+        public virtual bool GotMessage(MessageTypes type, long source, long dest, long msgid, string request, ref string response)
         {
             long lv = 0;
             switch (type)
@@ -204,7 +204,7 @@ namespace TradeLink.Common
             return false;
         }
 
-        public virtual bool SendMessage(MessageTypes type, uint source, uint dest, uint msgid, string request, string response)
+        public virtual bool SendMessage(MessageTypes type, long source, long dest, long msgid, string request, string response)
         {
             if (_tl == null)return false;
             if (!_tl.RequestFeatureList.Contains(type))

@@ -40,7 +40,7 @@ namespace ServerMB
             tl.newFeatureRequest += new MessageArrayDelegate(tl_newFeatureRequest);
             tl.newSendOrderRequest += new OrderDelegate(tl_newSendOrderRequest);
             tl.newRegisterStocks += new DebugDelegate(tl_newRegisterStocks);
-            tl.newOrderCancelRequest += new UIntDelegate(tl_newOrderCancelRequest);
+            tl.newOrderCancelRequest += new LongDelegate(tl_newOrderCancelRequest);
             tl.newAcctRequest += new StringDelegate(tl_newAcctRequest);
             tl.newPosList += new PositionArrayDelegate(tl_newPosList);
 
@@ -116,7 +116,7 @@ namespace ServerMB
 
         void m_OrderClient_OnRemove(MbtOpenOrder pOrd)
         {
-            uint num = Convert.ToUInt32(pOrd.OrderNumber);
+            long num = Convert.ToUInt32(pOrd.OrderNumber);
             tl.newOrderCancel((long)num);
         }
 
@@ -148,7 +148,7 @@ namespace ServerMB
             return string.Join(",", accts);
         }
 
-        void tl_newOrderCancelRequest(uint number)
+        void tl_newOrderCancelRequest(long number)
         {
             test();
             string res = null;

@@ -46,7 +46,7 @@ namespace TestTradeLink
             int size = 100;
             DateTime date = DateTime.Now;
             TradeImpl t = new TradeImpl(sym, price, size, date);
-            uint magicid = 555;
+            long magicid = 555;
             t.id = magicid;
             t.Exchange = "NYMEX";
             // serialize it for transmission

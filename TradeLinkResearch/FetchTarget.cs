@@ -36,8 +36,8 @@ namespace TradeLink.Research
         /// <returns></returns>
         public Basket Go()
         {
-            if (_file != "") return FILE();
-            return URL();
+            if (_file != "") return FetchFILE();
+            return FetchURL();
         }
         /// <summary>
         /// unused.
@@ -52,7 +52,7 @@ namespace TradeLink.Research
         /// gets a basket from a url
         /// </summary>
         /// <returns></returns>
-        public Basket URL()
+        public Basket FetchURL()
         {
             Basket mb = new BasketImpl();
             if (!Uri.IsWellFormedUriString(_url, UriKind.RelativeOrAbsolute)) return mb;
@@ -67,7 +67,7 @@ namespace TradeLink.Research
         /// gets a basket from a file
         /// </summary>
         /// <returns></returns>
-        public Basket FILE()
+        public Basket FetchFILE()
         {
             Basket mb = new BasketImpl();
             if ((_file == "") || (_file == null)) return mb;

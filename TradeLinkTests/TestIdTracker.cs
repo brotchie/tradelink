@@ -34,8 +34,8 @@ namespace TestTradeLink
             const int BOX2ID = 23;
             const int ATTEMPTS = 1000;
             // store ids
-            List<uint> b1 = new List<uint>(ATTEMPTS);
-            List<uint> b2 = new List<uint>(ATTEMPTS);
+            List<long> b1 = new List<long>(ATTEMPTS);
+            List<long> b2 = new List<long>(ATTEMPTS);
             // create a new tracker with virtual id represent my book
             it = new IdTracker(BOX1ID);
             // create a second tracker with unique id

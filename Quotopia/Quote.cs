@@ -59,7 +59,7 @@ namespace Quotopia
             }
             tl.gotFill += new FillDelegate(tl_gotFill);
             tl.gotOrder += new OrderDelegate(tl_gotOrder);
-            tl.gotOrderCancel += new UIntDelegate(tl_gotOrderCancel);
+            tl.gotOrderCancel += new LongDelegate(tl_gotOrderCancel);
             tl.gotPosition += new PositionDelegate(tl_gotPosition);
             tl.gotAccounts += new DebugDelegate(tl_gotAccounts);
             ordergrid.ContextMenuStrip = new ContextMenuStrip();
@@ -183,10 +183,10 @@ namespace Quotopia
             qg.Refresh();
         }
 
-        void tl_gotOrderCancel(uint number)
+        void tl_gotOrderCancel(long number)
         {
             if (ordergrid.InvokeRequired)
-                ordergrid.Invoke(new UIntDelegate(tl_gotOrderCancel), new object[] { number });
+                ordergrid.Invoke(new LongDelegate(tl_gotOrderCancel), new object[] { number });
             else
             {
                 int oidx = orderidx(number); // get row number of this order in the grid
@@ -199,7 +199,7 @@ namespace Quotopia
         {
             for (int i = 0; i < ordergrid.SelectedRows.Count; i++)
             {
-                uint oid = (uint)ordergrid["oid", ordergrid.SelectedRows[i].Index].Value;
+                long oid = (long)ordergrid["oid", ordergrid.SelectedRows[i].Index].Value;
                 tl.CancelOrder((long)oid);
                 debug("Sending cancel for " + oid.ToString());
             }
@@ -211,10 +211,10 @@ namespace Quotopia
                 ordergrid.Rows.Add(new object[] { o.id, o.symbol, (o.side ? "BUY" : "SELL"), o.UnsignedSize, (o.price == 0 ? "Market" : o.price.ToString(_dispdecpointformat)), (o.stopp == 0 ? "" : o.stopp.ToString(_dispdecpointformat)), o.Account });
         }
 
-        int orderidx(uint orderid)
+        int orderidx(long orderid)
         {
             for (int i = 0; i < ordergrid.Rows.Count; i++) // see if's an existing existing order
-                if ((uint)ordergrid["oid", i].Value == orderid)
+                if ((long)ordergrid["oid", i].Value == orderid)
                     return i;
             return -1;
         }

@@ -82,7 +82,7 @@ namespace TradeLink.AppKit
         void assemblaTicketControl1_TicketSucceed()
         {
             if (LoginSucceeded!=null)
-                LoginSucceeded(assemblaTicketControl1._user.Text, assemblaTicketControl1._pass.Text);
+                LoginSucceeded(assemblaTicketControl1.user.Text, assemblaTicketControl1.pass.Text);
             Close();
         }
 

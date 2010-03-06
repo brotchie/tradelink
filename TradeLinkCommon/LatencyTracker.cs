@@ -4,7 +4,7 @@ using TradeLink.API;
 namespace TradeLink.Common
 {
 
-    public delegate void LatencyDelegate(MessageTypes type, uint id, double timems);
+    public delegate void LatencyDelegate(MessageTypes type, long id, double timems);
     /// <summary>
     /// used to track latency between:
     /// orders->order acks
@@ -14,9 +14,9 @@ namespace TradeLink.Common
     public class LatencyTracker
     {
         IdTracker _idt;
-        System.Collections.Generic.Dictionary<uint, long> _otime = new System.Collections.Generic.Dictionary<uint, long>(100);
-        System.Collections.Generic.Dictionary<uint, long> _ctime = new System.Collections.Generic.Dictionary<uint, long>(100);
-        System.Collections.Generic.Dictionary<uint, string> _id2sym = new System.Collections.Generic.Dictionary<uint, string>();
+        System.Collections.Generic.Dictionary<long, long> _otime = new System.Collections.Generic.Dictionary<long, long>(100);
+        System.Collections.Generic.Dictionary<long, long> _ctime = new System.Collections.Generic.Dictionary<long, long>(100);
+        System.Collections.Generic.Dictionary<long, string> _id2sym = new System.Collections.Generic.Dictionary<long, string>();
 
         public void sendorder(Order o)
         {
@@ -43,8 +43,8 @@ namespace TradeLink.Common
             if (SendOrderEvent != null)
                 SendOrderEvent(o);
         }
-        public event UIntDelegate SendCancelEvent;
-        public void sendcancel(uint id)
+        public event LongDelegate SendCancelEvent;
+        public void sendcancel(long id)
         {
             long time = gettime();
             // store start for cancel
@@ -65,6 +65,10 @@ namespace TradeLink.Common
         public event LatencyDelegate SendLatency;
         public event OrderDelegate SendOrderEvent;
 
+        /// <summary>
+        /// pass fills through here
+        /// </summary>
+        /// <param name="t"></param>
         public void GotFill(Trade t)
         {
             if (SendLatency == null) return;
@@ -74,7 +78,10 @@ namespace TradeLink.Common
             double lat = new System.DateTime(gettime()).Subtract(new System.DateTime(start)).TotalMilliseconds;
             report(MessageTypes.EXECUTENOTIFY, t.id, lat);
         }
-
+        /// <summary>
+        /// pass orders through here
+        /// </summary>
+        /// <param name="o"></param>
         public void GotOrder(Order o)
         {
             if (SendLatency == null) return;
@@ -85,9 +92,16 @@ namespace TradeLink.Common
             report(MessageTypes.ORDERNOTIFY, o.id, lat);
         }
 
-        public void GotCancel(int id) { GotCancel((uint)id); }
-        public void GotCancel(long id) { GotCancel((uint)id); }
-        public void GotCancel(uint id)
+        /// <summary>
+        /// pass cancels through here
+        /// </summary>
+        /// <param name="id"></param>
+        public void GotCancel(int id) { GotCancel((long)id); }
+        /// <summary>
+        /// pass cancels through here
+        /// </summary>
+        /// <param name="id"></param>
+        public void GotCancel(long id)
         {
             
             // see if we know this message
@@ -98,7 +112,7 @@ namespace TradeLink.Common
 
         }
 
-        void report(MessageTypes type, uint id, double last)
+        void report(MessageTypes type, long id, double last)
         {
             if (SendLatency == null) return;
             SendLatency(type, id, last);

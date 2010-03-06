@@ -9,7 +9,7 @@ namespace TradeLink.Common
     [Serializable]
     public class TradeImpl : Trade
     {
-        uint _id = 0;
+        long _id = 0;
         CurrencyType cur = CurrencyType.USD;
         SecurityType type = SecurityType.STK;
         string _localsymbol = "";
@@ -24,7 +24,7 @@ namespace TradeLink.Common
         string _ex = "NYSE";
         public int UnsignedSize { get { return Math.Abs(_xsize); } }
         public string ex { get { return _ex; } set { _ex = value; } }
-        public uint id { get { return _id; } set { _id = value; } }
+        public long id { get { return _id; } set { _id = value; } }
         public string LocalSymbol { get { return _localsymbol; } set { _localsymbol = value; } }
         public CurrencyType Currency { get { return cur; } set { cur = value; } }
         public SecurityType Security { get { return type; } set { type = value; } }

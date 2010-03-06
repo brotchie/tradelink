@@ -74,14 +74,14 @@ namespace TradeLink.AppKit
         {
             chartControl1.newTick(k);
             if (Visible)
-                chartControl1.refresh();
+                chartControl1.redraw();
         }
 
         public void newPoint(decimal p, int time, int date, int size)
         {
             chartControl1.newPoint(p, time, date, size);
             if (Visible)
-                chartControl1.refresh();
+                chartControl1.redraw();
 
         }
 

@@ -548,7 +548,7 @@ namespace Kadina
             {
                 resname = name;
                 myres.SendDebugEvent += new DebugFullDelegate(myres_GotDebug);
-                myres.SendCancelEvent += new UIntDelegate(myres_CancelOrderSource);
+                myres.SendCancelEvent += new LongDelegate(myres_CancelOrderSource);
                 myres.SendOrderEvent += new OrderDelegate(myres_SendOrder);
                 myres.SendIndicatorsEvent += new StringParamDelegate(myres_SendIndicators);
                 myres.SendMessageEvent += new MessageDelegate(myres_SendMessage);
@@ -578,7 +578,7 @@ namespace Kadina
             c.DrawChartLabel(price, bar, label,col);
         }
         bool _sendmesswarn = false;
-        void myres_SendMessage(MessageTypes type, uint source, uint dest, uint id, string data, ref string response)
+        void myres_SendMessage(MessageTypes type, long source, long dest, long id, string data, ref string response)
         {
             if (_sendmesswarn) return;
             _sendmesswarn = true;
@@ -610,13 +610,13 @@ namespace Kadina
             h.SimBroker.SendOrderStatus(o);
         }
 
-        void broker_GotOrderCancel(string sym, bool side, uint id)
+        void broker_GotOrderCancel(string sym, bool side, long id)
         {
             if (myres != null)
                 myres.GotOrderCancel(id);
         }
 
-        void myres_CancelOrderSource(uint number)
+        void myres_CancelOrderSource(long number)
         {
             h.SimBroker.CancelOrder(number);
         }
@@ -752,7 +752,7 @@ namespace Kadina
             SafeBindingSource.refreshgrid(ig, ibs);
             SafeBindingSource.refreshgrid(og, obs);
             SafeBindingSource.refreshgrid(fg, fbs);
-            c.refresh();
+            c.redraw();
             _tr.Clear();
             _tr.NewResultTrades(resname +"."+PrettyEPF(), _tradelist);
             _tr.Refresh();

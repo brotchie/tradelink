@@ -30,19 +30,19 @@ namespace TradeLink.Common
         public string[] IgnoreSyms { get { return _ignore; } set { _ignore = value; } }
         bool _hasevents = false;
         public event OrderDelegate SendOrder;
-        public event UIntDelegate SendCancel;
+        public event LongDelegate SendCancel;
         PositionTracker _pt = new PositionTracker();
         /// <summary>
         /// a position tracker you can reuse 
         /// </summary>
         public PositionTracker PositionTracker { get { return _pt; } set { _pt = value; } }
         public OffsetTracker() { }
-        public IdTracker _ids = new IdTracker();
+        IdTracker _ids = new IdTracker();
         /// <summary>
         /// id tracker used by offsettracker, you can reuse in other apps you use OT.
         /// </summary>
         public IdTracker Ids { get { return _ids; } set { _ids = value; } }
-        public OffsetTracker(uint initialid) : this(new IdTracker(initialid)) { }
+        public OffsetTracker(long initialid) : this(new IdTracker(initialid)) { }
         public OffsetTracker(IdTracker tracker)
         {
             _ids = tracker;
@@ -145,7 +145,7 @@ namespace TradeLink.Common
         bool hascustom(string symbol) { OffsetInfo oi; return _offvals.TryGetValue(symbol, out oi); }
 
         void cancel(OffsetInfo offset) { cancel(offset.ProfitId); cancel(offset.StopId); }
-        void cancel(uint id) { if (id != 0) SendCancel(id); }
+        void cancel(long id) { if (id != 0) SendCancel(id); }
         /// <summary>
         /// cancels all offsets (profit+stops) for given side
         /// </summary>
@@ -274,7 +274,7 @@ namespace TradeLink.Common
             return false; 
         }
 
-        uint ProfitId(string sym)
+        long ProfitId(string sym)
         {
             OffsetInfo val;
             // if we have an offset, return the id
@@ -284,7 +284,7 @@ namespace TradeLink.Common
             return 0;
         }
 
-        uint StopId(string sym)
+        long StopId(string sym)
         {
             OffsetInfo val;
             // if we have offset, return it's id
@@ -364,7 +364,7 @@ namespace TradeLink.Common
         /// should be called from GotCancel, when cancels arrive from broker.
         /// </summary>
         /// <param name="id"></param>
-        public void GotCancel(uint id)
+        public void GotCancel(long id)
         {
             // find any matching orders and reflect them as canceled
             foreach (string sym in _offvals.Keys)
@@ -400,8 +400,8 @@ namespace TradeLink.Common
         }
 
         // track offset ids
-        Dictionary<string, uint> _profitids = new Dictionary<string, uint>();
-        Dictionary<string, uint> _stopids = new Dictionary<string, uint>();
+        Dictionary<string, long> _profitids = new Dictionary<string, long>();
+        Dictionary<string, long> _stopids = new Dictionary<string, long>();
         // per-symbol offset values
         Dictionary<string, OffsetInfo> _offvals = new Dictionary<string, OffsetInfo>();
         

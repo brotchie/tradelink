@@ -31,7 +31,7 @@ namespace ServerDBFX
             // tl events
             newProviderName = Providers.DBFX;
             newFeatureRequest += new MessageArrayDelegate(ServerDBFX_newFeatureRequest);
-            newOrderCancelRequest += new UIntDelegate(ServerDBFX_newOrderCancelRequest);
+            newOrderCancelRequest += new LongDelegate(ServerDBFX_newOrderCancelRequest);
             newSendOrderRequest += new OrderDelegate(ServerDBFX_newSendOrderRequest);
         }
 
@@ -65,11 +65,11 @@ namespace ServerDBFX
         }
 
         string[] _acct = new string[0];
-        Dictionary<uint, string> _tl2dbfx = new Dictionary<uint, string>();
+        Dictionary<long, string> _tl2dbfx = new Dictionary<long, string>();
 
         bool isunique(Order o)
         {
-            foreach (uint id in _tl2dbfx.Keys)
+            foreach (long id in _tl2dbfx.Keys)
                 if (o.id == id) return false;
             return true;
         }
@@ -92,7 +92,7 @@ namespace ServerDBFX
         void D(string msg) { if (SendDebug != null) SendDebug(DebugImpl.Create(msg)); }
 
 
-        void ServerDBFX_newOrderCancelRequest(uint number)
+        void ServerDBFX_newOrderCancelRequest(long number)
         {
             string dbfxid = string.Empty;
             if (!_tl2dbfx.TryGetValue(number, out dbfxid)) return;

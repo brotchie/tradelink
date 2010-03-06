@@ -12,7 +12,7 @@ namespace TestTradeLink
     {
         public TestOffsetTracker() 
         {
-            ot.SendCancel += new UIntDelegate(ot_SendCancel);
+            ot.SendCancel += new LongDelegate(ot_SendCancel);
             ot.SendOrder += new OrderDelegate(ot_SendOffset);
             ot.SendDebug += new DebugDelegate(ot_SendDebug);
         }
@@ -184,7 +184,7 @@ namespace TestTradeLink
                 stops.Add(o);
         }
 
-        void ot_SendCancel(uint number)
+        void ot_SendCancel(long number)
         {
             
             for (int i = profits.Count - 1; i >= 0; i--)

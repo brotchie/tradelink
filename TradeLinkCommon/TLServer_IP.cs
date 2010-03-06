@@ -160,7 +160,7 @@ namespace TradeLink.Common
         }
 
         List<Listener> _listeners = new List<Listener>();
-        List<List<uint>> _listroute = new List<List<uint>>();
+        List<List<long>> _listroute = new List<List<long>>();
         void RegisterListener(Listener lis)
         {
             

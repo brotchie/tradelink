@@ -16,7 +16,7 @@ namespace TradeLink.Common
         {
             _r = r;
             _r.SendOrderEvent += new OrderDelegate(_r_SendOrder);
-            _r.SendCancelEvent += new UIntDelegate(_r_SendCancel);
+            _r.SendCancelEvent += new LongDelegate(_r_SendCancel);
             _tff = tff;
             _h = new HistSim(_tff);
             _h.GotTick += new TickDelegate(_h_GotTick);
@@ -28,7 +28,7 @@ namespace TradeLink.Common
 
         public void Go() { _h.PlayTo(HistSim.ENDSIM); }
 
-        void SimBroker_GotOrderCancel(string sym, bool side, uint id)
+        void SimBroker_GotOrderCancel(string sym, bool side, long id)
         {
             _r.GotOrderCancel(id);
         }
@@ -43,7 +43,7 @@ namespace TradeLink.Common
             _h.SimBroker.SendOrderStatus(o);
         }
 
-        void _r_SendCancel(uint number)
+        void _r_SendCancel(long number)
         {
             _h.SimBroker.CancelOrder(number);
         }

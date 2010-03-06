@@ -26,10 +26,10 @@ namespace TradeLink.Common
         private bool DAYEND = false;
         public int time { get { return _time; } }
         public bool DayEnd { get { return DAYEND; } }
-        public ulong lHigh { get { return h; } }
-        public ulong lLow { get { return l; } }
-        public ulong lOpen { get { return o; } }
-        public ulong lClose { get { return c; } }
+        ulong lHigh { get { return h; } }
+        ulong lLow { get { return l; } }
+        ulong lOpen { get { return o; } }
+        ulong lClose { get { return c; } }
         public decimal High { get { return h*Const.IPRECV; } }
         public decimal Low { get { return l * Const.IPRECV; } }
         public decimal Open { get { return o * Const.IPRECV; } }

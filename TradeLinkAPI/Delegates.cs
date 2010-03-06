@@ -10,8 +10,7 @@ namespace TradeLink.API
     public delegate void TickDelegate(Tick t);
     public delegate void FillDelegate(Trade t);
     public delegate void OrderDelegate(Order o);
-    public delegate void IntDelegate(Int64 number);
-    public delegate void UIntDelegate(UInt32 number);
+    public delegate void Int64Delegate(Int64 number);
     public delegate void SecurityDelegate(Security sec);
     public delegate void StringDecimalDelegate(string txt, decimal val);
     public delegate void DecimalDelgate(decimal val);
@@ -24,14 +23,14 @@ namespace TradeLink.API
     public delegate int IntStringDelegate(string s);
     public delegate string StringDelegate();
     public delegate Position[] PositionArrayDelegate(string account);
-    public delegate void OrderCancelDelegate(string sym, bool side, uint id);
+    public delegate void OrderCancelDelegate(string sym, bool side, long id);
     public delegate MessageTypes[] MessageArrayDelegate();
     public delegate void MessageArrayDel(MessageTypes[] messages);
     public delegate long UnknownMessageDelegate(MessageTypes t, string msg);
     public delegate void SymBarIntervalDelegate(string symbol, int interval);
     public delegate void ImbalanceDelegate(Imbalance imb);
     public delegate void VoidDelegate();
-    public delegate void MessageDelegate(MessageTypes type, uint source, uint dest, uint msgid, string request,ref string response);
+    public delegate void MessageDelegate(MessageTypes type, long source, long dest, long msgid, string request,ref string response);
     public delegate void MessageFullDelegate(GenericMessage m);
     public delegate void BasketDelegate(Basket b, int id);
     public delegate void BarListDelegate(BarList b);

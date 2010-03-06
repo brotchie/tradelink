@@ -20,7 +20,7 @@ namespace Responses
                 D("feature: " + mt.ToString());
         }
         MessageTracker _mt = new MessageTracker();
-        public override void GotMessage(MessageTypes type, uint source, uint dest, uint msgid, string request, ref string response)
+        public override void GotMessage(MessageTypes type, long source, long dest, long msgid, string request, ref string response)
         {
             _mt.GotMessage(type, source, dest, msgid, request, ref response);
         }

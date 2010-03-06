@@ -4,7 +4,7 @@ namespace TradeLink.API
 {
     public interface Trade
     {
-        uint id { get; set; }
+        long id { get; set; }
         string symbol { get; set; }
         int xsize { get; set; }
         decimal xprice { get; set; }

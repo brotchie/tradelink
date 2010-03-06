@@ -8,7 +8,7 @@ namespace TradeLink.Common
     {
         public StopOrder(string sym, bool side, int size, decimal stop, string comment) : base(sym, side, size, 0, stop, comment, 0, 0) { }
         public StopOrder(string sym, bool side, int size, decimal stop) : base(sym, side, size, 0, stop, "", 0, 0) { }
-        public StopOrder(string sym, bool side, int size, decimal stop,uint orderid) : base(sym, side, size, 0, stop, "", 0, 0,orderid) { }
+        public StopOrder(string sym, bool side, int size, decimal stop,long orderid) : base(sym, side, size, 0, stop, "", 0, 0,orderid) { }
     }
     /// <summary>
     /// Create a buystop order.
@@ -17,7 +17,7 @@ namespace TradeLink.Common
     {
         public BuyStop(string sym, int size, decimal stop, string comment) : base(sym, true, size, 0, stop, comment, 0, 0) { }
         public BuyStop(string sym, int size, decimal stop) : base(sym, true, size, 0, stop, "", 0, 0) { }
-        public BuyStop(string sym, int size, decimal stop,uint orderid) : base(sym, true, size, 0, stop, "", 0, 0,orderid) { }
+        public BuyStop(string sym, int size, decimal stop,long orderid) : base(sym, true, size, 0, stop, "", 0, 0,orderid) { }
 
     }
     /// <summary>
@@ -27,7 +27,7 @@ namespace TradeLink.Common
     {
         public SellStop(string sym, int size, decimal stop, string comment) : base(sym, false, size, 0, stop, comment, 0, 0) { }
         public SellStop(string sym, int size, decimal stop) : base(sym, false, size, 0, stop, "", 0, 0) { }
-        public SellStop(string sym, int size, decimal stop,uint orderid) : base(sym, false, size, 0, stop, "", 0, 0,orderid) { }
+        public SellStop(string sym, int size, decimal stop,long orderid) : base(sym, false, size, 0, stop, "", 0, 0,orderid) { }
 
     }
 

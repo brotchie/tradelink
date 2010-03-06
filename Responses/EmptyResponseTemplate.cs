@@ -23,10 +23,10 @@ namespace Responses
         public void GotFill(Trade fill)
         {
         }
-        public void GotOrderCancel(uint cancelid)
+        public void GotOrderCancel(long cancelid)
         {
         }
-        public void GotMessage(MessageTypes type, uint source, uint dest, uint id, string request, ref string response) { }
+        public void GotMessage(MessageTypes type, long source, long dest, long id, string request, ref string response) { }
         public void Reset() { }
         public void GotPosition(Position p) { }
         public bool isValid { get { return true; } set { } }
@@ -35,7 +35,7 @@ namespace Responses
         public string FullName { get { return ""; } set { } }
         public event DebugFullDelegate SendDebugEvent;
         public event OrderDelegate SendOrderEvent;
-        public event UIntDelegate SendCancelEvent;
+        public event LongDelegate SendCancelEvent;
         public event StringParamDelegate SendIndicatorsEvent;
         public event MessageDelegate SendMessageEvent;
         public event BasketDelegate SendBasketEvent;

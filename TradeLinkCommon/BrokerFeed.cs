@@ -53,7 +53,7 @@ namespace TradeLink.Common
         RingBuffer<Tick> _kbuf = new RingBuffer<Tick>(10000);
         RingBuffer<Order> _obuff = new RingBuffer<Order>(1000);
         RingBuffer<Trade> _fbuff = new RingBuffer<Trade>(100);
-        RingBuffer<uint> _cbuff = new RingBuffer<uint>(1000);
+        RingBuffer<long> _cbuff = new RingBuffer<long>(1000);
         RingBuffer<Position> _pbuff = new RingBuffer<Position>(100);
         RingBuffer<string> _abuff = new RingBuffer<string>(10);
         RingBuffer<GenericMessage> _mbuff = new RingBuffer<GenericMessage>(500);
@@ -80,7 +80,7 @@ namespace TradeLink.Common
 
                 while (_cbuff.hasItems)
                 {
-                    uint c = _cbuff.Read();
+                    long c = _cbuff.Read();
                     if (gotOrderCancel != null)
                         gotOrderCancel(c);
                 }
@@ -299,7 +299,7 @@ namespace TradeLink.Common
                     execute.gotAccounts += new DebugDelegate(execute_gotAccounts);
                     execute.gotFill += new FillDelegate(execute_gotFill);
                     execute.gotOrder += new OrderDelegate(execute_gotOrder);
-                    execute.gotOrderCancel += new UIntDelegate(execute_gotOrderCancel);
+                    execute.gotOrderCancel += new LongDelegate(execute_gotOrderCancel);
                     execute.gotPosition += new PositionDelegate(execute_gotPosition);
                     execute.gotUnknownMessage += new MessageDelegate(execute_gotUnknownMessage);
 
@@ -309,7 +309,7 @@ namespace TradeLink.Common
                     execute.gotAccounts += new DebugDelegate(execute_gotAccounts2);
                     execute.gotFill += new FillDelegate(execute_gotFill2);
                     execute.gotOrder += new OrderDelegate(execute_gotOrder2);
-                    execute.gotOrderCancel += new UIntDelegate(execute_gotOrderCancel2);
+                    execute.gotOrderCancel += new LongDelegate(execute_gotOrderCancel2);
                     execute.gotPosition += new PositionDelegate(execute_gotPosition2);
                     execute.gotUnknownMessage += new MessageDelegate(execute_gotUnknownMessage2);
                 }
@@ -321,7 +321,7 @@ namespace TradeLink.Common
             tl = null;
         }
 
-        void quote_gotUnknownMessage2(MessageTypes type, uint source, uint dest, uint msgid, string request, ref string response)
+        void quote_gotUnknownMessage2(MessageTypes type, long source, long dest, long msgid, string request, ref string response)
         {
             if (gotUnknownMessage != null)
                 gotUnknownMessage(type, source, dest, msgid, request, ref response);
@@ -333,7 +333,7 @@ namespace TradeLink.Common
                 gotTick(t);
         }
 
-        void execute_gotUnknownMessage2(MessageTypes type, uint source, uint dest, uint msgid, string request, ref string response)
+        void execute_gotUnknownMessage2(MessageTypes type, long source, long dest, long msgid, string request, ref string response)
         {
             if (gotUnknownMessage != null)
                 gotUnknownMessage(type, source, dest, msgid, request, ref response);
@@ -345,7 +345,7 @@ namespace TradeLink.Common
                 gotPosition(pos);
         }
 
-        void execute_gotOrderCancel2(uint number)
+        void execute_gotOrderCancel2(long number)
         {
             if (gotOrderCancel != null)
                 gotOrderCancel(number);
@@ -391,12 +391,12 @@ namespace TradeLink.Common
                 execute.RequestFeatures();
         }
 
-        void quote_gotUnknownMessage(MessageTypes type, uint source, uint dest, uint msgid, string request, ref string response)
+        void quote_gotUnknownMessage(MessageTypes type, long source, long dest, long msgid, string request, ref string response)
         {
             _mqbuff.Write(new GenericMessage(type, source, dest, msgid, request, response));
         }
 
-        void execute_gotUnknownMessage(MessageTypes type, uint source, uint dest, uint msgid, string request, ref string response)
+        void execute_gotUnknownMessage(MessageTypes type, long source, long dest, long msgid, string request, ref string response)
         {
             _mbuff.Write(new GenericMessage(type, source, dest, msgid, request, response));
 
@@ -407,7 +407,7 @@ namespace TradeLink.Common
             _pbuff.Write(pos);
         }
 
-        void execute_gotOrderCancel(uint number)
+        void execute_gotOrderCancel(long number)
         {
             _cbuff.Write(number);
             _reader.Interrupt();
@@ -521,7 +521,7 @@ namespace TradeLink.Common
         public event FillDelegate gotFill;
         public event OrderDelegate gotOrder;
         public event DebugDelegate gotAccounts;
-        public event UIntDelegate gotOrderCancel;
+        public event LongDelegate gotOrderCancel;
         public event MessageTypesMsgDelegate gotFeatures;
         public event PositionDelegate gotPosition;
         public event ImbalanceDelegate gotImbalance;

@@ -156,7 +156,7 @@ namespace WinGauntlet
             e.Result = ga;
         }
 
-        void SimBroker_GotOrderCancel(string sym, bool side, uint id)
+        void SimBroker_GotOrderCancel(string sym, bool side, long id)
         {
             args.Response.GotOrderCancel(id);
         }
@@ -216,7 +216,7 @@ namespace WinGauntlet
         }
 
         int count = 0;
-        uint lastp = 0;
+        long lastp = 0;
         void h_GotTick(Tick t)
         {
             if (args.Response == null) return;
@@ -228,7 +228,7 @@ namespace WinGauntlet
             }
             catch (Exception ex) { debug("response threw exception: " + ex.Message); }
             if (args.isUnattended) return;
-            uint percent = (uint)((double)count*100 / h.TicksPresent);
+            long percent = (long)((double)count*100 / h.TicksPresent);
             if ((percent!=lastp) && (percent % 5 == 0))
             {
                 updatepercent(percent);
@@ -237,10 +237,10 @@ namespace WinGauntlet
 
         }
 
-        void updatepercent(uint per)
+        void updatepercent(long per)
         {
             if (InvokeRequired)
-                Invoke(new UIntDelegate(updatepercent), new object[] { per });
+                Invoke(new LongDelegate(updatepercent), new object[] { per });
             else
             {
                 try
@@ -393,7 +393,7 @@ namespace WinGauntlet
             args.Response.SendMessageEvent += new MessageDelegate(Response_SendMessage);
             args.Response.SendIndicatorsEvent += new StringParamDelegate(Response_SendIndicators);
             args.Response.SendDebugEvent += new DebugFullDelegate(Response_GotDebug);
-            args.Response.SendCancelEvent += new UIntDelegate(Response_CancelOrderSource);
+            args.Response.SendCancelEvent += new LongDelegate(Response_CancelOrderSource);
             args.Response.SendOrderEvent += new OrderDelegate(Response_SendOrder);
             args.Response.SendBasketEvent += new BasketDelegate(Response_SendBasket);
             args.Response.SendChartLabelEvent += new ChartLabelDelegate(Response_SendChartLabel);
@@ -415,7 +415,7 @@ namespace WinGauntlet
             
         }
         int _depth = 0;
-        void Response_SendMessage(MessageTypes type, uint source, uint dest, uint id, string data, ref string response)
+        void Response_SendMessage(MessageTypes type, long source, long dest, long id, string data, ref string response)
         {
             switch (type)
             {
@@ -450,13 +450,13 @@ namespace WinGauntlet
                 h.SimBroker.SendOrderStatus(o);
         }
 
-        void mybroker_GotOrderCancel(string sym, bool side, uint id)
+        void mybroker_GotOrderCancel(string sym, bool side, long id)
         {
             if (args.Response != null)
                 args.Response.GotOrderCancel(id);
         }
 
-        void Response_CancelOrderSource(uint number)
+        void Response_CancelOrderSource(long number)
         {
             if (h!=null)
                 h.SimBroker.CancelOrder(number);
