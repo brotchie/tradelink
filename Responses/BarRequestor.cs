@@ -9,7 +9,7 @@ namespace Responses
     /// <summary>
     /// demonstrates response that uses historical bar data
     /// </summary>
-    public class BarRequest : ResponseTemplate
+    public class BarRequestor : ResponseTemplate
     {
         MessageTracker _mt = new MessageTracker();
         BarListTracker _blt = new BarListTracker();
