@@ -27,6 +27,7 @@ static void __stdcall SerializeDeserialize()
 	const CString sym = "CLZ8";
 	const CString ex = "NYMEX";
 	TLOrder o;
+	o.id = 2;
 	o.symbol = sym;
 	o.exchange = ex;
 	o.date = 20081201;
@@ -46,6 +47,8 @@ static void __stdcall SerializeDeserialize()
 	CFIX_ASSERT(o.exchange==d.exchange);
 	CFIX_ASSERT(o.date==d.date);
 	CFIX_ASSERT(o.time==d.time);
+	CFIX_ASSERT(o.id==d.id);
+
 }
 
 CFIX_BEGIN_FIXTURE( TestTLOrder)

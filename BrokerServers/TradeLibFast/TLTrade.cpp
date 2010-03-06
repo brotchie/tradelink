@@ -10,6 +10,7 @@ namespace TradeLibFast
 		xtime = 0;
 		xdate = 0;
 		xprice = 0;
+		id = 0;
 	}
 
 	TLTrade::~TLTrade(void)
@@ -30,7 +31,7 @@ namespace TradeLibFast
 		CString m;
 		CString sde = this->side ? _T("True") : _T("False");
 		// date,time,sec,symbol,side,size,price,comment,acc,sect,currency,localsymbol,exchange
-		m.Format(_T("%i,%i,,%s,%s,%i,%f,%s,%s,%s,%s,%s,%u,%s"),xdate,xtime,symbol,sde,xsize,xprice,comment,account,security,currency,localsymbol,id,exchange);
+		m.Format(_T("%i,%i,,%s,%s,%i,%f,%s,%s,%s,%s,%s,%lld,%s"),xdate,xtime,symbol,sde,xsize,xprice,comment,account,security,currency,localsymbol,id,exchange);
 		return m;
 	}
 
@@ -50,7 +51,7 @@ namespace TradeLibFast
 		t.localsymbol = r[tLocalSymbol];
 		t.security = r[tSecurity];
 		t.currency = r[tCurrency];
-		t.id = _tstoi(r[tID]);
+		t.id = _tstol(r[tID]);
 		t.exchange = r[tExch];
 		return t;
 	}

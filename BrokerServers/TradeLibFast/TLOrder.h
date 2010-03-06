@@ -7,7 +7,7 @@ namespace TradeLibFast
 	public:
 		TLOrder(void);
 		~TLOrder(void);
-		unsigned int id;
+		long long id;
 		int size;
 		double price;
 		double stop;

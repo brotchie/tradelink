@@ -21,6 +21,7 @@ namespace TradeLibFast
 		account = "";
 		exchange = "NYSE";
 		localsymbol = "";
+		id = 0;
 	}
 
 	bool TLOrder::isValid()
@@ -33,7 +34,7 @@ namespace TradeLibFast
 		CString sde = (this->side) ? CString("True") : CString("False");
 		CString m;
 		// sym,side,size,price,stop,user,exch,acct,sect,curr,lsym,id,TIF,date,time,sec,trail
-		m.Format(_T("%s,%s,%i,%f,%f,%s,%s,%s,%s,%s,%s,%u,%s,%i,%i,,%f"),symbol,sde,size,price,stop,comment,exchange,account,security,currency,localsymbol,id,TIF,date,time,trail);
+		m.Format(_T("%s,%s,%i,%f,%f,%s,%s,%s,%s,%s,%s,%lld,%s,%i,%i,,%f"),symbol,sde,size,price,stop,comment,exchange,account,security,currency,localsymbol,id,TIF,date,time,trail);
 		return m;
 	}
 
@@ -59,7 +60,7 @@ namespace TradeLibFast
 		o.trail = _tstof(r[oTRAIL].GetBuffer());
 		o.symbol = r[oSYM];
 		o.localsymbol = r[oLSYM];
-		o.id = _tstoi(r[oID].GetBuffer());
+		o.id = _tstol(r[oID].GetBuffer());
 		o.TIF = r[oTIF];
 		o.date = _tstoi(r[oDate].GetBuffer());
 		o.time = _tstoi(r[oTime].GetBuffer());
