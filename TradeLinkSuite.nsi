@@ -10,6 +10,7 @@ Icon "Install\tradelinkinstaller.ico"
 !define SUPPORT_EMAIL "tradelink-users@googlegroups.com"
 !addplugindir Install
 !include "Install\DotNET.nsh"
+!include "Install\Registry.nsh"
 !include "Install\FileAssociation.nsh"
 
 ; The file to write
@@ -154,6 +155,16 @@ Section "TradeLinkSuite"
   ; make sure TickData folder is present
   CreateDirectory $PROGRAMFILES\TradeLink\TickData
   
+  ; check for .net35
+  File "Install\DotNetInstaller.exe"
+  DetailPrint "Checking for .net35..."
+  ReadRegStr $0 HKLM SOFTWARE\TradeLinkSuite "InstalledDOTNET35"
+  StrCmp $0 "Yes" dotnetinstalled
+  Call IsNetfx35Installed
+  
+ dotnetinstalled:
+  
+  
   ; skip tickdata and vcredistuble installs if running in silent mode
   StrCmp $SILENT "YES" finishinstall
   
@@ -278,6 +289,20 @@ Function .onInit
          ; '0' if everything closed normally, and '-1' if some error occurred.
 FunctionEnd
 
+Function IsNetfx35Installed
+;Check is Net 3.5 is install
+;Push 0 for true, Pop -1 for false
+${registry::Read} 'HKEY_LOCAL_MACHINE\Software\Microsoft\NET Framework Setup\NDP\v3.5' “SP” $R0 $R1
+${If} $R1 == ”
+;Push -1
+ExecWait "DotNetInstaller.exe"
+WriteRegStr HKLM SOFTWARE\TradeLinkSuite "InstalledDOTNET35" "Yes"
+${Else}
+;Push 0
+DetailPrint ".net35 found"
+${EndIf}
+FunctionEnd
+
 Function IsSilent
   Var /GLOBAL SILENT
   StrCpy $SILENT "NO"
@@ -323,6 +348,8 @@ Function StrStr
   Pop $R2
   Exch $R1
 FunctionEnd
+
+
 
 
 
