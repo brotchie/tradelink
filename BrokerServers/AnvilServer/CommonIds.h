@@ -152,7 +152,8 @@ enum HistoricalOrderType
 	LP_BULLET	 = 4,
 	LP_STAGING_ORDER = 5,
 	LP_LOCATE = 6,
-	LP_OPTION_ORDER = 7,
+	LP_OPTION_EXECUTION = 7,
+//	LP_OPTION_ORDER = 8,
 };
 
 enum TransactionSide
@@ -172,6 +173,8 @@ enum Tif
 	TIF_ISLAND_EXTENDED_DAY	= 99999,
 
     TIF_DEFAULT             = 999999,
+	
+	TIF_GTD_IN_FIX_TAGS     = 0xfffffff3,
 
 	TIF_NOW_AND_NEXT_CROSSING_SESSION = 0xFFFFFFF5,
     TIF_ON_CLO_IMBALANCE_ONLY   = 0xfffffff6,

@@ -17,16 +17,19 @@
 #define BUSINESS_API __declspec(dllimport)
 #endif
 
-const char* const BusinessHeaderVersion = "2.7.8.12";
+const char* const BusinessHeaderVersion = "2.8.3.2";
 
 #include "ObserverApi.h"
 #include "CommonIds.h"
-//#include <vector>
+#include <vector>
+
+class ATxOrder;
 
 //class MsgLogon;
 //class MsgLogonNew;
 
 typedef unsigned int time32;
+typedef std::vector<unsigned int> PendingOrdersSize;
 /*
 template <class T>
 class BUSINESS_API MathValue
@@ -41,6 +44,8 @@ public:
 };
 class BUSINESS_API Money : public MathValue<Money>
 */
+
+#define OPRA_NEW_SYMBOLOGY
 
 const unsigned int B_MULTIPLIER = 10;
 const unsigned int B_DECMULTIPLIER = 1000;
@@ -466,6 +471,35 @@ protected:
     unsigned int m_shares;
 };
 
+#ifdef OPRA_NEW_SYMBOLOGY
+class BUSINESS_API LongSymbol
+{
+public:
+	LongSymbol(unsigned __int64 first, unsigned __int64 second):m_first(first),m_second(second){}
+	LongSymbol():m_first(0),m_second(0){}
+	LongSymbol(const char* symbol);
+	void Init(unsigned __int64 first, unsigned __int64 second){m_first = first; m_second = second;}
+	bool isZero() const{return !m_first && !m_second;}
+	void SetZero(){m_first = m_second = 0;}
+	unsigned __int64 GetFirst() const{return m_first;}
+	unsigned __int64 GetSecond() const{return m_second;}
+	operator UINT() const{return (unsigned int)m_first;}
+#ifdef _WIN64
+	operator unsigned __int64() const{return m_first;}
+#endif
+	bool operator<(const LongSymbol& other) const{return m_first < other.m_first || m_first == other.m_first && m_second < other.m_second;}
+	bool operator>(const LongSymbol& other) const{return m_first > other.m_first || m_first == other.m_first && m_second > other.m_second;}
+	bool operator==(const LongSymbol& other) const{return m_first == other.m_first && m_second == other.m_second;}
+	bool operator!=(const LongSymbol& other) const{return m_first != other.m_first || m_second != other.m_second;}
+	bool operator<=(const LongSymbol& other) const{return operator<(other) || operator==(other);}
+	bool operator>=(const LongSymbol& other) const{return operator>(other) || operator==(other);}
+	const char* GetSymbol() const{return (const char*)&m_first;}
+protected:
+	unsigned __int64 m_first;
+	unsigned __int64 m_second;
+};
+#endif
+
 enum PrintSourse
 {
     PS_NASDAQ,
@@ -693,7 +727,7 @@ public:
 protected:
 //    TradePack(const char* symbol, unsigned int id, char side, unsigned int shares, int price, const char* destination, time32 timeEntered = 0, const char* reference = "");
     TradePack(const char* symbol, unsigned int id, char side, unsigned int shares, const Money& price, const char* destination, time32 timeEntered = 0, const char* reference = "");
-    char m_symbol[LENGTH_SYMBOL + 1];
+    char m_symbol[LENGTH_SYMBOL + LENGTH_SYMBOL + 1];
     char m_destination[LENGTH_SYMBOL];
     unsigned int m_id;
     char m_side;
@@ -969,6 +1003,7 @@ public:
 	const Money& GetLimitPrice() const{return m_limitPrice;}
 	const char* GetComment() const{return m_comment;}
     time32 GetLastExecutionTime() const{return m_lastExecutionTime;}
+    time32 GetTimeToSetCurrent() const{return m_TimeToSetCurrent;}
     unsigned int GetChronologyOrdinal() const{return m_chronologyOrdinal;}
     virtual const MoneyPrecise& GetExecutedPrice() const = 0;
 	unsigned int GetSize() const{return m_size;}
@@ -1003,6 +1038,7 @@ protected:
     time32 m_timeEntered;
 	time32 m_timeReceived;
 	time32 m_lastExecutionTime;
+	time32 m_TimeToSetCurrent;
 	char m_side;
     bool m_userCancelled;
 	bool m_current;
@@ -1269,9 +1305,14 @@ public:
 	void SetOptionOrderTraderStatus(OptionOrderStatus ooStatus, OptionTraderStatus otStatus){m_optionOrderTraderStatus = (unsigned char)((otStatus << 4) | ooStatus);}
 	int GetPositionSize() const{return m_positionSize;}
 	unsigned __int64 GetCmta() const{return m_cmta;}
-
 	virtual const Money& GetLowerBracketPriceOffset() const;
 	virtual const Money& GetUpperBracketPriceOffset() const;
+	const char* GetATxCustomParameters() const;
+	bool IsAtxOrder() const { return m_ATxOrder ? true : false; }
+	void SetAsATxOrder(const ATxOrder* atxOrder)
+	{
+		m_ATxOrder = const_cast<ATxOrder*>(atxOrder);
+	}
 protected:
     Order(const char* symbol, char stockExchange,
 		const OptionData* optionData,
@@ -1331,6 +1372,7 @@ protected:
     char m_stockExchange;
     bool m_proactive;
     bool m_principalOrAgency;
+	ATxOrder* m_ATxOrder;
 private:
 	bool m_child;
     virtual void OrderSubordinateDestroyed(Order* order){}
@@ -1442,7 +1484,11 @@ class BUSINESS_API StockBase
 public:
     virtual ~StockBase(){}
 	virtual bool isStockMovement() const{return false;}
-    const char* GetSymbol() const{return m_symbol;}
+    virtual const char* GetSymbol() const{return m_symbol;}
+#ifdef OPRA_NEW_SYMBOLOGY
+	static const LongSymbol zeroLongSymbol;
+	virtual const LongSymbol& GetLongSymbol() const{return zeroLongSymbol;}
+#endif
     const char* GetSecurityName() const{return m_securityName;}//This is OPRA for Options
     char GetPrimaryExchange() const{return m_primaryExchange;}
     char GetStockAttributes() const{return m_stockAttributes;}
@@ -1517,6 +1563,9 @@ public:
     int GetNyseImbalance() const{return m_nyseImbalance;}
     int GetNysePreviousImbalance() const{return m_nysePreviousImbalance;}
     unsigned int GetNyseImbalanceMatchedShares() const{return m_nyseImbalanceMatchedShares;}
+	const Money& GetNyseImbalanceReferencePrice() const{return m_nyseImbalanceReferencePrice;}
+	const Money& GetNyseImbalanceClearingPrice() const{return m_nyseImbalanceClearingPrice;}
+	const Money& GetNyseImbalanceCloseOnlyClearingPrice() const{return m_nyseImbalanceCloseOnlyClearingPrice;}
 
 	int GetNyseInformationalImbalance() const{return m_nyseInformationalImbalance;}
 
@@ -1700,6 +1749,9 @@ protected:
     int m_nyseImbalance;
     int m_nysePreviousImbalance;
     unsigned int m_nyseImbalanceMatchedShares;
+	Money m_nyseImbalanceReferencePrice;
+	Money m_nyseImbalanceClearingPrice;
+	Money m_nyseImbalanceCloseOnlyClearingPrice;
 
 	int m_nyseInformationalImbalance;
 
@@ -1896,6 +1948,7 @@ public:
 
 	virtual void* CreateOrderIterator(unsigned int orderStatusFlags) const{return NULL;}
 	virtual void AddOrdersToIterator(void* iterator, unsigned int orderStatusFlags) const{}
+	virtual void* CreateOrderIteratorForQuote(bool side, const char* mmid, const Money& quote) const{return NULL;}
 
 	virtual void* CreateSmartOrderIterator(bool buy) const{return NULL;}
 	virtual void* CreateSmartDeadOrderIterator(bool buy) const{return NULL;}
@@ -1973,17 +2026,19 @@ public:
     unsigned int GetOversellSecondsToExpire() const;
 
 	virtual bool hasOrder(bool side, const char* mmid, const Money& quote) const{return false;}
-	//virtual bool GetTotalPendingOrderSize(bool side, const char* mmid, const Money& quote, unsigned int& shares)const
-	//{
-	//	shares = 0;
-	//	return false;
-	//}
-	//
-	//virtual bool GetAllPendingOrdersSize(bool side, const char* mmid, const Money& quote, std::vector<unsigned int>& shares)const
-	//{
-	//	//to do add code here to initialize vector
-	//	return false;
-	//}
+	
+	/*virtual bool GetAllPendingOrdersSize(bool side, const char* mmid, const Money& quote, PendingOrdersSize& shares)const
+	{
+		//to do add code here to initialize vector
+		return false;
+	}*/
+
+	//virtual std::vector<Order* >* GetAllPendingOrders(bool side, const char* mmid, const Money& quote)const
+	virtual std::vector<Order* >* GetAllPendingOrdersForQuote(bool side, const char* mmid, const Money& quote)const
+	{
+		//return false;
+		return NULL;
+	}
 
 	virtual const Money* GetBestNonZeroOrderPrice(bool side) const{return NULL;}
 	virtual const Money* GetWorstNonZeroOrderPrice(bool side) const{return NULL;}
@@ -2188,7 +2243,7 @@ public:
 */
 protected:
     Position(const char* symbol);
-    char m_symbol[LENGTH_SYMBOL + 1];
+    char m_symbol[2 * LENGTH_SYMBOL + 1];
     int m_bullets;
     int m_size;
 
@@ -3555,7 +3610,7 @@ class BUSINESS_API MsgStock : public Message
 {
 public:
     const StockBase* m_stockHandle;
-    char m_symbol[LENGTH_SYMBOL + 1];
+    char m_symbol[2 * LENGTH_SYMBOL + 1];
 protected:
     MsgStock(const StockBase* stockHandle, const char* symbol, unsigned int type, unsigned int size);
 };
@@ -4446,6 +4501,9 @@ void* WINAPI B_CreatePositionOrderIterator(unsigned int orderStatusFlags, const 
 Order* WINAPI B_GetNextOrder(void* iteratorHandle);
 Order* WINAPI B_FindOrder(unsigned int id, const Observable* account = NULL);
 
+void* WINAPI B_CreatePositionOrderIteratorForQuote(bool side, const char* mmid, const Money& quote, const Position* position);
+Order* WINAPI B_GetNextOrderForQuote(void* iteratorHandle);
+
 Order* WINAPI B_CancelLastOrder(unsigned int flags, unsigned int securityFilter, const char* destination = NULL, bool includeSmartOrders = false, bool includeChildOrders = true, const Observable* account = NULL);
 Order* WINAPI B_CancelOldestOrder(unsigned int flags, unsigned int securityFilter, const char* destination = NULL, bool includeSmartOrders = false, bool includeChildOrders = true, const Observable* account = NULL);
 void WINAPI B_CancelAllOrdersInAllAccounts(unsigned int flags, unsigned int securityFilter, const char* destination = NULL, bool includeSmartOrders = false, bool includeChildOrders = true);
@@ -4541,6 +4599,23 @@ unsigned int WINAPI B_SendOrder(const StockBase* stockHandle,
 	OptionOrderStatus ooStatus = OOS_DEFAULT,
 	OptionTraderStatus otStatus = OTS_DEFAULT,
 	const StagingOrder* stagingOrder = NULL);
+
+unsigned int WINAPI B_SendATxAlgoOrder(const StockBase* stockHandle,
+    char side,
+    const char* destination,
+    unsigned int size,
+    const Money& price,//0 for Market
+    unsigned int timeInForce,
+    bool proactive,
+    bool principalOrAgency, //principal - true, agency - false
+    char superMontageAlgorithm,
+    Order** orderSent = NULL,
+    Observable* account = NULL,
+    unsigned int userType = 0,
+    const char* userDescription = NULL,
+	bool institutionalDisclaimerVisible = false,
+	const StagingOrder* stagingOrder = NULL,
+	const char* AtxOrderParameters = NULL);
 
 Observable* WINAPI B_SendSmartStopOrder(const StockBase* stockHandle,
     char side,
@@ -6220,9 +6295,16 @@ unsigned int WINAPI B_DestroyUnusedOptions();
 void* WINAPI B_CreateOptionIterator();
 const StockBase* WINAPI B_GetNextOption(void* iteratorHandle);
 const StockBase* WINAPI B_GetOptionHandle(const char* symbol);
+
+#ifdef OPRA_NEW_SYMBOLOGY
+const StockBase* WINAPI B_FindOptionBySymbol(const LongSymbol& symbol);
+bool WINAPI B_GetStringAsOptionSymbol(const char* str, LongSymbol& longSymbol);
+#else
 const StockBase* WINAPI B_FindOption(const char* symbol);
 //const StockBase* WINAPI B_GetOptionHandleByNumId(unsigned __int64 symbol);
 const StockBase* WINAPI B_FindOptionByNumId(unsigned __int64 symbol);
+#endif
+
 const StockBase* WINAPI B_FindStockByNumId(unsigned __int64 symbol);
 //void WINAPI B_DeleteOption(StockBase* stockHandle);//Use B_DeleteStock to delete Option
 unsigned int WINAPI B_GetLoadedOptionCount();

@@ -8,7 +8,7 @@
 #include "MessageIds.h"
 #include "ObserverApi.h"
 
-const char* const ReceiverHeaderVersion = "2.7.9.6";
+const char* const ReceiverHeaderVersion = "2.8.3.2";
 
 const unsigned int totallyVisibleSizeHundreds = 999;
 
@@ -219,6 +219,79 @@ public:
 	char		    m_achReference[15];
 	char		    m_bDecimal;
 
+};
+
+class MsgPoolOptionExecution : public Message
+{
+public:
+	MsgPoolOptionExecution():
+        Message(M_POOL_OPTION_EXECUTION, sizeof(MsgPoolOptionExecution)),
+        x_ExecutionPrice(0),
+        x_NumberOfShares(0),
+        x_NumberOfSharesLeft(0),
+        x_bMoreShares(false),
+        x_Time(0),
+		m_strikePrice(0),
+        x_OrderId(0),
+        x_executionId(0),
+        m_bDecimal(1)
+    {
+        memset(x_UserId, 0, sizeof(x_UserId));
+        memset(x_Symbol, 0, sizeof(x_Symbol));
+        memset(x_CounterParty, 0, sizeof(x_CounterParty));
+        memset(x_ExecutionType, 0, sizeof(x_ExecutionType));
+        memset(m_achReference, 0, sizeof(m_achReference));
+    }
+
+	int 		    x_ExecutionPrice;
+	long		    x_NumberOfShares;
+	long		    x_NumberOfSharesLeft;
+	bool		    x_bMoreShares;
+	unsigned int    x_Time;
+    char		    x_UserId[LENGTH_SYMBOL];
+	char		    x_Symbol[LENGTH_SYMBOL];
+	unsigned int	m_strikePrice;
+	unsigned int	x_OrderId;
+	char		    x_CounterParty[LENGTH_SYMBOL];
+	char		    x_ExecutionType[4]; // SOEE for SOES, EEXO for Selectnet.
+	unsigned long   x_executionId;
+	char		    m_achReference[15];
+	char		    m_bDecimal;
+
+};
+
+class OutsideOptionTradeChangeMessage : public Message
+{
+public:
+	unsigned int    x_ExecutionTime;
+	char            x_TraderId[LENGTH_SYMBOL];
+	char            x_Symbol[LENGTH_SYMBOL];
+	unsigned int	m_strikePrice;
+	char	        x_Side; // 'B' - Buy, 'S' - Sel, 'h' - Short Sell.
+	int             x_Price;
+	int		        x_Quantity;
+	char	        x_Contra[LENGTH_SYMBOL];
+	char	        x_ExecutionType[4]; // SOEE for SOES, EEXO for Selectnet.
+	int		        x_Leaves; // Number of shares remaining.
+	int		        x_BranchSeqId;
+	unsigned int    m_OrderID;
+	char	        m_achReference[15];
+protected:
+	OutsideOptionTradeChangeMessage(unsigned int type, unsigned int size) : Message(type, size){}
+};
+
+
+class MsgOptionTradeInsert: public OutsideOptionTradeChangeMessage
+{
+public:
+	MsgOptionTradeInsert() : OutsideOptionTradeChangeMessage(M_OPTION_TRADE_INSERT, sizeof(MsgOptionTradeInsert)), m_bDecimal(1){}
+	char m_bDecimal;
+};
+
+class MsgOptionTradeDelete: public OutsideOptionTradeChangeMessage
+{
+public:
+	MsgOptionTradeDelete() : OutsideOptionTradeChangeMessage(M_OPTION_TRADE_DELETE, sizeof(MsgOptionTradeDelete)){}
 };
 
 class MsgPoolLocate : public Message
@@ -882,6 +955,7 @@ public:
 
 	union RespMsgBuffer
 	{
+		char m_OptionExecution[sizeof(MsgPoolOptionExecution)];
 		char m_Execution[sizeof(MsgPoolExecution)];
 		char m_Order[sizeof(MsgUpdateOrder)];
 		char m_Cancel[sizeof(MsgPoolCancel)];
@@ -1739,6 +1813,183 @@ public:
 	unsigned char m_expirationDay;
 };
 
+//////New Option Messages
+
+class LongSymbolMessage : public Message
+{
+public:
+	unsigned int m_flags;
+	unsigned __int64 m_first;
+	unsigned __int64 m_second;
+protected:
+    LongSymbolMessage(unsigned short type, unsigned short size, unsigned __int64 first, unsigned __int64 second, unsigned int flags) : Message(type, size),m_first(first),m_second(second),m_flags(flags){}
+};
+
+
+class MsgNewOptionSymbol : public LongSymbolMessage
+{
+public:
+	MsgNewOptionSymbol(unsigned __int64 first = 0, unsigned __int64 second = 0, unsigned int flags = 0) : LongSymbolMessage(M_NEW_OPTION_SYMBOL, sizeof(MsgNewOptionSymbol), first, second, flags){}
+};
+
+class MsgRefreshOptionSymbol : public LongSymbolMessage
+{
+public:
+    MsgRefreshOptionSymbol(unsigned short aSize, unsigned __int64 first = 0, unsigned __int64 second = 0, unsigned int flags = 0) : LongSymbolMessage(M_RESP_REFRESH_OPTION_SYMBOL, aSize, first, second, flags){}
+};
+
+class MsgRefreshOptionSymbolFailed : public LongSymbolMessage
+{
+public:
+	MsgRefreshOptionSymbolFailed(unsigned __int64 first = 0, unsigned __int64 second = 0) : LongSymbolMessage(M_RESP_REFRESH_OPTION_SYMBOL_FAILED, sizeof(MsgRefreshOptionSymbolFailed), first, second, 0){}
+};
+
+class ReqRefreshOptionSymbol : public LongSymbolMessage
+{
+public:
+	ReqRefreshOptionSymbol(unsigned __int64 first = 0, unsigned __int64 second = 0, unsigned int flags = 0):LongSymbolMessage(M_REQ_REFRESH_OPTION_SYMBOL, sizeof(ReqRefreshOptionSymbol), first, second, flags){}
+};
+
+class ReqUnsubscribeOptionSymbol : public LongSymbolMessage
+{
+public:
+    ReqUnsubscribeOptionSymbol(unsigned __int64 first = 0, unsigned __int64 second = 0, unsigned int flags = 0):LongSymbolMessage(M_REQ_FROM_CLIENT_UNSUBSCRIBE_OPTION_SYMBOL, sizeof(ReqUnsubscribeOptionSymbol), first, second, flags){}
+};
+
+class MsgOptionSymbolUnsubscribed : public LongSymbolMessage
+{
+public:
+	MsgOptionSymbolUnsubscribed(unsigned __int64 first = 0, unsigned __int64 second = 0, unsigned int flags = 0):LongSymbolMessage(M_RESP_TO_CLIENT_OPTION_SYMBOL_UNSUBSCRIBED, sizeof(MsgOptionSymbolUnsubscribed), first, second, flags){}
+};
+
+class MsgUnsubscribeOptionSymbolFailed : public LongSymbolMessage
+{
+public:
+	MsgUnsubscribeOptionSymbolFailed(unsigned __int64 first = 0, unsigned __int64 second = 0, unsigned int flags = 0):LongSymbolMessage(M_RESP_TO_CLIENT_UNSUBSCRIBE_OPTION_SYMBOL_FAILED, sizeof(MsgUnsubscribeOptionSymbolFailed), first, second, flags){}
+};
+
+class UIntSymbolMessage : public Message
+{
+public:
+	unsigned int m_subscriptionId;
+protected:
+    UIntSymbolMessage(unsigned short type, unsigned short size, unsigned int subscriptionId) : Message(type, size),m_subscriptionId(subscriptionId){}
+};
+
+class UIntSymbolTimeMessage : public UIntSymbolMessage
+{
+public:
+	unsigned int m_millisecond;
+protected:
+    UIntSymbolTimeMessage(unsigned short type, unsigned short size, unsigned int subscriptionId, unsigned int millisecond) : UIntSymbolMessage(type, size, subscriptionId), m_millisecond(millisecond){}
+};
+
+class MsgOptionClosePrice : public UIntSymbolMessage
+{
+public:
+	MsgOptionClosePrice(unsigned int subscriptionId, unsigned int price):UIntSymbolMessage(M_OPTION_CLOSE_PRICE, sizeof(MsgOptionClosePrice), subscriptionId){}
+	unsigned int m_closePrice;
+};
+
+class MsgOptionLevel2Quote : public UIntSymbolTimeMessage
+{
+public:
+	MsgOptionLevel2Quote(unsigned int subscriptionId, unsigned int millisecond, char side, unsigned int price, unsigned int size, unsigned int mmid, char quoteCondition):
+		UIntSymbolTimeMessage(M_OPTION_LEVEL2_QUOTE, sizeof(MsgOptionLevel2Quote), subscriptionId, millisecond),
+		m_mmid(mmid),
+		m_price(price),
+		m_size(size),
+		m_side(side),
+		m_quoteCondition(quoteCondition)
+	{}
+	unsigned int m_mmid;
+	unsigned int m_price;
+	unsigned int m_size;
+	char m_side;
+	char m_quoteCondition;
+};
+
+class MsgOptionLevel2QuoteShort : public UIntSymbolTimeMessage
+{
+public:
+	MsgOptionLevel2QuoteShort(unsigned int subscriptionId, unsigned int millisecond, char side, unsigned short price, unsigned short size, unsigned int mmid, char quoteCondition):
+		UIntSymbolTimeMessage(M_OPTION_LEVEL2_QUOTE_SHORT, sizeof(MsgOptionLevel2QuoteShort), subscriptionId, millisecond),
+		m_mmid(mmid),
+		m_price(price),
+		m_size(size),
+		m_side(side),
+		m_quoteCondition(quoteCondition)
+	{}
+	unsigned int m_mmid;
+	unsigned short m_price;
+	unsigned short m_size;
+	char m_side;
+	char m_quoteCondition;
+};
+
+class MsgOptionPrint : public UIntSymbolTimeMessage
+{
+public:
+	MsgOptionPrint(unsigned int subscriptionId, unsigned int millisecond, unsigned int price, unsigned int size, char executionExchange, char saleCondition):
+		UIntSymbolTimeMessage(M_OPTION_PRINT, sizeof(MsgOptionPrint), subscriptionId, millisecond),
+		m_price(price),
+		m_size(size),
+		m_executionExchange(executionExchange),
+		m_saleCondition(saleCondition)
+	{}
+	unsigned int m_price;
+	unsigned int m_size;
+	char m_executionExchange;
+	char m_saleCondition;
+};
+
+class MsgOptionPrintShort : public UIntSymbolTimeMessage
+{
+public:
+	MsgOptionPrintShort(unsigned int subscriptionId, unsigned int millisecond, unsigned short price, unsigned short size, char executionExchange, char saleCondition):
+		UIntSymbolTimeMessage(M_OPTION_PRINT_SHORT, sizeof(MsgOptionPrintShort), subscriptionId, millisecond),
+		m_price(price),
+		m_size(size),
+		m_executionExchange(executionExchange),
+		m_saleCondition(saleCondition)
+	{}
+	unsigned short m_price;
+	unsigned short m_size;
+	char m_executionExchange;
+	char m_saleCondition;
+};
+
+class MsgOptionLevel1Quote : public UIntSymbolTimeMessage
+{
+public:
+    MsgOptionLevel1Quote(unsigned int subscriptionId, unsigned int millisecond, char side, unsigned int price, unsigned int size, char participantId) :
+		UIntSymbolTimeMessage(M_OPTION_LEVEL1_QUOTE, sizeof(MsgOptionLevel1Quote), subscriptionId, millisecond),
+		m_price(price),
+		m_size(size),
+		m_side(side),
+		m_participantId(participantId)
+		{}
+	unsigned int m_price;
+	unsigned int m_size;
+	char m_side;
+	char m_participantId;
+};
+
+class MsgOptionLevel1QuoteShort : public UIntSymbolTimeMessage
+{
+public:
+    MsgOptionLevel1QuoteShort(unsigned int subscriptionId, unsigned int millisecond, char side, unsigned short price, unsigned short size, char participantId) :
+		UIntSymbolTimeMessage(M_OPTION_LEVEL1_QUOTE_SHORT, sizeof(MsgOptionLevel1QuoteShort), subscriptionId, millisecond),
+		m_price(price),
+		m_size(size),
+		m_side(side),
+		m_participantId(participantId)
+		{}
+	unsigned short m_price;
+	unsigned short m_size;
+	char m_side;
+	char m_participantId;
+};
 
 
 //////
@@ -2357,7 +2608,7 @@ public:
     char m_noIndicativeClearingPriceFlag;
     char m_priceVariationIndicator;
 };
-
+//Old Imbalance Message
 class MsgNyseImbalance : public SymbolMessage
 {
 public:
@@ -2381,6 +2632,43 @@ class MsgNyseImbalanceNone : public SymbolMessage
 public:
     MsgNyseImbalanceNone():SymbolMessage(M_NYSE_IMBALANCE_NONE, sizeof(MsgNyseImbalanceNone)){}
  };
+///////////////////////
+//New Imbalance Message
+class MsgNyseImbalanceBase : public SymbolMessage
+{
+public:
+    unsigned int m_matchedShares;     
+    int m_imbalance;     
+    unsigned int m_flags;//low 5 bits - flags, the rest - millisecond
+    unsigned int m_referencePrice;
+    unsigned int m_clearingPrice;
+protected:
+    MsgNyseImbalanceBase(unsigned short type, unsigned short size):
+        SymbolMessage(type, size),
+        m_matchedShares(0),
+        m_imbalance(0),
+        m_flags(0),
+        m_referencePrice(0),
+		m_clearingPrice(0)
+    {
+    }
+};
+
+class MsgNyseImbalanceOpening : public MsgNyseImbalanceBase
+{
+public:
+	MsgNyseImbalanceOpening():MsgNyseImbalanceBase(M_NYSE_IMBALANCE_OPENING, sizeof(MsgNyseImbalanceOpening)){}
+};
+
+class MsgNyseImbalanceClosing : public MsgNyseImbalanceBase
+{
+public:
+	MsgNyseImbalanceClosing():
+		MsgNyseImbalanceBase(M_NYSE_IMBALANCE_CLOSING, sizeof(MsgNyseImbalanceClosing)),
+		m_closeOnlyClearingPrice(0)
+	{}
+    unsigned int m_closeOnlyClearingPrice;
+};
 
 class MsgLRP : public SymbolMessage
 {
@@ -2716,7 +3004,10 @@ public:
 		m_nasdaqImbalanceType(-1),
 
 		m_numericCode(numericCode),
-		m_nyseInformationalImbalance(0)
+		m_nyseInformationalImbalance(0),
+		m_nyseImbalanceReferencePrice(0),
+		m_nyseImbalanceClearingPrice(0),
+		m_nyseImbalanceCloseOnlyClearingPrice(0)
     {
         *m_symbol = '\0';
         *m_description = '\0';
@@ -2825,6 +3116,10 @@ public:
 	unsigned short m_numericCode;
 
 	int m_nyseInformationalImbalance;
+
+	unsigned int m_nyseImbalanceReferencePrice;
+	unsigned int m_nyseImbalanceClearingPrice;
+	unsigned int m_nyseImbalanceCloseOnlyClearingPrice;
 };
 
 class MsgMsRefreshSymbolSortablePack : public Message
@@ -3098,7 +3393,7 @@ public:
         NONE
     };
 };
-
+//Old MS NYSE Imbalance Messages
 class MsgMsNyseImbalance : public MsNumericCode
 {
 public:
@@ -3122,6 +3417,45 @@ class MsgMsNyseImbalanceNone : public MsNumericCode
 public:
     MsgMsNyseImbalanceNone(unsigned short code):MsNumericCode(code, M_MS_NYSE_IMBALANCE_NONE, sizeof(MsgMsNyseImbalanceNone)){}
 };
+
+//New MS NYSE Imbalance Messages
+class MsgMsNyseImbalanceBase : public MsNumericCode
+{
+public:
+    unsigned int m_matchedShares;     
+    int m_imbalance;     
+    unsigned int m_flags;//low 5 bits - flags, the rest - millisecond
+    unsigned int m_referencePrice;
+    unsigned int m_clearingPrice;
+protected:
+    MsgMsNyseImbalanceBase(unsigned short code, unsigned short type, unsigned short size):
+        MsNumericCode(code, type, size),
+        m_matchedShares(0),
+        m_imbalance(0),
+        m_flags(0),
+        m_referencePrice(0),
+		m_clearingPrice(0)
+    {
+    }
+};
+
+class MsgMsNyseImbalanceOpening : public MsgMsNyseImbalanceBase
+{
+public:
+	MsgMsNyseImbalanceOpening(unsigned short code):MsgMsNyseImbalanceBase(code, M_MS_NYSE_IMBALANCE_OPENING, sizeof(MsgMsNyseImbalanceOpening)){}
+};
+
+class MsgMsNyseImbalanceClosing : public MsgMsNyseImbalanceBase
+{
+public:
+	MsgMsNyseImbalanceClosing(unsigned short code):
+		MsgMsNyseImbalanceBase(code, M_MS_NYSE_IMBALANCE_CLOSING, sizeof(MsgMsNyseImbalanceClosing)),
+		m_closeOnlyClearingPrice(0)
+	{}
+    unsigned int m_closeOnlyClearingPrice;
+};
+////////
+
 
 class MsgMsSymbolSortableNysBid : public MsNumericCode
 {
