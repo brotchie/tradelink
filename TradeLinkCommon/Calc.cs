@@ -1483,6 +1483,18 @@ namespace TradeLink.Common
             }
             return maxdd;
         }
+        /// <summary>
+        /// convert an array of decimals to less precise doubles
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static double[] Decimal2Double(decimal[] array)
+        {
+            double[] vals = new double[array.Length];
+            for (int i = 0; i < array.Length; i++)
+                vals[i] = (double)array[i];
+            return vals;
+        }
 
     }
 }

@@ -217,7 +217,9 @@ SectionEnd
 
 Section "ResponseExamples"
   File /r /x *.user /x *.xml /x *.dll /x *.pdf /x *.csv /x *.txt /x *.Cache /x .svn /x obj /x bin Responses
+  File /r Responses\TA*.*
   CreateShortCut "$SMPROGRAMS\TradeLink\ResponseExamples.lnk" "$INSTDIR\Responses\Responses.csproj" "" "$INSTDIR\Responses\Responses.csproj" 0
+  
 SectionEnd
 
 Section "CSharpIde (Write Strategies)"

@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using TradeLink.Common;
 using TradeLink.API;
-using System.ComponentModel; 
+using System.ComponentModel;
+using TicTacTec.TA.Library; // to use TA-lib indicators
 
 namespace Responses
 {
@@ -15,6 +16,10 @@ namespace Responses
         public int EntrySize { get { return _entrysize; } set { _entrysize= value; } }
         [Description("Default bar interval for this response.")]
         public BarInterval Interval { get { return _barinterval; } set { _barinterval = value; } }
+        [Description("bars back when calculating sma")]
+        public int BarsBack { get { return _barsback; } set { _barsback = value; } }
+        [Description("shutdown time")]
+        public int Shutdown { get { return _shutdowntime; } set { _shutdowntime = value; } }
 
         // this function is called the constructor, because it sets up the response
         // it is run before all the other functions, and has same name as my response.
@@ -31,25 +36,76 @@ namespace Responses
             // only calculate on new bars
             blt.GotNewBar += new SymBarIntervalDelegate(blt_GotNewBar);
 
+            // handle when new symbols are added to the active tracker
+            _active.NewTxt += new TextIdxDelegate(_active_NewTxt);
 
             // set our indicator names, in case we import indicators into R
             // or excel, or we want to view them in gauntlet or kadina
             Indicators = new string[] { "Time","SMA" };
         }
 
+
+        // wait for fill
+        GenericTracker<bool> _wait = new GenericTracker<bool>();
+        // track whether shutdown 
+        GenericTracker<bool> _active = new GenericTracker<bool>();
+
+        void _active_NewTxt(string txt, int idx)
+        {
+            // go ahead and notify any other trackers about this symbol
+            _wait.addindex(txt, false);
+        }
+
         void blt_GotNewBar(string symbol, int interval)
         {
             // lets do our entries.  
 
-            // calculate the SMA using closign prices
-            decimal SMA = Calc.Avg(blt[symbol].Close());
+            // calculate the SMA using closign prices for so many bars back
+            decimal SMA = Calc.Avg(Calc.EndSlice(blt[symbol].Close(),_barsback));
+            // uncomment to use TA-lib indicators
+            //int v = 0;
+            //double[] result = new double[0];
+            //Core.Sma(0, blt[symbol].Close().Length - 1, Calc.Decimal2Double(blt[symbol].Close()), _barsback, out v, out v, result);
+            //SMA = (decimal)result[result.Length - 1];
 
-            // if our current price is above SMA, buy
-            if (blt[symbol].RecentBar.Close > SMA)
-                sendorder(new BuyMarket(symbol, EntrySize));
-            // otherwise if it's less than SMA, sell
-            if (blt[symbol].RecentBar.Close < SMA)
-                sendorder(new SellMarket(symbol, EntrySize));
+            // ensure we're tracking waits for this symbol
+            _wait.addindex(symbol, false);
+
+            //ensure we aren't waiting for previous order to fill
+            if (!_wait[symbol])
+            {
+
+                // if we're flat and not waiting
+                if (pt[symbol].isFlat)
+                {
+                    // if our current price is above SMA, buy
+                    if (blt[symbol].RecentBar.Close > SMA)
+                    {
+                        D("crosses above MA, buy");
+                        sendorder(new BuyMarket(symbol, EntrySize));
+                        // wait for fill
+                        _wait[symbol] = true;
+                    }
+                    // otherwise if it's less than SMA, sell
+                    if (blt[symbol].RecentBar.Close < SMA)
+                    {
+                        D("crosses below MA, sell");
+                        sendorder(new SellMarket(symbol, EntrySize));
+                        // wait for fill
+                        _wait[symbol] = true;
+                    }
+                }
+                else if ((pt[symbol].isLong && (blt[symbol].RecentBar.Close < SMA))
+                    || (pt[symbol].isShort && (blt[symbol].RecentBar.Close > SMA)))
+                {
+                    D("counter trend, exit.");
+                    sendorder(new MarketOrderFlat(pt[symbol]));
+                    // wait for fill
+                    _wait[symbol] = true;
+                }
+            }
+
+
 
             // this way we can debug our indicators during development
             // indicators are sent in the same order as they are named above
@@ -72,6 +128,20 @@ namespace Responses
         {
             // keep track of time from tick
             time = tick.time;
+            // ensure response is active
+            if (!isValid) return;
+            // ensure we are tracking active status for this symbol
+            int idx = _active.addindex(tick.symbol, true);
+            // if we're not active, quit
+            if (!_active[idx]) return;
+            // check for shutdown time
+            if (tick.time > Shutdown)
+            {
+                // if so shutdown
+                shutdown();
+                // and quit
+                return;
+            }
             // apply bar tracking to all ticks that enter
             blt.newTick(tick);
 
@@ -83,18 +153,36 @@ namespace Responses
             // exits are processed first, lets see if we have our total profit
             if (Calc.OpenPL(tick.trade, pt[tick.symbol]) + pt[tick.symbol].ClosedPL > TotalProfitTarget)
             {
-                // if we hit our target, flat our position
-                sendorder(new MarketOrderFlat(pt[tick.symbol]));
-                // shut us down
-                isValid = false;
+                // if we hit our target, shutdown trading on this symbol
+                shutdown(tick.symbol);
                 // don't process anything else after this (entries, etc)
                 return;
             }
+            
+        }
 
+        void shutdown()
+        {
+            D("shutting down everything");
+            foreach (Position p in pt)
+                sendorder(new MarketOrderFlat(p));
+            isValid = false;
+        }
+
+        void shutdown(string sym)
+        {
+            // notify
+            D("shutting down " + sym);
+            // send flat order
+            sendorder(new MarketOrderFlat(pt[sym]));
+            // set inactive
+            _active[sym] = false;
         }
 
         public override void GotFill(Trade fill)
         {
+            // stop waiting
+            _wait[fill.symbol] = false;
             // make sure every fill is tracked against a position
             pt.Adjust(fill);
             // chart fills
@@ -113,6 +201,7 @@ namespace Responses
         BarInterval _barinterval = BarInterval.FiveMin;
         int _entrysize = 100;
         decimal _totalprofit = 200;
+        int _shutdowntime = 155000;
     }
 
     /// <summary>
