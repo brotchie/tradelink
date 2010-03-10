@@ -63,10 +63,10 @@ namespace ServerRedi
                         {
                             string se= string.Empty;
 
-                            object vret = _cc.VBRediCache.Submit("L1", true, ref err);
+                            object vret = _cc.VBRediCache.Submit("L1", "true", ref err);
                             checkerror(ref err,"submit");
                             _cc.VBRediCache.AddWatch(0, s.Symbol, string.Empty, ref err);
-                            checkerror(ref err,"addwatch");
+                            checkerror(ref err,"watch");
                         }
                         catch (Exception ex)
                         {
@@ -116,7 +116,7 @@ namespace ServerRedi
         void checkerror(ref object err, string context)
         {
             if (err != null)
-                debug(context+" error: "+err.ToString());
+                debug(context+" result: "+err.ToString());
             err = null;
         }
 
@@ -134,32 +134,31 @@ namespace ServerRedi
                     {
 
                         debug("row: "+row.ToString());
-                        for (int i = 0; i < row; i++)
-                        {
-                            Tick k = new TickImpl();
-                            _cc.VBGetCell(i, "SYMBOL", ref cv, ref err);
-                            debug("getcellerr: "+err.ToString());
-                            k.symbol = cv.ToString();
-                            _cc.VBGetCell(i, "LastPrice", ref cv, ref err);
-                            if (decimal.TryParse(cv.ToString(), out dv))
-                                k.trade = dv;
-                            _cc.VBGetCell(i, "BidPrice", ref cv, ref err);
-                            if (decimal.TryParse(cv.ToString(), out dv))
-                                k.bid = dv;
-                            _cc.VBGetCell(i, "AskPrice", ref cv, ref err);
-                            if (decimal.TryParse(cv.ToString(), out dv))
-                                k.ask = dv;
-                            _cc.VBGetCell(i, "LastSize", ref cv, ref err);
-                            if (int.TryParse(cv.ToString(), out iv))
-                                k.size = iv;
-                            _cc.VBGetCell(i, "BidSize", ref cv, ref err);
-                            if (int.TryParse(cv.ToString(), out iv))
-                                k.bs = iv;
-                            _cc.VBGetCell(i, "AskSize", ref cv, ref err);
-                            if (int.TryParse(cv.ToString(), out iv))
-                                k.os = iv;
-                            newTick(k);
-                        }
+                        int i = row;
+                        Tick k = new TickImpl();
+                        _cc.VBGetCell(i, "SYMBOL", ref cv, ref err);
+                        debug("getcellerr: "+err.ToString());
+                        k.symbol = cv.ToString();
+                        _cc.VBGetCell(i, "LastPrice", ref cv, ref err);
+                        if (decimal.TryParse(cv.ToString(), out dv))
+                            k.trade = dv;
+                        _cc.VBGetCell(i, "BidPrice", ref cv, ref err);
+                        if (decimal.TryParse(cv.ToString(), out dv))
+                            k.bid = dv;
+                        _cc.VBGetCell(i, "AskPrice", ref cv, ref err);
+                        if (decimal.TryParse(cv.ToString(), out dv))
+                            k.ask = dv;
+                        _cc.VBGetCell(i, "LastSize", ref cv, ref err);
+                        if (int.TryParse(cv.ToString(), out iv))
+                            k.size = iv;
+                        _cc.VBGetCell(i, "BidSize", ref cv, ref err);
+                        if (int.TryParse(cv.ToString(), out iv))
+                            k.bs = iv;
+                        _cc.VBGetCell(i, "AskSize", ref cv, ref err);
+                        if (int.TryParse(cv.ToString(), out iv))
+                            k.os = iv;
+                        newTick(k);
+
                     }
                     break;
                     /*
