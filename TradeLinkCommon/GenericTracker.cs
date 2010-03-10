@@ -38,6 +38,15 @@ namespace TradeLink.Common
         }
 
         /// <summary>
+        /// gets array of labels tracked
+        /// </summary>
+        /// <returns></returns>
+        public string[] ToLabelArray()
+        {
+            return _txt.ToArray();
+        }
+
+        /// <summary>
         /// get a tracked value from it's index
         /// </summary>
         /// <param name="i"></param>
