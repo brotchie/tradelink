@@ -68,6 +68,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\REDI.lnk" "$INSTDIR\ServerRedi.exe" "" "$INSTDIR\ServerRedi.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\LogViewer.lnk" "$INSTDIR\LogViewer.exe" "" "$INSTDIR\LogViewer.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\IQFeed.lnk" "$INSTDIR\IQFeedBroker.exe" "" "$INSTDIR\IQFeedBroker.exe" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink\TickData Folder.lnk" "$PROGRAMFILES\TradeLink\TickData\" "" "$PROGRAMFILES\TradeLink\TickData\" 0
   
   
   ; install these files
