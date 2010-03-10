@@ -284,10 +284,10 @@ bar.Close, (int)((double)bar.Volume / 4), string.Empty));
             
         }
 
-        public DateTime DateFromBarsBack(int barsback, BarInterval intv) { return DateFromBarsBack(barsback, intv, DateTime.Now); }
-        public DateTime DateFromBarsBack(int barsback, BarInterval intv, DateTime enddate) { return DateFromBarsBack(barsback, (int)intv, enddate); }
-        public DateTime DateFromBarsBack(int barsback, int interval) { return DateFromBarsBack(barsback,interval,DateTime.Now); }
-        public DateTime DateFromBarsBack(int barsback, int interval, DateTime enddate)
+        public static DateTime DateFromBarsBack(int barsback, BarInterval intv) { return DateFromBarsBack(barsback, intv, DateTime.Now); }
+        public static DateTime DateFromBarsBack(int barsback, BarInterval intv, DateTime enddate) { return DateFromBarsBack(barsback, (int)intv, enddate); }
+        public static DateTime DateFromBarsBack(int barsback, int interval) { return DateFromBarsBack(barsback, interval, DateTime.Now); }
+        public static DateTime DateFromBarsBack(int barsback, int interval, DateTime enddate)
         {
            return enddate.Subtract(new TimeSpan(0,0,interval*barsback));
         }
@@ -299,7 +299,7 @@ bar.Close, (int)((double)bar.Volume / 4), string.Empty));
         /// <param name="barsback"></param>
         /// <param name="interval"></param>
         /// <returns></returns>
-        public string BuildBarRequestBarsBack(string sym, int barsback, int interval)
+        public static string BuildBarRequestBarsBack(string sym, int barsback, int interval)
         {
             DateTime n = DateTime.Now;
             return BuildBarRequest(new BarRequest(sym, interval, Util.ToTLDate(DateFromBarsBack(barsback, interval, n)), Util.ToTLTime(DateFromBarsBack(barsback, interval, n)), Util.ToTLDate(n), Util.ToTLTime(n), string.Empty));

@@ -103,5 +103,16 @@ namespace TestTradeLink
             Assert.AreEqual(b.Bardate, cb.Bardate);
 
         }
+
+        // TestBarImpl
+        [Test]
+        public void BarsBack()
+        {
+            DateTime present = DateTime.Parse("2010/1/3 15:00:00");
+            DateTime past = BarImpl.DateFromBarsBack(5, BarInterval.FiveMin, present);
+            Assert.AreEqual(20100103, Util.ToTLDate(past));
+            Assert.AreEqual(143500, Util.ToTLTime(past));
+
+        }
     }
 }
