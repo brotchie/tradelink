@@ -90,8 +90,7 @@ namespace TDServer
             AmeritradeBrokerAPI.ATradeArgument brokerAcctPosArgs = new AmeritradeBrokerAPI.ATradeArgument();
             brokerAcctPosArgs.oPositions = new List<AmeritradeBrokerAPI.Positions>();
             api.TD_getAcctBalancesAndPositions(_user.Text, _pass.Text, AmeritradeBrokerAPI.SOURCEID, APIVER, ref brokerAcctPosArgs.oCashBalances, ref brokerAcctPosArgs.oPositions);
-            Position[] plist = new Position[brokerAcctPosArgs.oPositions.Count];
-            int count = 0;
+            List<Position> plist = new List<Position>();
             foreach (AmeritradeBrokerAPI.Positions oPosition in brokerAcctPosArgs.oPositions)
             {
                 decimal price = 0;
@@ -99,9 +98,12 @@ namespace TDServer
                 int size = 0;
                 int.TryParse(oPosition.Quantity,out size);
                 Position p = new PositionImpl(oPosition.StockSymbol,price,size);
-                plist[count++] = p;
+                if (p.isValid)
+                    plist.Add(p);
+                else
+                    debug("can't send invalid position: " + p.ToString());
             }
-            return plist;
+            return plist.ToArray();
 
             
         }
