@@ -48,6 +48,27 @@ namespace Record
             }
             TradeLink.AppKit.Versions.UpgradeAlert(tl);
             FormClosing += new FormClosingEventHandler(RecordMain_FormClosing);
+            // process command line
+            processcommands();
+
+        }
+
+        void processcommands()
+        {
+            string[] args = Environment.GetCommandLineArgs();
+            if (args.Length < 2) return;
+            try
+            {
+                debug("attempting to auto-record basket: " + args[1]);
+                Basket b = BasketImpl.FromFile(args[1]);
+                subscribe(b);
+                return;
+            }
+            catch (Exception ex)
+            {
+                debug("Error auto-subscribing to: " + args[1]);
+                debug(ex.Message + ex.StackTrace);
+            }
         }
 
         void _tlt_GotDebug(string msg)
@@ -115,6 +136,12 @@ namespace Record
         {
             string syms = Microsoft.VisualBasic.Interaction.InputBox("Enter symbols seperated by commas", "Symbols", mb.ToString(), 0, 0);
             Basket b = BasketImpl.FromString(syms);
+            subscribe(b);
+
+        }
+
+        void subscribe(Basket b)
+        {
             mb = b;
             try
             {
@@ -123,7 +150,6 @@ namespace Record
             catch (TLServerNotFound) { }
             refreshlist();
             debug("Recording: " + mb.ToString());
-
         }
 
         void debug(string msg)
