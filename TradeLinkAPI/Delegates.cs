@@ -5,6 +5,7 @@ namespace TradeLink.API
 {
     public delegate void SymDelegate(string sym);
     public delegate void Int32Delegate(int val);
+    public delegate void IntDelegate(int val);
     public delegate void LongDelegate(long val);
     public delegate void StringParamDelegate(string param);
     public delegate void TickDelegate(Tick t);
