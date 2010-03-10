@@ -583,15 +583,16 @@ namespace IQFeedBroker
         {
                 try
                 {
+                    if (actualData[0] == "F") return;
                         Tick tick = new TickImpl();
                         tick.date = Util.ToTLDate();
-                        tick.time = Util.DT2FT(DateTime.Parse(actualData[68]));
+                        tick.time = Util.DT2FT(DateTime.Parse(actualData[65]));
                         int v = 0;
-                        if (int.TryParse(actualData[66],out v))
+                        if (int.TryParse(actualData[64],out v))
                             tick.oe = getmarket(v);
-                        if (int.TryParse(actualData[65],out v))
+                        if (int.TryParse(actualData[63],out v))
                             tick.be = getmarket(v);
-                        if (int.TryParse(actualData[64], out v))
+                        if (int.TryParse(actualData[62], out v))
                             tick.ex = getmarket(v);
                         tick.symbol = actualData[1];
                         tick.bid = Convert.ToDecimal(actualData[10]);
