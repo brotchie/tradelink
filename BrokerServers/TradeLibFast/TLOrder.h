@@ -1,4 +1,5 @@
 #pragma once
+typedef long long int64;
 
 namespace TradeLibFast 
 {
@@ -7,7 +8,7 @@ namespace TradeLibFast
 	public:
 		TLOrder(void);
 		~TLOrder(void);
-		long long id;
+		int64 id;
 		int size;
 		double price;
 		double stop;

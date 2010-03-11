@@ -24,7 +24,7 @@ namespace TradeLibFast
 		// these are the TradeLink methods we're overriding
 		int SendOrder(TLOrder o);
 		int BrokerName(void);
-		int CancelRequest(OrderId id);
+		int CancelRequest(int64 id);
 		int AccountResponse(CString clientname);
 		int RegisterStocks(CString clientname);
 		std::vector<int> GetFeatures();
@@ -41,16 +41,16 @@ namespace TradeLibFast
 		// (if we have more than one)
 		std::vector<EClient*> m_link;
 		int FIRSTSOCKET; // first port to look for TWS instances
-		std::vector<int> m_nextorderids; // next valid id for each mlink
+		std::vector<OrderId> m_nextorderids; // next valid id for each mlink
 		std::vector<CString> accts; // accounts for each mlink
 		void InitSockets(int maxsockets, int clientid); // discover mlinks
 		int m_nextsocket; // next socket to search for mlink
 		OrderId getNextOrderId(CString account);
-		vector<uint> iborders;
-		vector<uint> tlorders;
-		uint TL2IBID(uint tlid);
-		uint IB2TLID(uint ibid);
-		uint newOrder(uint tlid,CString acct);
+		vector<OrderId> iborders;
+		vector<int64> tlorders;
+		OrderId TL2IBID(int64 tlid);
+		int64 IB2TLID(OrderId ibid);
+		OrderId newOrder(int64 tlid,CString acct);
 		void IncOrderId(CString account);
 		bool hasAccount(CString account);
 		int getMlinkId(OrderId id);

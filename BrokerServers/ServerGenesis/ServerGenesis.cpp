@@ -337,7 +337,7 @@ int ServerGenesis::SendOrder(TradeLibFast::TLOrder o)
 	int err = OK;
 	GTOrder go;
 	go = pStock->m_defOrder;
-	go.dwUserData = o.id;
+	go.dwUserData = (DWORD)o.id;
 	if (o.isStop())
 	{
 		if(pStock->PlaceOrder(go, (o.side ? 'B' : 'S'), o.size, o.price, METHOD_STOP, getTIF(o.TIF))==0)

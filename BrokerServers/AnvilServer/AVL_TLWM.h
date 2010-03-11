@@ -44,19 +44,19 @@ using namespace TradeLibFast;
 		int BrokerName(void);
 		int SendOrder(TLOrder order);
 		int UnknownMessage(int MessageType,CString msg);
-		int CancelRequest(long order);
+		int CancelRequest(int64 order);
 
 		// account monitoring stuff
 		Observable* imbalance;
 		vector<int> imbalance_clients;
 		vector<Observable*> accounts;
-		vector<uint> orderids;
-		uint fetchOrderIdAndRemove(Order* order);
-		uint fetchOrderId(Order * order);
-		bool IdIsUnique(uint id);
-		bool saveOrder(Order* o,uint id, bool overwriteexistingid);
-		bool saveOrder(Order* o,uint id);
-		unsigned int AnvilId(unsigned int TLOrderId);
+		vector<int64> orderids;
+		int64 fetchOrderIdAndRemove(Order* order);
+		int64 fetchOrderId(Order * order);
+		bool IdIsUnique(int64 id);
+		bool saveOrder(Order* o,int64 id, bool overwriteexistingid);
+		bool saveOrder(Order* o,int64 id);
+		unsigned int AnvilId(int64 TLOrderId);
 
 		virtual void Process(const Message* message, Observable* from, const Message* additionalInfo);
 

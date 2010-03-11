@@ -26,7 +26,7 @@ const int MAXTICKS = 10000;
 		void SrvGotFill(TLTrade trade);
 		void SrvGotTick(TLTick tick);
 		void SrvGotTickAsync(TLTick k);
-		void SrvGotCancel(int orderid);
+		void SrvGotCancel(int64 orderid);
 		CString Version();
 		int FindSym(CString sym);
 		// thread stuff
@@ -76,7 +76,7 @@ const int MAXTICKS = 10000;
 		virtual std::vector<int> GetFeatures();
 		virtual int ClearClient(CString client);
 		virtual int ClearStocks(CString client);
-		virtual int CancelRequest(long order);
+		virtual int CancelRequest(int64 order);
 		virtual void Start();
 
 		void D(const CString & message);

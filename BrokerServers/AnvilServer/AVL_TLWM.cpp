@@ -620,14 +620,14 @@
 	}
 
 
-	bool AVL_TLWM::IdIsUnique(uint id)
+	bool AVL_TLWM::IdIsUnique(int64 id)
 	{
 		for (uint i = 0; i<orderids.size(); i++)
 			if (orderids[i]==id) 
 				return false;
 		return true;
 	}
-	uint AVL_TLWM::fetchOrderId(Order* order)
+	int64 AVL_TLWM::fetchOrderId(Order* order)
 	{
 		if (order==NULL) return ORDER_NOT_FOUND;
 		for (uint i = 0; i<ordercache.size(); i++)
@@ -636,22 +636,22 @@
 		return 0;
 	}
 
-	uint AVL_TLWM::fetchOrderIdAndRemove(Order* order)
+	int64 AVL_TLWM::fetchOrderIdAndRemove(Order* order)
 	{
 		if (order==NULL) return ORDER_NOT_FOUND;
 		for (uint i = 0; i<ordercache.size(); i++)
 			if (ordercache[i]==order) 
 			{
 				ordercache[i] = NULL;
-				int id = orderids[i];
+				int64 id = orderids[i];
 				orderids[i] = 0;
 				return id;
 			}
 		return 0;
 	}
 
-	bool AVL_TLWM::saveOrder(Order* o, uint id) { return saveOrder(o,id,false); }
-	bool AVL_TLWM::saveOrder(Order* o,uint id, bool allowduplicates)
+	bool AVL_TLWM::saveOrder(Order* o, int64 id) { return saveOrder(o,id,false); }
+	bool AVL_TLWM::saveOrder(Order* o,int64 id, bool allowduplicates)
 	{
 		// fail if invalid order
 		if (o==NULL) return false;
@@ -707,7 +707,7 @@
 				if (sent(xid)) return; // don't notify twice on same execution
 				else sentids.push_back(xid);
 
-				unsigned int thisid = this->fetchOrderId(order);
+				int64 thisid = this->fetchOrderId(order);
 				CString ac = CString(B_GetAccountName(order->GetAccount()));
 
 				// build the serialized trade object
@@ -760,7 +760,7 @@
 				if (order->isDead()) 
 				{
 					//const MsgUpdateOrder* msg2 = (const MsgUpdateOrder*)message;
-					uint id = fetchOrderIdAndRemove(order);
+					int64 id = fetchOrderIdAndRemove(order);
 					if (id>0)
 						SrvGotCancel(id);
 					return;
@@ -770,7 +770,7 @@
 				bool isnew = saveOrder(order,0);
 				// if it fails, we already have it so get the id
 				// if it succeeds, we should be able to get the id anyways
-				uint id = fetchOrderId(order);
+				int64 id = fetchOrderId(order);
 
 				CTime ct = CTime::GetCurrentTime();
 				TLOrder o;
@@ -795,7 +795,7 @@
 					if (info->m_order!=NULL)
 					{
 						Order* order = info->m_order;
-						unsigned int id = fetchOrderIdAndRemove(order);
+						int64 id = fetchOrderIdAndRemove(order);
 						if (id>0)
 							SrvGotCancel(id);
 
@@ -810,10 +810,13 @@
 					if (additionalInfo && (additionalInfo->GetType()==M_AI_STOCK_MOVEMENT))
 					{
 						const StockMovement* sm = ((MsgStockMovement*)additionalInfo)->m_stock;
-						const StockBase* stk = preload(sm->GetSymbol());
+						const StockBase* stk = (StockBase*)sm;
 						TLImbalance imb;
 						if ((stk!=NULL) && stk->isLoaded()) 
 							imb.InfoImbalance = stk->GetNyseInformationalImbalance();
+						// don't send empty imbalances
+						if (imb.InfoImbalance==0) 
+							return;
 						imb.Symbol = CString(sm->GetSymbol());
 						imb.ThisImbalance = sm->GetNyseImbalance();
 						imb.PrevImbalance = sm->GetNysePreviousImbalance();
@@ -932,7 +935,7 @@
 
 	}
 
-	unsigned int AVL_TLWM::AnvilId(unsigned int TLOrderId)
+	unsigned int AVL_TLWM::AnvilId(int64 TLOrderId)
 	{
 		for (uint i = 0; i<orderids.size(); i++)
 		{
@@ -1019,7 +1022,7 @@
 		return f;
 	}
 
-	int AVL_TLWM::CancelRequest(long tlsid)
+	int AVL_TLWM::CancelRequest(int64 tlsid)
 	{
 		bool found = false;
 		// get current anvil id from tradelink id

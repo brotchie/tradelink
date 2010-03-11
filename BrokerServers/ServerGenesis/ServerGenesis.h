@@ -32,7 +32,7 @@ public :
 	bool Autologin();
 	bool IdIsUnique(uint id);
 	int _depth;
-	std::vector<uint> orderids;
+	std::vector<int64> orderids;
 	std::vector<long> orderseq;
 	std::vector<long> orderticket;
 	int GetIDIndex(long id, int type);

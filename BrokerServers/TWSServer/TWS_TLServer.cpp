@@ -135,14 +135,14 @@ namespace TradeLibFast
 		return UNKNOWN_MESSAGE;
 	}
 
-	uint TWS_TLServer::TL2IBID(uint tlid)
+	OrderId TWS_TLServer::TL2IBID(int64 tlid)
 	{
 		for (uint i = 0; i<tlorders.size(); i++)
 			if (tlorders[i]==tlid)
 				return iborders[i];
 		return 0;
 	}
-	uint TWS_TLServer::IB2TLID(uint ibid)
+	int64 TWS_TLServer::IB2TLID(OrderId ibid)
 	{
 		for (uint i = 0 ; i<iborders.size(); i++)
 			if (iborders[i]==ibid)
@@ -150,10 +150,10 @@ namespace TradeLibFast
 		return 0;
 	}
 
-	uint TWS_TLServer::newOrder(uint tlid,CString acct)
+	OrderId TWS_TLServer::newOrder(int64 tlid,CString acct)
 	{
 		if (tlid==0) tlid = GetTickCount(); // if no id, auto-assign one
-		uint ibid = TL2IBID(tlid);
+		OrderId ibid = TL2IBID(tlid);
 		if (ibid!=0) return ibid; // id already exists
 		ibid = getNextOrderId(acct);
 		tlorders.push_back(tlid);
@@ -399,11 +399,12 @@ namespace TradeLibFast
 		m_nextorderids[0]++;
 	}
 
-	int TWS_TLServer::CancelRequest(OrderId orderid)
+	int TWS_TLServer::CancelRequest(int64 orderid)
 	{
+		// gets the IB id
+		OrderId ibid = TL2IBID(orderid);
 		// gets mlink associated with order
-		int mlink = getMlinkId(orderid);
-		uint ibid = TL2IBID((uint)orderid);
+		int mlink = getMlinkId(ibid);
 		if (ibid==0) return ORDER_NOT_FOUND;
 		m_link[this->validlinkids[mlink]]->cancelOrder(ibid);
 		return OK;
@@ -417,9 +418,9 @@ namespace TradeLibFast
 	{
 		// for some reason IB sends order cancels as an error rather than
 		// as an order update message
-		int tlid = IB2TLID(id);
+		int64 tlid = IB2TLID(id);
 		CString msg;
-		msg.Format("%s [err:%i] [ibid:%i] [tlid:%i]",errorString,errorCode,id,tlid);
+		msg.Format("%s [err:%i] [ibid:%i] [tlid:%lld]",errorString,errorCode,id,tlid);
 		if (errorCode==202) 
 			this->SrvGotCancel(tlid); // cancels
 		else if (IGNOREERRORS) return; // ignore errors during init

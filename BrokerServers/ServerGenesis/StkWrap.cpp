@@ -75,7 +75,7 @@ int StkWrap::OnExecMsgErrMsg(const GTErrMsg &err)
 	int index = tl->GetIDIndex(oseq,SEQ);
 	if (index==NO_ID) return GTStock::OnExecMsgErrMsg(err);
 	// get id
-	uint id = tl->orderids[index];
+	int64 id = tl->orderids[index];
 	CString sym = CString(err.szStock);
 	CString errmsg = CString(err.szText);
 	int ioseq = (int)oseq;
@@ -88,7 +88,7 @@ int StkWrap::OnExecMsgErrMsg(const GTErrMsg &err)
 int StkWrap::OnExecMsgCancel(const GTCancel &cancel)
 {
 	int idx = tl->GetIDIndex(cancel.dwTicketNo,TICKET);
-	int id = tl->orderids[idx];
+	int64 id = tl->orderids[idx];
 	tl->SrvGotCancel(id);
 
 
