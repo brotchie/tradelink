@@ -50,12 +50,16 @@ namespace TradeLink.AppKit
                 _msg.Invoke(new stringdel(debug), new object[] { msg });
             else
             {
-                if (!TimeStamps)
-                    _msg.Items.Add(msg);
-                else
-                    _msg.Items.Add(DateTime.Now.ToString("HHmmss") + ": " + msg);
-                _msg.SelectedIndex = _msg.Items.Count - 1;
-                _msg.Invalidate(true);
+                try
+                {
+                    if (!TimeStamps)
+                        _msg.Items.Add(msg);
+                    else
+                        _msg.Items.Add(DateTime.Now.ToString("HHmmss") + ": " + msg);
+                    _msg.SelectedIndex = _msg.Items.Count - 1;
+                    _msg.Invalidate(true);
+                }
+                catch { }
             }
         }
 
