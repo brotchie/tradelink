@@ -129,7 +129,7 @@
             this.Controls.Add(this._send);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "CrashReport";
-            this.Text = "An application has crashed.";
+            this.Text = "Report a bug or issue";
             this.ResumeLayout(false);
             this.PerformLayout();
 

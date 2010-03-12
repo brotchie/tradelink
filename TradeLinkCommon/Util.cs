@@ -21,12 +21,21 @@ namespace TradeLink.Common
         static string KEY_PATH = "Path";
         static string KEY_VERSION = "Version";
 
+        /// <summary>
+        /// you should call ProgramPath rather than use this fucntion
+        /// </summary>
+        /// <param name="PROGRAM"></param>
+        /// <returns></returns>
         public static string ProgramRegPath(string PROGRAM)
         {
             if (PROGRAM == string.Empty) return string.Empty;
             return REGPATH + @"\" + PROGRAM;
         }
-
+        /// <summary>
+        /// gets folder where a given program is installed
+        /// </summary>
+        /// <param name="PROGRAM"></param>
+        /// <returns></returns>
         public static string ProgramPath(string PROGRAM)
         {
             try
@@ -54,6 +63,27 @@ namespace TradeLink.Common
             return Environment.CurrentDirectory;
         }
 
+        public static string ProgramDataBasePath
+        {
+            get
+            {
+                return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\";
+            }
+        }
+
+        /// <summary>
+        /// gets folder where data for a given program should reside
+        /// </summary>
+        /// <param name="PROGRAM"></param>
+        /// <returns></returns>
+        public static string ProgramData(string PROGRAM)
+        {
+            string path = ProgramDataBasePath + PROGRAM;
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+            return path;
+        }
+
         public static string TLBaseDir
         {
             get
@@ -74,7 +104,9 @@ namespace TradeLink.Common
             return Environment.GetEnvironmentVariable("ProgramFiles");
         }
 
-
+        /// <summary>
+        /// gets folder where tradelink is installed
+        /// </summary>
         public static string TLProgramDir
         {
             get
@@ -82,8 +114,11 @@ namespace TradeLink.Common
                 return ProgramPath(PROGRAM);
             }
         }
+        /// <summary>
+        /// path to tradelink tick folder
+        /// </summary>
         public static string TLTickDir 
-        { get { return TLBaseDir + "TickData\\"; } }
+        { get { return Util.ProgramData("TradeLinkTicks"); } }
 
 
         public static TickFileInfo ParseFile(string filepath)

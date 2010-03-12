@@ -21,7 +21,7 @@ namespace TradeLink.AppKit
         public string FullName { get { return fn; } }
         private StringBuilder _content = new StringBuilder();
         public string Content  { get { return _content.ToString(); } }
-        public Log(string name) : this(name, true, true, Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)) { }
+        public Log(string program) : this(program, true, true, Util.ProgramData(program)) { }
         public Log(string logname, bool dateinlogname,bool appendtolog,string path)
         {
             fn = path+"\\"+logname+(dateinlogname ? "."+TradeLink.Common.Util.ToTLDate(DateTime.Now): "") + ".txt";

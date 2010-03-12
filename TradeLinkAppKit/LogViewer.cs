@@ -45,7 +45,7 @@ namespace TradeLink.AppKit
             _logs.Sorted = true;
             init();
             fsw =  new System.IO.FileSystemWatcher(PATH,WILDEXT);
-            fsw.IncludeSubdirectories = false;
+            fsw.IncludeSubdirectories = true;
             fsw.Changed += new System.IO.FileSystemEventHandler(fsw_Changed);
             fsw.Created += new System.IO.FileSystemEventHandler(fsw_Created);
         }
@@ -80,7 +80,7 @@ namespace TradeLink.AppKit
         {
             _logs.Items.Clear();
             System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(PATH);
-            System.IO.FileInfo [] fis = di.GetFiles(WILDEXT, System.IO.SearchOption.TopDirectoryOnly);
+            System.IO.FileInfo [] fis = di.GetFiles(WILDEXT, System.IO.SearchOption.AllDirectories);
             foreach (System.IO.FileInfo fi in fis)
                 addname(fi.Name);
             Invalidate();

@@ -45,7 +45,7 @@ namespace TradeLink.AppKit
             Invalidate(true);
         }
 
-        string path { get { return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\"; } }
+        string path { get { return TradeLink.Common.Util.ProgramData(space.Text); } }
 
         public event VoidDelegate TicketSucceed;
         public event VoidDelegate TicketFailed;
