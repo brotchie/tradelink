@@ -219,7 +219,7 @@ namespace TradeLink.Common
             return o;
         }
 
-        public static long Unique { get { return (long)((decimal)DateTime.Now.TimeOfDay.TotalMilliseconds); } }
+        public static long Unique { get { return DateTime.Now.Ticks; } }
     }
 
 
