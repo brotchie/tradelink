@@ -226,7 +226,6 @@ namespace SterServer
                         if (idacct.TryGetValue(number, out acct))
                         {
                             stiOrder.CancelOrder(acct, 0, number.ToString(), DateTime.Now.Ticks.ToString() + acct);
-                            newOrderCancel(number);
                         }
                         else
                             debug("No record of id: " + number.ToString());
@@ -326,6 +325,7 @@ namespace SterServer
             f.side = t.bstrSide == "B";
             f.xtime = ((int)(rem % 10000)) * 100 + xsec;
             f.xdate = (int)((now - f.xtime) / 1000000);
+            f.ex = t.bstrDestination;
             pt.Adjust(f);
             newFill(f);
         }
@@ -339,6 +339,12 @@ namespace SterServer
             long id = 0;
             if (!long.TryParse(structOrderUpdate.bstrClOrderId, out id))
                 id = (long)structOrderUpdate.nOrderRecordId;
+            // if this is a cancel notification, pass along
+            if (structOrderUpdate.nOrderStatus == (int)STIOrderStatus.osSTICanceled)
+            {
+                newOrderCancel(id);
+                return;
+            }
             // don't notify for same order more than once
             if (_onotified.Contains(id)) return;
             if (structOrderUpdate.bstrLogMessage.Contains("REJ"))
@@ -358,8 +364,9 @@ namespace SterServer
             o.date = (int)((rem - o.time) / 10000);
             _onotified.Add(o.id);
             newOrder(o);
-
+            
         }
+
 
 
         Position[] tl_gotSrvPosList(string account)

@@ -803,7 +803,8 @@
 
 				}
 				break;
-			case M_MS_NYSE_IMBALANCE: 
+			case M_MS_NYSE_IMBALANCE_OPENING:
+			case M_MS_NYSE_IMBALANCE_CLOSING: 
 			//case M_MS_NYSE_IMBALANCE_NONE:
 				{
 					if (imbalance_clients.size()==0) return;
@@ -814,12 +815,12 @@
 						TLImbalance imb;
 						if ((stk!=NULL) && stk->isLoaded()) 
 							imb.InfoImbalance = stk->GetNyseInformationalImbalance();
-						// don't send empty imbalances
-						if (imb.InfoImbalance==0) 
-							return;
 						imb.Symbol = CString(sm->GetSymbol());
 						imb.ThisImbalance = sm->GetNyseImbalance();
 						imb.PrevImbalance = sm->GetNysePreviousImbalance();
+						// don't send empty imbalances
+						if ((imb.InfoImbalance==0) && (imb.ThisImbalance==0))
+							return;
 						imb.Ex = CString("NYSE");
 						imb.ThisTime = sm->GetNyseImbalanceTime();
 						imb.PrevTime = sm->GetNysePreviousImbalanceTime();
