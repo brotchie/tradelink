@@ -225,7 +225,7 @@ namespace SterServer
                         string acct = "";
                         if (idacct.TryGetValue(number, out acct))
                         {
-                            stiOrder.CancelOrder(acct, 0, number.ToString(), DateTime.Now.Ticks.ToString() + acct);
+                            stiOrder.CancelOrder(acct, 0, number.ToString(), _canceltracker.AssignId.ToString());
                         }
                         else
                             debug("No record of id: " + number.ToString());
@@ -278,6 +278,8 @@ namespace SterServer
                     Thread.Sleep(_SLEEP);
             }
         }
+
+        IdTracker _canceltracker = new IdTracker(false, 0, DateTime.Now.Ticks);
 
         string getside(string symbol, bool side)
         {
