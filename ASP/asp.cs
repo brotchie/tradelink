@@ -31,6 +31,7 @@ namespace ASP
         TLTracker _tlt;
         MessageTracker _mtexec;
         MessageTracker _mtquote;
+        MessageTracker _mtconnect;
 
         Dictionary<int, string> _resskinidx = new Dictionary<int, string>();
         Dictionary<string, string> _class2dll = new Dictionary<string, string>();
@@ -159,6 +160,9 @@ namespace ASP
             _mtexec = new MessageTracker(_bf.BrokerClient);
             _mtexec.SendMessageResponse += new MessageDelegate(tl_gotUnknownMessage);
             _mtexec.SendDebug += new DebugDelegate(_mt_SendDebug);
+            _mtconnect = new MessageTracker(_bf);
+            _mtconnect.SendMessageResponse+=new MessageDelegate(tl_gotUnknownMessage);
+            _mtconnect.SendDebug+=new DebugDelegate(_mt_SendDebug);
 
             // startup
             _tlt_GotConnect();

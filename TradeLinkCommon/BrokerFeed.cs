@@ -153,6 +153,8 @@ namespace TradeLink.Common
 
         public long TLSend(MessageTypes type, string message)
         {
+            for (int i = 0; i < _pcon.Count; i++)
+                _pcon[i].TLSend(type, message);
             return 0;
         }
 
@@ -162,6 +164,9 @@ namespace TradeLink.Common
                 quote.Disconnect();
             if (execute != null)
                 execute.Disconnect();
+            for (int i = 0; i < _pcon.Count; i++)
+                if (_pcon[i] != null)
+                    _pcon[i].Disconnect();
         }
 
         public int HeartBeat()
@@ -216,6 +221,7 @@ namespace TradeLink.Common
 
         Providers[] _pavail = new Providers[0];
         public Providers[] ProvidersAvailable { get { return _pavail; } }
+        List<TLClient> _pcon = new List<TLClient>();
         public int ProviderSelected { get { return -1; } }
         public List<MessageTypes> RequestFeatureList { get { return _RequestFeaturesList; } }
         public void ProvidersUpdate()
@@ -317,8 +323,30 @@ namespace TradeLink.Common
             }
 
             feedready = true;
+            // connect to the rest
+            for (int i = 0; i < ProvidersAvailable.Length; i++)
+            {
+                // skip existing connections
+                if ((i == xi) || (i == qi)) continue;
+                // add new connections
+                TLClient newcon = new TLClient_WM(i, PROGRAM, false);
+                newcon.gotFeatures += new MessageTypesMsgDelegate(newcon_gotFeatures);
+                newcon.gotUnknownMessage += new MessageDelegate(newcon_gotUnknownMessage);
+                _pcon.Add(newcon);
+            }
             tl.Disconnect();
             tl = null;
+        }
+
+        void newcon_gotUnknownMessage(MessageTypes type, long source, long dest, long msgid, string request, ref string response)
+        {
+            if (gotUnknownMessage != null)
+                gotUnknownMessage(type, source, dest, msgid, request, ref response);
+        }
+
+        void newcon_gotFeatures(MessageTypes[] messages)
+        {
+            
         }
 
         void quote_gotUnknownMessage2(MessageTypes type, long source, long dest, long msgid, string request, ref string response)
