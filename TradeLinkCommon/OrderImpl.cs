@@ -211,7 +211,7 @@ namespace TradeLink.Common
             o.LocalSymbol = rec[(int)OrderField.LocalSymbol];
             o.Currency = (CurrencyType)Enum.Parse(typeof(CurrencyType), rec[(int)OrderField.Currency]);
             o.Security = (SecurityType)Enum.Parse(typeof(SecurityType), rec[(int)OrderField.Security]);
-            o.id = Convert.ToUInt32(rec[(int)OrderField.OrderID]);
+            o.id = Convert.ToInt64(rec[(int)OrderField.OrderID]);
             o.TIF = rec[(int)OrderField.OrderTIF];
             o.trail = Convert.ToDecimal(rec[(int)OrderField.Trail], System.Globalization.CultureInfo.InvariantCulture);
             o.date = Convert.ToInt32(rec[(int)OrderField.oDate]);

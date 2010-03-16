@@ -40,7 +40,7 @@ namespace TradeLink.Common
                 pm.symbol = r[(int)MessagePeg2Midpoint.Symbol];
                 pm.size = Convert.ToInt32(r[(int)MessagePeg2Midpoint.Size]);
                 pm.pegdiff = Convert.ToDecimal(r[(int)MessagePeg2Midpoint.PegDiff]);
-                pm.id = Convert.ToUInt32(r[(int)MessagePeg2Midpoint.Id]);
+                pm.id = Convert.ToInt64(r[(int)MessagePeg2Midpoint.Id]);
                 pm.ex = r[(int)MessagePeg2Midpoint.Ex];
                 pm.Account = r[(int)MessagePeg2Midpoint.Account];
             }

@@ -116,8 +116,9 @@ namespace ServerMB
 
         void m_OrderClient_OnRemove(MbtOpenOrder pOrd)
         {
-            long num = Convert.ToUInt32(pOrd.OrderNumber);
-            tl.newOrderCancel((long)num);
+            long num = 0;
+            if (long.TryParse(pOrd.OrderNumber,out num))
+                tl.newOrderCancel(num);
         }
 
 
@@ -132,7 +133,9 @@ namespace ServerMB
             o.date = Util.ToTLDate(pOrd.UTCDateTime);
             o.trail = (decimal)pOrd.TrailingOffset;
             //o.ex = pOrd.Route;
-            o.id = Convert.ToUInt32(pOrd.OrderNumber);
+            long id = 0;
+            if (long.TryParse(pOrd.OrderNumber, out id))
+                o.id = id;
             tl.newOrder(o);
 
 

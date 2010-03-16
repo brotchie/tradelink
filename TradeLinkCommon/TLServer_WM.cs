@@ -256,8 +256,11 @@ namespace TradeLink.Common
                         WMUtil.SendMsg(PositionImpl.Serialize(pos), MessageTypes.POSITIONRESPONSE, Handle, client);
                     break;
                 case MessageTypes.ORDERCANCELREQUEST:
-                    if (newOrderCancelRequest != null)
-                        newOrderCancelRequest(Convert.ToUInt32(msg));
+                    {
+                        long id = 0;
+                        if (long.TryParse(msg,out id) && (newOrderCancelRequest != null))
+                            newOrderCancelRequest(id);
+                    }
                     break;
                 case MessageTypes.SENDORDER:
                     SrvDoExecute(msg);

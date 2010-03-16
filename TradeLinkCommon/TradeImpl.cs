@@ -129,7 +129,7 @@ namespace TradeLink.Common
             t.comment = rec[(int)TradeField.Comment];
             t.Account = rec[(int)TradeField.Account];
             t.LocalSymbol = rec[(int)TradeField.LocalSymbol];
-            t.id = Convert.ToUInt32(rec[(int)TradeField.ID]);
+            t.id = Convert.ToInt64(rec[(int)TradeField.ID]);
             t.ex = rec[(int)TradeField.Exch];
             t.Currency = (CurrencyType)Enum.Parse(typeof(CurrencyType), rec[(int)TradeField.Currency]);
             t.Security = (SecurityType)Enum.Parse(typeof(SecurityType), rec[(int)TradeField.Security]);
