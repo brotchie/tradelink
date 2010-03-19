@@ -32,8 +32,6 @@ namespace TradeLink.Common
         IntPtr himh = IntPtr.Zero;
         List<MessageTypes> _rfl = new List<MessageTypes>();
         public List<MessageTypes> RequestFeatureList { get { return _rfl; } }
-        Dictionary<string, decimal> chighs = new Dictionary<string, decimal>();
-        Dictionary<string, decimal> clows = new Dictionary<string, decimal>();
         Dictionary<string, PositionImpl> cpos = new Dictionary<string, PositionImpl>();
         List<Providers> servers = new List<Providers>();
         List<string> srvrwin = new List<string>();
@@ -163,45 +161,15 @@ namespace TradeLink.Common
             string m = OrderImpl.Serialize(o);
             return (int)TLSend(MessageTypes.SENDORDER, m);
         }
-
+        /// <summary>
+        /// request a list of features, result will be returned to gotFeatureResponse and RequestFeaturesList
+        /// </summary>
         public void RequestFeatures() 
         {
             _rfl.Clear();
             TLSend(MessageTypes.FEATUREREQUEST,Text); 
         }
 
-        /// <summary>
-        /// Today's high
-        /// </summary>
-        /// <param name="sym">The symbol.</param>
-        /// <returns></returns>
-        public decimal FastHigh(string sym)
-        {
-            try
-            {
-                return chighs[sym];
-            }
-            catch (KeyNotFoundException)
-            {
-                return 0;
-            }
-        }
-        /// <summary>
-        /// Today's low
-        /// </summary>
-        /// <param name="sym">The symbol</param>
-        /// <returns></returns>
-        public decimal FastLow(string sym)
-        {
-            try
-            {
-                return clows[sym];
-            }
-            catch (KeyNotFoundException)
-            {
-                return 0;
-            }
-        }
 
         /// <summary>
         /// Request an order be canceled
@@ -341,20 +309,8 @@ namespace TradeLink.Common
                         debug("Error: " + ex.Message + ex.StackTrace);
                         break;
                     }
-                    if (t.isTrade)
-                    {
-                        try
-                        {
-                            if (t.trade > chighs[t.symbol]) chighs[t.symbol] = t.trade;
-                            if (t.trade < clows[t.symbol]) clows[t.symbol] = t.trade;
-                        }
-                        catch (KeyNotFoundException)
-                        {
-                            chighs.Add(t.symbol, 0);
-                            clows.Add(t.symbol, decimal.MaxValue);
-                        }
-                    }
-                    if (gotTick != null) gotTick(t);
+                    if (gotTick != null) 
+                        gotTick(t);
                     break;
                 case MessageTypes.IMBALANCERESPONSE:
                     Imbalance i = ImbalanceImpl.Deserialize(msg);
