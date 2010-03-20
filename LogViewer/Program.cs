@@ -27,7 +27,10 @@ namespace LogViewer
             }
             try
             {
-                app = new TradeLink.AppKit.LogViewer(namefilter,succeed,Properties.Settings.Default.au,Properties.Settings.Default.ap);
+                List<string> progs = new List<string>();
+                List<string> ex = new List<string>();
+                ex.Add("temp");
+                app = new TradeLink.AppKit.LogViewer(namefilter,progs,ex,succeed,Properties.Settings.Default.au,Properties.Settings.Default.ap);
                 app.Icon = Properties.Resources.LogViewer;
                 Application.Run(app);
             }

@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
 
 namespace TradeLink.AppKit
 {
@@ -20,11 +21,13 @@ namespace TradeLink.AppKit
         string pw = string.Empty;
         System.IO.FileSystemWatcher fsw;
         AssemblaTicketWindow.LoginSucceedDel loginsucceed;
-        public LogViewer() : this(string.Empty,null,string.Empty,string.Empty) { }
-        public LogViewer(string spacefilter, AssemblaTicketWindow.LoginSucceedDel loginsuccess,string User, string Pw)
+        public LogViewer() : this(string.Empty,new List<string>(),new List<string>(),null,string.Empty,string.Empty) { }
+        public LogViewer(string spacefilter, List<string> programs, List<string> excludes,AssemblaTicketWindow.LoginSucceedDel loginsuccess,string User, string Pw)
         {
             namefilter = spacefilter;
             loginsucceed = loginsuccess;
+            programlist = programs;
+            exclude = excludes;
             user = User;
             pw = Pw;
             if (loginsucceed == null)
@@ -79,11 +82,63 @@ namespace TradeLink.AppKit
         void init()
         {
             _logs.Items.Clear();
-            System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(PATH);
-            System.IO.FileInfo [] fis = di.GetFiles(WILDEXT, System.IO.SearchOption.AllDirectories);
-            foreach (System.IO.FileInfo fi in fis)
-                addname(fi.Name);
+            ApplyAllFiles(PATH, ProcessFile);
+            foreach (string file in matchfile)
+                addname(Path.GetFileNameWithoutExtension(file));
             Invalidate();
+        }
+
+        List<string> matchfile = new List<string>();
+        List<string> programlist = new List<string>();
+        List<string> exclude = new List<string>();
+        public List<string> ExcludeList { get { return exclude; } set { exclude = value; } }
+        public List<string> ProgramList { get { return programlist; } set { programlist = value; } }
+        void ProcessFile(string path) 
+        {
+            int e = 0;
+            if (path.Contains(DOTEXT))
+            {
+                foreach (string p in exclude)
+                {
+                    if (path.ToLower().Contains(p.ToLower()))
+                    {
+                        e++;
+                        break;
+                    }
+                    if (programlist.Count == 0)
+                    {
+                        matchfile.Add(path);
+                        break;
+                    }
+                }
+                foreach (string program in programlist)
+                {
+                    if (path.ToLower().Contains(program.ToLower()))
+                    {
+                        matchfile.Add(path);
+                        break;
+                    }
+                }
+            }
+            e = 0;
+        }
+        static void ApplyAllFiles(string folder, Action<string> fileAction)
+        {
+            foreach (string file in Directory.GetFiles(folder))
+            {
+                fileAction(file);
+            }
+            foreach (string subDir in Directory.GetDirectories(folder))
+            {
+                try
+                {
+                    ApplyAllFiles(subDir, fileAction);
+                }
+                catch
+                {
+                    // swallow, log, whatever
+                }
+            }
         }
 
         bool addname(string name)
@@ -101,12 +156,12 @@ namespace TradeLink.AppKit
 
         string getpath(int idx)
         {
-            return PATH + _logs.Items[idx].ToString() + DOTEXT;
+            return matchfile[idx];
         }
 
         string getname(int idx)
         {
-            return _logs.Items[idx].ToString() + DOTEXT;
+            return Path.GetFileNameWithoutExtension(matchfile[idx]);
         }
 
         void fsw_Created(object sender, System.IO.FileSystemEventArgs e)
