@@ -26,18 +26,18 @@ namespace ServerRedi
             }
             catch (Exception ex)
             {
-                TradeLink.AppKit.CrashReport.Report(ServerRedi.PROGRAM, ex);
+                TradeLink.AppKit.CrashReport.Report(RediMain.PROGRAM, ex);
             }
         }
 
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            TradeLink.AppKit.CrashReport.Report(ServerRedi.PROGRAM, (Exception)e.ExceptionObject);
+            TradeLink.AppKit.CrashReport.Report(RediMain.PROGRAM, (Exception)e.ExceptionObject);
         }
 
         static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
-            TradeLink.AppKit.CrashReport.Report(ServerRedi.PROGRAM, e);
+            TradeLink.AppKit.CrashReport.Report(RediMain.PROGRAM, e);
         }
     }
 }

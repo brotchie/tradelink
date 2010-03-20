@@ -14,6 +14,8 @@ namespace ServerRedi
     {
         ServerRedi tl = new ServerRedi();
         DebugWindow _dw = new DebugWindow();
+        public const string PROGRAM = "RediServer";
+        Log _log = new Log(PROGRAM);
         public RediMain()
         {
             InitializeComponent();
@@ -31,10 +33,12 @@ namespace ServerRedi
         {
             Properties.Settings.Default.Save();
             tl.Stop();
+            _log.Stop();
         }
 
         void tl_SendDebug(string msg)
         {
+
             debug(msg);
         }
 
@@ -44,6 +48,7 @@ namespace ServerRedi
         {
             _msgs.AppendLine(msg);
             _dw.GotDebug(msg);
+            _log.GotDebug(msg);
         }
 
         private void _login_Click(object sender, EventArgs e)
@@ -62,7 +67,7 @@ namespace ServerRedi
 
         private void _report_Click(object sender, EventArgs e)
         {
-            CrashReport.Report(ServerRedi.PROGRAM, string.Empty, string.Empty, _msgs.ToString(), null, new AssemblaTicketWindow.LoginSucceedDel(success), false);
+            CrashReport.Report(PROGRAM, string.Empty, string.Empty, _msgs.ToString(), null, new AssemblaTicketWindow.LoginSucceedDel(success), false);
         }
     }
 }

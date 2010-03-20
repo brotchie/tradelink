@@ -40,6 +40,7 @@ namespace ServerEsignal
         void EsignalMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             tl.Stop();
+            _log.Stop();
         }
 
 

@@ -10,7 +10,7 @@ namespace ServerRedi
 {
     public class ServerRedi : TLServer_WM
     {
-        public const string PROGRAM = "RediServer";
+
         VBCacheClass _cc;
         VBOrderClass _oc;
         bool _conn = false;
@@ -186,7 +186,7 @@ namespace ServerRedi
             try
             {
                 debug(Util.TLSIdentity());
-                debug("Attempting to start " + PROGRAM);
+                debug("Attempting to start ");
                 _cc = new VBCacheClass();
                 _oc = new VBOrderClass();
                 _cc.VBRediCache.CacheEvent += new RediLib.ECacheControl_CacheEventEventHandler(VBRediCache_CacheEvent);
@@ -196,7 +196,7 @@ namespace ServerRedi
             }
             catch (Exception ex)
             {
-                debug("error starting "+PROGRAM);
+                debug("error starting ");
                 debug(ex.Message + ex.StackTrace);
                 debug("Did you forget to login to Redi?");
                 _conn = false;

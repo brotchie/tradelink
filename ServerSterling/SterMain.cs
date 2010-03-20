@@ -16,6 +16,7 @@ namespace SterServer
         ServerSterling tl = new ServerSterling();
         public const string PROGRAM = "SterServer ";
         DebugControl _dc = new DebugControl(true);
+        Log _log = new Log(PROGRAM);
         public SterMain()
         {
             InitializeComponent();
@@ -31,6 +32,8 @@ namespace SterServer
 
         void tl_SendDebug(string msg)
         {
+            _log.GotDebug(msg);
+            _msgs.AppendLine(Util.ToTLTime()+" "+msg);
             debug(msg);
         }
 
@@ -57,6 +60,7 @@ namespace SterServer
             try
             {
                 tl.Stop();
+                _log.Stop();
             }
             catch (Exception)
             {

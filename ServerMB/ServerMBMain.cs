@@ -25,7 +25,8 @@ namespace ServerMB
         PositionTracker pt = new PositionTracker();
         bool showmessage = false;
         DebugWindow _dw = new DebugWindow();
-        public const string PROGRAM = "ServerMB BETA"; 
+        public const string PROGRAM = "ServerMB BETA";
+        Log _log = new Log(PROGRAM);
         public ServerMBMain()
         {
             InitializeComponent();
@@ -82,6 +83,7 @@ namespace ServerMB
             Properties.Settings.Default.Save();
             try
             {
+                _log.Stop();
                 m_Quotes.Disconnect();
                 m_OrderClient.Disconnect();
             }
@@ -296,6 +298,7 @@ namespace ServerMB
 
         void debug(string msg)
         {
+            _log.GotDebug(msg);
             _dw.GotDebug(msg);
         }
 

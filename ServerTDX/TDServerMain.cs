@@ -21,7 +21,8 @@ namespace TDServer
        // AmeritradeBrokerAPI api = new AmeritradeBrokerAPI();
         const string APIVER = "1";
         TLServer_WM tl = new TLServer_WM();
-        public const string PROGRAM = "ServerTD BETA";
+        public const string PROGRAM = "ServerTDX BETA";
+        Log _log = new Log(PROGRAM);
         public TDServerMain()
         {
             InitializeComponent();
@@ -283,6 +284,7 @@ namespace TDServer
 
         void TDServerMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            _log.Stop();
             Properties.Settings.Default.Save();
             if (ok)
                 api.Logout();
@@ -324,8 +326,9 @@ namespace TDServer
 
         void debug(string msg)
         {
+            _log.GotDebug(msg);
             _dw.GotDebug(msg);
-            this.txtDebug.AppendText(msg);
+            
         }
         const string MESSAGES = "Messages";
 

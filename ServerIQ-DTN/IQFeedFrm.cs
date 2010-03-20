@@ -18,7 +18,7 @@ namespace IQFeedBroker
 
         private IQFeedHelper _helper;
         DebugWindow _dw = new DebugWindow();
-
+        Log _log = new Log(PROGRAM);
 
         public IQFeedFrm()
         {
@@ -26,10 +26,16 @@ namespace IQFeedBroker
             this.FormClosing += IQFeedFrm_FormClosing;
             _helper = new IQFeedHelper();
             _helper.MktCodes = parsemkts(Properties.Resources.marketcenters);
-            _helper.SendDebug += new DebugDelegate(_dw.GotDebug);
+            _helper.SendDebug += new DebugDelegate(_helper_SendDebug);
             _helper.Connected += new IQFeedHelper.booldel(_helper_Connected);
 
 
+        }
+
+        void _helper_SendDebug(string msg)
+        {
+            _dw.GotDebug(msg);
+            _log.GotDebug(msg);
         }
 
         public static Dictionary<int, string> parsemkts(string data)
@@ -63,7 +69,7 @@ namespace IQFeedBroker
         private void IQFeedFrm_FormClosing(object sender, FormClosingEventArgs e)
         {
             Properties.Settings.Default.Save();
-
+            _log.Stop();
             _helper.Stop();
         }
 

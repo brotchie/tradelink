@@ -13,11 +13,18 @@ namespace ServerDBFX
     {
         ServerDBFX _dbfx = new ServerDBFX();
         public const string PROGRAM = "ServerDBFX";
+        Log _log = new Log(PROGRAM);
         public ServerDBFXMain()
         {
             InitializeComponent();
-            _dbfx.SendDebug += new TradeLink.API.DebugFullDelegate(_dw.GotDebug);
+            _dbfx.SendDebug += new TradeLink.API.DebugFullDelegate(_dbfx_SendDebug);
             FormClosing += new FormClosingEventHandler(ServerDBFXMain_FormClosing);
+        }
+
+        void _dbfx_SendDebug(TradeLink.API.Debug debug)
+        {
+            _dw.GotDebug(debug);
+            _log.GotDebug(debug);
         }
 
 
@@ -25,6 +32,7 @@ namespace ServerDBFX
         {
             Properties.Settings.Default.Save();
             _dbfx.Stop();
+            _log.Stop();
         }
 
         public DebugWindow _dw = new DebugWindow();
