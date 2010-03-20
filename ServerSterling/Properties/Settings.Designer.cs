@@ -34,5 +34,17 @@ namespace SterServer.Properties {
                 this["CoverEnabled"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string defaultaccount {
+            get {
+                return ((string)(this["defaultaccount"]));
+            }
+            set {
+                this["defaultaccount"] = value;
+            }
+        }
     }
 }

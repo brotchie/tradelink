@@ -144,14 +144,13 @@ namespace SterServer
         {
             try
             {
+                _runbg = false;
                 stiQuote.DeRegisterAllQuotes();
                 stiBook = null;
                 stiOrder = null;
                 stiPos = null;
                 stiEvents = null;
                 stiQuote = null;
-                _runbg = false;
-                Thread.Sleep(250);
                 if ((_bw.ThreadState != ThreadState.Aborted) || (_bw.ThreadState != ThreadState.Stopped))
                 {
                     try
@@ -175,6 +174,13 @@ namespace SterServer
         string symquotes = "";
         Dictionary<long, string> idacct = new Dictionary<long, string>();
 
+        string _account = string.Empty;
+        /// <summary>
+        /// gets or sets default account
+        /// </summary>
+        public string Account { get { return _account; } set { _account = value; debug("default account: " + _account); } }
+            
+
 
         bool _runbg = false;
         void background(object param)
@@ -194,8 +200,8 @@ namespace SterServer
                         order.Side = getside(o.symbol,o.side);
                         order.Symbol = o.symbol;
                         order.Quantity = o.UnsignedSize;
-                        string acct = accts.Count > 0 ? accts[0] : "";
-                        order.Account = o.Account != "" ? o.Account : acct;
+                        string acct = _account != string.Empty ? _account : (accts.Count > 0 ? accts[0] : string.Empty);
+                        order.Account = o.Account != string.Empty ? o.Account : acct;
                         order.Destination = o.Exchange != "" ? o.ex : "NYSE";
                         order.Tif = o.TIF;
                         order.PriceType = o.isMarket ? STIPriceTypes.ptSTIMkt : (o.isLimit ? STIPriceTypes.ptSTILmt : STIPriceTypes.ptSTISvrStp);
@@ -254,8 +260,8 @@ namespace SterServer
                                     order.Quantity = Math.Abs(o.size);
                                     order.Destination = o.ex;
                                     order.ClOrderID = o.id.ToString();
-                                    string acct = accts.Count > 0 ? accts[0] : "";
-                                    order.Account = o.Account != "" ? o.Account : acct;
+                                    string acct = _account != string.Empty ? _account : (accts.Count > 0 ? accts[0] : string.Empty);
+                                    order.Account = o.Account != string.Empty ? o.Account : acct;
                                     int err = order.SubmitOrder();
                                     string tmp = "";
                                     if ((err == 0) && (!idacct.TryGetValue(o.id, out tmp)))

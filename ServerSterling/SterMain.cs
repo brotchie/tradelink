@@ -23,13 +23,21 @@ namespace SterServer
             _dc.Parent = this;
             _dc.Dock = DockStyle.Fill;
             ContextMenu = new ContextMenu();
+            ContextMenu.MenuItems.Add("account", new EventHandler(setaccount));
             ContextMenu.MenuItems.Add("report", new EventHandler(report));
             tl.SendDebug += new DebugDelegate(tl_SendDebug);
             tl.CoverEnabled = Properties.Settings.Default.CoverEnabled;
+            tl.Account = Properties.Settings.Default.defaultaccount;
             tl.Start();
             FormClosing += new FormClosingEventHandler(SterMain_FormClosing);
         }
 
+        void setaccount(object sender, EventArgs e)
+        {
+            string acct = Microsoft.VisualBasic.Interaction.InputBox("Provide default account name: ", "Default Sterling Account", Properties.Settings.Default.defaultaccount, 0, 0);
+            Properties.Settings.Default.defaultaccount = acct;
+            tl.Account = acct;
+        }
         void tl_SendDebug(string msg)
         {
             _log.GotDebug(msg);
@@ -59,6 +67,7 @@ namespace SterServer
         {
             try
             {
+                Properties.Settings.Default.Save();
                 tl.Stop();
                 _log.Stop();
             }
