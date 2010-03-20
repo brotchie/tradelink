@@ -10,10 +10,16 @@ namespace TradeLink.Common
     /// <typeparam name="T"></typeparam>
     public struct RingBuffer<T>
     {
+        int _or;
         T[] _buffer;
-        volatile int _rc;
-        volatile int _wc;
-        volatile bool _flipped;
+        int _rc;
+        int _wc;
+        int _rflip;
+        int _wflip;
+        /// <summary>
+        /// number of overruns, should be zero (otherwise increase buffer size)
+        /// </summary>
+        public int BufferOverrun { get { return _or; } }
         /// <summary>
         /// maximum # of unread elements the buffer can hold.
         /// </summary>
@@ -32,17 +38,19 @@ namespace TradeLink.Common
             if (_wc >= _buffer.Length)
             {
                 _wc = 0;
-                _flipped = true;
+                _wflip++;
+                if ((_wflip - _rflip > 1))
+                    _or++;
             }
         }
         /// <summary>
         /// returns true if all written elements have been read from buffer
         /// </summary>
-        public bool isEmpty { get { return (_rc >= _wc) && !_flipped; } }
+        public bool isEmpty { get { return (_rc >= _wc) && (_wflip== _rflip); } }
         /// <summary>
         /// returns false if there is more to be read
         /// </summary>
-        public bool hasItems { get { return (_rc < _wc) || _flipped; } }
+        public bool hasItems { get { return (_rc < _wc) || (_wflip!=_rflip); } }
         /// <summary>
         /// reads next unread element from buffer
         /// </summary>
@@ -53,20 +61,23 @@ namespace TradeLink.Common
             if (_rc >= _buffer.Length)
             {
                 _rc = 0;
-                _flipped = false;
+                _rflip++;
             }
             return val;
         }
+        
         /// <summary>
         /// create a buffer of fixed size in elements
         /// </summary>
         /// <param name="BufferSize"></param>
         public RingBuffer(int BufferSize)
         {
+            _or = 0;
             _buffer = new T[BufferSize];
             _wc = 0;
             _rc = 0;
-            _flipped = false;
+            _rflip = 0;
+            _wflip = 0;
         }
     }
 }

@@ -12,159 +12,193 @@ namespace TradeLink.Common
     /// </summary>
     public class AsyncResponse
     {
-        const long MAXTICK = 10000;
-        Tick[] _tickcache = new Tick[MAXTICK];
-        long _readticks = 0;
-        long _writeticks = 0;
+        const int MAXTICK = 10000;
+        const int MAXIMB = 100000;
+        RingBuffer<Tick> _tickcache;
+        RingBuffer<Imbalance> _imbcache;
+
+        /// <summary>
+        /// fired when tick is read asychronously from buffer
+        /// </summary>
         public event TickDelegate GotTick;
+        /// <summary>
+        ///  fired when buffer is empty
+        /// </summary>
         public event VoidDelegate GotTickQueueEmpty;
+        /// <summary>
+        /// fired when buffer is written
+        /// </summary>
         public event VoidDelegate GotTickQueued;
-        volatile bool _tickflip = false;
+        /// <summary>
+        /// should be zero unless buffer too small
+        /// </summary>
+        public int TickOverrun { get { return _tickcache.BufferOverrun; } }
+
         static ManualResetEvent _tickswaiting = new ManualResetEvent(false);
         Thread _readtickthread = null;
 
-
+        volatile bool _readtick = true;
 
         void ReadTick()
         {
 
-            while (true)
+            while (_readtick)
             {
-                if (GotTickQueued != null) GotTickQueued();
-                while (_readticks < _tickcache.Length)
+                if (_tickcache.hasItems && (GotTickQueued!=null))
+                    GotTickQueued();
+                while (_tickcache.hasItems)
                 {
-                    if (_readtickthread.ThreadState == ThreadState.StopRequested)
-                        return;
-                    if ((_readticks>=_writeticks) && !_tickflip)
+                    if (!_readtick)
                         break;
-                    Tick k = _tickcache[_readticks];
+                    Tick k = _tickcache.Read();
                     if (GotTick != null)
                         GotTick(k);
-                    _readticks++;
-                    if (_readticks >= _tickcache.Length)
-                    {
-                        _readticks = 0;
-                        _tickflip = false;
-                    }
                 }
                 // send event that queue is presently empty
-                if (GotTickQueueEmpty != null) GotTickQueueEmpty();
+                if (_tickcache.isEmpty && (GotTickQueueEmpty != null))
+                    GotTickQueueEmpty();
                 // clear current flag signal
                 _tickswaiting.Reset();
-                // wait for a new signal to continue reading
-                _tickswaiting.WaitOne(-1); 
-                    
+                try
+                {
+                    // wait for a new signal to continue reading
+                    _tickswaiting.WaitOne(SLEEP);
+                }
+                catch (ThreadInterruptedException) { }
             }
         }
-        
+
+        public const int SLEEP = 10;
+
+        /// <summary>
+        /// pass new ticks through here to be processed asyncrhomously
+        /// </summary>
+        /// <param name="k"></param>
         public void newTick(Tick k)
         {
-            _tickcache[_writeticks] = k;
-            _writeticks++;
-            if (_writeticks >= _tickcache.Length)
-            {
-                _writeticks = 0;
-                _tickflip = true;
-            }
-
+            _tickcache.Write(k);
             if ((_readtickthread != null) && (_readtickthread.ThreadState == ThreadState.Unstarted))
+            {
+                _readtick = true;
                 _readtickthread.Start();
+            }
             else if ((_readtickthread != null) && (_readtickthread.ThreadState == ThreadState.WaitSleepJoin))
             {
                 _tickswaiting.Set(); // signal ReadIt thread to read now
             }
         }
 
-        const long MAXIMB = 100000;
-        Imbalance[] _imbcache = new Imbalance[MAXIMB];
-        long _readimbs = 0;
-        long _writeimbs = 0;
+
+
+        /// <summary>
+        /// fired when imbalance is read asynchronously from buffer
+        /// </summary>
         public event ImbalanceDelegate GotImbalance;
+        /// <summary>
+        /// fired when buffer is written to
+        /// </summary>
         public event VoidDelegate GotImbalanceQueued;
+        /// <summary>
+        /// fired when buffer is empty
+        /// </summary>
         public event VoidDelegate GotImbalanceQueueEmpty;
-        volatile bool _imbflip = false;
+        /// <summary>
+        /// should be zero unless buffer too small
+        /// </summary>
+        public int ImbalanceOverrun { get { return _imbcache.BufferOverrun; } }
+
         static ManualResetEvent _imbswaiting = new ManualResetEvent(false);
         Thread _readimbthread = null;
+        bool _readimb = true;
 
         void ReadImbs()
         {
 
-            while (true)
+            while (_readimb)
             {
-                if (GotImbalanceQueued != null) GotImbalanceQueued();
-                while (_readimbs < _imbcache.Length)
+                if (_imbcache.hasItems &&(GotImbalanceQueued != null))
+                    GotImbalanceQueued();
+                while (_imbcache.hasItems)
                 {
-                    if (_readimbthread.ThreadState == ThreadState.StopRequested)
-                        return;
-                    if ((_readimbs >= _writeimbs) && !_imbflip)
+                    if (!_readimb)
                         break;
-                    Imbalance imb  = _imbcache[_readimbs];
+                    Imbalance imb  = _imbcache.Read();
                     if (GotImbalance != null)
                         GotImbalance(imb);
-                    _readimbs++;
-                    if (_readimbs >= _imbcache.Length)
-                    {
-                        _readimbs = 0;
-                        _imbflip = false;
-                    }
                 }
                 // send event that queue is presently empty
-                if (GotImbalanceQueueEmpty != null) GotImbalanceQueueEmpty();
+                if (_imbcache.isEmpty && (GotImbalanceQueueEmpty != null) )
+                    GotImbalanceQueueEmpty();
                 // clear current flag signal
                 _imbswaiting.Reset();
-                // wait for a new signal to continue reading
-                _imbswaiting.WaitOne(-1);
+                try
+                {
+                    // wait for a new signal to continue reading
+                    _imbswaiting.WaitOne(SLEEP);
+                }
+                catch (ThreadInterruptedException) { }
 
             }
         }
-
+        /// <summary>
+        /// write an imbalance to buffer for later processing
+        /// </summary>
+        /// <param name="imb"></param>
         public void newImbalance(Imbalance imb)
         {
-            _imbcache[_writeimbs] = imb;
-            _writeimbs++;
-            if (_writeimbs >= _imbcache.Length)
-            {
-                _writeimbs = 0;
-                _imbflip = true;
-            }
+            _imbcache.Write(imb);
 
             if ((_readimbthread != null) && (_readimbthread.ThreadState == ThreadState.Unstarted))
+            {
+                _readimb = true;
                 _readimbthread.Start();
+            }
             else if ((_readimbthread != null) && (_readimbthread.ThreadState == ThreadState.WaitSleepJoin))
             {
                 // signal ReadIt thread to read now
-                _imbswaiting.Set(); 
+                _imbswaiting.Set();
             }
         }
-
-        public AsyncResponse()
+        /// <summary>
+        /// create an asynchronous responder
+        /// </summary>
+        public AsyncResponse() : this(MAXTICK, MAXIMB) { }
+        /// <summary>
+        /// creates asynchronous responder with specified buffer sizes
+        /// </summary>
+        /// <param name="maxticks"></param>
+        /// <param name="maximb"></param>
+        public AsyncResponse(int maxticks, int maximb)
         {
+            _tickcache = new RingBuffer<Tick>(maxticks);
+            _imbcache = new RingBuffer<Imbalance>(maximb);
             _readtickthread = new Thread(this.ReadTick);
             _readimbthread = new Thread(this.ReadImbs);
         }
-
+        /// <summary>
+        /// stop the read threads and shutdown (call on exit)
+        /// </summary>
         public void Stop()
         {
+            _readimb = false;
+            _readtick = false;
             try
             {
                 if ((_readtickthread != null) && ((_readtickthread.ThreadState != ThreadState.Stopped) && (_readtickthread.ThreadState != ThreadState.StopRequested)))
-                    _readtickthread.Abort();
+                    _readtickthread.Interrupt();
                 if ((_readimbthread != null) && ((_readimbthread.ThreadState != ThreadState.Stopped) && (_readimbthread.ThreadState != ThreadState.StopRequested)))
-                    _readimbthread.Abort();
+                    _readimbthread.Interrupt();
             }
             catch { }
             try
             {
-                _tickcache = new Tick[MAXTICK];
-                _imbcache = new Imbalance[MAXIMB];
-                _readimbs = 0;
-                _writeimbs = 0;
+                _tickcache = new RingBuffer<Tick>(MAXTICK);
+                _imbcache = new RingBuffer<Imbalance>(MAXIMB);
                 _imbswaiting.Reset();
-                _writeticks = 0;
-                _readticks = 0;
                 _tickswaiting.Reset();
             }
             catch { }
         }
+
     }
 }

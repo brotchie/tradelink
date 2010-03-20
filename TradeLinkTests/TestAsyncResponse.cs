@@ -12,7 +12,24 @@ namespace TestTradeLink
         public TestAsyncResponse()
         {
             ar.GotTick += new TickDelegate(ar_GotTick);
+            ar.GotTickQueueEmpty += new VoidDelegate(ar_GotTickQueueEmpty);
+            ar.GotImbalanceQueueEmpty += new VoidDelegate(ar_GotImbalanceQueueEmpty);
             ar.GotImbalance += new ImbalanceDelegate(ar_GotImbalance);
+        }
+
+
+
+
+        bool tickdone = false;
+        void ar_GotTickQueueEmpty()
+        {
+            tickdone = tc >= MAXTICKS;
+        }
+
+        bool imbdone = false;
+        void ar_GotImbalanceQueueEmpty()
+        {
+            imbdone = ic >= MAXIMBS;
         }
 
 
@@ -20,7 +37,7 @@ namespace TestTradeLink
         const int MAXIMBS = 1000;
         const string SYM = "TST";
         AsyncResponse ar = new AsyncResponse();
-
+        const int MAXWAITS = 100;
 
         [Test]
         public void TickTest()
@@ -33,8 +50,23 @@ namespace TestTradeLink
             for (int i = 0; i < sent.Length; i++)
                 ar.newTick(sent[i]);
 
+            int waits = 0;
             // wait for reception
-            System.Threading.Thread.CurrentThread.Join(250);
+            while (!tickdone)
+            {
+                System.Threading.Thread.Sleep(AsyncResponse.SLEEP);
+                if (waits++ > 5)
+                {
+                    //System.Diagnostics.Debugger.Break();
+                    Console.WriteLine(string.Format("waits: {0} tickcount: {1}", waits, tc));
+                }
+            }
+
+            Assert.AreEqual(0, ar.TickOverrun,"tick overrun");
+
+            // verify done
+            Assert.IsTrue(tickdone, tc.ToString() + " ticks recv/"+MAXTICKS.ToString());
+
 
             //verify count
             Assert.AreEqual(MAXTICKS, tc);
@@ -57,7 +89,24 @@ namespace TestTradeLink
                 ar.newImbalance(sent[i]);
 
             // wait for reception
-            System.Threading.Thread.CurrentThread.Join(250);
+            int waits = 0;
+            // wait for reception
+            while (!imbdone)
+            {
+                System.Threading.Thread.Sleep(AsyncResponse.SLEEP);
+                if (waits++ > 5)
+                {
+                    //System.Diagnostics.Debugger.Break();
+                    Console.WriteLine(string.Format("waits: {0} tickcount: {1}", waits, tc));
+                }
+
+            }
+
+            //verify no overruns
+            Assert.AreEqual(0, ar.ImbalanceOverrun,"imbalance overrun");
+
+            // verify done
+            Assert.IsTrue(imbdone, ic.ToString() + " imbalances recv/"+MAXIMBS.ToString());
 
             // verify count
             Assert.AreEqual(MAXIMBS, ic);
@@ -79,20 +128,38 @@ namespace TestTradeLink
 
         void ar_GotImbalance(Imbalance imb)
         {
-            bool v = (lasti <= imb.ThisTime);
-            if (!v)
-                iorder = false;
-            irecv[ic++] = imb;
-            lasti = imb.ThisTime;
+            try
+            {
+                bool v = (lasti <= imb.ThisTime);
+                if (!v)
+                    iorder = false;
+                irecv[ic++] = imb;
+                lasti = imb.ThisTime;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                ic++;
+            }
         }
 
         void ar_GotTick(Tick t)
         {
-            bool v = (lastt <= t.time);
-            if (!v)
-                torder = false;
-            trecv[tc++] = t;
-            lastt = t.time;
+            try
+            {
+                bool v = true;
+                v = (lastt <= t.time);
+                if (!v)
+                    torder = false;
+                trecv[tc++] = t;
+                lastt = t.time;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                tc++;
+            }
+
         }
 
         [TestFixtureTearDown]
