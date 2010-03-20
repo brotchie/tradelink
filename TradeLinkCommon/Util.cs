@@ -677,7 +677,14 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="o"></param>
         /// <returns></returns>
-        public static string DumpObjectProperties(Object o)
+        public static string DumpObjectProperties(Object o) { return DumpObjectProperties(o, null); }
+        /// <summary>
+        /// dumps public properties and fields as xml string, with optional debugging for errors
+        /// </summary>
+        /// <param name="o"></param>
+        /// <param name="deb"></param>
+        /// <returns></returns>
+        public static string DumpObjectProperties(Object o,DebugDelegate deb)
         {
             try
             {
@@ -688,8 +695,26 @@ namespace TradeLink.Common
                 sw.Close();
                 return sw.ToString();
             }
-            catch { }
+            catch (Exception ex)
+            {
+                if (deb != null)
+                    deb("Error dumping: "+o.ToString()+" "+ex.Message + ex.StackTrace);
+            }
             return string.Empty;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="PROGRAM"></param>
+        /// <returns></returns>
+        public static int ProgramCount(string PROGRAM)
+        {
+            System.Diagnostics.Process[] ps = System.Diagnostics.Process.GetProcesses();
+            int count = 0;
+            foreach (System.Diagnostics.Process p in ps)
+                if (p.ProcessName.ToLower().Contains(PROGRAM.ToLower()))
+                    count++;
+            return count;
         }
         
     }
