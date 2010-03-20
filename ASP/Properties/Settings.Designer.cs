@@ -106,5 +106,17 @@ namespace ASP.Properties {
                 this["feedfallback"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string defaultdest {
+            get {
+                return ((string)(this["defaultdest"]));
+            }
+            set {
+                this["defaultdest"] = value;
+            }
+        }
     }
 }

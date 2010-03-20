@@ -1091,8 +1091,11 @@ namespace ASP
                     o.Exchange = sec.DestEx;
                 }
                 else
-                    debug("security and exchange missing on: " + o.symbol); 
+                    debug("security type missing on: " + o.symbol); 
             }
+            // if still empty, use default
+            if (o.ex == string.Empty)
+                o.Exchange = _ao._dest.Text;
             // set the local symbol
             if (o.LocalSymbol==string.Empty)
                 o.LocalSymbol = o.symbol;

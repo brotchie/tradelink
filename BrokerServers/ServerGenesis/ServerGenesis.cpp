@@ -313,6 +313,7 @@ int ServerGenesis::SendOrder(TradeLibFast::TLOrder o)
 			return SYMBOL_NOT_LOADED;
 		}
 	}
+
 	// ensure id is unique
 	if (o.id==0) // if id is zero, we auto-assign the id
 	{

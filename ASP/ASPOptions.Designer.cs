@@ -30,49 +30,40 @@
         {
             this.components = new System.ComponentModel.Container();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this._virtids = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
             this.archivetickbox = new System.Windows.Forms.CheckBox();
-            this._account = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
-            this._brokertimeout = new System.Windows.Forms.NumericUpDown();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this._providerfallback = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this._datasel = new System.Windows.Forms.ComboBox();
             this._execsel = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this._brokertimeout = new System.Windows.Forms.NumericUpDown();
+            this._providerfallback = new System.Windows.Forms.CheckBox();
+            this._dest = new System.Windows.Forms.TextBox();
+            this._virtids = new System.Windows.Forms.CheckBox();
+            this._account = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._brokertimeout)).BeginInit();
             this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._brokertimeout)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this._dest);
+            this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this._virtids);
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.archivetickbox);
             this.groupBox1.Controls.Add(this._account);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(381, 74);
+            this.groupBox1.Size = new System.Drawing.Size(381, 109);
             this.groupBox1.TabIndex = 20;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "General";
-            // 
-            // _virtids
-            // 
-            this._virtids.Appearance = System.Windows.Forms.Appearance.Button;
-            this._virtids.AutoSize = true;
-            this._virtids.Checked = global::ASP.Properties.Settings.Default.usevirtualids;
-            this._virtids.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::ASP.Properties.Settings.Default, "usevirtualids", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this._virtids.Location = new System.Drawing.Point(264, 26);
-            this._virtids.Name = "_virtids";
-            this._virtids.Size = new System.Drawing.Size(90, 30);
-            this._virtids.TabIndex = 18;
-            this._virtids.Text = "Virtual Ids";
-            this._virtids.UseVisualStyleBackColor = true;
             // 
             // label4
             // 
@@ -98,16 +89,6 @@
             this.toolTip1.SetToolTip(this.archivetickbox, "archive ticks automatically for playback/study");
             this.archivetickbox.UseVisualStyleBackColor = true;
             // 
-            // _account
-            // 
-            this._account.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::ASP.Properties.Settings.Default, "accountname", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this._account.Location = new System.Drawing.Point(80, 28);
-            this._account.Name = "_account";
-            this._account.Size = new System.Drawing.Size(76, 26);
-            this._account.TabIndex = 15;
-            this._account.Text = global::ASP.Properties.Settings.Default.accountname;
-            this.toolTip1.SetToolTip(this._account, "destination account orders and executions are sent for");
-            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -116,38 +97,6 @@
             this.label1.Size = new System.Drawing.Size(146, 20);
             this.label1.TabIndex = 20;
             this.label1.Text = "FeedTimeout (sec):";
-            // 
-            // _brokertimeout
-            // 
-            this._brokertimeout.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::ASP.Properties.Settings.Default, "brokertimeoutsec", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this._brokertimeout.Location = new System.Drawing.Point(263, 133);
-            this._brokertimeout.Maximum = new decimal(new int[] {
-            10000000,
-            0,
-            0,
-            0});
-            this._brokertimeout.Name = "_brokertimeout";
-            this._brokertimeout.Size = new System.Drawing.Size(90, 26);
-            this._brokertimeout.TabIndex = 19;
-            this._brokertimeout.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.toolTip1.SetToolTip(this._brokertimeout, "0 disables timeout");
-            this._brokertimeout.Value = global::ASP.Properties.Settings.Default.brokertimeoutsec;
-            this._brokertimeout.ValueChanged += new System.EventHandler(this._brokertimeout_ValueChanged);
-            // 
-            // _providerfallback
-            // 
-            this._providerfallback.AutoSize = true;
-            this._providerfallback.Checked = global::ASP.Properties.Settings.Default.feedfallback;
-            this._providerfallback.CheckState = System.Windows.Forms.CheckState.Checked;
-            this._providerfallback.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::ASP.Properties.Settings.Default, "feedfallback", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this._providerfallback.Location = new System.Drawing.Point(14, 103);
-            this._providerfallback.Name = "_providerfallback";
-            this._providerfallback.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this._providerfallback.Size = new System.Drawing.Size(137, 24);
-            this._providerfallback.TabIndex = 4;
-            this._providerfallback.Text = "Fallback to any";
-            this.toolTip1.SetToolTip(this._providerfallback, "Fallback to any provider if preferred not found.");
-            this._providerfallback.UseVisualStyleBackColor = true;
             // 
             // groupBox2
             // 
@@ -158,7 +107,7 @@
             this.groupBox2.Controls.Add(this._execsel);
             this.groupBox2.Controls.Add(this.label3);
             this.groupBox2.Controls.Add(this.label2);
-            this.groupBox2.Location = new System.Drawing.Point(13, 92);
+            this.groupBox2.Location = new System.Drawing.Point(13, 127);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(380, 180);
             this.groupBox2.TabIndex = 21;
@@ -199,11 +148,85 @@
             this.label2.TabIndex = 0;
             this.label2.Text = "Execution:";
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(15, 68);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(47, 20);
+            this.label5.TabIndex = 19;
+            this.label5.Text = "Dest:";
+            // 
+            // _brokertimeout
+            // 
+            this._brokertimeout.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::ASP.Properties.Settings.Default, "brokertimeoutsec", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this._brokertimeout.Location = new System.Drawing.Point(263, 133);
+            this._brokertimeout.Maximum = new decimal(new int[] {
+            10000000,
+            0,
+            0,
+            0});
+            this._brokertimeout.Name = "_brokertimeout";
+            this._brokertimeout.Size = new System.Drawing.Size(90, 26);
+            this._brokertimeout.TabIndex = 19;
+            this._brokertimeout.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.toolTip1.SetToolTip(this._brokertimeout, "0 disables timeout");
+            this._brokertimeout.Value = global::ASP.Properties.Settings.Default.brokertimeoutsec;
+            this._brokertimeout.ValueChanged += new System.EventHandler(this._brokertimeout_ValueChanged);
+            // 
+            // _providerfallback
+            // 
+            this._providerfallback.AutoSize = true;
+            this._providerfallback.Checked = global::ASP.Properties.Settings.Default.feedfallback;
+            this._providerfallback.CheckState = System.Windows.Forms.CheckState.Checked;
+            this._providerfallback.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::ASP.Properties.Settings.Default, "feedfallback", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this._providerfallback.Location = new System.Drawing.Point(14, 103);
+            this._providerfallback.Name = "_providerfallback";
+            this._providerfallback.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this._providerfallback.Size = new System.Drawing.Size(137, 24);
+            this._providerfallback.TabIndex = 4;
+            this._providerfallback.Text = "Fallback to any";
+            this.toolTip1.SetToolTip(this._providerfallback, "Fallback to any provider if preferred not found.");
+            this._providerfallback.UseVisualStyleBackColor = true;
+            // 
+            // _dest
+            // 
+            this._dest.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::ASP.Properties.Settings.Default, "defaultdest", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this._dest.Location = new System.Drawing.Point(80, 65);
+            this._dest.Name = "_dest";
+            this._dest.Size = new System.Drawing.Size(76, 26);
+            this._dest.TabIndex = 20;
+            this._dest.Text = global::ASP.Properties.Settings.Default.defaultdest;
+            this.toolTip1.SetToolTip(this._dest, "Default exchange/destination");
+            // 
+            // _virtids
+            // 
+            this._virtids.Appearance = System.Windows.Forms.Appearance.Button;
+            this._virtids.AutoSize = true;
+            this._virtids.Checked = global::ASP.Properties.Settings.Default.usevirtualids;
+            this._virtids.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::ASP.Properties.Settings.Default, "usevirtualids", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this._virtids.Location = new System.Drawing.Point(264, 26);
+            this._virtids.Name = "_virtids";
+            this._virtids.Size = new System.Drawing.Size(90, 30);
+            this._virtids.TabIndex = 18;
+            this._virtids.Text = "Virtual Ids";
+            this._virtids.UseVisualStyleBackColor = true;
+            // 
+            // _account
+            // 
+            this._account.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::ASP.Properties.Settings.Default, "accountname", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this._account.Location = new System.Drawing.Point(80, 28);
+            this._account.Name = "_account";
+            this._account.Size = new System.Drawing.Size(76, 26);
+            this._account.TabIndex = 15;
+            this._account.Text = global::ASP.Properties.Settings.Default.accountname;
+            this.toolTip1.SetToolTip(this._account, "destination account orders and executions are sent for");
+            // 
             // ASPOptions
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(415, 284);
+            this.ClientSize = new System.Drawing.Size(415, 319);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
@@ -211,9 +234,9 @@
             this.Text = "Options";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this._brokertimeout)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this._brokertimeout)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -234,5 +257,7 @@
         public System.Windows.Forms.CheckBox _providerfallback;
         public System.Windows.Forms.ComboBox _datasel;
         public System.Windows.Forms.ComboBox _execsel;
+        private System.Windows.Forms.Label label5;
+        public System.Windows.Forms.TextBox _dest;
     }
 }

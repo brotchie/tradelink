@@ -475,6 +475,9 @@
 			m_account = B_GetCurrentAccount();
 		else 
 			m_account = B_GetAccount(o.account.GetBuffer());
+		// ensure we have an exchange
+		if (o.exchange=="")
+			o.exchange = o.symbol.GetLength()>3 ? "NSDQ" : "NYSE";
 		
 
 

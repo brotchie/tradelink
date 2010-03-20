@@ -196,6 +196,8 @@ namespace SterServer
                         Order o = _orderq.Read();
                         order.LmtPrice = (double)o.price;
                         order.StpPrice = (double)o.stopp;
+                        if (o.ex == string.Empty)
+                            o.ex = o.symbol.Length > 3 ? "NSDQ" : "NYSE";
                         order.Destination = o.Exchange;
                         order.Side = getside(o.symbol,o.side);
                         order.Symbol = o.symbol;

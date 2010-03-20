@@ -21,7 +21,7 @@ namespace TradeLink.Common
         int _xdate = 0;
         int _xtime = 0;
         decimal _xprice = 0;
-        string _ex = "NYSE";
+        string _ex = string.Empty;
         public int UnsignedSize { get { return Math.Abs(_xsize); } }
         public string ex { get { return _ex; } set { _ex = value; } }
         public long id { get { return _id; } set { _id = value; } }
