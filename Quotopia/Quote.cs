@@ -567,7 +567,7 @@ namespace Quotopia
             if (res == null) return new int[0];
             return res;
         }
-
+        HighLowTracker _hlt = new HighLowTracker();
         void RefreshRow(Tick t)
         {
             if (qg.InvokeRequired)
@@ -577,9 +577,8 @@ namespace Quotopia
             }
             else
             {
+                _hlt.newTick(t);
                 int[] rows = GetSymbolRows(t.symbol);
-                decimal high = tl.FastHigh(t.symbol);
-                decimal low = tl.FastLow(t.symbol);
                 for (int i = 0; i < rows.Length; i++)
                 {
                     // last,size,bid/ask,sizes
@@ -630,8 +629,8 @@ namespace Quotopia
                         int bs = (s != "") ? Convert.ToInt32(s) : 0;
                         qt.Rows[r]["Sizes"] = bs.ToString() + "x" + os.ToString();
                     }
-                    qt.Rows[r]["High"] = high.ToString(_dispdecpointformat);
-                    qt.Rows[r]["Low"] = low.ToString(_dispdecpointformat);
+                    qt.Rows[r]["High"] = _hlt.High(t.symbol).ToString(_dispdecpointformat);
+                    qt.Rows[r]["Low"] = _hlt.Low(t.symbol).ToString(_dispdecpointformat);
                     if (_dispdecpoints.Value > 2)
                     {
                         try

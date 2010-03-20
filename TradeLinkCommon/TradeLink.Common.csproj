@@ -102,6 +102,7 @@
     <Compile Include="GauntletEngine.cs" />
     <Compile Include="GenericTracker.cs" />
     <Compile Include="GZip.cs" />
+    <Compile Include="HighLowTracker.cs" />
     <Compile Include="HistSim.cs">
       <SubType>Component</SubType>
     </Compile>
