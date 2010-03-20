@@ -11,6 +11,7 @@ namespace TradeLink.API
     public delegate void TickDelegate(Tick t);
     public delegate void FillDelegate(Trade t);
     public delegate void OrderDelegate(Order o);
+    public delegate long OrderDelegateStatus(Order o);
     public delegate void Int64Delegate(Int64 number);
     public delegate void SecurityDelegate(Security sec);
     public delegate void StringDecimalDelegate(string txt, decimal val);

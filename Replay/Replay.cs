@@ -25,7 +25,7 @@ namespace Replay
         public Replay()
         {
             InitializeComponent();
-            tl.newSendOrderRequest += new OrderDelegate(tl_gotSrvFillRequest);
+            tl.newSendOrderRequest += new OrderDelegateStatus(tl_gotSrvFillRequest);
             tl.newOrderCancelRequest += new LongDelegate(tl_OrderCancelRequest);
             tl.newAcctRequest += new StringDelegate(tl_gotSrvAcctRequest);
             tl.newPosList += new PositionArrayDelegate(tl_gotSrvPosList);
@@ -266,8 +266,9 @@ namespace Replay
 
         
 
-        void tl_gotSrvFillRequest(Order o)
+        long tl_gotSrvFillRequest(Order o)
         {
+            long err = 0;
             // pass tradelink fill requests through to the histsim broker
             // (if histsim has been started)
             if (h != null)
@@ -282,7 +283,7 @@ namespace Replay
                 oldbbo.Account = "";
 
                 // then send the order
-                h.SimBroker.SendOrderStatus(o);
+                err = h.SimBroker.SendOrderStatus(o);
 
                 // get the new top of book
                 Order newbbo = h.SimBroker.BestBidOrOffer(o.symbol,o.side);
@@ -295,6 +296,7 @@ namespace Replay
                     tl.newTick(newtick);
                 }
             }
+            return err;
         }
 
         void _playback_ProgressChanged(object sender, ProgressChangedEventArgs e)

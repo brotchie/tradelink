@@ -32,7 +32,7 @@ namespace ServerDBFX
             newProviderName = Providers.DBFX;
             newFeatureRequest += new MessageArrayDelegate(ServerDBFX_newFeatureRequest);
             newOrderCancelRequest += new LongDelegate(ServerDBFX_newOrderCancelRequest);
-            newSendOrderRequest += new OrderDelegate(ServerDBFX_newSendOrderRequest);
+            newSendOrderRequest += new OrderDelegateStatus(ServerDBFX_newSendOrderRequest);
         }
 
         MessageTypes[] ServerDBFX_newFeatureRequest()
@@ -74,10 +74,10 @@ namespace ServerDBFX
             return true;
         }
         IdTracker _id = new IdTracker();
-        void ServerDBFX_newSendOrderRequest(Order o)
+        long ServerDBFX_newSendOrderRequest(Order o)
         {
             if ((o.id != 0) && !isunique(o))
-                return;
+                return (long)MessageTypes.DUPLICATE_ORDERID;
             if (o.id == 0)
                 o.id = _id.AssignId;
             object psOrderId;
@@ -87,6 +87,7 @@ namespace ServerDBFX
             _tl2dbfx.Add(o.id, psOrderId.ToString());
             newOrder(o);
             //D(psOrderId.ToString());
+            return (long)MessageTypes.OK;
         }
 
         void D(string msg) { if (SendDebug != null) SendDebug(DebugImpl.Create(msg)); }

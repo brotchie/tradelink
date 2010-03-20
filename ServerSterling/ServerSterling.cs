@@ -58,7 +58,7 @@ namespace SterServer
 
                 newAcctRequest += new StringDelegate(tl_newAcctRequest);
                 newProviderName = Providers.Sterling;
-                newSendOrderRequest += new OrderDelegate(tl_gotSrvFillRequest);
+                newSendOrderRequest += new OrderDelegateStatus(tl_gotSrvFillRequest);
                 newPosList += new PositionArrayDelegate(tl_gotSrvPosList);
                 newRegisterStocks += new DebugDelegate(tl_RegisterStocks);
                 newOrderCancelRequest += new LongDelegate(tl_OrderCancelRequest);
@@ -429,11 +429,12 @@ namespace SterServer
             newTick(k);
         }
         IdTracker _idt = new IdTracker();
-        void tl_gotSrvFillRequest(Order o)
+        long tl_gotSrvFillRequest(Order o)
         {
 
             if (o.id == 0) o.id = _idt.AssignId;
             _orderq.Write(o);
+            return (long)MessageTypes.OK;
         }
 
         List<string> accts = new List<string>();

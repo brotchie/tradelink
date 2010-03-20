@@ -46,7 +46,7 @@ namespace ServerBlackwood
             newUnknownRequest += new UnknownMessageDelegate(ServerBlackwood_newUnknownRequest);
             newFeatureRequest += new MessageArrayDelegate(ServerBlackwood_newFeatureRequest);
             newOrderCancelRequest += new LongDelegate(ServerBlackwood_newOrderCancelRequest);
-            newSendOrderRequest += new OrderDelegate(ServerBlackwood_newSendOrderRequest);
+            newSendOrderRequest += new OrderDelegateStatus(ServerBlackwood_newSendOrderRequest);
             newRegisterStocks += new DebugDelegate(ServerBlackwood_newRegisterStocks);
             newPosList += new PositionArrayDelegate(ServerBlackwood_newPosList);
             //newImbalanceRequest += new VoidDelegate(ServerBlackwood_newImbalanceRequest);
@@ -97,10 +97,10 @@ namespace ServerBlackwood
         }
         
         IdTracker _id = new IdTracker();
-        void ServerBlackwood_newSendOrderRequest(Order o)
+        long ServerBlackwood_newSendOrderRequest(Order o)
         {
             if ((o.id != 0) && !isunique(o))
-                return;
+                return (long)MessageTypes.DUPLICATE_ORDERID;
             if (o.id == 0)
                 o.id = _id.AssignId;
 
@@ -139,6 +139,7 @@ namespace ServerBlackwood
             // send the order
             bwOrder.Send();
             _bwOrdIds.Add(o.id, 0);
+            return (long)MessageTypes.OK;
         }
 
         void ServerBlackwood_newOrderCancelRequest(long tlID)

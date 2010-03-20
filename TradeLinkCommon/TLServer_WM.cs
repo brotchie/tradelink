@@ -13,7 +13,7 @@ namespace TradeLink.Common
     public class TLServer_WM : Form, TradeLinkServer
     {
         public event StringDelegate newAcctRequest;
-        public event OrderDelegate newSendOrderRequest;
+        public event OrderDelegateStatus newSendOrderRequest;
         public event LongDelegate newOrderCancelRequest;
         public event PositionArrayDelegate newPosList;
         public event DebugDelegate newRegisterStocks;

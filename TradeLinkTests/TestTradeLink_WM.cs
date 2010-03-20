@@ -53,7 +53,7 @@ namespace TestTradeLink
             c2.Mode(pi, false);
 
             // register server events (so server can process orders)
-            s.newSendOrderRequest += new OrderDelegate(tl_gotSrvFillRequest);
+            s.newSendOrderRequest += new OrderDelegateStatus(tl_gotSrvFillRequest);
 
             // setup client events
             c.gotFill += new FillDelegate(tlclient_gotFill);
@@ -227,10 +227,11 @@ namespace TestTradeLink
 
         // event handlers
 
-        void tl_gotSrvFillRequest(Order o)
+        long tl_gotSrvFillRequest(Order o)
         {
             s.newOrder(o);
             fillrequest++;
+            return 0;
         }
 
         void tlclient_gotTick(Tick t)

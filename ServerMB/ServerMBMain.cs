@@ -39,7 +39,7 @@ namespace ServerMB
             // tradelink bindings
             tl.newProviderName = Providers.MBTrading;
             tl.newFeatureRequest += new MessageArrayDelegate(tl_newFeatureRequest);
-            tl.newSendOrderRequest += new OrderDelegate(tl_newSendOrderRequest);
+            tl.newSendOrderRequest += new OrderDelegateStatus(tl_newSendOrderRequest);
             tl.newRegisterStocks += new DebugDelegate(tl_newRegisterStocks);
             tl.newOrderCancelRequest += new LongDelegate(tl_newOrderCancelRequest);
             tl.newAcctRequest += new StringDelegate(tl_newAcctRequest);
@@ -249,7 +249,7 @@ namespace ServerMB
 
 
 
-        void tl_newSendOrderRequest(Order o)
+        long tl_newSendOrderRequest(Order o)
         {
             test();
             int side = o.side ? MBConst.VALUE_BUY : MBConst.VALUE_SELL;
@@ -271,6 +271,7 @@ namespace ServerMB
             {
                 debug("The following order failed: " + o);
             }
+            return (long)MessageTypes.OK;
         }
 
         MbtAccount getaccount(string name) { foreach (MbtAccount a in m_OrderClient.Accounts) if (a.Account == name) return a; return m_OrderClient.Accounts.DefaultAccount; }

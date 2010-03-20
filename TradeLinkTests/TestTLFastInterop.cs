@@ -62,9 +62,10 @@ namespace TestTradeLink
 
         Order last = new OrderImpl();
 
-        void tl_newSendOrderRequest(Order o)
+        long tl_newSendOrderRequest(Order o)
         {
             last = o;
+            return 0;
   
         }
         const string sym = "TST";
@@ -73,7 +74,7 @@ namespace TestTradeLink
             // start a server
             TLServer_WM tl = new TLServer_WM();
             // handle new orders
-            tl.newSendOrderRequest += new OrderDelegate(tl_newSendOrderRequest);
+            tl.newSendOrderRequest += new OrderDelegateStatus(tl_newSendOrderRequest);
 
         }
     }

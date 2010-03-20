@@ -31,7 +31,7 @@ namespace TDServer
             // bindings
             tl.newProviderName = Providers.TDAmeritrade;
             tl.newFeatureRequest += new MessageArrayDelegate(tl_newFeatureRequest);
-            tl.newSendOrderRequest += new OrderDelegate(tl_gotSrvFillRequest);
+            tl.newSendOrderRequest += new OrderDelegateStatus(tl_gotSrvFillRequest);
             tl.newAcctRequest += new StringDelegate(tl_gotSrvAcctRequest);
             tl.newOrderCancelRequest += new LongDelegate(tl_newOrderCancelRequest);
             tl.newUnknownRequest += new UnknownMessageDelegate(tl_newUnknownRequest);
@@ -227,9 +227,9 @@ namespace TDServer
             bool ok { get { return api.LoggedIn; } }
             Dictionary<long, long> idmap = new Dictionary<long, long>();
         
-        void tl_gotSrvFillRequest(Order o)
+        long tl_gotSrvFillRequest(Order o)
         {
-            if (!ok) { debug("not logged in."); return; }
+            if (!ok) { debug("not logged in."); return (long)MessageTypes.BROKERSERVER_NOT_FOUND; }
 
             string action = o.side ? "buy" : "sell";
             string otype = o.isLimit ? "limit" : "market";
@@ -278,7 +278,7 @@ namespace TDServer
             }*/
             debug("order not presently hooked up in TDX: "+o.ToString());
 
-            
+            return (long)MessageTypes.OK;
         }
         const string OK = "OK";
 
