@@ -129,11 +129,11 @@ namespace TradeLink.Common
         public int NumClients { get { return client.Count; } }
 
         // server structures
-        private List<string> client = new List<string>();
-        private List<DateTime> heart = new List<DateTime>();
-        private List<string> stocks = new List<string>();
-        private List<string> index = new List<string>();
-        private List<IntPtr> hims = new List<IntPtr>();
+        protected List<string> client = new List<string>();
+        protected List<DateTime> heart = new List<DateTime>();
+        protected List<string> stocks = new List<string>();
+        protected List<string> index = new List<string>();
+        protected List<IntPtr> hims = new List<IntPtr>();
 
         private string SrvStocks(string him)
         {
