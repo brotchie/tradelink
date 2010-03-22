@@ -10,7 +10,7 @@ namespace TradeLink.Common
     /// <typeparam name="T"></typeparam>
     public struct RingBuffer<T>
     {
-        int _or;
+        int _bo;
         T[] _buffer;
         int _rc;
         int _wc;
@@ -19,7 +19,7 @@ namespace TradeLink.Common
         /// <summary>
         /// number of overruns, should be zero (otherwise increase buffer size)
         /// </summary>
-        public int BufferOverrun { get { return _or; } }
+        public int BufferOverrun { get { return _bo; } }
         /// <summary>
         /// maximum # of unread elements the buffer can hold.
         /// </summary>
@@ -34,14 +34,15 @@ namespace TradeLink.Common
         /// <param name="val"></param>
         public void Write(T val)
         {
-            _buffer[_wc++] = val;
+            System.Threading.Interlocked.Increment(ref _wc);
             if (_wc >= _buffer.Length)
             {
-                _wc = 0;
-                _wflip++;
+                System.Threading.Interlocked.Exchange(ref _wc, 0);
+                System.Threading.Interlocked.Increment(ref _wflip);
                 if ((_wflip - _rflip > 1))
-                    _or++;
+                    _bo++;
             }
+            _buffer[_wc] = val;
         }
         /// <summary>
         /// returns true if all written elements have been read from buffer
@@ -57,12 +58,14 @@ namespace TradeLink.Common
         /// <returns></returns>
         public T Read()
         {
-            T val = _buffer[_rc++];
+            System.Threading.Interlocked.Increment(ref _rc);
             if (_rc >= _buffer.Length)
             {
-                _rc = 0;
-                _rflip++;
+                System.Threading.Interlocked.Exchange(ref _rc, 0);
+                System.Threading.Interlocked.Increment(ref _rflip);
             }
+            T val = _buffer[_rc];
+
             return val;
         }
         
@@ -72,7 +75,7 @@ namespace TradeLink.Common
         /// <param name="BufferSize"></param>
         public RingBuffer(int BufferSize)
         {
-            _or = 0;
+            _bo = 0;
             _buffer = new T[BufferSize];
             _wc = 0;
             _rc = 0;
