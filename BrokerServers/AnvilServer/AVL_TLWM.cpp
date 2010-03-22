@@ -726,7 +726,7 @@
 				fill.symbol = CString(msg->x_Symbol);
 				fill.xprice = (double)msg->x_ExecutionPrice/1024;
 				fill.xsize= msg->x_NumberOfShares;
-				fill.exchange = CString(ExchangeName((long)msg->x_executionId));
+				fill.exchange = CString(DestExchangeName((long)msg->x_executionId));
 				fill.account = CString(B_GetAccountName(order->GetAccount()));
 				SrvGotFill(fill);
 
@@ -817,14 +817,17 @@
 						const StockBase* stk = (StockBase*)sm;
 						TLImbalance imb;
 						if ((stk!=NULL) && stk->isLoaded()) 
+						{
 							imb.InfoImbalance = stk->GetNyseInformationalImbalance();
+							uint exid = (uint)stk->GetStockExchange();
+							imb.Ex = SymExchangeName(exid);
+						}
 						imb.Symbol = CString(sm->GetSymbol());
 						imb.ThisImbalance = sm->GetNyseImbalance();
 						imb.PrevImbalance = sm->GetNysePreviousImbalance();
 						// don't send empty imbalances
 						if ((imb.InfoImbalance==0) && (imb.ThisImbalance==0))
 							return;
-						imb.Ex = CString("NYSE");
 						imb.ThisTime = sm->GetNyseImbalanceTime();
 						imb.PrevTime = sm->GetNysePreviousImbalanceTime();
 						SrvGotImbAsync(imb);
@@ -839,8 +842,16 @@
 					if (additionalInfo && (additionalInfo->GetType()==M_AI_STOCK_MOVEMENT))
 					{
 						const StockMovement* sm = ((MsgStockMovement*)additionalInfo)->m_stock;
+						const StockBase* stk = (StockBase*)sm;
 						TLImbalance imb;
 						imb.Symbol = CString(sm->GetSymbol());
+						if ((stk!=NULL) && stk->isLoaded()) 
+						{
+							imb.InfoImbalance = stk->GetNyseInformationalImbalance();
+							uint exid = (uint)stk->GetStockExchange();
+							imb.Ex = SymExchangeName(exid);
+						}
+
 						imb.ThisImbalance = sm->GetNasdaqImbalance();
 						imb.PrevImbalance = sm->GetNasdaqPreviousImbalance();
 						if (imb.hasImbalance() || imb.hadImbalance()) 

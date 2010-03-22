@@ -40,7 +40,7 @@ unsigned int TIFId(CString name)
 	return tif;
 }
 
-CString ExchangeName(unsigned int exchangeid)
+CString DestExchangeName(unsigned int exchangeid)
 {
 	CString ex = "";
 	switch (exchangeid)
@@ -83,6 +83,34 @@ CString ExchangeName(unsigned int exchangeid)
 		break;
 	case ExecExch_NSD:
 		ex = "NSD";
+		break;
+	}
+	return ex;
+}
+
+
+CString SymExchangeName(unsigned int exid)
+{
+	CString ex = CString("");
+	switch (exid)
+	{
+			case NASDAQ:
+		ex = "NSDQ";
+		break;
+	case NYSE:
+		ex = "NYSE";
+		break;
+
+    case AMEX:
+		ex = "AMEX";
+		break;
+
+    case ARCA:
+		ex = "ARCA";
+		break;
+
+    case CBOE:
+		ex = "CBOE";
 		break;
 	}
 	return ex;
