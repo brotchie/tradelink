@@ -188,7 +188,7 @@ namespace TradeLibFast
 			case ORDERCANCELREQUEST :
 				{
 					const char * ch = msg.GetBuffer();
-					int64 id = (int64)_tstol(ch);
+					int64 id = _atoi64(ch);
 					return CancelRequest(id);
 				}
 			case ACCOUNTREQUEST :
@@ -425,7 +425,7 @@ namespace TradeLibFast
 	void TLServer_WM::SrvGotCancel(int64 orderid)
 	{
 		CString id;
-		id.Format(_T("%i"),orderid);
+		id.Format(_T("%I64d"),orderid);
 		for (size_t i = 0; i<client.size(); i++)
 			if (client[i]!="")
 				TLSend(ORDERCANCELRESPONSE,id,client[i]);
