@@ -31,6 +31,11 @@ namespace Quotopia
         public Quote()
         {
             InitializeComponent();
+            try
+            {
+                tl = new TLClient_WM("quotopia.client", true);
+            }
+            catch (TLServerNotFound ex) { debug(ex.Message); }
             int poll = (int)((double)Properties.Settings.Default.brokertimeoutsec*1000/2);
             _tlt = new TLTracker(poll, (int)Properties.Settings.Default.brokertimeoutsec, tl, Providers.Unknown, true);
             _tlt.GotConnectFail += new VoidDelegate(_tlt_GotConnectFail);
@@ -222,10 +227,11 @@ namespace Quotopia
         void Quote_FormClosing(object sender, FormClosingEventArgs e)
         {
             Properties.Settings.Default.Save();
-            _ar.Stop();
-            _tlt.Stop();
+
             try
             {
+                _ar.Stop();
+                _tlt.Stop();
                 tl.Unsubscribe();
                 tl.Disconnect();
             }
@@ -570,6 +576,7 @@ namespace Quotopia
         HighLowTracker _hlt = new HighLowTracker();
         void RefreshRow(Tick t)
         {
+            _hlt.newTick(t);
             if (qg.InvokeRequired)
             {
                 qg.Invoke(new TickDelegate(RefreshRow), new object[] { t });
@@ -577,7 +584,7 @@ namespace Quotopia
             }
             else
             {
-                _hlt.newTick(t);
+                
                 int[] rows = GetSymbolRows(t.symbol);
                 for (int i = 0; i < rows.Length; i++)
                 {
@@ -629,8 +636,12 @@ namespace Quotopia
                         int bs = (s != "") ? Convert.ToInt32(s) : 0;
                         qt.Rows[r]["Sizes"] = bs.ToString() + "x" + os.ToString();
                     }
-                    qt.Rows[r]["High"] = _hlt.High(t.symbol).ToString(_dispdecpointformat);
-                    qt.Rows[r]["Low"] = _hlt.Low(t.symbol).ToString(_dispdecpointformat);
+                    try
+                    {
+                        qt.Rows[r]["High"] = _hlt.High(t.symbol).ToString(_dispdecpointformat);
+                        qt.Rows[r]["Low"] = _hlt.Low(t.symbol).ToString(_dispdecpointformat);
+                    }
+                    catch { }
                     if (_dispdecpoints.Value > 2)
                     {
                         try
@@ -711,7 +722,7 @@ namespace Quotopia
 
 
 
-        TLClient_WM tl = new TLClient_WM("quotopia.client",true);
+        TLClient_WM tl;
         ~Quote() { QuotopiaClose(); }
         void QuotopiaClose()
         {
@@ -808,7 +819,8 @@ namespace Quotopia
         string _dispdecpointformat = "N2";
         private void _dispdecpoints_ValueChanged(object sender, EventArgs e)
         {
-            _dispdecpointformat = "N" + ((int)_dispdecpoints.Value).ToString();
+            if (Size.Height!=0)
+                _dispdecpointformat = "N" + ((int)_dispdecpoints.Value).ToString();
         }
 
         private void _brokertimeout_ValueChanged(object sender, EventArgs e)
