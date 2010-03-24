@@ -13,7 +13,7 @@ namespace SterServer
     public partial class SterMain : Form
     {
         // basic structures needed for operation
-        ServerSterling tl = new ServerSterling();
+        ServerSterling tl;
         public const string PROGRAM = "SterServer ";
         DebugControl _dc = new DebugControl(true);
         Log _log = new Log(PROGRAM);
@@ -25,10 +25,22 @@ namespace SterServer
             ContextMenu = new ContextMenu();
             ContextMenu.MenuItems.Add("account", new EventHandler(setaccount));
             ContextMenu.MenuItems.Add("report", new EventHandler(report));
-            tl.SendDebug += new DebugDelegate(tl_SendDebug);
-            tl.CoverEnabled = Properties.Settings.Default.CoverEnabled;
-            tl.Account = Properties.Settings.Default.defaultaccount;
-            tl.Start();
+            try
+            {
+                tl = new ServerSterling();
+                tl.SendDebug += new DebugDelegate(tl_SendDebug);
+                tl.CoverEnabled = Properties.Settings.Default.CoverEnabled;
+                tl.Account = Properties.Settings.Default.defaultaccount;
+                tl.Start();
+            }
+            catch (Exception ex)
+            {
+                const string URL = @"http://code.google.com/p/tradelink/wiki/SterConfig";
+                debug("problem connecting to sterling...");
+                debug("please check guide at: " + URL);
+                System.Diagnostics.Process.Start(URL);
+                debug(ex.Message+ex.StackTrace);
+            }
             FormClosing += new FormClosingEventHandler(SterMain_FormClosing);
         }
 
