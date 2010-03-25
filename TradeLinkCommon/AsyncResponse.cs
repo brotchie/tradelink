@@ -66,10 +66,10 @@ namespace TradeLink.Common
                 // send event that queue is presently empty
                 if (_tickcache.isEmpty && (GotTickQueueEmpty != null))
                     GotTickQueueEmpty();
-                // clear current flag signal
-                _tickswaiting.Reset();
                 try
                 {
+                    // clear current flag signal
+                    _tickswaiting.Reset();
                     // wait for a new signal to continue reading
                     _tickswaiting.WaitOne(SLEEP);
                 }
@@ -190,10 +190,10 @@ namespace TradeLink.Common
                 // send event that queue is presently empty
                 if (_imbcache.isEmpty && (GotImbalanceQueueEmpty != null) )
                     GotImbalanceQueueEmpty();
-                // clear current flag signal
-                _imbswaiting.Reset();
                 try
                 {
+                    // clear current flag signal
+                    _imbswaiting.Reset();
                     // wait for a new signal to continue reading
                     _imbswaiting.WaitOne(SLEEP);
                 }
