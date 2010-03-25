@@ -17,6 +17,10 @@ namespace TradeLink.Common
         int _rflip;
         int _wflip;
         /// <summary>
+        /// called when buffer overrun occurs
+        /// </summary>
+        public event TradeLink.API.VoidDelegate BufferOverrunEvent;
+        /// <summary>
         /// number of overruns, should be zero (otherwise increase buffer size)
         /// </summary>
         public int BufferOverrun { get { return _bo; } }
@@ -40,7 +44,11 @@ namespace TradeLink.Common
                 System.Threading.Interlocked.Exchange(ref _wc, 0);
                 System.Threading.Interlocked.Increment(ref _wflip);
                 if ((_wflip - _rflip > 1))
+                {
                     _bo++;
+                    if (BufferOverrunEvent != null)
+                        BufferOverrunEvent();
+                }
             }
             _buffer[_wc] = val;
         }
@@ -75,6 +83,7 @@ namespace TradeLink.Common
         /// <param name="BufferSize"></param>
         public RingBuffer(int BufferSize)
         {
+            BufferOverrunEvent = null;
             _bo = 0;
             _buffer = new T[BufferSize];
             _wc = 0;

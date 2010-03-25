@@ -13,8 +13,26 @@ namespace TestTradeLink
         {
             ar.GotTick += new TickDelegate(ar_GotTick);
             ar.GotTickQueueEmpty += new VoidDelegate(ar_GotTickQueueEmpty);
+            ar.GotTickOverrun += new VoidDelegate(ar_GotTickOverrun);
             ar.GotImbalanceQueueEmpty += new VoidDelegate(ar_GotImbalanceQueueEmpty);
             ar.GotImbalance += new ImbalanceDelegate(ar_GotImbalance);
+            ar.GotBadTick += new VoidDelegate(ar_GotBadTick);
+            ar.GotImbalanceOverrun += new VoidDelegate(ar_GotImbalanceOverrun);
+        }
+
+        void ar_GotImbalanceOverrun()
+        {
+            debug("imbalance overrun");
+        }
+
+        void ar_GotTickOverrun()
+        {
+            debug("tick overrun");
+        }
+
+        void ar_GotBadTick()
+        {
+            debug("null tick, read: " + ar.BadTickRead + " written: " + ar.BadTickWritten);
         }
 
 
@@ -57,11 +75,15 @@ namespace TestTradeLink
                 System.Threading.Thread.Sleep(AsyncResponse.SLEEP);
                 if (waits++ > 5)
                 {
+                    if (ar.BadTickWritten + ar.BadTickRead > 0)
+                        break;
                     //System.Diagnostics.Debugger.Break();
                     Console.WriteLine(string.Format("waits: {0} tickcount: {1}", waits, tc));
                 }
             }
 
+            Assert.AreEqual(0, ar.BadTickRead,"null ticks read");
+            Assert.AreEqual(0, ar.BadTickWritten, "null ticks written");
             Assert.AreEqual(0, ar.TickOverrun,"tick overrun");
 
             // verify done
@@ -96,11 +118,17 @@ namespace TestTradeLink
                 System.Threading.Thread.Sleep(AsyncResponse.SLEEP);
                 if (waits++ > 5)
                 {
+                    if (ar.BadTickRead + ar.BadTickWritten > 0)
+                        break;
                     //System.Diagnostics.Debugger.Break();
                     Console.WriteLine(string.Format("waits: {0} tickcount: {1}", waits, tc));
                 }
 
             }
+
+            // verify no null imbalances
+            Assert.AreEqual(0, ar.BadImbalanceRead,"null imbalances read");
+            Assert.AreEqual(0, ar.BadImbalanceWritten, "null imbalances written");
 
             //verify no overruns
             Assert.AreEqual(0, ar.ImbalanceOverrun,"imbalance overrun");
@@ -160,6 +188,11 @@ namespace TestTradeLink
                 tc++;
             }
 
+        }
+
+        void debug(string msg)
+        {
+            Console.WriteLine(msg);
         }
 
         [TestFixtureTearDown]
