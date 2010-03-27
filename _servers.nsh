@@ -63,14 +63,6 @@ Section "Uninstall"
   DeleteRegKey HKLM SOFTWARE\NSIS_TLBrokerServer
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\App Paths\TradeLibFast.dll"
 
-  ; Remove files and uninstaller
-  Delete $INSTDIR\uninstall.exe
-  Delete "$INSTDIR\${ANVILDIRNAME}\*.*"
-  Delete "$INSTDIR\*.*"
-  ; Remove shortcuts, if any
-  Delete "$SMPROGRAMS\TradeLink\InteractiveBrokers.lnk"
-  Delete "$SMPROGRAMS\TradeLink\Genesis.lnk"
-  Delete "$SMPROGRAMS\TradeLink\Assent.lnk"
   
 
   ; Remove directories used

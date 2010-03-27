@@ -17,11 +17,11 @@ Icon "Install\tradelinkinstaller.ico"
 OutFile "TradeLinkSuite.exe"
 
 ; The default installation directory
-InstallDir $PROGRAMFILES\TradeLink\TradeLinkSuite
+InstallDir $PROGRAMFILES\TradeLink\
 
 ; Registry key to check for directory (so if you install again, it will 
 ; overwrite the old one automatically)
-InstallDirRegKey HKLM "Software\TradeLinkSuite" "Install_Dir"
+;InstallDirRegKey HKLM "Software\TradeLinkSuite" "Install_Dir"
 
 ; Pages
 Page components
@@ -68,7 +68,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\REDI.lnk" "$INSTDIR\ServerRedi.exe" "" "$INSTDIR\ServerRedi.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\LogViewer.lnk" "$INSTDIR\LogViewer.exe" "" "$INSTDIR\LogViewer.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\IQFeed.lnk" "$INSTDIR\IQFeedBroker.exe" "" "$INSTDIR\IQFeedBroker.exe" 0  
-  CreateShortCut "$SMPROGRAMS\TradeLink\TickData Folder.lnk" "$PROGRAMFILES\TradeLink\TickData\" "" "$PROGRAMFILES\TradeLink\TickData\" 0
+  CreateShortCut "$SMPROGRAMS\TradeLink\TickData.lnk" "$LOCALAPPDATA\TradeLinkTicks\" "" "$LOCALAPPDATA\TradeLinkTicks" 0
   
   
   ; install these files
@@ -124,6 +124,7 @@ Section "TradeLinkSuite"
   File "ServerMB\bin\x86\release\Interop.MBTQUOTELib.dll"   
   File "Install\VCRedistInstall.exe"
   File "Install\TickDataInstall.exe"
+  File "Install\TickDataMigrate.exe"
   File "ServerEsignal\bin\release\Interop.IESignal.dll"
   File "ServerEsignal\bin\release\ServerEsignal.exe"
   File "ServerEsignal\bin\release\ServerEsignal.exe.config"
@@ -149,12 +150,14 @@ Section "TradeLinkSuite"
   ; removing brokerserver folder as people transition to single installer
   Delete "$PROGRAMFILES\TradeLink\BrokerServer\*.*"  
   RMDir /r "$PROGRAMFILES\TradeLink\BrokerServer"
+    Delete "$PROGRAMFILES\TradeLink\TradeLinkSuite\*.*"  
+  RMDir /r "$PROGRAMFILES\TradeLink\TradeLinkSuite"
   
   ; Write the installation path into the registry
   WriteRegStr HKLM SOFTWARE\TradeLinkSuite "Install_Dir" "$INSTDIR"
     
   ; make sure TickData folder is present
-  CreateDirectory $PROGRAMFILES\TradeLink\TickData
+  CreateDirectory "$LOCALAPPDATA\TradeLinkTicks"
   
   ; check for .net35
   File "Install\DotNetInstaller.exe"
@@ -168,6 +171,14 @@ Section "TradeLinkSuite"
   
   ; skip tickdata and vcredistuble installs if running in silent mode
   StrCmp $SILENT "YES" finishinstall
+
+  DetailPrint "Checking for Migration..."
+  ReadRegStr $0 HKLM SOFTWARE\TradeLinkSuite "TickData2074Migration"
+  StrCmp $0 "Yes" vcredistinstall
+  ExecWait "TickDataMigrate.exe"
+  WriteRegStr HKLM SOFTWARE\TradeLinkSuite "TickData2074Migration" "Yes"
+  DetailPrint "TickData Migration."
+
   
   DetailPrint "Checking for TickData..."
   ReadRegStr $0 HKLM SOFTWARE\TradeLinkSuite "InstalledTickData"
@@ -175,6 +186,7 @@ Section "TradeLinkSuite"
   ExecWait "TickDataInstall.exe"
   WriteRegStr HKLM SOFTWARE\TradeLinkSuite "InstalledTickData" "Yes"
   DetailPrint "TickData was installed."
+  
   
  vcredistinstall:
   DetailPrint "Checking for VCRedistributable..."
@@ -256,21 +268,7 @@ Section "Uninstall"
   Delete "$INSTDIR\Properties\*.*"
   RMDir "$INSTDIR\Properties"
     ; Remove shortcuts, if any
-  Delete "$SMPROGRAMS\TradeLink\Asp.lnk"  
-  Delete "$SMPROGRAMS\TradeLink\Kadina.lnk"
-  Delete "$SMPROGRAMS\TradeLink\Quotopia.lnk"
-  Delete "$SMPROGRAMS\TradeLink\Time and Sales.lnk"
-  Delete "$SMPROGRAMS\TradeLink\Replay.lnk"
-  Delete "$SMPROGRAMS\TradeLink\Record.lnk"
-  Delete "$SMPROGRAMS\TradeLink\Sterling.lnk"
-  Delete "$SMPROGRAMS\TradeLink\Gauntlet.lnk"
-  Delete "$SMPROGRAMS\TradeLink\TDServer.lnk"
-  Delete "$SMPROGRAMS\TradeLink\Uninstall TradeLinkSuite"
-  Delete "$SMPROGRAMS\TradeLink\MB.lnk"
-  Delete "$SMPROGRAMS\TradeLink\Esignal.lnk"
-  Delete "$SMPROGRAMS\TradeLink\DBFX.lnk"
-  Delete "$SMPROGRAMS\TradeLink\Blackwood.lnk"
-  Delete "$SMPROGRAMS\TradeLink\LogViewer.lnk"
+  Delete "$SMPROGRAMS\TradeLink\*.*"
 
   ; Remove directories used
   RMDir "$SMPROGRAMS\TradeLink"

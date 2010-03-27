@@ -12,7 +12,7 @@ namespace TestTradeLink
     [TestFixture(Description="May not work on machines without brokerserver installed to default location.")]
     public class TestTLFastInterop
     {
-        [DllImport("c:\\program files\\TradeLink\\TradeLinkSuite\\TradeLibFast.dll",EntryPoint="TLSENDORDER")]
+        [DllImport("c:\\program files\\TradeLink\\TradeLibFast.dll",EntryPoint="TLSENDORDER")]
         public static extern int SendOrder(string sym, bool side, int size, double limit, double stop, int id, string account, string dest);
         
 

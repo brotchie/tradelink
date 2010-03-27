@@ -3,9 +3,9 @@ Name "SampleTikData-20070926"
 
 OutFile "Install-SampleTikData-20070926.exe"
 ; Icon for project (comment out if not used)
-Icon "..\InstallSuite\tradelinkinstaller.ico"
+Icon "..\Install\tradelinkinstaller.ico"
 
-InstallDir $PROGRAMFILES\TradeLink\TickData
+InstallDir "$LOCALAPPDATA\TradeLinkTicks"
 
 Section "SampleTikData-20070926"
 

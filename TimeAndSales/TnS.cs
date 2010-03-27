@@ -135,7 +135,7 @@ namespace TimeSales
                 return;
             }
             OpenFileDialog od = new OpenFileDialog();
-            od.Title = "TickFiles in: "+Util.TLTickDir;
+            od.Title = "Browse to TickData";
             od.Multiselect = false;
             od.Filter = "Time & Sales |"+TikConst.WILDCARD_EXT;
             od.DefaultExt = TikConst.WILDCARD_EXT;
