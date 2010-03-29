@@ -21,12 +21,14 @@ namespace SterServer
         bool imbalance = false;
         PositionTracker pt = new PositionTracker();
         int _SLEEP = 50;
+        int _ORDERSLEEP = 1;
         bool _supportcover = true;
         public bool CoverEnabled { get { return _supportcover; } set { _supportcover = value; } }
-        public ServerSterling() : this(50) { }
-        public ServerSterling(int sleepOnNodata)
+        public ServerSterling() : this(50,1) { }
+        public ServerSterling(int sleepOnNodata, int sleepAfterOrder)
         {
             _SLEEP = 50;
+            _ORDERSLEEP = sleepAfterOrder;
         }
         bool _connected = false;
         public bool isConnected { get { return _connected; } }
@@ -211,7 +213,12 @@ namespace SterServer
                         int err = order.SubmitOrder();
                         string tmp = "";
                         if ((err == 0) && (!idacct.TryGetValue(o.id, out tmp)))
+                        {
+                            // save account/id relationship for canceling
                             idacct.Add(o.id, order.Account);
+                            // wait briefly between orders
+                            Thread.Sleep(_ORDERSLEEP);
+                        }
                         if (err < 0)
                             debug("Error sending order: " + Util.PrettyError(newProviderName, err) + o.ToString());
                         if (err == -1)

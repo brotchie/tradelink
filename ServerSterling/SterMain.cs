@@ -27,7 +27,7 @@ namespace SterServer
             ContextMenu.MenuItems.Add("report", new EventHandler(report));
             try
             {
-                tl = new ServerSterling();
+                tl = new ServerSterling(Properties.Settings.Default.Sleep,Properties.Settings.Default.OrderSleep);
                 tl.SendDebug += new DebugDelegate(tl_SendDebug);
                 tl.CoverEnabled = Properties.Settings.Default.CoverEnabled;
                 tl.Account = Properties.Settings.Default.defaultaccount;

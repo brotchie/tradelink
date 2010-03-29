@@ -46,5 +46,29 @@ namespace SterServer.Properties {
                 this["defaultaccount"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
+        public int Sleep {
+            get {
+                return ((int)(this["Sleep"]));
+            }
+            set {
+                this["Sleep"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int OrderSleep {
+            get {
+                return ((int)(this["OrderSleep"]));
+            }
+            set {
+                this["OrderSleep"] = value;
+            }
+        }
     }
 }
