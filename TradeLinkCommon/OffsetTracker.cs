@@ -100,7 +100,7 @@ namespace TradeLink.Common
             // wait till next tick if we sent cancel
             if (sentcancel)
                 return;
-
+            bool sentorder = false;
             if (!off.hasProfit)
             {
                 // since we have no stop, it's cancel can't be pending
@@ -117,9 +117,14 @@ namespace TradeLink.Common
                     SendOrder(profit);
                     // notify
                     debug(string.Format("sent new profit: {0} {1}", profit.id, profit.ToString()));
+                    sentorder = true;
+                }
+                else if (_verbdebug)
+                {
+                    debug(sym + " invalid profit: " + profit.ToString());
                 }
             }
-            if (!off.hasStop)
+            if ((!off.hasStop && AllowSimulatenousOrders) || (!off.hasStop && !AllowSimulatenousOrders && !sentorder)) 
             {
                 // since we have no stop, it's cancel can't be pending
                 off.StopcancelPending = false;
@@ -135,12 +140,24 @@ namespace TradeLink.Common
                     SendOrder(stop);
                     // notify
                     debug(string.Format("sent new stop: {0} {1}", stop.id, stop.ToString()));
+                    sentorder = true;
                 }
+                else if (_verbdebug)
+                {
+                    debug(sym + " invalid stop: " + stop.ToString());
+                }
+
             }
             // make sure new offset info is reflected
             SetOffset(sym, off);
 
         }
+
+        bool _sendsametime = true;
+        /// <summary>
+        /// allow stops and profit offsets to be sent at same time
+        /// </summary>
+        public bool AllowSimulatenousOrders { get { return _sendsametime; } set { _sendsametime = value; } }
 
         bool hascustom(string symbol) { OffsetInfo oi; return _offvals.TryGetValue(symbol, out oi); }
 
@@ -349,6 +366,12 @@ namespace TradeLink.Common
             return DefaultOffset;
         }
 
+        bool _verbdebug = false;
+        /// <summary>
+        /// enable verbose debugging messages
+        /// </summary>
+        public bool VerboseDebugging { get { return _verbdebug; } set { _verbdebug = value; } }
+
         void SetOffset(string sym, OffsetInfo off)
         {
             OffsetInfo v;
@@ -359,6 +382,8 @@ namespace TradeLink.Common
                 else
                     _offvals.Add(sym, off);
             }
+            if (_verbdebug)
+                debug(sym + " set offset: " + off.ToString());
         }
         /// <summary>
         /// should be called from GotCancel, when cancels arrive from broker.
