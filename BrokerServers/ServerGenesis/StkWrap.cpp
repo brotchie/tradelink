@@ -121,14 +121,46 @@ int StkWrap::OnGotLevel2Record(GTLevel2 *pRcd)
 	CString strStock;
 
 	int rc = GTStock::OnGotLevel2Record(pRcd);
-
-	if(pRcd->nOwnShares > 0)
+	// make sure depth is enabled
+	if (tl->_depth==0)
 	{
-		char str[1000];
-		// didn't work :(
-		sprintf(str, "owned: %d", pRcd->nOwnShares);
-		tl->D( str );
+		char chSide = pRcd->chSide;
+
+        TLTick k;
+        k.sym = CString(pRcd->szStock);
+        k.symid = _symid;
+        k.depth = 0;
+        k.time = GT2TL(pRcd->gtime);
+        k.date = date;
+        
+        if (pRcd->chSide=='B')
+        {
+                k.bid = pRcd->dblPrice;
+                k.bs = pRcd->dwShares / SHAREUNITS;
+                k.be = CString(CAST_MMID_TEXT(pRcd->mmid));
+        }
+        else
+        {
+                k.ask = pRcd->dblPrice;
+                k.os = pRcd->dwShares / SHAREUNITS;
+                k.oe = CString(CAST_MMID_TEXT(pRcd->mmid));
+
+        }
+        tl->SrvGotTick(k);
 	}
+	else 
+	{
+		if(pRcd->nOwnShares > 0)
+		{
+			char str[1000];
+			// didn't work :(
+			sprintf(str, "owned: %d", pRcd->nOwnShares);
+			tl->D( str );
+		}
+		SendData();
+	}
+
+
 
 
 	SendData();
@@ -202,6 +234,12 @@ CString tifstring(int TIF)
 int StkWrap::OnBestAskPriceChanged()
 {
 	int rc = GTStock::OnBestAskPriceChanged();
+	return rc;
+}
+
+int StkWrap::OnBestBidPriceChanged()
+{
+	int rc = GTStock::OnBestBidPriceChanged();
 	return rc;
 }
 
@@ -326,11 +364,7 @@ void StkWrap::SendData()
 
 }
 
-int StkWrap::OnBestBidPriceChanged()
-{
-	int rc = GTStock::OnBestBidPriceChanged();
-	return rc;
-}
+
 
 
 int StkWrap::OnExecMsgPending(const GTPending &pRcd)
