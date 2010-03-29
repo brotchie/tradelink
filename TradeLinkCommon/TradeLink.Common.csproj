@@ -103,8 +103,7 @@
     <Compile Include="GenericTracker.cs" />
     <Compile Include="GZip.cs" />
     <Compile Include="HighLowTracker.cs" />
-    <Compile Include="HistSim.cs">
-      <SubType>Component</SubType>
+    <Compile Include="HistSimImpl.cs">
     </Compile>
     <Compile Include="IdTracker.cs" />
     <Compile Include="ImbalanceImpl.cs" />
@@ -150,10 +149,8 @@
     <Compile Include="TLTracker.cs" />
     <Compile Include="TradeImpl.cs" />
     <Compile Include="TLClient_WM.cs">
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="TLServer_WM.cs">
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="TrailTracker.cs" />
     <Compile Include="Util.cs" />

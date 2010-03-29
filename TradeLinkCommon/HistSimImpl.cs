@@ -12,7 +12,8 @@ namespace TradeLink.Common
     /// plays back many tickfiles insequence over time.
     /// also processes orders and executions against same tickfiles (via embedded Broker component).
     /// </summary>
-    public class HistSim 
+    [System.ComponentModel.DesignerCategory("")]
+    public class HistSimImpl : HistSim
     {
         // working variables
         string _folder = Util.TLTickDir;
@@ -58,23 +59,23 @@ namespace TradeLink.Common
         /// <summary>
         /// Create a historical simulator using default tick folder and null filter
         /// </summary>
-        public HistSim() : this(Util.TLTickDir, null) { }
+        public HistSimImpl() : this(Util.TLTickDir, null) { }
         /// <summary>
         /// Create historical simulator with your own tick folder
         /// </summary>
         /// <param name="TickFolder"></param>
-        public HistSim(string TickFolder) : this(TickFolder, null) { }
+        public HistSimImpl(string TickFolder) : this(TickFolder, null) { }
         /// <summary>
         /// Create a historical simulator
         /// </summary>
         /// <param name="tff"></param>
-        public HistSim(TickFileFilter tff) : this(Util.TLTickDir, tff) { }
+        public HistSimImpl(TickFileFilter tff) : this(Util.TLTickDir, tff) { }
         /// <summary>
         /// Create a historical simulator
         /// </summary>
         /// <param name="TickFolder">tick folder to use</param>
         /// <param name="tff">filter to determine what tick files from folder to use</param>
-        public HistSim(string TickFolder, TickFileFilter tff)
+        public HistSimImpl(string TickFolder, TickFileFilter tff)
         {
             _folder = TickFolder;
             if (tff != null)
@@ -92,7 +93,7 @@ namespace TradeLink.Common
         /// Create a historical simulator
         /// </summary>
         /// <param name="filenames">list of tick files to use</param>
-        public HistSim(string[] filenames)
+        public HistSimImpl(string[] filenames)
         {
             _tickfiles = filenames;
         }
@@ -314,7 +315,7 @@ namespace TradeLink.Common
             while ((i<times.Length) && (times[i] == COMPLETED))
                 i++;
             // set next time to first available time, or end of simulation if none available
-            _nextticktime = i==times.Length ? HistSim.ENDSIM : times[i];
+            _nextticktime = i==times.Length ? HistSimImpl.ENDSIM : times[i];
         }
 
 

@@ -16,7 +16,7 @@ namespace Replay
     {
         TLServer_WM tl = new TLServer_WM();
         Playback _playback = null;
-        HistSim h = new HistSim();
+        HistSimImpl h = new HistSimImpl();
         string tickfolder = Util.TLTickDir;
         static Account HISTBOOK = new Account("_HISTBOOK");
         public const string PROGRAM = "Replay";

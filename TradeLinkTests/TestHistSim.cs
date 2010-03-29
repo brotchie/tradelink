@@ -19,7 +19,7 @@ namespace TestTradeLink
         [Test]
         public void RawPerformance()
         {
-            HistSim h = new HistSim(Environment.CurrentDirectory);
+            HistSimImpl h = new HistSimImpl(Environment.CurrentDirectory);
             h.Initialize();
             h.GotTick += new TradeLink.API.TickDelegate(raw_GotTick);
 
@@ -35,7 +35,7 @@ namespace TestTradeLink
 
             DateTime start = DateTime.Now;
 
-            h.PlayTo(HistSim.ENDSIM);
+            h.PlayTo(HistSimImpl.ENDSIM);
             
 
             double time = DateTime.Now.Subtract(start).TotalSeconds;
@@ -77,12 +77,12 @@ namespace TestTradeLink
 
         int fillcount = 0;
         int desiredfills = 1000;
-        HistSim h;
+        HistSimImpl h;
         [Test]
         public void ExecutionPerformance()
         {
             System.Threading.Thread.Sleep(100);
-            h = new HistSim(Environment.CurrentDirectory);
+            h = new HistSimImpl(Environment.CurrentDirectory);
             h.Initialize();
             h.GotTick += new TradeLink.API.TickDelegate(execute_GotTick);
             h.SimBroker.GotFill += new TradeLink.API.FillDelegate(SimBroker_GotFill);
@@ -98,7 +98,7 @@ namespace TestTradeLink
 
             DateTime start = DateTime.Now;
 
-            h.PlayTo(HistSim.ENDSIM);
+            h.PlayTo(HistSimImpl.ENDSIM);
 
             double time = DateTime.Now.Subtract(start).TotalSeconds;
 
@@ -132,7 +132,7 @@ namespace TestTradeLink
         [Test]
         public void BarPerformance()
         {
-            HistSim h = new HistSim(Environment.CurrentDirectory);
+            HistSimImpl h = new HistSimImpl(Environment.CurrentDirectory);
             h.GotTick += new TradeLink.API.TickDelegate(h_GotTick);
 
             h.Initialize();
@@ -146,7 +146,7 @@ namespace TestTradeLink
 
             DateTime start = DateTime.Now;
 
-            h.PlayTo(HistSim.ENDSIM);
+            h.PlayTo(HistSimImpl.ENDSIM);
 
             double time = DateTime.Now.Subtract(start).TotalSeconds;
             h.Stop();

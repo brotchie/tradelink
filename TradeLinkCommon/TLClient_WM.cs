@@ -10,6 +10,7 @@ namespace TradeLink.Common
     /// TradeLink clients can connect to any supported TradeLink broker.
     /// version of the client that supports the tradelink protocol via windows messaging transport.
     /// </summary>
+    [System.ComponentModel.DesignerCategory("")]
     public class TLClient_WM : Form , TLClient
     {
 

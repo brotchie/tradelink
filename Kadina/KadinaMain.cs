@@ -42,7 +42,7 @@ namespace Kadina
 
         BackgroundWorker bw = new BackgroundWorker();
         BackgroundWorker bw2 = new BackgroundWorker();
-        HistSim h = new HistSim();
+        HistSimImpl h = new HistSimImpl();
         ChartControl c = new ChartControl();
 
         public kadinamain()
@@ -180,7 +180,7 @@ namespace Kadina
             switch (type)
             {
                 case PlayTo.End : 
-                    val = HistSim.ENDSIM; 
+                    val = HistSimImpl.ENDSIM; 
                     break;
                 case PlayTo.FiveMin : 
                 case PlayTo.OneMin:
@@ -308,7 +308,7 @@ namespace Kadina
             else
             {
                 myres = null;
-                h = new HistSim();
+                h = new HistSimImpl();
                 epffiles.Clear();
                 resname = string.Empty;
                 updatetitle();
@@ -671,7 +671,7 @@ namespace Kadina
                     if (!isRecentTickfile(f) && SecurityImpl.SecurityFromFileName(f).isValid)
                         recent.DropDownItems.Add(f);
                 epffiles.Add(f);
-                h = new HistSim(epffiles.ToArray());
+                h = new HistSimImpl(epffiles.ToArray());
                 h.SimBroker.GotOrder += new OrderDelegate(broker_GotOrder);
                 h.SimBroker.GotFill += new FillDelegate(broker_GotFill);
                 h.GotTick += new TickDelegate(h_GotTick);

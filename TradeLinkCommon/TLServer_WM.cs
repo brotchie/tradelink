@@ -10,6 +10,7 @@ namespace TradeLink.Common
     /// tradelink servers allow tradelink clients to talk to any supported broker with common interface.
     /// this version of server supports communication with clients via windows messaging.
     /// </summary>
+    [System.ComponentModel.DesignerCategory("")]
     public class TLServer_WM : Form, TradeLinkServer
     {
         public event StringDelegate newAcctRequest;
