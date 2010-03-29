@@ -711,13 +711,18 @@ namespace Quotopia
 
         void tl_gotTick(Tick t)
         {
-            _tlt.newTick(t);
-            if (spillTick != null)
-                spillTick(t);
-            RefreshRow(t);
-            BarListImpl bl = null;
-            if (bardict.TryGetValue(t.symbol, out bl))
-                bardict[t.symbol].newTick(t);
+
+            try
+            {
+                _tlt.newTick(t);
+                if (spillTick != null)
+                    spillTick(t);
+                RefreshRow(t);
+                BarListImpl bl = null;
+                if (bardict.TryGetValue(t.symbol, out bl))
+                    bardict[t.symbol].newTick(t);
+            }
+            catch (System.Threading.ThreadInterruptedException) { }
         }
 
 
