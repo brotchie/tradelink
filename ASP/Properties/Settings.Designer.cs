@@ -118,5 +118,17 @@ namespace ASP.Properties {
                 this["defaultdest"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10000")]
+        public int TickBufferSize {
+            get {
+                return ((int)(this["TickBufferSize"]));
+            }
+            set {
+                this["TickBufferSize"] = value;
+            }
+        }
     }
 }

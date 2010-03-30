@@ -37,7 +37,7 @@ namespace ASP
         Dictionary<string, string> _class2dll = new Dictionary<string, string>();
         PositionTracker _pt = new PositionTracker();
         string[] _acct = new string[0];
-        AsyncResponse _ar = new AsyncResponse();
+        AsyncResponse _ar = new AsyncResponse(Properties.Settings.Default.TickBufferSize,0);
         Log _log = new Log(PROGRAM);
         DebugWindow _dw = new DebugWindow();
         const int REMOVERES = 0;
@@ -80,6 +80,8 @@ namespace ASP
             _saveskins.Click+=new EventHandler(_saveskins_Click);
             _skins.SelectedIndexChanged+=new EventHandler(_skins_SelectedIndexChanged);
             _ar.GotTick += new TickDelegate(tl_gotTick);
+            _ar.GotBadTick += new VoidDelegate(_ar_GotBadTick);
+            _ar.GotTickOverrun += new VoidDelegate(_ar_GotTickOverrun);
             _bf = new BrokerFeed(Properties.Settings.Default.prefquote, Properties.Settings.Default.prefexecute,_ao._providerfallback.Checked,false,PROGRAM);
             _bf.SendDebug+=new DebugDelegate(debug);
             // get providers
@@ -106,6 +108,17 @@ namespace ASP
             // process command line
             processcommands();
 
+        }
+
+        void _ar_GotTickOverrun()
+        {
+            debug("tick buffer overrun #" + _ar.TickOverrun);
+        }
+
+        void _ar_GotBadTick()
+        {
+            if (_ar.BadTickRead + _ar.BadTickWritten % 100 == 0)
+                debug("bad tick count: (r/w)" + _ar.BadTickRead + "/" + _ar.BadTickWritten);
         }
 
         void processcommands()
