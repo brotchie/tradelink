@@ -17,7 +17,7 @@
 #define BUSINESS_API __declspec(dllimport)
 #endif
 
-const char* const BusinessHeaderVersion = "2.8.3.2";
+const char* const BusinessHeaderVersion = "2.8.4.2";
 
 #include "ObserverApi.h"
 #include "CommonIds.h"
@@ -1565,6 +1565,7 @@ public:
     unsigned int GetNyseImbalanceMatchedShares() const{return m_nyseImbalanceMatchedShares;}
 	const Money& GetNyseImbalanceReferencePrice() const{return m_nyseImbalanceReferencePrice;}
 	const Money& GetNyseImbalanceClearingPrice() const{return m_nyseImbalanceClearingPrice;}
+	const Money& GetNyseImbalanceClearingPriceDelta() const{return m_nyseImbalanceClearingPriceDelta;}
 	const Money& GetNyseImbalanceCloseOnlyClearingPrice() const{return m_nyseImbalanceCloseOnlyClearingPrice;}
 
 	int GetNyseInformationalImbalance() const{return m_nyseInformationalImbalance;}
@@ -1752,6 +1753,7 @@ protected:
 	Money m_nyseImbalanceReferencePrice;
 	Money m_nyseImbalanceClearingPrice;
 	Money m_nyseImbalanceCloseOnlyClearingPrice;
+	Money m_nyseImbalanceClearingPriceDelta;
 
 	int m_nyseInformationalImbalance;
 
