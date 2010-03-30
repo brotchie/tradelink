@@ -83,7 +83,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ServerDBFX.cs">
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="ServerDBFXMain.cs">
       <SubType>Form</SubType>

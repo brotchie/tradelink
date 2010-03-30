@@ -87,7 +87,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ServerSterling.cs">
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="SterMain.cs">
       <SubType>Form</SubType>

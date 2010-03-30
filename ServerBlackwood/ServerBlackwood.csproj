@@ -106,7 +106,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ServerBlackwood.cs">
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="ServerBlackwoodMain.cs">
       <SubType>Form</SubType>

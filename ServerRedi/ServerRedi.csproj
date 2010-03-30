@@ -89,7 +89,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="ServerRedi.cs">
-      <SubType>Form</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
