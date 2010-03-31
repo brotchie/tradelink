@@ -17,13 +17,14 @@ namespace ServerEsignal
     public partial class EsignalMain : Form
     {
 
-        EsignalServer tl = new EsignalServer();
+        EsignalServer tl;
         public const string PROGRAM = "ServerEsignal";
         Log _log = new Log(PROGRAM);
         
         public EsignalMain()
         {
             InitializeComponent();
+            tl = new EsignalServer();
             // send debug messages to log file
             tl.GotDebug += new DebugFullDelegate(tl_GotDebug);
             // attempt to connect to esignal

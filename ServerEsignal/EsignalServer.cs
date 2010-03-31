@@ -30,9 +30,6 @@ namespace ServerEsignal
             newRegisterStocks += new DebugDelegate(tl_newRegisterStocks);
             // handle feature requests
             newFeatureRequest += new MessageArrayDelegate(tl_newFeatureRequest);
-            // handle esignal quotes
-            esig.OnQuoteChanged += new _IHooksEvents_OnQuoteChangedEventHandler(esig_OnQuoteChanged);
-
         }
 
         public void Start(string user, string password, string data1, int data2)
@@ -40,8 +37,18 @@ namespace ServerEsignal
             try
             {
                 esig = new Hooks();
+                // handle esignal quotes
+                esig.OnQuoteChanged += new _IHooksEvents_OnQuoteChangedEventHandler(esig_OnQuoteChanged);
             }
-            catch (Exception ex) { debug("Exception loading esignal: " + ex.Message + ex.StackTrace); _valid = false;  return; }
+            catch (Exception ex) 
+            {
+                const string url = @"http://code.google.com/p/tradelink/wiki/EsignalConfig";
+                System.Diagnostics.Process.Start(url);
+                debug("Exception loading esignal: " + ex.Message + ex.StackTrace); _valid = false;
+                debug("For more info see: " + url);
+                _valid = false;
+                return; 
+            }
             if ((user==null) || (user==string.Empty)) return;
             esig.SetApplication(user);
             _valid = esig.IsEntitled != 0;
