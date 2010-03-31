@@ -47,7 +47,14 @@ namespace TradeLink.AppKit
         void debug(string msg)
         {
             if (_msg.InvokeRequired)
-                _msg.Invoke(new stringdel(debug), new object[] { msg });
+            {
+                try
+                {
+                    _msg.Invoke(new stringdel(debug), new object[] { msg });
+                }
+                catch (ObjectDisposedException) { }
+                catch (System.Threading.ThreadInterruptedException) { }
+            }
             else
             {
                 try
