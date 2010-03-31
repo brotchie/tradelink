@@ -218,7 +218,7 @@ namespace TradeLink.Common
                 switch (type)
                 {
                     case MessageTypes.DOMREQUEST:
-                        request.Replace(Book.EMPTYREQUESTOR, _tl.Name);
+                        request = request.Replace(Book.EMPTYREQUESTOR, _tl.Name);
                         break;
                     case MessageTypes.BARREQUEST:
                         {
