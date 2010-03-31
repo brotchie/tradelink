@@ -44,9 +44,17 @@ namespace TradeLink.Common
         public int SentStopSize = 0;
         public bool isOffsetCurrent(Position p)
         {
-            Order l = Calc.PositionProfit(p, this);
+            return isStopCurrent(p) && isProfitCurrent(p);
+        }
+        public bool isStopCurrent(Position p)
+        {
             Order s = Calc.PositionStop(p, this);
-            return (l.size == SentProfitSize) && (s.size == SentStopSize);
+            return (s.size == SentStopSize);
+        }
+        public bool isProfitCurrent(Position p)
+        {
+            Order l = Calc.PositionProfit(p, this);
+            return (l.size == SentProfitSize);
         }
         public bool hasProfit { get { return ProfitId != 0; } }
         public bool hasStop { get { return StopId != 0; } }

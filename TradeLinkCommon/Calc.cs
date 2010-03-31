@@ -166,12 +166,12 @@ namespace TradeLink.Common
         {
             Order o = new OrderImpl();
             if (!p.isValid || p.isFlat) return o;
-            decimal price = OffsetPrice(p, Math.Abs(offset)*-1);
+            decimal price = OffsetPrice(p, offset*-1);
             int size = !normalizesize ? (int)(p.FlatSize * percent) : Norm2Min(p.FlatSize * percent, MINSIZE);
             o = new StopOrder(p.Symbol, !p.isLong, size, price);
             return o;
         }
-        public static Order PositionStop(Position p, OffsetInfo offset) { return PositionStop(p, offset.ProfitDist, offset.ProfitPercent); }
+        public static Order PositionStop(Position p, OffsetInfo offset) { return PositionStop(p, offset.StopDist, offset.StopPercent); }
         /// <summary>
         /// sum last elements of array
         /// </summary>

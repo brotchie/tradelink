@@ -12,28 +12,35 @@ namespace TestTradeLink
     {
         public TestOffsetTracker() 
         {
-            ot.SendCancel += new LongDelegate(ot_SendCancel);
-            ot.SendOrder += new OrderDelegate(ot_SendOffset);
-            ot.SendDebug += new DebugDelegate(ot_SendDebug);
+
         }
 
         void ot_SendDebug(string msg)
         {
-            //Console.WriteLine(msg);
+            Console.WriteLine(msg);
         }
 
-        OffsetTracker ot = new OffsetTracker();
+        void reset()
+        {
+            ot = new OffsetTracker();
+            ot.SendCancel += new LongDelegate(ot_SendCancel);
+            ot.SendOrder += new OrderDelegate(ot_SendOffset);
+            ot.SendDebug += new DebugDelegate(ot_SendDebug);
+            profits.Clear();
+            stops.Clear();
+        }
+
+        OffsetTracker ot;
         List<Order> profits = new List<Order>();
         List<Order> stops = new List<Order>();
 
         [Test]
         public void IgnoreByDefault()
         {
+            // reset "book"
+            reset();
             // ignore all symbols by default, unless custom defined
             ot.IgnoreDefault = true;
-            // reset "book"
-            profits.Clear();
-            stops.Clear();
             // reset offsets
             ot.ClearCustom();
             // make sure offsets don't exist
@@ -68,6 +75,8 @@ namespace TestTradeLink
         [Test]
         public void CustomOffsets()
         {
+            // reset "book"
+            reset();
 
             // get default offset
             ot.DefaultOffset = SampleOffset();
@@ -105,11 +114,11 @@ namespace TestTradeLink
         const int SIZE = 300;
 
         [Test]
-        public void Basics()
+        public void StopAndProfit()
         {
             // reset "book"
-            profits.Clear();
-            stops.Clear();
+            reset();
+
             // make sure offsets don't exist
             Assert.AreEqual(0,profits.Count);
             Assert.AreEqual(0,stops.Count);
@@ -156,6 +165,178 @@ namespace TestTradeLink
             // partial hit the profit order
             ot.Adjust(new TradeImpl(SYM, PRICE + 1, -1 * SIZE));
             // tick
+            ot.newTick(nt());
+            // verify only one order exists on each side
+            Assert.AreEqual(1, profits.Count);
+            Assert.AreEqual(1, stops.Count);
+            // get orders
+            profit = profits[0];
+            stop = stops[0];
+            // verify profit offset
+            Assert.IsTrue(profit.isValid);
+            Assert.AreEqual(PRICE + 1 + POFFSET, profit.price);
+            Assert.AreEqual(SIZE, profit.UnsignedSize);
+            // verify stop offset
+            Assert.IsTrue(stop.isValid);
+            Assert.AreEqual(PRICE + 1 - SOFFSET, stop.stopp);
+            Assert.AreEqual(SIZE, stop.UnsignedSize);
+
+        }
+
+        [Test]
+        public void StopOnly()
+        {
+            // reset "book"
+            reset();
+
+            // make sure offsets don't exist
+            Assert.AreEqual(0, profits.Count);
+            Assert.AreEqual(0, stops.Count);
+            // setup offset defaults
+            ot.DefaultOffset = new OffsetInfo(0, SOFFSET, 0, 1, false, 1);
+            // send position update to generate offsets
+            ot.Adjust(new PositionImpl(SYM, PRICE, SIZE));
+            // verify orders exist
+            Assert.AreEqual(0, profits.Count);
+            Assert.AreEqual(1, stops.Count);
+            // get orders
+            Order stop = stops[0];
+            // verify stop offset
+            Assert.IsTrue(stop.isValid);
+            Assert.AreEqual(PRICE - SOFFSET, stop.stopp);
+            Assert.AreEqual(SIZE, stop.UnsignedSize);
+
+
+
+            // send position update
+            ot.Adjust(new TradeImpl(SYM, PRICE + 2, SIZE));
+            // tick
+            ot.newTick(nt());
+            // verify only one order exists
+            Assert.AreEqual(0, profits.Count);
+            Assert.AreEqual(1, stops.Count);
+            // get orders
+            stop = stops[0];
+            // verify stop offset
+            Assert.IsTrue(stop.isValid);
+            Assert.AreEqual(PRICE + 1 - SOFFSET, stop.stopp);
+            Assert.AreEqual(SIZE * 2, stop.UnsignedSize);
+
+
+        }
+
+        [Test]
+        public void ProfitOnly()
+        {
+            // reset "book"
+            reset();
+
+            // make sure offsets don't exist
+            Assert.AreEqual(0, profits.Count);
+            Assert.AreEqual(0, stops.Count);
+            // setup offset defaults
+            ot.DefaultOffset = new OffsetInfo(POFFSET, 0, 1, 0, false, 1);
+            // send position update to generate offsets
+            ot.Adjust(new PositionImpl(SYM, PRICE, SIZE));
+            // verify orders exist
+            Assert.AreEqual(1, profits.Count);
+            Assert.AreEqual(0, stops.Count);
+            // get orders
+            Order profit = profits[0];
+            // verify profit offset
+            Assert.IsTrue(profit.isValid);
+            Assert.AreEqual(PRICE + POFFSET, profit.price);
+            Assert.AreEqual(SIZE, profit.UnsignedSize);
+
+
+
+            // send position update
+            ot.Adjust(new TradeImpl(SYM, PRICE + 2, SIZE));
+            // tick
+            ot.newTick(nt());
+            // verify only one order exists
+            Assert.AreEqual(1, profits.Count);
+            // get orders
+            profit = profits[0];
+            // verify profit offset
+            Assert.IsTrue(profit.isValid);
+            Assert.AreEqual(PRICE + 1 + POFFSET, profit.price);
+            Assert.AreEqual(SIZE * 2, profit.UnsignedSize);
+
+            // partial hit the profit order
+            ot.Adjust(new TradeImpl(SYM, PRICE + 1, -1 * SIZE));
+            // tick
+            ot.newTick(nt());
+            // verify only one order exists on each side
+            Assert.AreEqual(1, profits.Count);
+            Assert.AreEqual(0, stops.Count);
+            // get orders
+            profit = profits[0];
+            // verify profit offset
+            Assert.IsTrue(profit.isValid);
+            Assert.AreEqual(PRICE + 1 + POFFSET, profit.price);
+            Assert.AreEqual(SIZE, profit.UnsignedSize);
+
+        }
+
+        [Test]
+        public void NoSimulataneous()
+        {
+            // reset "book"
+            reset();
+            // turn off simulat
+            ot.AllowSimulatenousOrders = false;
+            // make sure offsets don't exist
+            Assert.AreEqual(0, profits.Count);
+            Assert.AreEqual(0, stops.Count);
+            // setup offset defaults
+            ot.DefaultOffset = SampleOffset();
+            // send position update to generate offsets
+            ot.Adjust(new PositionImpl(SYM, PRICE, SIZE));
+            // verify stop exists
+            Assert.AreEqual(0, profits.Count);
+            Assert.AreEqual(1, stops.Count);
+            // send tick
+            ot.newTick(nt());
+            // verify stop and profit exist
+            Assert.AreEqual(1, profits.Count);
+            Assert.AreEqual(1, stops.Count);
+            // get orders
+            Order profit = profits[0];
+            Order stop = stops[0];
+            // verify profit offset
+            Assert.IsTrue(profit.isValid);
+            Assert.AreEqual(PRICE + POFFSET, profit.price);
+            Assert.AreEqual(SIZE, profit.UnsignedSize);
+            // verify stop offset
+            Assert.IsTrue(stop.isValid);
+            Assert.AreEqual(PRICE - SOFFSET, stop.stopp);
+            Assert.AreEqual(SIZE, stop.UnsignedSize);
+
+            // send position update
+            ot.Adjust(new TradeImpl(SYM, PRICE + 2, SIZE));
+            // tick
+            ot.newTick(nt());
+            ot.newTick(nt());
+            // verify only one order exists
+            Assert.AreEqual(1, profits.Count);
+            Assert.AreEqual(1, stops.Count);
+            // get orders
+            profit = profits[0];
+            stop = stops[0];
+            // verify profit offset
+            Assert.IsTrue(profit.isValid);
+            Assert.AreEqual(PRICE + 1 + POFFSET, profit.price);
+            Assert.AreEqual(SIZE * 2, profit.UnsignedSize);
+            // verify stop offset
+            Assert.IsTrue(stop.isValid);
+            Assert.AreEqual(PRICE + 1 - SOFFSET, stop.stopp);
+            Assert.AreEqual(SIZE * 2, stop.UnsignedSize);
+
+            // partial hit the profit order
+            ot.Adjust(new TradeImpl(SYM, PRICE + 1, -1 * SIZE));
+            // tick
+            ot.newTick(nt());
             ot.newTick(nt());
             // verify only one order exists on each side
             Assert.AreEqual(1, profits.Count);
