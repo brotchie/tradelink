@@ -22,6 +22,8 @@ namespace SterServer
         PositionTracker pt = new PositionTracker();
         int _SLEEP = 50;
         int _ORDERSLEEP = 1;
+        int _CANCELWAIT = 1000;
+        public int CancelWait { get { return _CANCELWAIT; } set { _CANCELWAIT = value; } }
         bool _supportcover = true;
         public bool CoverEnabled { get { return _supportcover; } set { _supportcover = value; } }
         public ServerSterling() : this(50,1) { }
@@ -244,6 +246,9 @@ namespace SterServer
                         }
                         else
                             debug("No record of id: " + number.ToString());
+                        // see if empty yet
+                        if (_cancelq.hasItems)
+                            Thread.Sleep(_CANCELWAIT);
                     }
 
                     // messages

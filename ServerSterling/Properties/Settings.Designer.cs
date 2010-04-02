@@ -70,5 +70,17 @@ namespace SterServer.Properties {
                 this["OrderSleep"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1000")]
+        public int CancelWait {
+            get {
+                return ((int)(this["CancelWait"]));
+            }
+            set {
+                this["CancelWait"] = value;
+            }
+        }
     }
 }

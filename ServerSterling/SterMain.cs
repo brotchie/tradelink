@@ -31,6 +31,7 @@ namespace SterServer
                 tl.SendDebug += new DebugDelegate(tl_SendDebug);
                 tl.CoverEnabled = Properties.Settings.Default.CoverEnabled;
                 tl.Account = Properties.Settings.Default.defaultaccount;
+                tl.CancelWait = Properties.Settings.Default.CancelWait;
                 tl.Start();
             }
             catch (Exception ex)

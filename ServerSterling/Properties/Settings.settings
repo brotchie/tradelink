@@ -14,5 +14,8 @@
     <Setting Name="OrderSleep" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
+    <Setting Name="CancelWait" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1000</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
