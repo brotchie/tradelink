@@ -71,7 +71,16 @@ namespace TradeLink.Common
         /// <summary>
         /// obtains a new id permanently
         /// </summary>
-        public long AssignId { get { if (NextOverflows) throw new IdTrackerOverflow(); return _nextid++; } }
+        public long AssignId 
+        { 
+            get 
+            { 
+                if (NextOverflows) 
+                    throw new IdTrackerOverflow();
+                long next = System.Threading.Interlocked.Increment(ref _nextid);
+                return next;
+            } 
+        }
         /// <summary>
         /// provides what next id will be without assigning it
         /// </summary>
