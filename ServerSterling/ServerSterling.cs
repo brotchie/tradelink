@@ -112,7 +112,6 @@ namespace SterServer
             f.Add(MessageTypes.LIVEDATA);
             f.Add(MessageTypes.LIVETRADING);
             f.Add(MessageTypes.SIMTRADING);
-            f.Add(MessageTypes.SENDORDER);
             f.Add(MessageTypes.ORDERCANCELREQUEST);
             f.Add(MessageTypes.ORDERCANCELRESPONSE);
             f.Add(MessageTypes.OK);
@@ -123,9 +122,9 @@ namespace SterServer
             f.Add(MessageTypes.FEATURERESPONSE);
             f.Add(MessageTypes.HEARTBEAT);
             f.Add(MessageTypes.ORDERNOTIFY);
+            f.Add(MessageTypes.EXECUTENOTIFY);
             f.Add(MessageTypes.REGISTERCLIENT);
             f.Add(MessageTypes.REGISTERSTOCK);
-            f.Add(MessageTypes.SENDORDER);
             f.Add(MessageTypes.TICKNOTIFY);
             f.Add(MessageTypes.VERSION);
             f.Add(MessageTypes.IMBALANCEREQUEST);
@@ -134,10 +133,11 @@ namespace SterServer
             f.Add(MessageTypes.POSITIONRESPONSE);
             f.Add(MessageTypes.ACCOUNTREQUEST);
             f.Add(MessageTypes.ACCOUNTRESPONSE);
+            f.Add(MessageTypes.SENDORDER);
             f.Add(MessageTypes.SENDORDERSTOP);
             f.Add(MessageTypes.SENDORDERMARKET);
             f.Add(MessageTypes.SENDORDERLIMIT);
-            f.Add(MessageTypes.EXECUTENOTIFY);
+            f.Add(MessageTypes.SENDORDERTRAIL);
             f.Add(MessageTypes.SENDORDERPEGMIDPOINT);
             return f.ToArray();
         }
@@ -210,7 +210,16 @@ namespace SterServer
                         order.Account = o.Account != string.Empty ? o.Account : acct;
                         order.Destination = o.Exchange != "" ? o.ex : "NYSE";
                         order.Tif = o.TIF;
-                        order.PriceType = o.isMarket ? STIPriceTypes.ptSTIMkt : (o.isLimit ? STIPriceTypes.ptSTILmt : STIPriceTypes.ptSTISvrStp);
+                        if (o.isMarket)
+                            order.PriceType = STIPriceTypes.ptSTIMkt;
+                        else if (o.isLimit && o.isStop)
+                            order.PriceType = STIPriceTypes.ptSTISvrStpLmt;
+                        else if (o.isLimit)
+                            order.PriceType = STIPriceTypes.ptSTILmt;
+                        else if (o.isStop)
+                            order.PriceType = STIPriceTypes.ptSTISvrStp;
+                        else if (o.isTrail)
+                            order.PriceType = STIPriceTypes.ptSTITrailStp;
                         order.ClOrderID = o.id.ToString();
                         int err = order.SubmitOrder();
                         string tmp = "";
