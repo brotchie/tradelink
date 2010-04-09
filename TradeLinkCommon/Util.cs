@@ -638,26 +638,49 @@ namespace TradeLink.Common
 
 
         /// <summary>
+        /// gets list of readable tickfiles in top level of a folder.
+        /// 2nd dimension of list is size of file in bytes (as string)
+        /// </summary>
+        /// <param name="folder"></param>
+        /// <returns></returns>
+        public static string[,] TickFileIndex(string folder) { return TickFileIndex(folder, TikConst.WILDCARD_EXT); }
+        /// <summary>
+        /// builds list of readable tick files with given extension found in top level of folder
+        /// </summary>
+        /// <param name="Folder"></param>
+        /// <param name="tickext"></param>
+        /// <returns></returns>
+        public static string[,] TickFileIndex(string Folder, string tickext) { return TickFileIndex(Folder, tickext, false, null); }
+        /// <summary>
         /// builds list of readable tickfiles found in given folder
         /// </summary>
         /// <param name="Folder">path containing tickfiles</param>
         /// <param name="tickext">file extension</param>
         /// <returns></returns>
-        public static string[,] TickFileIndex(string Folder, string tickext)
+        public static string[,] TickFileIndex(string Folder, string tickext, bool searchSubFolders) { return TickFileIndex(Folder, tickext, searchSubFolders, null); }
+        /// <summary>
+        /// builds list of readable tickfiles (and their byte-size) found in folder
+        /// </summary>
+        /// <param name="Folder"></param>
+        /// <param name="tickext"></param>
+        /// <param name="searchSubFolders"></param>
+        /// <param name="debug"></param>
+        /// <returns></returns>
+        public static string[,] TickFileIndex(string Folder, string tickext, bool searchSubFolders, DebugDelegate debug)
         {
             string[] _tickfiles = Directory.GetFiles(Folder, tickext);
             DirectoryInfo di = new DirectoryInfo(Folder);
-            FileInfo[] fi = di.GetFiles(tickext, SearchOption.AllDirectories);
+            FileInfo[] fi = di.GetFiles(tickext, searchSubFolders ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
             string[,] index = new string[_tickfiles.Length, 2];
+            int i = 0;
+            int qtr = fi.Length / 4;
             foreach (FileInfo thisfi in fi)
             {
-                for (int i = 0; i < _tickfiles.Length; i++)
-                    if (thisfi.FullName == _tickfiles[i])
-                    {
-                        index[i, 0] = thisfi.Name;
-                        index[i, 1] = thisfi.Length.ToString();
-                    }
-
+                if ((debug != null) && (i % qtr == 0))
+                    debug((fi.Length - i).ToString("N0") + " files remaining to index...");
+                index[i, 0] = thisfi.Name;
+                index[i, 1] = thisfi.Length.ToString();
+                i++;
             }
             return index;
         }
