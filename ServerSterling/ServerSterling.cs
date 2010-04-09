@@ -58,6 +58,8 @@ namespace SterServer
                 stiPos.OnSTIPositionUpdate += new _ISTIPositionEvents_OnSTIPositionUpdateEventHandler(stiPos_OnSTIPositionUpdate);
                 stiQuote.OnSTIQuoteUpdate += new _ISTIQuoteEvents_OnSTIQuoteUpdateEventHandler(stiQuote_OnSTIQuoteUpdate);
                 stiQuote.OnSTIQuoteSnap += new _ISTIQuoteEvents_OnSTIQuoteSnapEventHandler(stiQuote_OnSTIQuoteSnap);
+                stiEvents.OnSTIOrderRejectMsg += new _ISTIEventsEvents_OnSTIOrderRejectMsgEventHandler(stiEvents_OnSTIOrderRejectMsg);
+                stiEvents.OnSTIOrderReject += new _ISTIEventsEvents_OnSTIOrderRejectEventHandler(stiEvents_OnSTIOrderReject);
                 stiPos.GetCurrentPositions();
 
                 newAcctRequest += new StringDelegate(tl_newAcctRequest);
@@ -79,6 +81,16 @@ namespace SterServer
             debug(PROGRAM + " started.");
             _connected = true;
             return _connected;
+        }
+
+        void stiEvents_OnSTIOrderReject(ref structSTIOrderReject structOrderReject)
+        {
+            debug("reject: " + structOrderReject.bstrClOrderId + " reason: " + structOrderReject.nRejectReason);
+        }
+
+        void stiEvents_OnSTIOrderRejectMsg(STIOrderRejectMsg oSTIOrderRejectMsg)
+        {
+            debug("reject: " + oSTIOrderRejectMsg.ClOrderID + " reason: " + oSTIOrderRejectMsg.RejectReason.ToString());
         }
 
         void tl_newImbalanceRequest()
