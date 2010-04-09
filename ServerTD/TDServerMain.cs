@@ -94,15 +94,23 @@ namespace TDServer
             List<Position> plist = new List<Position>();
             foreach (AmeritradeBrokerAPI.Positions oPosition in brokerAcctPosArgs.oPositions)
             {
-                decimal price = 0;
-                decimal.TryParse(oPosition.AveragePric,out price);
-                int size = 0;
-                int.TryParse(oPosition.Quantity,out size);
-                Position p = new PositionImpl(oPosition.StockSymbol,price,size);
-                if (p.isValid)
-                    plist.Add(p);
-                else
-                    debug("can't send invalid position: " + p.ToString());
+                try
+                {
+                    decimal price = 0;
+                    string acct = brokerAcctPosArgs.BrokerAcctID;
+                    decimal.TryParse(oPosition.AveragePric, out price);
+                    int size = 0;
+                    int.TryParse(oPosition.Quantity, out size);
+                    Position p = new PositionImpl(oPosition.StockSymbol, price, size, 0, acct);
+                    if (p.isValid)
+                        plist.Add(p);
+                    else
+                        debug("can't send invalid position: " + p.ToString());
+                }
+                catch (Exception ex)
+                {
+                    debug("can't send invalid position: " + oPosition.StockSymbol + " " + oPosition.AveragePric + " " + oPosition.Quantity + " " + brokerAcctPosArgs.BrokerAcctID);
+                }
             }
             return plist.ToArray();
 
