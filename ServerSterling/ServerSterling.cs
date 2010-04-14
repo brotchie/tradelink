@@ -391,7 +391,7 @@ namespace SterServer
             // don't notify for same order more than once
             if (_onotified.Contains(id)) return;
             if (structOrderUpdate.bstrLogMessage.Contains("REJ"))
-                debug(o.id+" "+structOrderUpdate.bstrLogMessage);
+                debug(id+" "+structOrderUpdate.bstrLogMessage);
             o.id = id;
             o.size = structOrderUpdate.nQuantity;
             o.side = o.size > 0;
