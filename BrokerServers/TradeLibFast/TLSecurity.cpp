@@ -11,6 +11,8 @@ namespace TradeLibFast
 		this->type = -1;
 		this->date = 0;
 		this->dest = CString("");
+		this->details = CString("");
+		this->strike = 0;
 	}
 
 	TLSecurity::TLSecurity(CString symbol)
@@ -19,6 +21,8 @@ namespace TradeLibFast
 		this->type = -1;
 		this->date = 0;
 		this->dest = CString("");
+		this->details = CString("");
+		this->strike = 0;
 	}
 
 	TLSecurity::~TLSecurity()
@@ -47,9 +51,27 @@ namespace TradeLibFast
 		else 
 			rec.push_back(msg);
 		TLSecurity sec;
+		// symbol is a requirement for every type
 		sec.sym = rec[SecSym];
-		// see if both type and destination were specified
-		if (rec.size()>2)
+		// check for option
+		bool isopt = (msg.Find(CString("PUT"))!=-1) || (msg.Find(CString("CALL"))!=-1);
+		if (isopt)
+		{
+			// sym, date, details, price, ex
+			sec.date = _tstoi(rec[1]);
+			bool isput = msg.Find(CString("PUT"))!=-1;
+			sec.details = isput ? CString("PUT") : CString("CALL");
+			sec.strike = _tstof(rec[3]);
+			if (rec.size()>5)
+			{
+				sec.dest = rec[4];
+				sec.type = _tstoi(rec[5]);
+			}
+			else
+				sec.type = SecurityID(rec[4]);
+
+		}// see if both type and destination were specified
+		else if (rec.size()>2)
 		{
 			// try to get type from both parameters
 			int f2id = SecurityID(rec[2]);

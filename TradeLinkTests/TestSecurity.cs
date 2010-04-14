@@ -31,6 +31,12 @@ namespace TestTradeLink
             SecurityImpl goog = SecurityImpl.Parse("GOOG");
             Assert.AreEqual("GOOG", goog.FullName);
 
+            Security opt = SecurityImpl.Parse("IBM PUT 201004 100.00");
+            Assert.That(opt.Type == SecurityType.OPT);
+            Assert.AreEqual(100, opt.Strike);
+            Assert.AreEqual("PUT", opt.Details);
+            Assert.AreEqual(201004, opt.Date);
+
 
             
         }

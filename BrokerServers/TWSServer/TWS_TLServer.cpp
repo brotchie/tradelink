@@ -212,7 +212,17 @@ namespace TradeLibFast
 		if (o.symbol.FindOneOf(" ")!=-1)
 		{
 			contract->symbol = tmpsec.sym;
-			contract->localSymbol = o.localsymbol!="" ? o.localsymbol : tmpsec.sym;
+			// options stuff
+			if (tmpsec.isCall()|| tmpsec.isPut())
+			{
+				CString expire;
+				expire.Format("%i",tmpsec.date);
+				contract->expiry = expire;
+				contract->strike = tmpsec.strike;
+				contract->right = tmpsec.details;
+			}
+			else
+				contract->localSymbol = o.localsymbol!="" ? o.localsymbol : tmpsec.sym;
 			if (tmpsec.hasDest())
 				contract->exchange = tmpsec.dest;
 			if (tmpsec.hasType())
@@ -225,9 +235,10 @@ namespace TradeLibFast
 			contract->localSymbol = o.localsymbol!="" ? o.localsymbol : o.symbol;
 			contract->exchange = o.exchange;
 			contract->secType = o.security;
-			if (contract->exchange=="")
-				contract->exchange= "SMART";
+
 		}
+		if (contract->exchange=="")
+			contract->exchange= "SMART";
 		
 		contract->currency = o.currency;
 
@@ -438,12 +449,22 @@ namespace TradeLibFast
 		trade.account = execution.acctNumber;
 		trade.exchange = contract.exchange;
 		trade.id = IB2TLID(orderId);
-		trade.localsymbol = contract.localSymbol;
 		trade.xprice = execution.price;
 		trade.xsize = execution.shares;
-		trade.symbol = contract.localSymbol;
 		trade.side = execution.side=="BOT";
 		trade.security = contract.secType;
+		if (trade.security==CString("OPT"))
+		{
+			CString m;
+			m.Format("%s %s %s %f OPT",contract.symbol,contract.expiry,(contract.right==CString("C")) ? "CALL" : "PUT",contract.strike);
+			trade.symbol = m;
+		}
+		else
+		{
+			trade.localsymbol = contract.localSymbol;
+			trade.symbol = contract.localSymbol;
+		}
+
 
 		// convert date and time
 		std::vector<CString> r;
@@ -491,8 +512,22 @@ namespace TradeLibFast
 			if (hasTicker(sec.sym)) continue;
 			// otherwise, subscribe to this stock and save it to subscribed list of tickers
 			Contract contract;
-			// set local symbol to symbol
-			contract.localSymbol = sec.sym;
+			
+			// if option, pass options parameters
+			if (sec.isCall() || sec.isPut())
+			{
+				contract.symbol = sec.sym;
+				contract.right = sec.details;
+				CString expire;
+				expire.Format("%i",sec.date);
+				contract.expiry = expire;
+				contract.strike = sec.strike;
+				if (!sec.hasDest())
+					contract.exchange = "SMART";
+			}
+			else // set local symbol to symbol
+				contract.localSymbol = sec.sym;
+
 			// if destination specified use it
 			if (sec.hasDest())
 				contract.exchange = sec.dest;
@@ -610,7 +645,14 @@ namespace TradeLibFast
 		double unrealizedPNL, double realizedPNL, const CString &accountName) 
 	{ 
 		TLPosition pos;
-		pos.Symbol = contract.localSymbol;
+		if (contract.secType!=CString("OPT"))
+			pos.Symbol = contract.localSymbol;
+		else
+		{
+			CString m;
+			m.Format("%s %s %s %f OPT",contract.symbol,contract.expiry,(contract.right==CString("C")) ? "CALL" : "PUT",contract.strike);
+			pos.Symbol = m;
+		}
 		pos.Size = position;
 		pos.AvgPrice = marketPrice;
 		pos.ClosedPL = realizedPNL;

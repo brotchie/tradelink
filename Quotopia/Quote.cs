@@ -339,7 +339,7 @@ namespace Quotopia
             Security s = GetVisibleSecurity(CurrentRow);
             if (s.Type == SecurityType.IDX) return;
             string sym = s.Symbol;
-            Order o = new OrderImpl(sym,0);
+            Order o = new OrderImpl(s.FullName,0);
             o.ex = s.DestEx;
             o.Security = s.Type;
             o.LocalSymbol = sym;

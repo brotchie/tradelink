@@ -1103,8 +1103,6 @@ namespace ASP
                     o.Security = sec.Type;
                     o.Exchange = sec.DestEx;
                 }
-                else
-                    debug("security type missing on: " + o.symbol); 
             }
             // if still empty, use default
             if (o.ex == string.Empty)

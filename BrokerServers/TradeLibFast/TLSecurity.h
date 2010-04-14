@@ -3,27 +3,6 @@
 namespace TradeLibFast
 {
 
-	class AFX_EXT_CLASS TLSecurity
-	{
-	public:
-		TLSecurity(CString symbol);
-		TLSecurity(void);
-		~TLSecurity(void);
-		CString sym;
-		int date;
-		CString dest;
-		int type;
-		bool isValid();
-		CString Serialize(void);
-		bool hasDest();
-		bool hasType();
-		static TLSecurity Deserialize(CString msg);
-		static LPCTSTR SecurityTypeName(int SecurityTypeID);
-		static int SecurityID(CString SecurityTypeName);
-	};
-
-}
-
 	enum TLSecurityID
     {
 		NIL = -1,
@@ -46,4 +25,31 @@ namespace TradeLibFast
 		SecType,
 		SecDest,
 	};
+
+	class AFX_EXT_CLASS TLSecurity
+	{
+	public:
+		TLSecurity(CString symbol);
+		TLSecurity(void);
+		~TLSecurity(void);
+		CString sym;
+		int date;
+		CString dest;
+		int type;
+		double strike;
+		CString details;
+		bool isValid();
+		CString Serialize(void);
+		bool hasDest();
+		bool hasType();
+		static TLSecurity Deserialize(CString msg);
+		static LPCTSTR SecurityTypeName(int SecurityTypeID);
+		static int SecurityID(CString SecurityTypeName);
+		bool isPut() { return (type==OPT) && (details==CString("PUT")); }
+		bool isCall() { return (type==OPT) && (details==CString("CALL")); }
+	};
+
+}
+
+
 
