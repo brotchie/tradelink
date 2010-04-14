@@ -43,38 +43,39 @@ namespace TradeLink.Common
 
         void ReadTick()
         {
-
-            while (_readtick)
+            try
             {
-                if (_tickcache.hasItems && (GotTickQueued!=null))
-                    GotTickQueued();
-                while (_tickcache.hasItems)
+                while (_readtick)
                 {
-                    if (!_readtick)
-                        break;
-                    Tick k = _tickcache.Read();
-                    if (k == null)
+
+                    if (_tickcache.hasItems && (GotTickQueued!=null))
+                        GotTickQueued();
+                    while (_tickcache.hasItems)
                     {
-                        _nrt++;
-                        if (GotBadTick != null)
-                            GotBadTick();
-                        continue;
+                        if (!_readtick)
+                            break;
+                        Tick k = _tickcache.Read();
+                        if (k == null)
+                        {
+                            _nrt++;
+                            if (GotBadTick != null)
+                                GotBadTick();
+                            continue;
+                        }
+                        if (GotTick != null)
+                            GotTick(k);
                     }
-                    if (GotTick != null)
-                        GotTick(k);
-                }
-                // send event that queue is presently empty
-                if (_tickcache.isEmpty && (GotTickQueueEmpty != null))
-                    GotTickQueueEmpty();
-                try
-                {
+                    // send event that queue is presently empty
+                    if (_tickcache.isEmpty && (GotTickQueueEmpty != null))
+                        GotTickQueueEmpty();
                     // clear current flag signal
                     _tickswaiting.Reset();
                     // wait for a new signal to continue reading
                     _tickswaiting.WaitOne(SLEEP);
+
                 }
-                catch (ThreadInterruptedException) { }
             }
+            catch (ThreadInterruptedException) { }
         }
 
         public const int SLEEP = 10;
@@ -167,39 +168,40 @@ namespace TradeLink.Common
 
         void ReadImbs()
         {
-
-            while (_readimb)
+            try
             {
-                if (_imbcache.hasItems &&(GotImbalanceQueued != null))
-                    GotImbalanceQueued();
-                while (_imbcache.hasItems)
+                while (_readimb)
                 {
-                    if (!_readimb)
-                        break;
-                    Imbalance imb  = _imbcache.Read();
-                    if (imb == null)
+                    if (_imbcache.hasItems &&(GotImbalanceQueued != null))
+                        GotImbalanceQueued();
+                    while (_imbcache.hasItems)
                     {
-                        _nir++;
-                        if (GotBadImbalance != null)
-                            GotBadImbalance();
-                        continue;
+                        if (!_readimb)
+                            break;
+                        Imbalance imb  = _imbcache.Read();
+                        if (imb == null)
+                        {
+                            _nir++;
+                            if (GotBadImbalance != null)
+                                GotBadImbalance();
+                            continue;
+                        }
+                        if (GotImbalance != null)
+                            GotImbalance(imb);
                     }
-                    if (GotImbalance != null)
-                        GotImbalance(imb);
-                }
-                // send event that queue is presently empty
-                if (_imbcache.isEmpty && (GotImbalanceQueueEmpty != null) )
-                    GotImbalanceQueueEmpty();
-                try
-                {
+                    // send event that queue is presently empty
+                    if (_imbcache.isEmpty && (GotImbalanceQueueEmpty != null) )
+                        GotImbalanceQueueEmpty();
+
                     // clear current flag signal
                     _imbswaiting.Reset();
                     // wait for a new signal to continue reading
                     _imbswaiting.WaitOne(SLEEP);
-                }
-                catch (ThreadInterruptedException) { }
 
+
+                }
             }
+            catch (ThreadInterruptedException) { }
         }
         /// <summary>
         /// write an imbalance to buffer for later processing
