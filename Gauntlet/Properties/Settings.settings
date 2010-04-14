@@ -3,10 +3,10 @@
   <Profiles />
   <Settings>
     <Setting Name="tickfolder" Type="System.String" Scope="User">
-      <Value Profile="(Default)">c:\program files\tradelink\tickdata\</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="boxdll" Type="System.String" Scope="User">
-      <Value Profile="(Default)">c:\program files\tradelink\tradelinksuite\responses.dll</Value>
+      <Value Profile="(Default)">c:\program files\tradelink\responses.dll</Value>
     </Setting>
     <Setting Name="saveonexit" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>

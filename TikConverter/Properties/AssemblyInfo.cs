@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Chartographer")]
+[assembly: AssemblyTitle("TickConverter")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Chartographer")]
-[assembly: AssemblyCopyright("Copyright © Franta.com 2008")]
+[assembly: AssemblyProduct("TickConverter")]
+[assembly: AssemblyCopyright("Copyright ©  2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("4f39f8fd-b7c2-45fc-a5bb-d7ab16e6c4f8")]
+[assembly: Guid("f462152e-e4d9-4361-bc45-9ab0e9b8dc0a")]
 
 // Version information for an assembly consists of the following four values:
 //

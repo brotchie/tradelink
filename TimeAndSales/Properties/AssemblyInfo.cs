@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("TimeSales")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Franta.com")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("TimeSales")]
 [assembly: AssemblyCopyright("Copyright © Franta.com 2008")]
 [assembly: AssemblyTrademark("")]

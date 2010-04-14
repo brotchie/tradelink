@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Kadina")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Org")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Kadina")]
 [assembly: AssemblyCopyright("Copyright © Org 2008")]
 [assembly: AssemblyTrademark("")]
