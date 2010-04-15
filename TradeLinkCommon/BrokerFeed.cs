@@ -320,6 +320,8 @@ namespace TradeLink.Common
                     execute.gotUnknownMessage += new MessageDelegate(execute_gotUnknownMessage2);
                 }
                 debug("Executions: " + execute.BrokerName + " " + execute.ServerVersion);
+                if (RequestAccountsOnStartup)
+                    RequestAccounts();
             }
 
             feedready = true;
@@ -393,6 +395,9 @@ namespace TradeLink.Common
 
         void execute_gotAccounts2(string msg)
         {
+            debug("accounts: " + msg);
+            if (RequestPositionsOnAccounts)
+                RequestPositions(msg);
             if (gotAccounts != null)
                 gotAccounts(msg);
 
@@ -459,21 +464,51 @@ namespace TradeLink.Common
         /// </summary>
         public bool RequestPositionsOnAccounts { get { return _requestpositionsonaccount; } set { _requestpositionsonaccount = value; } }
 
+        bool _requestaccountsonstart = true;
+        /// <summary>
+        /// request accounts when connection is reset or started
+        /// </summary>
+        public bool RequestAccountsOnStartup { get { return _requestaccountsonstart; } set { _requestaccountsonstart = value; } }
+
         void execute_gotAccounts(string msg)
         {
+            debug("accounts: " + msg);
             if (RequestPositionsOnAccounts)
-            {
-                try
-                {
-                    debug("requesting positions for account: " + msg);
-                    execute.TLSend(MessageTypes.POSITIONREQUEST, BrokerClient.Name + "+" + msg);
-                }
-                catch (Exception ex)
-                {
-                    debug("position request error: " + ex.Message + ex.StackTrace);
-                }
-            }
+                RequestPositions(msg);
             _abuff.Write(msg);
+        }
+        /// <summary>
+        /// request positions for a given account
+        /// </summary>
+        /// <param name="acct"></param>
+        public void RequestPositions(string acct)
+        {
+
+            try
+            {
+                debug("requesting positions for account: " + acct);
+                long r = execute.TLSend(MessageTypes.POSITIONREQUEST, BrokerClient.Name + "+" + acct);
+            }
+            catch (Exception ex)
+            {
+                debug("position request error: "+acct + ex.Message + ex.StackTrace);
+            }
+
+        }
+        /// <summary>
+        /// request accounts available on connection
+        /// </summary>
+        public void RequestAccounts()
+        {
+            try
+            {
+                debug("requesting accounts on: " + Name);
+                long r = execute.TLSend(MessageTypes.ACCOUNTREQUEST, Name);
+            }
+            catch (Exception ex)
+            {
+                debug("Account request error: " + ex.Message + ex.StackTrace);
+            }
         }
 
 
