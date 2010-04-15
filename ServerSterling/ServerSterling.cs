@@ -407,7 +407,7 @@ namespace SterServer
                 debug(id+" "+structOrderUpdate.bstrLogMessage);
             o.id = id;
             o.size = structOrderUpdate.nQuantity;
-            o.side = o.size > 0;
+            o.side = structOrderUpdate.bstrSide == "B";
             o.price = (decimal)structOrderUpdate.fLmtPrice;
             o.stopp = (decimal)structOrderUpdate.fStpPrice;
             o.TIF = structOrderUpdate.bstrTif;
