@@ -453,8 +453,26 @@ namespace TradeLink.Common
             _reader.Interrupt();
         }
 
+        bool _requestpositionsonaccount = true;
+        /// <summary>
+        /// request positions automatically when accounts are received
+        /// </summary>
+        public bool RequestPositionsOnAccounts { get { return _requestpositionsonaccount; } set { _requestpositionsonaccount = value; } }
+
         void execute_gotAccounts(string msg)
         {
+            if (RequestPositionsOnAccounts)
+            {
+                try
+                {
+                    debug("requesting positions for account: " + msg);
+                    execute.TLSend(MessageTypes.POSITIONREQUEST, BrokerClient.Name + "+" + msg);
+                }
+                catch (Exception ex)
+                {
+                    debug("position request error: " + ex.Message + ex.StackTrace);
+                }
+            }
             _abuff.Write(msg);
         }
 
