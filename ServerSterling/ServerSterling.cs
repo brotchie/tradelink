@@ -263,7 +263,12 @@ namespace SterServer
                         string acct = "";
                         if (idacct.TryGetValue(number, out acct))
                         {
-                            stiOrder.CancelOrder(acct, 0, number.ToString(), _canceltracker.AssignId.ToString());
+                            // get unique cancel id
+                            long cancelid = _canceltracker.AssignId;
+                            // save cancel to order id relationship
+                            _cancel2order.Add(cancelid, number);
+                            // send cancel
+                            stiOrder.CancelOrder(acct, 0, number.ToString(), cancelid.ToString());
                         }
                         else
                             debug("No record of id: " + number.ToString());
@@ -319,6 +324,8 @@ namespace SterServer
                     Thread.Sleep(_SLEEP);
             }
         }
+
+        Dictionary<long, long> _cancel2order = new Dictionary<long, long>(MAXRECORD);
 
         IdTracker _canceltracker = new IdTracker(false, 0, DateTime.Now.Ticks);
 
@@ -385,7 +392,13 @@ namespace SterServer
             // if this is a cancel notification, pass along
             if (structOrderUpdate.nOrderStatus == (int)STIOrderStatus.osSTICanceled)
             {
-                newOrderCancel(id);
+                // if it's a cancel, we'll have cancel id rather than order id
+                // get new id
+                long orderid = 0;
+                if (_cancel2order.TryGetValue(id, out orderid))
+                    newOrderCancel(orderid);
+                else
+                    debug("no record for cancel id: " + id);
                 return;
             }
             // don't notify for same order more than once

@@ -94,16 +94,21 @@ namespace TradeLink.Common
                         WMUtil.SendMsg(TickImpl.Serialize(tick), hims[i],Handle, (int)MessageTypes.TICKNOTIFY );
             }
         }
-        delegate void tlsenddel(string m, MessageTypes t, string c);
+
         public void TLSend(string message, MessageTypes type, string clientname)
         {
+            int id = client.IndexOf(clientname);
+            if (id == -1) return;
+            TLSend(message,type,hims[id]);
+        }
+        delegate void tlsenddel(string m, MessageTypes t, IntPtr dest);
+        public void TLSend(string message, MessageTypes type, IntPtr dest)
+        {
             if (InvokeRequired)
-                Invoke(new tlsenddel(TLSend), new object[] { message, type, clientname });
+                Invoke(new tlsenddel(TLSend), new object[] { message, type,dest });
             else
             {
-                int id = client.IndexOf(clientname);
-                if (id == -1) return;
-                WMUtil.SendMsg(message, hims[id], Handle, (int)type);
+                WMUtil.SendMsg(message, dest, Handle, (int)type);
             }
         }
 
@@ -217,14 +222,14 @@ namespace TradeLink.Common
 
         public void newOrderCancel(long orderid_being_cancled)
         {
-            foreach (string c in client) // send order cancel notifcation to clients
-                WMUtil.SendMsg(orderid_being_cancled.ToString(), MessageTypes.ORDERCANCELRESPONSE, Handle, c);
+                foreach (string c in client) // send order cancel notifcation to clients
+                    TLSend(orderid_being_cancled.ToString(), MessageTypes.ORDERCANCELRESPONSE, c);
         }
 
         public void newImbalance(Imbalance imb)
         {
-            for (int i = 0; i < client.Count; i++)
-                WMUtil.SendMsg(ImbalanceImpl.Serialize(imb), hims[i],Handle, (int)MessageTypes.IMBALANCERESPONSE );
+                for (int i = 0; i < client.Count; i++)
+                    TLSend(ImbalanceImpl.Serialize(imb), MessageTypes.IMBALANCERESPONSE, hims[i]);
         }
 
         public Providers newProviderName = Providers.TradeLink;
@@ -254,7 +259,7 @@ namespace TradeLink.Common
                     string acct = pm[1];
                     Position[] list = newPosList(acct);
                     foreach (Position pos in list)
-                        WMUtil.SendMsg(PositionImpl.Serialize(pos), MessageTypes.POSITIONRESPONSE, Handle, client);
+                        TLSend(PositionImpl.Serialize(pos), MessageTypes.POSITIONRESPONSE, client);
                     break;
                 case MessageTypes.ORDERCANCELREQUEST:
                     {
