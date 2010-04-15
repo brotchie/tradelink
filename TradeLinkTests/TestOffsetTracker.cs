@@ -222,6 +222,19 @@ namespace TestTradeLink
             Assert.AreEqual(PRICE + 1 - SOFFSET, stop.stopp);
             Assert.AreEqual(SIZE * 2, stop.UnsignedSize);
 
+            // partial hit the profit order
+            ot.Adjust(new TradeImpl(SYM, PRICE +1 - 1, -1 * SIZE));
+            // tick
+            ot.newTick(nt());
+
+            // verify stop offset
+            // get orders
+            stop = stops[0];
+            Assert.AreEqual(SIZE, ot.PositionTracker[SYM].Size);
+            Assert.IsTrue(stop.isValid);
+            Assert.AreEqual(PRICE + 1 - SOFFSET, stop.stopp);
+            Assert.AreEqual(SIZE, stop.UnsignedSize);
+
 
         }
 
