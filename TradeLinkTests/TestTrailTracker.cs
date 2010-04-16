@@ -83,13 +83,21 @@ namespace TestTradeLink
             trail = o;
         }
 
+        void debug(string msg)
+        {
+            Console.WriteLine(msg);
+        }
+
         [Test]
-        public void Basics2()
+        public void TrailStartedAfterFirePoint()
         {
             // setup trail tracker
             TrailTracker tt = new TrailTracker();
             tt.isValid = true;
+            const string acct = "DEFAULT";
+            tt.pt.DefaultAccount = acct;
             tt.SendOrder += new OrderDelegate(tt_SendOrder);
+            //tt.SendDebug += new DebugFullDelegate(tt_SendDebug);
             // set 15c trailing stop
             tt.DefaultTrail = new OffsetInfo(0, .15m);
             // verify it's set
@@ -97,7 +105,7 @@ namespace TestTradeLink
             // 
             tt.TrailByDefault = true;
             // put in a position to track
-            tt.Adjust(new PositionImpl(SYM, 11.00m, 100, 0m));
+            tt.Adjust(new PositionImpl(SYM, 11.00m, 100, 0m,acct));
             // check position in tt-pt
             Assert.AreEqual(1, tt.pt.Count);
             // manually enter a trail
@@ -131,6 +139,11 @@ namespace TestTradeLink
             }
 
             Assert.AreEqual(1, oc);
+        }
+
+        void tt_SendDebug(Debug deb)
+        {
+            debug(deb.Msg);
         }
         
     }
