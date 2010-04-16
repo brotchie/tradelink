@@ -82,5 +82,59 @@ namespace TestTradeLink
             Assert.AreEqual(0, s);
             Assert.IsFalse(except);
         }
+
+        [Test]
+        public void MultipleAccount()
+        {
+            // setup defaults for 1st and 2nd accounts and positions
+            string sym = "TST";
+            string a1 = "account1";
+            string a2 = "account2";
+            int s1 = 300;
+            int s2 = 500;
+            decimal p = 100m;
+
+            // create position tracker
+            PositionTracker pt = new PositionTracker();
+
+            // set initial position in 1st account
+            pt.Adjust(new PositionImpl(sym, p, s1, 0, a1));
+
+            // set initial position in 2nd account
+            pt.Adjust(new PositionImpl(sym, p, s2, 0, a2));
+
+            // verify I can query default account and it's correct
+            Assert.AreEqual(s1, pt[sym].Size);
+            // change default to 2nd account
+            pt.DefaultAccount = a2;
+            // verify I can query default and it's correct
+            Assert.AreEqual(s2, pt[sym].Size);
+            // verify I can query 1st account and correct
+            Assert.AreEqual(s1, pt[sym,a1].Size);
+            // verify I can query 2nd account and correct
+            Assert.AreEqual(s2, pt[sym,a2].Size);
+            // get fill in sym for 1st account
+            TradeImpl f = new TradeImpl(sym, p, s1);
+            f.Account = a1;
+            pt.Adjust(f);
+            // get fill in sym for 2nd account
+            TradeImpl f2 = new TradeImpl(sym, p, s2);
+            f2.Account = a2;
+            pt.Adjust(f2);
+            // verify that I can querry 1st account and correct
+            Assert.AreEqual(s1*2, pt[sym, a1].Size);
+            // verify I can query 2nd account and correct
+            Assert.AreEqual(s2*2, pt[sym, a2].Size);
+            // reset
+            pt.Clear();
+            // ensure I can query first and second account and get flat symbols
+            Assert.AreEqual(0, pt[sym].Size);
+            Assert.AreEqual(0, pt[sym, a1].Size);
+            Assert.AreEqual(0, pt[sym, a2].Size);
+            Assert.IsTrue(pt[sym, a1].isFlat);
+            Assert.IsTrue(pt[sym, a2].isFlat);
+            Assert.IsTrue(pt[sym].isFlat);
+            Assert.AreEqual(string.Empty, pt.DefaultAccount);
+        }
     }
 }

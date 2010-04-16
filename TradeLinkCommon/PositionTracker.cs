@@ -29,31 +29,76 @@ namespace TradeLink.Common
 
         /// <summary>
         /// clear all positions.  use with caution.
+        /// also resets default account.
         /// </summary>
         public void Clear()
         {
+            _defaultacct = string.Empty;
             _poslist.Clear();
             _symidx.Clear();
         }
-
+        string _defaultacct = string.Empty;
+        /// <summary>
+        /// Default account used when querying positions
+        /// (if never set by user, defaults to first account provided via adjust)
+        /// </summary>
+        public string DefaultAccount { get { return _defaultacct; } set { _defaultacct = value; } }
+        /// <summary>
+        /// get position given position's index
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <returns></returns>
         public Position this[int idx] { get { return _poslist[idx]; } }
+        /// <summary>
+        /// get position given positions symbol (assumes default account)
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <returns></returns>
         public Position this[string symbol] 
         { 
             get 
             {
                 int idx = -1;
-                if (_symidx.TryGetValue(symbol, out idx))
+                if (_symidx.TryGetValue(symbol+DefaultAccount, out idx))
                     return _poslist[idx];
-                return new PositionImpl(symbol);  
+                Position p = new PositionImpl(symbol,0,0,0,DefaultAccount);  
+                return p;
             } 
         }
+        /// <summary>
+        /// get a position in tracker given symbol and account
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <param name="account"></param>
+        /// <returns></returns>
+        public Position this[string symbol, string account] 
+        { 
+            get 
+            {
+                int idx = -1;
+                if (_symidx.TryGetValue(symbol+account, out idx))
+                    return _poslist[idx];
+                Position p = new PositionImpl(symbol,0,0,0,account);  
+                return p;
+            } 
+        }
+        /// <summary>
+        /// enumerate through positions in tracker using foreach
+        /// </summary>
+        /// <returns></returns>
         public IEnumerator GetEnumerator() 
         { 
             foreach (Position p in _poslist) 
                 yield return p; 
         }
-
+        /// <summary>
+        /// count of positions stored in tracker
+        /// </summary>
         public int Count { get { return _poslist.Count; } }
+        /// <summary>
+        /// array of positions in tracker
+        /// </summary>
+        /// <returns></returns>
         public Position[] ToArray()
         {
             return _poslist.ToArray();
@@ -72,13 +117,15 @@ namespace TradeLink.Common
         public void NewPosition(Position newpos)
         {
             _totalclosedpl += newpos.ClosedPL;
+            if (_defaultacct == string.Empty)
+                _defaultacct = newpos.Account;
             int idx = 0;
-            if (_symidx.TryGetValue(newpos.Symbol,out idx))
+            if (_symidx.TryGetValue(newpos.Symbol+newpos.Account,out idx))
                 _poslist[idx] = new PositionImpl(newpos);
             else
             {
                 _poslist.Add(new PositionImpl(newpos));
-                _symidx.Add(newpos.Symbol,_poslist.Count-1);
+                _symidx.Add(newpos.Symbol+newpos.Account,_poslist.Count-1);
                 if (NewSymbol != null)
                     NewSymbol(newpos.Symbol);
             }
@@ -93,12 +140,15 @@ namespace TradeLink.Common
         {
             decimal cpl = 0;
             int idx = -1;
-            if (_symidx.TryGetValue(fill.symbol, out idx))
+            if (_defaultacct == string.Empty)
+                _defaultacct = fill.Account ;
+
+            if (_symidx.TryGetValue(fill.symbol+fill.Account, out idx))
                 cpl += _poslist[idx].Adjust(fill);
             else
             {
                 _poslist.Add(new PositionImpl(fill));
-                _symidx.Add(fill.symbol, _poslist.Count - 1);
+                _symidx.Add(fill.symbol+fill.Account, _poslist.Count - 1);
                 if (NewSymbol != null)
                     NewSymbol(fill.symbol);
             }
