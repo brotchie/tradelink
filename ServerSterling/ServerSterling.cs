@@ -50,7 +50,7 @@ namespace SterServer
                 _runbg = true;
                 _bw.Start();
 
-
+                stiEvents.OnSTIShutdown += new _ISTIEventsEvents_OnSTIShutdownEventHandler(stiEvents_OnSTIShutdown);
                 stiEvents.SetOrderEventsAsStructs(true);
 
                 stiEvents.OnSTIOrderUpdate += new _ISTIEventsEvents_OnSTIOrderUpdateEventHandler(stiEvents_OnSTIOrderUpdate);
@@ -81,6 +81,11 @@ namespace SterServer
             debug(PROGRAM + " started.");
             _connected = true;
             return _connected;
+        }
+
+        void stiEvents_OnSTIShutdown()
+        {
+            debug("Interface shutdown");
         }
 
         void stiEvents_OnSTIOrderReject(ref structSTIOrderReject structOrderReject)
