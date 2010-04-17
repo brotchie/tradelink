@@ -69,6 +69,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\LogViewer.lnk" "$INSTDIR\LogViewer.exe" "" "$INSTDIR\LogViewer.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\IQFeed.lnk" "$INSTDIR\IQFeedBroker.exe" "" "$INSTDIR\IQFeedBroker.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\TickData.lnk" "$LOCALAPPDATA\TradeLinkTicks\" "" "$LOCALAPPDATA\TradeLinkTicks" 0
+  CreateShortCut "$SMPROGRAMS\TradeLink\Logs.lnk" "$LOCALAPPDATA\" "" "$LOCALAPPDATA\" 0
   
   
   ; install these files
