@@ -94,6 +94,9 @@ namespace Replay
             f.Add(MessageTypes.REGISTERCLIENT);
             f.Add(MessageTypes.REGISTERSTOCK);
             f.Add(MessageTypes.SENDORDER);
+            f.Add(MessageTypes.SENDORDERLIMIT);
+            f.Add(MessageTypes.SENDORDERMARKET);
+            f.Add(MessageTypes.SENDORDERSTOP);
             f.Add(MessageTypes.TICKNOTIFY);
             f.Add(MessageTypes.POSITIONREQUEST);
             f.Add(MessageTypes.POSITIONRESPONSE);
@@ -101,6 +104,8 @@ namespace Replay
             f.Add(MessageTypes.FEATURERESPONSE);
             f.Add(MessageTypes.DAYHIGH);
             f.Add(MessageTypes.DAYLOW);
+            f.Add(MessageTypes.DOMREQUEST);
+            f.Add(MessageTypes.DOMRESPONSE);
             return f.ToArray();
         }
 
@@ -347,55 +352,59 @@ namespace Replay
         {
             // only process requested depth
             if (t.depth > tickdepth) return;
-
-            lasttime = t.time;
-            lastdate = t.date;
-            if (t.isTrade)
+            if (tickdepth == 0)
             {
-                decimal price = 0;
-                if (last.TryGetValue(t.symbol, out price))
-                    last[t.symbol] = t.trade;
-                else last.Add(t.symbol, t.trade);
-                if (highs.TryGetValue(t.symbol, out price))
+                lasttime = t.time;
+                lastdate = t.date;
+                if (t.isTrade)
                 {
-                    if (t.trade > price)
-                        highs[t.symbol] = t.trade;
+                    decimal price = 0;
+                    if (last.TryGetValue(t.symbol, out price))
+                        last[t.symbol] = t.trade;
+                    else last.Add(t.symbol, t.trade);
+                    if (highs.TryGetValue(t.symbol, out price))
+                    {
+                        if (t.trade > price)
+                            highs[t.symbol] = t.trade;
+                    }
+                    else highs.Add(t.symbol, t.trade);
+                    if (lows.TryGetValue(t.symbol, out price))
+                    {
+                        if (t.trade < price)
+                            lows[t.symbol] = t.trade;
+                    }
+                    else lows.Add(t.symbol, t.trade);
+                    tl.newTick(t); // notify of the trade
                 }
-                else highs.Add(t.symbol, t.trade);
-                if (lows.TryGetValue(t.symbol, out price))
-                {
-                    if (t.trade < price)
-                        lows[t.symbol] = t.trade;
+                else
+                {   // it's a quote so we need to update the book
+
+                    // first though get the BBO from hist book to detect improvements
+                    Order oldbid = h.SimBroker.BestBid(t.symbol);
+                    Order oldask = h.SimBroker.BestOffer(t.symbol);
+
+                    // then update the historical book
+                    PlaceHistoricalOrder(t);
+
+                    // fetch the new book
+                    Order newbid = h.SimBroker.BestBid(t.symbol);
+                    Order newask = h.SimBroker.BestOffer(t.symbol);
+
+                    // reset accounts so equality comparisons work properly in next step
+                    oldbid.Account = "";
+                    oldask.Account = "";
+                    newbid.Account = "";
+                    newask.Account = "";
+
+                    // if there are changes, notify clients
+                    if (oldbid != newbid)
+                        tl.newTick(OrderToTick(newbid));
+                    if (oldask != newask)
+                        tl.newTick(OrderToTick(newask));
                 }
-                else lows.Add(t.symbol, t.trade);
-                tl.newTick(t); // notify of the trade
             }
             else
-            {   // it's a quote so we need to update the book
-
-                // first though get the BBO from hist book to detect improvements
-                Order oldbid = h.SimBroker.BestBid(t.symbol);
-                Order oldask = h.SimBroker.BestOffer(t.symbol);
-
-                // then update the historical book
-                PlaceHistoricalOrder(t);
-
-                // fetch the new book
-                Order newbid = h.SimBroker.BestBid(t.symbol);
-                Order newask = h.SimBroker.BestOffer(t.symbol);
-
-                // reset accounts so equality comparisons work properly in next step
-                oldbid.Account = "";
-                oldask.Account = "";
-                newbid.Account = "";
-                newask.Account = "";
-
-                // if there are changes, notify clients
-                if (oldbid != newbid)
-                    tl.newTick(OrderToTick(newbid));
-                if (oldask != newask)
-                    tl.newTick(OrderToTick(newask));
-            }
+                tl.newTick(t);
         }
 
         Tick OrderToTick(Order o)
