@@ -82,5 +82,17 @@ namespace SterServer.Properties {
                 this["CancelWait"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool VerboseDebugging {
+            get {
+                return ((bool)(this["VerboseDebugging"]));
+            }
+            set {
+                this["VerboseDebugging"] = value;
+            }
+        }
     }
 }

@@ -34,6 +34,8 @@ namespace SterServer
         }
         bool _connected = false;
         public bool isConnected { get { return _connected; } }
+        bool _verbosedebug = false;
+        public bool VerboseDebugging { get { return _verbosedebug; } set { _verbosedebug = value; } }
         public bool Start()
         {
             try
@@ -112,6 +114,8 @@ namespace SterServer
 
         long tl_newUnknownRequest(MessageTypes t, string msg)
         {
+            if (VerboseDebugging)
+                debug("got message: " + t.ToString() + " " + msg);
             // message will be handled on main thread for com security
             _msgq.Write(new GenericMessage(t, msg));
             // we say ok for any supported messages
@@ -215,6 +219,8 @@ namespace SterServer
                     {
                         STIOrder order = new STIOrder();
                         Order o = _orderq.Read();
+                        if (VerboseDebugging)
+                            debug("client order received: " + o.ToString());
                         order.LmtPrice = (double)o.price;
                         order.StpPrice = (double)o.stopp;
                         if (o.ex == string.Empty)
@@ -239,6 +245,8 @@ namespace SterServer
                             order.PriceType = STIPriceTypes.ptSTITrailStp;
                         order.ClOrderID = o.id.ToString();
                         int err = order.SubmitOrder();
+                        if (VerboseDebugging)
+                            debug("client order sent: " + order.ClOrderID);
                         string tmp = "";
                         if ((err == 0) && (!idacct.TryGetValue(o.id, out tmp)))
                         {
@@ -274,6 +282,8 @@ namespace SterServer
                             _cancel2order.Add(cancelid, number);
                             // send cancel
                             stiOrder.CancelOrder(acct, 0, number.ToString(), cancelid.ToString());
+                            if (VerboseDebugging)
+                                debug("client cancel requested: " + number.ToString() + " " + cancelid.ToString());
                         }
                         else
                             debug("No record of id: " + number.ToString());
@@ -297,6 +307,8 @@ namespace SterServer
                                     // get order
                                     Peg2Midpoint o = Peg2Midpoint.Deserialize(gm.Request);
                                     if (!o.isValid) break;
+                                    if (VerboseDebugging)
+                                        debug("client P2M order: " + o.ToString());
                                     order.Symbol = o.symbol;
                                     order.PegDiff = (double)o.pegdiff;
                                     order.PriceType = STIPriceTypes.ptSTIPegged;
@@ -352,6 +364,8 @@ namespace SterServer
 
         void tl_RegisterStocks(string msg)
         {
+            if (VerboseDebugging)
+                debug("client subscribe request received: " + msg);
             symquotes = msg;
             _symsq.Write(true);
         }
@@ -383,6 +397,8 @@ namespace SterServer
             f.ex = t.bstrDestination;
             pt.Adjust(f);
             newFill(f);
+            if (VerboseDebugging)
+                debug("new trade sent: " + f.ToString() + " " + f.id);
         }
 
         List<long> _onotified = new List<long>(MAXRECORD);
@@ -401,7 +417,11 @@ namespace SterServer
                 // get new id
                 long orderid = 0;
                 if (_cancel2order.TryGetValue(id, out orderid))
+                {
                     newOrderCancel(orderid);
+                    if (VerboseDebugging)
+                        debug("cancel received for: " + orderid);
+                }
                 else
                     debug("no record for cancel id: " + id);
                 return;
@@ -424,6 +444,8 @@ namespace SterServer
             o.time = ((int)(rem % 10000)) * 100 + xsec;
             o.date = (int)((rem - o.time) / 10000);
             _onotified.Add(o.id);
+            if (VerboseDebugging)
+                debug("order acknowledgement: " + o.ToString());
             newOrder(o);
             
         }
@@ -510,6 +532,8 @@ namespace SterServer
             // track account
             if (!accts.Contains(ac))
                 accts.Add(ac);
+            if (VerboseDebugging)
+                debug("new position sent: " + p.ToString());
         }
 
         void stiEvents_OnSTIOrderUpdateMsg(STIOrderUpdateMsg oSTIOrderUpdateMsg)

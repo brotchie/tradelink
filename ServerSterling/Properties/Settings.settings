@@ -17,5 +17,8 @@
     <Setting Name="CancelWait" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1000</Value>
     </Setting>
+    <Setting Name="VerboseDebugging" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
