@@ -249,7 +249,8 @@ namespace TradeLink.Common
             {
                 case MessageTypes.ACCOUNTREQUEST:
                     if (newAcctRequest == null) break;
-                    WMUtil.SendMsg(newAcctRequest(), MessageTypes.ACCOUNTRESPONSE, Handle, msg);
+                    string accts = newAcctRequest();
+                    TLSend(accts, MessageTypes.ACCOUNTRESPONSE, msg);
                     break;
                 case MessageTypes.POSITIONREQUEST:
                     if (newPosList == null) break;
@@ -321,7 +322,7 @@ namespace TradeLink.Common
                         }
                     }
                     msf = string.Join(",", mf.ToArray());
-                    WMUtil.SendMsg(msf, MessageTypes.FEATURERESPONSE, Handle, msg);
+                    TLSend(msf,MessageTypes.FEATURERESPONSE,msg);
                     break;
                 case MessageTypes.VERSION :
                     result = (long)MinorVer;
