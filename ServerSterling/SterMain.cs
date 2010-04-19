@@ -32,6 +32,7 @@ namespace SterServer
                 tl.CoverEnabled = Properties.Settings.Default.CoverEnabled;
                 tl.Account = Properties.Settings.Default.defaultaccount;
                 tl.CancelWait = Properties.Settings.Default.CancelWait;
+                tl.VerboseDebugging = Properties.Settings.Default.VerboseDebugging;
                 tl.Start();
             }
             catch (Exception ex)
