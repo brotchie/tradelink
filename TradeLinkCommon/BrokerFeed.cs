@@ -487,7 +487,7 @@ namespace TradeLink.Common
             try
             {
                 debug("requesting positions for account: " + acct);
-                long r = execute.TLSend(MessageTypes.POSITIONREQUEST, BrokerClient.Name + "+" + acct);
+                long r = execute.TLSend(MessageTypes.POSITIONREQUEST, execute.Name + "+" + acct);
             }
             catch (Exception ex)
             {
@@ -503,7 +503,7 @@ namespace TradeLink.Common
             try
             {
                 debug("requesting accounts on: " + Name);
-                long r = execute.TLSend(MessageTypes.ACCOUNTREQUEST, Name);
+                long r = execute.TLSend(MessageTypes.ACCOUNTREQUEST, execute.Name);
             }
             catch (Exception ex)
             {
