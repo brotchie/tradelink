@@ -396,8 +396,12 @@ namespace TradeLink.Common
         void execute_gotAccounts2(string msg)
         {
             debug("accounts: " + msg);
-            if (RequestPositionsOnAccounts)
-                RequestPositions(msg);
+            if (RequestPositionsOnAccounts && (msg!=string.Empty))
+            {
+                string[] accts = msg.Split(',');
+                foreach (string a in accts)
+                    RequestPositions(a);
+            }
             if (gotAccounts != null)
                 gotAccounts(msg);
 
