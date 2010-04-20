@@ -76,7 +76,8 @@ namespace TradeLink.Common
             // if we're up to date then quit
             if (cprofit && cstop) return;
             // see if we have stop update
-            if (!cstop && off.hasStop)
+            if ((!cstop && off.hasStop && !CancelOnce) 
+                || (!cstop && off.hasStop && CancelOnce && !off.StopcancelPending))
             {
                 // notify
                 if (!off.StopcancelPending)
@@ -92,15 +93,18 @@ namespace TradeLink.Common
             if ((!cprofit && off.hasProfit && AllowSimulatenousCancels) ||
                 (!cprofit && off.hasProfit && AllowSimulatenousCancels && !sentcancel))
             {
-                // notify
-                if (!off.ProfitcancelPending)
-                    debug(string.Format("attempting profit cancel: {0} {1}", sym, off.ProfitId));
-                // cancel existing profits
-                cancel(off.ProfitId);
-                // mark cancel pending
-                off.ProfitcancelPending = true;
-                // mark as sent
-                sentcancel |= true;
+                if (!CancelOnce || (CancelOnce && !off.ProfitcancelPending))
+                {
+                    // notify
+                    if (!off.ProfitcancelPending)
+                        debug(string.Format("attempting profit cancel: {0} {1}", sym, off.ProfitId));
+                    // cancel existing profits
+                    cancel(off.ProfitId);
+                    // mark cancel pending
+                    off.ProfitcancelPending = true;
+                    // mark as sent
+                    sentcancel |= true;
+                }
             }
 
             // wait till next tick if we sent cancel
@@ -160,6 +164,12 @@ namespace TradeLink.Common
             SetOffset(sym, off);
 
         }
+
+        bool _cancelonce = false;
+        /// <summary>
+        /// only cancel an offset once per update
+        /// </summary>
+        public bool CancelOnce { get { return _cancelonce; } set { _cancelonce = value; } }
 
         bool _waitaftercancel = true;
         /// <summary>
