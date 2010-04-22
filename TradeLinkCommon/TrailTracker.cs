@@ -108,10 +108,25 @@ namespace TradeLink.Common
             if (SendOrder == null) return;
             // see if we have anything to trail against
             if (_pt[k.symbol].isFlat) return;
-            // only care about trades
-            if (!k.isTrade) return;
+            // // pass along as point
+            if (k.isTrade && !UseBidAskExitPrices)
+                newPoint(k.symbol, k.trade);
+            if (UseBidAskExitPrices && _pt[k.symbol].isLong && k.hasBid)
+                newPoint(k.symbol, k.bid);
+            else if (UseBidAskExitPrices && _pt[k.symbol].isShort && k.hasAsk)
+                newPoint(k.symbol, k.ask);
+        }
+
+        bool _usebidask = false;
+        /// <summary>
+        /// uses bid/ask rather than last trade to price trailing stop amount
+        /// </summary>
+        bool UseBidAskExitPrices { get { return _usebidask; } set { _usebidask = value; } }
+
+        public void newPoint(string symbol, decimal p)
+        {
             // get index for symbol
-            int idx = symidx(k.symbol);
+            int idx = symidx(symbol);
             // setup parameters
             OffsetInfo trail = null;
             decimal refp = 0;
@@ -120,10 +135,10 @@ namespace TradeLink.Common
             {
                 // get parameters
                 idx = _trail.Count;
-                refp = k.trade;
+                refp = p;
                 trail = new OffsetInfo(_defaulttrail);
                 // save them
-                _symidx.Add(k.symbol, idx);
+                _symidx.Add(symbol, idx);
                 _ref.Add(refp);
                 _pendingfill.Add(false);
                 // just in case user is modifying on seperate thread
@@ -131,7 +146,7 @@ namespace TradeLink.Common
                 {
                     _trail.Add(trail);
                 }
-                D("trail tracking: " + k.symbol + " " + trail.ToString());
+                D("trail tracking: " + symbol + " " + trail.ToString());
             }
             else if ((idx == NOSYM) && !_trailbydefault)
                 return;
@@ -140,9 +155,9 @@ namespace TradeLink.Common
                 // get parameters
                 refp = _ref[idx];
                 // in case tracker started after trail stop should have been broken.
-                if (refp == 0 && _pt[k.symbol].isValid)
+                if (refp == 0 && _pt[symbol].isValid)
                 {
-                    refp = _pt[k.symbol].AvgPrice;
+                    refp = _pt[symbol].AvgPrice;
                 }
                 // just in case user tries to modify on seperate thread
                 lock (_trail)
@@ -153,24 +168,24 @@ namespace TradeLink.Common
 
             // see if we need to update ref price
             if ((refp == 0)
-                || (_pt[k.symbol].isLong && (refp < k.trade))
-                || (_pt[k.symbol].isShort && (refp > k.trade)))
+                || (_pt[symbol].isLong && (refp < p))
+                || (_pt[symbol].isShort && (refp > p)))
             {
                 // update
-                refp = k.trade;
+                refp = p;
                 // save it
                 _ref[idx] = refp;
             }
 
             // see if we broke our trail
-            if (!_pendingfill[idx] && (trail.StopDist!=0) && (Math.Abs(refp - k.trade) > trail.StopDist))
+            if (!_pendingfill[idx] && (trail.StopDist!=0) && (Math.Abs(refp - p) > trail.StopDist))
             {
                 // notify
-                D("hit trailing stop at: " + k.trade.ToString("n2"));
+                D("hit trailing stop at: " + p.ToString("n2"));
                 // mark pending order
                 _pendingfill[idx] = true;
                 // get order
-                Order flat = new MarketOrderFlat(_pt[k.symbol], trail.StopPercent, trail.NormalizeSize, trail.MinimumLotSize);
+                Order flat = new MarketOrderFlat(_pt[symbol], trail.StopPercent, trail.NormalizeSize, trail.MinimumLotSize);
                 // get order id
                 flat.id = _id.AssignId;
                 // send flat order
@@ -178,7 +193,7 @@ namespace TradeLink.Common
                 // notify
                 D("enforcing trail with: " + flat.ToString());
                 if (HitOffset != null)
-                    HitOffset(k.symbol, flat.id,k.trade);
+                    HitOffset(symbol, flat.id,p);
             }
 
 
