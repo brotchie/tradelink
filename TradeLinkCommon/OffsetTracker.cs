@@ -370,8 +370,8 @@ namespace TradeLink.Common
             // see if it's our order
             OffsetInfo oi = GetOffset(t.symbol);
             // see what was hit
-            bool hp = (oi.ProfitId == t.id);
-            bool hs = (oi.StopId == t.id);
+            bool hp = (t.id!=0) && (oi.ProfitId == t.id);
+            bool hs = (t.id != 0) && (oi.StopId == t.id);
             // if we hit something
             if (hp || hs)
             {
@@ -395,8 +395,11 @@ namespace TradeLink.Common
             if (_pt[t.symbol].isFlat)
             {
                 debug(t.symbol + " now flat.");
-                CancelAll(t.symbol);
+                if (oi.hasProfit || oi.hasStop)
+                    CancelAll(t.symbol);
             }
+            // save offset
+            SetOffset(t.symbol, oi);
             // do we have events?
             if (!HasEvents()) return;
             // do update
