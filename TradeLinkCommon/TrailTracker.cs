@@ -122,7 +122,11 @@ namespace TradeLink.Common
         /// uses bid/ask rather than last trade to price trailing stop amount
         /// </summary>
         bool UseBidAskExitPrices { get { return _usebidask; } set { _usebidask = value; } }
-
+        /// <summary>
+        /// pass arbitrary price to use for trail reference price
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <param name="p"></param>
         public void newPoint(string symbol, decimal p)
         {
             // get index for symbol
