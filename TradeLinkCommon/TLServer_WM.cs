@@ -36,13 +36,13 @@ namespace TradeLink.Common
             this.Show();
             this.ShowInTaskbar = false;
             this.Hide();
-            WMUtil.SendMsg(Text, (IntPtr)WMUtil.HWND_BROADCAST, Handle, (int)MessageTypes.SERVERUP);
+            //WMUtil.SendMsg(Text, (IntPtr)WMUtil.HWND_BROADCAST, Handle, (int)MessageTypes.SERVERUP);
         }
 
 
         public virtual void Stop()
         {
-            WMUtil.SendMsg(Text, (IntPtr)WMUtil.HWND_BROADCAST, Handle, (int)MessageTypes.SERVERDOWN);
+            //WMUtil.SendMsg(Text, (IntPtr)WMUtil.HWND_BROADCAST, Handle, (int)MessageTypes.SERVERDOWN);
         }
 
         private void SrvDoExecute(string msg) // handle an order (= execute request)
