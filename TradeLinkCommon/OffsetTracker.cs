@@ -70,6 +70,8 @@ namespace TradeLink.Common
             OffsetInfo off = GetOffset(sym);
             // get position
             Position p = new PositionImpl(_pt[sym]);
+            // if we're flat, nothign to do
+            if (p.isFlat) return;
             // see if we need an update
             bool cprofit = off.isProfitCurrent(p);
             bool cstop = off.isStopCurrent(p);
@@ -367,10 +369,34 @@ namespace TradeLink.Common
             _pt.Adjust(t);
             // see if it's our order
             OffsetInfo oi = GetOffset(t.symbol);
-            if (((oi.ProfitId==t.id) || (oi.StopId==t.id)) && (HitOffset!=null))
-                HitOffset(t.symbol,t.id,t.xprice);
+            // see what was hit
+            bool hp = (oi.ProfitId == t.id);
+            bool hs = (oi.StopId == t.id);
+            // if we hit something
+            if (hp || hs)
+            {
+                // notify
+                debug(t.symbol + " hit " +(hp ? "profit" : "stop") +": " + t.id);
+                // see if we should clear offset
+                if (hp && (oi.SentProfitSize == t.xsize))
+                {
+                    debug(t.symbol + " profit closed: " + t.id);
+                    oi.ProfitId = 0;
+                }
+                if (hs && (oi.SentStopSize == t.xsize))
+                {
+                    debug(t.symbol + " stop closed: " + t.id);
+                    oi.StopId = 0;
+                }
+                if (HitOffset != null)
+                    HitOffset(t.symbol, t.id, t.xprice);
+            }
             // if we're flat, nothing to do
-            if (_pt[t.symbol].isFlat) return;
+            if (_pt[t.symbol].isFlat)
+            {
+                debug(t.symbol + " now flat.");
+                CancelAll(t.symbol);
+            }
             // do we have events?
             if (!HasEvents()) return;
             // do update

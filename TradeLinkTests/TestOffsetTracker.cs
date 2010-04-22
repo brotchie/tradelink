@@ -248,7 +248,7 @@ namespace TestTradeLink
             Assert.IsTrue(stop.side);
 
             // fully hit the profit order
-            ot.Adjust(new TradeImpl(SYM, PRICE + 1, SIZE * 2));
+            fill(new TradeImpl(SYM, PRICE + 1, SIZE * 2),profit.id);
             // tick
             ot.newTick(nt());
             // verify we're flat 
@@ -257,7 +257,7 @@ namespace TestTradeLink
             Assert.AreEqual(0, profits.Count);
             Assert.AreEqual(0, stops.Count);
             // take new position
-            ot.Adjust(new PositionImpl(SYM, PRICE, -1 * SIZE));
+            fill(new TradeImpl(SYM, PRICE, -1 * SIZE));
             // verify we're not flat 
             Assert.IsTrue(ot.PositionTracker[SYM].isShort);
             // verify orders exist
@@ -409,7 +409,7 @@ namespace TestTradeLink
             Assert.IsTrue(stop.side);
 
             // fully hit the profit order
-            ot.Adjust(new TradeImpl(SYM, PRICE + 1, SIZE*2));
+            fill(new TradeImpl(SYM, PRICE + 1, SIZE*2),profit.id);
             // tick
             ot.newTick(nt());
             // verify only one order exists on each side
@@ -562,7 +562,7 @@ namespace TestTradeLink
             Assert.AreEqual(SIZE, stop.UnsignedSize);
 
             // send position update
-            ot.Adjust(new TradeImpl(SYM, PRICE + 2, SIZE));
+            fill(new TradeImpl(SYM, PRICE + 2, SIZE));
             // tick
             ot.newTick(nt());
             ot.newTick(nt());
@@ -582,7 +582,7 @@ namespace TestTradeLink
             Assert.AreEqual(SIZE * 2, stop.UnsignedSize);
 
             // partial hit the profit order
-            ot.Adjust(new TradeImpl(SYM, PRICE + 1, -1 * SIZE));
+            fill(new TradeImpl(SYM, PRICE + 1, -1 * SIZE),profit.id);
             // tick
             ot.newTick(nt());
             ot.newTick(nt());
@@ -605,6 +605,32 @@ namespace TestTradeLink
 
         Tick nt() { return (Tick)TickImpl.NewTrade(SYM, PRICE, SIZE); }
 
+        void fill(Trade f) { fill(f, 0); }
+        void fill(Trade fill, long id)
+        {
+            if (fill.id == 0)
+            {
+                debug("no id on fill: " + fill.id);
+                fill.id = (id!=0) ? id : ot.Ids.AssignId;
+            }
+            bool hit = false;
+            for (int i = profits.Count - 1; i >= 0; i--)
+                if ((profits[i].id == fill.id) && (profits[i].UnsignedSize==fill.UnsignedSize))
+                {
+                    debug("filled profit: " + fill.id);
+                    hit = true;
+                    profits.RemoveAt(i);
+                }
+            for (int i = stops.Count - 1; i >= 0; i--)
+                if ((stops[i].id == fill.id) && (stops[i].UnsignedSize==fill.UnsignedSize))
+                {
+                    debug("filled stop: " + fill.id);
+                    hit = true;
+                    stops.RemoveAt(i);
+                }
+            ot.Adjust(fill);
+        }
+
         void ot_SendOffset(Order o)
         {
             if (o.isLimit)
@@ -615,16 +641,30 @@ namespace TestTradeLink
 
         void ot_SendCancel(long number)
         {
-            
+            bool hit = false;
             for (int i = profits.Count - 1; i >= 0; i--)
                 if (profits[i].id == number)
+                {
+                    hit = true;
                     profits.RemoveAt(i);
+                }
             for (int i = stops.Count - 1; i >= 0; i--)
                 if (stops[i].id == number)
+                {
+                    hit = true;
                     stops.RemoveAt(i);
+                }
 
+            if (hit)
+                ot.GotCancel(number);
+            else
+                debug("unable to cancel: "+number);
+                
+        }
 
-            ot.GotCancel(number);
+        void debug(string msg)
+        {
+            Console.WriteLine(msg);
         }
     }
 }
