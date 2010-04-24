@@ -204,7 +204,13 @@ namespace TradeLink.Common
         /// returns true if bar has symbol and has requested intervals
         /// </summary>
         public bool isValid { get { return (_sym != string.Empty) && (_intdata.Length>0); } }
-        public IEnumerator GetEnumerator() { int idx = _intdataidx[_defaultint]; int max = _intdata[idx].Count(); for (int i = 0; i < max; i++) yield return _intdata[idx].GetBar(Symbol); }
+        public IEnumerator GetEnumerator() 
+        { 
+            int idx = _intdataidx[_defaultint]; 
+            int max = _intdata[idx].Count(); 
+            for (int i = 0; i < max; i++) 
+                yield return _intdata[idx].GetBar(i,Symbol); 
+        }
         /// <summary>
         /// gets first bar in any interval
         /// </summary>
