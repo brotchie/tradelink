@@ -87,7 +87,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppTracker.cs">
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="AssemblaDocument.cs" />
     <Compile Include="AssemblaTicket.cs" />

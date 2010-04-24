@@ -4,16 +4,49 @@ using System.Text;
 using System.Windows.Forms;
 using System.ComponentModel;
 using TradeLink.Common;
+using TradeLink.API;
+using TradeLink.AppKit;
 using System.Net;
 
 namespace TradeLink.AppKit
 {
+    /// <summary>
+    /// record application custom application events, mouse-clicks, etc to a URL
+    /// </summary>
+    [System.ComponentModel.DesignerCategory("")]
     public partial class AppTracker : System.Windows.Forms.Form
     {
+        public AppTracker() :base() { }
+        public AppTracker(string Program, string url) :this()
+        {
+            _URL = url;
+            _TAG = Program;
+        }
         string _URL = string.Empty;
+        /// <summary>
+        /// url to post requests
+        /// </summary>
         public string TrackUrl { get { return _URL; } set { _URL = value; } }
+        string _TAG = string.Empty;
+        /// <summary>
+        /// program to post as
+        /// </summary>
+        public string Program { get { return _TAG; } set { _TAG = value; } }
+
+        bool _autostartstop = false;
+        /// <summary>
+        /// send start and stop actions automatically at load and form close
+        /// </summary>
+        public bool AutoStartStop { get { return _autostartstop; } set { _autostartstop = value; } }
+
+        bool _track = true;
+        /// <summary>
+        /// enable or disable tracking
+        /// </summary>
+        public bool TrackEnabled { get { return _track; } set { _track = value; } }
         BackgroundWorker _bw = new BackgroundWorker();
         bool _go = true;
+        public event DebugDelegate SendDebug;
 
         protected override void OnClosed(EventArgs e)
         {
@@ -21,23 +54,59 @@ namespace TradeLink.AppKit
             base.OnClosed(e);
         }
 
+        void debug(string msg)
+        {
+            if (SendDebug != null)
+            {
+                try
+                {
+                    SendDebug(msg);
+                }
+                catch { }
+            }
+        }
+
         protected override void OnLoad(EventArgs e)
         {
+            debug("loading apptracker for " + Program);
             base.OnLoad(e);
+            
             _bw.WorkerSupportsCancellation = true;
             _bw.DoWork += new DoWorkEventHandler(_bw_DoWork);
-
+            _bw.RunWorkerAsync();
+            if (_autostartstop)
+                Track(TrackType.AppStart);
             HookControl(this as Control);
         }
 
+        bool _postallonclose = true;
+        public bool PushTracksOnClose { get { return _postallonclose; } set { _postallonclose = value; } }
+
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
+            debug("apptracker stopping for " + Program);
+            if (_autostartstop)
+                Track(TrackType.AppStop);
+            if (PushTracksOnClose)
+                debug("Pushing tracks on close and waiting...");
+            while (PushTracksOnClose && _untrackedqueue.hasItems)
+            {
+                
+                _SLEEP = 10;
+                System.Threading.Thread.Sleep(100);
+            }
+            debug("Canceling background threads");
             _go = false;
             _bw.CancelAsync();
+            debug("apptracker closed");
             base.OnFormClosing(e);
+            
         }
         int _SLEEP = 5000;
-        public int TrackSleep { get { return _SLEEP; } set { _SLEEP = value; } }
+        /// <summary>
+        /// wait between tracks
+        /// </summary>
+        public int InterTrackSleep { get { return _SLEEP; } set { _SLEEP = value; } }
         RingBuffer<Track> _untrackedqueue = new RingBuffer<Track>(1000);
         void _bw_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -45,16 +114,24 @@ namespace TradeLink.AppKit
             while (_go)
             {
                 if (e.Cancel) break;
-                System.Threading.Thread.Sleep(TrackSleep);
+                
                 if (TrackUrl == string.Empty) continue;
-                while (!_untrackedqueue.isEmpty)
+                while (!_untrackedqueue.isEmpty && TrackEnabled)
                 {
                     if (e.Cancel) break;
                     // get item
                     Track t = _untrackedqueue.Read();
-                    wc.UploadValues(TrackUrl, t.ToQuery());
-                    System.Threading.Thread.Sleep((int)((double)TrackSleep / 10));
+                    try
+                    {
+                        wc.UploadValues(TrackUrl, "POST", t.ToQuery());
+                    }
+                    catch (Exception ex)
+                    {
+                        debug("error uploading: " + t.ToQuery() + " " + ex.Message + ex.StackTrace);
+                    }
+                    System.Threading.Thread.Sleep((int)((double)_SLEEP / 10));
                 }
+                System.Threading.Thread.Sleep(_SLEEP);
                 
             }
         }
@@ -77,30 +154,117 @@ namespace TradeLink.AppKit
             }
         }
 
+        bool _trackclicks = true;
+        /// <summary>
+        /// track mouse clicks as apptracker events
+        /// </summary>
+        public bool TrackClicks { get { return _trackclicks; } set { _trackclicks = value; } }
+
         void AllControlsMouseClick(object sender, MouseEventArgs e)
         {
-            Form f = (Form)sender;
+            try
+            {
+                Control f = (Control)sender;
+                Track(TrackType.ClickAction, f.Name);
+            }
+            catch (InvalidCastException)
+            {
+                try
+                {
+                    Form f = (Form)sender;
+                    Track(TrackType.ClickAction, f.Name);
+                }
+                catch (InvalidCastException ex)
+                {
+                    debug("can't cast: " + sender.ToString() + " " + ex.Message + ex.StackTrace);
+                }
+            }
+            
+
+        }
+
+        int _tc = 0;
+        /// <summary>
+        /// count of how many events/actions have been tracked in total for this session
+        /// </summary>
+        public int TrackCount { get { return _tc; } }
+
+        /// <summary>
+        /// track an event
+        /// </summary>
+        /// <param name="type"></param>
+        public void Track(TrackType type) { Track(type, string.Empty); }
+        /// <summary>
+        /// track an event with custom data
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="data"></param>
+        public void Track(TrackType type, string data)
+        {
+            if (!TrackEnabled) return;
+            _tc++;
             // get clicked item name
-            Track t;
-            t.name = f.Name;
-            t.date = Util.ToTLDate();
-            t.time = Util.ToTLTime();
+            Track t = new Track(type,data);
+            t.id = Auth.GetCPUId();
+            t.tag = Program;
+            debug(_tc.ToString()+" "+t.ToString());
             _untrackedqueue.Write(t);
         }
     }
 
     public struct Track
     {
-        public string name;
+        public string id;
+        public string tag;
+        public string data;
         public int date;
         public int time;
+        public TrackType type;
+        public Track(TrackType t)
+        {
+            id = string.Empty;
+            tag = string.Empty;
+            data = string.Empty;
+            date = Util.ToTLDate();
+            time = Util.ToTLTime();
+            type = t;
+        }
+
+        public Track(TrackType t,string datamsg)
+        {
+            id = string.Empty;
+            tag = string.Empty;
+            data = datamsg;
+            date = Util.ToTLDate();
+            time = Util.ToTLTime();
+            type = t;
+        }
+
         public System.Collections.Specialized.NameValueCollection ToQuery()
         {
             System.Collections.Specialized.NameValueCollection nvc = new System.Collections.Specialized.NameValueCollection();
-            nvc.Add("name", name);
-            nvc.Add("date", date.ToString());
-            nvc.Add("time", time.ToString());
+            nvc.Add("ID", id);
+            nvc.Add("TAG", tag);
+            nvc.Add("DATA", data);
+            nvc.Add("TYPE", type.ToString());
+            nvc.Add("DATE", date.ToString());
+            nvc.Add("TIME", time.ToString());
             return nvc;
         }
+        public override string ToString()
+        {
+            return date.ToString() + time.ToString() + " " + id + " " + tag + " " + data;
+        }
+    }
+
+    public enum TrackType
+    {
+        Unknown = 0,
+        AppLog,
+        AppStart,
+        AppStop,
+        AppCrash,
+        AppBugReport,
+        ClickAction,
     }
 }
