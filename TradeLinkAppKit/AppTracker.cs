@@ -13,7 +13,6 @@ namespace TradeLink.AppKit
     /// <summary>
     /// record application custom application events, mouse-clicks, etc to a URL
     /// </summary>
-    [System.ComponentModel.DesignerCategory("")]
     public partial class AppTracker : System.Windows.Forms.Form
     {
         public AppTracker() :base() { }
