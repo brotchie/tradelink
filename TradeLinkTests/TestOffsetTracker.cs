@@ -41,6 +41,54 @@ namespace TestTradeLink
             _lasthit = id;
         }
 
+        [Test]
+        public void ResendTest2()
+        {
+            // reset "book" to start from scratch
+            reset();
+            
+            // TSL_SETOFFSET(symbol_name, 0.03, 0, 1, 0);
+            const string sym = "IBM";
+            const decimal pdist = .03m;
+            const decimal pct = 1;
+            ot[sym] = new OffsetInfo(pdist, 0, pct, 0, false, 1);
+            Assert.AreEqual(pdist, ot[sym].ProfitDist);
+            Assert.AreEqual(pct, ot[sym].ProfitPercent);
+            // entry fill
+            // 094508: fill: 20100423,94532,IBM,SELL,10,128.85, 0
+            fill(new TradeImpl(sym, 128.85m, -10));
+            Assert.AreEqual(-10, ot.PositionTracker[sym].Size);
+            // profit 
+            // 094508: sent new profit: 634076112353906253  BUY10 IBM@128.82 [CTSNIP] 634076112353906253
+            Assert.AreEqual(1, profits.Count);
+            Order profit = profits[0];
+            Assert.AreEqual(128.82m, profit.price);
+            Assert.AreEqual(10, profit.size);
+            // fill profit
+            // 094609: fill: 20100423,94632,IBM,BUY,10,128.82, 634076112353906253
+            // 094609: IBM hit profit: 634076112353906253
+            Assert.IsTrue(profit.Fill(TickImpl.NewTrade(sym, 128.82m, 10)));
+            Trade profitfill = (Trade)profit;
+            fill(profitfill);
+
+            // we're now flat
+            // 094609: IBM now flat.
+            Assert.IsTrue(ot.PositionTracker[sym].isFlat);
+            // tick
+            ot.newTick(TickImpl.NewTrade(sym,128.82m,100));
+            Assert.AreEqual(0, profits.Count);
+            // re-enter
+            //094722: fill: 20100423,94746,IBM,SELL,10,128.86, 100947
+            fill(new TradeImpl(sym, 128.86m, -10));
+            Assert.AreEqual(-10, ot.PositionTracker[sym].Size);
+            // we should now have a profit offset
+            Assert.AreEqual(1, profits.Count);
+            profit = profits[0];
+            Assert.AreEqual(128.83m, profit.price);
+            Assert.AreEqual(10, profit.size);
+
+        }
+
         OffsetTracker ot;
         List<Order> profits = new List<Order>();
         List<Order> stops = new List<Order>();
@@ -610,7 +658,7 @@ namespace TestTradeLink
         {
             if (fill.id == 0)
             {
-                debug("no id on fill: " + fill.id);
+                debug("no id on fill: " + fill.ToString());
                 fill.id = (id!=0) ? id : ot.Ids.AssignId;
             }
             bool hit = false;

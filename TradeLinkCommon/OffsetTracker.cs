@@ -193,7 +193,27 @@ namespace TradeLink.Common
 
         bool hascustom(string symbol) { OffsetInfo oi; return _offvals.TryGetValue(symbol, out oi); }
 
-        void cancel(OffsetInfo offset) { cancel(offset.ProfitId); cancel(offset.StopId); }
+        void cancel(OffsetInfo offset) 
+        {
+
+            bool hit = false;
+            string ids = string.Empty;
+            if (offset.hasProfit)
+            {
+                hit |= true;
+                ids += offset.ProfitId + " ";
+                cancel(offset.ProfitId);
+            }
+            if (offset.hasStop)
+            {
+                hit |= true;
+                ids += offset.StopId + " ";
+                cancel(offset.StopId);
+            }
+            if (hit)
+                debug("canceling offsets: " + ids);
+            
+        }
         void cancel(long id) { if (id != 0) SendCancel(id); }
         /// <summary>
         /// cancels all offsets (profit+stops) for given side
@@ -217,13 +237,19 @@ namespace TradeLink.Common
         /// <param name="sym"></param>
         public void CancelAll(string sym)
         {
-            debug("canceling offsets for: " + sym);
+            
+            bool hit = false;
             foreach (Position p in _pt)
             {
                 // if sym matches, cancel all offsets
-                if (p.Symbol==sym)
+                if (p.Symbol == sym)
+                {
+                    hit |= true;
                     cancel(GetOffset(sym));
+                }
             }
+            if (hit)
+                debug("canceling offsets for: " + sym);
             
         }
 
@@ -349,10 +375,22 @@ namespace TradeLink.Common
         /// <param name="p"></param>
         public void Adjust(Position p)
         {
+            // did position exist?
+            bool exists = !_pt[p.Symbol].isFlat;
+            if (exists)
+                debug(p.Symbol + " re-initialization of existing position");
             // update position
             _pt.Adjust(p);
             // if we're flat, nothing to do
-            if (_pt[p.Symbol].isFlat) return;
+            if (_pt[p.Symbol].isFlat)
+            {
+                debug(p.Symbol + " initialized to flat.");
+                // cancel pending offsets
+                CancelAll(p.Symbol);
+                // reset offset state but not configuration
+                SetOffset(p.Symbol,new OffsetInfo(this[p.Symbol]));
+                return;
+            }
             // do we have events?
             if (!HasEvents()) return;
             // do update
@@ -395,11 +433,12 @@ namespace TradeLink.Common
             if (_pt[t.symbol].isFlat)
             {
                 debug(t.symbol + " now flat.");
-                if (oi.hasProfit || oi.hasStop)
-                    CancelAll(t.symbol);
+                CancelAll(t.symbol);
+                // reset offset state but not configuration
+                SetOffset(t.symbol,new OffsetInfo(this[t.symbol]));
             }
-            // save offset
-            SetOffset(t.symbol, oi);
+            else // save offset
+                SetOffset(t.symbol, oi);
             // do we have events?
             if (!HasEvents()) return;
             // do update
