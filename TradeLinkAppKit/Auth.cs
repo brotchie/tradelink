@@ -64,6 +64,12 @@ namespace TradeLink.AppKit
         {
             return isAuthorized(key, true, false, true,pause);
         }
+        void debug(string msg)
+        {
+            if (SendDebug != null)
+                SendDebug(msg);
+        }
+        public event TradeLink.API.DebugDelegate SendDebug;
         /// <summary>
         /// see if given key is authorized
         /// </summary>
@@ -75,32 +81,43 @@ namespace TradeLink.AppKit
         /// <returns></returns>
         public bool isAuthorized(string key, bool appendrandom, bool throwexception, bool showerrorbox, bool pause)
         {
-            WebClient wc = new WebClient();
-            string rurl = url;
-            if (appendrandom)
+            bool reg = false;
+            _lastauth = false;
+            try
             {
-                if (!rurl.Contains("?"))
-                    rurl += "?";
-                Random rand = new Random((int)DateTime.Now.Ticks);
-                string last = rurl.Substring(url.Length-1,1);
-                if ((last != "?") || (last != "&"))
-                    rurl += "&";
-                rurl += "r=" + rand.Next().ToString();
-            }
-            string res = "";
-            try 
-            {
+                WebClient wc = new WebClient();
+                string rurl = url;
+                if (appendrandom)
+                {
+                    if (!rurl.Contains("?"))
+                        rurl += "?";
+                    Random rand = new Random((int)DateTime.Now.Ticks);
+                    string last = rurl.Substring(url.Length - 1, 1);
+                    if ((last != "?") || (last != "&"))
+                        rurl += "&";
+                    rurl += "r=" + rand.Next().ToString();
+                }
+                string res = "";
                 res = wc.DownloadString(rurl);
+                reg = res.Contains(key);
             }
-            catch (WebException ex) { res = ex.Message; }
-            bool reg = res.Contains(key);
+            catch (Exception ex)
+            {
+                debug("authexcept: "+ex.Message+" "+ex.StackTrace);
+                reg = false;
+            }
+            _lastauth = reg;
+            _authtime = Util.ToTLTime();
             string err = "Registration Key " + key + " not found. Contact your software provider to register software.";
             if (throwexception && !reg)
                 throw new UnregisteredException(err);
             if (showerrorbox && !reg)
-                PopupWindow.Show("Registration Error", err,true,pause);
-            _lastauth = reg;
-            _authtime = Util.ToTLTime();
+                PopupWindow.Show("Registration Error", err, true, pause);
+            if (reg)
+                debug("authorization succeeded suceeded");
+            else
+                debug(err);
+
             return reg;
         }
 
