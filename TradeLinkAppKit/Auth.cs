@@ -114,7 +114,7 @@ namespace TradeLink.AppKit
             if (showerrorbox && !reg)
                 PopupWindow.Show("Registration Error", err, true, pause);
             if (reg)
-                debug("authorization succeeded suceeded");
+                debug("authorization succeeded: "+key);
             else
                 debug(err);
 
