@@ -209,6 +209,24 @@ namespace TradeLink.AppKit
             debug(_tc.ToString()+" "+t.ToString());
             _untrackedqueue.Write(t);
         }
+
+        /// <summary>
+        /// track a numeric event
+        /// </summary>
+        /// <param name="t"></param>
+        /// <param name="val"></param>
+        public void Track(TrackType t, decimal val)
+        {
+            Track(t, val.ToString("F2"));
+        }
+        /// <summary>
+        /// track a score update
+        /// </summary>
+        /// <param name="points"></param>
+        public void Score(decimal points)
+        {
+            Track(TrackType.ScorePoints, points);
+        }
     }
 
     public struct Track
@@ -265,5 +283,6 @@ namespace TradeLink.AppKit
         AppCrash,
         AppBugReport,
         ClickAction,
+        ScorePoints,
     }
 }
