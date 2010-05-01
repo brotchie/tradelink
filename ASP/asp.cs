@@ -792,8 +792,14 @@ namespace ASP
 
         void ASP_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (_resskinidx.Count>0) 
-                _saveskins_Click(null, null);
+            if (_resskinidx.Count > 0)
+            {
+                try
+                {
+                    _saveskins_Click(null, null);
+                }
+                catch { }
+            }
             // save ASP properties
             Properties.Settings.Default.Save();
 
