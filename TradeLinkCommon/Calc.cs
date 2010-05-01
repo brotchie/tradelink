@@ -1008,7 +1008,7 @@ namespace TradeLink.Common
             decimal[] o = new decimal[len];
             if (start > input.Length) return o;
             for (int i = start; i < start + len; i++)
-                o[i - start] = input[start];
+                o[i - start] = input[i];
             return o;
         }
 
