@@ -1245,10 +1245,19 @@ namespace ASP
         {
             foreach (int idx in _resskinidx.Keys)
             {
-                // get all skins this response is part of
-                string[] names = _resskinidx[idx].Split(' ');
-                // get response
-                Response r = _reslist[idx];
+                Response r = null;
+                string[] names = new string[0];
+                try
+                {
+                    // get all skins this response is part of
+                    names = _resskinidx[idx].Split(' ');
+                    // get response
+                    r = _reslist[idx];
+                }
+                catch (Exception ex)
+                {
+                    continue;
+                }
                 // don't save invalid responses
                 if (r.Name == new InvalidResponse().Name) continue;
                 // save status
