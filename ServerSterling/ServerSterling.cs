@@ -92,12 +92,77 @@ namespace SterServer
 
         void stiEvents_OnSTIOrderReject(ref structSTIOrderReject structOrderReject)
         {
-            debug("reject: " + structOrderReject.bstrClOrderId + " reason: " + structOrderReject.nRejectReason);
+            debug("reject: " + structOrderReject.bstrClOrderId + " reason: " + structOrderReject.nRejectReason+ " "+sterrejectpretty(structOrderReject.nRejectReason));
         }
 
         void stiEvents_OnSTIOrderRejectMsg(STIOrderRejectMsg oSTIOrderRejectMsg)
         {
             debug("reject: " + oSTIOrderRejectMsg.ClOrderID + " reason: " + oSTIOrderRejectMsg.RejectReason.ToString());
+        }
+
+        string sterrejectpretty(string rint)
+        {
+            int ri = -1;
+            if (int.TryParse(rint, out ri))
+                return sterrejectpretty(ri);
+            return "unknown reject error";
+        }
+        string sterrejectpretty(int r)
+        {
+            try
+            {
+                rejectmessages rm = (rejectmessages)r;
+                return rm.ToString();
+            }
+            catch (Exception ex)
+            {
+                return "unknown reject error";
+            }
+        }
+
+        enum rejectmessages
+        {
+            rrSTIUnknown = 0,
+            rrSTIUnknownPid =1,
+            rrSTIInvalidPassword,
+            rrSTIAccessDenied,
+            rrSTINotFound,
+            rrSTICannotRoute,
+            rrSTIPendingCancel,
+            rrSTIPendingReplace,
+            rrSTIOrderClosed,
+            rrSTICannotCreate,
+            rrSTIDupeClOrdId,
+            rrSTINoSeqNoAvailable,
+            rrSTIInvalidAcct,
+            rrSTIInvalidDest_OrNotEnabledForDest,
+            rrSTIError,
+            rrSTIDupeSeqNo,
+            rrSTINoChange,
+            rrSTIInvalidSeqNo,
+            rrSTIInvalidQty,
+            rrSTITLTC_TooLateToCancel,
+            rrSTIShareLimit,
+            rrSTIDollarLimit,
+            rrSTIBuyingPower,
+            rrSTITenSecRule,
+            rrSTINotSupported,
+            rrSTIDupeAcct,
+            rrSTIInvalidGroupId,
+            rrSTIDupeStation,
+            rrSTIPosTradingLmt,
+            rrSTITltcMoc_TooLateCancelMOC,
+            rrSTIHardToBorrow,
+            rrSTIVersion,
+            rrSTIDupeLogin,
+            rrSTIInvalidSym,
+            rrSTINxRules,
+            rrSTIBulletNotRequired,
+            rrSTIMocMktImb,
+            rrSTINx30SecRule,
+            rrSTIEasyToBorrowOnly,
+            rrSTIStaleOrder,
+            rrSTILast,
         }
 
         void tl_newImbalanceRequest()
