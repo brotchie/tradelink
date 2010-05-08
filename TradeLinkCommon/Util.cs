@@ -335,12 +335,7 @@ namespace TradeLink.Common
             }
             catch (Exception ex)
             {
-                try
-                {
-                    string path = ProgramPath(program);
-                    return BuildFromFile(path+"\\VERSION.txt");
-                }
-                catch { }
+                // unable to find version
             }
             return 0;
             
