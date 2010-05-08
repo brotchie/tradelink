@@ -112,7 +112,11 @@ namespace TradeLink.Common
         /// <returns></returns>
         public static string SafeSymbol(string realsymbol)
         {
-            foreach (char c in Path.GetInvalidPathChars())
+        	char[] _invalid = Path.GetInvalidPathChars();
+        	char[] _more = "/\\*?:".ToCharArray();
+        	_more.CopyTo(_invalid, 0);
+        	//_more.CopyTo(0,_invalid,_invalid.Length,_more.Length);
+            foreach (char c in _invalid)
             {
                 int p = 0;
                 while (p != -1)

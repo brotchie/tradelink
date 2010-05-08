@@ -100,6 +100,62 @@ namespace TestTradeLink
 
         }
 
+        [Test]
+        public void FilenameTest()
+        {
+            // get symbol
+            string SYM = "EUR/USD";
+            const int SHORTTEST = 1000;
+            // get some data to test with
+            Tick[] data =
+                TradeLink.Research.RandomTicks.GenerateSymbol(SYM, SHORTTEST);
+            // apply date and time to ticks
+            for (int i = 0; i < SHORTTEST; i++)
+            {
+                data[i].date = DATE;
+                data[i].time = Util.DT2FT(DateTime.Now);
+            }
+            // write and read data, clocking time
+            double elapms = writeandread(data, 0, true);
+            // verify length
+            Assert.AreEqual(data.Length, readdata.Count);
+            // verify content
+            bool equal = true;
+            for (int i = 0; i < SHORTTEST; i++)
+                equal &= data[i].trade == readdata[i].trade;
+            Assert.IsTrue(equal, "read/write mismatch on TIK data.");
+
+
+        }
+
+        [Test]
+        public void FilenameTestOption()
+        {
+            // get symbol
+            string SYM = "MSTR 201007 CALL 85.0000 OPT";
+            const int SHORTTEST = 1000;
+            // get some data to test with
+            Tick[] data =
+                TradeLink.Research.RandomTicks.GenerateSymbol(SYM, SHORTTEST);
+            // apply date and time to ticks
+            for (int i = 0; i < SHORTTEST; i++)
+            {
+                data[i].date = DATE;
+                data[i].time = Util.DT2FT(DateTime.Now);
+            }
+            // write and read data, clocking time
+            double elapms = writeandread(data, 0, true);
+            // verify length
+            Assert.AreEqual(data.Length, readdata.Count);
+            // verify content
+            bool equal = true;
+            for (int i = 0; i < SHORTTEST; i++)
+                equal &= data[i].trade == readdata[i].trade;
+            Assert.IsTrue(equal, "read/write mismatch on TIK data.");
+
+
+        }
+
         double writeandread(Tick[] data, int date, bool printperf)
         {            
             // clear out the read buffer
