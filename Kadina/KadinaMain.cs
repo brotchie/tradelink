@@ -219,7 +219,6 @@ namespace Kadina
             Kadina.Properties.Settings.Default.Save();
         }
         const string PLAYTO = "Play +";
-        const string PLAYTOUNIT = " min";
         void InitContext()
         {
             ContextMenu = new ContextMenu();
@@ -227,7 +226,7 @@ namespace Kadina
             string[] list = Enum.GetNames(typeof(PlayTo));
             for (int i = 0; i < list.Length; i++)
                 if (list[i]!="LastPlayTo")
-                    ContextMenu.MenuItems.Add(PLAYTO+list[i]+PLAYTOUNIT,new EventHandler(rightplay));
+                    ContextMenu.MenuItems.Add(PLAYTO+list[i],new EventHandler(rightplay));
             ContextMenu.MenuItems.Add("Reset", new EventHandler(rightreset));
             //ContextMenu.MenuItems.Add("NewStudy", new EventHandler(rightstudy));
             msgbox.ContextMenu = ContextMenu;
@@ -250,7 +249,6 @@ namespace Kadina
             MenuItem mi = (MenuItem)sender;
             string tmp = mi.Text;
             tmp = tmp.Replace(PLAYTO, "");
-            tmp = tmp.Replace(PLAYTOUNIT, "");
             PlayTo pttmp = (PlayTo)Enum.Parse(typeof(PlayTo), tmp);
             if (pttmp != PlayTo.LastPlayTo)
                 pt = pttmp;
