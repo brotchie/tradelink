@@ -86,7 +86,7 @@ namespace TradeLink.Common
         public static string Skin(object response, string classname, string dll) { return Skin(response, classname, dll, null); }
         public static string Skin(object response, string classname, string dll, DebugDelegate deb)
         {
-            return Serialize(new SkinImpl(response, classname, dll),deb);
+            return Serialize(new SkinImpl(response, classname, dll,deb),deb);
         }
         public static string Skin(object response, string dll) { return Skin(response, dll, (DebugDelegate)null); }
         public static string Skin(object response, string dll,DebugDelegate deb)
@@ -178,7 +178,7 @@ namespace TradeLink.Common
             if (!skin.isValid) return string.Empty;
             try
             {
-                skin.Properties = GZip.Compress(skin.Properties);
+                skin.Properties = skin.Properties;
                 SkinImpl si = (SkinImpl)skin;
                 XmlSerializer xs = new XmlSerializer(typeof(SkinImpl));
                 StringWriter sw = new StringWriter();
@@ -207,7 +207,7 @@ namespace TradeLink.Common
                 // close serializer
                 sw.Close();
                 // uncompress properties
-                s.Properties = GZip.Uncompress(s.Properties);
+                s.Properties = s.Properties;
                 // return result
                 return s;
             }
@@ -243,7 +243,7 @@ namespace TradeLink.Common
             try
             {
                 // serialize the list
-                XmlSerializer xs = new XmlSerializer(type);
+                XmlSerializer xs = new XmlSerializer(o.GetType());
                 // get file to save skin
                 StringWriter sw = new StringWriter();
                 // save it

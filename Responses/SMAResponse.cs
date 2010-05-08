@@ -21,27 +21,32 @@ namespace Responses
         [Description("shutdown time")]
         public int Shutdown { get { return _shutdowntime; } set { _shutdowntime = value; } }
 
+        bool _black = false;
         // this function is called the constructor, because it sets up the response
         // it is run before all the other functions, and has same name as my response.
         public SMAResponse() : this(true) { }
         public SMAResponse(bool prompt)
         {
-            // enable prompting of system parameters to user,
-            // so they do not have to recompile to change things
-            ParamPrompt.Popup(this,!prompt);
-
-            // only build bars for user's interval
-            blt = new BarListTracker(Interval);
-
-            // only calculate on new bars
-            blt.GotNewBar += new SymBarIntervalDelegate(blt_GotNewBar);
-
+            _black = !prompt;
             // handle when new symbols are added to the active tracker
             _active.NewTxt += new TextIdxDelegate(_active_NewTxt);
 
             // set our indicator names, in case we import indicators into R
             // or excel, or we want to view them in gauntlet or kadina
             Indicators = new string[] { "Time","SMA" };
+        }
+
+        public override void Reset()
+        {
+            // enable prompting of system parameters to user,
+            // so they do not have to recompile to change things
+            ParamPrompt.Popup(this, true,_black);
+
+            // only build bars for user's interval
+            blt = new BarListTracker(Interval);
+
+            // only calculate on new bars
+            blt.GotNewBar += new SymBarIntervalDelegate(blt_GotNewBar);
         }
 
 
