@@ -79,10 +79,17 @@ namespace TestTradeLink
             Bar b = new BarImpl(1, 1, 1, 1, 1, 20100302, 93533, "IBM", (int)BarInterval.FiveMin);
             Assert.AreEqual(93500, b.Bartime);
             Assert.AreEqual(93533, b.time);
+            Console.WriteLine(b.Bartime + " " + b.time);
 
             b = new BarImpl(1, 1, 1, 1, 1, 20100302, 93533, "IBM", (int)BarInterval.Hour);
             Assert.AreEqual(90000, b.Bartime);
             Assert.AreEqual(93533, b.time);
+            Console.WriteLine(b.Bartime + " " + b.time);
+
+            b = new BarImpl(1, 1, 1, 1, 1, 20100302, 95504, "IBM", (int)BarInterval.FiveMin);
+            Assert.AreEqual(95500, b.Bartime);
+            Assert.AreEqual(95504, b.time);
+            Console.WriteLine(b.Bartime + " " + b.time);
         }
 
         [Test]
