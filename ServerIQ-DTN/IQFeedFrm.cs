@@ -12,7 +12,7 @@ using TradeLink.AppKit;
 
 namespace IQFeedBroker
 {
-    public partial class IQFeedFrm : Form
+    public partial class IQFeedFrm : AppTracker
     {
         public const string PROGRAM = "IQFeedConnector";
 
@@ -22,6 +22,8 @@ namespace IQFeedBroker
 
         public IQFeedFrm()
         {
+            TrackEnabled = Util.TrackUsage();
+            Program = PROGRAM;
             InitializeComponent();
             this.FormClosing += IQFeedFrm_FormClosing;
             _helper = new IQFeedHelper();

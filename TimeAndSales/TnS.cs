@@ -11,7 +11,7 @@ using TradeLink.AppKit;
 
 namespace TimeSales
 {
-    public partial class TnS : Form
+    public partial class TnS : AppTracker
     {
         public const string PROGRAM = "Time&Sales";
         DataTable _dt = new DataTable();
@@ -20,7 +20,8 @@ namespace TimeSales
 
         public TnS()
         {
-            
+            TrackEnabled = Util.TrackUsage();
+            Program = PROGRAM;
             InitializeComponent();
             initgrid();
             

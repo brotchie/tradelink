@@ -16,7 +16,7 @@ using MBTQUOTELib;
 
 namespace ServerMB
 {
-    public partial class ServerMBMain : Form, IMbtQuotesNotify
+    public partial class ServerMBMain : AppTracker, IMbtQuotesNotify
     {
         TLServer_WM tl = new TLServer_WM();
         static MBTCOMLib.MbtComMgr m_ComMgr;
@@ -29,6 +29,8 @@ namespace ServerMB
         Log _log = new Log(PROGRAM);
         public ServerMBMain()
         {
+            TrackEnabled = Util.TrackUsage();
+            Program = PROGRAM;
             InitializeComponent();
             m_ComMgr = new MBTCOMLib.MbtComMgrClass();
             m_ComMgr.SilentMode = true;

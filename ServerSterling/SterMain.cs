@@ -10,7 +10,7 @@ using TradeLink.AppKit;
 
 namespace SterServer
 {
-    public partial class SterMain : Form
+    public partial class SterMain : AppTracker
     {
         // basic structures needed for operation
         ServerSterling tl;
@@ -19,6 +19,8 @@ namespace SterServer
         Log _log = new Log(PROGRAM);
         public SterMain()
         {
+            TrackEnabled = Util.TrackUsage();
+            Program = PROGRAM;
             InitializeComponent();
             _dc.Parent = this;
             _dc.Dock = DockStyle.Fill;

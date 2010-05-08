@@ -10,7 +10,7 @@ using TradeLink.AppKit;
 
 namespace WinGauntlet
 {
-    public partial class Gauntlet : Form
+    public partial class Gauntlet : AppTracker
     {
 
 
@@ -27,6 +27,8 @@ namespace WinGauntlet
 
         public Gauntlet()
         {
+            TrackEnabled = Util.TrackUsage();
+            Program = PROGRAM;
             InitializeComponent();
             debug(Util.TLSIdentity());
             args.GotDebug += new DebugDelegate(args_GotDebug);

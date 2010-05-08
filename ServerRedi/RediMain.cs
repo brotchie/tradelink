@@ -7,10 +7,11 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using TradeLink.AppKit;
+using TradeLink.Common;
 
 namespace ServerRedi
 {
-    public partial class RediMain : Form
+    public partial class RediMain : AppTracker
     {
         ServerRedi tl = new ServerRedi();
         DebugWindow _dw = new DebugWindow();
@@ -18,6 +19,8 @@ namespace ServerRedi
         Log _log = new Log(PROGRAM);
         public RediMain()
         {
+            TrackEnabled = Util.TrackUsage();
+            Program = PROGRAM;
             InitializeComponent();
             tl.SendDebug += new TradeLink.API.DebugDelegate(tl_SendDebug);
 

@@ -15,7 +15,7 @@ using TradeLink.AppKit;
 namespace Quotopia
 {
     public delegate void OrderStatusDel(string sym, int error);
-    public partial class Quote : Form
+    public partial class Quote : AppTracker
     {
 
         public int GetDate { get { DateTime d = DateTime.Now; int i = (d.Year * 10000) + (d.Month * 100) + d.Day; return i; } }
@@ -30,6 +30,8 @@ namespace Quotopia
 
         public Quote()
         {
+            TrackEnabled = Util.TrackUsage();
+            Program = PROGRAM;
             InitializeComponent();
             try
             {

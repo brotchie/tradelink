@@ -12,7 +12,7 @@ using TradeLink.AppKit;
 
 namespace Kadina
 {
-    public partial class kadinamain : Form
+    public partial class kadinamain : AppTracker
     {
         SecurityImpl sec = null;
         string tickfile = "";
@@ -47,6 +47,8 @@ namespace Kadina
 
         public kadinamain()
         {
+            TrackEnabled = Util.TrackUsage();
+            Program = PROGRAM;
             InitializeComponent();
             initgrids();
             InitContext();

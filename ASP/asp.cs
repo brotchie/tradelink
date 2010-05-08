@@ -15,7 +15,7 @@ using System.Reflection;
 
 namespace ASP
 {
-    public partial class ASP : Form
+    public partial class ASP : AppTracker
     {
         public const string PROGRAM = "ASP";
         const string SKINEXT = ".skn";
@@ -53,6 +53,8 @@ namespace ASP
 
         public ASP()
         {
+            TrackEnabled = Util.TrackUsage();
+            Program = PROGRAM;
             // read designer options for gui
             InitializeComponent();
             // show status

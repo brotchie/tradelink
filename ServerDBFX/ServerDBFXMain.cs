@@ -6,16 +6,19 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using TradeLink.AppKit;
+using TradeLink.Common;
 
 namespace ServerDBFX
 {
-    public partial class ServerDBFXMain : Form
+    public partial class ServerDBFXMain : AppTracker
     {
         ServerDBFX _dbfx = new ServerDBFX();
         public const string PROGRAM = "ServerDBFX";
         Log _log = new Log(PROGRAM);
         public ServerDBFXMain()
         {
+            TrackEnabled = Util.TrackUsage();
+            Program = PROGRAM;
             InitializeComponent();
             _dbfx.SendDebug += new TradeLink.API.DebugFullDelegate(_dbfx_SendDebug);
             FormClosing += new FormClosingEventHandler(ServerDBFXMain_FormClosing);

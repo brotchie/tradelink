@@ -13,7 +13,7 @@ using AMTD_API;
 
 namespace TDServer
 {
-    public partial class TDServerMain : Form
+    public partial class TDServerMain : AppTracker
     {
 
 
@@ -25,6 +25,8 @@ namespace TDServer
         Log _log = new Log(PROGRAM);
         public TDServerMain()
         {
+            TrackEnabled = Util.TrackUsage();
+            Program = PROGRAM;
             InitializeComponent();
             FormClosing += new FormClosingEventHandler(TDServerMain_FormClosing);
 

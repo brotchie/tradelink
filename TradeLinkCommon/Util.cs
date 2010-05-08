@@ -20,16 +20,44 @@ namespace TradeLink.Common
         static string REGPATH64 = REGPATH + @"\wow6432Node";
         static string KEY_PATH = "Path";
         static string KEY_VERSION = "Version";
+        static string KEY_TRACKUSAGE = "TrackUsage";
 
         /// <summary>
         /// you should call ProgramPath rather than use this fucntion
         /// </summary>
         /// <param name="PROGRAM"></param>
         /// <returns></returns>
-        public static string ProgramRegPath(string PROGRAM)
+        public static string ProgramRegPath(string program)
         {
-            if (PROGRAM == string.Empty) return string.Empty;
-            return REGPATH + @"\" + PROGRAM;
+            if (program == string.Empty) return string.Empty;
+            return REGPATH + @"\" + program;
+        }
+
+        /// <summary>
+        /// determines whether user has consented to application tracking for given program
+        /// </summary>
+        /// <returns></returns>
+        public static bool TrackUsage() { return TrackUsage(PROGRAM); }
+        /// <summary>
+        /// determines whether user has consented to application tracking for given program
+        /// </summary>
+        /// <param name="program"></param>
+        /// <returns></returns>
+        public static bool TrackUsage(string program)
+        {
+            RegistryKey r = Registry.LocalMachine;
+            bool sixfourbit = IntPtr.Size * 8 == 64;
+            string path = (sixfourbit ? REGPATH64 : REGPATH) + @"\" + program;
+            try
+            {
+                string tus = r.OpenSubKey(path).GetValue(KEY_TRACKUSAGE).ToString();
+                bool tu = tus.ToUpper() == "YES";
+                return tu;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
         /// <summary>
         /// gets folder where a given program is installed

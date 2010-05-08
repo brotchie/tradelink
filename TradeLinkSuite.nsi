@@ -251,6 +251,14 @@ finishinstall:
 
 SectionEnd
 
+Section "Anonymous Suite Usage Tracking"
+
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "TrackUsage" "Yes"
+  
+finishinstall:  
+
+SectionEnd
+
 
 Section "Uninstall"
   

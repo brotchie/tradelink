@@ -21,7 +21,7 @@ namespace TradeLink.AppKit
             _URL = url;
             _TAG = Program;
         }
-        string _URL = string.Empty;
+        string _URL = @"http://tradelinkappstore.appspot.com/apptracker";
         /// <summary>
         /// url to post requests
         /// </summary>
@@ -32,7 +32,7 @@ namespace TradeLink.AppKit
         /// </summary>
         public string Program { get { return _TAG; } set { _TAG = value; } }
 
-        bool _autostartstop = false;
+        bool _autostartstop = true;
         /// <summary>
         /// send start and stop actions automatically at load and form close
         /// </summary>
@@ -284,5 +284,7 @@ namespace TradeLink.AppKit
         AppBugReport,
         ClickAction,
         ScorePoints,
+        AppAuthOk,
+        AppAuthFail,
     }
 }

@@ -11,7 +11,7 @@ using TradeLink.AppKit;
 
 namespace Record
 {
-    public partial class RecordMain : Form
+    public partial class RecordMain : AppTracker
     {
         DebugWindow _dw = new DebugWindow();
         TickArchiver _ta = new TickArchiver();
@@ -24,6 +24,8 @@ namespace Record
         
         public RecordMain()
         {
+            TrackEnabled = Util.TrackUsage();
+            Program = PROGRAM;
             InitializeComponent();
             int pollms = (int)(((double)Properties.Settings.Default.brokertimeoutsec * 1000) / 2);
             _tlt = new TLTracker(pollms, Properties.Settings.Default.brokertimeoutsec, tl, Providers.Unknown, true);

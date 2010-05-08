@@ -9,15 +9,19 @@ using System.Windows.Forms;
 using System.IO;
 using TradeLink.Common;
 using TradeLink.API;
+using TradeLink.Common;
+using TradeLink.AppKit;
 
 namespace TikConverter
 {
-    public partial class TikConvertMain : Form
+    public partial class TikConvertMain : AppTracker
     {
         public const string PROGRAM = "TikConverter";
         BackgroundWorker bw = new BackgroundWorker();
         public TikConvertMain()
         {
+            TrackEnabled = Util.TrackUsage();
+            Program = PROGRAM;
             InitializeComponent();
             _con.Items.AddRange(Enum.GetNames(typeof(Converter)));
             bw.WorkerReportsProgress = true;

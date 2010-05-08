@@ -11,7 +11,7 @@ using TradeLink.AppKit;
 
 namespace Chartographer
 {
-    public partial class ChartMain : Form
+    public partial class ChartMain : AppTracker
     {
         public event BarListDelegate newChartData;
         Dictionary<string, BarList> blbox = new Dictionary<string, BarList>();
@@ -19,6 +19,8 @@ namespace Chartographer
 
         public ChartMain()
         {
+            TrackEnabled = Util.TrackUsage();
+            Program = PROGRAM;
             InitializeComponent();
             stickychartsbox.Checked = Chartographer.Properties.Settings.Default.stickychartson;
             maxchartbox.Checked = Chartographer.Properties.Settings.Default.maxcharts;

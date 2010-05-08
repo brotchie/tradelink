@@ -12,7 +12,7 @@ using TradeLink.AppKit;
 
 namespace Replay
 {
-    public partial class Replay : Form
+    public partial class Replay : AppTracker
     {
         TLServer_WM tl = new TLServer_WM();
         Playback _playback = null;
@@ -24,6 +24,8 @@ namespace Replay
 
         public Replay()
         {
+            TrackEnabled = Util.TrackUsage();
+            Program = PROGRAM;
             InitializeComponent();
             tl.newSendOrderRequest += new OrderDelegateStatus(tl_gotSrvFillRequest);
             tl.newOrderCancelRequest += new LongDelegate(tl_OrderCancelRequest);

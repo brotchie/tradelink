@@ -3,10 +3,11 @@ using System.Drawing;
 using System.Windows.Forms;
 using TradeLink.API;
 using TradeLink.AppKit;
+using TradeLink.Common;
 
 namespace ServerBlackwood
 {
-    public partial class ServerBlackwoodMain : Form
+    public partial class ServerBlackwoodMain : AppTracker
     {
         public const string PROGRAM = "ServerBlackwood";
         public DebugWindow _dw = new DebugWindow();
@@ -18,6 +19,8 @@ namespace ServerBlackwood
 
         public ServerBlackwoodMain()
         {
+            TrackEnabled = Util.TrackUsage();
+            Program = PROGRAM;
             InitializeComponent();
             _con.BWConnectedEvent += new BWConnectedEventHandler(_con_BWConnectedEvent);
             _con.SendDebug += new DebugFullDelegate(_dw.GotDebug);

@@ -14,7 +14,7 @@ using IESignal;
 
 namespace ServerEsignal
 {
-    public partial class EsignalMain : Form
+    public partial class EsignalMain : AppTracker
     {
 
         EsignalServer tl;
@@ -23,6 +23,8 @@ namespace ServerEsignal
         
         public EsignalMain()
         {
+            TrackEnabled = Util.TrackUsage();
+            Program = PROGRAM;
             InitializeComponent();
             tl = new EsignalServer();
             // send debug messages to log file
