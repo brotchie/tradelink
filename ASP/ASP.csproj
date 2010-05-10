@@ -77,7 +77,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="asp.cs">
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="asp.Designer.cs">
       <DependentUpon>asp.cs</DependentUpon>
