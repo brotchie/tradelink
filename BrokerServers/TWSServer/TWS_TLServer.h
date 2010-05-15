@@ -60,6 +60,8 @@ namespace TradeLibFast
 		bool hasTicker(CString symbol);
 		// following used because tick updates only include size or price that changed (not both)
 		std::vector<TLTick> stockticks;
+		// default currency
+		CString _currency;
 
 		// these are the IB-api methods we'll override (from EWrapper above)
 		void tickPrice( TickerId ddeId, TickType field, double price, int canAutoExecute);

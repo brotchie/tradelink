@@ -13,6 +13,7 @@ namespace TradeLibFast
 	TWS_TLServer::TWS_TLServer(void)
 	{
 		IGNOREERRORS = false;
+		_currency = CString("USD");
 
 	}
 
@@ -50,6 +51,9 @@ namespace TradeLibFast
 		file.getline(skip,100);
 		file.getline(data,8);
 		sessionid = atoi(data); // get the session id next 
+		file.getline(skip,100);
+		file.getline(data,8);
+		_currency = CString(data);
 		file.close();
 		CString msg;
 		if (sessionid!=0)
@@ -66,6 +70,8 @@ namespace TradeLibFast
 		D(msg);
 		D(CString("For more instances, change value in: ")+CONFIGFILE);
 		msg.Format("Found accounts: %s",gjoin(accts,","));
+		D(msg);
+		msg.Format("Using currency: %s",_currency);
 		D(msg);
 	}
 
@@ -220,6 +226,7 @@ namespace TradeLibFast
 				contract->expiry = expire;
 				contract->strike = tmpsec.strike;
 				contract->right = tmpsec.details;
+				//contract->currency = _currency;			
 			}
 			else
 				contract->localSymbol = o.localsymbol!="" ? o.localsymbol : tmpsec.sym;
@@ -540,8 +547,7 @@ namespace TradeLibFast
 			// if we have a stock and it has no destination, use default
 			if ((sec.type==STK) && !sec.hasDest())
 				contract.exchange = "SMART";
-			// assume USD
-			contract.currency = "USD";
+			contract.currency = _currency;
 			contract.secType = TLSecurity::SecurityTypeName(sec.type);
 			this->m_link[this->validlinkids[0]]->reqMktData((TickerId)stockticks.size(),contract,"",false);
 			TLTick k; // create blank tick
