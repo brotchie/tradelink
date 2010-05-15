@@ -32,10 +32,26 @@ namespace TradeLink.AppKit
         {
             ContextMenu = new ContextMenu();
             ContextMenu.MenuItems.Add("View tickdata", new EventHandler(viewdata));
+            ContextMenu.MenuItems.Add("Export filter", new EventHandler(export));
             _dw.Text = "Selected Tickdata:";
             _dw.TimeStamps = false;
             _dw.GotDebug("No tickdata selected.");
             InitializeComponent();
+        }
+
+        void export(object o, EventArgs e)
+        {
+            TickFileFilter tff = GetFilter();
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "Filter (*.txt)|*.txt|All files (*.*)|*.*";
+            sfd.AddExtension = true;
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                if (TickFileFilter.ToFile(tff, sfd.FileName))
+                    _dw.GotDebug("saved filter as: " + sfd.FileName);
+                else
+                    _dw.GotDebug("unable to save filter as: " + sfd.FileName);
+            }
         }
 
         void viewdata(object o, EventArgs e)

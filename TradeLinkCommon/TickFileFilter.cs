@@ -26,6 +26,8 @@ namespace TradeLink.Common
         public bool AllowInvalid { get { return _allowedinvalid; } set { _allowedinvalid = value; } }
         List<string> namelist = new List<string>();
         List<TLDateFilter> datelist = new List<TLDateFilter>();
+        public List<string> SymbolList { get { return namelist; } set { namelist = value; } }
+        public List<TLDateFilter> DateList { get { return datelist; } set { datelist = value; } }
         public TickFileFilter() : this(new List<string>(), new List<TLDateFilter>()) { }
         public TickFileFilter(List<string> namefilter) : this(namefilter, null) { }
         public TickFileFilter(List<TLDateFilter> datefilter) : this(null, datefilter) { }
@@ -188,7 +190,9 @@ namespace TradeLink.Common
             }
             return allow;
         }
-
+        /// <summary>
+        /// match a specific portion of a tradelink date (eg month only, year only, etc)
+        /// </summary>
         public struct TLDateFilter
         {
             public TLDateFilter(int date, DateMatchType type)
@@ -212,14 +216,27 @@ namespace TradeLink.Common
                 return df;
             }
         }
-
+        /// <summary>
+        /// get a filter that excludes everything but year from TL date
+        /// </summary>
+        /// <param name="year"></param>
+        /// <returns></returns>
         public static int TLYearMask(int year) { return year * 10000; }
+        /// <summary>
+        /// get a filter that excludes everything but the month from TL date
+        /// </summary>
+        /// <param name="month"></param>
+        /// <returns></returns>
         public static int TLMonthMask(int month) { return month * 100; }
 
         const char d = ',';
         const char name = 'N';
         const char date = 'D';
-
+        /// <summary>
+        /// serialize a tradelink tick file filter
+        /// </summary>
+        /// <param name="tff"></param>
+        /// <returns></returns>
         public static string Serialize(TickFileFilter tff)
         {
             // save everything as xml
@@ -243,7 +260,11 @@ namespace TradeLink.Common
             return fs.GetStringBuilder().ToString();
 
         }
-
+        /// <summary>
+        /// take a serialized tickfilefilter and convert back to an object
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <returns></returns>
         public static TickFileFilter Deserialize(string msg)
         {
             StringReader fs;
@@ -264,7 +285,11 @@ namespace TradeLink.Common
             return tf;
 
         }
-
+        /// <summary>
+        /// save tickfilefilter to a file
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
         public static TickFileFilter FromFile(string filename)
         {
             StreamReader sr = new StreamReader(filename);
@@ -272,7 +297,12 @@ namespace TradeLink.Common
             TickFileFilter tff = TickFileFilter.Deserialize(msg);
             return tff;
         }
-
+        /// <summary>
+        /// restore a filter from a file
+        /// </summary>
+        /// <param name="tff"></param>
+        /// <param name="filename"></param>
+        /// <returns></returns>
         public static bool ToFile(TickFileFilter tff, string filename)
         {
             try

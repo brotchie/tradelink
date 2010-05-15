@@ -266,7 +266,10 @@ namespace WinGauntlet
             // tick folder
             FolderBrowserDialog fd = new FolderBrowserDialog();
             fd.Description = "Select the folder containing tick files";
-            fd.SelectedPath = args.Folder;
+            string folder = Util.TLTickDir;
+            if (Directory.Exists(args.Folder))
+                folder = args.Folder;
+            fd.SelectedPath = folder;
             if (fd.ShowDialog() == DialogResult.OK)
             {
                 args.Folder = fd.SelectedPath;
