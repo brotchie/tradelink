@@ -337,6 +337,9 @@ namespace ASP
             {
                 //get response index from display index
                 int idx = getrindx(didx);
+                // ignore where we don't have an index
+                if ((idx < 0) || (idx>_reslist.Count)) 
+                    continue;
                 // save them as skin
                 bool worked = SkinImpl.SkinFile(_reslist[idx], _reslist[idx].FullName, _class2dll[_reslist[idx].FullName], SKINPATH + name + "." + startidx.ToString() + SKINEXT, new DebugDelegate(debug));
                 // notify errors
