@@ -79,7 +79,16 @@ namespace TradeLink.AppKit
         }
 
         bool _postallonclose = true;
+        /// <summary>
+        /// push any untracked events when form is closed
+        /// </summary>
         public bool PushTracksOnClose { get { return _postallonclose; } set { _postallonclose = value; } }
+
+        int _maxattemps = 6;
+        /// <summary>
+        /// maximum number of attempts to push tracks on close
+        /// </summary>
+        public int PushTracksCloseMax { get { return _maxattemps; } set { _maxattemps = value; } }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
@@ -88,7 +97,8 @@ namespace TradeLink.AppKit
                 Track(TrackType.AppStop);
             if (PushTracksOnClose)
                 debug("Pushing tracks on close and waiting...");
-            while (PushTracksOnClose && _untrackedqueue.hasItems)
+            int closeattempts = 0;
+            while (PushTracksOnClose && _untrackedqueue.hasItems && (((_maxattemps!=0) && (closeattempts++<_maxattemps)) || (_maxattemps==0)))
             {
                 
                 _SLEEP = 10;
