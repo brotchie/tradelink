@@ -94,7 +94,6 @@ namespace TradeLink.Common
 
         /// <summary>
         /// Provides an offsetting price from a position.
-        /// Positive offset will be a profit offset, negative offset will be stop.
         /// </summary>
         /// <param name="p">Position</param>
         /// <param name="offset">Offset amount</param>
@@ -132,7 +131,7 @@ namespace TradeLink.Common
         {
             Order o = new OrderImpl();
             if (!p.isValid || p.isFlat) return o;
-            decimal price = OffsetPrice(p,Math.Abs(offset));
+            decimal price = OffsetPrice(p,offset);
             int size = !normalizesize ? (int)(p.FlatSize * percent) : Norm2Min(p.FlatSize*percent,MINSIZE);
             o = new LimitOrder(p.Symbol, !p.isLong, size, price);
             return o;
