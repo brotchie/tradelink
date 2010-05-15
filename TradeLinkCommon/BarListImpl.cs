@@ -574,8 +574,13 @@ histperiod=daily&startdate=" + startdate + "&enddate=" + enddate + "&output=csv&
         }
 
         private static BarListImpl _fromepf;
-        public static BarList FromTIK(string filename)
+        private static bool _uselast = true;
+        private static bool _usebid = true;
+        public static BarList FromTIK(string filename) { return FromTIK(filename, true, true); }
+        public static BarList FromTIK(string filename, bool uselast, bool usebid)
         {
+            _uselast = uselast;
+            _usebid = usebid;
             SecurityImpl s = SecurityImpl.FromTIK(filename);
             s.HistSource.gotTick += new TickDelegate(HistSource_gotTick);
             _fromepf = new BarListImpl(s.Symbol);
@@ -585,7 +590,15 @@ histperiod=daily&startdate=" + startdate + "&enddate=" + enddate + "&output=csv&
 
         static void HistSource_gotTick(Tick t)
         {
-            _fromepf.newTick(t);
+            if (_uselast)
+                _fromepf.newTick(t);
+            else
+            {
+                if (t.hasAsk && !_usebid)
+                    _fromepf.newPoint(t.ask, t.time, t.date, t.AskSize);
+                else if (t.hasBid && _usebid)
+                    _fromepf.newPoint(t.bid, t.time, t.date, t.BidSize);
+            }
         }
         /// <summary>
         /// gets index of bar that preceeds given date

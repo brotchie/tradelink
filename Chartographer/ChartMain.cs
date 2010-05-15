@@ -106,6 +106,8 @@ namespace Chartographer
             Chartographer.Properties.Settings.Default.blackchartbg = blackbackground.Checked;
         }
 
+        bool _uselast = Properties.Settings.Default.ChartLast;
+        bool _usebid = Properties.Settings.Default.ChartNoLastUseBid;
 
         private void button2_Click(object sender, EventArgs e)
         {
@@ -117,7 +119,7 @@ namespace Chartographer
             od.Multiselect = false;
             if (od.ShowDialog() == DialogResult.OK)
             {
-                BarList bl = BarListImpl.FromTIK(od.FileName);
+                BarList bl = BarListImpl.FromTIK(od.FileName,_uselast,_usebid);
                 newChart(bl);
             }
 

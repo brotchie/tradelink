@@ -168,8 +168,26 @@ namespace Kadina
                 myres.GotTick(t);
             // send to chart
             if (c != null)
-                c.newTick(t);
+            {
+                if (_chartlast)
+                {
+                    if (t.isTrade)
+                        c.newPoint(t.trade, t.time, t.date, t.size);
+                }
+                else if (_chartbid)
+                {
+                    if (t.hasBid)
+                        c.newPoint(t.bid, t.time, t.date, t.BidSize);
+                }
+                else if (t.hasAsk)
+                {
+                    c.newPoint(t.ask, t.time, t.date, t.AskSize);
+                }
+            }
         }
+
+        bool _chartlast = Properties.Settings.Default.ChartLast;
+        bool _chartbid = Properties.Settings.Default.ChartNoLastUseBid;
 
         void Play(object sender, DoWorkEventArgs e)
         {
