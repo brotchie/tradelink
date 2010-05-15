@@ -130,6 +130,8 @@ namespace TradeLink.API
         /// owner/originator of this order
         /// </summary>
         int VirtualOwner { get; set; }
+
+        string ToString(int decimals);
     }
 
     public class InvalidOrder : Exception { }

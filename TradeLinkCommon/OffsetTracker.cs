@@ -48,6 +48,13 @@ namespace TradeLink.Common
             _ids = tracker;
         }
 
+        int _debdecimals = 2;
+        /// <summary>
+        /// number of decimal places in SendDebug events
+        /// (defaults to 2, set to 5 for forex)
+        /// </summary>
+        public int DebugDecimals { get { return _debdecimals; } set { _debdecimals = value; } }
+
         /// <summary>
         /// clear single custom offset
         /// </summary>
@@ -129,12 +136,12 @@ namespace TradeLink.Common
                     off.StopId = stop.id;
                     SendOrder(stop);
                     // notify
-                    debug(string.Format("sent new stop: {0} {1}", stop.id, stop.ToString()));
+                    debug(string.Format("sent new stop: {0} {1}", stop.id, stop.ToString(DebugDecimals)));
                     sentorder = true;
                 }
                 else if (_verbdebug)
                 {
-                    debug(sym + " invalid stop: " + stop.ToString());
+                    debug(sym + " invalid stop: " + stop.ToString(DebugDecimals));
                 }
 
             }
@@ -154,12 +161,12 @@ namespace TradeLink.Common
                     off.ProfitId = profit.id;
                     SendOrder(profit);
                     // notify
-                    debug(string.Format("sent new profit: {0} {1}", profit.id, profit.ToString()));
+                    debug(string.Format("sent new profit: {0} {1}", profit.id, profit.ToString(DebugDecimals)));
                     sentorder = true;
                 }
                 else if (_verbdebug)
                 {
-                    debug(sym + " invalid profit: " + profit.ToString());
+                    debug(sym + " invalid profit: " + profit.ToString(DebugDecimals));
                 }
             }
             // make sure new offset info is reflected
@@ -481,7 +488,7 @@ namespace TradeLink.Common
                     _offvals.Add(sym, off);
             }
             if (_verbdebug)
-                debug(sym + " set offset: " + off.ToString());
+                debug(sym + " set offset: " + off.ToString(DebugDecimals));
         }
         /// <summary>
         /// should be called from GotCancel, when cancels arrive from broker.

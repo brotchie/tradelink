@@ -62,7 +62,11 @@ namespace TradeLink.Common
         public bool ProfitcancelPending = false;
         public override string ToString()
         {
-            return string.Format("p{0:n2}/{1:p0} s{2:n2}/{3:p0}", ProfitDist, ProfitPercent, StopDist, StopPercent);
+            return ToString(2);
+        }
+        public string ToString(int decimals)
+        {
+            return string.Format("p{0}/{1:p0} s{2}/{3:p0}", ProfitDist.ToString("N"+decimals.ToString()), ProfitPercent, StopDist.ToString("N"+decimals.ToString()), StopPercent);
         }
 
         public static string Serialize(OffsetInfo oi)
