@@ -105,7 +105,7 @@ namespace TradeLink.Common
         public bool newPoint(string sym,decimal p)
         {
             int idx = _highs.getindex(sym);
-            if (idx == GenericTracker.UNKNOWN)
+            if (idx<0)
             {
                 NewTxt(sym, 0);
                 idx = _highs.Count - 1;

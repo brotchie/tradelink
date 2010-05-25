@@ -38,5 +38,42 @@ namespace TestTradeLink
         {
             newtxt++;
         }
+
+        // track something
+        GenericTracker<bool> sym = new GenericTracker<bool>();
+        GenericTracker<decimal> price1 = new GenericTracker<decimal>();
+        GenericTracker<decimal> price2 = new GenericTracker<decimal>();
+        GenericTracker<bool> special = new GenericTracker<bool>();
+
+        [Test]
+        public void Importing()
+        {
+            const string FILE = "TestGenericTracker.txt";
+            // setup mappings
+            sym.NewTxt += new TextIdxDelegate(gt_NewTxt2);
+            // import syms
+            Assert.IsTrue(GenericTracker.CSVInitGeneric<bool>(FILE, ref sym, false));
+            Assert.AreEqual(4, sym.Count);
+            Assert.AreEqual(4, price1.Count);
+            // import other col data
+            Assert.IsTrue(GenericTracker.CSVCOL2Generic<decimal>(FILE, ref price1, 1));
+            Assert.IsTrue(GenericTracker.CSVCOL2Generic<decimal>(FILE, ref price2, 3));
+            Assert.IsTrue(GenericTracker.CSVCOL2Generic<bool>(FILE, ref special, 4));
+            // check data
+            Assert.AreEqual(10, price1["IBM"]);
+            Assert.AreEqual(20, price2["IBM"]);
+            Assert.AreEqual(1, price2["LVS"]);
+            Assert.AreEqual(false, special["LVS"]);
+            Assert.AreEqual(true, special["MHS"]);
+            // verify FRX left alone
+            Assert.AreEqual(true, special["FRX"]);
+        }
+
+        void gt_NewTxt2(string txt, int idx)
+        {
+            price1.addindex(txt, 0);
+            price2.addindex(txt, 0);
+            special.addindex(txt, true);
+        }
     }
 }

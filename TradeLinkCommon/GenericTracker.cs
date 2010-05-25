@@ -136,5 +136,134 @@ namespace TradeLink.Common
     public static class GenericTracker
     {
         public const int UNKNOWN = -1;
+        public static bool CSVInitGeneric<T>(string csvfile, ref GenericTracker<T> gt) { return CSVInitGeneric(csvfile, true, ref gt, 0, default(T), ',', null); }
+        public static bool CSVInitGeneric<T>(string csvfile, ref GenericTracker<T> gt,  T coldefault) { return CSVInitGeneric(csvfile, true, ref gt, 0, coldefault, ',', null); }
+        public static bool CSVInitGeneric<T>(string csvfile, bool hasheader, ref GenericTracker<T> gt, int symcol, T coldefault) { return CSVInitGeneric(csvfile, hasheader, ref gt, symcol, coldefault, ',', null); }
+        public static bool CSVInitGeneric<T>(string csvfile, bool hasheader, ref GenericTracker<T> gt, int symcol, T coldefault, char delim) { return CSVInitGeneric(csvfile, hasheader, ref gt, symcol, coldefault, delim, null); }
+        public static bool CSVInitGeneric<T>(string csvfile, bool hasheader, ref GenericTracker<T> gt, int symcol, T coldefault, char delim, TradeLink.API.DebugDelegate debug)
+        {
+            try
+            {
+                System.IO.StreamReader sr = new System.IO.StreamReader(csvfile);
+                if (hasheader)
+                    sr.ReadLine();
+                while (!sr.EndOfStream)
+                {
+                    string line = string.Empty;
+                    try
+                    {
+                        // get line
+                        line = sr.ReadLine();
+                        // get columns
+                        string[] cols = line.Split(delim);
+                        // get symbol
+                        string sym = cols[symcol];
+                        // add symbol to tracker 
+                        int idx = gt.addindex(sym, coldefault);
+
+                    }
+                    catch (Exception ex)
+                    {
+                        if (debug != null)
+                        {
+                            debug("error on: " + line);
+                            debug(ex.Message + ex.StackTrace);
+                            continue;
+                        }
+                    }
+                }
+                sr.Close();
+            }
+            catch (Exception ex)
+            {
+                if (debug != null)
+                {
+                    debug(ex.Message + ex.StackTrace);
+                }
+                return false;
+            }
+            return true;
+        }
+        public static bool CSVCOL2Generic<T>(string csvfile, ref GenericTracker<T> gt, int col) { return CSVCOL2Generic<T>(csvfile, true, ref gt, 0, col,  ',', null); }
+        public static bool CSVCOL2Generic<T>(string csvfile, ref GenericTracker<T> gt, int symcol, int col) { return CSVCOL2Generic<T>(csvfile, true, ref gt, symcol, col,  ',', null); }
+        public static bool CSVCOL2Generic<T>(string csvfile, bool hasheader, ref GenericTracker<T> gt, int symcol, int col) { return CSVCOL2Generic<T>(csvfile, hasheader, ref gt, symcol, col,  ',', null); }
+        public static bool CSVCOL2Generic<T>(string csvfile, bool hasheader, ref GenericTracker<T> gt, int symcol, int col, T coldefaultOnFail) { return CSVCOL2Generic<T>(csvfile, hasheader, ref gt, symcol, col, ',', null); }
+        public static bool CSVCOL2Generic<T>(string csvfile, bool hasheader, ref GenericTracker<T> gt, int symcol, int col, T coldefaultOnFail, char delim) { return CSVCOL2Generic<T>(csvfile, hasheader, ref gt, symcol, col, delim, null); }
+        /// <summary>
+        /// import csv column to a generic tracker value
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="csvfile"></param>
+        /// <param name="hasheader"></param>
+        /// <param name="gt"></param>
+        /// <param name="symcol"></param>
+        /// <param name="col"></param>
+        /// <param name="coldefaultOnFail"></param>
+        /// <param name="delim"></param>
+        /// <param name="debug"></param>
+        /// <returns></returns>
+        public static bool CSVCOL2Generic<T>(string csvfile, bool hasheader, ref GenericTracker<T> gt, int symcol, int col, char delim, TradeLink.API.DebugDelegate debug)
+        {
+            try
+            {
+                System.IO.StreamReader sr = new System.IO.StreamReader(csvfile);
+                if (hasheader)
+                    sr.ReadLine();
+                while (!sr.EndOfStream)
+                {
+                    string line = string.Empty;
+                    try
+                    {
+                        // get line
+                        line = sr.ReadLine();
+                        // get columns
+                        string[] cols = line.Split(delim);
+                        // see if this is a symbol column
+                        bool issym = symcol==col;
+                        // get symbol
+                        string sym = cols[symcol];
+                        // add symbol to tracker 
+                        int idx = gt.getindex(sym);
+                        // skip if we don't know the symbol
+                        if (idx<0)
+                            continue;
+                        // otherwise get column data
+                        string coldata = cols[col];
+                        // save it
+                        try
+                        {
+                            gt[idx] = (T)Convert.ChangeType(coldata, typeof(T));
+                        }
+                        catch (InvalidCastException)
+                        {
+
+                        }
+                        // thanks to : http://predicatet.blogspot.com/2009/04/c-string-to-generic-type-conversion.html
+
+                    }
+                    catch (Exception ex)
+                    {
+                        if (debug != null)
+                        {
+                            debug("error on: " + line);
+                            debug(ex.Message + ex.StackTrace);
+                            continue;
+                        }
+                    }
+
+                }
+                sr.Close();
+            }
+            catch (Exception ex)
+            {
+                if (debug != null)
+                {
+                    debug(ex.Message + ex.StackTrace);
+                }
+                return false;
+            }
+            return true;
+            
+        }
     }
 }
