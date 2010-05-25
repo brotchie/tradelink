@@ -18,7 +18,7 @@ namespace SterServer
         STIPosition stiPos;
         STIQuote stiQuote;
         STIBook stiBook;
-        bool imbalance = false;
+
         PositionTracker pt = new PositionTracker();
         int _SLEEP = 50;
         int _ORDERSLEEP = 1;
@@ -165,11 +165,11 @@ namespace SterServer
             rrSTILast,
         }
 
+        bool _lastimbalance = false;
+        bool _imbalance = false;
         void tl_newImbalanceRequest()
         {
-            // register for imbalance data
-            stiQuote.RegisterForMdx(true);
-            imbalance = true;
+            _imbalance = true;
         }
 
         string tl_newAcctRequest()
@@ -397,6 +397,13 @@ namespace SterServer
                                 break;
                         }
                     }
+
+                    if (_lastimbalance != _imbalance)
+                    {
+                        _lastimbalance = _imbalance;
+                        // register for imbalance data
+                        stiQuote.RegisterForNewMdx(true, true);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -542,8 +549,12 @@ namespace SterServer
             k.trade = (decimal)q.fLastPrice;
             k.size = q.nLastSize;
             newTick(k);
-            if ((q.bValidMktImb == 0) || !imbalance) return;
-            newImbalance(new ImbalanceImpl(k.symbol, k.ex, q.nMktImbalance, k.time, 0, 0, 0));
+            // if imbalances are not enabled we're done
+            if (!_imbalance) return;
+            // if there is no imbalance we're done
+            if (q.bValidMktImb == 0) return;
+            Imbalance imb = new ImbalanceImpl(k.symbol, k.ex, q.nMktImbalance, k.time, 0, 0, q.nMktImbalance);
+            newImbalance(imb);
 
         }
 
