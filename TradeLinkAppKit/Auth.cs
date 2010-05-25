@@ -13,21 +13,65 @@ namespace TradeLink.AppKit
     public sealed class Auth 
     {
         /// <summary>
+        /// default name for authorization file
+        /// </summary>
+        public const string AuthFile = "\\_AuthInfo.txt";
+        /// <summary>
         /// authenicate using given url
         /// </summary>
         /// <param name="authurl"></param>
-        public Auth(string authurl) : this(authurl, 0) { }
+        public Auth(string authurl) : this(authurl, string.Empty, string.Empty,0) { }
+        /// <summary>
+        /// authenticate using url and login via http to said url, look for identification in default location for program
+        /// </summary>
+        /// <param name="authurl"></param>
+        /// <param name="useHttpAuth"></param>
+        /// <param name="program"></param>
+        public Auth(string authurl, bool useHttpAuth, string program) : this(authurl, useHttpAuth ? authusername(Util.ProgramPath(program) + AuthFile) : "nofile.txt", useHttpAuth ? authpassword(Util.ProgramPath(program) + AuthFile) : "nofile.txt", 0) { }
+        /// <summary>
+        /// authenticate using url and login via http to said url, using specified http authentication file
+        /// </summary>
+        /// <param name="authurl"></param>
+        /// <param name="authfilepath"></param>
+        public Auth(string authurl, string authfilepath) : this(authurl, authusername(authfilepath), authpassword(authfilepath), 0) { }
+        /// <summary>
+        /// authenticate using url and login via http to said url, using specified http authentication file and specified expiration.
+        /// </summary>
+        /// <param name="authurl"></param>
+        /// <param name="authfilepath"></param>
+        /// <param name="expireAfterSeconds"></param>
+        public Auth(string authurl, string authfilepath, int expireAfterSeconds) : this(authurl, authusername(authfilepath), authpassword(authfilepath), expireAfterSeconds) { }
         /// <summary>
         /// authenticate using given url and expire authenticates 
         /// </summary>
         /// <param name="authUrl"></param>
         /// <param name="expireAfterSeconds"></param>
-        public Auth(string authUrl, int expireAfterSeconds) 
+        public Auth(string authUrl, int expireAfterSeconds) : this(authUrl, string.Empty, string.Empty, expireAfterSeconds) { }
+        /// <summary>
+        /// authenticate using given url, username and password with no expiration
+        /// </summary>
+        /// <param name="authUrl"></param>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        public Auth(string authUrl, string username, string password) : this(authUrl, username, password, 0) { }
+        /// <summary>
+        /// authenticate using given url, username/password and expiration settings
+        /// </summary>
+        /// <param name="authUrl"></param>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <param name="expireAfterSeconds"></param>
+        public Auth(string authUrl, string username, string password, int expireAfterSeconds) 
         { 
             url = authUrl;
+            _un = username;
+            _pw = password;
             _expiresec = expireAfterSeconds;
         }
-        string url = "";
+        private bool hasuser { get { return _un != string.Empty; } }
+        string _un = string.Empty;
+        string _pw = string.Empty;
+        string url = string.Empty;
         bool _lastauth = false;
         int _authtime = 0;
         int _expiresec = 0;
@@ -64,11 +108,14 @@ namespace TradeLink.AppKit
         {
             return isAuthorized(key, true, false, true,pause);
         }
-        void debug(string msg)
+        private void debug(string msg)
         {
             if (SendDebug != null)
                 SendDebug(msg);
         }
+        /// <summary>
+        /// get debugging message from authentication
+        /// </summary>
         public event TradeLink.API.DebugDelegate SendDebug;
         /// <summary>
         /// see if given key is authorized
@@ -85,21 +132,44 @@ namespace TradeLink.AppKit
             _lastauth = false;
             try
             {
-                WebClient wc = new WebClient();
-                string rurl = url;
-                if (appendrandom)
+                if (!hasuser)
                 {
-                    if (!rurl.Contains("?"))
-                        rurl += "?";
-                    Random rand = new Random((int)DateTime.Now.Ticks);
-                    string last = rurl.Substring(url.Length - 1, 1);
-                    if ((last != "?") || (last != "&"))
-                        rurl += "&";
-                    rurl += "r=" + rand.Next().ToString();
+                    WebClient wc = new WebClient();
+                    string rurl = url;
+                    if (appendrandom)
+                    {
+                        if (!rurl.Contains("?"))
+                            rurl += "?";
+                        Random rand = new Random((int)DateTime.Now.Ticks);
+                        string last = rurl.Substring(url.Length - 1, 1);
+                        if ((last != "?") || (last != "&"))
+                            rurl += "&";
+                        rurl += "r=" + rand.Next().ToString();
+                    }
+                    string res = "";
+                    res = wc.DownloadString(rurl);
+                    reg = res.Contains(key);
                 }
-                string res = "";
-                res = wc.DownloadString(rurl);
-                reg = res.Contains(key);
+                else
+                {
+                    HttpWebRequest req = WebRequest.Create(url) as HttpWebRequest;
+                    req.Credentials = new System.Net.NetworkCredential(_un, _pw);
+                    req.PreAuthenticate = true;
+                    SetBasicAuthHeader(req, _un, _pw);
+                    if (req == null)
+                    {
+                        throw new NullReferenceException("request is not a http request");
+                    }
+
+
+                    // Process response
+                    HttpWebResponse res = req.GetResponse() as HttpWebResponse;
+                    System.IO.StreamReader responseReader = new System.IO.StreamReader(res.GetResponseStream());
+                    string fullResponse = responseReader.ReadToEnd();
+                    res.Close();
+                    reg = fullResponse.Contains(key);
+
+                }
             }
             catch (Exception ex)
             {
@@ -119,6 +189,45 @@ namespace TradeLink.AppKit
                 debug(err);
 
             return reg;
+        }
+        
+        private static string authpassword(string filepath)
+        {
+            try
+            {
+                System.IO.StreamReader sr = new System.IO.StreamReader(filepath);
+                // skip user
+                sr.ReadLine();
+                // get password
+                string r = sr.ReadLine();
+                sr.Close();
+                return r;
+            }
+            catch { }
+            return string.Empty;
+            
+        }
+
+        private static string authusername(string filepath)
+        {
+            try
+            {
+                System.IO.StreamReader sr = new System.IO.StreamReader(filepath);
+                // get user
+                string r = sr.ReadLine();
+                sr.Close();
+                return r;
+            }
+            catch { }
+            return string.Empty;
+            
+        }
+
+        private static void SetBasicAuthHeader(WebRequest req, String userName, String userPassword)
+        {
+            string authInfo = userName + ":" + userPassword;
+            authInfo = Convert.ToBase64String(Encoding.Default.GetBytes(authInfo));
+            req.Headers["Authorization"] = "Basic " + authInfo;
         }
 
         /// <summary>
