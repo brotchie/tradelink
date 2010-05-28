@@ -402,7 +402,7 @@ namespace SterServer
                     {
                         _lastimbalance = _imbalance;
                         // register for imbalance data
-                        stiQuote.RegisterForNewMdx(true, true);
+                        stiQuote.RegisterForAllMdx(true);
                     }
                 }
                 catch (Exception ex)
@@ -536,24 +536,22 @@ namespace SterServer
             k.ask = (decimal)q.fAskPrice;
             k.bs = q.nBidSize / 100;
             k.os = q.nAskSize / 100;
-            if (q.bstrExch != "*")
-                k.ex = q.bstrExch;
-            if (q.bstrBidExch != "*")
-                k.be = q.bstrBidExch;
-            if (q.bstrAskExch != "*")
-                k.oe = q.bstrAskExch;
+            k.ex = GetExPretty(q.bstrExch);
+            k.be = GetExPretty(q.bstrBidExch);
+            k.oe = GetExPretty(q.bstrAskExch);
             int now = Convert.ToInt32(q.bstrUpdateTime);
             k.date = Util.ToTLDate(DateTime.Now);
             int sec = now % 100;
             k.time = now;
             k.trade = (decimal)q.fLastPrice;
             k.size = q.nLastSize;
-            newTick(k);
+            if (!_imbalance || (_imbalance && k.isValid))
+                newTick(k);
             // if imbalances are not enabled we're done
             if (!_imbalance) return;
             // if there is no imbalance we're done
-            if (q.bValidMktImb == 0) return;
-            Imbalance imb = new ImbalanceImpl(k.symbol, k.ex, q.nMktImbalance, k.time, 0, 0, q.nMktImbalance);
+            if (q.nMktImbalance==0) return;
+            Imbalance imb = new ImbalanceImpl(k.symbol, GetExPretty(k.ex), q.nMktImbalance, k.time, 0, 0, q.nMktImbalance);
             newImbalance(imb);
 
         }
@@ -566,12 +564,9 @@ namespace SterServer
             k.ask = (decimal)q.fAskPrice;
             k.bs = q.nBidSize / 100;
             k.os = q.nAskSize / 100;
-            if (q.bstrExch != "*")
-                k.ex = q.bstrExch;
-            if (q.bstrBidExch != "*")
-                k.be = q.bstrBidExch;
-            if (q.bstrAskExch != "*")
-                k.oe = q.bstrAskExch;
+            k.ex = GetExPretty(q.bstrExch);
+            k.be = GetExPretty(q.bstrBidExch);
+            k.oe = GetExPretty(q.bstrAskExch);
             int now = Convert.ToInt32(q.bstrUpdateTime);
             k.date = Util.ToTLDate(DateTime.Now);
             k.time = now;
@@ -622,7 +617,22 @@ namespace SterServer
             throw new NotImplementedException();
         }
 
+        public string GetExPretty(string val)
+        {
+            return GetExType(val).ToString();
+        }
 
+        public STEREXCH GetExType(string val)
+        {
+            try
+            {
+                char c = val.ToCharArray(0, 1)[0];
+                int ascii = (int)c;
+                return (STEREXCH)ascii;
+            }
+            catch { }
+            return STEREXCH.NONE;
+        }
 
         void debug(string msg)
         {
@@ -632,4 +642,23 @@ namespace SterServer
 
         public event DebugDelegate SendDebug;
     }
+
+    public enum STEREXCH
+    {
+        NONE = -1,
+        AMEX = 65,
+        BSTN = 66,
+        CNCI = 67,
+        MWST = 77,
+        NYSE = 78,
+        PACE = 79,
+        NSDS = 83,
+        NSDT = 84,
+        NSDQ = 81,
+        CBOE = 87,
+        PSE = 88,
+        CMPO = 79,
+        CMPE = 42,
+    }
+
 }
