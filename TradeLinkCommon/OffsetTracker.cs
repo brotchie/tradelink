@@ -376,6 +376,12 @@ namespace TradeLink.Common
             return 0;
         }
 
+        bool _shutonreinit = true;
+        /// <summary>
+        /// if a position is provided twice in the same session, assume this is bad and cancel/shutdown offsets.
+        /// </summary>
+        public bool ShutdownOnReinit { get { return _shutonreinit; } set { _shutonreinit = value; } }
+
         /// <summary>
         /// must send new positions here (eg from GotPosition on Response)
         /// </summary>
@@ -386,6 +392,20 @@ namespace TradeLink.Common
             bool exists = !_pt[p.Symbol].isFlat;
             if (exists)
                 debug(p.Symbol + " re-initialization of existing position");
+            if (exists && ShutdownOnReinit)
+            {
+                // get offset
+                OffsetInfo oi = GetOffset(p.Symbol);
+                // disable it
+                oi.ProfitPercent = 0;
+                oi.StopPercent = 0;
+                // save it
+                SetOffset(p.Symbol, oi);
+                // cancel existing orders
+                CancelAll(p.Symbol);
+                // stop processing
+                return;
+            }
             // update position
             _pt.Adjust(p);
             // if we're flat, nothing to do
