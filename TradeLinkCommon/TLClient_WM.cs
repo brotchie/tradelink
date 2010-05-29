@@ -142,7 +142,16 @@ namespace TradeLink.Common
         public long TLSend(MessageTypes type, string m, IntPtr dest)
         {
             if (InvokeRequired)
-                return (long)Invoke(new TLSendDelegate(TLSend), new object[] { type, m, dest });
+            {
+                // ensure that our object is still running before we message from it
+                try
+                {
+                    return (long)Invoke(new TLSendDelegate(TLSend), new object[] { type, m, dest });
+                }
+                catch (NullReferenceException) { }
+                catch (ObjectDisposedException) { }
+                return 0;
+            }
             else
             {
                 if (dest == IntPtr.Zero) throw new TLServerNotFound();
