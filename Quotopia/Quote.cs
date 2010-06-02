@@ -823,7 +823,7 @@ namespace Quotopia
 
         }
 
-        string _dispdecpointformat = "N2";
+        string _dispdecpointformat = "N"+((int)Properties.Settings.Default.displaydecpoints).ToString();
         private void _dispdecpoints_ValueChanged(object sender, EventArgs e)
         {
             if (Size.Height!=0)
