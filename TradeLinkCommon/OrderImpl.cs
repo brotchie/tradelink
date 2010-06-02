@@ -67,7 +67,7 @@ namespace TradeLink.Common
         {
             this.symbol = sym;
             this.side = side;
-            this.size = System.Math.Abs(size);
+            this.size = System.Math.Abs(size) * (side ? 1 : -1);
             this.price = p;
             this.stopp = s;
             this.comment = c;
@@ -78,7 +78,7 @@ namespace TradeLink.Common
         {
             this.symbol = sym;
             this.side = side;
-            this.size = System.Math.Abs(size);
+            this.size = System.Math.Abs(size) * (side ? 1 : -1);
             this.price = p;
             this.stopp = s;
             this.comment = c;
@@ -95,7 +95,7 @@ namespace TradeLink.Common
             this.comment = "";
             this.time = 0;
             this.date = 0;
-            this.size = System.Math.Abs(size);
+            this.size = System.Math.Abs(size) * (side ? 1 : -1);
         }
         public OrderImpl(string sym, bool side, int size, string c)
         {
@@ -106,7 +106,7 @@ namespace TradeLink.Common
             this.comment = c;
             this.time = 0;
             this.date = 0;
-            this.size = System.Math.Abs(size);
+            this.size = System.Math.Abs(size) * (side ? 1 : -1);
         }
         public OrderImpl(string sym, int size)
         {
@@ -117,7 +117,7 @@ namespace TradeLink.Common
             this.comment = "";
             this.time = 0;
             this.date = 0;
-            this.size = System.Math.Abs(size);
+            this.size = System.Math.Abs(size) * (side ? 1 : -1);
         }
         public override string ToString()
         {
@@ -189,7 +189,7 @@ namespace TradeLink.Common
         public static string Serialize(Order o)
         {
             if (o.isFilled) return TradeImpl.Serialize((Trade)o);
-            string[] r = new string[] { o.symbol, (o.side ? "true" : "false"), o.UnsignedSize.ToString(), o.price.ToString(System.Globalization.CultureInfo.InvariantCulture), o.stopp.ToString(System.Globalization.CultureInfo.InvariantCulture), o.comment, o.ex, o.Account, o.Security.ToString(), o.Currency.ToString(), o.LocalSymbol, o.id.ToString(), o.TIF, o.date.ToString(), o.time.ToString(), "", o.trail.ToString(System.Globalization.CultureInfo.InvariantCulture) };
+            string[] r = new string[] { o.symbol, (o.side ? "true" : "false"), (o.UnsignedSize * (o.side ? 1 : -1)).ToString(), o.price.ToString(System.Globalization.CultureInfo.InvariantCulture), o.stopp.ToString(System.Globalization.CultureInfo.InvariantCulture), o.comment, o.ex, o.Account, o.Security.ToString(), o.Currency.ToString(), o.LocalSymbol, o.id.ToString(), o.TIF, o.date.ToString(), o.time.ToString(), "", o.trail.ToString(System.Globalization.CultureInfo.InvariantCulture) };
             return string.Join(",", r);
         }
         /// <summary>
@@ -202,7 +202,7 @@ namespace TradeLink.Common
             string[] rec = message.Split(','); // get the record
             if (rec.Length < 17) throw new InvalidOrder();
             bool side = Convert.ToBoolean(rec[(int)OrderField.Side]);
-            int size = Convert.ToInt32(rec[(int)OrderField.Size]);
+            int size = Math.Abs(Convert.ToInt32(rec[(int)OrderField.Size])) * (side ? 1 : -1);
             decimal oprice = Convert.ToDecimal(rec[(int)OrderField.Price], System.Globalization.CultureInfo.InvariantCulture);
             decimal ostop = Convert.ToDecimal(rec[(int)OrderField.Stop], System.Globalization.CultureInfo.InvariantCulture);
             string sym = rec[(int)OrderField.Symbol];
