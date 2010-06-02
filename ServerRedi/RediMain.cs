@@ -56,7 +56,7 @@ namespace ServerRedi
 
         private void _login_Click(object sender, EventArgs e)
         {
-            if (tl.Start(_user.Text, _pass.Text))
+            if (tl.Start(_user.Text, _pass.Text, txtAcronym.Text + txtAccount.Text))
                 BackColor = Color.Green;
             else
                 BackColor = Color.Red;
