@@ -85,18 +85,6 @@ namespace Quotopia.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string boxdllpath {
-            get {
-                return ((string)(this["boxdllpath"]));
-            }
-            set {
-                this["boxdllpath"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
 <ArrayOfString xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
   <string>BuyerCol</string>
@@ -127,18 +115,6 @@ namespace Quotopia.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string ticfolderpath {
-            get {
-                return ((string)(this["ticfolderpath"]));
-            }
-            set {
-                this["ticfolderpath"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Green")]
         public global::System.Drawing.Color highcolor {
             get {
@@ -163,7 +139,7 @@ namespace Quotopia.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("700, 429")]
+        [global::System.Configuration.DefaultSettingValueAttribute("900, 429")]
         public global::System.Drawing.Size wsize {
             get {
                 return ((global::System.Drawing.Size)(this["wsize"]));
@@ -235,17 +211,6 @@ namespace Quotopia.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Specialized.StringCollection stocks {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["stocks"]));
-            }
-            set {
-                this["stocks"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool saveonexit {
             get {
@@ -277,18 +242,6 @@ namespace Quotopia.Properties {
             }
             set {
                 this["colheaderfg"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2")]
-        public int tlmode {
-            get {
-                return ((int)(this["tlmode"]));
-            }
-            set {
-                this["tlmode"] = value;
             }
         }
         
@@ -337,18 +290,6 @@ namespace Quotopia.Properties {
             }
             set {
                 this["headerfont"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool boxdebug {
-            get {
-                return ((bool)(this["boxdebug"]));
-            }
-            set {
-                this["boxdebug"] = value;
             }
         }
         

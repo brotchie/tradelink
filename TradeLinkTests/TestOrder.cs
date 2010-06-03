@@ -162,7 +162,7 @@ namespace TestTradeLink
             Assert.That(n.size == z,n.size.ToString());
             Assert.That(n.price == p,n.price.ToString());
             Assert.That(n.Exchange == x,n.Exchange);
-            Assert.That(n.comment == u,n.comment);
+            
             Assert.That(n.Security == t,n.Security.ToString());
             Assert.That(n.Currency == c,n.Currency.ToString());
             Assert.That(n.TIF == ot, n.TIF);

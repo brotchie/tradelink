@@ -24,38 +24,54 @@ namespace Quotopia
         public event OrderStatusDel orderStatus;
         AsyncResponse _ar = new AsyncResponse();
         public const string PROGRAM = "Quotopia";
-        DebugWindow _dw = new DebugWindow();
+        Log _log = new Log(PROGRAM);
         TLTracker _tlt;
         BackgroundWorker bw = new BackgroundWorker();
-
+        bool _constructed = false;
         public Quote()
         {
             TrackEnabled = Util.TrackUsage();
             Program = PROGRAM;
             InitializeComponent();
-            try
-            {
-                tl = new TLClient_WM("quotopia.client", true);
-            }
-            catch (TLServerNotFound ex) { debug(ex.Message); }
-            int poll = (int)((double)Properties.Settings.Default.brokertimeoutsec*1000/2);
-            _tlt = new TLTracker(poll, (int)Properties.Settings.Default.brokertimeoutsec, tl, Providers.Unknown, true);
-            _tlt.GotConnectFail += new VoidDelegate(_tlt_GotConnectFail);
-            _tlt.GotConnect += new VoidDelegate(_tlt_GotConnect);
-            _tlt.GotDebug += new DebugDelegate(_tlt_GotDebug);
+
             if ((Location.X == 0) && (Location.Y == 0))
             {
                 Quotopia.Properties.Settings.Default.location = new Point(300, 300);
                 Quotopia.Properties.Settings.Default.Save();
                 Refresh();
             }
-            Size = Quotopia.Properties.Settings.Default.wsize;
+
             debug(Util.TLSIdentity());
             QuoteGridSetup();
-
+            initfeeds();
             statfade.Interval = 3000;
             statfade.Tick += new EventHandler(statfade_Tick);
             statfade.Start();
+            
+            ordergrid.ContextMenuStrip = new ContextMenuStrip();
+            ordergrid.ContextMenuStrip.Items.Add("Cancel", null, new EventHandler(cancelorder));
+            FormClosing += new FormClosingEventHandler(Quote_FormClosing);
+            Resize += new EventHandler(Quote_Resize);
+            _tlt_GotConnect();
+            bw.DoWork += new DoWorkEventHandler(bw_DoWork);
+            bw.RunWorkerAsync();
+            processcommands();
+
+            _constructed = true;
+        }
+
+        void initfeeds()
+        {
+            try
+            {
+                tl = new TLClient_WM("quotopia.client", true);
+            }
+            catch (TLServerNotFound ex) { debug(ex.Message); }
+            int poll = (int)((double)Properties.Settings.Default.brokertimeoutsec * 1000 / 2);
+            _tlt = new TLTracker(poll, (int)Properties.Settings.Default.brokertimeoutsec, tl, Providers.Unknown, true);
+            _tlt.GotConnectFail += new VoidDelegate(_tlt_GotConnectFail);
+            _tlt.GotConnect += new VoidDelegate(_tlt_GotConnect);
+            _tlt.GotDebug += new DebugDelegate(_tlt_GotDebug);
             // if our machine is multi-core we use seperate thread to process ticks
             if (Environment.ProcessorCount == 1)
                 tl.gotTick += new TickDelegate(tl_gotTick);
@@ -69,19 +85,23 @@ namespace Quotopia
             tl.gotOrderCancel += new LongDelegate(tl_gotOrderCancel);
             tl.gotPosition += new PositionDelegate(tl_gotPosition);
             tl.gotAccounts += new DebugDelegate(tl_gotAccounts);
-            ordergrid.ContextMenuStrip = new ContextMenuStrip();
-            ordergrid.ContextMenuStrip.Items.Add("Cancel", null, new EventHandler(cancelorder));
-            FormClosing += new FormClosingEventHandler(Quote_FormClosing);
-            Resize += new EventHandler(Quote_Resize);
-            if (tl.ProvidersAvailable.Length > 0)
-            {
-                debug(tl.BrokerName + " " + tl.ServerVersion + " connected.");
-                status(tl.BrokerName + " connected.");
-                _tlt_GotConnect();
-            }
-            bw.DoWork += new DoWorkEventHandler(bw_DoWork);
-            bw.RunWorkerAsync();
+        }
 
+        void processcommands()
+        {
+            string[] args = Environment.GetCommandLineArgs();
+            if (args.Length < 2) return;
+            string f = args[1];
+            if (!File.Exists(f))
+            {
+                status("Can't load basket file: " + Path.GetFileName(f));
+                debug("file does not exist: " + f);
+                return;
+            }
+            Basket nb = BasketImpl.FromFile(f);
+            addbasket(nb);
+            updatebasket();
+            Refresh();
         }
 
         void bw_DoWork(object sender, DoWorkEventArgs e)
@@ -91,48 +111,42 @@ namespace Quotopia
 
         void _tlt_GotDebug(string msg)
         {
-            debug(msg);
+            //debug(msg);
         }
 
         void _tlt_GotConnect()
         {
-            if (_tlt.tw.RecentTime != 0)
-            {
-                debug(tl.BrokerName + " " + tl.ServerVersion + " connected.");
-                status(tl.BrokerName + " connected.");
-            }
-            _brokertimeout.Enabled = tl.BrokerName != Providers.TradeLink;
             try
             {
-                // get accounts
-                tl.RequestAccounts();
-                // request positions
-                foreach (string acct in accts)
-                    tl.RequestPositions(acct);
-                // resubscribe
-                if (mb.Count > 0)
-                    tl.Subscribe(mb);
+                if (_tlt.tw.RecentTime != 0)
+                {
+                    debug(tl.BrokerName + " " + tl.ServerVersion + " refreshed.");
+                    status(tl.BrokerName + " connected.");
+                }
+                // if we have a quote provider
+                if ((tl.ProvidersAvailable.Length>0))
+                {
+                    // don't track tradelink
+                    if (tl.BrokerName == Providers.TradeLink)
+                    {
+                        _tlt.Stop();
+                    }
+
+                    // if we have a quote provid
+                    if (mb.Count > 0)
+                        updatebasket();
+                }
             }
             catch { }
-            if (tl.BrokerName == Providers.TradeLink)
-            {
-                _tlt.Stop();
-            }
         }
 
         void _tlt_GotConnectFail()
         {
             if (_tlt.tw.RecentTime != 0)
             {
-                debug("Broker disconnected");
-                status("Broker disconnected");
             }
         }
 
-        void togdebug(object sender, EventArgs e)
-        {
-            _dw.Toggle();
-        }
 
         void Quote_Resize(object sender, EventArgs e)
         {
@@ -145,6 +159,7 @@ namespace Quotopia
 
         void tl_gotAccounts(string msg)
         {
+            debug("avail accounts: " + msg);
             accts = msg.Split(',');
             
         }
@@ -159,6 +174,7 @@ namespace Quotopia
 
         void tl_gotPosition(Position pos)
         {
+            debug("pos: " + pos.ToString());
             pt.Adjust(pos);
             int[] rows = new int[0];
             if (symidx.TryGetValue(pos.Symbol, out rows))
@@ -192,6 +208,7 @@ namespace Quotopia
 
         void tl_gotOrderCancel(long number)
         {
+            debug("cancelack: " + number);
             if (ordergrid.InvokeRequired)
                 ordergrid.Invoke(new LongDelegate(tl_gotOrderCancel), new object[] { number });
             else
@@ -207,13 +224,14 @@ namespace Quotopia
             for (int i = 0; i < ordergrid.SelectedRows.Count; i++)
             {
                 long oid = (long)ordergrid["oid", ordergrid.SelectedRows[i].Index].Value;
-                tl.CancelOrder((long)oid);
-                debug("Sending cancel for " + oid.ToString());
+                tl.CancelOrder(oid);
+                debug("cancel: " + oid.ToString());
             }
         }
 
         void tl_gotOrder(Order o)
         {
+            debug("orderack: " + o.ToString());
             if (orderidx(o.id)==-1) // if we don't have this order, add it
                 ordergrid.Rows.Add(new object[] { o.id, o.symbol, (o.side ? "BUY" : "SELL"), o.UnsignedSize, (o.price == 0 ? "Market" : o.price.ToString(_dispdecpointformat)), (o.stopp == 0 ? "" : o.stopp.ToString(_dispdecpointformat)), o.Account });
         }
@@ -232,6 +250,7 @@ namespace Quotopia
 
             try
             {
+                _log.Stop();
                 _ar.Stop();
                 _tlt.Stop();
                 tl.Unsubscribe();
@@ -281,10 +300,9 @@ namespace Quotopia
             qg.ColumnHeadersVisible = true;
             qg.Capture = true;
             qg.ContextMenuStrip = new ContextMenuStrip();
-            qg.ContextMenuStrip.Items.Add("Messages", null, new EventHandler(togdebug));
+            qg.ContextMenuStrip.Items.Add("Chart", null, new EventHandler(rightchart));
+            qg.ContextMenuStrip.Items.Add("Ticket", null, new EventHandler(rightticket));
             qg.ContextMenuStrip.Items.Add("Remove", null,new EventHandler(rightremove));
-            qg.ContextMenuStrip.Items.Add("Chart", null,new EventHandler(rightchart));
-            qg.ContextMenuStrip.Items.Add("Ticket", null,new EventHandler(rightticket));
             qg.ContextMenuStrip.Items.Add("Import Basket", null,new EventHandler(importbasketbut_Click));
             qg.ContextMenuStrip.Items.Add("Export Basket", null, new EventHandler(exportbasket));
             qg.ContextMenuStrip.Items.Add("Report Bug", null, new EventHandler(report));
@@ -314,7 +332,8 @@ namespace Quotopia
 
         void report(object o, EventArgs e)
         {
-            CrashReport.Report(PROGRAM, string.Empty,string.Empty,_dw.Content,null,null,false);
+            CrashReport.Report(PROGRAM, string.Empty,string.Empty,_dmsg.ToString(),null,null,false);
+            _dmsg = new System.Text.StringBuilder();
         }
 
         void qg_DoubleClick(object sender, EventArgs e)
@@ -364,10 +383,12 @@ namespace Quotopia
             int res = tl.SendOrder(sendOrder);
             if (res != 0)
             {
-                string err = Util.PrettyError(tl.BrokerName,res);
+                string err = Util.PrettyError(tl.BrokerName, res);
                 status(err);
                 debug(sendOrder.ToString() + "( " + err + " )");
             }
+            else
+                debug("order: "+sendOrder.ToString());
         }
 
         void rightremove(object sender, EventArgs e)
@@ -674,6 +695,7 @@ namespace Quotopia
 
         void tl_gotFill(Trade t)
         {
+            debug("fill: " + t.ToString());
             if (InvokeRequired)
                 Invoke(new FillDelegate(tl_gotFill), new object[] { t });
             else
@@ -736,9 +758,12 @@ namespace Quotopia
             tl.Disconnect(); // unregister all stocks and this client
         }
 
+        System.Text.StringBuilder _dmsg = new System.Text.StringBuilder();
         public void debug(string s)
         {
-            _dw.GotDebug(s);
+            _dmsg.AppendLine(s);
+            debugControl1.GotDebug(s);
+            _log.GotDebug(s);
         }
 
         DateTime laststat = DateTime.Now;
@@ -788,11 +813,16 @@ namespace Quotopia
                 status("Imported " + count + " instruments.");
             }
             else return;
-            if (tl.ProvidersAvailable.Length>0)
+            updatebasket();
+            Invalidate(true);
+        }
+
+        void updatebasket()
+        {
+            if (tl.ProvidersAvailable.Length > 0)
                 tl.Subscribe(mb);
             else
                 status("no server running to obtain quotes from.");
-            Invalidate(true);
         }
 
         void addbasket(Basket b)
@@ -826,7 +856,7 @@ namespace Quotopia
         string _dispdecpointformat = "N"+((int)Properties.Settings.Default.displaydecpoints).ToString();
         private void _dispdecpoints_ValueChanged(object sender, EventArgs e)
         {
-            if (Size.Height!=0)
+            if (_constructed)
                 _dispdecpointformat = "N" + ((int)_dispdecpoints.Value).ToString();
         }
 

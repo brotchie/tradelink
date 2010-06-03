@@ -17,9 +17,6 @@
     <Setting Name="downtickcolor" Type="System.Drawing.Color" Scope="User">
       <Value Profile="(Default)">Red</Value>
     </Setting>
-    <Setting Name="boxdllpath" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
     <Setting Name="colhide" Type="System.Collections.Specialized.StringCollection" Scope="User">
       <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
 &lt;ArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
@@ -32,9 +29,6 @@
     <Setting Name="gridcolor" Type="System.Drawing.Color" Scope="User">
       <Value Profile="(Default)">White</Value>
     </Setting>
-    <Setting Name="ticfolderpath" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
     <Setting Name="highcolor" Type="System.Drawing.Color" Scope="User">
       <Value Profile="(Default)">Green</Value>
     </Setting>
@@ -42,7 +36,7 @@
       <Value Profile="(Default)">Maroon</Value>
     </Setting>
     <Setting Name="wsize" Type="System.Drawing.Size" Scope="User">
-      <Value Profile="(Default)">700, 429</Value>
+      <Value Profile="(Default)">900, 429</Value>
     </Setting>
     <Setting Name="highcolorbg" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -59,9 +53,6 @@
     <Setting Name="location" Type="System.Drawing.Point" Scope="User">
       <Value Profile="(Default)">0, 0</Value>
     </Setting>
-    <Setting Name="stocks" Type="System.Collections.Specialized.StringCollection" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
     <Setting Name="saveonexit" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
@@ -70,9 +61,6 @@
     </Setting>
     <Setting Name="colheaderfg" Type="System.Drawing.Color" Scope="User">
       <Value Profile="(Default)">White</Value>
-    </Setting>
-    <Setting Name="tlmode" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">2</Value>
     </Setting>
     <Setting Name="savesymbollist" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -85,9 +73,6 @@
     </Setting>
     <Setting Name="headerfont" Type="System.Drawing.Font" Scope="User">
       <Value Profile="(Default)">Microsoft Sans Serif, 8.25pt, style=Bold</Value>
-    </Setting>
-    <Setting Name="boxdebug" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="accountname" Type="System.String" Scope="User">
       <Value Profile="(Default)" />

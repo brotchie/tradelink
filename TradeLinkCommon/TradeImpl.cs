@@ -32,7 +32,8 @@ namespace TradeLink.Common
         public string Account { get { return accountid; } set { accountid = value; } }
         public string symbol { get { return _sym; } set { _sym = value; } }
         public bool side { get { return _side; } set { _side = value; } }
-        public string comment { get { return _comment; } set { _comment = value; } }
+        [Obsolete]
+        public string comment { get { return _id.ToString(); } set { _comment = value; } }
         public int xsize { get { return _xsize; } set { _xsize = value; } }
         public decimal xprice { get { return _xprice; } set { _xprice = value; } }
         public int xdate { get { return _xdate; } set { _xdate = value; } }
@@ -80,11 +81,15 @@ namespace TradeLink.Common
         {
             return ToString(',');
         }
-        public string ToString(char delimiter)
+        public string ToString(bool includeid) { return ToString(',', includeid); }
+        public string ToString(char delimiter) { return ToString(delimiter, false); }
+        public string ToString(char delimiter,bool includeid)
         {
             int usize = Math.Abs(xsize);
             string[] trade = new string[] { xdate.ToString(), xtime.ToString(), symbol, (side ? "BUY" : "SELL"), usize.ToString(), xprice.ToString("N2"), comment };
-            return string.Join(delimiter.ToString(), trade);
+            if (!includeid)
+                return string.Join(delimiter.ToString(), trade);
+            return string.Join(delimiter.ToString(), trade) + delimiter + id;
         }
         public static Trade FromString(string tradestring) { return FromString(tradestring, ','); }
         public static Trade FromString(string tradestring, char delimiter)
