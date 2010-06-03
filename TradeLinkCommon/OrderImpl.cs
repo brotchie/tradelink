@@ -138,6 +138,7 @@ namespace TradeLink.Common
         public bool Fill(Tick t, bool fillOPG)
         {
             if (!t.isTrade) return false;
+            if (t.symbol != symbol) return false;
             if (!fillOPG && TIF=="OPG") return false;
             if ((isLimit && side && (t.trade <= price)) // buy limit
                 || (isLimit && !side && (t.trade >= price))// sell limit
