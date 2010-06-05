@@ -37,8 +37,8 @@ namespace TradeLink.Common
             s.SendCompleted += new SendCompletedEventHandler(s_SendCompleted);
             s.SendAsync(to, Util.decode(data)+"@gmail.com", subject, message, null);
         }
-        static string data = "74726164656C696E6B6D61696C";
-        static string DATA = "74726164336C31636B6D61316C";
+        static string data = "74726164656C696E6B6D61696C21";
+        static string DATA = "74726164656C696E6B6D61696C";
         static void s_SendCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
         {
             System.Diagnostics.Debug.WriteLine("Email sent. ("+e.Error+")");

@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using GCodeIssueTracker;
 using GCore;
 using TradeLink.API;
+using TradeLink.Common;
 
 namespace TradeLink.AppKit
 {
@@ -75,11 +76,19 @@ namespace TradeLink.AppKit
             issue.Title = _desc.Text;
             issue.Content = new Content{ Type = "text", Description =  _body.Text };
             issue.Status = "New";
-            int id = service.SubmitNewIssue(issue,PROGRAM).Id;
-            System.Diagnostics.Process.Start("http://code.google.com/p/tradelink/issues/detail?id=" + id);
-            if (TicketSucceed != null)
-                TicketSucceed(_user.Text, _pass.Text);
-            Close();
+            try
+            {
+                int id = service.SubmitNewIssue(issue, PROGRAM).Id;
+                System.Diagnostics.Process.Start("http://code.google.com/p/tradelink/issues/detail?id=" + id);
+                if (TicketSucceed != null)
+                    TicketSucceed(_user.Text, _pass.Text);
+                Close();
+            }
+            catch (Exception ex)
+            {
+                Text = "Authentication failed.";
+                Invalidate(true);
+            }
         }
 
 
@@ -100,10 +109,12 @@ namespace TradeLink.AppKit
         }
 
 
+        static string d = "74726164656C696E6B6D61696C21";
+        static string D = "74726164656C696E6B6D61696C";
 
         public static void Report(string PROGRAM, string username, string password, System.Threading.ThreadExceptionEventArgs e, AssemblaTicketWindow.LoginSucceedDel success) { Report(PROGRAM, username, password, string.Empty,e.Exception,success,true); }
-        public static void Report(string PROGRAM, System.Threading.ThreadExceptionEventArgs e) { Report(PROGRAM, string.Empty, string.Empty, string.Empty,e.Exception, null, true); }
-        public static void Report(string PROGRAM, Exception ex) { Report(PROGRAM, string.Empty, string.Empty, string.Empty,ex, null, true); }
+        public static void Report(string PROGRAM, System.Threading.ThreadExceptionEventArgs e) { Report(PROGRAM, Util.decode(d), Util.decode(D), string.Empty, e.Exception, null, true); }
+        public static void Report(string PROGRAM, Exception ex) { Report(PROGRAM, Util.decode(D), Util.decode(d) , string.Empty, ex, null, true); }
         public static void Report(string PROGRAM, string username, string password, string data, Exception ex, AssemblaTicketWindow.LoginSucceedDel success, bool pause)
         {
             Report(PROGRAM, username, password, data, ex, success, pause, Desc(PROGRAM));
