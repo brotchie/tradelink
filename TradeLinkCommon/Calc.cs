@@ -1356,14 +1356,14 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="bl"></param>
         /// <returns></returns>
-        public static decimal BollingerLower(BarList bl) { return BollingerUpper(bl, 2.5m, true); }
+        public static decimal BollingerLower(BarList bl) { return BollingerLower(bl, 2.5m, true); }
         /// <summary>
         /// calculates lower bollinger using opening prices.  calculate yourself for faster speed
         /// </summary>
         /// <param name="bl"></param>
         /// <param name="numStdDevs"></param>
         /// <returns></returns>
-        public static decimal BollingerLower(BarList bl, decimal numStdDevs) { return BollingerUpper(bl, numStdDevs, true); }
+        public static decimal BollingerLower(BarList bl, decimal numStdDevs) { return BollingerLower(bl, numStdDevs, true); }
         /// <summary>
         /// calculates lower bollinger using open (true) or closing (false) prices, at specified # of standard deviations
         /// </summary>
