@@ -72,6 +72,7 @@ namespace TradeLink.Common
         {
             _requested = BarListImpl.BarInterval2Int(intervals);
             _reqtype = intervals;
+            _default = (int)intervals[0];
         }
         Dictionary<string, BarListImpl> _bdict = new Dictionary<string, BarListImpl>();
         public int SymbolCount { get { return _bdict.Count; } }
