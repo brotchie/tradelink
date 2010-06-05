@@ -185,7 +185,7 @@ namespace TradeLink.Common
             if (!_pendingfill[idx] && (trail.StopDist!=0) && (Math.Abs(refp - p) > trail.StopDist))
             {
                 // notify
-                D("hit trailing stop at: " + p.ToString("n2"));
+                D("hit trailing stop at: " + p.ToString("F2"));
                 // mark pending order
                 _pendingfill[idx] = true;
                 // get order

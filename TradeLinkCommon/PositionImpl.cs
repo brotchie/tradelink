@@ -77,7 +77,7 @@ namespace TradeLink.Common
 
         public override string ToString()
         {
-            return Symbol+" "+Size+"@"+AvgPrice.ToString("N2");
+            return Symbol+" "+Size+"@"+AvgPrice.ToString("F2");
         }
         public Trade ToTrade()
         {
