@@ -68,6 +68,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\REDI.lnk" "$INSTDIR\ServerRedi.exe" "" "$INSTDIR\ServerRedi.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\LogViewer.lnk" "$INSTDIR\LogViewer.exe" "" "$INSTDIR\LogViewer.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\IQFeed.lnk" "$INSTDIR\IQFeedBroker.exe" "" "$INSTDIR\IQFeedBroker.exe" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink\NxCore.lnk" "$INSTDIR\ServerNxCore.exe" "" "$INSTDIR\ServerNxCore.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\TickData.lnk" "$LOCALAPPDATA\TradeLinkTicks\" "" "$LOCALAPPDATA\TradeLinkTicks" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Logs.lnk" "$LOCALAPPDATA\" "" "$LOCALAPPDATA\" 0
   
@@ -145,6 +146,11 @@ Section "TradeLinkSuite"
   File "ServerRedi\bin\release\VBRediClasses.dll"
   File "ServerIQ-DTN\bin\Release\IQFeedBroker.exe"
   File "ServerIQ-DTN\bin\Release\IQFeedBroker.exe.config"
+  
+  File "ServerNxCore\bin\release\ServerNxCore.exe"
+  File "ServerNxCore\bin\release\ServerNxCore.exe.config"
+  File "ServerNxCore\bin\release\NxCoreAPI.dll"
+  File "ServerNxCore\bin\release\NxCoreAPI64.dll"
 
   File "TikConverter\bin\release\TikConverter.exe"
 
