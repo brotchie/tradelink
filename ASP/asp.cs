@@ -132,7 +132,11 @@ namespace ASP
 
         void initfeeds()
         {
-
+            if ((_bf == null) || (_ao==null))
+            {
+                debug("a problem has occured.  ASP must be run in interactive mode.");
+                return;
+            }
             _bf.Reset();
             _ao._execsel.DataSource = _bf.ProvidersAvailable;
             _ao._datasel.DataSource = _bf.ProvidersAvailable;
