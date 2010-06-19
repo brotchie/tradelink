@@ -5,29 +5,15 @@ using TradeLink.API;
 
 namespace TradeLink.Common
 {
+    /// <summary>
+    /// enforce time limits for orders
+    /// </summary>
     public class TIFTracker
     {
 
-        long this[string symbol] 
-        { 
-            get 
-            {
-              int idx = symidx(symbol);
-              if (idx==NOIDX) return _tif;
-              return _tifs[idx];
-            }
-        set
-        {
-            int idx = symidx(symbol);
-            if (idx == NOIDX)
-            {
-                _symidx.Add(symbol, _tifs.Count);
-                _tifs.Add(value);
-            }
-            else
-                _tifs[idx] = value;
-        }
-        }
+        
+        List<long> _id = new List<long>();
+        List<int> _tifs = new List<int>();
         public TIFTracker() : this(new IdTracker()) { }
         public TIFTracker(IdTracker id)
         {
@@ -36,14 +22,13 @@ namespace TradeLink.Common
         public event LongDelegate SendCancel;
         public event OrderDelegate SendOrder;
         public event DebugDelegate SendDebug;
-        long _tif = 300;
-        public long DefaultTif { get { return _tif; } set { _tif = value; } }
+        int _tif = 0;
+        public int DefaultTif { get { return _tif; } set { _tif = value; } }
         IdTracker _idt = null;
         Dictionary<string, int> _symidx = new Dictionary<string, int>();
         Dictionary<long, int> _ididx = new Dictionary<long, int>();
         List<int> _senttime = new List<int>();
-        List<long> _tifs = new List<long>(); 
-        List<long> _id = new List<long>();
+
         const int NOIDX = -1;
         int _lasttime = 0;
 
@@ -57,6 +42,9 @@ namespace TradeLink.Common
 
         void checktifs()
         {
+            // can't check until time is set
+            if (_lasttime == 0) return;
+            // check time
             for (int i = 0; i < _senttime.Count; i++)
             {
                 int diff = Util.FTDIFF(_senttime[i], _lasttime);
@@ -84,12 +72,12 @@ namespace TradeLink.Common
                 checktifs();
             }
         }
-        public void SendOrderTIF(Order o)
+        public void SendOrderTIF(Order o, int TIF)
         {
             // update time
             if ((o.time != 0) && (o.time > _lasttime))
                 _lasttime = o.time;
-            if ((o.time==0) && (_lasttime==0))
+            if ((o.time == 0) && (_lasttime == 0))
             {
                 debug("No time available!  Can't enforce tif!");
                 return;
@@ -117,6 +105,7 @@ namespace TradeLink.Common
             if (SendOrder != null)
                 SendOrder(o);
         }
+
 
 
     }
