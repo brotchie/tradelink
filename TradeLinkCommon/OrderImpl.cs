@@ -155,6 +155,58 @@ namespace TradeLink.Common
             return false;
         }
         /// <summary>
+        /// fill against bid and ask rather than trade
+        /// </summary>
+        /// <param name="k"></param>
+        /// <param name="smart"></param>
+        /// <param name="fillOPG"></param>
+        /// <returns></returns>
+        public bool Fill(Tick k, bool bidask, bool fillOPG)
+        {
+            if (!bidask)
+                return Fill(k, fillOPG);
+            // buyer has to match with seller and vice verca
+            bool ok = side ? k.hasAsk : k.hasBid;
+            if (!ok) return false;
+            decimal p = side ? k.ask : k.bid;
+            int s = side ? k.AskSize : k.BidSize;
+            if (k.symbol != symbol) return false;
+            if (!fillOPG && TIF == "OPG") return false;
+            if ((isLimit && side && (p <= price)) // buy limit
+                || (isLimit && !side && (p >= price))// sell limit
+                || (isStop && side && (p >= stopp)) // buy stop
+                || (isStop && !side && (p <= stopp)) // sell stop
+                || isMarket)
+            {
+                this.xprice = p;
+                this.xsize = s >= UnsignedSize ? size : s;
+                this.xtime = k.time;
+                this.xdate = k.date;
+                return true;
+            }
+            return false;
+        }
+        /// <summary>
+        /// fill against bid and ask rather than trade
+        /// </summary>
+        /// <param name="k"></param>
+        /// <param name="OPG"></param>
+        /// <returns></returns>
+        public bool FillBidAsk(Tick k, bool OPG)
+        {
+            return Fill(k, true, OPG);
+        }
+        /// <summary>
+        /// fill against bid and ask rather than trade
+        /// </summary>
+        /// <param name="k"></param>
+        /// <returns></returns>
+        public bool FillBidAsk(Tick k)
+        {
+            return Fill(k, true, false);
+        }
+
+        /// <summary>
         /// Try to fill incoming order against this order.  If orders match.
         /// </summary>
         /// <param name="o"></param>

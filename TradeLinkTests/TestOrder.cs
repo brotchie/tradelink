@@ -122,52 +122,55 @@ namespace TestTradeLink
 
         }
 
-
+        [Test]
         public void FillBidAsk()
         {
             const string s = "TST";
             // market should fill on trade but not on quote
             OrderImpl o = new BuyMarket(s, 100);
-            Assert.That(o.Fill(TickImpl.NewTrade(s, 9, 100)));
-            Assert.That(!o.Fill(TickImpl.NewBid(s, 8, 100)));
+            Assert.That(o.FillBidAsk(TickImpl.NewAsk(s, 9, 100)));
+            Assert.That(!o.FillBidAsk(TickImpl.NewTrade(s, 9, 100)));
+            Assert.That(!o.FillBidAsk(TickImpl.NewBid(s, 8, 100)));
 
             // buy limit
 
             // limit should fill if order price is inside market
             o = new BuyLimit(s, 100, 10m);
-            Assert.That(o.Fill(TickImpl.NewTrade(s, 9, 100)));
+            Assert.That(o.FillBidAsk(TickImpl.NewAsk(s, 9, 100)));
             // shouldn't fill outside market
             o = new BuyLimit(s, 100, 10m);
-            Assert.That(!o.Fill(TickImpl.NewTrade(s, 11, 100)));
+            Assert.That(!o.FillBidAsk(TickImpl.NewTrade(s, 11, 100)));
+            Assert.That(!o.FillBidAsk(TickImpl.NewAsk(s, 11, 100)));
+            Assert.That(!o.FillBidAsk(TickImpl.NewBid(s, 10, 100)));
 
             // sell limit
 
             // limit should fill if order price is inside market
             o = new SellLimit(s, 100, 10m);
-            Assert.That(o.Fill(TickImpl.NewTrade(s, 11, 100)));
+            Assert.That(o.FillBidAsk(TickImpl.NewBid(s, 11, 100)));
             // shouldn't fill outside market
             o = new SellLimit(s, 100, 10m);
-            Assert.That(!o.Fill(TickImpl.NewTrade(s, 9, 100)));
+            Assert.That(!o.FillBidAsk(TickImpl.NewTrade(s, 9, 100)));
 
             // buy stop
 
             o = new BuyStop(s, 100, 10m);
-            Assert.That(o.Fill(TickImpl.NewTrade(s, 11, 100)));
+            Assert.That(o.FillBidAsk(TickImpl.NewAsk(s, 11, 100)));
             // shouldn't fill outside market
             o = new BuyStop(s, 100, 10m);
-            Assert.That(!o.Fill(TickImpl.NewTrade(s, 9, 100)));
+            Assert.That(!o.FillBidAsk(TickImpl.NewTrade(s, 9, 100)));
 
             // sell stop
 
             o = new SellStop(s, 100, 10m);
-            Assert.That(o.Fill(TickImpl.NewTrade(s, 9, 100)));
+            Assert.That(o.FillBidAsk(TickImpl.NewBid(s, 9, 100)));
             // shouldn't fill outside market
             o = new SellStop(s, 100, 10m);
-            Assert.That(!o.Fill(TickImpl.NewTrade(s, 11, 100)));
+            Assert.That(!o.FillBidAsk(TickImpl.NewTrade(s, 11, 100)));
 
             // always fail filling an invalid tick
             o = new BuyMarket(s, 100);
-            Assert.IsFalse(o.Fill(TickImpl.NewTrade(s, 0, 0)));
+            Assert.IsFalse(o.FillBidAsk(TickImpl.NewTrade(s, 0, 0)));
         }
 
 
