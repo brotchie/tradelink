@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Collections;
 using System.Text;
+using System.IO;
+using TradeLink.API;
 
 namespace TradeLink.Common
 {
@@ -133,12 +135,52 @@ namespace TradeLink.Common
 
     }
 
+    /// <summary>
+    /// helper methods to use with GenericTracker T
+    /// </summary>
     public static class GenericTracker
     {
         public const int UNKNOWN = -1;
+
+        /// <summary>
+        /// import a csv file into a generic tracker
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="csvfile"></param>
+        /// <param name="gt"></param>
+        /// <returns></returns>
         public static bool CSVInitGeneric<T>(string csvfile, ref GenericTracker<T> gt) { return CSVInitGeneric(csvfile, true, ref gt, 0, default(T), ',', null); }
+        /// <summary>
+        /// import a csv file into a generic tracker
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="csvfile"></param>
+        /// <param name="gt"></param>
+        /// <param name="coldefault"></param>
+        /// <returns></returns>
         public static bool CSVInitGeneric<T>(string csvfile, ref GenericTracker<T> gt,  T coldefault) { return CSVInitGeneric(csvfile, true, ref gt, 0, coldefault, ',', null); }
+        /// <summary>
+        /// import a csv file into a generic tracker
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="csvfile"></param>
+        /// <param name="hasheader"></param>
+        /// <param name="gt"></param>
+        /// <param name="symcol"></param>
+        /// <param name="coldefault"></param>
+        /// <returns></returns>
         public static bool CSVInitGeneric<T>(string csvfile, bool hasheader, ref GenericTracker<T> gt, int symcol, T coldefault) { return CSVInitGeneric(csvfile, hasheader, ref gt, symcol, coldefault, ',', null); }
+        /// <summary>
+        /// import a csv file into a generic tracker
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="csvfile"></param>
+        /// <param name="hasheader"></param>
+        /// <param name="gt"></param>
+        /// <param name="symcol"></param>
+        /// <param name="coldefault"></param>
+        /// <param name="delim"></param>
+        /// <returns></returns>
         public static bool CSVInitGeneric<T>(string csvfile, bool hasheader, ref GenericTracker<T> gt, int symcol, T coldefault, char delim) { return CSVInitGeneric(csvfile, hasheader, ref gt, symcol, coldefault, delim, null); }
         public static bool CSVInitGeneric<T>(string csvfile, bool hasheader, ref GenericTracker<T> gt, int symcol, T coldefault, char delim, TradeLink.API.DebugDelegate debug)
         {
@@ -264,6 +306,198 @@ namespace TradeLink.Common
             }
             return true;
             
+        }
+
+        /// <summary>
+        /// write a generic tracker to one column of a csv file, leaving rest of file untouched.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="filepath"></param>
+        /// <param name="gt"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
+        public static bool WriteCSV<T>(string filepath, GenericTracker<T> gt, int col) { return WriteCSV<T>(filepath, gt, col, 0, true, ',', string.Empty, null); }
+        /// <summary>
+        /// write a generic tracker to one column of a csv file, leaving rest of file untouched.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="filepath"></param>
+        /// <param name="gt"></param>
+        /// <param name="col"></param>
+        /// <param name="symcol"></param>
+        /// <returns></returns>
+        public static bool WriteCSV<T>(string filepath, GenericTracker<T> gt, int col, int symcol) { return WriteCSV<T>(filepath, gt, col, symcol, true, ',', string.Empty, null); }
+        /// <summary>
+        /// write a generic tracker to one column of a csv file, leaving rest of file untouched.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="filepath"></param>
+        /// <param name="gt"></param>
+        /// <param name="col"></param>
+        /// <param name="symcol"></param>
+        /// <param name="hasheader"></param>
+        /// <param name="delim"></param>
+        /// <returns></returns>
+        public static bool WriteCSV<T>(string filepath, GenericTracker<T> gt, int col, int symcol, bool hasheader) { return WriteCSV<T>(filepath, gt, col, symcol, hasheader, ',', string.Empty, null); }
+        /// <summary>
+        /// write a generic tracker to one column of a csv file, leaving rest of file untouched.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="filepath"></param>
+        /// <param name="gt"></param>
+        /// <param name="col"></param>
+        /// <param name="symcol"></param>
+        /// <param name="hasheader"></param>
+        /// <param name="delim"></param>
+        /// <param name="stringformat"></param>
+        /// <returns></returns>
+        public static bool WriteCSV<T>(string filepath, GenericTracker<T> gt, int col, int symcol, bool hasheader, char delim) { return WriteCSV<T>(filepath, gt, col, symcol, hasheader, delim, string.Empty, null); }
+        /// <summary>
+        /// write a generic tracker to one column of a csv file, leaving rest of file untouched.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="filepath"></param>
+        /// <param name="gt"></param>
+        /// <param name="col"></param>
+        /// <param name="symcol"></param>
+        /// <param name="hasheader"></param>
+        /// <param name="delim"></param>
+        /// <param name="stringformat"></param>
+        /// <returns></returns>
+        public static bool WriteCSV<T>(string filepath, GenericTracker<T> gt, int col, int symcol, bool hasheader, char delim, string stringformat) { return WriteCSV<T>(filepath, gt, col, symcol, hasheader, delim, stringformat, null); }
+        /// <summary>
+        /// write a generic tracker to one column of a csv file, leaving rest of file untouched.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="filepath"></param>
+        /// <param name="gt"></param>
+        /// <param name="col"></param>
+        /// <param name="symcol"></param>
+        /// <param name="hasheader"></param>
+        /// <param name="delim"></param>
+        /// <param name="stringformat"></param>
+        /// <param name="debug"></param>
+        /// <returns></returns>
+        public static bool WriteCSV<T>(string filepath, GenericTracker<T> gt, int col, int symcol, bool hasheader, char delim, string stringformat, DebugDelegate debug)
+        {
+            if (!File.Exists(filepath) && hasheader)
+            {
+                if (debug != null)
+                {
+                    debug("file does not exist: " + filepath);
+                    debug("Call InitCSV first on file");
+                }
+                return false;
+            }
+            try
+            {
+                // slurp file in
+                StreamReader sr = new StreamReader(filepath);
+                string file = sr.ReadToEnd();
+                string[] lines = file.Split(Environment.NewLine.ToCharArray());
+                sr.Close();
+                try
+                {
+                    // write back out
+                    StreamWriter sw = new StreamWriter(filepath, false);
+                    // skip first line if we have a header
+                    int start = hasheader ? 1 : 0;
+                    // write header back out if it exists
+                    if (hasheader)
+                        sw.WriteLine(lines[0]);
+                    // test to see if we have custom formating
+                    bool format = stringformat != string.Empty;
+                    // loop through every line in the file
+                    for (int i = start; i < lines.Length; i++)
+                    {
+                        // get all the columns
+                        string[] cols = lines[i].Split(delim);
+                        // get the symbol from the column
+                        string sym = cols[symcol];
+                        // get value from our GT and convert it for writing
+                        cols[col] = format ? string.Format("{0:" + stringformat + "}", gt[sym]) : gt[sym].ToString();
+                        // write the line back out
+                        sw.WriteLine(string.Join(delim.ToString(), cols));
+                    }
+                    sw.Close();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    if (debug != null)
+                    {
+                        debug("error writing file, returning to previous state: " + filepath);
+                        debug(ex.Message + ex.StackTrace);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (debug != null)
+                {
+                    debug(ex.Message + ex.StackTrace);
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// create a csv file
+        /// </summary>
+        /// <param name="filepath"></param>
+        /// <param name="headers"></param>
+        /// <returns></returns>
+        public static bool InitCSV(string filepath, string[] headers) { return InitCSV(filepath, headers, false); }
+        /// <summary>
+        /// create a csv file
+        /// </summary>
+        /// <param name="filepath"></param>
+        /// <param name="headers"></param>
+        /// <param name="overwrite"></param>
+        /// <returns></returns>
+        public static bool InitCSV(string filepath, string[] headers, bool overwrite) { return InitCSV(filepath, headers, overwrite, ','); }
+        /// <summary>
+        /// create a csv file
+        /// </summary>
+        /// <param name="filepath"></param>
+        /// <param name="headers"></param>
+        /// <param name="overwrite"></param>
+        /// <param name="delim"></param>
+        /// <returns></returns>
+        public static bool InitCSV(string filepath, string[] headers, bool overwrite, char delim) { return InitCSV(filepath, headers, overwrite, delim); }
+        /// <summary>
+        /// create a csv file
+        /// </summary>
+        /// <param name="filepath"></param>
+        /// <param name="headers"></param>
+        /// <param name="overwrite"></param>
+        /// <param name="delim"></param>
+        /// <param name="debug"></param>
+        /// <returns></returns>
+        public static bool InitCSV(string filepath, string[] headers, bool overwrite, char delim, DebugDelegate debug)
+        {
+            if (File.Exists(filepath) && !overwrite)
+            {
+                if (debug != null)
+                    debug(filepath + " already exists.");
+                return false;
+            }
+            try
+            {
+                StreamWriter sw = new StreamWriter(filepath, false);
+                if (headers.Length > 0)
+                    sw.WriteLine(string.Join(delim.ToString(), headers));
+                sw.Close();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                if (debug != null)
+                {
+                    debug(ex.Message + ex.StackTrace);
+                }
+            }
+            return false;
         }
     }
 }

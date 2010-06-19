@@ -7,6 +7,8 @@ using System.Reflection;
 using System.Net;
 using TradeLink.API;
 using Microsoft.Win32;
+using System.Xml.Serialization;
+using System.Text;
 
 namespace TradeLink.Common
 {
@@ -761,6 +763,182 @@ namespace TradeLink.Common
                 if (p.ProcessName.ToLower().Contains(PROGRAM.ToLower()))
                     count++;
             return count;
+        }
+        /// <summary>
+        /// convert any structure/type to a string (can be converted back using Deserialize)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        public static string Serialize<T>(T o) { return Serialize(o, false, null); }
+        /// <summary>
+        /// convert any structure/type to a string (can be converted back using Deserialize)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="o"></param>
+        /// <param name="debug"></param>
+        /// <returns></returns>
+        public static string Serialize<T>(T o, DebugDelegate debug) { return Serialize(o, false, debug); }
+        /// <summary>
+        /// convert any structure/type to a string (can be converted back using Deserialize)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="o"></param>
+        /// <param name="compress"></param>
+        /// <param name="debug"></param>
+        /// <returns></returns>
+        public static string Serialize<T>(T o, bool compress, DebugDelegate debug)
+        {
+            try
+            {
+                StringBuilder sb = new StringBuilder();
+                System.IO.StringWriter sw = new System.IO.StringWriter(sb);
+                XmlSerializer xs = new XmlSerializer(o.GetType());
+                xs.Serialize(sw, o);
+                sw.Close();
+                if (!compress)
+                    return sb.ToString();
+                string r = TradeLink.Common.GZip.Compress(sb.ToString());
+                return r;
+            }
+            catch (Exception ex)
+            {
+                if (debug != null)
+                {
+                    debug("unable to save " + TradeLink.Common.Util.DumpObjectProperties(o));
+                    debug(ex.Message + ex.StackTrace);
+                }
+            }
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// deserialize a structure/type from a string
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="msg"></param>
+        /// <returns></returns>
+        public static T Deserialize<T>(string msg) { return Deserialize<T>(msg, false, null); }
+        /// <summary>
+        /// deserialize a structure/type from a string
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="msg"></param>
+        /// <param name="debug"></param>
+        /// <returns></returns>
+        public static T Deserialize<T>(string msg, DebugDelegate debug) { return Deserialize<T>(msg, false, debug); }
+        /// <summary>
+        /// deserialize a structure/type from a string
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="msg"></param>
+        /// <param name="uncompress"></param>
+        /// <param name="debug"></param>
+        /// <returns></returns>
+        public static T Deserialize<T>(string msg, bool uncompress, DebugDelegate debug)
+        {
+
+            try
+            {
+                if (uncompress)
+                    msg = TradeLink.Common.GZip.Uncompress(msg);
+                System.IO.StringReader sr = new System.IO.StringReader(msg);
+                XmlSerializer xs = new XmlSerializer(typeof(T));
+                T O = (T)xs.Deserialize(sr);
+                sr.Close();
+                return O;
+            }
+            catch (Exception ex)
+            {
+                if (debug != null)
+                {
+                    debug("UNABLE TO read: " + msg);
+                    debug(ex.Message + ex.StackTrace);
+                }
+            }
+            return default(T);
+        }
+
+        /// <summary>
+        /// create an xml file from any data structure (can be restored with FromFile)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="o"></param>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        public static bool ToFile<T>(T o, string file) { return ToFile<T>(o, file, null); }
+        /// <summary>
+        /// create an xml file from any data structure (can be restored with FromFile)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="o"></param>
+        /// <param name="file"></param>
+        /// <param name="debug"></param>
+        /// <returns></returns>
+        public static bool ToFile<T>(T o, string file, DebugDelegate debug)
+        {
+            try
+            {
+                string msg = Serialize(o, debug);
+                if (msg == string.Empty) return false;
+                System.IO.StreamWriter sw = new System.IO.StreamWriter(file, false);
+                sw.WriteLine(msg);
+                sw.Close();
+
+            }
+            catch (Exception ex)
+            {
+                if (debug != null)
+                {
+                    debug("error writing filename: " + file);
+                    debug(ex.Message + ex.StackTrace);
+                    return false;
+                }
+            }
+            return true;
+        }
+        /// <summary>
+        /// restore data structure(s) from a file (created with ToFile)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="file"></param>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        public static bool FromFile<T>(string file, ref T o) { return FromFile(file, ref o, null); }
+        /// <summary>
+        /// restore data structure(s) from a file (created with ToFile)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="file"></param>
+        /// <param name="o"></param>
+        /// <param name="debug"></param>
+        /// <returns></returns>
+        public static bool FromFile<T>(string file, ref T o, DebugDelegate debug)
+        {
+            try
+            {
+                if (!File.Exists(file))
+                {
+                    if (debug != null)
+                    {
+                        debug("file does not exist: " + file);
+                        return false;
+                    }
+                }
+                System.IO.StreamReader sr = new System.IO.StreamReader(file);
+                o = Deserialize<T>(sr.ReadToEnd(), debug);
+                sr.Close();
+            }
+            catch (Exception ex)
+            {
+                if (debug != null)
+                {
+                    debug("error writing filename: " + file);
+                    debug(ex.Message + ex.StackTrace);
+                    return false;
+                }
+            }
+            return (o != null) && (o.GetType() == typeof(T));
         }
         
     }
