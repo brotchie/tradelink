@@ -192,6 +192,7 @@
     <Compile Include="Ticket.Designer.cs">
       <DependentUpon>Ticket.cs</DependentUpon>
     </Compile>
+    <Compile Include="TicketTracker.cs" />
     <Compile Include="TickFileFilterControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

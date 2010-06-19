@@ -136,7 +136,78 @@ namespace TradeLink.AppKit
             return true;
         }
 
+        string _sum = string.Empty;
+        public string Summary { get { return _sum; } set { _sum = value; } }
+        string _desc = string.Empty;
+        public string Description { get { return _desc; } set { _desc = value; } }
+        AssemblaPriority _pri = AssemblaPriority.Normal;
+        public AssemblaPriority Priority { get { return _pri; } set { _pri = value; } }
+        AssemblaStatus _stat = AssemblaStatus.New;
+        public AssemblaStatus Status { get { return _stat; } set { _stat = value; } }
+
         public static event DebugFullDelegate SendDebug;
+
+        public override string ToString()
+        {
+            return Summary;
+        }
+
+        /// <summary>
+        /// create a new assembla ticket
+        /// </summary>
+        /// <param name="summary"></param>
+        /// <param name="desc"></param>
+        public AssemblaTicket(string summary, string desc) : this(summary, desc, AssemblaPriority.Normal, AssemblaStatus.New) { }
+
+        /// <summary>
+        /// create a new assembla ticket
+        /// </summary>
+        /// <param name="summary"></param>
+        /// <param name="desc"></param>
+        /// <param name="pri"></param>
+        /// <param name="stat"></param>
+        public AssemblaTicket(string summary, string desc, AssemblaPriority pri, AssemblaStatus stat)
+        {
+            _stat = stat;
+            _pri = pri;
+            _sum = summary;
+            _desc = desc;
+        }
+
+        /// <summary>
+        /// get extra information about this machine (formatted)
+        /// </summary>
+        /// <returns></returns>
+        public static string TicketContext() { return TicketContext("?", "?", null); }
+
+        /// <summary>
+        /// get extra information about this machine (formatted)
+        /// </summary>
+        /// <param name="program"></param>
+        /// <returns></returns>
+        public static string TicketContext(string program) { return TicketContext(program, program, null); }
+
+        /// <summary>
+        /// get extra information about this machine (formatted)
+        /// </summary>
+        /// <param name="program"></param>
+        /// <param name="ex"></param>
+        /// <returns></returns>
+        public static string TicketContext(string program, Exception ex) { return TicketContext(program, program, ex); }
+
+        /// <summary>
+        /// get a formatted description of information about this machine
+        /// </summary>
+        /// <param name="space"></param>
+        /// <param name="program"></param>
+        /// <param name="ex"></param>
+        /// <returns></returns>
+        public static string TicketContext(string space, string program, Exception ex)
+        {
+            string[] r = new string[] { "Product:" + space, "Program:" + program, "Exception:" + (ex != null ? ex.Message : "n/a"), "StackTrace:" + (ex != null ? ex.StackTrace : "n/a"), "CommandLine:" + Environment.CommandLine, "OS:" + Environment.OSVersion.VersionString + " " + (IntPtr.Size * 8).ToString() + "bit", "CLR:" + Environment.Version.ToString(4), "TradeLink:" + TradeLink.Common.Util.TLSIdentity(), "Memory:" + Environment.WorkingSet.ToString(), "Processors:" + Environment.ProcessorCount.ToString(), "MID: "+Auth.GetCPUId() };
+            string desc = string.Join(Environment.NewLine, r);
+            return desc;
+        }
     }
 
     public enum AssemblaPriority
