@@ -122,6 +122,7 @@
     <Compile Include="RingBuffer.cs" />
     <Compile Include="SkinImpl.cs" />
     <Compile Include="ThroughputTracker.cs" />
+    <Compile Include="TickTracker.cs" />
     <Compile Include="TikConstants.cs" />
     <Compile Include="TikReader.cs" />
     <Compile Include="TikUtil.cs" />
