@@ -297,8 +297,18 @@ namespace SterServer
                         string acct = _account != string.Empty ? _account : (accts.Count > 0 ? accts[0] : string.Empty);
                         order.Account = o.Account != string.Empty ? o.Account : acct;
                         order.Destination = o.Exchange != "" ? o.ex : "NYSE";
-                        order.Tif = o.TIF;
-                        if (o.isMarket)
+                        bool close = o.TIF == "CLS";
+                        order.Tif = tif2tif(o.TIF);
+                        if (close)
+                        {
+                            if (o.isMarket)
+                                order.PriceType = STIPriceTypes.ptSTIMktClo;
+                            else if (o.isLimit)
+                                order.PriceType = STIPriceTypes.ptSTILmtClo;
+                            else
+                                order.PriceType = STIPriceTypes.ptSTIClo;
+                        }
+                        else if (o.isMarket)
                             order.PriceType = STIPriceTypes.ptSTIMkt;
                         else if (o.isLimit && o.isStop)
                             order.PriceType = STIPriceTypes.ptSTISvrStpLmt;
@@ -412,6 +422,19 @@ namespace SterServer
                 if (_symsq.isEmpty && _orderq.isEmpty && _cancelq.isEmpty)
                     Thread.Sleep(_SLEEP);
             }
+        }
+
+        string tif2tif(string incoming)
+        {
+            if ((incoming == "OPG") || (incoming == "OPN"))
+            {
+                return "O";
+            }
+            if (incoming == "CLS")
+            {
+                return string.Empty;
+            }
+            return incoming;
         }
 
         Dictionary<long, long> _cancel2order = new Dictionary<long, long>(MAXRECORD);
