@@ -96,6 +96,14 @@ namespace TradeLink.Common
             int.TryParse(r[(int)OffsetInfoFields.MinSize], out min);
             return new OffsetInfo(pd, sd, pp, sd, n, min);
         }
+        /// <summary>
+        /// set an offset to this to disable it
+        /// </summary>
+        /// <returns></returns>
+        public static OffsetInfo DISABLE()
+        {
+            return new OffsetInfo(decimal.MaxValue, decimal.MaxValue, 0, 0, false, 1);
+        }
 
     }
 
