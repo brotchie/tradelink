@@ -153,6 +153,13 @@ Section "TradeLinkSuite"
   File "ServerNxCore\bin\release\NxCoreAPI64.dll"
 
   File "TikConverter\bin\release\TikConverter.exe"
+  
+  File "ServerFIX\bin\release\ServerFIX.exe"
+  File "ServerFIX\bin\release\ServerFIX.exe.config"
+  File "ServerFIX\bin\release\SessionSettings.txt"
+  File "ServerFIX\bin\release\quickfix_net.dll"
+  File "ServerFIX\bin\release\quickfix_net_messages.dll"
+  File "ServerFIX\bin\release\quickfix_net_test.dll"
 
   ; removing brokerserver folder as people transition to single installer
   Delete "$PROGRAMFILES\TradeLink\BrokerServer\*.*"  
