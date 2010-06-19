@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -35,6 +36,10 @@ namespace ServerMB
         Dictionary<string, MbtOpenOrder> orders = new Dictionary<string, MbtOpenOrder>();
         Dictionary<string, bool> cancelids = new Dictionary<string, bool>();
         Dictionary<long, bool> canceledids = new Dictionary<long, bool>();
+        
+        long _lasttime = 0;
+        //TODO: make this configurable from the app.config
+        bool DisableOldTicks;
         
         public ServerMBMain()
         {
@@ -87,7 +92,10 @@ namespace ServerMB
 	    	m_OrderClient.OnHistoryAdded += new _IMbtOrderClientEvents_OnHistoryAddedEventHandler( m_OrderClient_OnHistoryAdded );
 			
             FormClosing += new FormClosingEventHandler(ServerMBMain_FormClosing);
-
+            
+            //disable old ticks
+            //DisableOldTicks = Convert.ToBoolean(ConfigurationSettings.AppSettings["DisableOldTicks"]);
+            DisableOldTicks = true;
         }
         
         void m_Quotes_OnClose(int ErrorCode)
@@ -130,6 +138,8 @@ namespace ServerMB
         void m_OrderClient_OnAccountLoaded(MbtAccount account)
         {
         	debug(String.Format("account loaded:{0}", account.Account));
+        	debug(String.Format("account details:{0}", DisplayAccount(account)));
+        	debug(String.Format("Default is:{0}", m_OrderClient.Accounts.DefaultAccount.Account));
         }
 
         void m_OrderClient_OnAccountUnavailable(MbtAccount account)
@@ -404,7 +414,7 @@ namespace ServerMB
             o.id = tlid;
             o.side = ( pOrd.BuySell == MBConst.VALUE_BUY );
             o.price = (decimal)pOrd.Price;
-            o.stopp = (decimal)pOrd.StopLimit;
+            o.stopp = (decimal)pOrd.StopPrice;
             o.TIF = pOrd.TimeInForce == MBConst.VALUE_DAY ? "DAY" : "GTC";
             o.time = Util.DT2FT(pOrd.UTCDateTime);
             o.date = Util.ToTLDate(pOrd.UTCDateTime);
@@ -414,10 +424,15 @@ namespace ServerMB
         
         TradeImpl ToTradeLinkFill(MbtOpenOrder pOrd, MbtOrderHistory pHist)
         {
+        	//debug(String.Format("pOrd\n{0}\n\npHist\n{1}", Util.DumpObjectProperties(pOrd), Util.DumpObjectProperties(pHist)));
+        	debug(String.Format("pOrd: {0}", DisplayOrder(pOrd)));
+        	//TODO:Add hstory to this debug
         	TradeImpl f = new TradeImpl();
         	f.symbol = pOrd.Symbol;
         	f.Account = pOrd.Account.Account;
-        	f.xprice = (pOrd.Price > 0) ? (decimal)pOrd.Price : (decimal)pOrd.StopLimit;
+        	//f.xprice = (pOrd.Price > 0) ? (decimal)pOrd.Price : (decimal)pOrd.StopLimit;
+        	//f.xprice = Math.Abs((decimal)pOrd.Price);
+        	f.xprice = (decimal)pHist.Price;
         	//f.xsize = pHist.Event == "Executed" ? pHist.Quantity : pHist.SharesFilled;
         	f.xsize = pHist.Quantity;
         	f.side = ( pOrd.BuySell == MBConst.VALUE_BUY );
@@ -458,9 +473,9 @@ namespace ServerMB
         void m_OrderClient_OnHistoryAdded(MbtOrderHistory pHist)
         {
         	long tlid = 0;
-        	double price = (pHist.Price != 0 ) ? pHist.Price : pHist.StopLimit;
+        	double price = (pHist.Price != 0 ) ? pHist.Price : pHist.StopPrice;
         	broker2tl.TryGetValue(pHist.OrderNumber, out tlid);
-        	debug(String.Format("OnHistoryAdded {0} {1} {2} {3} {4} {5}", pHist.Symbol, pHist.Event, pHist.OrderNumber, tlid, price, pHist.Quantity));
+        	debug(String.Format("OnHistoryAdded {0} {1} {2} {3} {4} {5} {6}", pHist.Symbol, pHist.Event, pHist.OrderNumber, tlid, price, pHist.Quantity, pHist.Message));
         	switch( pHist.Event )
         	{
         		case "Accepted":
@@ -627,6 +642,17 @@ namespace ServerMB
 				}
 			}
         }
+        
+        void SendNewTick(TickImpl k)
+        {
+        	if (!DisableOldTicks)
+        		tl.newTick(k);
+        	else if (k.datetime >= _lasttime)
+        	{
+        		_lasttime = k.datetime;
+        		tl.newTick(k);
+        	}
+        }
 
         void MBTQUOTELib.IMbtQuotesNotify.OnOptionsData(ref OPTIONSRECORD pRec)
         {
@@ -657,7 +683,8 @@ namespace ServerMB
                     break;
             }
 
-            tl.newTick(k);
+            //tl.newTick(k);
+            SendNewTick(k);
         }
         
         /// <summary>
@@ -670,18 +697,17 @@ namespace ServerMB
         {
         	TickImpl k = new TickImpl(pQuote.bstrSymbol);
             k.time = Util.DT2FT(pQuote.UTCDateTime);
-            k.date = Util.ToTLDate(pQuote.UTCDateTime);
+            k.date = Util.ToTLDate(DateTime.UtcNow.Date);
             k.ask = (decimal)pQuote.dAsk;
             k.bid = (decimal)pQuote.dBid;
             k.os = k.AskSize = pQuote.lAskSize;
             k.bs = k.BidSize = pQuote.lBidSize;
             k.ex = k.be = k.oe = pQuote.bstrMarket;
-            //k.trade = k.bid;
-            tl.newTick(k);
+            SendNewTick(k);
         }
         
         /// <summary>
-        /// Process Level2 data but this currently causes issues with creating valid orders and needs more investigation.
+        /// Processing Level2 data requires tracking the actual current best ask and bid. That's on the TODO
         /// Currently using Level1 data from OnQuoteData
         /// </summary>
         /// <param name="pRec"></param>
@@ -690,6 +716,7 @@ namespace ServerMB
             TickImpl k = new TickImpl(pRec.bstrSymbol);
             k.ex = pRec.bstrSource;
             k.time = Util.DT2FT(pRec.UTCTime);
+            k.date = Util.ToTLDate(DateTime.UtcNow.Date);
             enumMarketSide ems = (enumMarketSide)pRec.side;
             switch (ems)
             {
@@ -708,8 +735,7 @@ namespace ServerMB
                     k.size = k.BidSize;
                     break;
             }
-            //k.trade = k.hasAsk ? k.ask : k.bid;
-            tl.newTick(k);
+            SendNewTick(k);
         }
 
 
@@ -723,7 +749,6 @@ namespace ServerMB
             test(o);
             string strType = "MBConst.VALUE_MARKET";
             int side = o.side ? MBConst.VALUE_BUY : MBConst.VALUE_SELL;
-            //int tif = MBConst.VALUE_DAY;
             int tif = MBConst.VALUE_GTC;
             //TODO: need to modify type depending on the type of order
             int otype = MBConst.VALUE_MARKET;
@@ -766,15 +791,41 @@ namespace ServerMB
             string res = null;
             string token = null;
             MbtAccount m_account = getaccount(o.Account);
-            bool good = m_OrderClient.Submit(side, o.UnsignedSize, o.symbol, (double)o.price, (double)o.stopp, tif, 0, otype, voltype, 0, m_account, route, "", 0, 0, dt, dt, 0, 0, 0, 0, 0, ref res);
+            //bool good = m_OrderClient.Submit(side, o.UnsignedSize, o.symbol, (double)o.price, (double)o.stopp, tif, 0, otype, voltype, 0, m_account, route, "", 0, 0, dt, dt, 0, 0, 0, 0, 0, ref res);
+            bool good = m_OrderClient.Submit(
+            	side, //lBuySell
+            	o.UnsignedSize,
+            	o.symbol,
+            	(double)o.price,
+            	(double)o.stopp,
+            	tif,
+            	0,
+            	otype,
+            	voltype,
+            	0, //lDisplayQty
+            	m_account,
+            	route,
+            	"", //Deprecated - bstrPrefMMID
+            	0, //dPriceOther
+            	0, //dPriceOther2
+            	dt, //timeActivate - previously not used, not sure at the moment
+            	dt, //timeExpire - previously not used and not yet in the new UI, still checking on this
+            	0, //lExpMonth
+            	0, //lExpYear
+            	0, //dStrikePrice
+            	"", //bstrCondSymbol - just added, not sure if it's implemented yet
+            	0, //lCondType - just implemented
+            	0, //dCondPrice - just added, not sure if it's implemented yet
+            	//0, //lPriceVsSpeed
+            	ref res);
             if (!good)
             {
-            	debug(String.Format("The following order failed: {0}\nreason:{1}",o, res));
+            	debug(String.Format("The following order failed: {0}\nreason:{1} {2}",o, o.Account, res));
             }
             else
             {
             	token = res;
-            	debug(String.Format("Order sent to server and waiting success: {0}\ninfo: {1}", o, token));
+            	debug(String.Format("Order sent to server and waiting success: {0}\ninfo: {1} {2}", o, o.Account, token));
             	// if the order ID is not 0, map it to the token
             	if( o.id != 0 )
             	{
@@ -856,6 +907,37 @@ namespace ServerMB
         {
             CrashReport.Report(PROGRAM, string.Empty, string.Empty, _dw.Content, null, null, false);
         }
+        
+        /// <summary>
+        /// Return a descriptive string of this order
+        /// TODO: one for history as well
+        /// </summary>
+        /// <param name="order"></param>
+        /// <returns></returns>
+		string DisplayOrder( MbtOpenOrder order) {
+			//string orderType = ( order.OrderType == MBConst.VALUE_MARKET ) ? MBConst.TYPE_MARKET : MBConst.TYPE_STOP;
+			string retVal = "";
+			retVal += "BuySell="+(order.BuySell==MBConst.VALUE_BUY?"Buy":"Sell");
+			retVal += ",Symbol="+order.Symbol;
+			retVal += ",Quantity="+order.Quantity;
+			retVal += ",Price="+order.Price;
+			retVal += ",OrderType=" + order.OrderType; //compare with OrderType values
+			retVal += ",OrderNumber="+order.OrderNumber;
+			retVal += ",Token="+order.Token;
+			retVal += ",SharesFilled="+order.SharesFilled;
+			return retVal;
+		}
+        
+		string DisplayAccount( MbtAccount acct) {
+			string retVal = "";
+			retVal += "Equity="+acct.CurrentEquity;
+			retVal += ",Excess="+acct.CurrentExcess;
+			retVal += ",MMRUsed="+acct.MMRUsed;
+			retVal += ",MMRMultiplier="+acct.MMRMultiplier;
+			retVal += ",PermedForForex="+acct.PermedForForex;
+			return retVal;
+		}
+
     }
 
     public static class MBConst

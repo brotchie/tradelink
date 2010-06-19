@@ -70,21 +70,17 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Interop.MBTCOMLib, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\Interop.MBTCOMLib.dll</HintPath>
+    <Reference Include="Interop.MBTCOMLib">
+      <HintPath>Interop.MBTCOMLib.dll</HintPath>
     </Reference>
-    <Reference Include="Interop.MBTHISTLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\Interop.MBTHISTLib.dll</HintPath>
+    <Reference Include="Interop.MBTHISTLib">
+      <HintPath>Interop.MBTHISTLib.dll</HintPath>
     </Reference>
-    <Reference Include="Interop.MBTORDERSLib, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\Interop.MBTORDERSLib.dll</HintPath>
+    <Reference Include="Interop.MBTORDERSLib">
+      <HintPath>Interop.MBTORDERSLib.dll</HintPath>
     </Reference>
-    <Reference Include="Interop.MBTQUOTELib, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\Interop.MBTQUOTELib.dll</HintPath>
+    <Reference Include="Interop.MBTQUOTELib">
+      <HintPath>Interop.MBTQUOTELib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
