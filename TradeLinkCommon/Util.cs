@@ -323,6 +323,7 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="filepath"></param>
         /// <returns></returns>
+        [Obsolete]
         public static int BuildFromFile(string filepath)
         {
             string builds = "";
@@ -352,7 +353,19 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="program"></param>
         /// <returns></returns>
+        [Obsolete]
         public static int BuildFromRegistry(string program)
+        {
+
+            return ProgramBuild(program);
+        }
+        /// <summary>
+        /// gets build for specific installed program.
+        /// returns 0 if not installed or error.
+        /// </summary>
+        /// <param name="program"></param>
+        /// <returns></returns>
+        public static int ProgramBuild(string program)
         {
             try
             {
@@ -368,8 +381,8 @@ namespace TradeLink.Common
                 // unable to find version
             }
             return 0;
-            
         }
+
         /// <summary>
         /// Gets string representing the version of this suite.
         /// </summary>
