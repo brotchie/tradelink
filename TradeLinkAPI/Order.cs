@@ -110,11 +110,17 @@ namespace TradeLink.API
         /// <returns></returns>
         bool Fill(Order o);
         /// <summary>
-        /// try to fill order against tick
+        /// try to fill order against trade
         /// </summary>
         /// <param name="t"></param>
         /// <returns></returns>
         bool Fill(Tick t);
+        /// <summary>
+        /// try to fill order against trade or bid/ask
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        bool Fill(Tick t, bool bidask, bool fillopg);
         /// <summary>
         /// try to fill order as OPG order
         /// </summary>

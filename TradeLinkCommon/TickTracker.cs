@@ -160,14 +160,56 @@ namespace TradeLink.Common
         /// <returns></returns>
         public Tick Tick(int idx)
         {
-            Tick k = new TickImpl(last.getlabel(idx));
-            k.trade = last[idx];
-            k.bid = bid[idx];
-            k.ask = ask[idx];
-            k.os = 1;
-            k.bs = 1;
-            k.size = 1;
-            return k;
+            return this[idx];
+        }
+        /// <summary>
+        /// get a tick in tick format
+        /// </summary>
+        /// <param name="sym"></param>
+        /// <returns></returns>
+        public Tick Tick(string sym)
+        {
+            return this[sym];
+        }
+        /// <summary>
+        /// get a tick in tick format
+        /// </summary>
+        /// <param name="sym"></param>
+        /// <returns></returns>
+        public Tick this[int idx]
+        {
+            get
+            {
+                Tick k = new TickImpl(last.getlabel(idx));
+                k.trade = last[idx];
+                k.bid = bid[idx];
+                k.ask = ask[idx];
+                k.os = 1;
+                k.bs = 1;
+                k.size = 1;
+                return k;
+            }
+        }
+        /// <summary>
+        /// get a tick in tick format
+        /// </summary>
+        /// <param name="sym"></param>
+        /// <returns></returns>
+        public Tick this[string sym]
+        {
+            get
+            {
+                int idx = last.getindex(sym);
+                if (idx < 0) return new TickImpl();
+                Tick k = new TickImpl(last.getlabel(idx));
+                k.trade = last[idx];
+                k.bid = bid[idx];
+                k.ask = ask[idx];
+                k.os = 1;
+                k.bs = 1;
+                k.size = 1;
+                return k;
+            }
         }
 
         /// <summary>
