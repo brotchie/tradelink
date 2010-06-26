@@ -143,8 +143,10 @@ namespace WinGauntlet
             status("Started: " + ga.ResponseName);
             // prepare simulator
             h = new HistSimImpl(ga.Folder,ga.Filter);
-            h.SimBroker.UseBidAskFills = _usebidask.Checked;
             h.GotDebug += new DebugDelegate(h_GotDebug);
+            h.CacheWait = 1000;
+            h.Initialize();
+            h.SimBroker.UseBidAskFills = _usebidask.Checked;
             h.GotTick += new TickDelegate(h_GotTick);
             h.SimBroker.GotFill+=new FillDelegate(args.Response.GotFill);
             h.SimBroker.GotOrder+=new OrderDelegate(args.Response.GotOrder);
