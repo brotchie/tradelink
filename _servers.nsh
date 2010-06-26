@@ -7,7 +7,7 @@ Section "TradeLibFast"
 	DetailPrint "Installing version ${VERSION}..."
   SectionIn RO
   SetOutPath $INSTDIR
-  CreateDirectory "$SMPROGRAMS\TradeLink"
+  CreateDirectory "$SMPROGRAMS\TradeLink Connectors"
   
   ; files included in install
   File "BrokerServers\release\TradeLibFast.dll"
@@ -26,7 +26,7 @@ SectionEnd
 Section "AnvilServer"
 
 
-  CreateShortCut "$SMPROGRAMS\TradeLink\Assent.lnk" "$INSTDIR\${ANVILDIRNAME}\Anvil.exe" "" "$INSTDIR\${ANVILDIRNAME}\Anvil.exe" 0
+  CreateShortCut "$SMPROGRAMS\TradeLink Connectors\Assent.lnk" "$INSTDIR\${ANVILDIRNAME}\Anvil.exe" "" "$INSTDIR\${ANVILDIRNAME}\Anvil.exe" 0
   ; Put file there
   File /nonfatal /r "BrokerServers\Install\${ANVILDIRNAME}" 
   File "/oname=$INSTDIR\${ANVILDIRNAME}\AnvilServer.dll" "BrokerServers\AnvilServer\Release\AnvilServer.dll"
@@ -39,7 +39,7 @@ Section "InteractiveBrokers Server"
   File "BrokerServers\release\TWSServer.exe"
   File "BrokerServers\TWSServer\TwsSocketClient.dll"
   File "BrokerServers\release\TwsServer.Config.txt"
-  CreateShortCut "$SMPROGRAMS\TradeLink\InteractiveBrokers.lnk" "$INSTDIR\TWSServer.exe" "" "$INSTDIR\TWSServer.exe" 0
+  CreateShortCut "$SMPROGRAMS\TradeLink Connectors\InteractiveBrokers.lnk" "$INSTDIR\TWSServer.exe" "" "$INSTDIR\TWSServer.exe" 0
 SectionEnd
 
 Section "Genesis Server"
@@ -47,7 +47,7 @@ Section "Genesis Server"
   File "BrokerServers\release\GTAPI.dll"  
   File "BrokerServers\ServerGenesis\GenesisServer.Config.txt"
   File "BrokerServers\ServerGenesis\GenesisServer.Login.txt"
-  CreateShortCut "$SMPROGRAMS\TradeLink\Genesis.lnk" "$INSTDIR\ServerGenesis.EXE" "" "$INSTDIR\ServerGenesis.EXE" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink Connectors\Genesis.lnk" "$INSTDIR\ServerGenesis.EXE" "" "$INSTDIR\ServerGenesis.EXE" 0  
 SectionEnd
 
 

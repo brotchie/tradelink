@@ -45,9 +45,13 @@ Section "TradeLinkSuite"
   SetOutPath $INSTDIR
   DetailPrint "Installing version ${PVERSION}..."
   ; remove existing shortcuts and recreate
-  	
-  
+  Delete "$SMPROGRAMS\TradeLink\*.*"
+  Delete "$SMPROGRAMS\TradeLink Connectors\*.*"
+  RMDir "$SMPROGRAMS\TradeLink"
+  RMDir "$SMPROGRAMS\TradeLink Connectors"
+
   CreateDirectory "$SMPROGRAMS\TradeLink"
+  CreateDirectory "$SMPROGRAMS\TradeLink Connectors"
   CreateShortCut "$SMPROGRAMS\TradeLink\Asp.lnk" "$INSTDIR\ASP.exe" "" "$INSTDIR\ASP.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Quotopia.lnk" "$INSTDIR\Quotopia.exe" "" "$INSTDIR\Quotopia.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Gauntlet.lnk" "$INSTDIR\Gauntlet.exe" "" "$INSTDIR\Gauntlet.exe" 0
@@ -57,18 +61,17 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\Uninstall TradeLink.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Kadina.lnk" "$INSTDIR\Kadina.EXE" "" "$INSTDIR\Kadina.EXE" 0 
   CreateShortCut "$SMPROGRAMS\TradeLink\Record.lnk" "$INSTDIR\Record.EXE" "" "$INSTDIR\Record.EXE" 0  
-  CreateShortCut "$SMPROGRAMS\TradeLink\SterlingPro.lnk" "$INSTDIR\SterServer.EXE" "" "$INSTDIR\SterServer.EXE" 0  
-  CreateShortCut "$SMPROGRAMS\TradeLink\TDAmeritrade.lnk" "$INSTDIR\TDServer.EXE" "" "$INSTDIR\TDServer.EXE" 0  
-  CreateShortCut "$SMPROGRAMS\TradeLink\TDAmeritradeX.lnk" "$INSTDIR\TDServerX.EXE" "" "$INSTDIR\TDServerX.EXE" 0  
-  CreateShortCut "$SMPROGRAMS\TradeLink\MBTrading.lnk" "$INSTDIR\ServerMB.EXE" "" "$INSTDIR\ServerMB.EXE" 0  
-  CreateShortCut "$SMPROGRAMS\TradeLink\Esignal.lnk" "$INSTDIR\ServerEsignal.exe" "" "$INSTDIR\ServerEsignal.exe" 0  
-  CreateShortCut "$SMPROGRAMS\TradeLink\DBFX.lnk" "$INSTDIR\ServerDBFX.exe" "" "$INSTDIR\ServerDBFX.exe" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink Connectors\SterlingPro.lnk" "$INSTDIR\SterServer.EXE" "" "$INSTDIR\SterServer.EXE" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink Connectors\TDAmeritrade.lnk" "$INSTDIR\TDServer.EXE" "" "$INSTDIR\TDServer.EXE" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink Connectors\TDAmeritradeX.lnk" "$INSTDIR\TDServerX.EXE" "" "$INSTDIR\TDServerX.EXE" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink Connectors\MBTrading.lnk" "$INSTDIR\ServerMB.EXE" "" "$INSTDIR\ServerMB.EXE" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink Connectors\Esignal.lnk" "$INSTDIR\ServerEsignal.exe" "" "$INSTDIR\ServerEsignal.exe" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink Connectors\DBFX.lnk" "$INSTDIR\ServerDBFX.exe" "" "$INSTDIR\ServerDBFX.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\TikConverter.lnk" "$INSTDIR\TikConverter.exe" "" "$INSTDIR\TikConverter.exe" 0
-  CreateShortCut "$SMPROGRAMS\TradeLink\Blackwood.lnk" "$INSTDIR\ServerBlackwood.exe" "" "$INSTDIR\ServerBlackwood.exe" 0  
-  CreateShortCut "$SMPROGRAMS\TradeLink\REDI.lnk" "$INSTDIR\ServerRedi.exe" "" "$INSTDIR\ServerRedi.exe" 0  
-  CreateShortCut "$SMPROGRAMS\TradeLink\LogViewer.lnk" "$INSTDIR\LogViewer.exe" "" "$INSTDIR\LogViewer.exe" 0  
-  CreateShortCut "$SMPROGRAMS\TradeLink\IQFeed.lnk" "$INSTDIR\IQFeedBroker.exe" "" "$INSTDIR\IQFeedBroker.exe" 0  
-  CreateShortCut "$SMPROGRAMS\TradeLink\NxCore.lnk" "$INSTDIR\ServerNxCore.exe" "" "$INSTDIR\ServerNxCore.exe" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink Connectors\Blackwood.lnk" "$INSTDIR\ServerBlackwood.exe" "" "$INSTDIR\ServerBlackwood.exe" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink Connectors\REDI.lnk" "$INSTDIR\ServerRedi.exe" "" "$INSTDIR\ServerRedi.exe" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink Connectors\IQFeed.lnk" "$INSTDIR\IQFeedBroker.exe" "" "$INSTDIR\IQFeedBroker.exe" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink Connectors\NxCore.lnk" "$INSTDIR\ServerNxCore.exe" "" "$INSTDIR\ServerNxCore.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink\TickData.lnk" "$LOCALAPPDATA\TradeLinkTicks\" "" "$LOCALAPPDATA\TradeLinkTicks" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Logs.lnk" "$LOCALAPPDATA\" "" "$LOCALAPPDATA\" 0
   
@@ -293,9 +296,11 @@ Section "Uninstall"
   RMDir "$INSTDIR\Properties"
     ; Remove shortcuts, if any
   Delete "$SMPROGRAMS\TradeLink\*.*"
+  Delete "$SMPROGRAMS\TradeLink Connectors\*.*"
 
   ; Remove directories used
   RMDir "$SMPROGRAMS\TradeLink"
+  RMDir "$SMPROGRAMS\TradeLink Connectors"
   RMDir "$INSTDIR"
 
   SectionEnd
