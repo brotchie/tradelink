@@ -380,12 +380,14 @@ namespace WinGauntlet
 
         private void boxlist_SelectedIndexChanged(object sender, EventArgs e)
         {
+            string rname = string.Empty;
             try
             {
-                args.Response = ResponseLoader.FromDLL((string)reslist.SelectedItem, args.DllName);
+                rname = (string)reslist.SelectedItem;
+                args.Response = ResponseLoader.FromDLL(rname, args.DllName);
             }
             catch (Exception ex) { status("Response failed to load, quitting... (" + ex.Message + (ex.InnerException != null ? ex.InnerException.Message.ToString() : "") + ")"); }
-            if (!args.Response.isValid) { status("Response did not load or loaded in a shutdown state. "+args.Response.Name+ " "+args.Response.FullName); return; }
+            if ((args==null) || (args.Response==null) || !args.Response.isValid) { status("Response did not load or loaded in a shutdown state. "+rname); return; }
             args.ResponseName = args.Response.FullName;
             _boundonce = false;
             bindresponseevents();
