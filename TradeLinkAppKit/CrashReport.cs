@@ -119,6 +119,7 @@ namespace TradeLink.AppKit
         {
             Report(PROGRAM, username, password, data, ex, success, pause, Desc(PROGRAM));
         }
+        public static void Report(string PROGRAM, string data, Exception ex, AssemblaTicketWindow.LoginSucceedDel success, bool pause, string desc) { Report(PROGRAM, Util.decode(D), Util.decode(d), data, ex, success, pause, desc); }
         public static void Report(string PROGRAM, string username, string password, string data, Exception ex,AssemblaTicketWindow.LoginSucceedDel success,bool pause,string desc)
         {
             CrashReport cr = new CrashReport(PROGRAM, username, password, ex,data,desc);
