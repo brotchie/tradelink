@@ -25,6 +25,12 @@ namespace TradeLink.Common
             bid = new GenericTracker<decimal>(_estlabels);
             ask = new GenericTracker<decimal>(_estlabels);
             last = new GenericTracker<decimal>(_estlabels);
+            bs = new GenericTracker<int>(_estlabels);
+            be = new GenericTracker<string>(_estlabels);
+            oe = new GenericTracker<string>(_estlabels);
+            os = new GenericTracker<int>(_estlabels);
+            ts = new GenericTracker<int>(_estlabels);
+            ex = new GenericTracker<string>(_estlabels);
             // setup generic trackers to track tick information
             last.NewTxt += new TextIdxDelegate(last_NewTxt);
         }
@@ -33,11 +39,23 @@ namespace TradeLink.Common
         {
             bid.addindex(txt, 0);
             ask.addindex(txt, 0);
+            bs.addindex(txt, 0);
+            os.addindex(txt, 0);
+            ts.addindex(txt, 0);
+            ex.addindex(txt, string.Empty);
+            be.addindex(txt, string.Empty);
+            oe.addindex(txt, string.Empty);
         }
 
         GenericTracker<decimal> bid;
         GenericTracker<decimal> ask;
         GenericTracker<decimal> last;
+        GenericTracker<int> bs;
+        GenericTracker<int> os;
+        GenericTracker<int> ts;
+        GenericTracker<string> be;
+        GenericTracker<string> oe;
+        GenericTracker<string> ex;
         /// <summary>
         /// track a new symbol
         /// </summary>
@@ -182,11 +200,14 @@ namespace TradeLink.Common
             {
                 Tick k = new TickImpl(last.getlabel(idx));
                 k.trade = last[idx];
+                k.size = ts[idx];
+                k.ex = ex[idx];
                 k.bid = bid[idx];
+                k.bs = bs[idx];
+                k.be = be[idx];
                 k.ask = ask[idx];
-                k.os = 1;
-                k.bs = 1;
-                k.size = 1;
+                k.os = os[idx];
+                k.oe = oe[idx];
                 return k;
             }
         }
@@ -203,11 +224,14 @@ namespace TradeLink.Common
                 if (idx < 0) return new TickImpl();
                 Tick k = new TickImpl(last.getlabel(idx));
                 k.trade = last[idx];
+                k.size = ts[idx];
+                k.ex = ex[idx];
                 k.bid = bid[idx];
+                k.bs = bs[idx];
+                k.be = be[idx];
                 k.ask = ask[idx];
-                k.os = 1;
-                k.bs = 1;
-                k.size = 1;
+                k.os = os[idx];
+                k.oe = oe[idx];
                 return k;
             }
         }
@@ -222,11 +246,23 @@ namespace TradeLink.Common
             if (idx < 0) return;
             // update bid/ask/last
             if (k.isTrade)
+            {
                 last[idx] = k.trade;
+                ex[idx] = k.ex;
+                ts[idx] = k.size;
+            }
             if (k.hasAsk)
+            {
                 ask[idx] = k.ask;
+                oe[idx] = k.oe;
+                os[idx] = k.os;
+            }
             if (k.hasBid)
+            {
                 bid[idx] = k.bid;
+                bs[idx] = k.bs;
+                be[idx] = k.be;
+            }
         }
         /// <summary>
         /// update the tracker with a new tick
@@ -239,11 +275,23 @@ namespace TradeLink.Common
             if (idx < 0) return false;
             // update bid/ask/last
             if (k.isTrade)
+            {
                 last[idx] = k.trade;
+                ex[idx] = k.ex;
+                ts[idx] = k.size;
+            }
             if (k.hasAsk)
+            {
                 ask[idx] = k.ask;
+                oe[idx] = k.oe;
+                os[idx] = k.os;
+            }
             if (k.hasBid)
+            {
                 bid[idx] = k.bid;
+                bs[idx] = k.bs;
+                be[idx] = k.be;
+            }
             return true;
         }
     }
