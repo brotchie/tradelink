@@ -35,6 +35,7 @@ namespace Replay
             tl.newUnknownRequest += new UnknownMessageDelegate(tl_newUnknownRequest);
             tl.DOMRequest += new Int64Delegate(tl_DOMRequest);
             h.GotTick += new TickDelegate(h_GotTick);
+            h.SimBroker.UseBidAskFills = Properties.Settings.Default.UseBidAskFills;
             h.SimBroker.GotOrder += new OrderDelegate(SimBroker_GotOrder);
             h.SimBroker.GotFill += new FillDelegate(SimBroker_GotFill);
             h.SimBroker.GotOrderCancel += new OrderCancelDelegate(SimBroker_GotOrderCancel);

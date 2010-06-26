@@ -49,6 +49,7 @@ namespace Kadina
         {
             TrackEnabled = Util.TrackUsage();
             Program = PROGRAM;
+            h.SimBroker.UseBidAskFills = Properties.Settings.Default.UseBidAskFills;
             InitializeComponent();
             initgrids();
             InitContext();

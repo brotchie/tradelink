@@ -119,6 +119,12 @@ namespace TradeLink.Common
             return add;
         }
 
+        bool _usebidaskfill = false;
+        /// <summary>
+        /// whether bid/ask is used to fill orders.  if false, last trade is used.
+        /// </summary>
+        public bool UseBidAskFills { get { return _usebidaskfill; } set { _usebidaskfill = value; } }
+
         protected void AddOrder(Order o,Account a) 
         {
             if (!a.isValid) throw new Exception("Invalid account provided"); // account must be good
@@ -293,14 +299,14 @@ namespace TradeLink.Common
                             (o.symbol.Length > 3))
                         {
                             // it's the opening tick, so fill it as an opg
-                            filled = o.Fill(tick, true);
+                            filled = o.Fill(tick,_usebidaskfill, true);
                             // mark this symbol as already being open
                             hasopened.Add(tick.symbol);
                         }
 
                     } 
                     else // otherwise fill order normally
-                        filled = o.Fill(tick); // fill our trade
+                        filled = o.Fill(tick,_usebidaskfill,false); // fill our trade
                     if (filled)
                     {
                         // remove filled size from size available in trade

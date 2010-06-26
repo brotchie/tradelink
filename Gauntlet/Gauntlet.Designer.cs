@@ -62,6 +62,7 @@ namespace WinGauntlet
             this._resulttab = new System.Windows.Forms.TabPage();
             this.tradeResults1 = new TradeLink.AppKit.TradeResults();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this._usebidask = new System.Windows.Forms.CheckBox();
             this.tabs.SuspendLayout();
             this.studypage.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -203,6 +204,7 @@ namespace WinGauntlet
             // 
             // optionpage
             // 
+            this.optionpage.Controls.Add(this._usebidask);
             this.optionpage.Controls.Add(this._indicatcsv);
             this.optionpage.Controls.Add(this._debugfile);
             this.optionpage.Controls.Add(this._unique);
@@ -444,6 +446,7 @@ namespace WinGauntlet
             // 
             // tradeResults1
             // 
+            this.tradeResults1.AutoWatch = false;
             this.tradeResults1.BackColor = System.Drawing.Color.White;
             this.tradeResults1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tradeResults1.Location = new System.Drawing.Point(3, 3);
@@ -451,6 +454,20 @@ namespace WinGauntlet
             this.tradeResults1.Path = "C:\\Users\\jfranta\\Documents";
             this.tradeResults1.Size = new System.Drawing.Size(615, 503);
             this.tradeResults1.TabIndex = 0;
+            // 
+            // _usebidask
+            // 
+            this._usebidask.AutoSize = true;
+            this._usebidask.Checked = global::WinGauntlet.Properties.Settings.Default.UseBidAskFills;
+            this._usebidask.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "UseBidAskFills", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this._usebidask.Location = new System.Drawing.Point(306, 290);
+            this._usebidask.Name = "_usebidask";
+            this._usebidask.Size = new System.Drawing.Size(149, 24);
+            this._usebidask.TabIndex = 29;
+            this._usebidask.Text = "Use Bid/Ask Fills";
+            this.toolTip1.SetToolTip(this._usebidask, "Use Bid/Ask to fill orders, otherwise last trade is used.  This should generally " +
+                    "be enabled for for-ex");
+            this._usebidask.UseVisualStyleBackColor = true;
             // 
             // Gauntlet
             // 
@@ -510,6 +527,7 @@ namespace WinGauntlet
         private System.Windows.Forms.CheckBox _debugs;
         private System.Windows.Forms.TabPage _resulttab;
         private TradeLink.AppKit.TradeResults tradeResults1;
+        private System.Windows.Forms.CheckBox _usebidask;
     }
 }
 

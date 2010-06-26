@@ -106,5 +106,17 @@ namespace WinGauntlet.Properties {
                 this["csvnamesunique"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool UseBidAskFills {
+            get {
+                return ((bool)(this["UseBidAskFills"]));
+            }
+            set {
+                this["UseBidAskFills"] = value;
+            }
+        }
     }
 }
