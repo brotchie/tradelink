@@ -58,7 +58,7 @@ namespace TradeLink.Common
         /// </summary>
         public int AlertThreshold { get { return _defaultwait; } set { _defaultwait = value; } }
 
-        Thread _bw = null;
+        System.ComponentModel.BackgroundWorker _bw = null;
         volatile int _lasttime = 0;
         /// <summary>
         /// most recent time received
@@ -141,22 +141,7 @@ namespace TradeLink.Common
         }
 
         bool _continue = true;
-        void backgroundpoll()
-        {
-            while (_continue)
-            {
-                if (PollProcess != null)
-                    PollProcess(_lasttime);
-                if ((GotMassAlert != null) && (_defaultwait!=0))
-                {
-                    int span = Util.FTDIFF(_lasttime, Util.DT2FT(DateTime.Now));
-                    bool alert = span > _defaultwait;
-                    if (alert)
-                        GotMassAlert(_lasttime);
-                }
-                System.Threading.Thread.Sleep((int)_pollint);
-            }
-        }
+
         public event Int32Delegate PollProcess;
         long _pollint = 0;
         public const int DEFAULTPOLLINT = 1000;
@@ -179,12 +164,44 @@ namespace TradeLink.Common
         {
             if ((_bw ==null) && (_pollint!=0))
             {
-                _bw = new Thread(this.backgroundpoll);
-                _bw.Start();
+                _bw = new System.ComponentModel.BackgroundWorker();
+                _bw.DoWork += new System.ComponentModel.DoWorkEventHandler(_bw_DoWork);
+                _bw.WorkerSupportsCancellation = true;
+                _bw.RunWorkerAsync();
             }
-            else if ((_bw!=null) && (_bw.ThreadState== ThreadState.Stopped))
+            else if ((_bw!=null) && !_continue)
             {
-                _bw.Start();
+                _continue = true;
+                _bw.RunWorkerAsync();
+            }
+        }
+
+        bool _alerting = false;
+        /// <summary>
+        /// whether mass alert is firing or not
+        /// </summary>
+        public bool isMassAlerting { get { return _alerting; } }
+        void _bw_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+            while (_continue)
+            {
+                if (_bw.CancellationPending || e.Cancel)
+                    break;
+                if (PollProcess != null)
+                    PollProcess(_lasttime);
+                if ((GotMassAlert != null) && (_defaultwait != 0) && (_lasttime!=0))
+                {
+                    int span = Util.FTDIFF(_lasttime, Util.DT2FT(DateTime.Now));
+                    bool alert = span > _defaultwait;
+                    if (alert && !_alerting)
+                    {
+                        _alerting = true;
+                        GotMassAlert(_lasttime);
+                    }
+                    else if (!alert && _alerting)
+                        _alerting = false;
+                }
+                System.Threading.Thread.Sleep((int)_pollint);
             }
         }
 
@@ -192,19 +209,7 @@ namespace TradeLink.Common
         {
             // flag to stop
             _continue = false;
-            // wait a moment 
-            System.Threading.Thread.Sleep(100);
-            // if it hasn't stoppped yet, force stop
-            if ((_bw != null) && (_bw.ThreadState != ThreadState.Stopped)
-                && (_bw.ThreadState != ThreadState.StopRequested))
-            {
-                try
-                {
-                    _bw.Abort();
-                    _bw = null;
-                }
-                catch { }
-            }
+            _bw.CancelAsync();
         }
 
     }
