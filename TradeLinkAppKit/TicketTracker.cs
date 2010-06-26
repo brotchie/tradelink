@@ -124,7 +124,7 @@ namespace TradeLink.AppKit
         /// </summary>
         public int AcceptedTickets { get { return _tickets; } }
 
-        int _SLEEP = 5000;
+        int _SLEEP = 1500;
         /// <summary>
         /// wait between tracks
         /// </summary>
