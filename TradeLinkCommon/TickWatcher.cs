@@ -11,7 +11,6 @@ namespace TradeLink.Common
     /// </summary>
     public class TickWatcher : TickIndicator
     {
-        private int _defaultwait = 60;
         private bool _alertonfirst = true;
         /// <summary>
         ///  returns count of symbols that have ticked at least once
@@ -53,10 +52,17 @@ namespace TradeLink.Common
         /// </summary>
         public event SymDelegate GotFirstTick;
         public bool FireFirstTick { get { return _alertonfirst; } set { _alertonfirst = value; } }
+        private int _defaultwait = 180;
         /// <summary>
-        /// minimum threshold in seconds when no tick updates have been received, alerts can be thrown.
+        /// minimum threshold in seconds when no tick updates have been received for a single symbol, alerts can be thrown.
         /// </summary>
         public int AlertThreshold { get { return _defaultwait; } set { _defaultwait = value; } }
+
+        int _defaultmass = 60;
+        /// <summary>
+        /// minimum threshold when no ticks have been received for many symbols
+        /// </summary>
+        public int MassAlertThreshold { get { return _defaultmass; } set { _defaultmass = value; } }
 
         System.ComponentModel.BackgroundWorker _bw = null;
         volatile int _lasttime = 0;
@@ -189,10 +195,10 @@ namespace TradeLink.Common
                     break;
                 if (PollProcess != null)
                     PollProcess(_lasttime);
-                if ((GotMassAlert != null) && (_defaultwait != 0) && (_lasttime!=0))
+                if ((GotMassAlert != null) && (_defaultmass != 0) && (_lasttime!=0))
                 {
                     int span = Util.FTDIFF(_lasttime, Util.DT2FT(DateTime.Now));
-                    bool alert = span > _defaultwait;
+                    bool alert = span > _defaultmass;
                     if (alert && !_alerting)
                     {
                         _alerting = true;
