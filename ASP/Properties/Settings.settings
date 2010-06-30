@@ -27,7 +27,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="TickBufferSize" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">10000</Value>
+      <Value Profile="(Default)">30000</Value>
     </Setting>
   </Settings>
 </SettingsFile>
