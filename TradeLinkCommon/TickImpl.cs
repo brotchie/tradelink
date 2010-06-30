@@ -34,8 +34,8 @@ namespace TradeLink.Common
         public bool isValid { get { return (_sym!= "") && (isIndex || hasTick); } }
         public bool atHigh(decimal high) { return (isTrade && (_trade>=high)); }
         public bool atLow(decimal low) { return (isTrade && (_trade <= low)); }
-        public int BidSize { get { return _bs * 100; } set { _bs = (int)(value / 100); } }
-        public int AskSize { get { return _os * 100; } set { _os = (int)(value / 100); } }
+        public int BidSize { get { return _bs * 100; } set { _bs = (int)((double)value / 100); } }
+        public int AskSize { get { return _os * 100; } set { _os = (int)((double)value / 100); } }
         public int TradeSize { get { return ts*100; } set { _size = (int)(value / 100); } }
         public int ts { get { return _size / 100; } } // normalized to bs/os
         internal long _datetime;

@@ -46,7 +46,7 @@ namespace TradeLink.Common
         {
             _kt.addindex(k.symbol);
             _kt.newTick(k);
-            
+            process();
         }
 
         Queue<Order> aq = new Queue<Order>(100);
@@ -150,6 +150,8 @@ namespace TradeLink.Common
             {
                 can.Enqueue(id);
             }
+            if (SendCancelEvent != null)
+                SendCancelEvent(id);
             process();
         }
     }

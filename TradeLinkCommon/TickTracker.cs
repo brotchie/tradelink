@@ -31,12 +31,16 @@ namespace TradeLink.Common
             os = new GenericTracker<int>(_estlabels);
             ts = new GenericTracker<int>(_estlabels);
             ex = new GenericTracker<string>(_estlabels);
+            date = new GenericTracker<int>(_estlabels);
+            time = new GenericTracker<int>(_estlabels);
             // setup generic trackers to track tick information
             last.NewTxt += new TextIdxDelegate(last_NewTxt);
         }
 
         void last_NewTxt(string txt, int idx)
         {
+            date.addindex(txt, 0);
+            time.addindex(txt, 0);
             bid.addindex(txt, 0);
             ask.addindex(txt, 0);
             bs.addindex(txt, 0);
@@ -47,6 +51,8 @@ namespace TradeLink.Common
             oe.addindex(txt, string.Empty);
         }
 
+        GenericTracker<int> date;
+        GenericTracker<int> time;
         GenericTracker<decimal> bid;
         GenericTracker<decimal> ask;
         GenericTracker<decimal> last;
@@ -199,6 +205,8 @@ namespace TradeLink.Common
             get
             {
                 Tick k = new TickImpl(last.getlabel(idx));
+                k.date = date[idx];
+                k.time = time[idx];
                 k.trade = last[idx];
                 k.size = ts[idx];
                 k.ex = ex[idx];
@@ -223,6 +231,8 @@ namespace TradeLink.Common
                 int idx = last.getindex(sym);
                 if (idx < 0) return new TickImpl();
                 Tick k = new TickImpl(last.getlabel(idx));
+                k.date = date[idx];
+                k.time = time[idx];
                 k.trade = last[idx];
                 k.size = ts[idx];
                 k.ex = ex[idx];
@@ -244,6 +254,9 @@ namespace TradeLink.Common
         public void newTick(Tick k, int idx)
         {
             if (idx < 0) return;
+            // update date/time
+            time[idx] = k.time;
+            date[idx] = k.date;
             // update bid/ask/last
             if (k.isTrade)
             {
@@ -273,6 +286,9 @@ namespace TradeLink.Common
         {
             int idx = last.getindex(k.symbol);
             if (idx < 0) return false;
+            // update date/time
+            time[idx] = k.time;
+            date[idx] = k.date;
             // update bid/ask/last
             if (k.isTrade)
             {
