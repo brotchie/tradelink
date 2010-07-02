@@ -37,6 +37,11 @@ namespace TradeLink.Common
         /// </summary>
         public event LongDelegate SendCancelEvent;
 
+        /// <summary>
+        /// debug messages
+        /// </summary>
+        public event DebugDelegate SendDebugEvent;
+
         TickTracker _kt = new TickTracker();
         /// <summary>
         /// pass data feed through to use for fills
@@ -49,8 +54,26 @@ namespace TradeLink.Common
             process();
         }
 
+        void debug(string msg)
+        {
+            if (SendDebugEvent != null)
+                SendDebugEvent(msg);
+        }
+
         Queue<Order> aq = new Queue<Order>(100);
         Queue<long> can = new Queue<long>(100);
+
+        /// <summary>
+        /// gets currently queued orders
+        /// </summary>
+        public Order[] QueuedOrders { get { lock (aq) { return aq.ToArray(); } } }
+
+        /// <summary>
+        /// gets count of queued cancels
+        /// </summary>
+        public int QueuedCancelCount { get { lock (can) { return can.Count; } } }
+
+        
 
         /// <summary>
         /// send paper trade orders
@@ -62,6 +85,7 @@ namespace TradeLink.Common
                 o.id = _idt.AssignId;
             lock (aq)
             {
+                debug(o.symbol + " PTT queueing order: " + o.ToString());
                 aq.Enqueue(o);
             }
             // ack the order
@@ -92,6 +116,7 @@ namespace TradeLink.Common
                 int cidx = gotcancel(o.id, cancels);
                 if (cidx >= 0)
                 {
+                    debug(o.symbol + " PTT canceling: " + o.id);
                     cancels[cidx] = 0;
                     if (GotCancelEvent != null)
                         GotCancelEvent(o.id);
@@ -106,12 +131,17 @@ namespace TradeLink.Common
                     unfilled.Add(o);
                     continue;
                 }
+                
                 // check for partial fill
                 Trade fill = (Trade)o;
+                debug(o.symbol + " PTT filled: " + fill.ToString());
                 bool partial = fill.UnsignedSize != o.UnsignedSize;
                 // if partial fill, update original order and add it back
-                o.size = (o.UnsignedSize - fill.UnsignedSize) * (o.side ? 1 : -1);
-                unfilled.Add(o);
+                if (partial)
+                {
+                    o.size = (o.UnsignedSize - fill.UnsignedSize) * (o.side ? 1 : -1);
+                    unfilled.Add(o);
+                }
                 // acknowledge the fill
                 if (GotFillEvent != null)
                     GotFillEvent(fill);
@@ -149,6 +179,7 @@ namespace TradeLink.Common
             lock (aq)
             {
                 can.Enqueue(id);
+                debug(" PTT queueing cancel: " + id);
             }
             if (SendCancelEvent != null)
                 SendCancelEvent(id);
