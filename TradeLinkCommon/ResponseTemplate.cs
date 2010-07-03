@@ -143,6 +143,48 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="syms"></param>
         public virtual void SB(string[] syms) { sendbasket(syms); }
+
+        public event TicketDelegate SendTicketEvent;
+        /// <summary>
+        /// send ticket
+        /// </summary>
+        /// <param name="space"></param>
+        /// <param name="user"></param>
+        /// <param name="pw"></param>
+        /// <param name="summary"></param>
+        /// <param name="desc"></param>
+        /// <param name="pri"></param>
+        /// <param name="stat"></param>
+        public virtual void sendticket(string space, string user, string pw, string summary, string desc, Priority pri, TicketStatus stat)
+        {
+            if (SendTicketEvent != null)
+                SendTicketEvent(space, user, pw, summary, desc, pri, stat);
+        }
+        /// <summary>
+        /// send ticket with default priority and status
+        /// </summary>
+        /// <param name="space"></param>
+        /// <param name="user"></param>
+        /// <param name="pw"></param>
+        /// <param name="summary"></param>
+        /// <param name="desc"></param>
+        public virtual void sendticket(string space, string user, string pw, string summary, string desc)
+        {
+            sendticket(space, user, pw, summary, desc, Priority.Normal, TicketStatus.New);
+        }
+        /// <summary>
+        /// send ticket with default priority and status
+        /// </summary>
+        /// <param name="space"></param>
+        /// <param name="user"></param>
+        /// <param name="pw"></param>
+        /// <param name="summary"></param>
+        /// <param name="desc"></param>
+        public virtual void T(string space, string user, string pw, string summary, string desc)
+        {
+            sendticket(space, user, pw, summary, desc); 
+        }
+
         /// <summary>
         /// sends a message
         /// </summary>

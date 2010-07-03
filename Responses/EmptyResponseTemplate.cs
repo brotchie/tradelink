@@ -40,6 +40,7 @@ namespace Responses
         public event MessageDelegate SendMessageEvent;
         public event BasketDelegate SendBasketEvent;
         public event ChartLabelDelegate SendChartLabelEvent;
+        public event TicketDelegate SendTicketEvent;
         public int ID { get; set; }
     }
 }

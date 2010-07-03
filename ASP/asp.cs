@@ -963,6 +963,12 @@ namespace ASP
             tmp.SendBasketEvent += new BasketDelegate(_workingres_SendBasket);
             tmp.SendChartLabelEvent += new ChartLabelDelegate(tmp_SendChartLabel);
             tmp.SendIndicatorsEvent += new StringParamDelegate(tmp_SendIndicators);
+            tmp.SendTicketEvent += new TicketDelegate(tmp_SendTicketEvent);
+        }
+
+        void tmp_SendTicketEvent(string space, string user, string password, string summary, string description, Priority pri, TicketStatus stat)
+        {
+            _rt.Track(space, user, password, summary, description, pri, stat);
         }
 
         void tmp_SendMessage(MessageTypes type, long source, long dest, long msgid, string request, ref string response)

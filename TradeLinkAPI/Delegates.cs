@@ -38,5 +38,5 @@ namespace TradeLink.API
     public delegate void BarListDelegate(BarList b);
     public delegate void ChartLabelDelegate(decimal price, int time, string label, System.Drawing.Color c);
     public delegate void ProviderDelegate(Providers p);
-    public delegate void TicketDelegatestring(string space, string user, string password, string summary, string description, Priority pri, TicketStatus stat);
+    public delegate void TicketDelegate(string space, string user, string password, string summary, string description, Priority pri, TicketStatus stat);
 }

@@ -400,6 +400,7 @@ namespace WinGauntlet
             if ((args.Response== null) || !args.Response.isValid)
                 return false;
             if (_boundonce) return true;
+            args.Response.SendTicketEvent += new TicketDelegate(Response_SendTicketEvent);
             args.Response.SendMessageEvent += new MessageDelegate(Response_SendMessage);
             args.Response.SendIndicatorsEvent += new StringParamDelegate(Response_SendIndicators);
             args.Response.SendDebugEvent += new DebugFullDelegate(Response_GotDebug);
@@ -410,13 +411,20 @@ namespace WinGauntlet
             _boundonce = true;
             return true;
         }
+        bool _sendticketwarn = false;
+        void Response_SendTicketEvent(string space, string user, string password, string summary, string description, Priority pri, TicketStatus stat)
+        {
+            if (_sendticketwarn) return;
+            debug("Sendticket not supported in gauntlet.");
+            _sendticketwarn = true;
+        }
 
         bool _sendbaskwarn = false;
         void Response_SendBasket(Basket b, int id)
         {
             if (_sendbaskwarn) return;
-            debug("Sendbasket not supported in kadina.");
-            debug("To specify trading symbols, add data to study.");
+            debug("Sendbasket not supported in gauntlet.");
+            debug("To specify trading symbols, select symbols via GUI.");
             _sendbaskwarn = true;
         }
 

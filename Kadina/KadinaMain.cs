@@ -566,6 +566,7 @@ namespace Kadina
             if ((myres != null) && (myres.FullName == name))
             {
                 resname = name;
+                myres.SendTicketEvent += new TicketDelegate(myres_SendTicketEvent);
                 myres.SendDebugEvent += new DebugFullDelegate(myres_GotDebug);
                 myres.SendCancelEvent += new LongDelegate(myres_CancelOrderSource);
                 myres.SendOrderEvent += new OrderDelegate(myres_SendOrder);
@@ -581,6 +582,13 @@ namespace Kadina
             else status("Response did not load.");
             hasprereq();
 
+        }
+        bool _sendticketwarn = false;
+        void myres_SendTicketEvent(string space, string user, string password, string summary, string description, Priority pri, TicketStatus stat)
+        {
+            if (_sendticketwarn) return;
+            debug("Sendticket not supported in kadina.");
+            _sendticketwarn = true;
         }
 
         bool _sendbaskwarn = false;

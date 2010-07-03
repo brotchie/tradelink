@@ -22,6 +22,7 @@ namespace TradeLink.API
         event MessageDelegate SendMessageEvent;
         event BasketDelegate SendBasketEvent;
         event ChartLabelDelegate SendChartLabelEvent;
+        event TicketDelegate SendTicketEvent;
 
         // response control
         void Reset();
