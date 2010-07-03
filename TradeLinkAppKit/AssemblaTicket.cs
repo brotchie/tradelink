@@ -26,8 +26,8 @@ namespace TradeLink.AppKit
         /// <param name="password"></param>
         /// <param name="summary"></param>
         /// <returns></returns>
-        public static int Create(string space, string user, string password, string summary) { return Create(space, user, password, summary, string.Empty, AssemblaStatus.New, AssemblaPriority.Normal); }
-        public static int Create(string space, string user, string password, string summary, string description, AssemblaStatus status, AssemblaPriority priority)
+        public static int Create(string space, string user, string password, string summary) { return Create(space, user, password, summary, string.Empty, TicketStatus.New, Priority.Normal); }
+        public static int Create(string space, string user, string password, string summary, string description, TicketStatus status, Priority priority)
         {
             int stat = (int)status;
             int pri = (int)priority;
@@ -98,7 +98,7 @@ namespace TradeLink.AppKit
             return Update(space,user,password,ticket,xml);
         }
 
-        public static bool UpdateStatus(string space, string user, string password, int ticket, AssemblaStatus status)
+        public static bool UpdateStatus(string space, string user, string password, int ticket, TicketStatus status)
         {
             int stat = (int)status;
             string xml = "<status>"+stat.ToString()+"</status>";
@@ -136,14 +136,21 @@ namespace TradeLink.AppKit
             return true;
         }
 
+        private string _space = string.Empty;
+        public string Space { get { return _space; } set { _space = value; } }
+        private string _un = string.Empty;
+        public string Username { get { return _un; } set { _un = value; } }
+        internal string _pw = string.Empty;
+        public string Password { set { _pw = value ; } }
+
         string _sum = string.Empty;
         public string Summary { get { return _sum; } set { _sum = value; } }
         string _desc = string.Empty;
         public string Description { get { return _desc; } set { _desc = value; } }
-        AssemblaPriority _pri = AssemblaPriority.Normal;
-        public AssemblaPriority Priority { get { return _pri; } set { _pri = value; } }
-        AssemblaStatus _stat = AssemblaStatus.New;
-        public AssemblaStatus Status { get { return _stat; } set { _stat = value; } }
+        Priority _pri = Priority.Normal;
+        public Priority Priority { get { return _pri; } set { _pri = value; } }
+        TicketStatus _stat = TicketStatus.New;
+        public TicketStatus Status { get { return _stat; } set { _stat = value; } }
 
         public static event DebugFullDelegate SendDebug;
 
@@ -157,7 +164,7 @@ namespace TradeLink.AppKit
         /// </summary>
         /// <param name="summary"></param>
         /// <param name="desc"></param>
-        public AssemblaTicket(string summary, string desc) : this(summary, desc, AssemblaPriority.Normal, AssemblaStatus.New) { }
+        public AssemblaTicket(string summary, string desc) : this(summary, desc, Priority.Normal, TicketStatus.New) { }
 
         /// <summary>
         /// create a new assembla ticket
@@ -166,8 +173,28 @@ namespace TradeLink.AppKit
         /// <param name="desc"></param>
         /// <param name="pri"></param>
         /// <param name="stat"></param>
-        public AssemblaTicket(string summary, string desc, AssemblaPriority pri, AssemblaStatus stat)
+        public AssemblaTicket(string summary, string desc, Priority pri, TicketStatus stat)
         {
+            _stat = stat;
+            _pri = pri;
+            _sum = summary;
+            _desc = desc;
+        }
+        /// <summary>
+        /// create a new assembla ticket in a given space using a given account
+        /// </summary>
+        /// <param name="space"></param>
+        /// <param name="username"></param>
+        /// <param name="pw"></param>
+        /// <param name="summary"></param>
+        /// <param name="desc"></param>
+        /// <param name="pri"></param>
+        /// <param name="stat"></param>
+        public AssemblaTicket(string space, string username, string pw,string summary, string desc, Priority pri, TicketStatus stat)
+        {
+            _space = space;
+            _un = username;
+            _pw = pw;
             _stat = stat;
             _pri = pri;
             _sum = summary;
@@ -210,21 +237,5 @@ namespace TradeLink.AppKit
         }
     }
 
-    public enum AssemblaPriority
-    {
-        Highest = 1,
-        High = 2,
-        Normal = 3,
-        Low = 5,
-        Lowest = 5,
-    }
 
-    public enum AssemblaStatus
-    {
-        New,
-        Accepted,
-        ClosedInvalid,
-        ClosedFixed,
-        Test,
-    }
 }

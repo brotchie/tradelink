@@ -57,7 +57,7 @@ namespace TradeLink.AppKit
                 status("missing subject.");
                 return;
             }
-            int id = AssemblaTicket.Create(space.Text, user.Text, pass.Text, summ.Text,desc.Text, AssemblaStatus.New, AssemblaPriority.Normal);
+            int id = AssemblaTicket.Create(space.Text, user.Text, pass.Text, summ.Text,desc.Text, TicketStatus.New, Priority.Normal);
             if (id!=0)
             {
                 if (attach)

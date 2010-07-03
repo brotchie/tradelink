@@ -22,7 +22,7 @@ namespace TradeLink.AppKit
         /// </summary>
         public string Program { get { return _prog; } set { _prog = value; }  }
         string _un = string.Empty;
-        string _pw = string.Empty;
+        private string _pw = string.Empty;
         /// <summary>
         /// create a ticket tracker
         /// </summary>
@@ -36,6 +36,12 @@ namespace TradeLink.AppKit
             _prog = program;
             _un = user;
             _pw = pw;
+        }
+        /// <summary>
+        /// create ticket tracker
+        /// </summary>
+        public TicketTracker()
+        {
         }
         /// <summary>
         /// start the tracker (optional)
@@ -92,9 +98,9 @@ namespace TradeLink.AppKit
         /// <param name="summary"></param>
         /// <param name="description"></param>
         /// <param name="pri"></param>
-        public void Track(string summary, string description, AssemblaPriority pri)
+        public void Track(string summary, string description, Priority pri)
         {
-            Track(new AssemblaTicket(summary, description, pri, AssemblaStatus.New));
+            Track(new AssemblaTicket(summary, description, pri, TicketStatus.New));
         }
         /// <summary>
         /// submit a ticket to portal in background
@@ -103,7 +109,7 @@ namespace TradeLink.AppKit
         /// <param name="description"></param>
         public void Track(string summary, string description)
         {
-            Track(new AssemblaTicket(summary, description,  AssemblaPriority.Normal, AssemblaStatus.New));
+            Track(new AssemblaTicket(summary, description,  Priority.Normal, TicketStatus.New));
         }
 
         /// <summary>
@@ -113,9 +119,23 @@ namespace TradeLink.AppKit
         /// <param name="description"></param>
         /// <param name="pri"></param>
         /// <param name="stat"></param>
-        public void Track(string summary, string description, AssemblaPriority pri, AssemblaStatus stat)
+        public void Track(string summary, string description, Priority pri, TicketStatus stat)
         {
             Track(new AssemblaTicket(summary, description, pri, stat));
+        }
+        /// <summary>
+        /// submit a ticket to a given portal using a given account in the background
+        /// </summary>
+        /// <param name="space"></param>
+        /// <param name="user"></param>
+        /// <param name="password"></param>
+        /// <param name="summary"></param>
+        /// <param name="description"></param>
+        /// <param name="pri"></param>
+        /// <param name="stat"></param>
+        public void Track(string space, string user, string password, string summary, string description, Priority pri, TicketStatus stat)
+        {
+            Track(new AssemblaTicket(space,user,password,summary, description, pri, stat));
         }
 
         int _tickets = 0;
@@ -142,9 +162,12 @@ namespace TradeLink.AppKit
                     if (e.Cancel) break;
                     // get item
                     AssemblaTicket t = _untrackedqueue.Read();
+                    string space = t.Space == string.Empty ? Space : t.Space;
+                    string un = t.Username == string.Empty ? _un : t.Username;
+                    string pw = t._pw == string.Empty ? _pw : t._pw;
                     try
                     {
-                        int tid = AssemblaTicket.Create(Space, _un, _pw, t.Summary, t.Description, t.Status, t.Priority);
+                        int tid = AssemblaTicket.Create(space, un, pw, t.Summary, t.Description, t.Status, t.Priority);
                         debug("created ticket: " + tid);
                     }
                     catch (Exception ex)

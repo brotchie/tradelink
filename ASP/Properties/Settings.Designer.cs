@@ -130,5 +130,41 @@ namespace ASP.Properties {
                 this["TickBufferSize"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool TicketTracking {
+            get {
+                return ((bool)(this["TicketTracking"]));
+            }
+            set {
+                this["TicketTracking"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool TicketsOnClose {
+            get {
+                return ((bool)(this["TicketsOnClose"]));
+            }
+            set {
+                this["TicketsOnClose"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int TicketsOnCloseMaxAttempts {
+            get {
+                return ((int)(this["TicketsOnCloseMaxAttempts"]));
+            }
+            set {
+                this["TicketsOnCloseMaxAttempts"] = value;
+            }
+        }
     }
 }

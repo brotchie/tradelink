@@ -33,6 +33,8 @@ namespace ASP
         MessageTracker _mtquote;
         MessageTracker _mtconnect;
 
+        TicketTracker _rt = new TicketTracker();
+
         Dictionary<int, string> _resskinidx = new Dictionary<int, string>();
         Dictionary<string, string> _class2dll = new Dictionary<string, string>();
         PositionTracker _pt = new PositionTracker();
@@ -86,6 +88,10 @@ namespace ASP
             _ar.GotTickOverrun += new VoidDelegate(_ar_GotTickOverrun);
             _bf = new BrokerFeed(Properties.Settings.Default.prefquote, Properties.Settings.Default.prefexecute,_ao._providerfallback.Checked,false,PROGRAM);
             _bf.SendDebug+=new DebugDelegate(debug);
+            _rt.PushTracksCloseMax = Properties.Settings.Default.TicketsOnCloseMaxAttempts;
+            _rt.PushTracksOnClose = Properties.Settings.Default.TicketsOnClose;
+            _rt.TrackEnabled = Properties.Settings.Default.TicketTracking;
+
             // get providers
             initfeeds();
             // get asp option events
@@ -820,6 +826,8 @@ namespace ASP
         {
             try
             {
+                // stop handling tickets
+                _rt.Stop();
                 // stop gui-safe broker-feed operations
                 _bf.Stop();
                 // stop watching ticks

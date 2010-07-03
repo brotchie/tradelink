@@ -99,6 +99,7 @@
     <Compile Include="SecurityType.cs" />
     <Compile Include="Skin.cs" />
     <Compile Include="Tick.cs" />
+    <Compile Include="TicketInfo.cs" />
     <Compile Include="Trade.cs" />
     <Compile Include="TradeLinkClient.cs" />
     <Compile Include="TradeLinkServer.cs" />
