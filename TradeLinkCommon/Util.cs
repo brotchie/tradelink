@@ -9,6 +9,7 @@ using TradeLink.API;
 using Microsoft.Win32;
 using System.Xml.Serialization;
 using System.Text;
+using System.Runtime.InteropServices;
 
 namespace TradeLink.Common
 {
@@ -17,6 +18,9 @@ namespace TradeLink.Common
     /// </summary>
     public class Util
     {
+        /// <summary>
+        /// official program name of the tradelink suite
+        /// </summary>
         public const string PROGRAM = "TradeLinkSuite";
         static string REGPATH = @"Software\Microsoft\Windows\CurrentVersion\Uninstall";
         static string REGPATH64 = REGPATH + @"\wow6432Node";
@@ -24,16 +28,6 @@ namespace TradeLink.Common
         static string KEY_VERSION = "Version";
         static string KEY_TRACKUSAGE = "TrackUsage";
 
-        /// <summary>
-        /// you should call ProgramPath rather than use this fucntion
-        /// </summary>
-        /// <param name="PROGRAM"></param>
-        /// <returns></returns>
-        public static string ProgramRegPath(string program)
-        {
-            if (program == string.Empty) return string.Empty;
-            return REGPATH + @"\" + program;
-        }
 
         /// <summary>
         /// determines whether user has consented to application tracking for given program
@@ -45,49 +39,98 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="program"></param>
         /// <returns></returns>
-        public static bool TrackUsage(string program)
+        public static bool TrackUsage(string program) { return TrackUsage(program, null); }
+        public static bool TrackUsage(string program,DebugDelegate deb)
         {
+            _deb = deb;
             RegistryKey r = Registry.LocalMachine;
-            bool sixfourbit = IntPtr.Size * 8 == 64;
-            string path = (sixfourbit ? REGPATH64 : REGPATH) + @"\" + program;
+            string path = REGPATH + @"\" + program;
             try
             {
+                debug("trying standard registry path...");
                 string tus = r.OpenSubKey(path).GetValue(KEY_TRACKUSAGE).ToString();
                 bool tu = tus.ToUpper() == "YES";
+                debug("success.");
                 return tu;
+            }
+            catch (NullReferenceException)
+            {
+                try
+                {
+                    debug("standard path failed, must be 64bit... trying 32bit compatibility...");
+                    string tus = PlatFormInvoke.GetKeyValue(path, KEY_TRACKUSAGE);
+                    bool tu = tus.ToUpper() == "YES";
+                    debug("success.");
+                    return tu;
+                }
+                catch (Exception ex)
+                {
+                    debug("all paths failed, path:" + path);
+                    debug("error: " + ex.Message + ex.StackTrace);
+                }
             }
             catch (Exception ex)
             {
-                return false;
+                debug("unknown error." + path);
+                debug("error: " + ex.Message + ex.StackTrace);
             }
+            return true;
+
         }
         /// <summary>
         /// gets folder where a given program is installed
         /// </summary>
         /// <param name="PROGRAM"></param>
         /// <returns></returns>
-        public static string ProgramPath(string PROGRAM)
+        public static string ProgramPath(string PROGRAM) { return ProgramPath(PROGRAM, null); }
+        /// <summary>
+        /// gets folder where given program was installed and provides debugging information
+        /// </summary>
+        /// <param name="PROGRAM"></param>
+        /// <param name="deb"></param>
+        /// <returns></returns>
+        public static string ProgramPath(string PROGRAM,DebugDelegate deb)
         {
+            _deb = deb;
+            string path = string.Empty;
+            RegistryKey r = Registry.LocalMachine;
             try
             {
+                debug("trying standard registry path...");
                 // check registry first
-                RegistryKey r = Registry.LocalMachine;
-                string regpath = ProgramRegPath(PROGRAM);
-                return r.OpenSubKey(regpath).GetValue(KEY_PATH).ToString();
+                path = REGPATH + @"\" + PROGRAM;
+                return r.OpenSubKey(path).GetValue(KEY_PATH).ToString();
+            }
+            catch (NullReferenceException)
+            {
+                try
+                {
+                    debug("standard path failed, must be 64bit... trying 32bit compatibility...");
+                    string ppath = PlatFormInvoke.GetKeyValue(path, KEY_PATH);
+                    debug("success.");
+                    return ppath;
+                }
+                catch (Exception ex)
+                {
+                    debug("all paths failed, path:" + path);
+                    debug("error: " + ex.Message + ex.StackTrace);
+                }
+            }
+            catch (Exception ex)
+            {
+                // then check program files
+                debug("unknown error." + path);
+                debug("error: " + ex.Message + ex.StackTrace);
+            }
+            try
+            {
+                string fold = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) + @"\" + PROGRAM;
+                if (Directory.Exists(fold))
+                    return fold + @"\";
             }
             catch
             {
-                // then check program files
-                try
-                {
-                    string fold = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)+@"\"+PROGRAM;
-                    if (Directory.Exists(fold))
-                        return fold + @"\";
-                }
-                catch
-                {
 
-                }
             }
             // otherwise assume current directory
             return Environment.CurrentDirectory;
@@ -354,10 +397,12 @@ namespace TradeLink.Common
         /// <param name="program"></param>
         /// <returns></returns>
         [Obsolete]
-        public static int BuildFromRegistry(string program)
+        public static int BuildFromRegistry(string program) { return ProgramBuild(program, null); }
+        [Obsolete]
+        public static int BuildFromRegistry(string program, DebugDelegate d)
         {
+            return ProgramBuild(program, d);
 
-            return ProgramBuild(program);
         }
         /// <summary>
         /// gets build for specific installed program.
@@ -365,22 +410,51 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="program"></param>
         /// <returns></returns>
-        public static int ProgramBuild(string program)
+        public static int ProgramBuild(string program,DebugDelegate deb)
         {
+            _deb = deb;
+            string path = string.Empty;
+            RegistryKey r = Registry.LocalMachine;
             try
             {
-                RegistryKey r = Registry.LocalMachine;
-                bool sixfourbit = IntPtr.Size * 8 == 64;
-                string path = (sixfourbit ? REGPATH64 : REGPATH) + @"\" + program;
+                debug("trying standard registry path...");
+                path = REGPATH + @"\" + PROGRAM;
                 string ver = r.OpenSubKey(path).GetValue(KEY_VERSION).ToString();
                 int build = Convert.ToInt32(ver);
+                debug("success.");
                 return build;
+            }
+            catch (NullReferenceException)
+            {
+                try
+                {
+                    debug("standard path failed, must be 64bit... trying 32bit compatibility...");
+                    string ver = PlatFormInvoke.GetKeyValue(path, KEY_VERSION);
+                    int build = Convert.ToInt32(ver);
+                    debug("success.");
+                    return build;
+                }
+                catch (Exception ex)
+                {
+                    debug("all paths failed, path:" + path);
+                    debug("error: " + ex.Message + ex.StackTrace);
+                }
             }
             catch (Exception ex)
             {
-                // unable to find version
+                debug("unknown error." + path);
+                debug("error: " + ex.Message + ex.StackTrace);
             }
             return 0;
+        }
+
+        private static DebugDelegate _deb = null;
+        static void debug(string msg)
+        {
+            if (_deb != null)
+            {
+                _deb(msg);
+            }
         }
 
         /// <summary>
@@ -953,7 +1027,67 @@ namespace TradeLink.Common
             }
             return (o != null) && (o.GetType() == typeof(T));
         }
-        
+
+
+        private class PlatFormInvoke
+        {
+            [DllImport("advapi32.dll", EntryPoint = "RegOpenKeyEx")]
+            internal static extern int RegOpenKeyEx_DllImport(
+                UIntPtr hKey,
+                string subKey,
+                uint options,
+                int sam,
+                out IntPtr phkResult);
+
+
+            [DllImport("advapi32.dll", EntryPoint = "RegQueryValueEx")]
+            static extern int RegQueryValueEx_DllImport(
+                IntPtr hKey,
+                string lpValueName,
+                int lpReserved,
+                out uint lpType,
+                System.Text.StringBuilder lpData,
+                ref uint lpcbData);
+
+
+            internal static string GetKeyValue(string strSubKey, string strKey)
+            {
+
+                UIntPtr HKEY_LOCAL_MACHINE = (UIntPtr)0x80000002;
+                const int KEY_WOW64_32KEY = 0x0200;
+                const int KEY_QUERY_VALUE = 0x1;
+
+                IntPtr hKeyVal;
+                uint lpType;
+                uint lpcbData = 0;
+                System.Text.StringBuilder pvData = new System.Text.StringBuilder(1024);
+                int valueRet;
+
+
+
+                string returnPath = String.Empty;
+                unchecked
+                {
+                    try
+                    {   //Open the required key path
+                        valueRet = RegOpenKeyEx_DllImport(HKEY_LOCAL_MACHINE, strSubKey, 0, KEY_QUERY_VALUE | KEY_WOW64_32KEY, out hKeyVal);
+
+                        //Retreive the key value
+                        valueRet = RegQueryValueEx_DllImport(hKeyVal, strKey, 0, out lpType, pvData, ref lpcbData);
+
+                        valueRet = RegQueryValueEx_DllImport(hKeyVal, strKey, 0, out lpType, pvData, ref lpcbData);
+
+                        returnPath = pvData.ToString();
+                    }
+                    catch (Exception e)
+                    {
+                        throw (e);
+                    }
+                }
+                return returnPath;
+            }
+
+        }
     }
 
     enum SterlingSubmitOrderError
@@ -1103,4 +1237,7 @@ namespace TradeLink.Common
         ClosedSize,
         AvgPrice,
     }
+
+
+    
 }
