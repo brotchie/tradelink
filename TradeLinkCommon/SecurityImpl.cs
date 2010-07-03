@@ -12,14 +12,45 @@ namespace TradeLink.Common
     /// </summary>
     public class SecurityImpl : Security
     {
+        /// <summary>
+        /// create new security
+        /// </summary>
+        /// <param name="sym"></param>
+        /// <param name="exchange"></param>
+        /// <param name="type"></param>
         public SecurityImpl(string sym, string exchange, SecurityType type)
         {
             _sym = sym;
             _destex = exchange;
             _type = type;
         }
+        /// <summary>
+        /// clone a security
+        /// </summary>
+        /// <param name="copy"></param>
+        public SecurityImpl(Security copy)
+        {
+            _sym = copy.Symbol;
+            _strike = copy.Strike;
+            _type = copy.Type;
+            _destex = copy.DestEx;
+            _date = copy.Date;
+            _details = copy.Details;
+        }
+        /// <summary>
+        /// create new security
+        /// </summary>
         public SecurityImpl() : this("", "", SecurityType.NIL) { }
+        /// <summary>
+        /// create new security
+        /// </summary>
+        /// <param name="sym"></param>
         public SecurityImpl(string sym) : this(sym, "", SecurityType.STK) { }
+        /// <summary>
+        /// create new security
+        /// </summary>
+        /// <param name="sym"></param>
+        /// <param name="type"></param>
         public SecurityImpl(string sym, SecurityType type) : this(sym, "", type) { }
         string _sym = "";
         SecurityType _type = SecurityType.NIL;

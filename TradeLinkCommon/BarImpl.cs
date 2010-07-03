@@ -292,6 +292,13 @@ bar.Close, (int)((double)bar.Volume / 4), string.Empty));
            return enddate.Subtract(new TimeSpan(0,0,interval*barsback));
         }
 
+        public static int BarsBackFromDate(BarInterval interval, int startdate) { return BarsBackFromDate(interval, Util.ToTLDate(startdate), Util.ToTLDate()); }
+        public static int BarsBackFromDate(BarInterval interval, int startdate, int enddate) { return BarsBackFromDate(interval, Util.ToTLDate(startdate), Util.ToTLDate(enddate)); }
+        public static int BarsBackFromDate(BarInterval interval, DateTime startdate, DateTime enddate)
+        {
+            return (int)((double)enddate.Subtract(startdate).TotalSeconds / (int)interval);
+        }
+
         /// <summary>
         /// build bar request for certain # of bars back from present
         /// </summary>

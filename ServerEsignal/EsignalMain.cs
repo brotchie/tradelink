@@ -27,6 +27,12 @@ namespace ServerEsignal
             Program = PROGRAM;
             InitializeComponent();
             tl = new EsignalServer();
+            // set defaults
+            tl.DefaultBarsBack = Properties.Settings.Default.DefaultBarsBack;
+            tl.VerboseDebugging = Properties.Settings.Default.VerboseDebugging;
+            tl.ReleaseBarHistoryAfteRequest = Properties.Settings.Default.ReleaseBarHistoryAfterSending;
+            tl.ReleaseDeadSymbols = Properties.Settings.Default.ReleaseDeadSymbols;
+            tl.WaitBetweenEvents = Properties.Settings.Default.WaitBetweenEvents;
             // send debug messages to log file
             tl.GotDebug += new DebugFullDelegate(tl_GotDebug);
             // attempt to connect to esignal

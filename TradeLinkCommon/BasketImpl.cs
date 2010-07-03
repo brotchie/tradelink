@@ -27,6 +27,16 @@ namespace TradeLink.Common
                 Add(new SecurityImpl(s));
         }
         /// <summary>
+        /// clone a basket
+        /// </summary>
+        /// <param name="copy"></param>
+        public BasketImpl(Basket copy)
+        {
+            foreach (Security s in copy)
+                Add(new SecurityImpl(s));
+            Name = copy.Name;
+        }
+        /// <summary>
         /// Create a basket of securities
         /// </summary>
         /// <param name="firstsec">security</param>
