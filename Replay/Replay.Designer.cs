@@ -96,10 +96,10 @@ namespace Replay
             // 
             // inputbut
             // 
-            this.inputbut.Location = new System.Drawing.Point(398, 18);
+            this.inputbut.Location = new System.Drawing.Point(387, 18);
             this.inputbut.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.inputbut.Name = "inputbut";
-            this.inputbut.Size = new System.Drawing.Size(68, 27);
+            this.inputbut.Size = new System.Drawing.Size(79, 37);
             this.inputbut.TabIndex = 4;
             this.inputbut.Text = "Input";
             this.toolTip1.SetToolTip(this.inputbut, "Change location of tick files");
@@ -178,9 +178,9 @@ namespace Replay
             // 
             // _msg
             // 
-            this._msg.Location = new System.Drawing.Point(313, 18);
+            this._msg.Location = new System.Drawing.Point(292, 18);
             this._msg.Name = "_msg";
-            this._msg.Size = new System.Drawing.Size(41, 27);
+            this._msg.Size = new System.Drawing.Size(41, 37);
             this._msg.TabIndex = 12;
             this._msg.Text = "!";
             this.toolTip1.SetToolTip(this._msg, "See replay diagnostics");
@@ -190,9 +190,9 @@ namespace Replay
             // button1
             // 
             this.button1.Image = ((System.Drawing.Image)(resources.GetObject("button1.Image")));
-            this.button1.Location = new System.Drawing.Point(361, 18);
+            this.button1.Location = new System.Drawing.Point(339, 18);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(31, 27);
+            this.button1.Size = new System.Drawing.Size(42, 37);
             this.button1.TabIndex = 13;
             this.toolTip1.SetToolTip(this.button1, "Report a bug");
             this.button1.UseVisualStyleBackColor = true;

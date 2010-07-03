@@ -45,7 +45,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(24, 92);
+            this.label2.Location = new System.Drawing.Point(36, 83);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(87, 20);
             this.label2.TabIndex = 4;
@@ -54,7 +54,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(24, 130);
+            this.label3.Location = new System.Drawing.Point(36, 121);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(82, 20);
             this.label3.TabIndex = 5;
@@ -62,9 +62,9 @@
             // 
             // _login
             // 
-            this._login.Location = new System.Drawing.Point(28, 176);
+            this._login.Location = new System.Drawing.Point(40, 167);
             this._login.Name = "_login";
-            this._login.Size = new System.Drawing.Size(75, 26);
+            this._login.Size = new System.Drawing.Size(75, 35);
             this._login.TabIndex = 6;
             this._login.Text = "login";
             this.toolTip1.SetToolTip(this._login, "Email tradelink-users@googlegroups.com with any problems using TD ameritrade with" +
@@ -75,9 +75,9 @@
             // _report
             // 
             this._report.Image = ((System.Drawing.Image)(resources.GetObject("_report.Image")));
-            this._report.Location = new System.Drawing.Point(169, 176);
+            this._report.Location = new System.Drawing.Point(181, 167);
             this._report.Name = "_report";
-            this._report.Size = new System.Drawing.Size(32, 26);
+            this._report.Size = new System.Drawing.Size(32, 35);
             this._report.TabIndex = 10;
             this.toolTip1.SetToolTip(this._report, "report a bug");
             this._report.UseVisualStyleBackColor = true;
@@ -85,9 +85,9 @@
             // 
             // _togmsg
             // 
-            this._togmsg.Location = new System.Drawing.Point(117, 176);
+            this._togmsg.Location = new System.Drawing.Point(129, 167);
             this._togmsg.Name = "_togmsg";
-            this._togmsg.Size = new System.Drawing.Size(34, 26);
+            this._togmsg.Size = new System.Drawing.Size(34, 35);
             this._togmsg.TabIndex = 9;
             this._togmsg.Text = "!";
             this.toolTip1.SetToolTip(this._togmsg, "toggle connector messages");
@@ -97,7 +97,7 @@
             // _pass
             // 
             this._pass.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::TDServer.Properties.Settings.Default, "password", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this._pass.Location = new System.Drawing.Point(117, 127);
+            this._pass.Location = new System.Drawing.Point(129, 118);
             this._pass.Name = "_pass";
             this._pass.PasswordChar = '*';
             this._pass.Size = new System.Drawing.Size(100, 26);
@@ -108,7 +108,7 @@
             // _user
             // 
             this._user.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::TDServer.Properties.Settings.Default, "username", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this._user.Location = new System.Drawing.Point(117, 89);
+            this._user.Location = new System.Drawing.Point(129, 80);
             this._user.Name = "_user";
             this._user.Size = new System.Drawing.Size(100, 26);
             this._user.TabIndex = 1;
@@ -116,7 +116,7 @@
             // 
             // api
             // 
-            this.api.Location = new System.Drawing.Point(28, 45);
+            this.api.Location = new System.Drawing.Point(28, 14);
             this.api.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.api.Name = "api";
             this.api.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("api.OcxState")));

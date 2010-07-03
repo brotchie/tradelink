@@ -60,9 +60,9 @@
             // 
             // _login
             // 
-            this._login.Location = new System.Drawing.Point(136, 115);
+            this._login.Location = new System.Drawing.Point(70, 115);
             this._login.Name = "_login";
-            this._login.Size = new System.Drawing.Size(75, 28);
+            this._login.Size = new System.Drawing.Size(75, 34);
             this._login.TabIndex = 6;
             this._login.Text = "login";
             this.toolTip1.SetToolTip(this._login, "Email tradelink-users@googlegroups.com with any problems using TD ameritrade with" +
@@ -93,9 +93,9 @@
             // _report
             // 
             this._report.Image = ((System.Drawing.Image)(resources.GetObject("_report.Image")));
-            this._report.Location = new System.Drawing.Point(258, 115);
+            this._report.Location = new System.Drawing.Point(192, 115);
             this._report.Name = "_report";
-            this._report.Size = new System.Drawing.Size(32, 27);
+            this._report.Size = new System.Drawing.Size(32, 33);
             this._report.TabIndex = 10;
             this.toolTip1.SetToolTip(this._report, "report a bug");
             this._report.UseVisualStyleBackColor = true;
@@ -103,9 +103,9 @@
             // 
             // _togmsg
             // 
-            this._togmsg.Location = new System.Drawing.Point(216, 115);
+            this._togmsg.Location = new System.Drawing.Point(150, 115);
             this._togmsg.Name = "_togmsg";
-            this._togmsg.Size = new System.Drawing.Size(35, 27);
+            this._togmsg.Size = new System.Drawing.Size(35, 33);
             this._togmsg.TabIndex = 9;
             this._togmsg.Text = "!";
             this.toolTip1.SetToolTip(this._togmsg, "toggle connector messages");
@@ -116,7 +116,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(328, 175);
+            this.ClientSize = new System.Drawing.Size(306, 175);
             this.Controls.Add(this._report);
             this.Controls.Add(this._togmsg);
             this.Controls.Add(this._login);

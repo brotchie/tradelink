@@ -56,7 +56,7 @@
             // 
             this._ok.Location = new System.Drawing.Point(237, 35);
             this._ok.Name = "_ok";
-            this._ok.Size = new System.Drawing.Size(36, 27);
+            this._ok.Size = new System.Drawing.Size(55, 27);
             this._ok.TabIndex = 2;
             this._ok.Text = "ok";
             this._ok.UseVisualStyleBackColor = true;
@@ -66,7 +66,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(293, 104);
+            this.ClientSize = new System.Drawing.Size(304, 104);
             this.Controls.Add(this._ok);
             this.Controls.Add(this.label1);
             this.Controls.Add(this._acctapp);

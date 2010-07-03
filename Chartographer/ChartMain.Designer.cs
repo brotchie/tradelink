@@ -76,7 +76,7 @@ namespace Chartographer
             this.stickychartsbox.AutoSize = true;
             this.stickychartsbox.Checked = global::Chartographer.Properties.Settings.Default.stickychartson;
             this.stickychartsbox.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::Chartographer.Properties.Settings.Default, "stickychartson", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.stickychartsbox.Location = new System.Drawing.Point(77, 52);
+            this.stickychartsbox.Location = new System.Drawing.Point(94, 52);
             this.stickychartsbox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.stickychartsbox.Name = "stickychartsbox";
             this.stickychartsbox.Size = new System.Drawing.Size(58, 30);
@@ -92,7 +92,7 @@ namespace Chartographer
             this.maxchartbox.AutoSize = true;
             this.maxchartbox.Checked = global::Chartographer.Properties.Settings.Default.maxcharts;
             this.maxchartbox.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::Chartographer.Properties.Settings.Default, "maxcharts", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.maxchartbox.Location = new System.Drawing.Point(142, 52);
+            this.maxchartbox.Location = new System.Drawing.Point(160, 52);
             this.maxchartbox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.maxchartbox.Name = "maxchartbox";
             this.maxchartbox.Size = new System.Drawing.Size(66, 30);
@@ -104,7 +104,7 @@ namespace Chartographer
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(142, 12);
+            this.button2.Location = new System.Drawing.Point(160, 12);
             this.button2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(66, 30);
@@ -118,7 +118,7 @@ namespace Chartographer
             // 
             this.button1.Location = new System.Drawing.Point(94, 12);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(40, 29);
+            this.button1.Size = new System.Drawing.Size(59, 29);
             this.button1.TabIndex = 7;
             this.button1.Text = "go";
             this.toolTip1.SetToolTip(this.button1, "load daily chart for desired symbol using internet data (free)");
@@ -131,7 +131,7 @@ namespace Chartographer
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.ClientSize = new System.Drawing.Size(236, 106);
+            this.ClientSize = new System.Drawing.Size(259, 106);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.blackbackground);
