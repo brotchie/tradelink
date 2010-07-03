@@ -72,12 +72,11 @@ namespace TradeLink.Common
         /// <param name="intervals"></param>
         public BarListImpl(string symbol, BarInterval[] intervals) : this(symbol,BarInterval2Int(intervals), intervals) {}
         /// <summary>
-        /// make copy of a barlist
+        /// make copy of a barlist.  remember you must re-setup GotNewBar events after using this.
         /// </summary>
         /// <param name="original"></param>
         public BarListImpl(BarList original) : this(original.Symbol,original.CustomIntervals,original.Intervals) 
         {
-
             for (int j = 0; j<original.Intervals.Length; j++)
             {
                 original.DefaultInterval = original.Intervals[j];
@@ -88,7 +87,8 @@ namespace TradeLink.Common
             }
         }
         /// <summary>
-        /// insert a bar at particular place in the list
+        /// insert a bar at particular place in the list.
+        /// REMEMBER YOU MUST REHANDLE GOTNEWBAR EVENT AFTER CALLING THIS.
         /// </summary>
         /// <param name="bl"></param>
         /// <param name="b"></param>
@@ -96,6 +96,7 @@ namespace TradeLink.Common
         /// <returns></returns>
         public static BarListImpl InsertBar(BarList bl, Bar b, int position)
         {
+            
             BarListImpl copy = new BarListImpl(bl);
             for (int j = 0; j < bl.CustomIntervals.Length; j++)
             {
@@ -108,6 +109,38 @@ namespace TradeLink.Common
                         addbar(copy, b, j);
                     }
                     addbar(copy, bl[i], j);
+                }
+            }
+            return copy;
+        }
+        /// <summary>
+        /// insert one barlist into another barlist
+        /// REMEMBER: You must re-handle the GotNewBar event after calling this method.
+        /// You should also ensure that inserted barlist has same intervals/types as original barlist.
+        /// </summary>
+        /// <param name="bl"></param>
+        /// <param name="insert"></param>
+        /// <returns></returns>
+        public static BarListImpl InsertBarList(BarList bl, BarList insert)
+        {
+            BarListImpl copy = new BarListImpl(bl);
+            for (int j = 0; j < bl.CustomIntervals.Length; j++)
+            {
+                for (int k = 0; k < insert.CustomIntervals.Length; k++)
+                {
+                    if (bl.CustomIntervals[j] != insert.CustomIntervals[k])
+                        continue;
+                    for (int l = 0; l < insert.Count; l++)
+                    {
+                        for (int m = 0; m < bl.Count; m++)
+                        {
+                            if (l == m)
+                            {
+                                addbar(copy, insert[l, (BarInterval)insert.CustomIntervals[k]], j);
+                            }
+                            addbar(copy, bl[m], j);
+                        }
+                    }
                 }
             }
             return copy;
@@ -576,7 +609,19 @@ histperiod=daily&startdate=" + startdate + "&enddate=" + enddate + "&output=csv&
         private static BarListImpl _fromepf;
         private static bool _uselast = true;
         private static bool _usebid = true;
+        /// <summary>
+        /// get a barlist from tick data
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
         public static BarList FromTIK(string filename) { return FromTIK(filename, true, true); }
+        /// <summary>
+        /// get a barlist from tick data and optionally use bid/ask data to construct bars
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="uselast"></param>
+        /// <param name="usebid"></param>
+        /// <returns></returns>
         public static BarList FromTIK(string filename, bool uselast, bool usebid)
         {
             _uselast = uselast;
@@ -584,6 +629,25 @@ histperiod=daily&startdate=" + startdate + "&enddate=" + enddate + "&output=csv&
             SecurityImpl s = SecurityImpl.FromTIK(filename);
             s.HistSource.gotTick += new TickDelegate(HistSource_gotTick);
             _fromepf = new BarListImpl(s.Symbol);
+            while (s.HistSource.NextTick()) ;
+            return _fromepf;
+        }
+        /// <summary>
+        /// create barlist from a tik file using given intervals/types
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="uselast"></param>
+        /// <param name="usebid"></param>
+        /// <param name="intervals"></param>
+        /// <param name="types"></param>
+        /// <returns></returns>
+        public static BarList FromTIK(string filename, bool uselast, bool usebid, int[] intervals, BarInterval[] types)
+        {
+            _uselast = uselast;
+            _usebid = usebid;
+            SecurityImpl s = SecurityImpl.FromTIK(filename);
+            s.HistSource.gotTick += new TickDelegate(HistSource_gotTick);
+            _fromepf = new BarListImpl(s.Symbol,intervals,types);
             while (s.HistSource.NextTick()) ;
             return _fromepf;
         }
