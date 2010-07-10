@@ -87,7 +87,7 @@ namespace ServerBlackwood
 
         void ServerBlackwood_newImbalanceRequest()
         {
-            m_Session.RequestImbalances();
+            m_Session.RequestNYSEImbalances();
         }
 
         bool isunique(Order o)
@@ -109,7 +109,7 @@ namespace ServerBlackwood
 
             ORDER_SIDE orderSide = (o.side ? ORDER_SIDE.SIDE_BUY : ORDER_SIDE.SIDE_SELL);
             BWVenue orderVenue = getVenueFromBW(o);
-            BWOrderType orderType = (o.isStop ? (o.isStop ? BWOrderType.STOP_LIMIT : BWOrderType.STOP_MARKET) : (o.isLimit ? BWOrderType.LIMIT : BWOrderType.MARKET));
+            BWOrderType orderType = (o.isStop ? (o.isLimit ? BWOrderType.STOP_LIMIT : BWOrderType.STOP_MARKET) : (o.isLimit ? BWOrderType.LIMIT : BWOrderType.MARKET));
             int orderTIF = (int)getDurationFromBW(o);
 
             uint  orderSize = (uint)o.UnsignedSize;
