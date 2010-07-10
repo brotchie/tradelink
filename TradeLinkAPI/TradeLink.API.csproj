@@ -75,6 +75,7 @@
   <ItemGroup>
     <Compile Include="Bar.cs" />
     <Compile Include="BarList.cs" />
+    <Compile Include="GenericTrackerI.cs" />
     <Compile Include="HistSim.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="Constants.cs" />

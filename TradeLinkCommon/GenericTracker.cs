@@ -12,7 +12,7 @@ namespace TradeLink.Common
     /// Used to track any type of item by both text label and index values
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class GenericTracker<T>
+    public class GenericTracker<T> : GenericTrackerI
     {
         int _estcount = 0;
         List<T> _tracked;
@@ -22,6 +22,24 @@ namespace TradeLink.Common
         /// gets count of items being tracked
         /// </summary>
         public int Count { get { return _tracked.Count; } }
+
+        string _name = string.Empty;
+        /// <summary>
+        /// name of this tracker
+        /// </summary>
+        public string Name { get { return _name; } set { _name = value; } }
+        /// <summary>
+        /// get display-ready tracked value of a given index
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <returns></returns>
+        public string Display(int idx) { return _tracked[idx].ToString(); }
+        /// <summary>
+        /// get display-ready tracked value of a given label
+        /// </summary>
+        /// <param name="txt"></param>
+        /// <returns></returns>
+        public string Display(string txt) { int idx = getindex(txt); if (idx < 0) return string.Empty; return _tracked[idx].ToString() ; }
 
         /// <summary>
         /// creates a tracker
@@ -442,6 +460,17 @@ namespace TradeLink.Common
         }
 
         /// <summary>
+        /// create a csv file using Name on each of an array of generic trackers
+        /// </summary>
+        /// <param name="filepath"></param>
+        /// <param name="gts"></param>
+        /// <returns></returns>
+        public static bool InitCSV(string filepath, GenericTrackerI[] gts)
+        {
+            return InitCSV(filepath, GetIndicatorNames(gts), false);
+        }
+
+        /// <summary>
         /// create a csv file
         /// </summary>
         /// <param name="filepath"></param>
@@ -499,5 +528,116 @@ namespace TradeLink.Common
             }
             return false;
         }
+        /// <summary>
+        /// gets indicator names from trackers
+        /// </summary>
+        /// <param name="gts"></param>
+        /// <returns></returns>
+        public static string[] GetIndicatorNames(params GenericTrackerI[] gts)
+        {
+            List<string> names = new List<string>(gts.Length);
+            for (int i = 0; i < gts.Length; i++)
+            {
+                names.Add(gts[i].Name);
+            }
+            return names.ToArray();
+        }
+
+        /// <summary>
+        /// gets indicator values from trackers
+        /// </summary>
+        /// <param name="gts"></param>
+        /// <returns></returns>
+        public static string[] GetIndicatorValues(int idx, params GenericTrackerI[] gts)
+        {
+            if ((idx<0) || (gts.Length==0)) return new string[0];
+            List<string> display = new List<string>(gts.Length);
+            for (int i = 0; i < gts.Length; i++)
+            {
+                if (idx >= gts[i].Count) 
+                    display.Add(string.Empty);
+                display.Add(gts[i].Display(idx));
+
+            }
+            return display.ToArray();
+        }
+
+        /// <summary>
+        /// gets indicator values from trackers
+        /// </summary>
+        /// <param name="gts"></param>
+        /// <returns></returns>
+        public static string[] GetIndicatorValues(string txt, params GenericTrackerI[] gts)
+        {
+            if ((gts.Length == 0)) return new string[0];
+            List<string> display = new List<string>(gts.Length);
+            for (int i = 0; i < gts.Length; i++)
+            {
+                int idx = gts[i].getindex(txt);
+                if ((idx<0) || (idx >= gts[i].Count))
+                    display.Add(string.Empty);
+                display.Add(gts[i].Display(txt));
+
+            }
+            return display.ToArray();
+        }
+        /// <summary>
+        /// get name=>value pairs
+        /// </summary>
+        /// <param name="txt"></param>
+        /// <param name="gts"></param>
+        /// <returns></returns>
+        public static string[] GetIndicatorPrettyPairs(string txt, params GenericTrackerI[] gts) { return GetIndicatorPrettyPairs(txt, "=>", gts); }
+        /// <summary>
+        /// get name=>value pairs
+        /// </summary>
+        /// <param name="txt"></param>
+        /// <param name="delim"></param>
+        /// <param name="gts"></param>
+        /// <returns></returns>
+        public static string[] GetIndicatorPrettyPairs(string txt, string delim,params GenericTrackerI[] gts)
+        {
+            if ((gts.Length == 0)) return new string[0];
+            List<string> display = new List<string>(gts.Length);
+            for (int i = 0; i < gts.Length; i++)
+            {
+                int idx = gts[i].getindex(txt);
+                if ((idx < 0) || (idx >= gts[i].Count))
+                    display.Add(string.Empty);
+                display.Add(gts[i].Name+delim+gts[i].Display(txt));
+
+            }
+            return display.ToArray();
+        }
+        /// <summary>
+        /// get name=>value pairs
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <param name="gts"></param>
+        /// <returns></returns>
+        public static string[] GetIndicatorPrettyPairs(int idx, params GenericTrackerI[] gts) { return GetIndicatorPrettyPairs(idx, "=>", gts); }
+        /// <summary>
+        /// get name=>value pairs
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <param name="delim"></param>
+        /// <param name="gts"></param>
+        /// <returns></returns>
+        public static string[] GetIndicatorPrettyPairs(int idx, string delim, params GenericTrackerI[] gts)
+        {
+            if ((idx<0) || (gts.Length == 0)) return new string[0];
+            List<string> display = new List<string>(gts.Length);
+            for (int i = 0; i < gts.Length; i++)
+            {
+                if ((idx < 0) || (idx >= gts[i].Count))
+                    display.Add(string.Empty);
+                display.Add(gts[i].Name + delim + gts[i].Display(idx));
+
+            }
+            return display.ToArray();
+        }
+
+
     }
+
 }
