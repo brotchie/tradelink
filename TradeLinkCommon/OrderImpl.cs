@@ -147,7 +147,8 @@ namespace TradeLink.Common
                 || isMarket)
             {
                 this.xprice = t.trade;
-                this.xsize = t.size >= UnsignedSize ? size : t.size;
+                this.xsize = t.size >= UnsignedSize ? UnsignedSize : t.size;
+                this.xsize *= side ? 1 : -1;
                 this.xtime = t.time;
                 this.xdate = t.date;
                 return true;
