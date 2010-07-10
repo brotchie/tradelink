@@ -973,8 +973,7 @@ namespace ASP
 
         void tmp_SendMessage(MessageTypes type, long source, long dest, long msgid, string request, ref string response)
         {
-            _mtquote.SendMessage(type, source, dest, msgid, request, response);
-            _mtexec.SendMessage(type, source, dest, msgid, request, response);
+            _bf.TLSend(type, source, dest, msgid, request, ref response);
         }
 
         bool _inderror = false;

@@ -17,6 +17,7 @@ namespace TradeLink.API
         void Subscribe(Basket mb);
         void Unsubscribe();
         long TLSend(MessageTypes type, string message);
+        long TLSend(MessageTypes type, long source, long dest, long msgid, string request, ref string result);
         int HeartBeat();
         int ServerVersion { get; }
         Providers BrokerName { get; }

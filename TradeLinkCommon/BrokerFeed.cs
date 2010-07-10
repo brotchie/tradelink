@@ -153,9 +153,41 @@ namespace TradeLink.Common
 
         public long TLSend(MessageTypes type, string message)
         {
+            string r = string.Empty;
+            long res = TLSend(type, 0, 0, 0, message, ref r);
+            return res;
+        }
+        public long TLSend(MessageTypes type, long source, long dest, long msgid, string message, ref string result)
+        {
             for (int i = 0; i < _pcon.Count; i++)
-                _pcon[i].TLSend(type, message);
+                if (_pcon[i].RequestFeatureList.Contains(type))
+                {
+                    // prepare message
+                    switch (type)
+                    {
+                        case MessageTypes.DOMREQUEST:
+                            message = message.Replace(Book.EMPTYREQUESTOR, _pcon[i].Name);
+                            break;
+                        case MessageTypes.BARREQUEST:
+                            {
+                                BarRequest br = BarImpl.ParseBarRequest(message);
+                                br.Client = _pcon[i].Name;
+                                message = BarImpl.BuildBarRequest(br);
+                            }
+                            break;
+                        case MessageTypes.FEATUREREQUEST:
+                            message = _pcon[i].Name;
+                            break;
+                    }
+                    long res = _pcon[i].TLSend(type, message);
+                    result = res.ToString();
+                    if (gotUnknownMessage != null)
+                        gotUnknownMessage(type, source, dest, msgid, message, ref result);
+
+                    return res;
+                }
             return 0;
+            
         }
 
         public void Disconnect()
@@ -231,6 +263,7 @@ namespace TradeLink.Common
             tl.Disconnect();
         }
 
+
         public void Reset()
         {
 
@@ -250,6 +283,18 @@ namespace TradeLink.Common
                 debug("preferred data not available: " + _feed);
             if (!isPreferredBroker)
                 debug("preferred execute not available: " + _broker);
+            // search for features
+
+            for (int i = 0; i < ProvidersAvailable.Length; i++)
+            {
+                if ((qi != -1) && (xi != -1)) break;
+                // switch to provider
+                if ((qi == -1) && hasminquote(tl, i))
+                    qi = i;
+                if ((xi == -1) && hasminexec(tl, i))
+                    xi = i;
+            }
+
             // see if we're allowed to fallback
 
             // not allowed
@@ -260,16 +305,7 @@ namespace TradeLink.Common
             }
             else // ok to fallback,but where
             {
-                // see if we need to search
-                for (int i = 0; i < ProvidersAvailable.Length; i++)
-                {
-                    if ((qi != -1) && (xi != -1)) break;
-                    // switch to provider
-                    if ((qi == -1) && hasminquote(tl, i))
-                        qi = i;
-                    if ((xi == -1) && hasminexec(tl, i))
-                        xi = i;
-                }
+ 
                 setquote = (qi != -1) && hasminquote(tl, qi);
                 setexec = (xi != -1) && hasminexec(tl, xi);
             }
@@ -329,7 +365,16 @@ namespace TradeLink.Common
             for (int i = 0; i < ProvidersAvailable.Length; i++)
             {
                 // skip existing connections
-                if ((i == xi) || (i == qi)) continue;
+                if (i == xi)
+                {
+                    _pcon.Add(execute);
+                    continue;
+                }
+                if ((xi!=qi) && (i == qi))
+                {
+                    _pcon.Add(quote);
+                    continue;
+                }
                 // add new connections
                 TLClient newcon = new TLClient_WM(i, PROGRAM, false);
                 newcon.gotFeatures += new MessageTypesMsgDelegate(newcon_gotFeatures);

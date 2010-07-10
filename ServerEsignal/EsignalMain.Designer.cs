@@ -32,6 +32,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this._acctapp = new System.Windows.Forms.TextBox();
             this._ok = new System.Windows.Forms.Button();
+            this._msg = new System.Windows.Forms.Button();
+            this._report = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -46,27 +48,49 @@
             // _acctapp
             // 
             this._acctapp.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::ServerEsignal.Properties.Settings.Default, "accountorappname", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this._acctapp.Location = new System.Drawing.Point(130, 36);
+            this._acctapp.Location = new System.Drawing.Point(121, 36);
             this._acctapp.Name = "_acctapp";
-            this._acctapp.Size = new System.Drawing.Size(100, 26);
+            this._acctapp.Size = new System.Drawing.Size(131, 26);
             this._acctapp.TabIndex = 0;
             this._acctapp.Text = global::ServerEsignal.Properties.Settings.Default.accountorappname;
             // 
             // _ok
             // 
-            this._ok.Location = new System.Drawing.Point(237, 35);
+            this._ok.Location = new System.Drawing.Point(121, 68);
             this._ok.Name = "_ok";
-            this._ok.Size = new System.Drawing.Size(55, 27);
+            this._ok.Size = new System.Drawing.Size(55, 28);
             this._ok.TabIndex = 2;
             this._ok.Text = "ok";
             this._ok.UseVisualStyleBackColor = true;
             this._ok.Click += new System.EventHandler(this._ok_Click);
             // 
+            // _msg
+            // 
+            this._msg.Location = new System.Drawing.Point(182, 68);
+            this._msg.Name = "_msg";
+            this._msg.Size = new System.Drawing.Size(30, 28);
+            this._msg.TabIndex = 3;
+            this._msg.Text = "!";
+            this._msg.UseVisualStyleBackColor = true;
+            this._msg.Click += new System.EventHandler(this._msg_Click);
+            // 
+            // _report
+            // 
+            this._report.Image = global::ServerEsignal.Properties.Resources.bug;
+            this._report.Location = new System.Drawing.Point(219, 68);
+            this._report.Name = "_report";
+            this._report.Size = new System.Drawing.Size(33, 28);
+            this._report.TabIndex = 4;
+            this._report.UseVisualStyleBackColor = true;
+            this._report.Click += new System.EventHandler(this._report_Click);
+            // 
             // EsignalMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(304, 104);
+            this.ClientSize = new System.Drawing.Size(304, 119);
+            this.Controls.Add(this._report);
+            this.Controls.Add(this._msg);
             this.Controls.Add(this._ok);
             this.Controls.Add(this.label1);
             this.Controls.Add(this._acctapp);
@@ -83,6 +107,8 @@
         private System.Windows.Forms.TextBox _acctapp;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button _ok;
+        private System.Windows.Forms.Button _msg;
+        private System.Windows.Forms.Button _report;
     }
 }
 

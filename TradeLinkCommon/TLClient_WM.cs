@@ -129,6 +129,10 @@ namespace TradeLink.Common
 
         
         delegate long TLSendDelegate(MessageTypes type, string msg, IntPtr d);
+        public long TLSend(MessageTypes type, long source, long dest, long msgid, string message, ref string result)
+        {
+            return TLSend(type, message);
+        }
         /// <summary>
         /// sends a message to server.  
         /// synchronous responses are returned immediately as a long

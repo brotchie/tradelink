@@ -292,13 +292,14 @@ bar.Close, (int)((double)bar.Volume / 4), string.Empty));
            return enddate.Subtract(new TimeSpan(0,0,interval*barsback));
         }
 
-        public static int BarsBackFromDate(BarInterval interval, int startdate) { return BarsBackFromDate(interval, Util.ToTLDate(startdate), Util.ToTLDate()); }
-        public static int BarsBackFromDate(BarInterval interval, int startdate, int enddate) { return BarsBackFromDate(interval, Util.ToTLDate(startdate), Util.ToTLDate(enddate)); }
+        public static int BarsBackFromDate(BarInterval interval, int startdate) { return BarsBackFromDate(interval, startdate, Util.ToTLDate()); }
+        public static int BarsBackFromDate(BarInterval interval, int startdate, int enddate) { return BarsBackFromDate(interval, Util.ToDateTime(startdate, 0), Util.ToDateTime(enddate,Util.ToTLTime())); }
         public static int BarsBackFromDate(BarInterval interval, DateTime startdate, DateTime enddate)
         {
-            return (int)((double)enddate.Subtract(startdate).TotalSeconds / (int)interval);
+            double start2endseconds = enddate.Subtract(startdate).TotalSeconds;
+            int bars = (int)((double)start2endseconds / (int)interval);
+            return bars;
         }
-
         /// <summary>
         /// build bar request for certain # of bars back from present
         /// </summary>
@@ -309,8 +310,9 @@ bar.Close, (int)((double)bar.Volume / 4), string.Empty));
         public static string BuildBarRequestBarsBack(string sym, int barsback, int interval)
         {
             DateTime n = DateTime.Now;
-            return BuildBarRequest(new BarRequest(sym, interval, Util.ToTLDate(DateFromBarsBack(barsback, interval, n)), Util.ToTLTime(DateFromBarsBack(barsback, interval, n)), Util.ToTLDate(n), Util.ToTLTime(n), string.Empty));
+            return BarImpl.BuildBarRequest(new BarRequest(sym, interval, Util.ToTLDate(BarImpl.DateFromBarsBack(barsback, interval, n)), Util.ToTLTime(BarImpl.DateFromBarsBack(barsback, interval, n)), Util.ToTLDate(n), Util.ToTLTime(n), string.Empty));
         }
+
         
     }
 

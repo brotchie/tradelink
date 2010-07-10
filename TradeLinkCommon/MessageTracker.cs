@@ -197,6 +197,7 @@ namespace TradeLink.Common
                             BLT[b.Symbol] = BarListImpl.InsertBar(bl, b, newpos);
                             
                         }
+                        return true;
 
                     }
                     break;

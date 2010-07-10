@@ -25,7 +25,7 @@ namespace ServerEsignal
         {
             // use a background thread to queue up COM-events
             bw.DoWork += new DoWorkEventHandler(bw_DoWork);
-
+            bw.WorkerSupportsCancellation = true;
             // set provider
             newProviderName = Providers.eSignal;
             // handle subscription requests
@@ -85,6 +85,45 @@ namespace ServerEsignal
                         }
                         qr = qc;
                     }
+
+                    while (_barrequests.hasItems)
+                    {
+                        BarRequest br = new BarRequest();
+                        try
+                        {
+                            br = _barrequests.Read();
+                            BarInterval bi = (BarInterval)br.Interval;
+                            string interval = string.Empty;
+                            int barsback = DefaultBarsBack;
+                            if (bi == BarInterval.CustomTicks)
+                                interval = br.CustomInterval + "T";
+                            else if (bi == BarInterval.CustomTime)
+                                interval = br.CustomInterval + "S";
+                            else if (bi == BarInterval.CustomVol)
+                                interval = br.CustomInterval + "V";
+                            else
+                            {
+                                interval = (br.Interval / 60).ToString();
+                                barsback = BarImpl.BarsBackFromDate(bi, br.StartDate, br.EndDate);
+                            }
+
+                            int hnd = esig.get_RequestHistory(br.Symbol, interval, (bi == BarInterval.Day) ? barType.btDAYS : barType.btBARS, barsback, -1, -1);
+                            verb("requested bar data for " + br.Symbol + " on: " + br.Interval.ToString() + " " + br.CustomInterval.ToString() + " reqhandle: " + hnd);
+                            // cache request
+                            if (!_barhandle2barrequest.ContainsKey(hnd))
+                                _barhandle2barrequest.Add(hnd, br);
+                            else
+                                verb("already had bar request: " + hnd + " " + _barhandle2barrequest[hnd].ToString());
+                            if (esig.get_IsHistoryReady(hnd) != 0)
+                                processhistory(hnd, br);
+                        }
+                        catch (Exception ex)
+                        {
+                            debug("error on historical bar request: " + br.ToString());
+                            debug(ex.Message + ex.StackTrace);
+                        }
+                    }
+
                 }
                 catch (Exception ex)
                 {
@@ -108,7 +147,9 @@ namespace ServerEsignal
             debug(msg);
         }
 
-        Dictionary<int, BarRequest> _barrequests = new Dictionary<int, BarRequest>();
+        Dictionary<int, BarRequest> _barhandle2barrequest = new Dictionary<int, BarRequest>();
+        RingBuffer<BarRequest> _barrequests = new RingBuffer<BarRequest>(500);
+
         long EsignalServer_newUnknownRequest(MessageTypes t, string msg)
         {
             switch (t)
@@ -119,34 +160,12 @@ namespace ServerEsignal
                         try
                         {
                             BarRequest br = BarImpl.ParseBarRequest(msg);
-                            BarInterval bi = (BarInterval)br.Interval;
-                            string interval = string.Empty;
-                            int barsback = DefaultBarsBack;
-                            if (bi == BarInterval.CustomTicks)
-                                interval = br.CustomInterval + "T";
-                            else if (bi == BarInterval.CustomTime)
-                                interval = br.CustomInterval + "S";
-                            else if (bi == BarInterval.CustomVol)
-                                interval = br.CustomInterval + "V";
-                            else
-                            {
-                                interval = (br.Interval / 60).ToString();
-                                barsback = BarImpl.BarsBackFromDate(bi, br.StartDate, br.EndDate);
-                            }
+                            _barrequests.Write(br);
 
-                            int hnd = esig.get_RequestHistory(br.Symbol, interval, (bi == BarInterval.Day) ? barType.btDAYS : barType.btBARS, barsback, -1, -1);
-                            verb("requested bar data for " + br.Symbol + " on: " + br.Interval.ToString() + " " + br.CustomInterval.ToString()+" reqhandle: "+hnd);
-                            // cache request
-                            if (!_barrequests.ContainsKey(hnd))
-                                _barrequests.Add(hnd, br);
-                            else
-                                verb("already had bar request: " + hnd + " " + _barrequests[hnd].ToString());
-                            if (esig.get_IsHistoryReady(hnd)!=0)
-                                processhistory(hnd,br);
                         }
                         catch (Exception ex)
                         {
-                            debug("error on historical bar request: " + msg);
+                            debug("error parsing bar request: " + msg);
                             debug(ex.Message + ex.StackTrace);
                         }
                         return 0;
@@ -159,6 +178,7 @@ namespace ServerEsignal
         {
             try
             {
+                debug("attempting to start connection");
                 // connect to esignal
                 esig = new Hooks();
                 // handle historical bars
@@ -180,10 +200,13 @@ namespace ServerEsignal
             _valid = esig.IsEntitled != 0;
             if (_valid)
             {
+                debug("success");
                 _go = true;
                 // start background processing
                 bw.RunWorkerAsync();
             }
+            else
+                debug("failed.");
         }
         public bool ReleaseBarHistoryAfteRequest = true;
         void processhistory(int lHandle,BarRequest br)
@@ -214,7 +237,7 @@ namespace ServerEsignal
                 try
                 {
                     esig.ReleaseHistory(lHandle);
-                    _barrequests.Remove(lHandle);
+                    _barhandle2barrequest.Remove(lHandle);
                 }
                 catch { }
             }
@@ -224,7 +247,7 @@ namespace ServerEsignal
         void esig_OnBarsReceived(int lHandle)
         {
             BarRequest br;
-            if (!_barrequests.TryGetValue(lHandle, out br))
+            if (!_barhandle2barrequest.TryGetValue(lHandle, out br))
             {
                 verb("Unknown barrequest handle: " + lHandle);
                 return;

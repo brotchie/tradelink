@@ -102,14 +102,20 @@ namespace TradeLink.Common
             {
                 if (bl.CustomIntervals[j] != b.Interval)
                     continue;
-                for (int i = 0; i < bl.Count; i++)
+                int count = bl.IntervalCount(b.Interval);
+                if (count != 0)
                 {
-                    if (i == position)
+                    for (int i = 0; i < count; i++)
                     {
-                        addbar(copy, b, j);
+                        if (i == position)
+                        {
+                            addbar(copy, b, j);
+                        }
+                        addbar(copy, bl[i, (BarInterval)b.Interval], j);
                     }
-                    addbar(copy, bl[i], j);
                 }
+                else
+                    addbar(copy, b, 0);
             }
             return copy;
         }

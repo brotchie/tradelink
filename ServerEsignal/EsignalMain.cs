@@ -20,6 +20,7 @@ namespace ServerEsignal
         EsignalServer tl;
         public const string PROGRAM = "ServerEsignal";
         Log _log = new Log(PROGRAM);
+        DebugWindow _dw = new DebugWindow();
         
         public EsignalMain()
         {
@@ -34,16 +35,27 @@ namespace ServerEsignal
             tl.ReleaseDeadSymbols = Properties.Settings.Default.ReleaseDeadSymbols;
             tl.WaitBetweenEvents = Properties.Settings.Default.WaitBetweenEvents;
             // send debug messages to log file
-            tl.GotDebug += new DebugFullDelegate(tl_GotDebug);
+            tl.GotDebug += new DebugFullDelegate(debug);
+            debug("Started " + PROGRAM + Util.TLVersion());
             // attempt to connect to esignal
             _ok_Click(null, null);
             // handle connector exits
             FormClosing += new FormClosingEventHandler(EsignalMain_FormClosing);
         }
 
-        void tl_GotDebug(Debug debug)
+
+        void debug(Debug deb)
         {
-            _log.GotDebug(debug);
+            debug(deb.Msg);
+        }
+
+        void debug(string msg)
+        {
+
+            _dw.GotDebug(msg);
+            _log.GotDebug(msg);
+
+
         }
 
         void EsignalMain_FormClosing(object sender, FormClosingEventArgs e)
@@ -59,6 +71,16 @@ namespace ServerEsignal
             if (_acctapp.Text == string.Empty) return;
             tl.Start(_acctapp.Text,null,null,0);
             if (tl.isValid) { BackColor = Color.Green; Invalidate(true); }
+        }
+
+        private void _msg_Click(object sender, EventArgs e)
+        {
+            _dw.Toggle();
+        }
+
+        private void _report_Click(object sender, EventArgs e)
+        {
+            TradeLink.AppKit.CrashReport.Report(PROGRAM, _dw.Content, null, null, false, string.Empty);
         }
     }
 }
