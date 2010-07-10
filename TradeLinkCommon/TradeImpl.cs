@@ -11,7 +11,7 @@ namespace TradeLink.Common
     {
         long _id = 0;
         CurrencyType cur = CurrencyType.USD;
-        SecurityType type = SecurityType.STK;
+        SecurityType type = SecurityType.NIL;
         string _localsymbol = "";
         string accountid = "";
         string _sym = "";

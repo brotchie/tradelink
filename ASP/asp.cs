@@ -1124,19 +1124,16 @@ namespace ASP
             }
             catch (KeyNotFoundException) 
             {
-                string sym = SecurityImpl.Parse(o.symbol).Symbol;
-                SecurityImpl sec = null;
-                if (_seclist.TryGetValue(sym, out sec))
-                {
-                    o.Security = sec.Type;
+                SecurityImpl sec = SecurityImpl.Parse(o.symbol);
+                o.Security = sec.Type;
+                if (o.ex==string.Empty)
                     o.Exchange = sec.DestEx;
-                }
             }
             // if still empty, use default
             if (o.ex == string.Empty)
                 o.Exchange = _ao._dest.Text;
             // set the local symbol
-            if (o.LocalSymbol==string.Empty)
+            if ((o.LocalSymbol==string.Empty) && (o.Sec.Type!= SecurityType.CASH))
                 o.LocalSymbol = o.symbol;
             // assign master order if necessary
             assignmasterorderid(ref o);
