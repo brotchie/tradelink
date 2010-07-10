@@ -49,5 +49,36 @@ namespace TradeLink.Common
 
 
         }
+
+        /// <summary>
+        /// get tick files created today from default folder
+        /// </summary>
+        /// <returns></returns>
+        public static List<string> GetFilesFromDate() { return GetFilesFromDate(Util.TLTickDir, Util.ToTLDate()); }
+        /// <summary>
+        /// get tick files created today
+        /// </summary>
+        /// <param name="tickfolder"></param>
+        /// <returns></returns>
+        public static List<string> GetFilesFromDate(string tickfolder) { return GetFilesFromDate(tickfolder, Util.ToTLDate()); }
+        /// <summary>
+        /// get tick files created on a certain date
+        /// </summary>
+        /// <param name="tickfolder"></param>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        public static List<string> GetFilesFromDate(string tickfolder, int date)
+        {
+            string[] files = TikUtil.GetFiles(tickfolder, TikConst.WILDCARD_EXT);
+            List<string> matching = new List<string>();
+            foreach (string file in files)
+            {
+                SecurityImpl sec = SecurityImpl.SecurityFromFileName(file);
+                string symfix = System.IO.Path.GetFileNameWithoutExtension(sec.Name);
+                if (sec.Date == date)
+                    matching.Add(file);
+            }
+            return matching;
+        }
     }
 }
