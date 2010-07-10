@@ -137,7 +137,7 @@ namespace TradeLink.AppKit
         void fw_Changed(object sender, FileSystemEventArgs e)
         {
             if (!_autowatch) return;
-            DisplayResults(FetchResults(LoadResults(e.Name)));
+            DisplayResults(Results.FetchResults(LoadResults(e.Name),_rfr,_comm,debug));
             tradefiles.SelectedItem = e.Name;
         }
 
@@ -268,93 +268,7 @@ namespace TradeLink.AppKit
 
         public event DebugDelegate SendDebug;
 
-        Results FetchResults(List<TradeResult> results)
-        {
-            List<decimal> _MIU = new List<decimal>();
-            List<decimal> _return = new List<decimal>();
-            List<int> days = new List<int>();
-            //clear position tracker
-            pt = new PositionTracker(results.Count);
-            // setup new results
-            Results r = new Results();
-            r.ComPerShare = _comm;
-            r.RiskFreeRet = string.Format("{0:P2}", _rfr);
-            int consecWinners = 0;
-            int consecLosers = 0;
-            foreach (TradeResult tr in results)
-            {
-                if (!days.Contains(tr.Source.xdate))
-                    days.Add(tr.Source.xdate);
-                pt.Adjust(tr.Source);
-                // calculate MIU and store on array
-                decimal miu = Calc.Sum(Calc.MoneyInUse(pt));
-                _MIU.Add(miu);
-                // get p&l
-                decimal pl = Calc.Sum(Calc.AbsoluteReturn(pt, new decimal[pt.Count], true, false));
-                _return.Add(pl);
-
-                if (!r.Symbols.Contains(tr.Source.symbol))
-                    r.Symbols += tr.Source.symbol + ",";
-                r.Trades++;
-                r.HundredLots += (int)(tr.Source.xsize / 100);
-                r.GrossPL += tr.ClosedPL;
-                
-                if (tr.ClosedPL > 0)
-                {
-                    r.Winners++;
-                    consecWinners++;
-                    consecLosers = 0;
-                }
-                else if (tr.ClosedPL < 0)
-                {
-                    r.Losers++;
-                    consecLosers++;
-                    consecWinners = 0;
-                }
-                if (consecWinners > r.ConsecWin) r.ConsecWin = consecWinners;
-                if (consecLosers > r.ConsecLose) r.ConsecLose = consecLosers;
-                if ((tr.OpenSize == 0) && (tr.ClosedPL == 0)) r.Flats++;
-                if (tr.ClosedPL > r.MaxWin) r.MaxWin = tr.ClosedPL;
-                if (tr.ClosedPL < r.MaxLoss) r.MaxLoss = tr.ClosedPL;
-                if (tr.OpenPL > r.MaxOpenWin) r.MaxOpenWin = tr.OpenPL;
-                if (tr.OpenPL < r.MaxOpenLoss) r.MaxOpenLoss = tr.OpenPL;
-
-            }
-
-
-            try
-            {
-                r.SharpeRatio = Math.Round(Calc.SharpeRatio(_return[_return.Count - 1], Calc.StdDev(_return.ToArray()), _rfr),3);
-            }
-            catch (Exception ex)
-            {
-                debug("sharp error: " + ex.Message);
-            }
-
-            if (r.Trades != 0)
-            {
-                r.MoneyInUse = Math.Round(Calc.Max(_MIU.ToArray()), 2);
-                r.MaxPL = Math.Round(Calc.Max(_return.ToArray()), 2);
-                r.MinPL = Math.Round(Calc.Min(_return.ToArray()), 2);
-                r.MaxDD = string.Format("{0:P1}", Calc.MaxDD(_return.ToArray()));
-                r.SymbolCount = pt.Count;
-                r.DaysTraded = days.Count;
-                r.GrossPerDay = Math.Round(r.GrossPL / days.Count, 2);
-                r.GrossPerSymbol = Math.Round(r.GrossPL / pt.Count, 2);
-            }
-            else
-            {
-                r.MoneyInUse = 0;
-                r.MaxPL = 0;
-                r.MinPL = 0;
-                r.MaxDD = "0";
-                r.GrossPerDay = 0;
-                r.GrossPerSymbol = 0;
-            }
-
-            return r;
-
-        }
+        
 
         List<TradeResult> LoadResults(string filename)
         {
@@ -392,7 +306,7 @@ namespace TradeLink.AppKit
         void DisplayResults(int idx)
         {
             if (idx == -1) return;
-            DisplayResults(FetchResults(_resultlists[idx]));
+            DisplayResults(Results.FetchResults(_resultlists[idx],_rfr,_comm,debug));
         }
 
 
@@ -431,6 +345,119 @@ namespace TradeLink.AppKit
 
     public class Results
     {
+        /// <summary>
+        /// get results from list of traderesults
+        /// </summary>
+        /// <param name="results"></param>
+        /// <param name="RiskFreeRate"></param>
+        /// <param name="CommissionPerContractShare"></param>
+        /// <param name="d"></param>
+        /// <returns></returns>
+        public static Results FetchResults(List<TradeResult> results, decimal RiskFreeRate, decimal CommissionPerContractShare, DebugDelegate d)
+        {
+            List<decimal> _MIU = new List<decimal>();
+            List<decimal> _return = new List<decimal>();
+            List<int> days = new List<int>();
+            //clear position tracker
+            PositionTracker pt = new PositionTracker(results.Count);
+            // setup new results
+            Results r = new Results();
+            r.ComPerShare = CommissionPerContractShare;
+            r.RiskFreeRet = string.Format("{0:P2}", RiskFreeRate);
+            int consecWinners = 0;
+            int consecLosers = 0;
+            foreach (TradeResult tr in results)
+            {
+                if (!days.Contains(tr.Source.xdate))
+                    days.Add(tr.Source.xdate);
+                pt.Adjust(tr.Source);
+                // calculate MIU and store on array
+                decimal miu = Calc.Sum(Calc.MoneyInUse(pt));
+                _MIU.Add(miu);
+                // get p&l
+                decimal pl = Calc.Sum(Calc.AbsoluteReturn(pt, new decimal[pt.Count], true, false));
+                _return.Add(pl);
+
+                if (!r.Symbols.Contains(tr.Source.symbol))
+                    r.Symbols += tr.Source.symbol + ",";
+                r.Trades++;
+                r.HundredLots += (int)(tr.Source.xsize / 100);
+                r.GrossPL += tr.ClosedPL;
+
+                if (tr.ClosedPL > 0)
+                {
+                    r.Winners++;
+                    consecWinners++;
+                    consecLosers = 0;
+                }
+                else if (tr.ClosedPL < 0)
+                {
+                    r.Losers++;
+                    consecLosers++;
+                    consecWinners = 0;
+                }
+                if (consecWinners > r.ConsecWin) r.ConsecWin = consecWinners;
+                if (consecLosers > r.ConsecLose) r.ConsecLose = consecLosers;
+                if ((tr.OpenSize == 0) && (tr.ClosedPL == 0)) r.Flats++;
+                if (tr.ClosedPL > r.MaxWin) r.MaxWin = tr.ClosedPL;
+                if (tr.ClosedPL < r.MaxLoss) r.MaxLoss = tr.ClosedPL;
+                if (tr.OpenPL > r.MaxOpenWin) r.MaxOpenWin = tr.OpenPL;
+                if (tr.OpenPL < r.MaxOpenLoss) r.MaxOpenLoss = tr.OpenPL;
+
+            }
+
+
+            try
+            {
+                r.SharpeRatio = Math.Round(Calc.SharpeRatio(_return[_return.Count - 1], Calc.StdDev(_return.ToArray()), RiskFreeRate), 3);
+            }
+            catch (Exception ex)
+            {
+                if (d != null)
+                    d("sharp error: " + ex.Message);
+            }
+
+            if (r.Trades != 0)
+            {
+                r.MoneyInUse = Math.Round(Calc.Max(_MIU.ToArray()), 2);
+                r.MaxPL = Math.Round(Calc.Max(_return.ToArray()), 2);
+                r.MinPL = Math.Round(Calc.Min(_return.ToArray()), 2);
+                r.MaxDD = string.Format("{0:P1}", Calc.MaxDD(_return.ToArray()));
+                r.SymbolCount = pt.Count;
+                r.DaysTraded = days.Count;
+                r.GrossPerDay = Math.Round(r.GrossPL / days.Count, 2);
+                r.GrossPerSymbol = Math.Round(r.GrossPL / pt.Count, 2);
+            }
+            else
+            {
+                r.MoneyInUse = 0;
+                r.MaxPL = 0;
+                r.MinPL = 0;
+                r.MaxDD = "0";
+                r.GrossPerDay = 0;
+                r.GrossPerSymbol = 0;
+            }
+
+            return r;
+
+        }
+        /// <summary>
+        /// get results from list of trades
+        /// </summary>
+        /// <param name="trades"></param>
+        /// <param name="riskfreerate"></param>
+        /// <param name="commissionpershare"></param>
+        /// <param name="d"></param>
+        /// <returns></returns>
+        public static Results ResultsFromTradeList(List<Trade> trades, decimal riskfreerate, decimal commissionpershare, DebugDelegate d)
+        {
+            string[] results = Util.TradesToClosedPL(trades);
+            List<TradeResult> tresults = new List<TradeResult>(results.Length);
+            foreach (string line in results)
+                tresults.Add(TradeResult.Init(line));
+            return Results.FetchResults(tresults, riskfreerate, commissionpershare, d);
+        }
+
         public string Symbols = "";
         public decimal GrossPL = 0;
         public string NetPL { get { return v2s(GrossPL - (HundredLots * 100 * ComPerShare)); } }
@@ -462,6 +489,41 @@ namespace TradeLink.AppKit
         public string WLRatio { get { return v2s((Losers == 0) ? 0 : (Winners / Losers)); } }
         public string GrossMargin { get { return v2s((GrossPL == 0) ? 0 : ((GrossPL - (HundredLots * 100 * ComPerShare)) / GrossPL)); } }
         public string RiskFreeRet = "0%";
+
+        /// <summary>
+        /// get string version of results table
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return ToString(": ");
+        }
+        /// <summary>
+        /// get results like calc => value where '=>' is the delim
+        /// </summary>
+        /// <param name="delim"></param>
+        /// <returns></returns>
+        public string ToString(string delim)
+        {
+            Type t = GetType();
+            FieldInfo[] fis = t.GetFields();
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            foreach (FieldInfo fi in fis)
+            {
+                string format = null;
+                if (fi.GetType() == typeof(Decimal)) format = "N2";
+                sb.AppendLine(fi.Name+delim+ (format != null ? string.Format(format, fi.GetValue(this)) : fi.GetValue(this).ToString()));
+            }
+            PropertyInfo[] pis = t.GetProperties();
+            foreach (PropertyInfo pi in pis)
+            {
+                string format = null;
+                if (pi.GetType() == typeof(Decimal)) format = "N2";
+                sb.AppendLine(pi.Name + delim + (format != null ? string.Format(format, pi.GetValue(this, null)) : pi.GetValue(this, null).ToString()));
+            }
+            return sb.ToString();
+
+        }
     }
 
     public class TradeResult : TradeLink.Common.TradeImpl
@@ -488,6 +550,7 @@ namespace TradeLink.AppKit
             return r;
         }
 
+
         public static List<TradeResult> ResultsFromTradeList(List<Trade> trades)
         {
             string[] results = Util.TradesToClosedPL(trades);
@@ -496,6 +559,8 @@ namespace TradeLink.AppKit
                 tresults.Add(TradeResult.Init(line));
             return tresults;
         }
+
+
 
     }
 
