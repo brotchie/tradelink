@@ -5,4 +5,6 @@ public enum Converter
     CQG,
     TradeStation,
     eSignal_EPF,
+    TradingPhysicsTnS,
+    TradingPhysicsTV
 }

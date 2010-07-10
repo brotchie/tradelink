@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Globalization;
 using System.Windows.Forms;
 using System.IO;
 using TradeLink.Common;
@@ -108,6 +109,7 @@ namespace TikConverter
             TikWriter outfile = null;
             // setup input file
             StreamReader infile = null;
+            int _date = 0;
             try
             {
                 // open input file
@@ -128,7 +130,18 @@ namespace TikConverter
                         infile = new StreamReader(filename);
                         // no header
                         break;
-                }
+                    case Converter.TradingPhysicsTnS:
+                    case Converter.TradingPhysicsTV:
+                        string file = System.IO.Path.GetFileName(filename);
+                        string[] date_sym = file.Split('_');
+                        string[] sym_ext = date_sym[1].Split('.');
+                        string datestr = date_sym[0];
+                        int.TryParse(datestr, out _date);
+                        _sym = sym_ext[0];
+                        infile = new StreamReader(filename);
+                        infile.ReadLine();//discard header line 
+                        break;
+                 }
 
             }
             catch (Exception ex) { debug("error reading input header:" + ex.Message); g = false; }
@@ -151,6 +164,12 @@ namespace TikConverter
                             break;
                         case Converter.TradeStation:
                             k = TradeStation.parseline(infile.ReadLine(), _sym, tradesize);
+                            break;
+                        case Converter.TradingPhysicsTnS:
+                            k = TradingPhysicsTnS.parseline(infile.ReadLine(), _sym, _date);
+                            break;
+                        case Converter.TradingPhysicsTV:
+                            k = TradingPhysicsTV.parseline(infile.ReadLine(), _sym, _date);
                             break;
                     }
                 }

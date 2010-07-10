@@ -94,6 +94,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="TradeStation.cs" />
+    <Compile Include="TradingPhysics.cs" />
     <EmbeddedResource Include="TikConvertMain.resx">
       <DependentUpon>TikConvertMain.cs</DependentUpon>
     </EmbeddedResource>
