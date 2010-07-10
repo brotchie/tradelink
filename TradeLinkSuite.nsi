@@ -51,7 +51,6 @@ Section "TradeLinkSuite"
   RMDir "$SMPROGRAMS\TradeLink Connectors"
 
   CreateDirectory "$SMPROGRAMS\TradeLink"
-  CreateDirectory "$SMPROGRAMS\TradeLink Connectors"
   CreateShortCut "$SMPROGRAMS\TradeLink\Asp.lnk" "$INSTDIR\ASP.exe" "" "$INSTDIR\ASP.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Quotopia.lnk" "$INSTDIR\Quotopia.exe" "" "$INSTDIR\Quotopia.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Gauntlet.lnk" "$INSTDIR\Gauntlet.exe" "" "$INSTDIR\Gauntlet.exe" 0
@@ -59,21 +58,23 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\Replay.lnk" "$INSTDIR\Replay.exe" "" "$INSTDIR\Replay.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Time and Sales.lnk" "$INSTDIR\TimeSales.exe" "" "$INSTDIR\TimeSales.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Uninstall TradeLink.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
+  CreateShortCut "$SMPROGRAMS\TradeLink\TikConverter.lnk" "$INSTDIR\TikConverter.exe" "" "$INSTDIR\TikConverter.exe" 0
+  CreateShortCut "$SMPROGRAMS\TradeLink\TickData.lnk" "$LOCALAPPDATA\TradeLinkTicks\" "" "$LOCALAPPDATA\TradeLinkTicks" 0
+  CreateShortCut "$SMPROGRAMS\TradeLink\Logs.lnk" "$LOCALAPPDATA\" "" "$LOCALAPPDATA\" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Kadina.lnk" "$INSTDIR\Kadina.EXE" "" "$INSTDIR\Kadina.EXE" 0 
   CreateShortCut "$SMPROGRAMS\TradeLink\Record.lnk" "$INSTDIR\Record.EXE" "" "$INSTDIR\Record.EXE" 0  
+
+  CreateDirectory "$SMPROGRAMS\TradeLink Connectors"
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\SterlingPro.lnk" "$INSTDIR\SterServer.EXE" "" "$INSTDIR\SterServer.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\TDAmeritrade.lnk" "$INSTDIR\TDServer.EXE" "" "$INSTDIR\TDServer.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\TDAmeritradeX.lnk" "$INSTDIR\TDServerX.EXE" "" "$INSTDIR\TDServerX.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\MBTrading.lnk" "$INSTDIR\ServerMB.EXE" "" "$INSTDIR\ServerMB.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\Esignal.lnk" "$INSTDIR\ServerEsignal.exe" "" "$INSTDIR\ServerEsignal.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\DBFX.lnk" "$INSTDIR\ServerDBFX.exe" "" "$INSTDIR\ServerDBFX.exe" 0  
-  CreateShortCut "$SMPROGRAMS\TradeLink\TikConverter.lnk" "$INSTDIR\TikConverter.exe" "" "$INSTDIR\TikConverter.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\Blackwood.lnk" "$INSTDIR\ServerBlackwood.exe" "" "$INSTDIR\ServerBlackwood.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\REDI.lnk" "$INSTDIR\ServerRedi.exe" "" "$INSTDIR\ServerRedi.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\IQFeed.lnk" "$INSTDIR\IQFeedBroker.exe" "" "$INSTDIR\IQFeedBroker.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\NxCore.lnk" "$INSTDIR\ServerNxCore.exe" "" "$INSTDIR\ServerNxCore.exe" 0  
-  CreateShortCut "$SMPROGRAMS\TradeLink\TickData.lnk" "$LOCALAPPDATA\TradeLinkTicks\" "" "$LOCALAPPDATA\TradeLinkTicks" 0
-  CreateShortCut "$SMPROGRAMS\TradeLink\Logs.lnk" "$LOCALAPPDATA\" "" "$LOCALAPPDATA\" 0
   
   
   ; install these files
@@ -99,6 +100,7 @@ Section "TradeLinkSuite"
   File "Quotopia\bin\release\Multimedia.dll"
   File "TradeLinkCommon\bin\release\TradeLinkCommon.dll"
   File "TradeLinkCommon\bin\Release\TradeLinkCommon.XML"
+  File "TradeLinkAppKit\bin\release\Ionic.zip.dll"
   File "TradeLinkAppKit\bin\release\TradeLinkAppKit.dll"
   File "TradeLinkAppKit\bin\Release\TradeLinkAppKit.XML"
   File "TradeLinkApi\bin\release\TradeLinkApi.dll"
@@ -129,7 +131,6 @@ Section "TradeLinkSuite"
   File "ServerBlackwood\bin\release\Blackwood.Framework.dll"
   File "ServerBlackwood\bin\release\BWCMessageLib.dll"
   File "ServerBlackwood\bin\release\zlib.net.dll"
-  File "LogViewer\bin\release\LogViewer.exe"
   File "ServerRedi\bin\release\ServerRedi.exe"
   File "ServerRedi\bin\release\Interop.RediLib.dll"
   File "ServerRedi\bin\release\VBRediClasses.dll"
@@ -153,7 +154,6 @@ Section "TradeLinkSuite"
   SetOverWrite off
   File "ServerFIX\bin\release\ServerFIX.exe.config"
   File "ServerNxCore\bin\release\ServerNxCore.exe.config"
-  File "LogViewer\bin\release\LogViewer.exe.config"
   File "ServerRedi\bin\release\ServerRedi.exe.config"
   File "ServerIQ-DTN\bin\Release\IQFeedBroker.exe.config"
   File "Kadina\bin\release\Kadina.exe.config"
