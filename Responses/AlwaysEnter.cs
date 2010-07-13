@@ -1,6 +1,7 @@
 using System;
 using TradeLink.Common;
 using TradeLink.API;
+using System.ComponentModel;
 
 namespace Responses
 {
@@ -13,7 +14,6 @@ namespace Responses
     /// </summary>
     public class AlwaysEnter : ResponseTemplate
     {
-        PositionTracker pt = new PositionTracker();
         public AlwaysEnter() : base() 
         {
             Name = "AlwaysEnter";
@@ -21,34 +21,75 @@ namespace Responses
 
         public override void GotTick(TradeLink.API.Tick tick)
         {
-            // ignore quotes
-            if (!tick.isTrade) return;
+            // track tick
+            _kt.newTick(tick);
             // get current position
-            Position p = pt[tick.symbol];
+            Position p = _pt[tick.symbol];
+
             // if we're flat, enter
             if (p.isFlat)
             {
-                D("entering long");
-                O(new BuyMarket(tick.symbol, 100));
+                D(tick.symbol+": entering long");
+                O(new MarketOrder(tick.symbol, EntrySize));
             }
-            // otherwise if we're up 10/th of a point, flat us
-            else if (Calc.OpenPT(tick.trade, p) > .1m)
+            else 
             {
-                D("hit profit target");
-                O(new MarketOrderFlat(p));
+                // get most recent tick data
+                Tick k = _kt[tick.symbol];
+                // estimate our exit price
+                decimal exitprice = UseQuotes 
+                    ? (k.hasAsk && p.isLong ? k.ask 
+                    : (k.hasBid && p.isShort ? k.bid : 0))
+                    : (k.isTrade ? k.trade : 0);
+                // assuming we could estimate an exit, see if our exit would hit our target
+                if ((exitprice != 0) && (Calc.OpenPT(exitprice, p) > ProfitTarget))
+                {
+                    D("hit profit target");
+                    O(new MarketOrderFlat(p));
+                }
+                
+                
             }
         }
+
+        PositionTracker _pt = new PositionTracker();
+        TickTracker _kt = new TickTracker();
 
         public override void GotFill(TradeLink.API.Trade fill)
         {
             // keep track of position
-            pt.Adjust(fill);
+            D(fill.symbol + " fill: " + fill.ToString());
+            _pt.Adjust(fill);
         }
 
         public override void GotPosition(TradeLink.API.Position p)
         {
             // keep track of position
-            pt.Adjust(p);
+            D(p.Symbol + " pos: " + p.ToString());
+            _pt.Adjust(p);
+        }
+
+        int _entrysize = 100;
+        [Description("size used when entering positions.  Negative numbers would be short entries.")]
+        public int EntrySize { get { return _entrysize; } set { _entrysize = value; } }
+        decimal _profittarget = .01m;
+        [Description("profit target in dollars when position is exited")]
+        public decimal ProfitTarget { get { return _profittarget; } set { _profittarget = value; } }
+        bool _usequotes = false;
+        [Description("whether bid/ask is used to determine profitability, otherwise last trade is used")]
+        public bool UseQuotes { get { return _usequotes; } set { _usequotes = value; } }
+
+    }
+
+    /// <summary>
+    /// allows user to control alwaysenter parameters through graphical pop-up interface
+    /// </summary>
+    public class AlwaysEnter_Parameters : AlwaysEnter
+    {
+        public override void Reset()
+        {
+            ParamPrompt.Popup(this, true, false);
+            base.Reset();
         }
     }
 }
