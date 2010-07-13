@@ -203,7 +203,8 @@ namespace ServerEsignal
                 debug("success");
                 _go = true;
                 // start background processing
-                bw.RunWorkerAsync();
+                if (!bw.IsBusy)
+                    bw.RunWorkerAsync();
             }
             else
                 debug("failed.");
