@@ -88,7 +88,7 @@ namespace TradeLink.AppKit
         /// see if we're authorized on this machine
         /// </summary>
         /// <returns></returns>
-        public bool isAuthorized() { return isAuthorized(Auth.GetCPUId()); }
+        public bool isAuthorized() { return isAuthorized(Auth.GetHDDSerial()); }
         /// <summary>
         /// see if a given key is authorized
         /// </summary>
@@ -132,6 +132,11 @@ namespace TradeLink.AppKit
             _lastauth = false;
             try
             {
+                if (key == string.Empty)
+                {
+                    debug("Empty key not allowed, authorization failing...");
+                    return false;
+                }
                 if (!hasuser)
                 {
                     WebClient wc = new WebClient();
@@ -232,8 +237,10 @@ namespace TradeLink.AppKit
 
         /// <summary>
         /// Return processorId from first CPU in machine
+        /// (some hardvendors use duplicate cpu ids)
         /// </summary>
         /// <returns>[string] ProcessorId</returns>
+        [Obsolete]
         public static string GetCPUId()
         {
             string cpuInfo = String.Empty;
@@ -249,13 +256,40 @@ namespace TradeLink.AppKit
             }
             return cpuInfo;
         }
+
+        /// <summary>
+        /// get hard disk drive serial number
+        /// </summary>
+        /// <returns></returns>
+        public static string GetHDDSerial()
+        {
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PhysicalMedia");
+
+            foreach (ManagementObject wmi_HD in searcher.Get())
+            {
+                // get the hardware serial no.
+                if (wmi_HD["SerialNumber"] != null)
+                    return wmi_HD["SerialNumber"].ToString();
+            }
+
+            return string.Empty;
+        }
         /// <summary>
         /// hold authentication information.
         /// </summary>
         public struct AuthInfo
         {
+            /// <summary>
+            /// username
+            /// </summary>
             public string Username;
+            /// <summary>
+            /// password
+            /// </summary>
             public string Password;
+            /// <summary>
+            /// isvalid auth information
+            /// </summary>
             public bool isValid { get { return (Username != null) && (Password != null); } }
         }
         /// <summary>
