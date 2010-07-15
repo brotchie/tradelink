@@ -132,6 +132,16 @@ namespace TradeLink.AppKit
             _lastauth = false;
             try
             {
+                if (key == null)
+                {
+                    debug("null keys not allowed");
+                    return false;
+                }
+                if (key.Contains(" "))
+                {
+                    debug("spaces not allowed in key: " + key);
+                    return false;
+                }
                 if (key == string.Empty)
                 {
                     debug("Empty key not allowed, authorization failing...");
@@ -244,16 +254,20 @@ namespace TradeLink.AppKit
         public static string GetCPUId()
         {
             string cpuInfo = String.Empty;
-            string temp = String.Empty;
-            ManagementClass mc = new ManagementClass("Win32_Processor");
-            ManagementObjectCollection moc = mc.GetInstances();
-            foreach (ManagementObject mo in moc)
+            try
             {
-                if (cpuInfo == String.Empty)
-                {// only return cpuInfo from first CPU
-                    cpuInfo = mo.Properties["ProcessorId"].Value.ToString();
+                string temp = String.Empty;
+                ManagementClass mc = new ManagementClass("Win32_Processor");
+                ManagementObjectCollection moc = mc.GetInstances();
+                foreach (ManagementObject mo in moc)
+                {
+                    if (cpuInfo == String.Empty)
+                    {// only return cpuInfo from first CPU
+                        cpuInfo = mo.Properties["ProcessorId"].Value.ToString();
+                    }
                 }
             }
+            catch { }
             return cpuInfo;
         }
 
@@ -263,16 +277,21 @@ namespace TradeLink.AppKit
         /// <returns></returns>
         public static string GetHDDSerial()
         {
-            ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PhysicalMedia");
-
-            foreach (ManagementObject wmi_HD in searcher.Get())
+            string r = string.Empty;
+            try
             {
-                // get the hardware serial no.
-                if (wmi_HD["SerialNumber"] != null)
-                    return wmi_HD["SerialNumber"].ToString();
-            }
+                ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PhysicalMedia");
 
-            return string.Empty;
+                foreach (ManagementObject wmi_HD in searcher.Get())
+                {
+                    // get the hardware serial no.
+                    if (wmi_HD["SerialNumber"] != null)
+                        r = wmi_HD["SerialNumber"].ToString().Replace(" ", string.Empty);
+                }
+            }
+            catch { }
+
+            return r;
         }
         /// <summary>
         /// hold authentication information.
