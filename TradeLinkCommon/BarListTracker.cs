@@ -139,7 +139,7 @@ namespace TradeLink.Common
                 GotNewBar(symbol, interval);
         }
         /// <summary>
-        /// give any ticks to this symbol and tracker will create barlists automatically 
+        /// give any ticks (trades) to this symbol and tracker will create barlists automatically 
         /// </summary>
         /// <param name="k"></param>
         public void newTick(Tick k)
@@ -153,6 +153,45 @@ namespace TradeLink.Common
                 _bdict.Add(k.symbol, bl);
             }
             bl.newTick(k);
+        }
+        /// <summary>
+        /// add any data point to bar
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <param name="p"></param>
+        /// <param name="time"></param>
+        /// <param name="date"></param>
+        /// <param name="size"></param>
+        public void newPoint(string symbol, decimal p, int time, int date, int size)
+        {
+            BarListImpl bl;
+            if (!_bdict.TryGetValue(symbol, out bl))
+            {
+                bl = new BarListImpl(symbol, _requested, _reqtype);
+                bl.DefaultCustomInterval = _default;
+                bl.GotNewBar += new SymBarIntervalDelegate(bl_GotNewBar);
+                _bdict.Add(symbol, bl);
+            }
+            bl.newPoint(p, time, date, size);
+        }
+
+        /// <summary>
+        /// build bar with bid data rather than trades
+        /// </summary>
+        /// <param name="k"></param>
+        public void newBid(Tick k)
+        {
+            if (!k.hasBid) return;
+            newPoint(k.symbol, k.bid, k.time, k.date, k.BidSize);
+        }
+        /// <summary>
+        /// build bar with ask data rather than trades
+        /// </summary>
+        /// <param name="k"></param>
+        public void newAsk(Tick k)
+        {
+            if (!k.hasAsk) return;
+            newPoint(k.symbol, k.ask, k.time, k.date, k.AskSize);
         }
     }
 }
