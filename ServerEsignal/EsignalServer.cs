@@ -218,11 +218,14 @@ namespace ServerEsignal
                 verb("no bars available for reqhandle: " + lHandle);
                 return;
             }
-            for (int i = 0; i<numbars; i++)
+            numbars *= -1;
+            for (int i = numbars; i<=0; i++)
             {
                 try
                 {
                     BarData bd = esig.get_GetBar(lHandle, i);
+                    if (VerboseDebugging)
+                        verb(br.Symbol + " " + bd.dtTime.ToString() + " " + bd.dOpen + " " + bd.dHigh + " " + bd.dLow + " " + bd.dClose + " " + bd.dVolume);
                     Bar b = new BarImpl((decimal)bd.dOpen, (decimal)bd.dHigh, (decimal)bd.dLow, (decimal)bd.dClose, (long)bd.dVolume, Util.ToTLDate(bd.dtTime), Util.ToTLTime(bd.dtTime), br.Symbol, br.Interval);
                     string msg = BarImpl.Serialize(b);
                     TLSend(msg, MessageTypes.BARRESPONSE, br.Client);

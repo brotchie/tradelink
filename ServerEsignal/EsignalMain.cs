@@ -70,7 +70,10 @@ namespace ServerEsignal
         {
             if (_acctapp.Text == string.Empty) return;
             tl.Start(_acctapp.Text,null,null,0);
-            if (tl.isValid) { BackColor = Color.Green; Invalidate(true); }
+            if (tl.isValid) { BackColor = Color.Green; }
+            else
+                BackColor = Color.Red;
+            Invalidate(true); 
         }
 
         private void _msg_Click(object sender, EventArgs e)
