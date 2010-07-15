@@ -400,6 +400,7 @@ namespace WinGauntlet
             if ((args.Response== null) || !args.Response.isValid)
                 return false;
             if (_boundonce) return true;
+            args.Response.ID = 0;
             args.Response.SendTicketEvent += new TicketDelegate(Response_SendTicketEvent);
             args.Response.SendMessageEvent += new MessageDelegate(Response_SendMessage);
             args.Response.SendIndicatorsEvent += new StringParamDelegate(Response_SendIndicators);

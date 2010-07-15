@@ -577,6 +577,7 @@ namespace Kadina
                 status(resname + " is current response.");
                 updatetitle();
                 igridinit();
+                myres.ID = 0;
                 myres.Reset();
             }
             else status("Response did not load.");
