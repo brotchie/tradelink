@@ -35,6 +35,9 @@ namespace SterServer
                 tl.Account = Properties.Settings.Default.defaultaccount;
                 tl.CancelWait = Properties.Settings.Default.CancelWait;
                 tl.VerboseDebugging = Properties.Settings.Default.VerboseDebugging;
+                tl.FixOrderDecimalPlace = Properties.Settings.Default.FixOrderDecimalPlaces;
+                tl.IgnoreOutOfOrderTicks = Properties.Settings.Default.IgnoreOutOfOrderTicks;
+                tl.AutosetUnsetId = Properties.Settings.Default.AutoSeUnsetId;
                 tl.Start();
             }
             catch (Exception ex)

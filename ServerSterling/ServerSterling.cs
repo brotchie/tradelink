@@ -19,6 +19,12 @@ namespace SterServer
         STIQuote stiQuote;
         STIBook stiBook;
 
+        bool _ignoreoutoforderticks = true;
+        public bool IgnoreOutOfOrderTicks { get { return _ignoreoutoforderticks; } set { _ignoreoutoforderticks = value; } }
+        int _fixorderdecimalplace = 2;
+        public int FixOrderDecimalPlace { get { return _fixorderdecimalplace; } set { _fixorderdecimalplace = value; } }
+
+
         PositionTracker pt = new PositionTracker();
         int _SLEEP = 50;
         int _ORDERSLEEP = 1;
@@ -269,7 +275,10 @@ namespace SterServer
         /// gets or sets default account
         /// </summary>
         public string Account { get { return _account; } set { _account = value; debug("default account: " + _account); } }
-            
+
+        bool _autosetunsetid = true;
+
+        public bool AutosetUnsetId { get { return _autosetunsetid; } set { _autosetunsetid = value; } }
 
 
         bool _runbg = false;
@@ -286,6 +295,12 @@ namespace SterServer
                         Order o = _orderq.Read();
                         if (VerboseDebugging)
                             debug("client order received: " + o.ToString());
+                        if ((o.id == 0) && AutosetUnsetId)
+                        {
+                            o.id = _idt.AssignId;
+                        }
+                        o.price = Math.Round(o.price, FixOrderDecimalPlace);
+                        o.stopp = Math.Round(o.stopp, FixOrderDecimalPlace);
                         order.LmtPrice = (double)o.price;
                         order.StpPrice = (double)o.stopp;
                         if (o.ex == string.Empty)
@@ -552,6 +567,8 @@ namespace SterServer
             return pt.ToArray();
         }
 
+        int _lasttime = 0;
+
         void stiQuote_OnSTIQuoteUpdate(ref structSTIQuoteUpdate q)
         {
             Tick k = new TickImpl(q.bstrSymbol);
@@ -566,6 +583,8 @@ namespace SterServer
             k.date = Util.ToTLDate(DateTime.Now);
             int sec = now % 100;
             k.time = now;
+            if (IgnoreOutOfOrderTicks && (k.time < _lasttime)) return;
+            _lasttime = k.time;
             k.trade = (decimal)q.fLastPrice;
             k.size = q.nLastSize;
             if (!_imbalance || (_imbalance && k.isValid))

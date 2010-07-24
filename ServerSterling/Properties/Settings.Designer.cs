@@ -94,5 +94,41 @@ namespace SterServer.Properties {
                 this["VerboseDebugging"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool IgnoreOutOfOrderTicks {
+            get {
+                return ((bool)(this["IgnoreOutOfOrderTicks"]));
+            }
+            set {
+                this["IgnoreOutOfOrderTicks"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public int FixOrderDecimalPlaces {
+            get {
+                return ((int)(this["FixOrderDecimalPlaces"]));
+            }
+            set {
+                this["FixOrderDecimalPlaces"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AutoSeUnsetId {
+            get {
+                return ((bool)(this["AutoSeUnsetId"]));
+            }
+            set {
+                this["AutoSeUnsetId"] = value;
+            }
+        }
     }
 }
