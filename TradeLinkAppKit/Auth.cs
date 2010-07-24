@@ -88,7 +88,7 @@ namespace TradeLink.AppKit
         /// see if we're authorized on this machine
         /// </summary>
         /// <returns></returns>
-        public bool isAuthorized() { return isAuthorized(Auth.GetHDDSerial()); }
+        public bool isAuthorized() { return isAuthorized(Auth.GetNetworkAddress()); }
         /// <summary>
         /// see if a given key is authorized
         /// </summary>
@@ -253,7 +253,7 @@ namespace TradeLink.AppKit
         [Obsolete]
         public static string GetCPUId()
         {
-            string cpuInfo = String.Empty;
+            string id = String.Empty;
             try
             {
                 string temp = String.Empty;
@@ -261,14 +261,41 @@ namespace TradeLink.AppKit
                 ManagementObjectCollection moc = mc.GetInstances();
                 foreach (ManagementObject mo in moc)
                 {
-                    if (cpuInfo == String.Empty)
+                    if (id == String.Empty)
                     {// only return cpuInfo from first CPU
-                        cpuInfo = mo.Properties["ProcessorId"].Value.ToString();
+                        id = mo.Properties["ProcessorId"].Value.ToString();
                     }
                 }
+                id = id.Replace("-", string.Empty);
+                id = id.Replace("{", string.Empty);
+                id = id.Replace("}", string.Empty);
             }
             catch { }
-            return cpuInfo;
+            return id;
+        }
+
+        /// <summary>
+        /// get network address
+        /// </summary>
+        /// <returns></returns>
+        public static string GetNetworkAddress()
+        {
+            try
+            {
+                foreach (System.Net.NetworkInformation.NetworkInterface ni in System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces())
+                {
+                    string id = ni.Id;
+                    id = id.Replace("-", string.Empty);
+                    id = id.Replace("{", string.Empty);
+                    id = id.Replace("}", string.Empty);
+                    return id;
+                }
+            }
+            catch
+            {
+            }
+
+            return string.Empty;
         }
 
         /// <summary>
@@ -277,7 +304,7 @@ namespace TradeLink.AppKit
         /// <returns></returns>
         public static string GetHDDSerial()
         {
-            string r = string.Empty;
+            string id = string.Empty;
             try
             {
                 ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PhysicalMedia");
@@ -286,12 +313,15 @@ namespace TradeLink.AppKit
                 {
                     // get the hardware serial no.
                     if (wmi_HD["SerialNumber"] != null)
-                        r = wmi_HD["SerialNumber"].ToString().Replace(" ", string.Empty);
+                        id = wmi_HD["SerialNumber"].ToString().Replace(" ", string.Empty);
                 }
+                id = id.Replace("-", string.Empty);
+                id = id.Replace("{", string.Empty);
+                id = id.Replace("}", string.Empty);
             }
             catch { }
 
-            return r;
+            return id;
         }
         /// <summary>
         /// hold authentication information.
