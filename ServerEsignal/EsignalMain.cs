@@ -60,6 +60,7 @@ namespace ServerEsignal
 
         void EsignalMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            Properties.Settings.Default.Save();
             tl.Stop();
             _log.Stop();
         }
