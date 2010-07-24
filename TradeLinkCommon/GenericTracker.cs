@@ -42,15 +42,28 @@ namespace TradeLink.Common
         public string Display(string txt) { int idx = getindex(txt); if (idx < 0) return string.Empty; return _tracked[idx].ToString() ; }
 
         /// <summary>
+        /// creates a tracker with given name
+        /// </summary>
+        /// <param name="name"></param>
+        public GenericTracker(string name) : this(0, name) { }
+
+        /// <summary>
         /// creates a tracker
         /// </summary>
-        public GenericTracker() : this(0) { }
+        public GenericTracker() : this(0,string.Empty) { }
+
         /// <summary>
-        /// create a tracker with an approximate # of initial items
+        /// creates tracker with approximate # of initial items
         /// </summary>
         /// <param name="EstCount"></param>
-        public GenericTracker(int EstCount)
+        public GenericTracker(int EstCount) : this(EstCount, string.Empty) { }
+        /// <summary>
+        /// create a tracker with an approximate # of initial items and name
+        /// </summary>
+        /// <param name="EstCount"></param>
+        public GenericTracker(int EstCount,string name)
         {
+            _name = name;
             _estcount = EstCount;
             _tracked = new List<T>(EstCount);
             _txtidx = new Dictionary<string, int>(EstCount);
