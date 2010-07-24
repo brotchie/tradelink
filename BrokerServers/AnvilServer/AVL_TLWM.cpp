@@ -806,7 +806,7 @@
 
 				}
 				break;
-			case M_MS_NYSE_IMBALANCE_OPENING:
+			case MsgMsNyseImbalanceOpening:
 			case M_MS_NYSE_IMBALANCE_CLOSING: 
 			//case M_MS_NYSE_IMBALANCE_NONE:
 				{

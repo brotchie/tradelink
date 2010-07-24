@@ -412,6 +412,7 @@ namespace ServerMB
         	}
             OrderImpl o = new OrderImpl(pOrd.Symbol,pOrd.Quantity);
             o.id = tlid;
+            o.Account = pOrd.Account.Account;
             o.side = ( pOrd.BuySell == MBConst.VALUE_BUY );
             o.price = (decimal)pOrd.Price;
             o.stopp = (decimal)pOrd.StopPrice;
