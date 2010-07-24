@@ -639,7 +639,8 @@ namespace TradeLink.Common
         public static string[] TradesToClosedPL(List<Trade> tradelist, char delimiter)
         {
             List<string> rowoutput = new List<string>();
-            Dictionary<string, PositionImpl> posdict = new Dictionary<string, PositionImpl>();
+            PositionTracker pt = new PositionTracker();
+            
             foreach (TradeImpl t in tradelist)
             {
                 string r = t.ToString(delimiter) + delimiter;
@@ -647,17 +648,10 @@ namespace TradeLink.Common
                 decimal cpl = 0;
                 decimal opl = 0;
                 int csize = 0;
-                if (!posdict.ContainsKey(s))
-                {
-                    posdict.Add(s, new PositionImpl(t));
-                }
-                else
-                {
-                    cpl = posdict[s].Adjust(t); // update the trade and get any closed pl
-                    opl = Calc.OpenPL(t.xprice, posdict[s]); // get any leftover open pl
-                    if (cpl != 0) csize = t.xsize; // if we closed any pl, get the size
-                }
-                string[] pl = new string[] { opl.ToString("f2"), cpl.ToString("f2"), posdict[s].Size.ToString(), csize.ToString(), posdict[s].AvgPrice.ToString("f2") };
+                cpl = pt.Adjust(t);
+                opl = Calc.OpenPL(t.xprice, pt[s]); // get any leftover open pl
+                if (cpl != 0) csize = t.xsize; // if we closed any pl, get the size
+                string[] pl = new string[] { opl.ToString("f2"), cpl.ToString("f2"), pt[s].Size.ToString(), csize.ToString(), pt[s].AvgPrice.ToString("f2") };
                 r += string.Join(delimiter.ToString(), pl);
                 rowoutput.Add(r);
             }
