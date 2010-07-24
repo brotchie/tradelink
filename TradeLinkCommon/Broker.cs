@@ -269,7 +269,7 @@ namespace TradeLink.Common
         public int Execute(Tick tick)
         {
             if (_pendorders == 0) return 0;
-            if (!tick.isTrade) return 0;
+            if (!tick.isTrade && !_usebidaskfill) return 0;
             int filledorders = 0;
             Account[] accts = new Account[MasterOrders.Count];
             MasterOrders.Keys.CopyTo(accts, 0);
