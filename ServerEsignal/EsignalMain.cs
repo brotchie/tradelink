@@ -34,6 +34,7 @@ namespace ServerEsignal
             tl.ReleaseBarHistoryAfteRequest = Properties.Settings.Default.ReleaseBarHistoryAfterSending;
             tl.ReleaseDeadSymbols = Properties.Settings.Default.ReleaseDeadSymbols;
             tl.WaitBetweenEvents = Properties.Settings.Default.WaitBetweenEvents;
+            tl.BarRequestsGetAllData = Properties.Settings.Default.BarRequestsuseAllData;
             // send debug messages to log file
             tl.GotDebug += new DebugFullDelegate(debug);
             debug("Started " + PROGRAM + Util.TLVersion());

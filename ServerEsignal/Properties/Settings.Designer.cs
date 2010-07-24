@@ -94,5 +94,17 @@ namespace ServerEsignal.Properties {
                 this["ReleaseDeadSymbols"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool BarRequestsuseAllData {
+            get {
+                return ((bool)(this["BarRequestsuseAllData"]));
+            }
+            set {
+                this["BarRequestsuseAllData"] = value;
+            }
+        }
     }
 }

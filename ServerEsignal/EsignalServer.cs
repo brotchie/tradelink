@@ -21,6 +21,11 @@ namespace ServerEsignal
         bool _go = true;
 
         public bool isValid { get { return _valid; } }
+
+        bool _barrequestsgetalldata = true;
+        public bool BarRequestsGetAllData { get { return _barrequestsgetalldata; } set { _barrequestsgetalldata = value; } }
+
+
         public EsignalServer() :base()
         {
             // use a background thread to queue up COM-events
@@ -107,7 +112,9 @@ namespace ServerEsignal
                                 barsback = BarImpl.BarsBackFromDate(bi, br.StartDate, br.EndDate);
                             }
 
-                            int hnd = esig.get_RequestHistory(br.Symbol, interval, (bi == BarInterval.Day) ? barType.btDAYS : barType.btBARS, barsback, -1, -1);
+                            int alldata = BarRequestsGetAllData ? -1 : 0;
+
+                            int hnd = esig.get_RequestHistory(br.Symbol, interval, (bi == BarInterval.Day) ? barType.btDAYS : barType.btBARS, barsback, alldata, alldata);
                             verb("requested bar data for " + br.Symbol + " on: " + br.Interval.ToString() + " " + br.CustomInterval.ToString() + " reqhandle: " + hnd);
                             // cache request
                             if (!_barhandle2barrequest.ContainsKey(hnd))
