@@ -100,9 +100,9 @@ namespace TradeLink.Common
         /// set an offset to this to disable it
         /// </summary>
         /// <returns></returns>
-        public static OffsetInfo DISABLE()
+        public static OffsetInfo DISABLEOFFSET()
         {
-            return new OffsetInfo(decimal.MaxValue, decimal.MaxValue, 0, 0, false, 1);
+            return new OffsetInfo(0, 0, 0, 0, false, 1);
         }
 
     }
