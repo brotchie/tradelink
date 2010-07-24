@@ -7,7 +7,7 @@ namespace TradeLink.Common
     /// <summary>
     /// keep track of bid/ask and last data for symbols
     /// </summary>
-    public class TickTracker : TickIndicator
+    public class TickTracker : TickIndicator, GenericTrackerI
     {
 
         int _estlabels = 10;
@@ -37,6 +37,11 @@ namespace TradeLink.Common
             last.NewTxt += new TextIdxDelegate(last_NewTxt);
         }
 
+        /// <summary>
+        /// called when new text label is added
+        /// </summary>
+        public event TextIdxDelegate NewTxt;
+
         void last_NewTxt(string txt, int idx)
         {
             date.addindex(txt, 0);
@@ -49,7 +54,10 @@ namespace TradeLink.Common
             ex.addindex(txt, string.Empty);
             be.addindex(txt, string.Empty);
             oe.addindex(txt, string.Empty);
+            if (NewTxt!=null)
+                NewTxt(txt,idx);
         }
+
 
         GenericTracker<int> date;
         GenericTracker<int> time;
@@ -62,6 +70,17 @@ namespace TradeLink.Common
         GenericTracker<string> be;
         GenericTracker<string> oe;
         GenericTracker<string> ex;
+
+        public string Display(int idx) { return this[idx].ToString(); }
+        public string Display(string txt) { return this[txt].ToString(); }
+
+        public string getlabel(int idx) { return last.getlabel(idx); }
+
+        string _name = string.Empty;
+        public string Name { get { return _name; } set { _name = value; } }
+
+        public int Count { get { return last.Count; } }
+
         /// <summary>
         /// track a new symbol
         /// </summary>
@@ -80,6 +99,8 @@ namespace TradeLink.Common
         {
             return last.getindex(symbol);
         }
+
+
 
         /// <summary>
         /// get the bid
@@ -284,8 +305,7 @@ namespace TradeLink.Common
         /// <returns></returns>
         public bool newTick(Tick k)
         {
-            int idx = last.getindex(k.symbol);
-            if (idx < 0) return false;
+            int idx = addindex(k.symbol);
             // update date/time
             time[idx] = k.time;
             date[idx] = k.date;

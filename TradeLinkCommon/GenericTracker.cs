@@ -7,7 +7,7 @@ using TradeLink.API;
 
 namespace TradeLink.Common
 {
-    public delegate void TextIdxDelegate(string txt,int idx);
+    
     /// <summary>
     /// Used to track any type of item by both text label and index values
     /// </summary>

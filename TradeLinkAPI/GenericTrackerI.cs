@@ -42,5 +42,10 @@ namespace TradeLink.API
         /// get total number of labels/values
         /// </summary>
         int Count { get; }
+
+        /// <summary>
+        /// called when new text label is added
+        /// </summary>
+        event TextIdxDelegate NewTxt;
     }
 }
