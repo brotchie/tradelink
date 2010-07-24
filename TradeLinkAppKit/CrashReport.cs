@@ -28,14 +28,53 @@ namespace TradeLink.AppKit
             PROGRAM = program;
             DATA = data;
             EX = ex;
-            _user.Text = username;
-            _pass.Text = password;
-            _desc.Text = desc;
-            _body.Text = DecodedBody(PROGRAM, EX, DATA, true);
+            user(username);
+            pw(password);
+            descrip(desc);
+            body(DecodedBody(PROGRAM, EX, DATA, true));
             FormClosing += new FormClosingEventHandler(CrashReport_FormClosing);
             SizeChanged += new EventHandler(CrashReport_SizeChanged);
             Load += new EventHandler(CrashReport_Load);
             Invalidate(true);
+        }
+
+        void body(string txt)
+        {
+            if (InvokeRequired)
+                Invoke(new DebugDelegate(body), new object[] { txt });
+            else
+            {
+                _body.Text = txt;
+            }
+        }
+
+        void user(string txt)
+        {
+            if (InvokeRequired)
+                Invoke(new DebugDelegate(user), new object[] { txt });
+            else
+            {
+                _user.Text = txt;
+            }
+        }
+
+        void pw(string txt)
+        {
+            if (InvokeRequired)
+                Invoke(new DebugDelegate(pw), new object[] { txt });
+            else
+            {
+                _pass.Text = txt;
+            }
+        }
+        void descrip(string txt)
+        {
+            if (InvokeRequired)
+                Invoke(new DebugDelegate(descrip), new object[] { txt });
+            else
+            {
+                _desc.Text = txt;
+            }
         }
 
         void CrashReport_Load(object sender, EventArgs e)
