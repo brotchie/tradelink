@@ -117,6 +117,12 @@ namespace TradeLink.AppKit
         /// </summary>
         public int InterTrackSleep { get { return _SLEEP; } set { _SLEEP = value; } }
         RingBuffer<Track> _untrackedqueue = new RingBuffer<Track>(1000);
+
+        /// <summary>
+        /// count of unprocessed items
+        /// </summary>
+        public int UnprocessedItemCount { get { return _untrackedqueue.Count; } }
+
         void _bw_DoWork(object sender, DoWorkEventArgs e)
         {
             WebClient wc = new WebClient();

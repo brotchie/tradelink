@@ -93,6 +93,11 @@ namespace TradeLink.AppKit
         }
 
         /// <summary>
+        /// count of unprocessed items
+        /// </summary>
+        public int UnprocessedItemCount { get { return _untrackedqueue.Count; } }
+
+        /// <summary>
         /// submit a ticket to portal in background
         /// </summary>
         /// <param name="summary"></param>
