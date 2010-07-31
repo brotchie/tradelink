@@ -41,15 +41,23 @@ namespace TradeLink.AppKit
 
                 // Create request and receive response
                 string postURL = url;
-                HttpWebResponse webResponse = WebHelpers.MultipartFormDataPost(postURL, user,password, postParameters,contenttype(filename));
-                
+                try
+                {
+                    HttpWebResponse webResponse = WebHelpers.MultipartFormDataPost(postURL, user,password, postParameters,contenttype(filename),filename);
 
-                // Process response
-                StreamReader responseReader = new StreamReader(webResponse.GetResponseStream());
-                string fullResponse = responseReader.ReadToEnd();
-                webResponse.Close();
-                
 
+                    // Process response
+                    StreamReader responseReader = new StreamReader(webResponse.GetResponseStream());
+                    string fullResponse = responseReader.ReadToEnd();
+                    webResponse.Close();
+                }
+                catch (WebException ex)
+                {
+                    // workaround for http://www.assembla.com/spaces/AssemblaSupport/support/tickets/122--500-internal-server-error--received-when-trying-to-create-documents
+                    if (ex.Message.Contains("500")) return true;
+                    return false;
+                }
+                
                 return true;
             }
             catch (Exception ex)
@@ -180,12 +188,12 @@ namespace TradeLink.AppKit
         /// postParameters with a value of type byte[] will be passed in the form as a file, and value of type string will be
         /// passed as a name/value pair.
         /// </summary>
-        public static HttpWebResponse MultipartFormDataPost(string postUrl, string user, string pw, Dictionary<string, object> postParameters, string contenttype)
+        public static HttpWebResponse MultipartFormDataPost(string postUrl, string user, string pw, Dictionary<string, object> postParameters, string contenttype, string fn)
         {
             string formDataBoundary = "-----------------------------28947758029299";
             string contentType = "multipart/form-data; boundary=" + formDataBoundary;
 
-            byte[] formData = WebHelpers.GetMultipartFormData(postParameters, formDataBoundary,contenttype);
+            byte[] formData = WebHelpers.GetMultipartFormData(postParameters, formDataBoundary,contenttype,fn);
 
             return WebHelpers.PostForm(postUrl,  user,pw,contentType, formData);
         }
@@ -201,6 +209,8 @@ namespace TradeLink.AppKit
             request.PreAuthenticate = true;
             request.Method = "POST";
             request.ContentType = contentType;
+            SetBasicAuthHeader(request, user, pw);
+
 
             if (request == null)
             {
@@ -226,11 +236,18 @@ namespace TradeLink.AppKit
             return request.GetResponse() as HttpWebResponse;
         }
 
+        public static void SetBasicAuthHeader(WebRequest req, String userName, String userPassword)
+        {
+            string authInfo = userName + ":" + userPassword;
+            authInfo = Convert.ToBase64String(Encoding.Default.GetBytes(authInfo));
+            req.Headers["Authorization"] = "Basic " + authInfo;
+        }
+
         /// <summary>
         /// Turn the key and value pairs into a multipart form.
         /// See http://www.ietf.org/rfc/rfc2388.txt for issues about file uploads
         /// </summary>
-        private static byte[] GetMultipartFormData(Dictionary<string, object> postParameters, string boundary, string contenttype)
+        private static byte[] GetMultipartFormData(Dictionary<string, object> postParameters, string boundary, string contenttype, string fn)
         {
             Stream formDataStream = new System.IO.MemoryStream();
 
@@ -241,7 +258,7 @@ namespace TradeLink.AppKit
                     byte[] fileData = param.Value as byte[];
 
                     // Add just the first part of this param, since we will write the file data directly to the Stream
-                    string header = string.Format("--{0}\r\nContent-Disposition: form-data; name=\"{1}\"; filename=\"{2}\";\r\nContent-Type: {3}\r\n\r\n", boundary, param.Key, param.Key,contenttype);
+                    string header = string.Format("--{0}\r\nContent-Disposition: form-data; name=\"{1}\"; filename=\"{2}\"\r\nContent-Type: {3}\r\n\r\n", boundary, param.Key, fn,contenttype);
                     formDataStream.Write(encoding.GetBytes(header), 0, header.Length);
 
                     // Write the file data directly to the Stream, rather than serializing it to a string.  This 
@@ -267,6 +284,7 @@ namespace TradeLink.AppKit
             return formData;
         }
     }
+
 
     public struct AssemblaDoc
     {
