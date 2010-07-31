@@ -329,6 +329,12 @@ namespace TradeLink.AppKit
                 if (pi.GetType() == typeof(Decimal)) format = "N2";
                 dt.Rows.Add(pi.Name, (format != null) ? string.Format(format, pi.GetValue(r, null)) : pi.GetValue(r, null).ToString());
             }
+            foreach (string ps in r.PerSymbolStats)
+            {
+                string[] rs= ps.Split(':');
+                if (rs.Length != 2) continue;
+                dt.Rows.Add(rs[0], rs[1]);
+            }
             dt.EndLoadData();
             refreshgrid();
         }
@@ -345,6 +351,44 @@ namespace TradeLink.AppKit
 
     public class Results
     {
+        decimal rfr = .01m;
+        public decimal RiskFreeRate { get { return rfr; } set { rfr = value; } }
+        decimal com = .01m;
+        public decimal Comission { get { return com; } set { com = value; } }
+        List<Trade> fills = new List<Trade>();
+        public void GotFill(Trade fill)
+        {
+            fills.Add(fill);
+        }
+        int _rt = 0;
+        bool sendreport= false;
+        public bool SendReport { get { return sendreport; } set { sendreport = value; } }
+        public int ReportTime { get { return _rt; } set { _rt = value; sendreport = (_rt != 0); } }
+        public void newTick(Tick k)
+        {
+            if (sendreport && (k.time>=_rt))
+            {
+                debug(k.symbol + " hit report time: " + ReportTime+" at: "+k.time);
+                Report();
+            }
+        }
+
+        public void Report()
+        {
+            if (SendReportEvent != null)
+            {
+                SendReportEvent(FetchResults().ToString());
+            }
+        }
+        void debug(string msg)
+        {
+            if (SendDebugEvent != null)
+                SendDebugEvent(msg);
+        }
+        public event DebugDelegate SendDebugEvent;
+        public event DebugDelegate SendReportEvent;
+        public Results FetchResults() { return FetchResults(RiskFreeRate, Comission); }
+        public Results FetchResults(decimal rfr, decimal commiss) { return FetchResults(TradeResult.ResultsFromTradeList(fills), rfr, commiss,debug); }
         /// <summary>
         /// get results from list of traderesults
         /// </summary>
@@ -354,6 +398,10 @@ namespace TradeLink.AppKit
         /// <param name="d"></param>
         /// <returns></returns>
         public static Results FetchResults(List<TradeResult> results, decimal RiskFreeRate, decimal CommissionPerContractShare, DebugDelegate d)
+        {
+            return FetchResults(results, RiskFreeRate, CommissionPerContractShare, true, d);
+        }
+        public static Results FetchResults(List<TradeResult> results, decimal RiskFreeRate, decimal CommissionPerContractShare, bool persymbol, DebugDelegate d)
         {
             List<Trade> fills = new List<Trade>();
             foreach (TradeResult tr in results)
@@ -370,9 +418,16 @@ namespace TradeLink.AppKit
             int consecWinners = 0;
             int consecLosers = 0;
             List<long> exitscounted = new List<long>();
+            decimal winpl = 0;
+            decimal losepl = 0;
+            Dictionary<string, int> tradecount = new Dictionary<string, int>();
 
             foreach (TradeResult tr in results)
             {
+                if (tradecount.ContainsKey(tr.symbol))
+                    tradecount[tr.symbol]++;
+                else
+                    tradecount.Add(tr.symbol, 1);
                 if (!days.Contains(tr.Source.xdate))
                     days.Add(tr.Source.xdate);
                 pt.Adjust(tr.Source);
@@ -389,8 +444,19 @@ namespace TradeLink.AppKit
                 r.HundredLots += (int)(tr.Source.xsize / 100);
                 r.GrossPL += tr.ClosedPL;
 
+
                 if ((tr.ClosedPL > 0) && (tr.id!=0) && !exitscounted.Contains(tr.id))
                 {
+                    if (tr.side)
+                    {
+                        r.SellWins++;
+                        r.SellPL += tr.ClosedPL;
+                    }
+                    else
+                    {
+                        r.BuyWins++;
+                        r.BuyPL += tr.ClosedPL;
+                    }
                     exitscounted.Add(tr.id);
                     r.Winners++;
                     consecWinners++;
@@ -398,11 +464,26 @@ namespace TradeLink.AppKit
                 }
                 else if ((tr.ClosedPL < 0) && (tr.id!=0) && !exitscounted.Contains(tr.id))
                 {
+                    if (tr.side)
+                    {
+                        r.SellLosers++;
+                        r.SellPL += tr.ClosedPL;
+                    }
+                    else
+                    {
+                        r.BuyLosers++;
+                        r.BuyPL += tr.ClosedPL;
+                    }
                     exitscounted.Add(tr.id);
                     r.Losers++;
                     consecLosers++;
                     consecWinners = 0;
                 }
+                if (tr.ClosedPL>0)
+                    winpl += tr.ClosedPL;
+                else if (tr.ClosedPL<0)
+                    losepl += tr.ClosedPL;
+
                 if (consecWinners > r.ConsecWin) r.ConsecWin = consecWinners;
                 if (consecLosers > r.ConsecLose) r.ConsecLose = consecLosers;
                 if ((tr.OpenSize == 0) && (tr.ClosedPL == 0)) r.Flats++;
@@ -426,6 +507,9 @@ namespace TradeLink.AppKit
 
             if (r.Trades != 0)
             {
+                r.AvgPerTrade = Math.Round((losepl + winpl) / r.Trades, 2);
+                r.AvgLoser = Math.Round(losepl / r.Losers, 2);
+                r.AvgWin = Math.Round(winpl / r.Winners, 2);
                 r.MoneyInUse = Math.Round(Calc.Max(_MIU.ToArray()), 2);
                 r.MaxPL = Math.Round(Calc.Max(_return.ToArray()), 2);
                 r.MinPL = Math.Round(Calc.Min(_return.ToArray()), 2);
@@ -434,6 +518,13 @@ namespace TradeLink.AppKit
                 r.DaysTraded = days.Count;
                 r.GrossPerDay = Math.Round(r.GrossPL / days.Count, 2);
                 r.GrossPerSymbol = Math.Round(r.GrossPL / pt.Count, 2);
+                if (persymbol)
+                {
+                    for (int i = 0; i < pt.Count; i++)
+                    {
+                        r.PerSymbolStats.Add(pt[i].Symbol + ": " + tradecount[pt[i].Symbol] + " for: " + pt[i].ClosedPL.ToString("C2"));
+                    }
+                }
             }
             else
             {
@@ -448,6 +539,9 @@ namespace TradeLink.AppKit
             return r;
 
         }
+
+        bool _persymbol = true;
+        public bool ShowPerSymbolStats { get { return _persymbol; } set { _persymbol = value; } }
         /// <summary>
         /// get results from list of trades
         /// </summary>
@@ -465,12 +559,23 @@ namespace TradeLink.AppKit
             return Results.FetchResults(tresults, riskfreerate, commissionpershare, d);
         }
 
+        public List<string> PerSymbolStats = new List<string>();
+
         public string Symbols = "";
         public decimal GrossPL = 0;
         public string NetPL { get { return v2s(GrossPL - (HundredLots * 100 * ComPerShare)); } }
+        public decimal BuyPL = 0;
+        public decimal SellPL = 0;
         public int Winners = 0;
+        public int BuyWins = 0;
+        public int SellWins = 0;
+        public int SellLosers = 0;
+        public int BuyLosers = 0;
         public int Losers = 0;
         public int Flats = 0;
+        public decimal AvgPerTrade = 0;
+        public decimal AvgWin = 0;
+        public decimal AvgLoser = 0;
         public decimal MoneyInUse = 0;
         public decimal MaxPL = 0;
         public decimal MinPL = 0;
@@ -512,6 +617,10 @@ namespace TradeLink.AppKit
         /// <returns></returns>
         public string ToString(string delim)
         {
+            return ToString(delim, true);
+        }
+        public string ToString(string delim, bool genpersymbol)
+        {
             Type t = GetType();
             FieldInfo[] fis = t.GetFields();
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
@@ -527,6 +636,14 @@ namespace TradeLink.AppKit
                 string format = null;
                 if (pi.GetType() == typeof(Decimal)) format = "N2";
                 sb.AppendLine(pi.Name + delim + (format != null ? string.Format(format, pi.GetValue(this, null)) : pi.GetValue(this, null).ToString()));
+            }
+            foreach (string ps in PerSymbolStats)
+            {
+                if ((ps==null) || (ps==string.Empty)) 
+                    continue;
+
+                string pst = ps.Replace(":", delim);
+                sb.AppendLine(pst);
             }
             return sb.ToString();
 
