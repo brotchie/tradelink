@@ -348,22 +348,40 @@ namespace TradeLink.AppKit
     }
 
 
-
+    /// <summary>
+    /// track results
+    /// </summary>
     public class Results
     {
+        public Results() : this(.01m, .01m, 0) { }
+        public Results(decimal rfr, decimal com, int reporttime)
+        {
+            RiskFreeRate = rfr;
+            Comission = com;
+            ReportTime = reporttime;
+            sendreport = false;
+        }
         decimal rfr = .01m;
-        public decimal RiskFreeRate { get { return rfr; } set { rfr = value; } }
+        decimal RiskFreeRate { get { return rfr; } set { rfr = value; } }
         decimal com = .01m;
-        public decimal Comission { get { return com; } set { com = value; } }
+        decimal Comission { get { return com; } set { com = value; } }
         List<Trade> fills = new List<Trade>();
+        /// <summary>
+        /// pass fills as they arrive
+        /// </summary>
+        /// <param name="fill"></param>
         public void GotFill(Trade fill)
         {
             fills.Add(fill);
         }
         int _rt = 0;
         bool sendreport= false;
-        public bool SendReport { get { return sendreport; } set { sendreport = value; } }
-        public int ReportTime { get { return _rt; } set { _rt = value; sendreport = (_rt != 0); } }
+        bool SendReport { get { return sendreport; } set { sendreport = value; } }
+        int ReportTime { get { return _rt; } set { _rt = value; sendreport = (_rt != 0); } }
+        /// <summary>
+        /// pass ticks as they arrive (only necessary if using report time)
+        /// </summary>
+        /// <param name="k"></param>
         public void newTick(Tick k)
         {
             if (sendreport && (k.time>=_rt))
@@ -372,7 +390,9 @@ namespace TradeLink.AppKit
                 Report();
             }
         }
-
+        /// <summary>
+        /// generate current report as report event
+        /// </summary>
         public void Report()
         {
             if (SendReportEvent != null)
@@ -424,10 +444,10 @@ namespace TradeLink.AppKit
 
             foreach (TradeResult tr in results)
             {
-                if (tradecount.ContainsKey(tr.symbol))
-                    tradecount[tr.symbol]++;
+                if (tradecount.ContainsKey(tr.Source.symbol))
+                    tradecount[tr.Source.symbol]++;
                 else
-                    tradecount.Add(tr.symbol, 1);
+                    tradecount.Add(tr.Source.symbol, 1);
                 if (!days.Contains(tr.Source.xdate))
                     days.Add(tr.Source.xdate);
                 pt.Adjust(tr.Source);
@@ -445,9 +465,9 @@ namespace TradeLink.AppKit
                 r.GrossPL += tr.ClosedPL;
 
 
-                if ((tr.ClosedPL > 0) && (tr.id!=0) && !exitscounted.Contains(tr.id))
+                if ((tr.ClosedPL > 0) && !exitscounted.Contains(tr.Source.id))
                 {
-                    if (tr.side)
+                    if (tr.Source.side)
                     {
                         r.SellWins++;
                         r.SellPL += tr.ClosedPL;
@@ -457,14 +477,15 @@ namespace TradeLink.AppKit
                         r.BuyWins++;
                         r.BuyPL += tr.ClosedPL;
                     }
-                    exitscounted.Add(tr.id);
+                    if (tr.Source.id!=0)
+                        exitscounted.Add(tr.id);
                     r.Winners++;
                     consecWinners++;
                     consecLosers = 0;
                 }
-                else if ((tr.ClosedPL < 0) && (tr.id!=0) && !exitscounted.Contains(tr.id))
+                else if ((tr.ClosedPL < 0) && !exitscounted.Contains(tr.Source.id))
                 {
-                    if (tr.side)
+                    if (tr.Source.side)
                     {
                         r.SellLosers++;
                         r.SellPL += tr.ClosedPL;
@@ -474,7 +495,8 @@ namespace TradeLink.AppKit
                         r.BuyLosers++;
                         r.BuyPL += tr.ClosedPL;
                     }
-                    exitscounted.Add(tr.id);
+                    if (tr.Source.id != 0)
+                        exitscounted.Add(tr.id);
                     r.Losers++;
                     consecLosers++;
                     consecWinners = 0;
@@ -508,8 +530,8 @@ namespace TradeLink.AppKit
             if (r.Trades != 0)
             {
                 r.AvgPerTrade = Math.Round((losepl + winpl) / r.Trades, 2);
-                r.AvgLoser = Math.Round(losepl / r.Losers, 2);
-                r.AvgWin = Math.Round(winpl / r.Winners, 2);
+                r.AvgLoser = r.Losers == 0 ? 0 : Math.Round(losepl / r.Losers, 2);
+                r.AvgWin = r.Winners == 0 ? 0 : Math.Round(winpl / r.Winners, 2);
                 r.MoneyInUse = Math.Round(Calc.Max(_MIU.ToArray()), 2);
                 r.MaxPL = Math.Round(Calc.Max(_return.ToArray()), 2);
                 r.MinPL = Math.Round(Calc.Min(_return.ToArray()), 2);
@@ -522,7 +544,7 @@ namespace TradeLink.AppKit
                 {
                     for (int i = 0; i < pt.Count; i++)
                     {
-                        r.PerSymbolStats.Add(pt[i].Symbol + ": " + tradecount[pt[i].Symbol] + " for: " + pt[i].ClosedPL.ToString("C2"));
+                        r.PerSymbolStats.Add(pt[i].Symbol + ": " + tradecount[pt[i].Symbol] + " for " + pt[i].ClosedPL.ToString("C2"));
                     }
                 }
             }
@@ -541,7 +563,7 @@ namespace TradeLink.AppKit
         }
 
         bool _persymbol = true;
-        public bool ShowPerSymbolStats { get { return _persymbol; } set { _persymbol = value; } }
+        bool ShowPerSymbolStats { get { return _persymbol; } set { _persymbol = value; } }
         /// <summary>
         /// get results from list of trades
         /// </summary>
@@ -559,7 +581,7 @@ namespace TradeLink.AppKit
             return Results.FetchResults(tresults, riskfreerate, commissionpershare, d);
         }
 
-        public List<string> PerSymbolStats = new List<string>();
+        internal List<string> PerSymbolStats = new List<string>();
 
         public string Symbols = "";
         public decimal GrossPL = 0;
