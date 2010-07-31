@@ -6,3 +6,5 @@
 0
 // default currency
 USD
+// VERBOSE
+0

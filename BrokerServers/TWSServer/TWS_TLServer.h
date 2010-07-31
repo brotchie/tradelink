@@ -33,6 +33,10 @@ namespace TradeLibFast
 
 
 	private:
+		void pcont(Contract* c);
+		void pord(Order* o);
+		void v(CString msg);
+		bool noverb;
 		bool linktest();
 		vector<TLPosition> poslist;
 		bool havepos(TLPosition p);

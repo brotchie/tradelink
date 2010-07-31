@@ -14,10 +14,15 @@ namespace TradeLibFast
 	{
 		IGNOREERRORS = false;
 		_currency = CString("USD");
+		noverb = true;
 
 	}
 
-
+	void TWS_TLServer::v(CString msg)
+	{
+		if (noverb) return;
+		D(msg);
+	}
 
 	TWS_TLServer::~TWS_TLServer(void)
 	{
@@ -32,7 +37,7 @@ namespace TradeLibFast
 		}
 
 	}
-
+	
 	void TWS_TLServer::Start(void)
 	{
 		TLServer_WM::Start();
@@ -52,9 +57,15 @@ namespace TradeLibFast
 		file.getline(data,8);
 		sessionid = atoi(data); // get the session id next 
 		file.getline(skip,100);
+		file.getline(data,8); 
+		_currency = CString(data); // get currency
+		// get verbosity
+		file.getline(skip,100);
 		file.getline(data,8);
-		_currency = CString(data);
+		noverb = 0==atoi(data);
 		file.close();
+		if (!noverb)
+			D("verbosity is on");
 		CString msg;
 		if (sessionid!=0)
 		{
@@ -103,7 +114,7 @@ namespace TradeLibFast
 				D(CString("Found instance at")+msg);
 				this->validlinkids.push_back(idx);
 			}
-			else D(CString("Noting found at")+msg);
+			else D(CString("Nothing found at")+msg);
 			m_nextsocket++;
 		}
 		IGNOREERRORS = false;
@@ -188,6 +199,20 @@ namespace TradeLibFast
 		return NOTSPECIAL;
 	}
 
+	void TWS_TLServer::pcont(Contract* c)
+	{
+		CString m;
+		m.Format("sym: %s local: %s currency: %s ex: %s primaryex: %s security: %s strike: %f expiry: %s",c->symbol,c->localSymbol,c->currency,c->exchange,c->primaryExchange,c->secType,c->strike,c->expiry);
+		v(m);
+	}
+
+	void TWS_TLServer::pord(Order* o)
+	{
+		CString m;
+		m.Format("size: %i price: %f stop: %f",o->totalQuantity,o->lmtPrice,o->auxPrice);
+		v(m);
+	}
+
 	int TWS_TLServer::SendOrder(TLOrder o)
 	{
 		// check our order
@@ -265,9 +290,13 @@ namespace TradeLibFast
 		else // otherwise get the session our account is logged into
 			client	= GetOrderSink(o.account);
 
+		pcont(contract);
+		pord(order);
+
 		// place our order
 		if (client!=NULL)
 			client->placeOrder(order->orderId,*contract,*order);
+		
 
 		delete order;
 		delete contract;
@@ -433,6 +462,9 @@ namespace TradeLibFast
 		// gets mlink associated with order
 		int mlink = getMlinkId(ibid);
 		if (ibid==0) return ORDER_NOT_FOUND;
+		CString m;
+		m.Format("trying to cancel order: %lld",orderid);
+		v(m);
 		m_link[this->validlinkids[mlink]]->cancelOrder(ibid);
 		return OK;
 	}
@@ -558,11 +590,13 @@ namespace TradeLibFast
 				contract.exchange = "SMART";
 			contract.currency = _currency;
 			contract.secType = TLSecurity::SecurityTypeName(sec.type);
+			v(CString("attempting to add symbol"));
+			pcont(&contract);
 			this->m_link[this->validlinkids[0]]->reqMktData((TickerId)stockticks.size(),contract,"",false);
 			TLTick k; // create blank tick
 			k.sym = stocks[cid][i]; // store long symbol
 			stockticks.push_back(k);
-			D(CString("Added IB subscription for ")+CString(sec.sym));
+			v(CString("Added IB subscription for ")+CString(sec.sym));
 
 		}
 		return OK;
