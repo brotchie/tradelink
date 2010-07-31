@@ -228,7 +228,7 @@ namespace TradeLibFast
 				contract->right = tmpsec.details;
 				//contract->currency = _currency;			
 			}
-			else
+			else 
 				contract->localSymbol = o.localsymbol!="" ? o.localsymbol : tmpsec.sym;
 			if (tmpsec.hasDest())
 				contract->exchange = tmpsec.dest;
@@ -243,6 +243,15 @@ namespace TradeLibFast
 			contract->exchange = o.exchange;
 			contract->secType = o.security;
 
+		}
+		if (tmpsec.type==CASH)
+		{
+			// remove base currency from symbol
+			CString cpy = CString(o.localsymbol);
+			int pidx = cpy.Find(CString("."));
+			if (pidx!=-1)
+				cpy.Delete(pidx,cpy.GetLength()-pidx);
+			contract->symbol = cpy;
 		}
 		if (contract->exchange=="")
 			contract->exchange= "SMART";
