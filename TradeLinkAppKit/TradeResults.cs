@@ -355,6 +355,9 @@ namespace TradeLink.AppKit
         /// <returns></returns>
         public static Results FetchResults(List<TradeResult> results, decimal RiskFreeRate, decimal CommissionPerContractShare, DebugDelegate d)
         {
+            List<Trade> fills = new List<Trade>();
+            foreach (TradeResult tr in results)
+                fills.Add(tr.Source);
             List<decimal> _MIU = new List<decimal>();
             List<decimal> _return = new List<decimal>();
             List<int> days = new List<int>();
@@ -422,7 +425,7 @@ namespace TradeLink.AppKit
                 r.MoneyInUse = Math.Round(Calc.Max(_MIU.ToArray()), 2);
                 r.MaxPL = Math.Round(Calc.Max(_return.ToArray()), 2);
                 r.MinPL = Math.Round(Calc.Min(_return.ToArray()), 2);
-                r.MaxDD = string.Format("{0:P1}", Calc.MaxDD(_return.ToArray()));
+                r.MaxDD = string.Format("{0:P1}", Calc.MaxDDPct(fills));
                 r.SymbolCount = pt.Count;
                 r.DaysTraded = days.Count;
                 r.GrossPerDay = Math.Round(r.GrossPL / days.Count, 2);

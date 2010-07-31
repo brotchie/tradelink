@@ -1475,24 +1475,46 @@ namespace TradeLink.Common
         }
 
         /// <summary>
-        /// calculate maximum drawdown from a PL stream for a given security/portfolio
+        /// calculate maximum drawdown from a PL stream for a given security/portfolio as a dollar value
         /// </summary>
-        /// <param name="ret">array containing p&l values for portfolio or security</param>
+        /// <param name="ret">array containing pl values for portfolio or security</param>
         /// <returns></returns>
-        public static decimal MaxDD(decimal[] ret)
+        public static decimal MaxDDVal(decimal[] ret)
         {
             decimal peak = decimal.MinValue;
-            decimal maxdd = 0;
+            decimal low = 0;
             foreach (decimal pl in ret)
             {
                 if (pl > peak)
                     peak = pl;
-                if (peak == 0) continue;
-                decimal dd = (peak - pl) / peak;
-                if (dd > maxdd)
-                    maxdd = dd;
+                if (pl < low)
+                    low = pl;
             }
-            return maxdd;
+            decimal maxddv = low == 0 ? 0 : -1 * (peak - low);
+            return maxddv;
+
+        }
+        /// <summary>
+        /// maximum drawdown as a percentage
+        /// </summary>
+        /// <param name="fills"></param>
+        /// <returns></returns>
+        public static decimal MaxDDPct(List<Trade> fills)
+        {
+            PositionTracker pt = new PositionTracker();
+            List<decimal> ret = new List<decimal>();
+            decimal mmiu = 0;
+            for (int i = 0; i < fills.Count; i++)
+            {
+                pt.Adjust(fills[i]);
+                decimal miu = Calc.Sum(Calc.MoneyInUse(pt));
+                if (miu > mmiu)
+                    mmiu = miu;
+                ret.Add(Calc.Sum(Calc.AbsoluteReturn(pt, new decimal[0], true, false)));
+            }
+            decimal maxddval = MaxDDVal(ret.ToArray());
+            decimal pct = mmiu== 0 ? 0 : maxddval / mmiu;
+            return pct;
         }
         /// <summary>
         /// convert an array of decimals to less precise doubles

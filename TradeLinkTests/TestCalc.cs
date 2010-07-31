@@ -50,6 +50,32 @@ namespace TestTradeLink
         }
 
         [Test]
+
+        public void MaxDD()
+        {
+            PositionTracker pt = new PositionTracker();
+            const string sym = "TST";
+            System.Collections.Generic.List<TradeLink.API.Trade> fills = new System.Collections.Generic.List<TradeLink.API.Trade>();
+            TradeImpl t = new TradeImpl(sym,10,100);
+            System.Collections.Generic.List<decimal> ret = new System.Collections.Generic.List<decimal>();
+            fills.Add(t);
+            pt.Adjust(t);
+            t = new TradeImpl(sym, 11, -100);
+            fills.Add(t);
+            ret.Add(pt.Adjust(t));
+            t = new TradeImpl(sym, 11, -100);
+            pt.Adjust(t);
+            fills.Add(t);
+            t = new TradeImpl(sym, 13, 100);
+            fills.Add(t);
+            ret.Add(pt.Adjust(t));
+            decimal maxdd = Calc.MaxDDVal(ret.ToArray());
+            decimal maxddp = Calc.MaxDDPct(fills);
+            Assert.AreEqual(-300,maxdd);
+            Assert.AreEqual(-.18m,Math.Round(maxddp,2));
+        }
+
+        [Test]
         public void Sums()
         {
             // integer
