@@ -410,6 +410,16 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="program"></param>
         /// <returns></returns>
+        public static int ProgramBuild(string program)
+        {
+            return ProgramBuild(program, null);
+        }
+        /// <summary>
+        /// get build with debugging information on errors
+        /// </summary>
+        /// <param name="program"></param>
+        /// <param name="deb"></param>
+        /// <returns></returns>
         public static int ProgramBuild(string program,DebugDelegate deb)
         {
             _deb = deb;
