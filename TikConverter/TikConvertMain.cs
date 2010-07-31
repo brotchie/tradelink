@@ -10,7 +10,6 @@ using System.Windows.Forms;
 using System.IO;
 using TradeLink.Common;
 using TradeLink.API;
-using TradeLink.Common;
 using TradeLink.AppKit;
 
 namespace TikConverter
@@ -46,7 +45,6 @@ namespace TikConverter
             long bytes = 0;
             if (of.ShowDialog() == DialogResult.OK)
             {
-                bool g = true;
                 foreach (string file in of.FileNames)
                 {
                     _path = Path.GetDirectoryName(file);

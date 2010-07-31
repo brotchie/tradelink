@@ -182,7 +182,7 @@ namespace ServerNxCore
 
             // Get the price and net change
             double Price = NxCore.PriceToDouble(Trade->Price, Trade->PriceType);
-            double NetChange = NxCore.PriceToDouble(Trade->NetChange, Trade->PriceType);
+            //double NetChange = NxCore.PriceToDouble(Trade->NetChange, Trade->PriceType);
 
             NxTime time = pNxCoreMsg->coreHeader.nxExgTimestamp;
             int tltime = time.Hour * 10000 + time.Minute * 100 + time.Second;
@@ -294,14 +294,13 @@ namespace ServerNxCore
             // Assign a pointer to the MMQuote data
             NxCoreMMQuote* Quote = &pNxCoreMsg->coreData.MMQuote;
 
-            String MarketMaker;
             if ((IntPtr)Quote->pnxStringMarketMaker == IntPtr.Zero) return;
 
-            MarketMaker = new String(&Quote->pnxStringMarketMaker->String);
+            //String MarketMaker = new String(&Quote->pnxStringMarketMaker->String);
 
             // Get bid and ask price
-            double Bid = NxCore.PriceToDouble(Quote->coreQuote.BidPrice, Quote->coreQuote.PriceType);
-            double Ask = NxCore.PriceToDouble(Quote->coreQuote.AskPrice, Quote->coreQuote.PriceType);
+            //double Bid = NxCore.PriceToDouble(Quote->coreQuote.BidPrice, Quote->coreQuote.PriceType);
+            //double Ask = NxCore.PriceToDouble(Quote->coreQuote.AskPrice, Quote->coreQuote.PriceType);
 
             
             /*D(string.Format("MMQuote for Symbol: {0:S}, MarketMaker: {1:S}  Time: {2:d}:{3:d}:{4:d}  Bid: {5:f}  Ask: {6:f}  BidSize: {7:d}  AskSise: {8:d}  Exchg: {9:d} ",

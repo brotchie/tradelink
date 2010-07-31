@@ -123,7 +123,7 @@ namespace TradeLink.AppKit
                     TicketSucceed(_user.Text, _pass.Text);
                 Close();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Text = "Authentication failed.";
                 Invalidate(true);

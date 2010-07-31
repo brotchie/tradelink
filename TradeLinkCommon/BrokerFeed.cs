@@ -537,6 +537,7 @@ namespace TradeLink.Common
             {
                 debug("requesting positions for account: " + acct);
                 long r = execute.TLSend(MessageTypes.POSITIONREQUEST, execute.Name + "+" + acct);
+                debug("TLSend return code " + r);
             }
             catch (Exception ex)
             {
@@ -553,6 +554,7 @@ namespace TradeLink.Common
             {
                 debug("requesting accounts on: " + Name);
                 long r = execute.TLSend(MessageTypes.ACCOUNTREQUEST, execute.Name);
+                debug("TLSend return code " + r);
             }
             catch (Exception ex)
             {

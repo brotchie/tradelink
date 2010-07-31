@@ -232,7 +232,7 @@ namespace TradeLink.Common
                         // get symbol
                         string sym = cols[symcol];
                         // add symbol to tracker 
-                        int idx = gt.addindex(sym, coldefault);
+                        gt.addindex(sym, coldefault);
 
                     }
                     catch (Exception ex)
@@ -292,7 +292,7 @@ namespace TradeLink.Common
                         // get columns
                         string[] cols = line.Split(delim);
                         // see if this is a symbol column
-                        bool issym = symcol==col;
+                        // bool issym = symcol==col;
                         // get symbol
                         string sym = cols[symcol];
                         // add symbol to tracker 

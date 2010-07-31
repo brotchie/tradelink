@@ -18,24 +18,30 @@ namespace ServerFix
             Symbol sym = new Symbol();
             message.getField(sym);
             Tick k = new TickImpl(sym.getValue());
+			
+			{
             // bid
             BidPx bp = new BidPx();
             BidSize bs = new BidSize();
             k.bid = (decimal)bp.getValue();
             k.bs = (int)message.getField(bs).getValue();
-
+			}
+			
+			{
             // ask
             OfferPx op = new OfferPx();
             OfferSize os = new OfferSize();
             k.ask = (decimal)op.getValue();
-            k.os = (int)message.getField(bs).getValue();
-
-
+            k.os = (int)message.getField(os).getValue();
+			}
+			
+			{
             // last
             Price price = new Price();
             message.getField(price);
             k.trade = (decimal)price.getValue();
-
+			}
+			
             newTick(k);
 
             //ClOrdID clOrdID = new ClOrdID();

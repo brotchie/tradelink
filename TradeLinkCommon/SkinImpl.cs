@@ -223,7 +223,10 @@ namespace TradeLink.Common
         public static Type GetType(string responsename, string dll)
         {
             bool fe = File.Exists(dll);
-            
+			if (!fe){
+                return null;				
+			}
+			
             // get assembly represented by this DLL
             Assembly asm = Assembly.LoadFrom(dll);
             foreach (Type t in asm.GetTypes())

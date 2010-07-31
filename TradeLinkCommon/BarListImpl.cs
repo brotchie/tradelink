@@ -495,7 +495,7 @@ namespace TradeLink.Common
                 wc.DownloadStringAsync(new Uri(GOOGURL + Symbol), new BarListDownload(Symbol, resultHandler,appendAmexOnFail));
             }
             catch (System.Net.WebException) { return false; }
-            catch (Exception ex) { return false; }
+            catch (Exception) { return false; }
             return true;
         }
 

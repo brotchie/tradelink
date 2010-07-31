@@ -532,7 +532,7 @@ namespace ASP
                 // show we added response
                 status(r.FullName + getsyms(idx));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return -1;
             }
@@ -1273,7 +1273,7 @@ namespace ASP
                     // get response
                     r = _reslist[idx];
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     continue;
                 }
@@ -1290,7 +1290,7 @@ namespace ASP
                         // then re-add it
                         worked &= SkinImpl.SkinFile(r, r.FullName, _class2dll[r.FullName], SKINPATH + name + "." + nextskinidx(SKINPATH, name).ToString() + SKINEXT, new DebugDelegate(debug));
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         debug("error saving skin: " + name);
                     }

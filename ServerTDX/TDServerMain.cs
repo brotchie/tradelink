@@ -180,11 +180,11 @@ namespace TDServer
 
         long tl_newUnknownRequest(MessageTypes t, string msg)
         {
-            switch (t)
-            {
+            //switch (t)
+            //{
               //  case MessageTypes.ISSHORTABLE:
              //       return api.TD_IsShortable(msg) ? 1 : 0;
-            }
+            //}
             return (long)MessageTypes.FEATURE_NOT_IMPLEMENTED;
         }
 
@@ -344,7 +344,7 @@ namespace TDServer
                         } 
             }             
             
-            catch (Exception exc) { }
+            catch (Exception) { }
 
         }
 

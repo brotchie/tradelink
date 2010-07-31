@@ -120,7 +120,7 @@ namespace SterServer
                 rejectmessages rm = (rejectmessages)r;
                 return rm.ToString();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return "unknown reject error";
             }
@@ -581,7 +581,7 @@ namespace SterServer
             k.oe = GetExPretty(q.bstrAskExch);
             int now = Convert.ToInt32(q.bstrUpdateTime);
             k.date = Util.ToTLDate(DateTime.Now);
-            int sec = now % 100;
+            //int sec = now % 100;
             k.time = now;
             if (IgnoreOutOfOrderTicks && (k.time < _lasttime)) return;
             _lasttime = k.time;

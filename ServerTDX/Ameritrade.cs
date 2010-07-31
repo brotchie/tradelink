@@ -173,7 +173,7 @@ namespace AMTD_API
                         Monitor.Pulse(lrs);
                     }
                 }
-                catch (Exception exc) { }
+                catch (Exception) { }
 
             }
 
@@ -3323,7 +3323,7 @@ namespace AMTD_API
                                         IAsyncResult ar = responseStream.BeginRead(rs.BufferRead, 0, BUFFER_SIZE, new AsyncCallback(ReadCallBack), rs);
 
                                     }
-                                    catch (Exception exc)
+                                    catch (Exception)
                                     {
                                         rs.CloseStream(rs);
                                         responseStream.Close();
@@ -3347,7 +3347,7 @@ namespace AMTD_API
 
 
                                 }
-                                catch (Exception exc)
+                                catch (Exception)
                                 {
                                     rs.CloseStream(rs);
                                     responseStream.Close();
@@ -3361,7 +3361,7 @@ namespace AMTD_API
 
                     }
                 }
-                catch (Exception exc)
+                catch (Exception)
                 {
 
                     /*/ This is very important.  In case the remote server should drop our connection /*/
@@ -3651,7 +3651,7 @@ namespace AMTD_API
                                     rs.SendHistoricalChartData(cSortedLines, rs.stockSymbol, rs.ServiceName);
 
                                 }
-                                catch (Exception e)
+                                catch (Exception)
                                 {
                                     s2.Close();
                                 }
@@ -7051,7 +7051,7 @@ namespace AMTD_API
                     }
                 }
             }
-            catch (Exception exce) { }
+            catch (Exception) { }
         }
 
 
@@ -7258,14 +7258,14 @@ namespace AMTD_API
 
 
                     }
-                    catch (Exception e) { s2.Close(); return cSortedLines; }
+                    catch (Exception) { s2.Close(); return cSortedLines; }
 
                 }
 
 
                 GC.Collect();
             }
-            catch (Exception exc) { }
+            catch (Exception) { }
 
 
             return cSortedLines;
@@ -7680,7 +7680,7 @@ namespace AMTD_API
             {
                 oL1Quote = this.TD_GetLevel1Quote(symbol, 1000);
             }
-            catch (Exception Exc)
+            catch (Exception)
             {
                 lStockSymbolFound = false;
             }
@@ -8649,7 +8649,7 @@ namespace AMTD_API
                     Monitor.Pulse(oLockTD_GetLevel1Quote);
 
                 }
-                catch (Exception exc) { }
+                catch (Exception) { }
 
             }
 

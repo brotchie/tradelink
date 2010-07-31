@@ -33,13 +33,12 @@ namespace TradeLink.Common
         public string symbol { get { return _sym; } set { _sym = value; } }
         public bool side { get { return _side; } set { _side = value; } }
         [Obsolete]
-        public string comment { get { return _id.ToString(); } set { _comment = value; } }
+        public string comment { get { return _comment; } set { _comment = value; } }
         public int xsize { get { return _xsize; } set { _xsize = value; } }
         public decimal xprice { get { return _xprice; } set { _xprice = value; } }
         public int xdate { get { return _xdate; } set { _xdate = value; } }
         public int xtime { get { return _xtime; } set { _xtime = value; } }
         public bool isFilled { get { return (xprice * xsize) != 0; } }
-        public int Size { get { return xsize; } }
         public TradeImpl(Trade copytrade)
         {
             // copy constructor, for copying using by-value (rather than by default of by-reference)

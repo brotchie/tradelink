@@ -170,7 +170,7 @@ namespace TradeLink.AppKit
         {
             if (tl == null) return false;
             if (tl.ProvidersAvailable.Length==0) return false;
-            int latest = latest = LatestVersion(Util.PROGRAM);
+            int latest = LatestVersion(Util.PROGRAM);
             int thisver = tl.ServerVersion;
             return latest > thisver;
         }

@@ -144,7 +144,7 @@ namespace TradeLink.AppKit
                     _bs.RaiseListChangedEvents = endstate;
 
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
 
                 }

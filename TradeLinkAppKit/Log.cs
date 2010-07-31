@@ -50,7 +50,7 @@ namespace TradeLink.AppKit
                 _log = new StreamWriter(fn,true);
                 _log.AutoFlush = true;
             }
-            catch (Exception ex) { _log = null; }
+            catch (Exception) { _log = null; }
         }
         public event DebugFullDelegate SendDebug;
         /// <summary>

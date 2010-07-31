@@ -248,11 +248,11 @@ namespace TradeLink.Common
                 xs.Serialize(fs, tff);
                 fs.Close();
             }
-            catch (FileNotFoundException ex)
+            catch (FileNotFoundException)
             {
                 return string.Empty;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return string.Empty;
             }
@@ -280,8 +280,8 @@ namespace TradeLink.Common
                 // close serializer
                 fs.Close();
             }
-            catch (FileNotFoundException fex) { }
-            catch (Exception ex) { }
+            catch (FileNotFoundException) { }
+            catch (Exception) { }
             return tf;
 
         }
