@@ -369,6 +369,8 @@ namespace TradeLink.AppKit
             r.RiskFreeRet = string.Format("{0:P2}", RiskFreeRate);
             int consecWinners = 0;
             int consecLosers = 0;
+            List<long> exitscounted = new List<long>();
+
             foreach (TradeResult tr in results)
             {
                 if (!days.Contains(tr.Source.xdate))
@@ -387,14 +389,16 @@ namespace TradeLink.AppKit
                 r.HundredLots += (int)(tr.Source.xsize / 100);
                 r.GrossPL += tr.ClosedPL;
 
-                if (tr.ClosedPL > 0)
+                if ((tr.ClosedPL > 0) && (tr.id!=0) && !exitscounted.Contains(tr.id))
                 {
+                    exitscounted.Add(tr.id);
                     r.Winners++;
                     consecWinners++;
                     consecLosers = 0;
                 }
-                else if (tr.ClosedPL < 0)
+                else if ((tr.ClosedPL < 0) && (tr.id!=0) && !exitscounted.Contains(tr.id))
                 {
+                    exitscounted.Add(tr.id);
                     r.Losers++;
                     consecLosers++;
                     consecWinners = 0;
