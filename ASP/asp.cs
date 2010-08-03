@@ -91,6 +91,7 @@ namespace ASP
             _rt.PushTracksCloseMax = Properties.Settings.Default.TicketsOnCloseMaxAttempts;
             _rt.PushTracksOnClose = Properties.Settings.Default.TicketsOnClose;
             _rt.TrackEnabled = Properties.Settings.Default.TicketTracking;
+            _rt.SendDebug += new DebugDelegate(debug);
 
             // get providers
             initfeeds();
@@ -117,6 +118,7 @@ namespace ASP
             processcommands();
 
         }
+
 
         void _ar_GotTickOverrun()
         {
