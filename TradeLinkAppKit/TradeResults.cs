@@ -359,7 +359,6 @@ namespace TradeLink.AppKit
             RiskFreeRate = rfr;
             Comission = com;
             ReportTime = reporttime;
-            sendreport = false;
         }
         decimal rfr = .01m;
         decimal RiskFreeRate { get { return rfr; } set { rfr = value; } }
@@ -386,6 +385,7 @@ namespace TradeLink.AppKit
         {
             if (sendreport && (k.time>=_rt))
             {
+                sendreport = false;
                 debug(k.symbol + " hit report time: " + ReportTime+" at: "+k.time);
                 Report();
             }
