@@ -423,142 +423,151 @@ namespace TradeLink.AppKit
         }
         public static Results FetchResults(List<TradeResult> results, decimal RiskFreeRate, decimal CommissionPerContractShare, bool persymbol, DebugDelegate d)
         {
-            List<Trade> fills = new List<Trade>();
-            foreach (TradeResult tr in results)
-                fills.Add(tr.Source);
-            List<decimal> _MIU = new List<decimal>();
-            List<decimal> _return = new List<decimal>();
-            List<int> days = new List<int>();
-            //clear position tracker
-            PositionTracker pt = new PositionTracker(results.Count);
-            // setup new results
-            Results r = new Results();
-            r.ComPerShare = CommissionPerContractShare;
-            r.RiskFreeRet = string.Format("{0:P2}", RiskFreeRate);
-            int consecWinners = 0;
-            int consecLosers = 0;
-            List<long> exitscounted = new List<long>();
-            decimal winpl = 0;
-            decimal losepl = 0;
-            Dictionary<string, int> tradecount = new Dictionary<string, int>();
-
-            foreach (TradeResult tr in results)
-            {
-                if (tradecount.ContainsKey(tr.Source.symbol))
-                    tradecount[tr.Source.symbol]++;
-                else
-                    tradecount.Add(tr.Source.symbol, 1);
-                if (!days.Contains(tr.Source.xdate))
-                    days.Add(tr.Source.xdate);
-                pt.Adjust(tr.Source);
-                // calculate MIU and store on array
-                decimal miu = Calc.Sum(Calc.MoneyInUse(pt));
-                _MIU.Add(miu);
-                // get p&l
-                decimal pl = Calc.Sum(Calc.AbsoluteReturn(pt, new decimal[pt.Count], true, false));
-                _return.Add(pl);
-
-                if (!r.Symbols.Contains(tr.Source.symbol))
-                    r.Symbols += tr.Source.symbol + ",";
-                r.Trades++;
-                r.HundredLots += (int)(tr.Source.xsize / 100);
-                r.GrossPL += tr.ClosedPL;
-
-
-                if ((tr.ClosedPL > 0) && !exitscounted.Contains(tr.Source.id))
-                {
-                    if (tr.Source.side)
-                    {
-                        r.SellWins++;
-                        r.SellPL += tr.ClosedPL;
-                    }
-                    else
-                    {
-                        r.BuyWins++;
-                        r.BuyPL += tr.ClosedPL;
-                    }
-                    if (tr.Source.id!=0)
-                        exitscounted.Add(tr.id);
-                    r.Winners++;
-                    consecWinners++;
-                    consecLosers = 0;
-                }
-                else if ((tr.ClosedPL < 0) && !exitscounted.Contains(tr.Source.id))
-                {
-                    if (tr.Source.side)
-                    {
-                        r.SellLosers++;
-                        r.SellPL += tr.ClosedPL;
-                    }
-                    else
-                    {
-                        r.BuyLosers++;
-                        r.BuyPL += tr.ClosedPL;
-                    }
-                    if (tr.Source.id != 0)
-                        exitscounted.Add(tr.id);
-                    r.Losers++;
-                    consecLosers++;
-                    consecWinners = 0;
-                }
-                if (tr.ClosedPL>0)
-                    winpl += tr.ClosedPL;
-                else if (tr.ClosedPL<0)
-                    losepl += tr.ClosedPL;
-
-                if (consecWinners > r.ConsecWin) r.ConsecWin = consecWinners;
-                if (consecLosers > r.ConsecLose) r.ConsecLose = consecLosers;
-                if ((tr.OpenSize == 0) && (tr.ClosedPL == 0)) r.Flats++;
-                if (tr.ClosedPL > r.MaxWin) r.MaxWin = tr.ClosedPL;
-                if (tr.ClosedPL < r.MaxLoss) r.MaxLoss = tr.ClosedPL;
-                if (tr.OpenPL > r.MaxOpenWin) r.MaxOpenWin = tr.OpenPL;
-                if (tr.OpenPL < r.MaxOpenLoss) r.MaxOpenLoss = tr.OpenPL;
-
-            }
-
-
             try
             {
-                r.SharpeRatio = Math.Round(Calc.SharpeRatio(_return[_return.Count - 1], Calc.StdDev(_return.ToArray()), RiskFreeRate), 3);
+                List<Trade> fills = new List<Trade>();
+                foreach (TradeResult tr in results)
+                    fills.Add(tr.Source);
+                List<decimal> _MIU = new List<decimal>();
+                List<decimal> _return = new List<decimal>();
+                List<int> days = new List<int>();
+                //clear position tracker
+                PositionTracker pt = new PositionTracker(results.Count);
+                // setup new results
+                Results r = new Results();
+                r.ComPerShare = CommissionPerContractShare;
+                r.RiskFreeRet = string.Format("{0:P2}", RiskFreeRate);
+                int consecWinners = 0;
+                int consecLosers = 0;
+                List<long> exitscounted = new List<long>();
+                decimal winpl = 0;
+                decimal losepl = 0;
+                Dictionary<string, int> tradecount = new Dictionary<string, int>();
+
+                foreach (TradeResult tr in results)
+                {
+                    if (tradecount.ContainsKey(tr.Source.symbol))
+                        tradecount[tr.Source.symbol]++;
+                    else
+                        tradecount.Add(tr.Source.symbol, 1);
+                    if (!days.Contains(tr.Source.xdate))
+                        days.Add(tr.Source.xdate);
+                    pt.Adjust(tr.Source);
+                    // calculate MIU and store on array
+                    decimal miu = Calc.Sum(Calc.MoneyInUse(pt));
+                    _MIU.Add(miu);
+                    // get p&l
+                    decimal pl = Calc.Sum(Calc.AbsoluteReturn(pt, new decimal[pt.Count], true, false));
+                    _return.Add(pl);
+
+                    if (!r.Symbols.Contains(tr.Source.symbol))
+                        r.Symbols += tr.Source.symbol + ",";
+                    r.Trades++;
+                    r.HundredLots += (int)(tr.Source.xsize / 100);
+                    r.GrossPL += tr.ClosedPL;
+
+
+                    if ((tr.ClosedPL > 0) && !exitscounted.Contains(tr.Source.id))
+                    {
+                        if (tr.Source.side)
+                        {
+                            r.SellWins++;
+                            r.SellPL += tr.ClosedPL;
+                        }
+                        else
+                        {
+                            r.BuyWins++;
+                            r.BuyPL += tr.ClosedPL;
+                        }
+                        if (tr.Source.id != 0)
+                            exitscounted.Add(tr.id);
+                        r.Winners++;
+                        consecWinners++;
+                        consecLosers = 0;
+                    }
+                    else if ((tr.ClosedPL < 0) && !exitscounted.Contains(tr.Source.id))
+                    {
+                        if (tr.Source.side)
+                        {
+                            r.SellLosers++;
+                            r.SellPL += tr.ClosedPL;
+                        }
+                        else
+                        {
+                            r.BuyLosers++;
+                            r.BuyPL += tr.ClosedPL;
+                        }
+                        if (tr.Source.id != 0)
+                            exitscounted.Add(tr.id);
+                        r.Losers++;
+                        consecLosers++;
+                        consecWinners = 0;
+                    }
+                    if (tr.ClosedPL > 0)
+                        winpl += tr.ClosedPL;
+                    else if (tr.ClosedPL < 0)
+                        losepl += tr.ClosedPL;
+
+                    if (consecWinners > r.ConsecWin) r.ConsecWin = consecWinners;
+                    if (consecLosers > r.ConsecLose) r.ConsecLose = consecLosers;
+                    if ((tr.OpenSize == 0) && (tr.ClosedPL == 0)) r.Flats++;
+                    if (tr.ClosedPL > r.MaxWin) r.MaxWin = tr.ClosedPL;
+                    if (tr.ClosedPL < r.MaxLoss) r.MaxLoss = tr.ClosedPL;
+                    if (tr.OpenPL > r.MaxOpenWin) r.MaxOpenWin = tr.OpenPL;
+                    if (tr.OpenPL < r.MaxOpenLoss) r.MaxOpenLoss = tr.OpenPL;
+
+                }
+
+
+                try
+                {
+                    r.SharpeRatio = _return.Count<2 ? 0 : Math.Round(Calc.SharpeRatio(_return[_return.Count - 1], Calc.StdDev(_return.ToArray()), RiskFreeRate), 3);
+                }
+                catch (Exception ex)
+                {
+                    if (d != null)
+                        d("sharp error: " + ex.Message);
+                }
+
+                if (r.Trades != 0)
+                {
+                    r.AvgPerTrade = Math.Round((losepl + winpl) / r.Trades, 2);
+                    r.AvgLoser = r.Losers == 0 ? 0 : Math.Round(losepl / r.Losers, 2);
+                    r.AvgWin = r.Winners == 0 ? 0 : Math.Round(winpl / r.Winners, 2);
+                    r.MoneyInUse = Math.Round(Calc.Max(_MIU.ToArray()), 2);
+                    r.MaxPL = Math.Round(Calc.Max(_return.ToArray()), 2);
+                    r.MinPL = Math.Round(Calc.Min(_return.ToArray()), 2);
+                    r.MaxDD = string.Format("{0:P1}", Calc.MaxDDPct(fills));
+                    r.SymbolCount = pt.Count;
+                    r.DaysTraded = days.Count;
+                    r.GrossPerDay = Math.Round(r.GrossPL / days.Count, 2);
+                    r.GrossPerSymbol = Math.Round(r.GrossPL / pt.Count, 2);
+                    if (persymbol)
+                    {
+                        for (int i = 0; i < pt.Count; i++)
+                        {
+                            r.PerSymbolStats.Add(pt[i].Symbol + ": " + tradecount[pt[i].Symbol] + " for " + pt[i].ClosedPL.ToString("C2"));
+                        }
+                    }
+                }
+                else
+                {
+                    r.MoneyInUse = 0;
+                    r.MaxPL = 0;
+                    r.MinPL = 0;
+                    r.MaxDD = "0";
+                    r.GrossPerDay = 0;
+                    r.GrossPerSymbol = 0;
+                }
+
+                return r;
             }
             catch (Exception ex)
             {
                 if (d != null)
-                    d("sharp error: " + ex.Message);
+                    d("error generting report: " + ex.Message + ex.StackTrace);
+                return new Results();
             }
-
-            if (r.Trades != 0)
-            {
-                r.AvgPerTrade = Math.Round((losepl + winpl) / r.Trades, 2);
-                r.AvgLoser = r.Losers == 0 ? 0 : Math.Round(losepl / r.Losers, 2);
-                r.AvgWin = r.Winners == 0 ? 0 : Math.Round(winpl / r.Winners, 2);
-                r.MoneyInUse = Math.Round(Calc.Max(_MIU.ToArray()), 2);
-                r.MaxPL = Math.Round(Calc.Max(_return.ToArray()), 2);
-                r.MinPL = Math.Round(Calc.Min(_return.ToArray()), 2);
-                r.MaxDD = string.Format("{0:P1}", Calc.MaxDDPct(fills));
-                r.SymbolCount = pt.Count;
-                r.DaysTraded = days.Count;
-                r.GrossPerDay = Math.Round(r.GrossPL / days.Count, 2);
-                r.GrossPerSymbol = Math.Round(r.GrossPL / pt.Count, 2);
-                if (persymbol)
-                {
-                    for (int i = 0; i < pt.Count; i++)
-                    {
-                        r.PerSymbolStats.Add(pt[i].Symbol + ": " + tradecount[pt[i].Symbol] + " for " + pt[i].ClosedPL.ToString("C2"));
-                    }
-                }
-            }
-            else
-            {
-                r.MoneyInUse = 0;
-                r.MaxPL = 0;
-                r.MinPL = 0;
-                r.MaxDD = "0";
-                r.GrossPerDay = 0;
-                r.GrossPerSymbol = 0;
-            }
-
-            return r;
 
         }
 

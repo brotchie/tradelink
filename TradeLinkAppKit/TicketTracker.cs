@@ -161,7 +161,6 @@ namespace TradeLink.AppKit
             {
                 if (e.Cancel) break;
                 System.Threading.Thread.Sleep(_SLEEP);
-                if ((Space == string.Empty)|| (_un==string.Empty)) continue;
                 while (!_untrackedqueue.isEmpty && TrackEnabled)
                 {
                     if (e.Cancel) break;
@@ -170,6 +169,11 @@ namespace TradeLink.AppKit
                     string space = t.Space == string.Empty ? Space : t.Space;
                     string un = t.Username == string.Empty ? _un : t.Username;
                     string pw = t._pw == string.Empty ? _pw : t._pw;
+                    if ((space == string.Empty) || (un == string.Empty))
+                    {
+                        debug(t.ToString() + " space or login information not provided, ignoring ticket.");
+                        continue;
+                    }
                     try
                     {
                         int tid = AssemblaTicket.Create(space, un, pw, t.Summary, t.Description, t.Status, t.Priority);
