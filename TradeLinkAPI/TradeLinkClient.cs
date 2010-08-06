@@ -34,6 +34,9 @@ namespace TradeLink.API
         event PositionDelegate gotPosition;
         event ImbalanceDelegate gotImbalance;
         event MessageDelegate gotUnknownMessage;
+        event DebugDelegate SendDebugEvent;
+        void Stop();
+        void Start();
         bool Mode(int ProviderIndex, bool showwarning);
         bool Mode();
         string Name { get; set; }
