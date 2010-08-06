@@ -377,13 +377,44 @@ namespace TradeLink.AppKit
         bool sendreport= false;
         bool SendReport { get { return sendreport; } set { sendreport = value; } }
         int ReportTime { get { return _rt; } set { _rt = value; sendreport = (_rt != 0); } }
+        bool _livecheck = true;
+        bool _islive = false;
+
+        System.Text.StringBuilder _msg;
+
+        public void GotDebug(string msg, bool appendtime)
+        {
+            if (appendtime)
+                _msg.AppendLine(_time + ": " + msg);
+            else
+                _msg.AppendLine(msg);
+        }
+        public void GotDebug(string msg)
+        {
+            _msg.AppendLine(_time + ": " + msg);
+        }
+        int _time = 0;
         /// <summary>
         /// pass ticks as they arrive (only necessary if using report time)
         /// </summary>
         /// <param name="k"></param>
         public void newTick(Tick k)
         {
-            if (sendreport && (k.time>=_rt))
+            _time = k.time;
+            if (_livecheck)
+            {
+                bool dmatch = k.date == Util.ToTLDate();
+                bool tmatch = Util.FTDIFF(k.time, Util.ToTLTime()) < 60;
+                _islive = dmatch && tmatch;
+                _livecheck = false;
+                if (_islive)
+                {
+
+                    _msg = new System.Text.StringBuilder(100000);
+                }
+
+            }
+            if (_islive && sendreport && (k.time>=_rt))
             {
                 sendreport = false;
                 debug(k.symbol + " hit report time: " + ReportTime+" at: "+k.time);
