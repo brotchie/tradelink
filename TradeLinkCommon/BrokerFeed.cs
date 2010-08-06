@@ -263,6 +263,11 @@ namespace TradeLink.Common
             tl.Disconnect();
         }
 
+        public void Start()
+        {
+            Reset();
+        }
+
 
         public void Reset()
         {
@@ -572,8 +577,8 @@ namespace TradeLink.Common
 
         void debug(string msg)
         {
-            if (SendDebug != null)
-                SendDebug(msg);
+            if (SendDebugEvent != null)
+                SendDebugEvent(msg);
 
         }
 
@@ -658,7 +663,7 @@ namespace TradeLink.Common
         public event PositionDelegate gotPosition;
         public event ImbalanceDelegate gotImbalance;
         public event MessageDelegate gotUnknownMessage;
-        public event DebugDelegate SendDebug;
+        public event DebugDelegate SendDebugEvent;
         public event DebugDelegate gotServerUp;
         public event DebugDelegate gotServerDown;
 

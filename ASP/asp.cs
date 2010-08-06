@@ -87,7 +87,7 @@ namespace ASP
             _ar.GotBadTick += new VoidDelegate(_ar_GotBadTick);
             _ar.GotTickOverrun += new VoidDelegate(_ar_GotTickOverrun);
             _bf = new BrokerFeed(Properties.Settings.Default.prefquote, Properties.Settings.Default.prefexecute,_ao._providerfallback.Checked,false,PROGRAM);
-            _bf.SendDebug+=new DebugDelegate(debug);
+            _bf.SendDebugEvent+=new DebugDelegate(debug);
             _rt.PushTracksCloseMax = Properties.Settings.Default.TicketsOnCloseMaxAttempts;
             _rt.PushTracksOnClose = Properties.Settings.Default.TicketsOnClose;
             _rt.TrackEnabled = Properties.Settings.Default.TicketTracking;

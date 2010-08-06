@@ -23,8 +23,20 @@ namespace TradeLink.Common
         public event VoidDelegate newImbalanceRequest;
         public event Int64Delegate DOMRequest;
 
+        bool _noverb = true;
+        /// <summary>
+        /// toggle higher level of debugging
+        /// </summary>
+        public bool VerboseDebugging { get { return !_noverb; } set { _noverb = !value; } }
+
         public string Version() { return Util.TLSIdentity(); }
         protected int MinorVer = 0;
+        public event DebugDelegate SendDebugEvent;
+        void debug(string msg)
+        {
+            if (SendDebugEvent != null)
+                SendDebugEvent(msg);
+        }
 
 
         public TLServer_WM() : base()
@@ -39,9 +51,13 @@ namespace TradeLink.Common
             //WMUtil.SendMsg(Text, (IntPtr)WMUtil.HWND_BROADCAST, Handle, (int)MessageTypes.SERVERUP);
         }
 
+        public void Start()
+        {
 
+        }
         public virtual void Stop()
         {
+            debug("stopping server.");
             //WMUtil.SendMsg(Text, (IntPtr)WMUtil.HWND_BROADCAST, Handle, (int)MessageTypes.SERVERDOWN);
         }
 
@@ -165,6 +181,7 @@ namespace TradeLink.Common
             index.Add("");
             hims.Add(WMUtil.HisHandle(cname));
             SrvBeatHeart(cname);
+            debug("registered: " + cname);
         }
         
         void SrvRegStocks(string cname, string stklist)
@@ -174,6 +191,7 @@ namespace TradeLink.Common
             stocks[cid] = stklist;
             SrvBeatHeart(cname);
             if (newRegisterStocks != null) newRegisterStocks(stklist);
+            debug(cname + " registered symbols: " + stklist);
         }
 
         void SrvClearStocks(string cname)
@@ -182,6 +200,7 @@ namespace TradeLink.Common
             if (cid == -1) return;
             stocks[cid] = "";
             SrvBeatHeart(cname);
+            debug(cname + " cleared symbols.");
         }
         void SrvClearIdx(string cname)
         {
@@ -201,6 +220,7 @@ namespace TradeLink.Common
             heart.RemoveAt(cid);
             index.RemoveAt(cid);
             hims.RemoveAt(cid);
+            debug(him + " disconnected.");
         }
 
         void SrvBeatHeart(string cname)
@@ -209,6 +229,7 @@ namespace TradeLink.Common
             if (cid == -1) return; // this client isn't registered, ignore
             TimeSpan since = DateTime.Now.Subtract(heart[cid]);
             heart[cid] = DateTime.Now;
+            debug(cname + " heartbeat.");
         }
 
         void SrvDOMReq(string cname, int depth)
@@ -218,6 +239,12 @@ namespace TradeLink.Common
             SrvBeatHeart(cname);
             if (DOMRequest!=null)
                 DOMRequest(depth);
+            debug(cname + " DOM request.");
+        }
+
+        public void newCancel(long id)
+        {
+            newOrderCancel(id);
         }
 
         public void newOrderCancel(long orderid_being_cancled)

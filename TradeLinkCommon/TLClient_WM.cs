@@ -25,7 +25,7 @@ namespace TradeLink.Common
         public event PositionDelegate gotPosition;
         public event ImbalanceDelegate gotImbalance;
         public event MessageDelegate gotUnknownMessage;
-        public event DebugDelegate SendDebug;
+        public event DebugDelegate SendDebugEvent;
         public event DebugDelegate gotServerUp;
         public event DebugDelegate gotServerDown;
 
@@ -38,6 +38,16 @@ namespace TradeLink.Common
         List<string> srvrwin = new List<string>();
         const int MAXSERVER = 10;
         int _curprovider = -1;
+
+        public void Start()
+        {
+            Mode();
+        }
+
+        public void Stop()
+        {
+
+        }
 
         public new string Name { get { return Text; } set { Text = WMUtil.GetUniqueWindow(value); Mode(_curprovider, false); } }
 
@@ -289,8 +299,8 @@ namespace TradeLink.Common
 
         void debug(string msg)
         {
-            if (SendDebug != null)
-                SendDebug(msg);
+            if (SendDebugEvent != null)
+                SendDebugEvent(msg);
         }
 
         int _tickerrors = 0;
@@ -337,8 +347,8 @@ namespace TradeLink.Common
                         if (gotOrderCancel != null)
                             if (long.TryParse(msg, out id))
                                 gotOrderCancel(id);
-                            else if (SendDebug!=null)
-                                SendDebug("Count not parse order cancel: " + msg);
+                            else if (SendDebugEvent!=null)
+                                SendDebugEvent("Count not parse order cancel: " + msg);
                     }
                     break;
                 case MessageTypes.EXECUTENOTIFY:
@@ -358,8 +368,8 @@ namespace TradeLink.Common
                     }
                     catch (Exception ex)
                     {
-                        if (SendDebug!=null)
-                            SendDebug(msg+" "+ex.Message + ex.StackTrace);
+                        if (SendDebugEvent!=null)
+                            SendDebugEvent(msg+" "+ex.Message + ex.StackTrace);
                     }
                     break;
 
