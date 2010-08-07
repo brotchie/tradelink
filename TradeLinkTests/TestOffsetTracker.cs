@@ -37,6 +37,7 @@ namespace TestTradeLink
         string _sym = string.Empty;
         void ot_HitOffset(string sym, long id, decimal price)
         {
+            debug(sym + " hit offset: " + id);
             _sym = sym;
             _lasthit = id;
         }
@@ -242,7 +243,6 @@ namespace TestTradeLink
 
         }
 
-        [Ignore]
         [Test]
         public void NoResendPartial()
         {
@@ -296,7 +296,9 @@ namespace TestTradeLink
             long pid = profit.id;
             long sid = stop.id;
             // partial hit the profit order
-            ot.Adjust(new TradeImpl(SYM, PRICE + 1, -1 * SIZE));
+            Trade t = new TradeImpl(SYM, PRICE + 1, -1 * SIZE);
+            t.id = pid;
+            ot.Adjust(t);
             // tick
             ot.newTick(nt());
             // verify only one order exists on each side
@@ -308,8 +310,6 @@ namespace TestTradeLink
             // verify profit offset and it should be same id
             Assert.AreEqual(pid, profit.id);
             Assert.IsTrue(profit.isValid);
-            Assert.AreEqual(PRICE + 1 + POFFSET, profit.price);
-            Assert.AreEqual(SIZE, profit.UnsignedSize);
             // verify stop offset (id should change)
             Assert.AreNotEqual(sid, stop.id);
             Assert.IsTrue(stop.isValid);
@@ -706,6 +706,7 @@ namespace TestTradeLink
             Assert.AreEqual(SIZE * 2, stop.UnsignedSize);
 
             // partial hit the profit order
+            long pid = profit.id;
             fill(new TradeImpl(SYM, PRICE + 1, -1 * SIZE),profit.id);
             // tick
             ot.newTick(nt());
@@ -716,10 +717,9 @@ namespace TestTradeLink
             // get orders
             profit = profits[0];
             stop = stops[0];
-            // verify profit offset
+            // verify profit offset is same
             Assert.IsTrue(profit.isValid);
-            Assert.AreEqual(PRICE + 1 + POFFSET, profit.price);
-            Assert.AreEqual(SIZE, profit.UnsignedSize);
+            Assert.AreEqual(pid, profit.id);
             // verify stop offset
             Assert.IsTrue(stop.isValid);
             Assert.AreEqual(PRICE + 1 - SOFFSET, stop.stopp);

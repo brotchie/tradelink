@@ -67,6 +67,7 @@ namespace TradeLink.Common
 
         object _lock = new object();
 
+        
         void doupdate(string sym)
         {
             // is update ignored?
@@ -79,14 +80,17 @@ namespace TradeLink.Common
             Position p = new PositionImpl(_pt[sym]);
             // if we're flat, nothign to do
             if (p.isFlat) return;
-            // see if we need an update
+            // see whats current
             bool cprofit = off.isProfitCurrent(p);
             bool cstop = off.isStopCurrent(p);
+            // if not current, mark for update
+            bool updateprofit = !cprofit;
+            bool updatestop = !cstop;
             // if we're up to date then quit
-            if (cprofit && cstop) return;
+            if (!updatestop && !updateprofit) return;
             // see if we have stop update
-            if ((!cstop && off.hasStop && !CancelOnce) 
-                || (!cstop && off.hasStop && CancelOnce && !off.StopcancelPending))
+            if ((updatestop && off.hasStop && !CancelOnce) 
+                || (updatestop && off.hasStop && CancelOnce && !off.StopcancelPending))
             {
                 // notify
                 if (!off.StopcancelPending)
@@ -99,8 +103,8 @@ namespace TradeLink.Common
                 sentcancel |= true;
             }
             // see if we have profit update
-            if ((!cprofit && off.hasProfit && AllowSimulatenousCancels) ||
-                (!cprofit && off.hasProfit && AllowSimulatenousCancels && !sentcancel))
+            if ((updateprofit && off.hasProfit && AllowSimulatenousCancels) ||
+                (updateprofit && off.hasProfit && AllowSimulatenousCancels && !sentcancel))
             {
                 if (!CancelOnce || (CancelOnce && !off.ProfitcancelPending))
                 {
@@ -448,11 +452,18 @@ namespace TradeLink.Common
                     debug(t.symbol + " profit closed: " + t.id);
                     oi.ProfitId = 0;
                 }
+                else if (hp)
+                    oi.SentProfitSize -= t.xsize;
+
+
                 if (hs && (oi.SentStopSize == t.xsize))
                 {
                     debug(t.symbol + " stop closed: " + t.id);
                     oi.StopId = 0;
                 }
+                else if (hs)
+                    oi.SentStopSize -= t.xsize;
+
                 if (HitOffset != null)
                     HitOffset(t.symbol, t.id, t.xprice);
             }
