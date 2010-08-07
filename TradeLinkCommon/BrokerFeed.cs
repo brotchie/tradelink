@@ -34,9 +34,25 @@ namespace TradeLink.Common
         public int ServerVersion { get { return 0; } }
         public Providers BrokerName { get { return Providers.Unknown; } }
 
-        public BrokerFeed(Providers feed, Providers broker, bool useany, bool threadsafe) : this(feed, broker, useany, threadsafe, "BrokerFeed") { }
-        public BrokerFeed(Providers feed, Providers broker, bool useany, bool threadsafe,string program)
+        string[] _servers = new string[0];
+        int _port = IPUtil.TLDEFAULTBASEPORT;
+
+        public BrokerFeed(Providers feed, Providers broker, bool useany, bool threadsafe) : this(feed, broker, useany, threadsafe, "BrokerFeed", new string[0],IPUtil.TLDEFAULTBASEPORT) { }
+        /// <summary>
+        /// if you provide ip addresses, BF will use IP as the transport.
+        /// otherwise it uses windows ipc/messaging
+        /// </summary>
+        /// <param name="feed"></param>
+        /// <param name="broker"></param>
+        /// <param name="useany"></param>
+        /// <param name="threadsafe"></param>
+        /// <param name="program"></param>
+        /// <param name="servers"></param>
+        /// <param name="port"></param>
+        public BrokerFeed(Providers feed, Providers broker, bool useany, bool threadsafe,string program, string[] servers, int port)
         {
+            _servers = servers;
+            _port = port;
             PROGRAM = program;
             _feed = feed;
             _broker = broker;
@@ -273,7 +289,8 @@ namespace TradeLink.Common
         {
 
             feedready = false;
-            TLClient_WM tl = new TLClient_WM(false);
+            TLClient tl = getsearchclient();
+            
             _pavail = tl.ProvidersAvailable;
 
             bool setquote = false;
@@ -318,7 +335,7 @@ namespace TradeLink.Common
             // map handlers
             if (setquote)
             {
-                quote = new TLClient_WM(qi, PROGRAM + "quote", false);
+                quote = getrealclient(qi, PROGRAM + "quote");
                 quote.gotFeatures += new MessageTypesMsgDelegate(quote_gotFeatures);
                 debug("DataFeed: " + quote.BrokerName + " " + quote.ServerVersion);
                 _feed = quote.BrokerName;
@@ -338,7 +355,7 @@ namespace TradeLink.Common
             }
             if (setexec)
             {
-                execute = new TLClient_WM(xi, PROGRAM + "exec", false);
+                execute = getrealclient(xi, PROGRAM + "exec");
                 _broker = execute.BrokerName;
                 execute.gotFeatures += new MessageTypesMsgDelegate(execute_gotFeatures);
                 if (isThreadSafe)
@@ -381,7 +398,7 @@ namespace TradeLink.Common
                     continue;
                 }
                 // add new connections
-                TLClient newcon = new TLClient_WM(i, PROGRAM, false);
+                TLClient newcon = getrealclient(i, PROGRAM);
                 newcon.gotFeatures += new MessageTypesMsgDelegate(newcon_gotFeatures);
                 newcon.gotUnknownMessage += new MessageDelegate(newcon_gotUnknownMessage);
                 _pcon.Add(newcon);
@@ -599,7 +616,7 @@ namespace TradeLink.Common
             return -1;
         }
 
-        static bool hasminquote(TLClient_WM tl, int provider)
+        static bool hasminquote(TLClient tl, int provider)
         {
             bool v = tl.Mode(provider, false);
             bool test = true;
@@ -608,7 +625,7 @@ namespace TradeLink.Common
             return test && v;
         }
 
-        static bool hasminexec(TLClient_WM tl, int provider)
+        static bool hasminexec(TLClient tl, int provider)
         {
             bool v = tl.Mode(provider, false);
             bool test = true;
@@ -624,7 +641,7 @@ namespace TradeLink.Common
         public bool ModifyFeed(int provider, bool warn)
         {
             if (!feedready) return false;
-            TLClient_WM tl = new TLClient_WM(false);
+            TLClient tl = getsearchclient();
             if ((provider < 0) || (provider > ProvidersAvailable.Length)) return false;
             Providers p = ProvidersAvailable[provider];
             if (!hasminquote(tl, provider))
@@ -637,11 +654,27 @@ namespace TradeLink.Common
             return true;
         }
 
+        TLClient getsearchclient()
+        {
+            if (_servers.Length == 0)
+                return new TLClient_WM(false);
+            else
+                return new TLClient_IP(_servers, _port);
+        }
+
+        TLClient getrealclient(int pidx, string name)
+        {
+            if (_servers.Length == 0)
+                return new TLClient_WM(pidx, name, false);
+            else
+                return new TLClient_IP(TLClient_IP.GetEndpoints(_port, _servers), pidx, name, 3, 10, debug);
+        }
+
         public bool ModifyBroker(int provider) { return ModifyBroker(provider, true); }
         public bool ModifyBroker(int provider, bool warn)
         {
             if (!feedready) return false;
-            TLClient_WM tl = new TLClient_WM(false);
+            TLClient tl = getsearchclient();
             if ((provider < 0) || (provider > ProvidersAvailable.Length)) return false;
             Providers p = ProvidersAvailable[provider];
             if (!hasminexec(tl, provider))

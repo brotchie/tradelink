@@ -38,5 +38,11 @@
     <Setting Name="TicketsOnCloseMaxAttempts" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
+    <Setting Name="ServerPort" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">50000</Value>
+    </Setting>
+    <Setting Name="ServerIpAddresses" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

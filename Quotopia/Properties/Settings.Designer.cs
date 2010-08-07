@@ -352,5 +352,65 @@ namespace Quotopia.Properties {
                 this["brokertimeoutsec"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("TradeLink")]
+        public global::TradeLink.API.Providers PreferredQuote {
+            get {
+                return ((global::TradeLink.API.Providers)(this["PreferredQuote"]));
+            }
+            set {
+                this["PreferredQuote"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("TradeLink")]
+        public global::TradeLink.API.Providers PreferredExec {
+            get {
+                return ((global::TradeLink.API.Providers)(this["PreferredExec"]));
+            }
+            set {
+                this["PreferredExec"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool FallbackToAnyProvider {
+            get {
+                return ((bool)(this["FallbackToAnyProvider"]));
+            }
+            set {
+                this["FallbackToAnyProvider"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50000")]
+        public int ServerPort {
+            get {
+                return ((int)(this["ServerPort"]));
+            }
+            set {
+                this["ServerPort"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ServerIpAddresses {
+            get {
+                return ((string)(this["ServerIpAddresses"]));
+            }
+            set {
+                this["ServerIpAddresses"] = value;
+            }
+        }
     }
 }

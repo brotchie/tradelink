@@ -86,7 +86,8 @@ namespace ASP
             _ar.GotTick += new TickDelegate(tl_gotTick);
             _ar.GotBadTick += new VoidDelegate(_ar_GotBadTick);
             _ar.GotTickOverrun += new VoidDelegate(_ar_GotTickOverrun);
-            _bf = new BrokerFeed(Properties.Settings.Default.prefquote, Properties.Settings.Default.prefexecute,_ao._providerfallback.Checked,false,PROGRAM);
+            string[] servers = Properties.Settings.Default.ServerIpAddresses.Split(',');
+            _bf = new BrokerFeed(Properties.Settings.Default.prefquote, Properties.Settings.Default.prefexecute,_ao._providerfallback.Checked,false,PROGRAM,servers,Properties.Settings.Default.ServerPort);
             _bf.SendDebugEvent+=new DebugDelegate(debug);
             _rt.PushTracksCloseMax = Properties.Settings.Default.TicketsOnCloseMaxAttempts;
             _rt.PushTracksOnClose = Properties.Settings.Default.TicketsOnClose;

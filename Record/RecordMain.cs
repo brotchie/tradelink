@@ -16,7 +16,7 @@ namespace Record
         DebugWindow _dw = new DebugWindow();
         TickArchiver _ta = new TickArchiver();
 
-        TLClient_WM tl = new TLClient_WM();
+        TLClient tl;
         Basket mb = new BasketImpl();
         public const string PROGRAM = "Record";
         AsyncResponse _ar = new AsyncResponse();
@@ -27,6 +27,11 @@ namespace Record
             TrackEnabled = Util.TrackUsage();
             Program = PROGRAM;
             InitializeComponent();
+            string[] servers = Properties.Settings.Default.ServerIpAddresses.Split(',');
+            if (servers.Length==0)
+                tl = new TLClient_WM();
+            else
+                tl = new TLClient_IP(servers, Properties.Settings.Default.ServerPort, debug);
             int pollms = (int)(((double)Properties.Settings.Default.brokertimeoutsec * 1000) / 2);
             _tlt = new TLTracker(pollms, Properties.Settings.Default.brokertimeoutsec, tl, Providers.Unknown, true);
             _tlt.GotConnect += new VoidDelegate(_tlt_GotConnect);
@@ -191,7 +196,7 @@ namespace Record
             ContextMenu.MenuItems[1].Checked = _l2;
             Invalidate(true);
             int depth = _l2 ? Book.MAXBOOK : 1;
-            tl.RequestDOM(depth);
+            tl.TLSend(MessageTypes.DOMREQUEST, tl.Name+ "+" + depth);
             debug("Set depth to: " + depth);
 
         }

@@ -261,7 +261,7 @@ namespace TradeLink.Common
 
         public Providers newProviderName = Providers.TradeLink;
 
-        protected override void WndProc(ref Message m)
+        protected override void WndProc(ref System.Windows.Forms.Message m)
         {
             TradeLinkMessage tlm = WMUtil.ToTradeLinkMessage(ref m);
             if (tlm == null)

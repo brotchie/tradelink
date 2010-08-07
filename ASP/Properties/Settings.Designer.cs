@@ -166,5 +166,29 @@ namespace ASP.Properties {
                 this["TicketsOnCloseMaxAttempts"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50000")]
+        public int ServerPort {
+            get {
+                return ((int)(this["ServerPort"]));
+            }
+            set {
+                this["ServerPort"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ServerIpAddresses {
+            get {
+                return ((string)(this["ServerIpAddresses"]));
+            }
+            set {
+                this["ServerIpAddresses"] = value;
+            }
+        }
     }
 }

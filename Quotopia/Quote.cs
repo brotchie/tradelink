@@ -60,31 +60,36 @@ namespace Quotopia
             _constructed = true;
         }
 
+        BrokerFeed _bf;
         void initfeeds()
         {
-            try
-            {
-                tl = new TLClient_WM("quotopia.client", true);
-            }
-            catch (TLServerNotFound ex) { debug(ex.Message); }
-            int poll = (int)((double)Properties.Settings.Default.brokertimeoutsec * 1000 / 2);
-            _tlt = new TLTracker(poll, (int)Properties.Settings.Default.brokertimeoutsec, tl, Providers.Unknown, true);
-            _tlt.GotConnectFail += new VoidDelegate(_tlt_GotConnectFail);
-            _tlt.GotConnect += new VoidDelegate(_tlt_GotConnect);
-            _tlt.GotDebug += new DebugDelegate(_tlt_GotDebug);
+            string[] servers = Properties.Settings.Default.ServerIpAddresses.Split(',');
+            _bf = new BrokerFeed(Properties.Settings.Default.PreferredQuote, Properties.Settings.Default.PreferredExec, Properties.Settings.Default.FallbackToAnyProvider, false,PROGRAM,servers,Properties.Settings.Default.ServerPort);
+            _bf.Reset();
+
             // if our machine is multi-core we use seperate thread to process ticks
             if (Environment.ProcessorCount == 1)
-                tl.gotTick += new TickDelegate(tl_gotTick);
+                _bf.gotTick += new TickDelegate(tl_gotTick);
             else
             {
-                tl.gotTick += new TickDelegate(tl_gotTickasync);
+                _bf.gotTick += new TickDelegate(tl_gotTickasync);
                 _ar.GotTick += new TickDelegate(tl_gotTick);
             }
-            tl.gotFill += new FillDelegate(tl_gotFill);
-            tl.gotOrder += new OrderDelegate(tl_gotOrder);
-            tl.gotOrderCancel += new LongDelegate(tl_gotOrderCancel);
-            tl.gotPosition += new PositionDelegate(tl_gotPosition);
-            tl.gotAccounts += new DebugDelegate(tl_gotAccounts);
+            _bf.gotFill += new FillDelegate(tl_gotFill);
+            _bf.gotOrder += new OrderDelegate(tl_gotOrder);
+            _bf.gotOrderCancel += new LongDelegate(tl_gotOrderCancel);
+            _bf.gotPosition += new PositionDelegate(tl_gotPosition);
+            _bf.gotAccounts += new DebugDelegate(tl_gotAccounts);
+            // monitor quote feed
+            if (_bf.isFeedConnected)
+            {
+                int poll = (int)((double)Properties.Settings.Default.brokertimeoutsec * 1000 / 2);
+                _tlt = new TLTracker(poll, (int)Properties.Settings.Default.brokertimeoutsec, _bf.FeedClient, Providers.Unknown, true);
+                _tlt.GotConnectFail += new VoidDelegate(_tlt_GotConnectFail);
+                _tlt.GotConnect += new VoidDelegate(_tlt_GotConnect);
+                _tlt.GotDebug += new DebugDelegate(_tlt_GotDebug);
+                status("Connected: " + _bf.Feed);
+            }
         }
 
         void processcommands()
@@ -106,7 +111,7 @@ namespace Quotopia
 
         void bw_DoWork(object sender, DoWorkEventArgs e)
         {
-            TradeLink.AppKit.Versions.UpgradeAlert(tl,true);
+            TradeLink.AppKit.Versions.UpgradeAlert(_bf.BrokerClient,true);
         }
 
         void _tlt_GotDebug(string msg)
@@ -120,14 +125,14 @@ namespace Quotopia
             {
                 if (_tlt.tw.RecentTime != 0)
                 {
-                    debug(tl.BrokerName + " " + tl.ServerVersion + " refreshed.");
-                    status(tl.BrokerName + " connected.");
+                    debug(_bf.BrokerName + " " + _bf.ServerVersion + " refreshed.");
+                    status(_bf.BrokerName + " connected.");
                 }
                 // if we have a quote provider
-                if ((tl.ProvidersAvailable.Length>0))
+                if ((_bf.ProvidersAvailable.Length>0))
                 {
                     // don't track tradelink
-                    if (tl.BrokerName == Providers.TradeLink)
+                    if (_bf.BrokerName == Providers.TradeLink)
                     {
                         _tlt.Stop();
                     }
@@ -224,7 +229,7 @@ namespace Quotopia
             for (int i = 0; i < ordergrid.SelectedRows.Count; i++)
             {
                 long oid = (long)ordergrid["oid", ordergrid.SelectedRows[i].Index].Value;
-                tl.CancelOrder(oid);
+                _bf.CancelOrder(oid);
                 debug("cancel: " + oid.ToString());
             }
         }
@@ -253,8 +258,8 @@ namespace Quotopia
                 _log.Stop();
                 _ar.Stop();
                 _tlt.Stop();
-                tl.Unsubscribe();
-                tl.Disconnect();
+                _bf.Unsubscribe();
+                _bf.Disconnect();
             }
             catch { }
         }
@@ -380,10 +385,10 @@ namespace Quotopia
                 sendOrder.Account = accountname.Text;
             if (exchdest.Text != "")
                 sendOrder.Exchange = exchdest.Text;
-            int res = tl.SendOrder(sendOrder);
+            int res = _bf.SendOrder(sendOrder);
             if (res != 0)
             {
-                string err = Util.PrettyError(tl.BrokerName, res);
+                string err = Util.PrettyError(_bf.BrokerName, res);
                 status(err);
                 debug(sendOrder.ToString() + "( " + err + " )");
             }
@@ -450,7 +455,7 @@ namespace Quotopia
                     newsymbol = "";
                     try
                     {
-                        tl.Subscribe(mb);
+                        _bf.Subscribe(mb);
                     }
                     catch (TLServerNotFound) { debug("no broker or feed server running."); }
                 }
@@ -751,11 +756,11 @@ namespace Quotopia
 
 
 
-        TLClient_WM tl;
+
         ~Quote() { QuotopiaClose(); }
         void QuotopiaClose()
         {
-            tl.Disconnect(); // unregister all stocks and this client
+            _bf.Disconnect(); // unregister all stocks and this client
         }
 
         System.Text.StringBuilder _dmsg = new System.Text.StringBuilder();
@@ -819,8 +824,8 @@ namespace Quotopia
 
         void updatebasket()
         {
-            if (tl.ProvidersAvailable.Length > 0)
-                tl.Subscribe(mb);
+            if (_bf.ProvidersAvailable.Length > 0)
+                _bf.Subscribe(mb);
             else
                 status("no server running to obtain quotes from.");
         }

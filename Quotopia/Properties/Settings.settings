@@ -89,5 +89,20 @@
     <Setting Name="brokertimeoutsec" Type="System.Decimal" Scope="User">
       <Value Profile="(Default)">10</Value>
     </Setting>
+    <Setting Name="PreferredQuote" Type="TradeLink.API.Providers" Scope="User">
+      <Value Profile="(Default)">TradeLink</Value>
+    </Setting>
+    <Setting Name="PreferredExec" Type="TradeLink.API.Providers" Scope="User">
+      <Value Profile="(Default)">TradeLink</Value>
+    </Setting>
+    <Setting Name="FallbackToAnyProvider" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ServerPort" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">50000</Value>
+    </Setting>
+    <Setting Name="ServerIpAddresses" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

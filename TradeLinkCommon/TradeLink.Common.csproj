@@ -112,6 +112,7 @@
     <Compile Include="LimitOrder.cs" />
     <Compile Include="BasketImpl.cs" />
     <Compile Include="MarketOrderFlat.cs" />
+    <Compile Include="Message.cs" />
     <Compile Include="MessageTracker.cs" />
     <Compile Include="OffsetInfo.cs" />
     <Compile Include="OffsetTracker.cs" />
@@ -149,6 +150,7 @@
     <Compile Include="TickFileFilter.cs" />
     <Compile Include="TickWatcher.cs" />
     <Compile Include="TLTracker.cs" />
+    <Compile Include="TLTransport.cs" />
     <Compile Include="TradeImpl.cs" />
     <Compile Include="TLClient_WM.cs">
     </Compile>

@@ -5,5 +5,11 @@
     <Setting Name="brokertimeoutsec" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">60</Value>
     </Setting>
+    <Setting Name="ServerIpAddresses" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ServerPort" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">50000</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
