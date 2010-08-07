@@ -4,7 +4,8 @@ namespace TradeLink.API
     public enum Providers
     {
         Unknown = -1,
-        TradeLink = 0,
+        Error = 0,
+        TradeLink = 1,
         Assent,
         InteractiveBrokers,
         Genesis,

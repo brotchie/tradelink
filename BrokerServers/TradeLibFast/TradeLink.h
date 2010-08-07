@@ -7,15 +7,6 @@
 	const CString SERVERWINDOW = _T("TradeLinkServer");
 	const CString CLIENTWINDOW = _T("TradeLinkClient");
 
-	enum TLTypes
-	{
-		NONE = 0,
-        SIMBROKER = 2,
-        LIVEBROKER = 4,
-        HISTORICALBROKER = 8,
-        TESTBROKER = 16,
-		ANYSERVER = 255,
-	};
 
 	enum MessageTypes {
         // START TRADELINK STATUS MESSAGES - DO NOT REMOVE OR RENAME MESSAGES (only add/insert)
@@ -141,7 +132,8 @@
 	enum Brokers
 	{
 		Unknown = -1,
-        TradeLink = 0,
+		Error = 0,
+        TradeLink = 1,
         Assent,
         InteractiveBrokers,
         Genesis,
