@@ -275,13 +275,19 @@ namespace TradeLibFast
 			CString cpy = CString(o.localsymbol);
 			int pidx = cpy.Find(CString("."));
 			if (pidx!=-1)
+			{
+
 				cpy.Delete(pidx,cpy.GetLength()-pidx);
+			}
 			contract->symbol = cpy;
+			contract->currency = getcurrency(o.localsymbol);
 		}
+		else
+			contract->currency = o.currency;
 		if (contract->exchange=="")
 			contract->exchange= "SMART";
 		
-		contract->currency = o.currency;
+		
 
 		// get the TWS session associated with our account
 		EClient* client;
@@ -588,7 +594,10 @@ namespace TradeLibFast
 			// if we have a stock and it has no destination, use default
 			if ((sec.type==STK) && !sec.hasDest())
 				contract.exchange = "SMART";
-			contract.currency = _currency;
+			if (sec.type==CASH)
+				contract.currency = getcurrency(sec.sym);
+			else
+				contract.currency = _currency;
 			contract.secType = TLSecurity::SecurityTypeName(sec.type);
 			v(CString("attempting to add symbol"));
 			pcont(&contract);
@@ -601,6 +610,17 @@ namespace TradeLibFast
 		}
 		return OK;
 
+	}
+
+	CString TWS_TLServer::getcurrency(CString localsymbol)
+	{
+			CString cpy = CString(localsymbol);
+			int pidx = cpy.Find(CString("."));
+			if (pidx!=-1)
+			{
+				cpy.Delete(0,cpy.GetLength()-pidx);				
+			}
+			return cpy;
 	}
 
 

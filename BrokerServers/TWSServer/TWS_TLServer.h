@@ -33,6 +33,7 @@ namespace TradeLibFast
 
 
 	private:
+		CString getcurrency(CString localsymbol);
 		void pcont(Contract* c);
 		void pord(Order* o);
 		void v(CString msg);
