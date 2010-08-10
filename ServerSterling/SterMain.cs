@@ -30,13 +30,16 @@ namespace SterServer
             try
             {
                 TradeLink.API.TradeLinkServer tls;
-                if (Properties.Settings.Default.TLClientAddress== string.Empty)
-                    tls = new TradeLink.Common.TLServer_WM() ;
+                if (Properties.Settings.Default.TLClientAddress == string.Empty)
+                {
+                    tls = new TradeLink.Common.TLServer_WM();
+                    tl.SendDebug += new DebugDelegate(tl_SendDebug);
+                }
                 else
                     tls = new TradeLink.Common.TLServer_IP(Properties.Settings.Default.TLClientAddress, Properties.Settings.Default.TLClientPort);
 
                 tl = new ServerSterling(tls, Properties.Settings.Default.Sleep,Properties.Settings.Default.OrderSleep,debug);
-                tl.SendDebug += new DebugDelegate(tl_SendDebug);
+                
                 tl.CoverEnabled = Properties.Settings.Default.CoverEnabled;
                 tl.Account = Properties.Settings.Default.defaultaccount;
                 tl.CancelWait = Properties.Settings.Default.CancelWait;
