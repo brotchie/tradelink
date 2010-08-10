@@ -35,11 +35,13 @@ namespace SterServer
         bool _supportcover = true;
         public bool CoverEnabled { get { return _supportcover; } set { _supportcover = value; } }
         
-        public ServerSterling(TradeLinkServer tls, int sleepOnNodata, int sleepAfterOrder)
+        public ServerSterling(TradeLinkServer tls, int sleepOnNodata, int sleepAfterOrder, DebugDelegate deb)
         {
+            SendDebug = deb;
             tl = tls;
             _SLEEP = 50;
             _ORDERSLEEP = sleepAfterOrder;
+            Start();
         }
         bool _connected = false;
         public bool isConnected { get { return _connected; } }
