@@ -18,25 +18,65 @@ namespace TradeLink.Common
         bool _reqpref = true;
         bool _isprefq = false;
         bool _isprefx = false;
+        /// <summary>
+        /// returns whether preferred feed is being used
+        /// </summary>
         public bool isPreferredFeed { get { return _isprefq; } }
+        /// <summary>
+        /// returns whether preferred broker is being used
+        /// </summary>
         public bool isPreferredBroker { get { return _isprefx; } }
+        /// <summary>
+        /// returns current client being used for feed
+        /// </summary>
         public TLClient FeedClient { get { return quote; } set { quote = value; }  }
+        /// <summary>
+        /// returns client of broker provider
+        /// </summary>
         public TLClient BrokerClient { get { return execute; } set { execute = value; } }
+        /// <summary>
+        /// returns current feed provider
+        /// </summary>
         public Providers Feed { get { return _feed; } }
+        /// <summary>
+        /// returns current broker provider
+        /// </summary>
         public Providers Broker { get { return _broker; } }
+        /// <summary>
+        /// whether feed/broker connections will be attempted if preferred options are not available
+        /// </summary>
         public bool RequirePreferred { get { return !_reqpref; } }
         bool _threadsafe = true;
+        /// <summary>
+        /// whether extra thread safety is enabled (generally not useful)
+        /// </summary>
         public bool isThreadSafe { get { return _threadsafe; } }
+        /// <summary>
+        /// create a new brokerfeed with default parameters
+        /// </summary>
         public BrokerFeed() : this(Providers.Unknown, Providers.Unknown, true,false) { }
         Thread _reader;
         bool _readergo = true;
 
+        /// <summary>
+        /// not used.   call BrokerClient.ServerVersion or FeedClient.ServerVersion
+        /// </summary>
         public int ServerVersion { get { return 0; } }
+        /// <summary>
+        /// not used.   See Broker or Feed properties.
+        /// </summary>
         public Providers BrokerName { get { return Providers.Unknown; } }
 
         string[] _servers = new string[0];
         int _port = IPUtil.TLDEFAULTBASEPORT;
 
+        /// <summary>
+        /// create broker feed
+        /// </summary>
+        /// <param name="feed"></param>
+        /// <param name="broker"></param>
+        /// <param name="useany"></param>
+        /// <param name="threadsafe"></param>
         public BrokerFeed(Providers feed, Providers broker, bool useany, bool threadsafe) : this(feed, broker, useany, threadsafe, "BrokerFeed", new string[0],IPUtil.TLDEFAULTBASEPORT) { }
         /// <summary>
         /// if you provide ip addresses, BF will use IP as the transport.
@@ -145,20 +185,30 @@ namespace TradeLink.Common
         }
 
         int _interrupts = 0;
+        /// <summary>
+        /// return # of interrupts when running in thread safe mode
+        /// </summary>
         public int SafeThreadInterrupts { get { return _interrupts; } }
-
+        /// <summary>
+        /// subscribe to symbols from feed provider
+        /// </summary>
+        /// <param name="b"></param>
         public void Subscribe(Basket b)
         {
             if (quote == null) return;
             quote.Subscribe(b);
         }
-
+        /// <summary>
+        /// unsubscribe symbols from feed provider
+        /// </summary>
         public void Unsubscribe()
         {
             if (quote != null)
                 quote.Unsubscribe();
         }
-
+        /// <summary>
+        /// register with providers
+        /// </summary>
         public void Register()
         {
             if (quote != null)
@@ -166,13 +216,28 @@ namespace TradeLink.Common
             if (execute != null)
                 execute.Register();
         }
-
+        /// <summary>
+        /// send a message to providers
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public long TLSend(MessageTypes type, string message)
         {
             string r = string.Empty;
             long res = TLSend(type, 0, 0, 0, message, ref r);
             return res;
         }
+        /// <summary>
+        /// send a message to providers
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="source"></param>
+        /// <param name="dest"></param>
+        /// <param name="msgid"></param>
+        /// <param name="message"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
         public long TLSend(MessageTypes type, long source, long dest, long msgid, string message, ref string result)
         {
             for (int i = 0; i < _pcon.Count; i++)
@@ -278,17 +343,26 @@ namespace TradeLink.Common
             _pavail = tl.ProvidersAvailable;
             tl.Disconnect();
         }
-
+        /// <summary>
+        /// start broker feed
+        /// </summary>
         public void Start()
         {
             Reset();
         }
 
-
+        /// <summary>
+        /// reset brokerfeed, look for any new servers and attempt to connect to current preferred providers
+        /// </summary>
         public void Reset()
         {
 
             feedready = false;
+            if (IPUtil.hasValidAddress(_servers))
+                debug("At least one valid IpAddress found, using IP transport.");
+            else
+                debug("Not ip addresses specified, using Windows IPC.");
+
             TLClient tl = getsearchclient();
             
             _pavail = tl.ProvidersAvailable;
@@ -299,8 +373,8 @@ namespace TradeLink.Common
             // see if we can get preferred providers
             int xi = getproviderindex(_broker);
             int qi = getproviderindex(_feed);
-            _isprefq = qi != -1;
-            _isprefx = xi != -1;
+            _isprefq = (qi != -1) && hasminquote(tl, qi);
+            _isprefx = (xi != -1) && hasminexec(tl, xi);
             if (!isPreferredFeed)
                 debug("preferred data not available: " + _feed);
             if (!isPreferredBroker)
@@ -322,14 +396,14 @@ namespace TradeLink.Common
             // not allowed
             if (RequirePreferred)
             {
-                setquote = isPreferredFeed && hasminquote(tl, qi);
-                setexec = isPreferredBroker && hasminexec(tl, xi);
+                setquote = isPreferredFeed ;
+                setexec = isPreferredBroker ;
             }
             else // ok to fallback,but where
             {
  
-                setquote = (qi != -1) && hasminquote(tl, qi);
-                setexec = (xi != -1) && hasminexec(tl, xi);
+                setquote = (qi != -1);
+                setexec = (xi != -1);
             }
 
             // map handlers
@@ -605,7 +679,13 @@ namespace TradeLink.Common
             int idx = getproviderindex(p);
             return idx != -1;
         }
+        /// <summary>
+        /// whether feed is connected
+        /// </summary>
         public bool isFeedConnected { get { return quote != null; } }
+        /// <summary>
+        /// whether broker is connected
+        /// </summary>
         public bool isBrokerConnected { get { return execute != null; } }
 
         int getproviderindex(Providers p)
@@ -616,10 +696,16 @@ namespace TradeLink.Common
             return -1;
         }
 
+        const int MAXFEATUREWAIT = 30;
+
         static bool hasminquote(TLClient tl, int provider)
         {
             bool v = tl.Mode(provider, false);
             bool test = true;
+            int count = 0;
+            while ((tl.BrokerName != Providers.Unknown) && (tl.BrokerName != Providers.Error)
+                && (tl.RequestFeatureList.Count == 0) && (count++<MAXFEATUREWAIT))
+                Thread.Sleep(10);
             test &= tl.RequestFeatureList.Contains(MessageTypes.TICKNOTIFY);
             tl.Disconnect();
             return test && v;
@@ -629,6 +715,10 @@ namespace TradeLink.Common
         {
             bool v = tl.Mode(provider, false);
             bool test = true;
+            int count = 0;
+            while ((tl.BrokerName != Providers.Unknown) && (tl.BrokerName != Providers.Error)
+                && (tl.RequestFeatureList.Count == 0) && (count++ < MAXFEATUREWAIT))
+                Thread.Sleep(10);
             test &= tl.RequestFeatureList.Contains(MessageTypes.EXECUTENOTIFY);
             test &= tl.RequestFeatureList.Contains(MessageTypes.SENDORDER);
             test &= tl.RequestFeatureList.Contains(MessageTypes.ORDERCANCELREQUEST);
@@ -654,17 +744,20 @@ namespace TradeLink.Common
             return true;
         }
 
+
         TLClient getsearchclient()
         {
-            if (_servers.Length == 0)
+            if (!IPUtil.hasValidAddress(_servers))
+            {
                 return new TLClient_WM(false);
+            }
             else
                 return new TLClient_IP(_servers, _port);
         }
 
         TLClient getrealclient(int pidx, string name)
         {
-            if (_servers.Length == 0)
+            if (!IPUtil.hasValidAddress(_servers))
                 return new TLClient_WM(pidx, name, false);
             else
                 return new TLClient_IP(TLClient_IP.GetEndpoints(_port, _servers), pidx, name, 3, 10, debug);

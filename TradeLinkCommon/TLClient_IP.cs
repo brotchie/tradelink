@@ -348,6 +348,7 @@ namespace TradeLink.Common
                 RequestFeatures();
                 // assuming we got this far, mark selected provider current
                 _curprovider = ProviderIndex;
+                _bn = servers[_curprovider];
                 return true;
             }
             catch (SocketException ex)
@@ -459,12 +460,12 @@ namespace TradeLink.Common
         /// <returns>number of positions to expect</returns>
         public int RequestPositions(string account) { if (account == "") return 0; return (int)TLSend(MessageTypes.POSITIONREQUEST, Name + "+" + account); }
 
+        Providers _bn = Providers.Unknown;
         public Providers BrokerName 
         { 
             get 
-            { 
-                long res = TLSend(MessageTypes.BROKERNAME);
-                return (Providers)res;
+            {
+                return _bn;
             } 
         }
 
@@ -645,11 +646,14 @@ namespace TradeLink.Common
                 case MessageTypes.FEATURERESPONSE:
                     string[] p = msg.Split(',');
                     List<MessageTypes> f = new List<MessageTypes>();
+                    _rfl.Clear();
                     foreach (string s in p)
                     {
                         try
                         {
-                            f.Add((MessageTypes)Convert.ToInt32(s));
+                            MessageTypes mt = (MessageTypes)Convert.ToInt32(s);
+                            f.Add(mt);
+                            _rfl.Add(mt);
                         }
                         catch (Exception) { }
                     }
