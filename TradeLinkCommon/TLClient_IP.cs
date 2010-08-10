@@ -418,13 +418,22 @@ namespace TradeLink.Common
         /// Sends the order.
         /// </summary>
         /// <param name="o">The oorder</param>
-        /// <returns>Zero if succeeded, Broker error code otherwise.</returns>
+        /// <returns>Zero if succeeded</returns>
         public int SendOrder(Order o)
         {
             if (o == null) return (int)MessageTypes.EMPTY_ORDER;
             if (!o.isValid) return (int)MessageTypes.EMPTY_ORDER;
             string m = OrderImpl.Serialize(o);
-            return (int)TLSend(MessageTypes.SENDORDER, m);
+            try
+            {
+                TLSend(MessageTypes.SENDORDER, m);
+                return 0;
+            }
+            catch (SocketException ex)
+            {
+                debug("Exception sending order: " + o.ToString() + " " + ex.SocketErrorCode + ex.Message + ex.StackTrace);
+                return (int)MessageTypes.UNKNOWN_ERROR;
+            }
         }
         /// <summary>
         /// request a list of features, result will be returned to gotFeatureResponse and RequestFeaturesList

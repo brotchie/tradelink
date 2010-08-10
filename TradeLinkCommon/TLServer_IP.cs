@@ -271,7 +271,10 @@ namespace TradeLink.Common
 
         private void SrvDoExecute(string msg) // handle an order (= execute request)
         {
-
+            Order o = OrderImpl.Deserialize(msg);
+            if (newSendOrderRequest != null) 
+                newSendOrderRequest(o); //request fill
+            
         }
 
 

@@ -700,7 +700,7 @@ namespace TradeLink.Common
 
         static bool hasminquote(TLClient tl, int provider)
         {
-            bool v = tl.Mode(provider, false);
+            bool v = (tl.ProviderSelected== provider) || tl.Mode(provider, false);
             bool test = true;
             int count = 0;
             while ((tl.BrokerName != Providers.Unknown) && (tl.BrokerName != Providers.Error)
@@ -713,7 +713,7 @@ namespace TradeLink.Common
 
         static bool hasminexec(TLClient tl, int provider)
         {
-            bool v = tl.Mode(provider, false);
+            bool v = (tl.ProviderSelected == provider) || tl.Mode(provider, false);
             bool test = true;
             int count = 0;
             while ((tl.BrokerName != Providers.Unknown) && (tl.BrokerName != Providers.Error)

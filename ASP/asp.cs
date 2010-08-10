@@ -146,22 +146,26 @@ namespace ASP
                 debug("a problem has occured.  ASP must be run in interactive mode.");
                 return;
             }
+            // try to connect to preferr providers
             _bf.Reset();
+            // update ASP gui with available providers
             _ao._execsel.DataSource = _bf.ProvidersAvailable;
             _ao._datasel.DataSource = _bf.ProvidersAvailable;
             // if we have quotes
-            // don't save ticks from replay since they're already saved
-            _ao.archivetickbox.Checked = ( _bf.ProvidersAvailable.Length>0) && !_bf.FeedClient.RequestFeatureList.Contains(MessageTypes.HISTORICALDATA);
-            // monitor quote feed
             if (_bf.isFeedConnected)
             {
+                // don't save ticks from replay since they're already saved
+                _ao.archivetickbox.Checked = (_bf.ProvidersAvailable.Length > 0) && !_bf.FeedClient.RequestFeatureList.Contains(MessageTypes.HISTORICALDATA);
+                // monitor quote feed
                 int poll = (int)((double)Properties.Settings.Default.brokertimeoutsec * 1000 / 2);
                 _tlt = new TLTracker(poll, (int)Properties.Settings.Default.brokertimeoutsec, _bf.FeedClient, Providers.Unknown, true);
                 _tlt.GotConnectFail += new VoidDelegate(_tlt_GotConnectFail);
                 _tlt.GotConnect += new VoidDelegate(_tlt_GotConnect);
                 _tlt.GotDebug += new DebugDelegate(_tlt_GotDebug);
+                // update selected providers in ASP gui
                 _ao._datasel.SelectedIndex = _bf.FeedClient.ProviderSelected;
                 _ao._datasel.Text = _bf.FeedClient.BrokerName.ToString();
+                // notify
                 status("Connected: " + _bf.Feed);
             }
 
