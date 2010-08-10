@@ -12,7 +12,7 @@ namespace TestTradeLink
     [TestFixture(Description="May not work on machines without brokerserver installed to default location.")]
     public class TestTLFastInterop
     {
-        [DllImport("c:\\program files\\TradeLink\\TradeLibFast.dll",EntryPoint="TLSENDORDER")]
+        [DllImport("c:\\program files\\tradelink\\TradeLibFast.dll",EntryPoint="TLSENDORDER")]
         public static extern int SendOrder(string sym, bool side, int size, double limit, double stop, int id, string account, string dest);
         
 
@@ -30,7 +30,7 @@ namespace TestTradeLink
             // verify price to 5 decimal places
             double expect = Math.Round(p, 5);
             double actual = (double)Math.Round(last.price, 5);
-            Assert.AreEqual(expect, actual );
+            Assert.AreEqual(expect, actual,last.ToString() );
 
         }
 
@@ -38,6 +38,7 @@ namespace TestTradeLink
         public void InterOpSpeed()
         {
             const int TESTSIZE = 100;
+            count = 0;
             // get some random prices
             Tick[] data = RandomTicks.GenerateSymbol(sym, TESTSIZE);
             // track the time
@@ -54,6 +55,8 @@ namespace TestTradeLink
             double elap = (double)elapms/1000;
             double rate = TESTSIZE / elap;
             Console.WriteLine("InterOpSpeed elap: " + elap.ToString("N1") + " rate: " + rate.ToString("N0") + " orders/sec");
+            // make sure orders received
+            Assert.AreEqual(data.Length, count);
             // make sure no bad orders
             Assert.AreEqual(0,bad);
             // make sure fast
@@ -61,10 +64,12 @@ namespace TestTradeLink
         }
 
         Order last = new OrderImpl();
+        int count = 0;
 
         long tl_newSendOrderRequest(Order o)
         {
             last = o;
+            count++;
             return 0;
   
         }
@@ -73,6 +78,7 @@ namespace TestTradeLink
         {
             // start a server
             TLServer_WM tl = new TLServer_WM();
+            tl.newProviderName = Providers.TradeLink;
             // handle new orders
             tl.newSendOrderRequest += new OrderDelegateStatus(tl_newSendOrderRequest);
 

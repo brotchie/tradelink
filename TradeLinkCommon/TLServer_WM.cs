@@ -13,6 +13,8 @@ namespace TradeLink.Common
     [System.ComponentModel.DesignerCategory("")]
     public class TLServer_WM : Form, TradeLinkServer
     {
+        Providers _pn = Providers.Unknown;
+        public Providers newProviderName { get { return _pn; } set { _pn = value; } }
         public event StringDelegate newAcctRequest;
         public event OrderDelegateStatus newSendOrderRequest;
         public event LongDelegate newOrderCancelRequest;
@@ -21,7 +23,6 @@ namespace TradeLink.Common
         public event MessageArrayDelegate newFeatureRequest;
         public event UnknownMessageDelegate newUnknownRequest;
         public event VoidDelegate newImbalanceRequest;
-        public event Int64Delegate DOMRequest;
 
         bool _noverb = true;
         /// <summary>
@@ -111,6 +112,11 @@ namespace TradeLink.Common
             }
         }
 
+        public void TLSend(string msg, MessageTypes type, int clientid)
+        {
+            TLSend(msg, type, hims[clientid]);
+
+        }
         public void TLSend(string message, MessageTypes type, string clientname)
         {
             int id = client.IndexOf(clientname);
@@ -232,15 +238,7 @@ namespace TradeLink.Common
             debug(cname + " heartbeat.");
         }
 
-        void SrvDOMReq(string cname, int depth)
-        {
-            int cid = client.IndexOf(cname);
-            if (cid == -1) return;
-            SrvBeatHeart(cname);
-            if (DOMRequest!=null)
-                DOMRequest(depth);
-            debug(cname + " DOM request.");
-        }
+
 
         public void newCancel(long id)
         {
@@ -258,8 +256,6 @@ namespace TradeLink.Common
                 for (int i = 0; i < client.Count; i++)
                     TLSend(ImbalanceImpl.Serialize(imb), MessageTypes.IMBALANCERESPONSE, hims[i]);
         }
-
-        public Providers newProviderName = Providers.TradeLink;
 
         protected override void WndProc(ref System.Windows.Forms.Message m)
         {
@@ -353,10 +349,6 @@ namespace TradeLink.Common
                     break;
                 case MessageTypes.VERSION :
                     result = (long)MinorVer;
-                    break;
-                case MessageTypes.DOMREQUEST:
-                    string[] dom = msg.Split('+');
-                    SrvDOMReq(dom[0], int.Parse(dom[1]) );
                     break;
                 default:
                     if (newUnknownRequest != null)

@@ -27,7 +27,7 @@ namespace TDServer
 
         AmeritradeBrokerAPI api = new AmeritradeBrokerAPI();
         const string APIVER = "1";
-        TLServer_WM tl = new TLServer_WM();
+        TradeLinkServer tl;
         public const string PROGRAM = "ServerTD BETA";
         Log _log = new Log(PROGRAM);
         public TDServerMain()
@@ -36,6 +36,12 @@ namespace TDServer
             Program = PROGRAM;
             InitializeComponent();
             FormClosing += new FormClosingEventHandler(TDServerMain_FormClosing);
+            
+            if (Properties.Settings.Default.TLClientAddress == string.Empty)
+                tl = new TradeLink.Common.TLServer_WM();
+            else
+                tl = new TradeLink.Common.TLServer_IP(Properties.Settings.Default.TLClientAddress, Properties.Settings.Default.TLClientPort);
+
 
             // bindings
             tl.newProviderName = Providers.TDAmeritrade;
@@ -165,7 +171,7 @@ namespace TDServer
                 orderid = id.ToString();
             api.TD_CancelOrder(api._accountid, orderid, _user.Text, _pass.Text, AmeritradeBrokerAPI.SOURCEID, APIVER, ref result);
             if (result==string.Empty)
-                tl.newOrderCancel(number);
+                tl.newCancel(number);
         }
 
         MessageTypes[] tl_newFeatureRequest()

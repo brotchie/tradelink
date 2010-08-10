@@ -19,7 +19,13 @@ namespace ServerNxCore
             InitializeComponent();
             ContextMenu = new ContextMenu();
             ContextMenu.MenuItems.Add(new MenuItem("report", new EventHandler(report)));
-            tl = new ServerNxCore(ServerNxCore.LIVEFEED, debug);
+            TradeLink.API.TradeLinkServer tls;
+            if (Properties.Settings.Default.TLClientAddress== string.Empty)
+                tls = new TradeLink.Common.TLServer_WM() ;
+            else
+                tls = new TradeLink.Common.TLServer_IP(Properties.Settings.Default.TLClientAddress, Properties.Settings.Default.TLClientPort);
+
+            tl = new ServerNxCore(tls,ServerNxCore.LIVEFEED, debug);
             FormClosing += new FormClosingEventHandler(ServerNxCoreMain_FormClosing);
             tl.Start();
         }

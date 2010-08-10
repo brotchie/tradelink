@@ -23,7 +23,13 @@ namespace ServerFix
             ContextMenu.MenuItems.Add("report", new EventHandler(report));
             _dc.Parent = this;
             _dc.Dock = DockStyle.Fill;
-            tl = new ServerQuickFix(Properties.Settings.Default.SettingsPath);
+            TradeLink.API.TradeLinkServer tls;
+            if (Properties.Settings.Default.TLClientAddress == string.Empty)
+                tls = new TradeLink.Common.TLServer_WM();
+            else
+                tls = new TradeLink.Common.TLServer_IP(Properties.Settings.Default.TLClientAddress, Properties.Settings.Default.TLClientPort);
+
+            tl = new ServerQuickFix(tls,Properties.Settings.Default.SettingsPath);
             tl.SendDebugEvent+=new TradeLink.API.DebugDelegate(debug);
             if (tl.Start(string.Empty, string.Empty))
                 debug("login succeeded.");

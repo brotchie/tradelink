@@ -13,12 +13,19 @@ namespace ServerRedi
 {
     public partial class RediMain : AppTracker
     {
-        ServerRedi tl = new ServerRedi();
+        ServerRedi tl;
         DebugWindow _dw = new DebugWindow();
         public const string PROGRAM = "RediServer";
         Log _log = new Log(PROGRAM);
         public RediMain()
         {
+            TradeLink.API.TradeLinkServer tls;
+            if (Properties.Settings.Default.TLClientAddress == string.Empty)
+                tls = new TradeLink.Common.TLServer_WM();
+            else
+                tls = new TradeLink.Common.TLServer_IP(Properties.Settings.Default.TLClientAddress, Properties.Settings.Default.TLClientPort);
+
+            tl = new ServerRedi(tls);
             TrackEnabled = Util.TrackUsage();
             Program = PROGRAM;
             InitializeComponent();

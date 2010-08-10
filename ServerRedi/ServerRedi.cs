@@ -1,16 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using VBRediClasses;
 using TradeLink.API;
 using TradeLink.Common;
 using System.Threading;
-
 namespace ServerRedi
 {
-    public class ServerRedi : TLServer_WM
+    public class ServerRedi 
     {
-
         VBCacheClass _cc;
         VBOrderClass _oc;
         string _account;
@@ -32,35 +30,32 @@ namespace ServerRedi
         Dictionary<string, long> OrderIdDict;
         PositionTracker pt = new PositionTracker();
         List<string> accts = new List<string>();
-
-        public ServerRedi() : this(50) { }
-        public ServerRedi(int sleepvalue)
+        
+        public ServerRedi(TradeLinkServer tls) : this(tls, 50) { }
+        public ServerRedi(TradeLinkServer tls, int sleepvalue)
         {
+            tl = tls;
             _bw = new Thread(new ParameterizedThreadStart(doqueues));
-            newProviderName = Providers.REDI;
-            newRegisterStocks += new DebugDelegate(ServerRedi_newRegisterStocks);
-            newSendOrderRequest += new OrderDelegateStatus(ServerRedi_newSendOrderRequest);
-            newOrderCancelRequest += new LongDelegate(ServerRedi_newOrderCancelRequest);
-            newFeatureRequest += new MessageArrayDelegate(ServerRedi_newFeatureRequest);
-            newPosList += new PositionArrayDelegate(ServerRedi_gotSrvPosList);
-            newAcctRequest += new StringDelegate(ServerRedi_newAcctRequest);
+            tl.newProviderName = Providers.REDI;
+            tl.newRegisterStocks += new DebugDelegate(ServerRedi_newRegisterStocks);
+            tl.newSendOrderRequest += new OrderDelegateStatus(ServerRedi_newSendOrderRequest);
+            tl.newOrderCancelRequest += new LongDelegate(ServerRedi_newOrderCancelRequest);
+            tl.newFeatureRequest += new MessageArrayDelegate(ServerRedi_newFeatureRequest);
+            tl.newPosList += new PositionArrayDelegate(ServerRedi_gotSrvPosList);
+            tl.newAcctRequest += new StringDelegate(ServerRedi_newAccountRequest);
         }
-
         void ServerRedi_newOrderCancelRequest(long val)
         {
             _newcancel.Write(val);
         }
-
         Position[] ServerRedi_gotSrvPosList(string account)
         {
             return pt.ToArray();
         }
-
-        string ServerRedi_newAcctRequest()
+        string ServerRedi_newAccountRequest()
         {
             return string.Join(",", accts.ToArray());
         }
-
         /*
         bool isMsgTableOpen = false;
          *                             if (isMsgTableOpen)
@@ -69,7 +64,6 @@ namespace ServerRedi
                             }
                             _cc.VBSubmit(ref isMsgTableOpen, ref se);
          */
-
         object vret;
         void doqueues(object obj)
         {
@@ -96,7 +90,6 @@ namespace ServerRedi
                                 vret = _cc.VBRediCache.Submit("L1", "true", ref err);
                                 checkerror(ref err, "submit");
                             }
-
                             _cc.VBRediCache.AddWatch(0, s.Symbol, string.Empty, ref err);
                             checkerror(ref err,"watch");
                         }
@@ -107,10 +100,8 @@ namespace ServerRedi
                     }
                     debug("registered: " + _newsymlist);
                 }
-
                 while (!_neworders.isEmpty)
                 {                  
-
                     Order o = _neworders.Read();
                     RediLib.ORDER rediOrder = new RediLib.ORDERClass();                 
                     
@@ -121,10 +112,8 @@ namespace ServerRedi
                     rediOrder.TIF = o.TIF;
                     rediOrder.Side = o.side ? "Buy" : "Sell";             
                     rediOrder.Symbol = o.symbol;
-
                     if (o.ex == string.Empty)
                         o.ex = o.symbol.Length > 3 ? "ARCA" : "NYSE";
-
                     rediOrder.Exchange = o.ex;      
                     rediOrder.Quantity = o.size;
                     rediOrder.Price = o.price.ToString();
@@ -139,7 +128,6 @@ namespace ServerRedi
                     bool IsSuccessful = rediOrder.Submit2(ref transId, ref err);
                     if (IsSuccessful)
                     {
-
                         object err1 = null;
                         _messageCache.VBRediCache.AddWatch(1, o.symbol, "", ref err1);
                         
@@ -153,22 +141,17 @@ namespace ServerRedi
                             debug("order submission was not successful: " + err.ToString());
                     }
                 }                
-
                 while (!_newcancel.isEmpty)
                 {
                     long id = _newcancel.Read();
                     object err = null;                    
-
                     _messageCache.VBRediCache.Cancel(id, ref err);
                 }
-
                 if (_newcancel.isEmpty && _neworders.isEmpty && _newsyms.isEmpty)
                     Thread.Sleep(_SLEEP);
             }
-
             
         }
-
         void MessageCache_CacheEvent(int action, int row)
         {
             switch (action)
@@ -184,7 +167,6 @@ namespace ServerRedi
                             object cv = null;                            
                             string orderReferenceNumber = String.Empty;
                             Order o = new OrderImpl();
-
                             _messageCache.VBGetCell(row, "SYMBOL", ref cv, ref err);
                             if (!(cv == null))
                             {
@@ -227,7 +209,6 @@ namespace ServerRedi
                             {
                                 orderReferenceNumber = cv.ToString();
                             }
-
                             _messageCache.VBGetCell(row, "Status", ref cv, ref err);                            
                             if (!(cv == null))
                             {
@@ -242,12 +223,12 @@ namespace ServerRedi
                                     OrderIdDict.Add(orderReferenceNumber, (long)row);
                                     if (_onotified.Contains((int)row)) return;
                                     _onotified.Add(o.id);
-                                    newOrder(o);
+                                    tl.newOrder(o);
                                 }
                                 else if (cv.ToString() == "Canceled")
                                 {
                                     long id = OrderIdDict[orderReferenceNumber];
-                                    newOrderCancel(id);
+                                    tl.newCancel(id);
                                 }
                                 else if (cv.ToString() == "Complete")
                                 {
@@ -257,38 +238,32 @@ namespace ServerRedi
                                     {
                                         f.symbol = cv.ToString();
                                     }
-
                                     _messageCache.VBGetCell(row, "ACCOUNT", ref cv, ref err);
                                     if (!(cv == null))
                                     {
                                         f.Account = cv.ToString();
                                     }
-
                                     _messageCache.VBGetCell(row, "BRSEQ", ref cv, ref err);
                                     if (!(cv == null))
                                     {
                                         long id = OrderIdDict[cv.ToString()];
                                         f.id = id;
                                     }
-
                                     _messageCache.VBGetCell(row, "EXECPRICE", ref cv, ref err);
                                     if (!(cv == null))
                                     {
                                         f.xprice = decimal.Parse(cv.ToString());
                                     }
-
                                     _messageCache.VBGetCell(row, "EXECQUANTITY", ref cv, ref err);
                                     if (!(cv == null))
                                     {
                                         f.xsize = int.Parse(cv.ToString());
                                     }
-
                                     _messageCache.VBGetCell(row, "EXCHANGE", ref cv, ref err);
                                     if (!(cv == null))
                                     {
                                         f.ex = cv.ToString();
                                     }
-
                                     _messageCache.VBGetCell(row, "SIDE", ref cv, ref err);
                                     if (!(cv == null))
                                     {
@@ -301,7 +276,6 @@ namespace ServerRedi
                                             f.side = false;
                                         }
                                     }
-
                                     long now = Util.ToTLDate(DateTime.Now);
                                     int xsec = (int)(now % 100);
                                     long rem = (now - xsec) / 100;
@@ -310,7 +284,7 @@ namespace ServerRedi
                                     Object objErr = null;
                                     _positionCache.VBRediCache.AddWatch(2, string.Empty, f.Account, ref objErr);
                                     pt.Adjust(f);
-                                    newFill(f);
+                                    tl.newFill(f);
                                 }
                             }                            
                         }
@@ -333,7 +307,6 @@ namespace ServerRedi
                             {
                                 orderStatus = cv.ToString();
                             }
-
                             if (orderStatus == "Complete")
                             {
                                 Trade f = new TradeImpl();
@@ -342,38 +315,32 @@ namespace ServerRedi
                                 {
                                     f.symbol = cv.ToString();
                                 }
-
                                 _messageCache.VBGetCell(row, "ACCOUNT", ref cv, ref err);
                                 if (!(cv == null))
                                 {
                                     f.Account = cv.ToString();
                                 }
-
                                 _messageCache.VBGetCell(row, "BRSEQ", ref cv, ref err);
                                 if (!(cv == null))
                                 {                                    
                                     long id = OrderIdDict[cv.ToString()];                                    
                                     f.id = id;
                                 }
-
                                 _messageCache.VBGetCell(row, "EXECPRICE", ref cv, ref err);
                                 if (!(cv == null))
                                 {
                                     f.xprice = decimal.Parse(cv.ToString());
                                 }
-
                                 _messageCache.VBGetCell(row, "EXECQUANTITY", ref cv, ref err);
                                 if (!(cv == null))
                                 {
                                     f.xsize = int.Parse(cv.ToString());
                                 }
-
                                 _messageCache.VBGetCell(row, "EXCHANGE", ref cv, ref err);
                                 if (!(cv == null))
                                 {
                                     f.ex = cv.ToString();
                                 }
-
                                 _messageCache.VBGetCell(row, "SIDE", ref cv, ref err);
                                 if (!(cv == null))
                                 {
@@ -386,7 +353,6 @@ namespace ServerRedi
                                         f.side = false;
                                     }
                                 }                                
-
                                 long now = Util.ToTLDate(DateTime.Now);
                                 int xsec = (int)(now % 100);
                                 long rem = (now - xsec) / 100;                                
@@ -395,12 +361,10 @@ namespace ServerRedi
                                 Object objErr = null;
                                 _positionCache.VBRediCache.AddWatch(2, string.Empty, f.Account, ref objErr);
                                 pt.Adjust(f);
-                                newFill(f);
+                                tl.newFill(f);
                             }
-
                             if (orderStatus == "Partial")
                             {
-
                             }
                         }
                         catch (Exception exc)
@@ -413,7 +377,6 @@ namespace ServerRedi
                     break;
             }
         }
-
         void PositionCache_CacheEvent(int action, int row)
         {
             int err = 0;
@@ -519,7 +482,6 @@ namespace ServerRedi
                     // track account
                     if (!accts.Contains(acct))
                         accts.Add(acct);
-
                 }
                 catch (Exception exc)
                 {
@@ -529,7 +491,6 @@ namespace ServerRedi
         }
         // after you are done watching a symbol (eg not subscribed)
         // you should close message table for that symbol
-
         void ServerRedi_newRegisterStocks(string msg)
         {
             debug("Subscribe request: " + msg);
@@ -542,11 +503,9 @@ namespace ServerRedi
             _newsymlist = msg;
             // notify other thread to subscribe to them
             _newsyms.Write(true);
-
             
             
         }
-
         IdTracker _idt = new IdTracker();
         long ServerRedi_newSendOrderRequest(Order o)
         {
@@ -554,7 +513,6 @@ namespace ServerRedi
             _neworders.Write(o);
             return (long)MessageTypes.OK;
         }
-
         MessageTypes[] ServerRedi_newFeatureRequest()
         {
             List<MessageTypes> f = new List<MessageTypes>();
@@ -590,14 +548,12 @@ namespace ServerRedi
             f.Add(MessageTypes.SENDORDERPEGMIDPOINT);
             return f.ToArray();
         }
-
         void checkerror(ref object err, string context)
         {
             if (err != null)
                 debug(context+" result: "+err.ToString());
             err = null;
         }
-
         // respond to redi events
         void VBRediCache_CacheEvent(int action, int row)
         {
@@ -659,7 +615,7 @@ namespace ServerRedi
                             }                            
                             k.date = Util.ToTLDate(DateTime.Now);
                             k.time = Util.DT2FT(DateTime.Now);
-                            newTick(k);
+                            tl.newTick(k);
                         }
                         catch (Exception exc)
                         {
@@ -680,7 +636,6 @@ namespace ServerRedi
                             Tick k = new TickImpl();
                             _cc.VBGetCell(i, "SYMBOL", ref cv, ref err);
                             debug("getcellerr: " + err.ToString());                            
-
                             if (!(cv == null))
                             {
                                 k.symbol = cv.ToString();
@@ -726,7 +681,7 @@ namespace ServerRedi
                             }
                             k.date = Util.ToTLDate(DateTime.Now);
                             k.time = Util.DT2FT(DateTime.Now);                            
-                            newTick(k);
+                            tl.newTick(k);
                         }
                         catch (Exception exc)
                         {
@@ -741,15 +696,14 @@ namespace ServerRedi
                     break;
                      */
             }
-
         }
-
         public event DebugDelegate SendDebug;
         void debug(string msg)
         {
             if (SendDebug != null)
                 SendDebug(msg);
         }
+        public TradeLinkServer tl;
         public bool Start(string user,string pw, string accnt)
         {
             try
@@ -761,21 +715,18 @@ namespace ServerRedi
                 _cc.VBRediCache.CacheEvent += new RediLib.ECacheControl_CacheEventEventHandler(VBRediCache_CacheEvent);
                 _cc.VBRediCache.UserID = user;
                 _cc.VBRediCache.Password = pw;
-
                 _messageCache = new VBCacheClass();
                 _messageCache.VBRediCache.CacheEvent += new RediLib.ECacheControl_CacheEventEventHandler(MessageCache_CacheEvent);
                 _messageCache.VBRediCache.UserID = user;
                 _messageCache.VBRediCache.Password = pw;
                 object err1 = null;
                 _messageCache.VBRediCache.Submit("Message", "true", ref err1);
-
                 _positionCache = new VBCacheClass();
                 _positionCache.VBRediCache.CacheEvent += new RediLib.ECacheControl_CacheEventEventHandler(PositionCache_CacheEvent);
                 _positionCache.VBRediCache.UserID = user;
                 _positionCache.VBRediCache.Password = pw;
                 object err2 = null;
                 _messageCache.VBRediCache.Submit("Position", "true", ref err2);
-
                 //app.OrderAck += new RediLib.EApplication_OrderAckEventHandler(app_OrderAck);
                 _userid = user;
                 _pwd = pw;
@@ -796,8 +747,7 @@ namespace ServerRedi
             _conn = true;
             return true;
         }        
-
-        public override void Stop()
+        public void Stop()
         {
             try
             {
@@ -806,22 +756,8 @@ namespace ServerRedi
                 _cc.VBRevokeObject(ref b);
             }
             catch { }
-            base.Stop();
+            tl.Stop();
         }
-
-        private void InitializeComponent()
-        {
-            this.SuspendLayout();
-            // 
-            // ServerRedi
-            // 
-            this.ClientSize = new System.Drawing.Size(812, 529);
-            this.Location = new System.Drawing.Point(0, 0);
-            this.Name = "ServerRedi";
-            this.ResumeLayout(false);
-
-        }
-
 
     }
 }

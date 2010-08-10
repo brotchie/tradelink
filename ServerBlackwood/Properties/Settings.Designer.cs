@@ -94,5 +94,29 @@ namespace ServerBlackwood.Properties {
                 this["wlocation"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TLClientAddress {
+            get {
+                return ((string)(this["TLClientAddress"]));
+            }
+            set {
+                this["TLClientAddress"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50000")]
+        public int TLClientPort {
+            get {
+                return ((int)(this["TLClientPort"]));
+            }
+            set {
+                this["TLClientPort"] = value;
+            }
+        }
     }
 }

@@ -12,11 +12,18 @@ namespace ServerDBFX
 {
     public partial class ServerDBFXMain : AppTracker
     {
-        ServerDBFX _dbfx = new ServerDBFX();
+        ServerDBFX _dbfx;
         public const string PROGRAM = "ServerDBFX";
         Log _log = new Log(PROGRAM);
         public ServerDBFXMain()
         {
+            TradeLink.API.TradeLinkServer tl;
+            if (Properties.Settings.Default.TLClientAddress == string.Empty)
+                tl = new TLServer_WM();
+            else
+                tl = new TLServer_IP(Properties.Settings.Default.TLClientAddress, Properties.Settings.Default.TLClientPort);
+            _dbfx = new ServerDBFX(tl);
+
             TrackEnabled = Util.TrackUsage();
             Program = PROGRAM;
             InitializeComponent();

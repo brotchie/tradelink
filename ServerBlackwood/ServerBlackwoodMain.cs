@@ -15,10 +15,18 @@ namespace ServerBlackwood
         private delegate void DisplayStatusHandler(bool bConnected);
         private DisplayStatusHandler StatusHandler;
 
-        ServerBlackwood _con = new ServerBlackwood();
+        ServerBlackwood _con ;
 
         public ServerBlackwoodMain()
         {
+            TradeLinkServer tl;
+            if (Properties.Settings.Default.TLClientAddress == string.Empty)
+                tl = new TLServer_WM();
+            else
+                tl = new TLServer_IP(Properties.Settings.Default.TLClientAddress, Properties.Settings.Default.TLClientPort);
+            _con = new ServerBlackwood(tl);
+
+            
             TrackEnabled = Util.TrackUsage();
             Program = PROGRAM;
             InitializeComponent();

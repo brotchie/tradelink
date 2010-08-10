@@ -15,7 +15,8 @@ namespace TradeLink.Common
     [System.ComponentModel.DesignerCategory("")]
     public class TLServer_IP : TradeLinkServer
     {
-
+        Providers _pn = Providers.Unknown;
+        public Providers newProviderName { get { return _pn; } set { _pn = value; } }
         IPAddress _addr;
         //private TcpListener tcpLsn;
         List<Socket> _sock = new List<Socket>();
@@ -243,6 +244,8 @@ namespace TradeLink.Common
         RingBuffer<Tick> tickq;
 
         public TLServer_IP() : this(IPAddress.Loopback.ToString(), IPUtil.TLDEFAULTBASEPORT, 50,100000) { }
+
+        public TLServer_IP(string ipaddr, int port) : this(ipaddr, port, 25, 100000) { }
         /// <summary>
         /// create an ip server
         /// </summary>
@@ -260,7 +263,7 @@ namespace TradeLink.Common
             _wait = wait;
             _addr = IPAddress.Parse(ipaddr);
             _port = port;
-
+            Start();
         }
 
         
@@ -508,8 +511,6 @@ namespace TradeLink.Common
                 for (int i = 0; i < client.Count; i++)
                     TLSend(ImbalanceImpl.Serialize(imb), MessageTypes.IMBALANCERESPONSE, i);
         }
-
-        public Providers newProviderName = Providers.TradeLink;
 
         bool _noverb = true;
         public bool VerboseDebugging { get { return !_noverb; } set { _noverb = !value; } }

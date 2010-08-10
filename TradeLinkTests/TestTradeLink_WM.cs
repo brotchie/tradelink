@@ -34,6 +34,7 @@ namespace TestTradeLink
         public TestTradeLink_WM() 
         {
             s = new TLServer_WM();
+            s.newProviderName = Providers.TradeLink;
             s.newUnknownRequest += new UnknownMessageDelegate(s_newUnknownRequest);
 
             // make sure we select our own loopback, if other servers are running

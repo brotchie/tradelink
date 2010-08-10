@@ -10,6 +10,8 @@ namespace TradeLink.API
     /// </summary>
     public interface TradeLinkServer
     {
+        Providers newProviderName { get; set; }
+
         /// <summary>
         /// enable extended debugging
         /// </summary>
@@ -50,6 +52,37 @@ namespace TradeLink.API
         /// notify of debug events
         /// </summary>
         event DebugDelegate SendDebugEvent;
+
+        /// <summary>
+        /// send message to a client
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="type"></param>
+        /// <param name="client"></param>
+        void TLSend(string msg, MessageTypes type, string client);
+
+        /// <summary>
+        /// send message to a client
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="type"></param>
+        /// <param name="client"></param>
+        void TLSend(string msg, MessageTypes type, int client);
+
+        event StringDelegate newAcctRequest;
+        event OrderDelegateStatus newSendOrderRequest;
+        event LongDelegate newOrderCancelRequest;
+        event PositionArrayDelegate newPosList;
+        event DebugDelegate newRegisterStocks;
+        event MessageArrayDelegate newFeatureRequest;
+        event UnknownMessageDelegate newUnknownRequest;
+        event VoidDelegate newImbalanceRequest;
+
+        /// <summary>
+        /// notify clients of a new imbalance
+        /// </summary>
+        /// <param name="imb"></param>
+        void newImbalance(Imbalance imb);
     }
 
 

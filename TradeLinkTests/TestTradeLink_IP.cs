@@ -41,6 +41,7 @@ namespace TestTradeLink
         {
             s = new TLServer_IP(IPUtil.LOCALHOST, IPUtil.TLDEFAULTTESTPORT, 0, 100000);
             s.SendDebugEvent += new DebugDelegate(debug);
+            s.newProviderName = Providers.TradeLink;
             s.Start();
 
             // make sure we select our own loopback, if other servers are running

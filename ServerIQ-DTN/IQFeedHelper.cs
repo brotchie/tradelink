@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
@@ -10,13 +10,11 @@ using TradeLink.API;
 using TradeLink.Common;
 using System.ComponentModel;
 using System.Diagnostics;
-
 namespace IQFeedBroker
 {
-    public class IQFeedHelper : TLServer_WM
+    public class IQFeedHelper 
     {
         #region Variables
-
         private const string IQ_FEED = "iqconnect";
         private readonly string IQ_FEED_PROGRAM = "IQConnect.exe";
         private const string IQ_FEED_REGISTRY_LOCATION = "SOFTWARE\\DTN\\IQFeed";
@@ -32,15 +30,10 @@ namespace IQFeedBroker
         private string _pswd;
         string _prod;
         private bool _registered;
-
         BackgroundWorker _connect;
         #endregion
-
-
         #region Properties
-
         public bool IsConnected { get { return _registered; } }
-
         private bool HaveUserCredentials
         {
             get
@@ -48,35 +41,29 @@ namespace IQFeedBroker
                 return !(string.IsNullOrEmpty(_user) && string.IsNullOrEmpty(_pswd));
             }
         }
-
         #endregion
-
-
         #region Constructors
-
-        public IQFeedHelper()
+        public IQFeedHelper(TradeLinkServer tls)
         {
             _basket = new BasketImpl();
             _connect = new BackgroundWorker();
             _connect.DoWork += new DoWorkEventHandler(bw_DoWork);
-            newProviderName = Providers.IQFeed;
-            newRegisterStocks += new DebugDelegate(IQFeedHelper_newRegisterStocks);
-            newFeatureRequest += new MessageArrayDelegate(IQFeedHelper_newFeatureRequest);
-            newUnknownRequest += new UnknownMessageDelegate(IQFeedHelper_newUnknownRequest);
+            tl = tls;
+            tl.newProviderName = Providers.IQFeed;
+            tl.newRegisterStocks += new DebugDelegate(IQFeedHelper_newRegisterStocks);
+            tl.newFeatureRequest += new MessageArrayDelegate(IQFeedHelper_newFeatureRequest);
+            tl.newUnknownRequest += new UnknownMessageDelegate(IQFeedHelper_newUnknownRequest);
             _cb_hist = new AsyncCallback(OnReceiveHist);
         }
-
         void bw_DoWork(object sender, DoWorkEventArgs e)
         {
             // start iqfeed and try to connect in background so it doesn't delay UI
             debug("wait a moment...");
             Connect();
-
             ConnectToAdmin();
             ConnectToLevelOne();
             ConnectHist();
         }
-
         long IQFeedHelper_newUnknownRequest(MessageTypes t, string msg)
         {
             switch (t)
@@ -140,12 +127,9 @@ namespace IQFeedBroker
                 debug("Exception sending barrequest: " + br.ToString());
                 debug(ex.Message + ex.StackTrace);
             }
-
         }
-
         public delegate void booldel(bool v);
         public event booldel Connected;
-
         MessageTypes[] IQFeedHelper_newFeatureRequest()
         {
             List<MessageTypes> f = new List<MessageTypes>();
@@ -155,46 +139,35 @@ namespace IQFeedBroker
             f.Add(MessageTypes.BROKERNAME);
             f.Add(MessageTypes.REGISTERSTOCK);
             f.Add(MessageTypes.VERSION);
-
             f.Add(MessageTypes.BARREQUEST);
             f.Add(MessageTypes.BARRESPONSE);
             f.Add(MessageTypes.DAYHIGH);
             f.Add(MessageTypes.DAYLOW);
             return f.ToArray();
         }
-
         void IQFeedHelper_newRegisterStocks(string msg)
         {
             AddBasket(BasketImpl.FromString(msg));
         }
-
         void connect(bool iscon)
         {
             if (Connected != null)
                 Connected(iscon);
             debug(iscon ? "Connected." : "Connection failed.");
         }
-
         #endregion
-
-
         #region IQFeedHelper Members
-
         public void Stop()
         {
             Array.ForEach(System.Diagnostics.Process.GetProcessesByName(IQ_FEED), iqProcess => iqProcess.Kill());
             debug("QUITTING****************************");
         }
-
-
         internal void ConnectToAdmin()
         {
             // Establish a connection to the admin socket in IQ Feed
             Thread.Sleep(2000);
             ConnectToAdminSocket();
         }
-
-
         internal void ConnectToLevelOne()
         {
             try
@@ -208,8 +181,6 @@ namespace IQFeedBroker
                 debug(ex.ToString());
             }
         }
-
-
         /// <summary>
         /// Subscribe to securities in the basket supplied as long as they aren't already in the underlying basket.
         /// </summary>
@@ -221,8 +192,6 @@ namespace IQFeedBroker
                 AddSecurity(security);
             }
         }
-
-
         /// <summary>
         /// Subscribe to the security supplied as long as its not in the underlying basket
         /// </summary>
@@ -233,14 +202,11 @@ namespace IQFeedBroker
             {
                 _highs.addindex(security.Symbol,decimal.MinValue);
                 _lows.addindex(security.Symbol,decimal.MaxValue);
-
                 _basket.Add(security);
                 AddSecurityToBasket(security);
                 debug("Added subscription: " + security.Symbol);
             }
         }
-
-
         /// <summary>
         /// Physically adds the security to the underlying basket and connects to the socket passing
         /// this security
@@ -248,29 +214,24 @@ namespace IQFeedBroker
         /// <param name="security"></param>
         private void AddSecurityToBasket(Security security)
         {
-
             // we form a watch command in the form of wSYMBOL\r\n
             string command = String.Format("w{0}\r\n", security.Symbol);
-
             // and we send it to the feed via the socket
             byte[] watchCommand = new byte[command.Length];
             watchCommand = Encoding.ASCII.GetBytes(command);
             m_sockIQConnect.Send(watchCommand, watchCommand.Length, SocketFlags.None);
         }
-
         bool havesymbol(string sym)
         {
             for (int i = 0; i < _basket.Count; i++)
                 if (_basket[i].Symbol == sym) return true;
             return false;
         }
-
-
+	public TradeLinkServer tl;
 
         public void Start(string username, string password, string data1, int data2)
         {
             _registered = false;
-
             // get IQConnect Location from registry
             // IQFeed Installation directory is stored in the registry key
             RegistryKey key = Registry.LocalMachine.OpenSubKey(IQ_FEED_REGISTRY_LOCATION);
@@ -285,9 +246,7 @@ namespace IQFeedBroker
             _pswd = password;
             _prod = data1;
             _connect.RunWorkerAsync();
-
         }
-
         void Connect()
         {
             try
@@ -316,8 +275,6 @@ namespace IQFeedBroker
                 throw ex;
             }
         }
-
-
         /// <summary>
         /// Establishes a connection to the admin socket in the IQ Feed
         /// </summary>
@@ -338,8 +295,6 @@ namespace IQFeedBroker
                 debug(String.Format("ADMIN SOCKET ERROR: {0}", ex.Message));
             }
         }
-
-
         /// <summary>
         /// Establishes a connection to the admin socket in IQFeed
         /// </summary>
@@ -386,18 +341,14 @@ namespace IQFeedBroker
                 debug("historical connect failed.");
                 debug(ex.Message + ex.StackTrace);
             }
-
         }
-
         AsyncCallback _cb_hist = null;
-
         private void WaitForData(string socketName)
         {
             try
             {
                 if (m_pfnCallback == null)
                     m_pfnCallback = new AsyncCallback(OnReceiveData);
-
                 if (socketName == Properties.Settings.Default.LEVEL_ONE_SOCKET_NAME)
                 {
                     if (m_sockIQConnect != null)
@@ -416,7 +367,6 @@ namespace IQFeedBroker
                 debug(ex.Message + ex.StackTrace);
             }
         }
-
         string _histbuff = string.Empty;
         const string HISTEND = "!ENDMSG!";
         void OnReceiveHist(IAsyncResult result)
@@ -456,7 +406,7 @@ namespace IQFeedBroker
                     catch { errorfree = false; }
                     // send it
                     if (errorfree)
-                        TLSend(BarImpl.Serialize(b), MessageTypes.BARRESPONSE, br.Client);
+                        tl.TLSend(BarImpl.Serialize(b), MessageTypes.BARRESPONSE, br.Client);
                 }
                 string lastrecord = bars[bars.Length-1];
                 if (lastrecord.Contains(HISTEND))
@@ -471,8 +421,6 @@ namespace IQFeedBroker
                 debug(ex.Message + ex.StackTrace);
             }
         }
-
-
         /// <summary>
         /// This is our callback that gets called by the .NET socket class when new data arrives on the socket
         /// </summary>
@@ -488,7 +436,6 @@ namespace IQFeedBroker
                     int bytesReceived = m_sockAdmin.EndReceive(result);
                     string rawData = Encoding.ASCII.GetString(m_szAdminSocketBuffer, 0, bytesReceived);
                     bool connectToLevelOne = _registered;
-
                     while (rawData.Length > 0)
                     {
                         string data = rawData.Substring(0, rawData.IndexOf("\n"));
@@ -519,10 +466,8 @@ namespace IQFeedBroker
                             _registered = true;
                             #endregion
                         }
-
                         rawData = rawData.Substring(data.Length + 1);
                     }
-
                     WaitForData(Properties.Settings.Default.ADMINISTRATION_SOCKET_NAME);
                 }
                 catch (SocketException ex)
@@ -543,9 +488,7 @@ namespace IQFeedBroker
                     int bytesReceived = 0;
                     bytesReceived = m_sockIQConnect.EndReceive(result);
                     string rawData = Encoding.ASCII.GetString(m_szLevel1SocketBuffer, 0, bytesReceived);
-
                     string[] splitTickData = rawData.Split('\n');
-
                     Array.Reverse(splitTickData);
                     var sentTicks = new Dictionary<string, int>();
                     Array.ForEach(splitTickData, str =>
@@ -567,7 +510,6 @@ namespace IQFeedBroker
                     debug(String.Format("LEVEL ONE: Full Exception: {0}", ex.Message));
                     debug(ex.ToString());
                 }
-
                 WaitForData(Properties.Settings.Default.LEVEL_ONE_SOCKET_NAME);
             }
             else
@@ -575,10 +517,8 @@ namespace IQFeedBroker
                 debug(result.AsyncState.ToString());
             }
         }
-
         GenericTracker<decimal> _highs = new GenericTracker<decimal>();
         GenericTracker<decimal> _lows = new GenericTracker<decimal>();
-
         private void FireTick(string[] actualData)
         {
                 try
@@ -603,7 +543,6 @@ namespace IQFeedBroker
                         tick.AskSize= Convert.ToInt32(actualData[13]);
                         // get symbol index for custom data requests
                         int idx = _highs.getindex(tick.symbol);
-
                         // update custom data (tryparse is faster than convert)
                         decimal d = 0;
                         if (decimal.TryParse(actualData[8], out d))
@@ -611,20 +550,14 @@ namespace IQFeedBroker
                         if (decimal.TryParse(actualData[9], out d))
                             _lows[idx] = d;
                         
-
-                        newTick(tick);
-
+                        tl.newTick(tick);
                 }
                 catch (Exception ex)
                 {
                     debug("Tick error: " + string.Join(",", actualData));
                     debug(ex.Message+ex.StackTrace);
                 }
-
-
                         
-
-
         }
         Dictionary<int, string> _code2mkt = new Dictionary<int, string>();
         public Dictionary<int, string> MktCodes { get { return _code2mkt; } set { _code2mkt = value; } }
@@ -634,18 +567,13 @@ namespace IQFeedBroker
             if (!_code2mkt.TryGetValue(code,out mkt)) return string.Empty;
             return mkt;
         }
-
         void debug(string msg)
         {
             if (SendDebug != null)
                 SendDebug(msg);
         }
         public event TradeLink.API.DebugDelegate SendDebug;
-
         
-
         #endregion
     }
-
-
 }

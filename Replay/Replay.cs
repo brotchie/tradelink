@@ -14,7 +14,8 @@ namespace Replay
 {
     public partial class Replay : AppTracker
     {
-        TLServer_WM tl = new TLServer_WM();
+        TradeLinkServer tl;
+            
         Playback _playback = null;
         HistSimImpl h = new HistSimImpl();
         string tickfolder = Util.TLTickDir;
@@ -24,6 +25,12 @@ namespace Replay
 
         public Replay()
         {
+            
+
+            if (Properties.Settings.Default.TLClientAddress== string.Empty)
+                tl = new TLServer_WM() ;
+            else
+                tl = new TLServer_IP(Properties.Settings.Default.TLClientAddress, Properties.Settings.Default.TLClientPort);
             TrackEnabled = Util.TrackUsage();
             Program = PROGRAM;
             InitializeComponent();
@@ -33,7 +40,6 @@ namespace Replay
             tl.newPosList += new PositionArrayDelegate(tl_gotSrvPosList);
             tl.newFeatureRequest+=new MessageArrayDelegate(GetFeatures);
             tl.newUnknownRequest += new UnknownMessageDelegate(tl_newUnknownRequest);
-            tl.DOMRequest += new Int64Delegate(tl_DOMRequest);
             h.GotTick += new TickDelegate(h_GotTick);
             h.SimBroker.UseBidAskFills = Properties.Settings.Default.UseBidAskFills;
             h.SimBroker.GotOrder += new OrderDelegate(SimBroker_GotOrder);
@@ -60,6 +66,17 @@ namespace Replay
         {
             switch (t)
             {
+                case MessageTypes.DOMREQUEST:
+                    {
+                        string client = string.Empty;
+                        int depth = 0;
+                        if (Book.ParseDOMRequest(msg, ref depth, ref client))
+                        {
+                            debug("depth set to: " + depth + " by client: " + client);
+                            tickdepth = depth;
+                        }
+                        break;
+                    }
                 case MessageTypes.DAYHIGH:
                     {
                         decimal price = 0;
@@ -77,10 +94,7 @@ namespace Replay
         }
 
         int tickdepth = 0;
-        void tl_DOMRequest(long number)
-        {
-            tickdepth = (int)number;
-        }
+
 
         MessageTypes[] GetFeatures()
         {
@@ -266,7 +280,7 @@ namespace Replay
         void SimBroker_GotOrderCancel(string sym, bool side,long id)
         {
             // if we get an order cancel notify from the broker, pass along to our clients
-            tl.newOrderCancel(id);
+            tl.newCancel(id);
             // send the updated book to our clients for same side as order
             Tick book = OrderToTick(h.SimBroker.BestBidOrOffer(sym, side));
             tl.newTick(book);
@@ -338,12 +352,12 @@ namespace Replay
 
         void SimBroker_GotFill(Trade t)
         {
-            tl.newFill(t,true);
+            tl.newFill(t);
         }
 
         void SimBroker_GotOrder(Order o)
         {
-            tl.newOrder(o,true);
+            tl.newOrder(o);
         }
 
         Dictionary<string, decimal> highs = new Dictionary<string, decimal>();

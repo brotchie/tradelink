@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,46 +7,41 @@ using TradeLink.Common;
 using System.Windows.Forms;
 using IESignal;
 using System.ComponentModel;
-
 namespace ServerEsignal
 {
-    public class EsignalServer : TLServer_WM
+    public class EsignalServer 
     {
         BackgroundWorker bw = new BackgroundWorker();
         Hooks esig;
         bool _valid = false;
-
         Basket _mb = new BasketImpl();
         public event DebugFullDelegate GotDebug;
         bool _go = true;
-
         public bool isValid { get { return _valid; } }
-
         bool _barrequestsgetalldata = true;
         public bool BarRequestsGetAllData { get { return _barrequestsgetalldata; } set { _barrequestsgetalldata = value; } }
-
-
-        public EsignalServer() :base()
+        public EsignalServer(TradeLinkServer tls)
+            : base()
         {
+            tl = tls;
             // use a background thread to queue up COM-events
             bw.DoWork += new DoWorkEventHandler(bw_DoWork);
             bw.WorkerSupportsCancellation = true;
             // set provider
-            newProviderName = Providers.eSignal;
+            tl.newProviderName = Providers.eSignal;
             // handle subscription requests
-            newRegisterStocks += new DebugDelegate(tl_newRegisterStocks);
+            tl.newRegisterStocks += new DebugDelegate(tl_newRegisterStocks);
             // handle feature requests
-            newFeatureRequest += new MessageArrayDelegate(tl_newFeatureRequest);
+            tl.newFeatureRequest += new MessageArrayDelegate(tl_newFeatureRequest);
             // handle unknown messages
-            newUnknownRequest += new UnknownMessageDelegate(EsignalServer_newUnknownRequest);
+            tl.newUnknownRequest += new UnknownMessageDelegate(EsignalServer_newUnknownRequest);
+            tl.Start();
         }
-
         void bw_DoWork(object sender, DoWorkEventArgs e)
         {
             if (!_valid) return;
             while (_go)
             {
-
                 try
                 {
                     if (qc > qr)
@@ -86,11 +81,9 @@ namespace ServerEsignal
                             }
                             if (symsreleased!=string.Empty)
                                 verb("released unused symbols: " + symsreleased);
-
                         }
                         qr = qc;
                     }
-
                     while (_barrequests.hasItems)
                     {
                         BarRequest br = new BarRequest();
@@ -111,9 +104,7 @@ namespace ServerEsignal
                                 interval = (br.Interval / 60).ToString();
                                 barsback = BarImpl.BarsBackFromDate(bi, br.StartDate, br.EndDate);
                             }
-
                             int alldata = BarRequestsGetAllData ? -1 : 0;
-
                             int hnd = esig.get_RequestHistory(br.Symbol, interval, (bi == BarInterval.Day) ? barType.btDAYS : barType.btBARS, barsback, alldata, alldata);
                             verb("requested bar data for " + br.Symbol + " on: " + br.Interval.ToString() + " " + br.CustomInterval.ToString() + " reqhandle: " + hnd);
                             // cache request
@@ -130,7 +121,6 @@ namespace ServerEsignal
                             debug(ex.Message + ex.StackTrace);
                         }
                     }
-
                 }
                 catch (Exception ex)
                 {
@@ -142,21 +132,17 @@ namespace ServerEsignal
                 System.Threading.Thread.Sleep(WaitBetweenEvents);
             }
         }
-
         public int DefaultBarsBack = 100;
         public bool VerboseDebugging = false;
         public int WaitBetweenEvents = 50;
         public bool ReleaseDeadSymbols = false;
-
         void verb(string msg)
         {
             if (!VerboseDebugging) return;
             debug(msg);
         }
-
         Dictionary<int, BarRequest> _barhandle2barrequest = new Dictionary<int, BarRequest>();
         RingBuffer<BarRequest> _barrequests = new RingBuffer<BarRequest>(500);
-
         long EsignalServer_newUnknownRequest(MessageTypes t, string msg)
         {
             switch (t)
@@ -168,7 +154,6 @@ namespace ServerEsignal
                         {
                             BarRequest br = BarImpl.ParseBarRequest(msg);
                             _barrequests.Write(br);
-
                         }
                         catch (Exception ex)
                         {
@@ -180,6 +165,7 @@ namespace ServerEsignal
             }
             return (long)MessageTypes.FEATURE_NOT_IMPLEMENTED;
         }
+	public TradeLinkServer tl;
 
         public void Start(string user, string password, string data1, int data2)
         {
@@ -235,7 +221,7 @@ namespace ServerEsignal
                         verb(br.Symbol + " " + bd.dtTime.ToString() + " " + bd.dOpen + " " + bd.dHigh + " " + bd.dLow + " " + bd.dClose + " " + bd.dVolume);
                     Bar b = new BarImpl((decimal)bd.dOpen, (decimal)bd.dHigh, (decimal)bd.dLow, (decimal)bd.dClose, (long)bd.dVolume, Util.ToTLDate(bd.dtTime), Util.ToTLTime(bd.dtTime), br.Symbol, br.Interval);
                     string msg = BarImpl.Serialize(b);
-                    TLSend(msg, MessageTypes.BARRESPONSE, br.Client);
+                    tl.TLSend(msg, MessageTypes.BARRESPONSE, br.Client);
                 }
                 catch (Exception ex)
                 {
@@ -252,9 +238,7 @@ namespace ServerEsignal
                 }
                 catch { }
             }
-
         }
-
         void esig_OnBarsReceived(int lHandle)
         {
             BarRequest br;
@@ -266,17 +250,12 @@ namespace ServerEsignal
             processhistory(lHandle,br);
             
         }
-
         void debug(string msg)
         {
             if (GotDebug != null)
                 GotDebug(DebugImpl.Create(msg));
         }
-
         string _tmpregister = string.Empty;
-
-
-
         MessageTypes[] tl_newFeatureRequest()
         {
             // features supported by connecotr
@@ -288,7 +267,6 @@ namespace ServerEsignal
             f.Add(MessageTypes.BARREQUEST);
             return f.ToArray();
         }
-
         void esig_OnQuoteChanged(string sSymbol)
         {
             try
@@ -305,13 +283,12 @@ namespace ServerEsignal
                 k.os = q.lAskSize;
                 k.size = q.lLastSize;
                 // send it
-                newTick(k);
+                tl.newTick(k);
             }
             catch (Exception ex)
             {
                 if (GotDebug != null)
                     GotDebug(DebugImpl.Create(ex.Message + ex.StackTrace, DebugLevel.Debug));
-
             }
         }
         /// <summary>
@@ -321,6 +298,8 @@ namespace ServerEsignal
         {
             // request thread be stopped
             _go = false;
+            if (tl != null)
+                tl.Stop();
             if (!_valid) return;
             
             try
@@ -335,22 +314,17 @@ namespace ServerEsignal
             {
                 if (GotDebug != null)
                     GotDebug(DebugImpl.Create(ex.Message + ex.StackTrace, DebugLevel.Debug));
-
             }
             // garbage collect esignal object
             esig = null;
         }
-
-
         int qc, qr;
-
         void tl_newRegisterStocks(string msg)
         {
             verb("got new symbol list: " + msg);
             _tmpregister = msg;
             qc++;
         }
-
         // see if we already subscribed to this guy
         bool contains(string sym)
         {
@@ -358,6 +332,5 @@ namespace ServerEsignal
                 if (sec.Symbol == sym) return true;
             return false;
         }
-
     }
 }

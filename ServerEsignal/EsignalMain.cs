@@ -24,10 +24,16 @@ namespace ServerEsignal
         
         public EsignalMain()
         {
+            TradeLinkServer tls;
+            if (Properties.Settings.Default.TLClientAddress == string.Empty)
+                tls = new TLServer_WM();
+            else
+                tls = new TLServer_IP(Properties.Settings.Default.TLClientAddress, Properties.Settings.Default.TLClientPort);
+
             TrackEnabled = Util.TrackUsage();
             Program = PROGRAM;
             InitializeComponent();
-            tl = new EsignalServer();
+            tl = new EsignalServer(tls);
             // set defaults
             tl.DefaultBarsBack = Properties.Settings.Default.DefaultBarsBack;
             tl.VerboseDebugging = Properties.Settings.Default.VerboseDebugging;

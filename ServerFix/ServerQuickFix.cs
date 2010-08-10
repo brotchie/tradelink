@@ -1,18 +1,16 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using TradeLink.Common;
 using TradeLink.API;
 using QuickFix;
-
 namespace ServerFix
 {
-    public class ServerQuickFix : TLServer_WM, QuickFix.Application
+    public class ServerQuickFix : QuickFix.Application
     {
-        public void fromAdmin(Message __p1, SessionID __p2)
+        public void fromAdmin(QuickFix.Message __p1, SessionID __p2)
         {
-
         }
-        public void fromApp(Message message, SessionID sessionID)
+        public void fromApp(QuickFix.Message message, SessionID sessionID)
         {
             // receiving messages
             Symbol sym = new Symbol();
@@ -42,17 +40,14 @@ namespace ServerFix
             k.trade = (decimal)price.getValue();
 			}
 			
-            newTick(k);
-
+            tl.newTick(k);
             //ClOrdID clOrdID = new ClOrdID();
             //message.getField(clOrdID);
         }
-
-        public void toApp(Message __p1, SessionID __p2)
+        public void toApp(QuickFix.Message __p1, SessionID __p2)
         {
             // sending messages
         }
-
         public void onCreate(SessionID __p1)
         {
             debug("session created" + __p1.getSenderCompID() + " " + __p1.getTargetCompID());
@@ -65,57 +60,47 @@ namespace ServerFix
         {
             _val = false;
         }
-        public void toAdmin(Message __p1, SessionID __p2)
+        public void toAdmin(QuickFix.Message __p1, SessionID __p2)
         {
         }
-
         /*
         public override void onMessage(QuickFix42.NewOrderSingle message, QuickFix.SessionID sessionID)
         {
           ClOrdID clOrdID = new ClOrdID;
           message.get(clOrdID);
-
           ClearingAccount clearingAccount = new ClearingAccount();
           message.get(clearingAccount);
         }
-
                 public override void onMessage(QuickFix42.OrderCancelRequest message, QuickFix.SessionID sessionID)
         {
           ClOrdID clOrdID = new ClOrdID;
           message.get(clOrdID);
-
           // compile time error!! field not defined for OrderCancelRequest
           ClearingAccount clearingAccount = new ClearingAccount();
           message.get(clearingAccount);
         }
          */
-
         bool _val = false;
         public bool isValid { get { return _val; } }
-
         string _fixid = "FIX.4.2";
         /// <summary>
         /// fix id
         /// </summary>
         public string FIXID { get { return _fixid; } set { _fixid = value; } }
-
         string _sender = string.Empty;
         public string SenderCompId { get { return _sender; } set { _sender = value; } }
-
         string _target = string.Empty;
         public string TargetCompId { get { return _target; } set { _target = value; } }
-
-
         string _setpath = string.Empty;
-        public ServerQuickFix(string settingpath)
+        public ServerQuickFix(TradeLinkServer tls, string settingpath)
         {
+            tl = tls;
             _setpath = settingpath;
-            newOrderCancelRequest += new LongDelegate(ServerQuickFix_newOrderCancelRequest);
-            newSendOrderRequest += new OrderDelegateStatus(ServerQuickFix_newSendOrderRequest);
-            newFeatureRequest += new MessageArrayDelegate(ServerQuickFix_newFeatureRequest);
-
+            tl.Start();
+            tl.newOrderCancelRequest += new LongDelegate(ServerQuickFix_newOrderCancelRequest);
+            tl.newSendOrderRequest += new OrderDelegateStatus(ServerQuickFix_newSendOrderRequest);
+            tl.newFeatureRequest += new MessageArrayDelegate(ServerQuickFix_newFeatureRequest);
         }
-
         MessageTypes[] ServerQuickFix_newFeatureRequest()
         {
             List<MessageTypes> f = new List<MessageTypes>();
@@ -123,14 +108,11 @@ namespace ServerFix
             f.Add(MessageTypes.TICKNOTIFY);
             return f.ToArray();
         }
-
         const string CANCEL = "D";
-
         long ServerQuickFix_newSendOrderRequest(Order o)
         {
-            Message message = new Message();
-            Message.Header header = message.getHeader();
-
+            QuickFix.Message message = new QuickFix.Message();
+            QuickFix.Message.Header header = message.getHeader();
             header.setField(new BeginString(FIXID));
             header.setField(new SenderCompID(SenderCompId));
             header.setField(new TargetCompID(TargetCompId));
@@ -140,31 +122,26 @@ namespace ServerFix
             message.setField(new Symbol(o.symbol));
             message.setField(new Side(o.side ? Side.BUY : Side.SELL));
             //message.setField(new Text("Cancel My Order!"));
-
             Session.sendToTarget(message);
-
             return 0;
             
         }
-
         void ServerQuickFix_newOrderCancelRequest(long val)
         {
-            
+            debug("order canceling not presently implemented");
         }
-
         public event DebugDelegate SendDebugEvent;
-
         void debug(string msg)
         {
             if (SendDebugEvent != null)
                 SendDebugEvent(msg);
         }
         SocketAcceptor acceptor;
+        public TradeLinkServer tl;
         public bool Start(string user, string pw)
         {
             try
             {
-
                 SessionSettings settings = new SessionSettings(_setpath);
                 Application application = this;
                 FileStoreFactory storeFactory = new FileStoreFactory(settings);
@@ -183,7 +160,6 @@ namespace ServerFix
             }
             return false;
         }
-
         public void Stop()
         {
             try
@@ -193,7 +169,5 @@ namespace ServerFix
             }
             catch { }
         }
-
-
     }
 }

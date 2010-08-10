@@ -8,7 +8,8 @@ using System.Threading;
 using SterlingLib;
 namespace SterServer
 {
-    public class ServerSterling : TLServer_WM
+
+    public class ServerSterling 
     {
         public const string PROGRAM ="ServerSterling";
         Thread _bw;
@@ -18,6 +19,7 @@ namespace SterServer
         STIPosition stiPos;
         STIQuote stiQuote;
         STIBook stiBook;
+        TradeLinkServer tl;
 
         bool _ignoreoutoforderticks = true;
         public bool IgnoreOutOfOrderTicks { get { return _ignoreoutoforderticks; } set { _ignoreoutoforderticks = value; } }
@@ -32,9 +34,10 @@ namespace SterServer
         public int CancelWait { get { return _CANCELWAIT; } set { _CANCELWAIT = value; } }
         bool _supportcover = true;
         public bool CoverEnabled { get { return _supportcover; } set { _supportcover = value; } }
-        public ServerSterling() : this(50,1) { }
-        public ServerSterling(int sleepOnNodata, int sleepAfterOrder)
+        
+        public ServerSterling(TradeLinkServer tls, int sleepOnNodata, int sleepAfterOrder)
         {
+            tl = tls;
             _SLEEP = 50;
             _ORDERSLEEP = sleepAfterOrder;
         }
@@ -70,15 +73,15 @@ namespace SterServer
                 stiEvents.OnSTIOrderReject += new _ISTIEventsEvents_OnSTIOrderRejectEventHandler(stiEvents_OnSTIOrderReject);
                 stiPos.GetCurrentPositions();
 
-                newAcctRequest += new StringDelegate(tl_newAcctRequest);
-                newProviderName = Providers.Sterling;
-                newSendOrderRequest += new OrderDelegateStatus(tl_gotSrvFillRequest);
-                newPosList += new PositionArrayDelegate(tl_gotSrvPosList);
-                newRegisterStocks += new DebugDelegate(tl_RegisterStocks);
-                newOrderCancelRequest += new LongDelegate(tl_OrderCancelRequest);
-                newFeatureRequest += new MessageArrayDelegate(tl_newFeatureRequest);
-                newUnknownRequest += new UnknownMessageDelegate(tl_newUnknownRequest);
-                newImbalanceRequest += new VoidDelegate(tl_newImbalanceRequest);
+                tl.newAcctRequest += new StringDelegate(tl_newAcctRequest);
+                tl.newProviderName = Providers.Sterling;
+                tl.newSendOrderRequest += new OrderDelegateStatus(tl_gotSrvFillRequest);
+                tl.newPosList += new PositionArrayDelegate(tl_gotSrvPosList);
+                tl.newRegisterStocks += new DebugDelegate(tl_RegisterStocks);
+                tl.newOrderCancelRequest += new LongDelegate(tl_OrderCancelRequest);
+                tl.newFeatureRequest += new MessageArrayDelegate(tl_newFeatureRequest);
+                tl.newUnknownRequest += new UnknownMessageDelegate(tl_newUnknownRequest);
+                tl.newImbalanceRequest += new VoidDelegate(tl_newImbalanceRequest);
             }
             catch (Exception ex)
             {
@@ -236,7 +239,7 @@ namespace SterServer
 
 
 
-        public override void Stop()
+        public void Stop()
         {
             try
             {
@@ -260,7 +263,9 @@ namespace SterServer
             {
                 debug(ex.Message + ex.StackTrace);
             }
-            base.Stop();
+            if (tl != null)
+                tl.Stop();
+
         }
         const int MAXRECORD = 5000;
         RingBuffer<Order> _orderq = new RingBuffer<Order>(MAXRECORD);
@@ -346,7 +351,7 @@ namespace SterServer
                             Thread.Sleep(_ORDERSLEEP);
                         }
                         if (err < 0)
-                            debug("Error sending order: " + Util.PrettyError(newProviderName, err) + o.ToString());
+                            debug("Error sending order: " + Util.PrettyError(tl.newProviderName, err) + o.ToString());
                         if (err == -1)
                             debug("Make sure you have set the account in sending program.");
                     }
@@ -414,7 +419,7 @@ namespace SterServer
                                     if ((err == 0) && (!idacct.TryGetValue(o.id, out tmp)))
                                         idacct.Add(o.id, order.Account);
                                     if (err < 0)
-                                        debug("Error sending order: " + Util.PrettyError(newProviderName, err) + o.ToString());
+                                        debug("Error sending order: " + Util.PrettyError(tl.newProviderName, err) + o.ToString());
                                     if (err == -1)
                                         debug("Make sure you have set the account in sending program.");
 
@@ -506,7 +511,7 @@ namespace SterServer
             f.xdate = (int)((now - f.xtime) / 1000000);
             f.ex = t.bstrDestination;
             pt.Adjust(f);
-            newFill(f);
+            tl.newFill(f);
             if (VerboseDebugging)
                 debug("new trade sent: " + f.ToString() + " " + f.id);
         }
@@ -528,7 +533,7 @@ namespace SterServer
                 long orderid = 0;
                 if (_cancel2order.TryGetValue(id, out orderid))
                 {
-                    newOrderCancel(orderid);
+                    tl.newCancel(orderid);
                     if (VerboseDebugging)
                         debug("cancel received for: " + orderid);
                 }
@@ -556,7 +561,7 @@ namespace SterServer
             _onotified.Add(o.id);
             if (VerboseDebugging)
                 debug("order acknowledgement: " + o.ToString());
-            newOrder(o);
+            tl.newOrder(o);
             
         }
 
@@ -588,13 +593,13 @@ namespace SterServer
             k.trade = (decimal)q.fLastPrice;
             k.size = q.nLastSize;
             if (!_imbalance || (_imbalance && k.isValid))
-                newTick(k);
+                tl.newTick(k);
             // if imbalances are not enabled we're done
             if (!_imbalance) return;
             // if there is no imbalance we're done
             if (q.nMktImbalance==0) return;
             Imbalance imb = new ImbalanceImpl(k.symbol, GetExPretty(k.ex), q.nMktImbalance, k.time, 0, 0, q.nMktImbalance);
-            newImbalance(imb);
+            tl.newImbalance(imb);
 
         }
 
@@ -614,7 +619,7 @@ namespace SterServer
             k.time = now;
             k.trade = (decimal)q.fLastPrice;
             k.size = q.nLastSize;
-            newTick(k);
+            tl.newTick(k);
         }
         IdTracker _idt = new IdTracker();
         long tl_gotSrvFillRequest(Order o)

@@ -103,5 +103,16 @@ namespace TradeLink.Common
         {
             return string.Join("+", new string[] { client, depthrequested.ToString() });
         }
+
+        public static bool ParseDOMRequest(string request, ref int depth, ref string client)
+        {
+
+            string[] r = request.Split('+');
+            if (r.Length != 2) return false;
+            if (!int.TryParse(r[1], out depth))
+                return false;
+            client = r[0];
+            return true;
+        }
     }
 }
