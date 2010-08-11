@@ -43,13 +43,13 @@ namespace Record
             ContextMenu.MenuItems.Add("Timeout", new EventHandler(timeout));
             ContextMenu.MenuItems.Add("ReportBug", new EventHandler(report));
             ContextMenu.MenuItems.Add("Messages", new EventHandler(togdebug));
-            if (tl.RequestFeatureList.Contains(MessageTypes.LIVEDATA) )
+            if (tl.BrokerName!= Providers.TradeLink )
             {
                 if (Environment.ProcessorCount == 1)
                     tl.gotTick += new TickDelegate(tl_gotTick);
                 else
                 {
-                    tl.gotTick+=new TickDelegate(_ar.newTick);
+                    tl.gotTick += new TickDelegate(tl_gotTick2);
                     _ar.GotTick+=new TickDelegate(tl_gotTick);
                 }
             }
@@ -58,6 +58,11 @@ namespace Record
             // process command line
             processcommands();
 
+        }
+
+        void tl_gotTick2(Tick t)
+        {
+            _ar.newTick(t);
         }
 
         void processcommands()
