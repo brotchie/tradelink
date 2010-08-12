@@ -65,6 +65,7 @@ namespace Quotopia
         {
             string[] servers = Properties.Settings.Default.ServerIpAddresses.Split(',');
             _bf = new BrokerFeed(Properties.Settings.Default.PreferredQuote, Properties.Settings.Default.PreferredExec, Properties.Settings.Default.FallbackToAnyProvider, false,PROGRAM,servers,Properties.Settings.Default.ServerPort);
+            _bf.SendDebugEvent+=new DebugDelegate(debug);
             _bf.Reset();
 
             // if our machine is multi-core we use seperate thread to process ticks
