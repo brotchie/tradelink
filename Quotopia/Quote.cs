@@ -402,6 +402,8 @@ namespace Quotopia
             string sym = GetVisibleSecurity(CurrentRow).Symbol;
             if (MessageBox.Show("Are you sure you want to remove "+sym+"?","Confirm remove",MessageBoxButtons.YesNo)== DialogResult.Yes)
             {
+                // remove symbol from basket
+                mb.Remove(sym);
                 //remove the row
                 qt.Rows.RemoveAt(CurrentRow);
                 // accept changes
@@ -491,6 +493,11 @@ namespace Quotopia
                 newsymbol += ".";
                 status(preface + newsymbol);
             }
+            else if ((e.KeyCode == Keys.OemMinus) && e.Shift)
+            {
+                newsymbol += "_";
+                status(preface + newsymbol);
+            }
             else if ((e.KeyCode == Keys.D4) && e.Shift)
             {
                 newsymbol = "$";
@@ -501,7 +508,7 @@ namespace Quotopia
                 newsymbol = "";
                 status("Symbol add canceled...");
             }
-            else if ((e.KeyCode == Keys.Back) && (newsymbol.Length>0))
+            else if ((e.KeyCode == Keys.Back) && (newsymbol.Length > 0))
             {
                 newsymbol = newsymbol.Substring(0, newsymbol.Length - 1);
                 status(preface + newsymbol);
@@ -526,7 +533,7 @@ namespace Quotopia
                 newsymbol += val;
                 status("Adding symbol: " + newsymbol);
             }
-            else if (e.KeyData== Keys.OemPeriod)
+            else if (e.KeyData == Keys.OemPeriod)
             {
                 newsymbol += ".";
                 status("Adding symbol: " + newsymbol);

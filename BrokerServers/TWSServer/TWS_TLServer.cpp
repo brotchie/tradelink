@@ -226,6 +226,7 @@ namespace TradeLibFast
 
 		// create broker-specific objects here
 		Order* order(new Order);
+
 		order->auxPrice = o.isTrail() ? o.trail : o.stop;
 		order->lmtPrice = o.price;
 		order->orderType = (o.isStop()) ? "STP" : (o.isLimit() ? "LMT" : (o.isTrail() ? "TRAIL" : "MKT"));
@@ -280,12 +281,14 @@ namespace TradeLibFast
 				cpy.Delete(pidx,cpy.GetLength()-pidx);
 			}
 			contract->symbol = cpy;
-			contract->currency = getcurrency(o.localsymbol);
+			contract->currency = truncateat(o.localsymbol,CString("."));
 		}
 		else
 			contract->currency = o.currency;
 		if (contract->exchange=="")
 			contract->exchange= "SMART";
+		contract->symbol = tl2ibspace(contract->symbol);
+		contract->localSymbol = tl2ibspace(contract->localSymbol);
 		
 		
 
@@ -450,6 +453,22 @@ namespace TradeLibFast
 
 	}
 
+	CString  TWS_TLServer::ib2tlspace(CString ibsym)
+	{
+		if (ibsym.FindOneOf(" ")==-1)
+			return ibsym;
+		ibsym.Replace(" ","_");
+		return ibsym;
+	}
+
+	CString TWS_TLServer::tl2ibspace(CString tlsym)
+	{
+		if (tlsym.FindOneOf("_")==-1)
+			return tlsym;
+		tlsym.Replace("_"," ");
+		return tlsym;
+	}
+
 	void TWS_TLServer::IncOrderId(CString account)
 	{
 		for (size_t i = 0; i<accts.size(); i++)
@@ -562,8 +581,13 @@ namespace TradeLibFast
 		for (unsigned int i = 0; i<stocks[cid].size(); i++)
 		{
 			// if we already have a subscription to this stock, proceed to next one
+			if (hasTicker(stocks[cid][i])) continue;
+			// get symbol
 			TLSecurity sec = TLSecurity::Deserialize(stocks[cid][i]);
-			if (hasTicker(sec.sym)) continue;
+			// keep copy of original symbol
+			CString lsym = CString(sec.sym);
+			sec.sym = tl2ibspace(sec.sym);
+
 			// otherwise, subscribe to this stock and save it to subscribed list of tickers
 			Contract contract;
 			
@@ -580,7 +604,10 @@ namespace TradeLibFast
 					contract.exchange = "SMART";
 			}
 			else // set local symbol to symbol
+			{
 				contract.localSymbol = sec.sym;
+
+			}
 
 			// if destination specified use it
 			if (sec.hasDest())
@@ -595,7 +622,7 @@ namespace TradeLibFast
 			if ((sec.type==STK) && !sec.hasDest())
 				contract.exchange = "SMART";
 			if (sec.type==CASH)
-				contract.currency = getcurrency(sec.sym);
+				contract.currency = truncateat(sec.sym,CString("."));
 			else
 				contract.currency = _currency;
 			contract.secType = TLSecurity::SecurityTypeName(sec.type);
@@ -612,13 +639,24 @@ namespace TradeLibFast
 
 	}
 
-	CString TWS_TLServer::getcurrency(CString localsymbol)
+	CString TWS_TLServer::truncateat(CString original,CString after)
 	{
-			CString cpy = CString(localsymbol);
-			int pidx = cpy.Find(CString("."));
+			CString cpy = CString(original);
+			int pidx = cpy.Find(after);
 			if (pidx!=-1)
 			{
 				cpy.Delete(0,cpy.GetLength()-pidx);				
+			}
+			return cpy;
+	}
+
+	CString TWS_TLServer::truncatebefore(CString original,CString before)
+	{
+			CString cpy = CString(original);
+			int pidx = cpy.Find(before);
+			if (pidx!=-1)
+			{
+				cpy.Delete(pidx,cpy.GetLength()-pidx);				
 			}
 			return cpy;
 	}

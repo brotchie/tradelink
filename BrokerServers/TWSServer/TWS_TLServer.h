@@ -33,9 +33,12 @@ namespace TradeLibFast
 
 
 	private:
-		CString getcurrency(CString localsymbol);
+		CString truncateat(CString original,CString after);
+		CString truncatebefore(CString original,CString before);
 		void pcont(Contract* c);
 		void pord(Order* o);
+		CString tl2ibspace(CString tlsym);
+		CString ib2tlspace(CString ibsym);
 		void v(CString msg);
 		bool noverb;
 		bool linktest();
