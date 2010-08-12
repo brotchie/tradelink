@@ -33,13 +33,12 @@ namespace SterServer
                 if (Properties.Settings.Default.TLClientAddress == string.Empty)
                 {
                     tls = new TradeLink.Common.TLServer_WM();
-                    tl.SendDebug += new DebugDelegate(tl_SendDebug);
+
                 }
                 else
                     tls = new TradeLink.Common.TLServer_IP(Properties.Settings.Default.TLClientAddress, Properties.Settings.Default.TLClientPort);
 
                 tl = new ServerSterling(tls, Properties.Settings.Default.Sleep,Properties.Settings.Default.OrderSleep,debug);
-                
                 tl.CoverEnabled = Properties.Settings.Default.CoverEnabled;
                 tl.Account = Properties.Settings.Default.defaultaccount;
                 tl.CancelWait = Properties.Settings.Default.CancelWait;
@@ -66,12 +65,6 @@ namespace SterServer
             Properties.Settings.Default.defaultaccount = acct;
             tl.Account = acct;
         }
-        void tl_SendDebug(string msg)
-        {
-            _log.GotDebug(msg);
-            _msgs.AppendLine(Util.ToTLTime()+" "+msg);
-            debug(msg);
-        }
 
         void report(object sender, EventArgs e)
         {
@@ -86,6 +79,8 @@ namespace SterServer
 
         void debug(string msg)
         {
+            _log.GotDebug(msg);
+            _msgs.AppendLine(Util.ToTLTime() + " " + msg);
             _dc.GotDebug(msg);
         }
 

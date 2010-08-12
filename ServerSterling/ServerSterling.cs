@@ -51,6 +51,7 @@ namespace SterServer
         {
             try
             {
+                if (_connected) return true;
                 debug(Util.TLSIdentity());
                 debug("Attempting to start: " + PROGRAM);
                 // basic structures needed for operation
