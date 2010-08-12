@@ -363,10 +363,12 @@ int ServerGenesis::SendOrder(TradeLibFast::TLOrder o)
 	// save order so it can be canceled later
 	if (err==OK)
 	{
-
+		return OK;
 	}
-
-	return err;
+	CString msg;
+	msg.Format("sendorder error: %i",err);
+	D(msg);
+	return UNKNOWN_ERROR;
 }
 
 int ServerGenesis::GetIDIndex(long id, int type)
