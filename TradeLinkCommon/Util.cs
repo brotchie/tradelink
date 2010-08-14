@@ -428,7 +428,7 @@ namespace TradeLink.Common
             try
             {
                 debug("trying standard registry path...");
-                path = REGPATH + @"\" + PROGRAM;
+                path = REGPATH + @"\" + program;
                 string ver = r.OpenSubKey(path).GetValue(KEY_VERSION).ToString();
                 int build = Convert.ToInt32(ver);
                 debug("success.");
