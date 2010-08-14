@@ -635,6 +635,18 @@ namespace TradeLink.Common
         }
 
         /// <summary>
+        /// converts a trade to an array of comma-delimited string data also containing closedPL, suitable for output to file for reading by excel, R, matlab, etc.
+        /// </summary>
+        /// <param name="trade"></param>
+        /// <returns></returns>
+        public static string[] TradesToClosedPL(Trade trade)
+        {
+            List<Trade> trades = new List<Trade>();
+            trades.Add(trade);
+            return TradesToClosedPL(trades);
+        }
+
+        /// <summary>
         /// Converts a list of trades to an array of comma-delimited string data also containing closedPL, suitable for output to file for reading by excel, R, matlab, etc.
         /// </summary>
         /// <param name="tradelist"></param>
@@ -675,12 +687,22 @@ namespace TradeLink.Common
         /// <param name="delimiter"></param>
         /// <param name="filepath"></param>
         public static void ClosedPLToText(List<Trade> tradelist, char delimiter, string filepath) { ClosedPLToText(tradelist, delimiter, filepath,false); }
-        public static void ClosedPLToText(List<Trade> tradelist, char delimiter, string filepath,bool generateheaderOnEmpty)
+        public static void ClosedPLToText(List<Trade> tradelist, char delimiter, string filepath, bool generateheaderOnEmpty) { ClosedPLToText(tradelist, delimiter, filepath, false, false); }
+        public static void ClosedPLToText(Trade trade, string filepath)
+        {
+            List<Trade> trades = new List<Trade>();
+            trades.Add(trade);
+
+            ClosedPLToText(trades, ',', filepath, false, true);
+        }
+        public static void ClosedPLToText(List<Trade> tradelist, char delimiter, string filepath,bool generateheaderOnEmpty, bool append)
         {
             if ((tradelist.Count == 0) && !generateheaderOnEmpty) return;
-            StreamWriter sw = new StreamWriter(filepath, false);
+            bool exists = File.Exists(filepath);
+            StreamWriter sw = new StreamWriter(filepath, append);
             string header = string.Join(delimiter.ToString(), Enum.GetNames(typeof(TradePLField)));
-            sw.WriteLine(header);
+            if (!exists)
+                sw.WriteLine(header);
             string[] lines = TradesToClosedPL(tradelist, delimiter);
             foreach (string line in lines)
                 sw.WriteLine(line);
