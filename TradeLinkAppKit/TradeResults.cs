@@ -410,7 +410,7 @@ namespace TradeLink.AppKit
                 if (_islive)
                 {
 
-                    _msg = new System.Text.StringBuilder(100000);
+                    _msg = new System.Text.StringBuilder(bufsize);
                 }
 
             }
@@ -421,6 +421,8 @@ namespace TradeLink.AppKit
                 Report();
             }
         }
+
+        const int bufsize = 100000;
         /// <summary>
         /// generate current report as report event
         /// </summary>
@@ -428,7 +430,9 @@ namespace TradeLink.AppKit
         {
             if (SendReportEvent != null)
             {
-                SendReportEvent(FetchResults().ToString());
+                _msg.Insert(0, FetchResults().ToString());
+                SendReportEvent(_msg.ToString());
+                _msg = new System.Text.StringBuilder(bufsize);
             }
         }
         void debug(string msg)
