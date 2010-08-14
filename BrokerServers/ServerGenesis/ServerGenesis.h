@@ -20,7 +20,7 @@ public :
 	void Stop();
 	int DOMRequest(int depth);
 	int SendOrder(TradeLibFast::TLOrder order);
-	int CancelRequest(long id);
+	int CancelRequest(int64 id);
 	int BrokerName();
 	int AccountResponse(CString clientname);
 	int RegisterStocks(CString client);
@@ -30,12 +30,12 @@ public :
 	GTWrap* gtw;
 	bool LoadConfig();
 	bool Autologin();
-	bool IdIsUnique(uint id);
+	bool IdIsUnique(int64 id);
 	int _depth;
 	std::vector<int64> orderids;
 	std::vector<long> orderseq;
 	std::vector<long> orderticket;
-	int GetIDIndex(long id, int type);
+	int GetIDIndex(int64 id, int type);
 
 private:
 

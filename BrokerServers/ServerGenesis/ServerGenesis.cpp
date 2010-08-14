@@ -371,7 +371,7 @@ int ServerGenesis::SendOrder(TradeLibFast::TLOrder o)
 	return UNKNOWN_ERROR;
 }
 
-int ServerGenesis::GetIDIndex(long id, int type)
+int ServerGenesis::GetIDIndex(int64 id, int type)
 {
 	switch (type)
 	{
@@ -392,7 +392,7 @@ int ServerGenesis::GetIDIndex(long id, int type)
 	return NO_ID;
 }
 
-bool ServerGenesis::IdIsUnique(uint id)
+bool ServerGenesis::IdIsUnique(int64 id)
 {
 	for (uint i = 0; i<orderids.size(); i++)
 		if (orderids[i]==id) 
@@ -400,7 +400,7 @@ bool ServerGenesis::IdIsUnique(uint id)
 	return true;
 }
 
-int ServerGenesis::CancelRequest(long id)
+int ServerGenesis::CancelRequest(int64 id)
 {
 	int idx = GetIDIndex(id,ID);
 	if (idx==NO_ID) 
