@@ -373,6 +373,15 @@ namespace TradeLink.AppKit
         {
             fills.Add(fill);
         }
+        /// <summary>
+        /// pass new positions as they arrive
+        /// </summary>
+        /// <param name="p"></param>
+        public void GotPosition(Position p)
+        {
+            fills.Add(p.ToTrade());
+        }
+
         int _rt = 0;
         bool sendreport= false;
         bool SendReport { get { return sendreport; } set { sendreport = value; } }
