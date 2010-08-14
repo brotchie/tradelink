@@ -11,14 +11,16 @@ namespace TradeLibFast
 		AvgPrice = 0;
 		Size = 0;
 		ClosedPL = 0;
+		Account = "";
 	}
 
-	TLPosition::TLPosition(CString symbol, double avgprice, int possize)
+	TLPosition::TLPosition(CString symbol, double avgprice, int possize, CString acct)
 	{
 		Symbol = symbol;
 		AvgPrice = avgprice;
 		Size = possize;
 		ClosedPL = 0;
+		Account = acct;
 	}
 
 	TLPosition::TLPosition(CString symbol)
@@ -32,7 +34,7 @@ namespace TradeLibFast
 	CString TLPosition::Serialize()
 	{
 		CString m;
-		m.Format("%s,%f,%i,%f",Symbol,AvgPrice,Size,ClosedPL);
+		m.Format("%s,%f,%i,%f,%s",Symbol,AvgPrice,Size,ClosedPL,Account);
 		return m;
 	}
 
@@ -45,6 +47,7 @@ namespace TradeLibFast
 		pos.AvgPrice = _tstof(r[pavg]);
 		pos.Size = _tstoi(r[psiz]);
 		pos.ClosedPL = _tstof(r[pcpl]);
+		pos.Account = r[pact];
 		return pos;
 	}
 

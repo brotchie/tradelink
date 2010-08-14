@@ -10,5 +10,6 @@ namespace TradeLink.API
         price,
         size,
         closedpl,
+        account,
     }
 }

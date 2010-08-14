@@ -93,13 +93,14 @@ namespace TradeLink.Common
             decimal price = Convert.ToDecimal(r[(int)PositionField.price], System.Globalization.CultureInfo.InvariantCulture);
             decimal cpl = Convert.ToDecimal(r[(int)PositionField.closedpl], System.Globalization.CultureInfo.InvariantCulture);
             int size = Convert.ToInt32(r[(int)PositionField.size]);
-            Position p = new PositionImpl(sym,price,size,cpl);
+            string act = r[(int)PositionField.account];
+            Position p = new PositionImpl(sym,price,size,cpl,act);
             return p;
         }
 
         public static string Serialize(Position p)
         {
-            string[] r = new string[] { p.Symbol, p.AvgPrice.ToString("N2",System.Globalization.CultureInfo.InvariantCulture), p.Size.ToString(), p.ClosedPL.ToString("N2",System.Globalization.CultureInfo.InvariantCulture) };
+            string[] r = new string[] { p.Symbol, p.AvgPrice.ToString("N2",System.Globalization.CultureInfo.InvariantCulture), p.Size.ToString(), p.ClosedPL.ToString("N2",System.Globalization.CultureInfo.InvariantCulture), p.Account };
             return string.Join(",", r);
         }
 

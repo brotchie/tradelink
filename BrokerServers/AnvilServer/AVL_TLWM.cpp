@@ -1143,6 +1143,7 @@
 			p.ClosedPL = GetDouble(pos->GetClosedPnl());
 			p.Size = pos->GetSize();
 			p.Symbol = CString(pos->GetSymbol());
+			p.Account = account;
 			CString msg = p.Serialize();
 			TLSend(POSITIONRESPONSE,msg,client);
 			count++;
