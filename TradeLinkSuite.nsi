@@ -199,14 +199,6 @@ Section "TradeLinkSuite"
   ; skip tickdata and vcredistuble installs if running in silent mode
   StrCmp $SILENT "YES" finishinstall
 
-  DetailPrint "Checking for Migration..."
-  IfFileExists "$INSTDIR\Tickdata\*.*" migrate tickdata
-migrate:
-  ReadRegStr $0 HKLM SOFTWARE\TradeLinkSuite "TickData2074Migration"
-  StrCmp $0 "Yes" vcredistinstall
-  ExecWait "TickDataMigrate.exe"
-  WriteRegStr HKLM SOFTWARE\TradeLinkSuite "TickData2074Migration" "Yes"
-  DetailPrint "TickData Migration."
 
 tickdata:  
   DetailPrint "Checking for TickData..."
