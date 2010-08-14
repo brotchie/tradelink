@@ -287,5 +287,79 @@ namespace TradeLink.Common
         public event MessageDelegate SendMessageEvent;
         public event BasketDelegate SendBasketEvent;
         public event ChartLabelDelegate SendChartLabelEvent;
+
+
+
+        // helper stuff
+
+        /// <summary>
+        /// shutdown a response entirely, flat all positions and notify user
+        /// </summary>
+        /// <param name="ResponseisValid"></param>
+        /// <param name="D"></param>
+        /// <param name="_pt"></param>
+        /// <param name="sendorder"></param>
+        /// <param name="gt"></param>
+        public static void shutdown(ref bool ResponseisValid, DebugDelegate D, PositionTracker _pt, OrderDelegate sendorder, GenericTracker<bool> gt)
+        {
+            if (ResponseisValid) return;
+            if (D != null)
+                D("ShutdownTime");
+            ResponseisValid = false;
+            bool ShutdownFlat = _pt != null;
+            bool usegt = gt != null;
+            if (ShutdownFlat)
+            {
+                if (D != null)
+                    D("flatting positions at shutdown.");
+                foreach (Position p in _pt)
+                {
+                    if (usegt && (gt.getindex(p.Symbol) < 0)) continue;
+                    Order o = new MarketOrderFlat(p);
+                    if (D != null)
+                        D("flat order: " + o.ToString());
+                    sendorder(o);
+                }
+            }
+            ResponseisValid = true;
+        }
+        /// <summary>
+        /// flat a symbol and flag it to prevent it from trading in future
+        /// </summary>
+        /// <param name="sym"></param>
+        /// <param name="activesym"></param>
+        /// <param name="_pt"></param>
+        /// <param name="sendorder"></param>
+        public static void shutdown(string sym, GenericTracker<bool> activesym, PositionTracker _pt, OrderDelegate sendorder) { shutdown(sym, activesym, _pt, sendorder, null, string.Empty); }
+        /// <summary>
+        /// flat a symbol and flag it to allow prevention of future trading with status
+        /// </summary>
+        /// <param name="sym"></param>
+        /// <param name="activesym"></param>
+        /// <param name="_pt"></param>
+        /// <param name="sendorder"></param>
+        /// <param name="D"></param>
+        public static void shutdown(string sym, GenericTracker<bool> activesym, PositionTracker _pt, OrderDelegate sendorder, DebugDelegate D) { shutdown(sym, activesym, _pt, sendorder, D, string.Empty); }
+        /// <summary>
+        /// flat a symbol and flag it to allow prevention of future trading with status and supplied reason
+        /// </summary>
+        /// <param name="sym"></param>
+        /// <param name="activesym"></param>
+        /// <param name="_pt"></param>
+        /// <param name="sendorder"></param>
+        /// <param name="D"></param>
+        /// <param name="reason"></param>
+        public static void shutdown(string sym, GenericTracker<bool> activesym, PositionTracker _pt, OrderDelegate sendorder, DebugDelegate D, string reason)
+        {
+            if (!activesym[sym]) return;
+            Order o = new MarketOrderFlat(_pt[sym]);
+            if (D != null)
+            {
+                string r = reason == string.Empty ? string.Empty : " (" + reason + ")";
+                D("symbol shutdown" + r + ", flat order: " + o.ToString());
+            }
+            sendorder(o);
+            activesym[sym] = false;
+        }
     }
 }
