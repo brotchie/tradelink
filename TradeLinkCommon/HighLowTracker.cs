@@ -37,7 +37,8 @@ namespace TradeLink.Common
             _lows.addindex(txt, decimal.MaxValue);
         }
 
-
+        public event SymDelegate NewHighEvent;
+        public event SymDelegate NewLowEvent;
 
         /// <summary>
         /// get high
@@ -125,11 +126,15 @@ namespace TradeLink.Common
             {
                 _highs[idx] = p;
                 v |= true;
+                if (NewHighEvent != null)
+                    NewHighEvent(_highs.getlabel(idx));
             }
             if (p < _lows[idx])
             {
                 _lows[idx] = p;
                 v |= true;
+                if (NewLowEvent!= null)
+                    NewLowEvent(_highs.getlabel(idx));
             }
             return v;
             
