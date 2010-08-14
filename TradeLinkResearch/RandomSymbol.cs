@@ -59,20 +59,37 @@ namespace TradeLink.Research
         /// <param name="num"></param>
         /// <param name="destbase"></param>
         /// <returns></returns>
-        public static int[] BaseTenConvert(int num, int destbase)
+        public static int[] BaseTenConvert(long num, int destbase)
         {
             List<int> ordinals = new List<int>();
             if (destbase==0) return ordinals.ToArray();
-            int rem = num % destbase;
+            long rem = num % destbase;
             int ans = (int)num / destbase;
             while (ans!=0)
             {
-                ordinals.Add(rem);
+                ordinals.Add((int)rem);
                 rem = ans % destbase;
                 ans = (int)ans / destbase;
             }
-            ordinals.Add(rem);
+            ordinals.Add((int)rem);
             return ordinals.ToArray();
+        }
+
+        public static int[] BaseTenConvert(long num, int destbase, int maxdigits)
+        {
+            int[] ordinals = new int[maxdigits];
+            if (destbase == 0) return ordinals;
+            long rem = num % destbase;
+            int ans = (int)num / destbase;
+            int i = 0;
+            while (ans != 0)
+            {
+                ordinals[i++]= (int)rem;
+                rem = ans % destbase;
+                ans = (int)ans / destbase;
+            }
+            ordinals[i++] = (int)rem;
+            return ordinals;
         }
         /// <summary>
         /// get a random list of symbols of a random length, given seed. (eg (int)DateTime.Now.Ticks
