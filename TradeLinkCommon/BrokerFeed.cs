@@ -366,6 +366,8 @@ namespace TradeLink.Common
             TLClient tl = getsearchclient();
             
             _pavail = tl.ProvidersAvailable;
+            if (_pavail.Length == 0)
+                debug("No providers were found.");
 
             bool setquote = false;
             bool setexec = false;
