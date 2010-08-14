@@ -366,6 +366,10 @@ namespace Quotopia
             Security s = GetVisibleSecurity(CurrentRow);
             if (s.Type == SecurityType.IDX) return;
             string sym = s.Symbol;
+            if ((s.FullName == string.Empty) || (sym == string.Empty))
+            {
+                return;
+            }
             Order o = new OrderImpl(s.FullName,0);
             o.ex = s.DestEx;
             o.Security = s.Type;
