@@ -807,6 +807,32 @@
 				}
 				break;
 			case M_MS_NYSE_IMBALANCE_OPENING:
+				{
+					if (imbalance_clients.size()==0) return;
+					const StockMovement* sm = ((MsgStockMovement*)additionalInfo)->m_stock;
+					const StockBase* stk = (StockBase*)sm;
+					if (from==B_GetLevel1(stk))
+					{
+						TLImbalance imb;
+						if ((stk!=NULL) && stk->isLoaded()) 
+						{
+							imb.InfoImbalance = stk->GetNyseInformationalImbalance();
+							uint exid = (uint)stk->GetStockExchange();
+							imb.Ex = SymExchangeName(exid);
+						}
+						imb.Symbol = CString(sm->GetSymbol());
+						imb.ThisImbalance = sm->GetNyseImbalance();
+						imb.PrevImbalance = sm->GetNysePreviousImbalance();
+						// don't send empty imbalances
+						if ((imb.InfoImbalance==0) && (imb.ThisImbalance==0))
+							return;
+						imb.ThisTime = sm->GetNyseImbalanceTime();
+						imb.PrevTime = sm->GetNysePreviousImbalanceTime();
+						SrvGotImbAsync(imb);
+
+					}
+				}
+				break;
 			case M_MS_NYSE_IMBALANCE_CLOSING: 
 			//case M_MS_NYSE_IMBALANCE_NONE:
 				{
