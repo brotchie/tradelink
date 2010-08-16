@@ -81,11 +81,11 @@
   <ItemGroup>
     <Reference Include="Blackwood.Framework, Version=1.0.3628.24695, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Visual Studio 2008\Projects\Blackwood\Blackwood.Framework.dll</HintPath>
+      <HintPath>bin\Release\Blackwood.Framework.dll</HintPath>
     </Reference>
     <Reference Include="BWCMessageLib, Version=1.0.3628.24692, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Visual Studio 2008\Projects\Blackwood\BWCMessageLib.dll</HintPath>
+      <HintPath>bin\Release\BWCMessageLib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -102,7 +102,10 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="zlib.net, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="zlib.net, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Release\zlib.net.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ServerBlackwood.cs">
