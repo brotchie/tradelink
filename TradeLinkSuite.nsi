@@ -139,7 +139,7 @@ Section "TradeLinkSuite"
   
   
   File "ServerNxCore\bin\release\ServerNxCore32.exe"
-  File "ServerNxCore\bin\x64\release\ServerNxCore64.exe"
+  File "ServerNxCore64\bin\x64\release\ServerNxCore64.exe"
   File "ServerNxCore\bin\release\NxCoreAPI.dll"
   File "ServerNxCore\bin\release\NxCoreAPI64.dll"
 
@@ -156,7 +156,7 @@ Section "TradeLinkSuite"
   SetOverWrite off
   File "ServerFIX\bin\release\ServerFIX.exe.config"
   File "ServerNxCore\bin\release\ServerNxCore32.exe.config"
-  File "ServerNxCore\bin\x64\release\ServerNxCore64.exe.config"
+  File "ServerNxCore64\bin\x64\release\ServerNxCore64.exe.config"
   File "ServerRedi\bin\release\ServerRedi.exe.config"
   File "ServerIQ-DTN\bin\Release\IQFeedBroker.exe.config"
   File "Kadina\bin\release\Kadina.exe.config"
