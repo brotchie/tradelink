@@ -29,17 +29,40 @@ namespace TradeLink.Common
         /// </summary>
         public string Name { get { return _name; } set { _name = value; } }
         /// <summary>
-        /// get display-ready tracked value of a given index
+        /// get display-ready tracked value of a given index.
+        /// For this to work, your tracked type MUST implement ToString() otherwise it will return as empty.
         /// </summary>
         /// <param name="idx"></param>
         /// <returns></returns>
-        public string Display(int idx) { return _tracked[idx].ToString(); }
+        public string Display(int idx) 
+        {
+            try
+            {
+                return _tracked[idx].ToString();
+            }
+            catch 
+            {
+                return string.Empty;
+            }
+        }
         /// <summary>
         /// get display-ready tracked value of a given label
         /// </summary>
         /// <param name="txt"></param>
         /// <returns></returns>
-        public string Display(string txt) { int idx = getindex(txt); if (idx < 0) return string.Empty; return _tracked[idx].ToString() ; }
+        public string Display(string txt) 
+        { 
+            int idx = getindex(txt); 
+            if (idx < 0) return string.Empty;
+            try
+            {
+                return _tracked[idx].ToString();
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
 
         /// <summary>
         /// creates a tracker with given name
