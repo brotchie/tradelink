@@ -389,7 +389,7 @@ namespace TradeLink.AppKit
         bool _livecheck = true;
         bool _islive = false;
 
-        System.Text.StringBuilder _msg;
+        System.Text.StringBuilder _msg = new System.Text.StringBuilder(bufsize);
 
         public void GotDebug(string msg, bool appendtime)
         {
@@ -416,11 +416,6 @@ namespace TradeLink.AppKit
                 bool tmatch = Util.FTDIFF(k.time, Util.ToTLTime()) < 60;
                 _islive = dmatch && tmatch;
                 _livecheck = false;
-                if (_islive)
-                {
-
-                    _msg = new System.Text.StringBuilder(bufsize);
-                }
 
             }
             if (_islive && sendreport && (k.time>=_rt))
