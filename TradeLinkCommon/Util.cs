@@ -1152,6 +1152,10 @@ namespace TradeLink.Common
         Sell_to_Open_Position_Not_Enabled_for_Options = -31,
         Allow_Close_and_Cancel_Only = -32,
         Symbol_Violates_Account_MinMax_PriceSettings = -39,
+        Quote_Unavailable_Order_dollar_limit = -40,
+        Quote_Unavailable_Maximum_Position_Cost = -41,
+        Quote_Unavailable_Buying_Power = -42 ,
+        Quote_Unavailable_Margin_Control = -43 ,
     }
 
 
