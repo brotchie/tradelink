@@ -36,6 +36,7 @@ namespace ServerBlackwood
             //m_Session.OnOrderMessage += new BWSession.OrderMessageHandler(m_Session_OnOrderMessage);
             m_Session.OnPositionMessage += new BWSession.PositionMessageHandler(m_Session_OnPositionMessage);
             m_Session.OnHistMessage += new BWSession.HistoricMessageHandler(m_Session_OnHistMessage);
+            m_Session.OnTimeMessage += new BWSession.TimeMessageHandler(m_Session_OnTimeMessage);
             // tradelink stuff
             tl.newProviderName = Providers.Blackwood;
             tl.newAcctRequest += new StringDelegate(ServerBlackwood_newAccountRequest);
@@ -219,7 +220,18 @@ namespace ServerBlackwood
             k.BidSize = quote.BidSize;
             k.ask = (decimal)quote.Ask;
             k.os = quote.AskSize;
+            k.date = date;
+            k.time = time;
             tl.newTick(k);
+        }
+
+        int date = 0;
+        int time = 0;
+
+        void m_Session_OnTimeMessage(object sender, BWTime timeMsg)
+        {
+            date = TradeLink.Common.Util.ToTLDate(timeMsg.ServerTime);
+            time = TradeLink.Common.Util.ToTLTime(timeMsg.ServerTime);
         }
         void stk_OnLevel2Update(object sender, BWLevel2Quote quote)
         {
@@ -231,6 +243,8 @@ namespace ServerBlackwood
             k.ask = (decimal)quote.Ask;
             k.os = quote.AskSize;
             k.oe = quote.MarketMaker;
+            k.date = date;
+            k.time = time;
             tl.newTick(k);
         }
         void stk_OnTrade(object sender, BWTrade print)
@@ -239,6 +253,8 @@ namespace ServerBlackwood
             k.trade = (decimal)print.Price;
             k.size = print.Size;
             k.ex = print.MarketMaker;
+            k.date = date;
+            k.time = time;
             tl.newTick(k);
         }
         TradeLinkServer tl;
