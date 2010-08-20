@@ -216,14 +216,15 @@ namespace TradeLink.Common
         {
             List<IPEndPoint> ip = new List<IPEndPoint>();
             foreach (string server in servers)
-                ip.Add(new IPEndPoint(IPAddress.Parse(server),port));
+                if (IPUtil.isValidAddress(server))
+                    ip.Add(new IPEndPoint(IPAddress.Parse(server),port));
             return ip;
         }
         public static List<IPEndPoint> GetEndpoints(params IPEndPoint[] eps) 
         { 
             List<IPEndPoint> ip = new List<IPEndPoint>();
             foreach(IPEndPoint ep in eps)
-                ip.Add(ep);
+                    ip.Add(ep);
             return ip;
         }
 

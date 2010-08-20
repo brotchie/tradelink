@@ -253,15 +253,19 @@ namespace TradeLink.Common
         /// <param name="port"></param>
         /// <param name="wait"></param>
         /// <param name="TickBufferSize">set to zero to send ticks immediately</param>
-        public TLServer_IP(string ipaddr, int port, int wait, int TickBufferSize)
+        public TLServer_IP(string ipaddr, int port, int wait, int TickBufferSize) : this(ipaddr, port, wait, TickBufferSize, null) { }
+        public TLServer_IP(string ipaddr, int port, int wait, int TickBufferSize, DebugDelegate deb)
         {
+            SendDebugEvent = deb;
             if (TickBufferSize == 0)
                 _queueb4send = false;
             else
                 tickq = new RingBuffer<Tick>(TickBufferSize);
             MinorVer = Util.ProgramBuild(Util.PROGRAM,debug);
             _wait = wait;
-            _addr = IPAddress.Parse(ipaddr);
+            if (!IPUtil.isValidAddress(ipaddr))
+                debug("Not valid ip address: " + ipaddr + ", using localhost.");
+            _addr = IPUtil.isValidAddress(ipaddr) ? IPAddress.Parse(ipaddr) : IPAddress.Loopback;
             _port = port;
             Start();
         }
