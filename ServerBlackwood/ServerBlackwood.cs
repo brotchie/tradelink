@@ -221,11 +221,11 @@ namespace ServerBlackwood
             k.ask = (decimal)quote.Ask;
             k.os = quote.AskSize;
             k.date = date;
-            k.time = time;
+            k.time = TradeLink.Common.Util.ToTLTime();
             tl.newTick(k);
         }
 
-        int date = 0;
+        int date = TradeLink.Common.Util.ToTLDate();
         int time = 0;
 
         void m_Session_OnTimeMessage(object sender, BWTime timeMsg)
@@ -244,7 +244,7 @@ namespace ServerBlackwood
             k.os = quote.AskSize;
             k.oe = quote.MarketMaker;
             k.date = date;
-            k.time = time;
+            k.time = TradeLink.Common.Util.ToTLTime();
             tl.newTick(k);
         }
         void stk_OnTrade(object sender, BWTrade print)
@@ -254,7 +254,7 @@ namespace ServerBlackwood
             k.size = print.Size;
             k.ex = print.MarketMaker;
             k.date = date;
-            k.time = time;
+            k.time = TradeLink.Common.Util.ToTLTime();
             tl.newTick(k);
         }
         TradeLinkServer tl;
