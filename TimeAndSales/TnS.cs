@@ -17,6 +17,8 @@ namespace TimeSales
         DataTable _dt = new DataTable();
         DataGridView _dg = new DataGridView();
         SafeBindingSource _bs = new SafeBindingSource();
+        int _dp = Properties.Settings.Default.DecimalPlaces;
+        string _dpf = "N2";
 
         public TnS()
         {
@@ -24,8 +26,8 @@ namespace TimeSales
             Program = PROGRAM;
             InitializeComponent();
             initgrid();
-            
 
+            _dpf = "N" + _dp;
             SetColumnContext();
             bw.DoWork += new DoWorkEventHandler(bw_DoWork);
             bw.WorkerSupportsCancellation = true;
@@ -221,11 +223,11 @@ namespace TimeSales
             string depth = "";
             if (t.isIndex)
             {
-                trade = t.trade.ToString("N2");
+                trade = t.trade.ToString(_dpf);
             }
             else if (t.isTrade)
             {
-                trade = t.trade.ToString("N2");
+                trade = t.trade.ToString(_dpf);
                 ts = t.size.ToString();
                 ex = t.ex;
             }
@@ -233,12 +235,12 @@ namespace TimeSales
             {
                 bs = t.bs.ToString();
                 be = t.be;
-                bid = t.bid.ToString("N2");
+                bid = t.bid.ToString(_dpf);
                 depth = t.depth.ToString();
             }
             if (t.hasAsk)
             {
-                ask = t.ask.ToString("N2");
+                ask = t.ask.ToString(_dpf);
                 oe = t.oe;
                 os = t.os.ToString();
                 depth = t.depth.ToString();
