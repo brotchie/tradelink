@@ -26,6 +26,10 @@ namespace TradeLink.API
         GAINCapital,
         FxCm,
         OpenEcry,
-        DBFX
+        DBFX,
+        Nanex,
+        KnightTrading,
+        PATS,
+        FIX,
     }
 }

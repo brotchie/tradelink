@@ -28,6 +28,8 @@ namespace ServerNxCore
             _fn = filename;
             _proc = new System.Threading.Thread(proc);
             tl = tls;
+            tl.newProviderName = Providers.Nanex
+           
             tl.newFeatureRequest += new MessageArrayDelegate(ServerNxCore_newFeatureRequest);
             tl.newRegisterStocks += new DebugDelegate(ServerNxCore_newRegisterStocks);
         }
@@ -282,6 +284,7 @@ namespace ServerNxCore
         }
         void ServerNxCore_newRegisterStocks(string msg)
         {
+            D("got quote request for: " + msg);
             // get new basket
             Basket b = BasketImpl.FromString(msg);
             _syms = new GenericTracker<bool>(2000);

@@ -32,10 +32,14 @@ namespace ServerNxCore
 
         void ServerNxCoreMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (tl != null)
+            try
             {
-                tl.Stop();
+                if (tl != null)
+                {
+                    tl.Stop();
+                }
             }
+            catch { }
             _log.Stop();
         }
 
