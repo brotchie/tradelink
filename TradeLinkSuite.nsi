@@ -84,16 +84,7 @@ Section "TradeLinkSuite"
   File "Replay\bin\release\Replay.exe"
   File "ServerSterling\bin\release\SterServer.exe"
   File "ServerSterling\Interop.SterlingLib.dll"
-  File /nonfatal "ServerTD\bin\release\TDServer.exe"
-  File /nonfatal "ServerTD\bin\release\Interop.MSXML2.dll"
-  File /nonfatal "ServerTD\bin\release\NZipLib.dll"
-  File /nonfatal "ServerTDX\bin\release\TDServerX.exe"
-  File /nonfatal "ServerTDX\bin\release\AxInterop.tdaactx.dll"
-  File /nonfatal "ServerTDX\bin\release\Interop.tdaactx.dll"
-  File /nonfatal "ServerTDX\bin\release\Interop.MSXML2.dll"
-  File /nonfatal "ServerTDX\bin\release\Interop.MSXML2.dll"
-  File /nonfatal "ServerTDX\ActiveXComp\ActiveX\TDAACTX.ocx"
-  RegDLL "$INSTDIR\TDAACTX.ocx"
+
   
   
   File "Responses\bin\release\Responses.dll"
@@ -123,7 +114,7 @@ Section "TradeLinkSuite"
   File "Install\TickDataInstall.exe"
   File "Install\TickDataMigrate.exe"
   File "ServerEsignal\bin\release\Interop.IESignal.dll"
-  File "ServerEsignal\bin\release\ServerEsignal.exe"
+
 
   File "ServerDBFX\bin\release\ServerDBFX.exe"
   File "ServerDBFX\bin\release\Interop.FXCore.dll"
@@ -135,7 +126,7 @@ Section "TradeLinkSuite"
   File "ServerRedi\bin\release\ServerRedi.exe"
   File "ServerRedi\bin\release\Interop.RediLib.dll"
   File "ServerRedi\bin\release\VBRediClasses.dll"
-  File "ServerIQ-DTN\bin\Release\IQFeedBroker.exe"
+  
   
   
   File "ServerNxCore\bin\release\ServerNxCore32.exe"
@@ -152,17 +143,30 @@ Section "TradeLinkSuite"
   File "ServerFIX\bin\release\quickfix_net_messages.dll"
   File "ServerFIX\bin\release\quickfix_net_test.dll"
   
-    ; don't overwrite certain files
+    ; may fail if you don't have 3rd party vendor software installed
+  File /nonfatal "ServerEsignal\bin\release\ServerEsignal.exe"
+  File /nonfatal "ServerIQ-DTN\bin\Release\IQFeedBroker.exe"
+    File /nonfatal "ServerTD\bin\release\TDServer.exe"
+  File /nonfatal "ServerTD\bin\release\Interop.MSXML2.dll"
+  File /nonfatal "ServerTD\bin\release\NZipLib.dll"
+  File /nonfatal "ServerTDX\bin\release\TDServerX.exe"
+  File /nonfatal "ServerTDX\bin\release\AxInterop.tdaactx.dll"
+  File /nonfatal "ServerTDX\bin\release\Interop.tdaactx.dll"
+  File /nonfatal "ServerTDX\bin\release\Interop.MSXML2.dll"
+  File /nonfatal "ServerTDX\bin\release\Interop.MSXML2.dll"
+  File /nonfatal "ServerTDX\ActiveXComp\ActiveX\TDAACTX.ocx"
+  RegDLL "$INSTDIR\TDAACTX.ocx"
+  
+    ; don't overwrite config files files
   SetOverWrite off
   File "ServerFIX\bin\release\ServerFIX.exe.config"
   File "ServerNxCore\bin\release\ServerNxCore32.exe.config"
   File "ServerNxCore64\bin\x64\release\ServerNxCore64.exe.config"
   File "ServerRedi\bin\release\ServerRedi.exe.config"
-  File "ServerIQ-DTN\bin\Release\IQFeedBroker.exe.config"
+
   File "Kadina\bin\release\Kadina.exe.config"
   File "ServerSterling\bin\release\SterServer.exe.config"
-  File /nonfatal "ServerTD\bin\release\TDServer.exe.config"
-  File /nonfatal "ServerTDX\bin\release\TDServerX.exe.config"
+  File "Replay\bin\release\Replay.exe.config"
   File "Quotopia\bin\release\Quotopia.exe.config"
   File "Gauntlet\bin\release\Gauntlet.exe.config"
   File "Chartographer\bin\release\Chartographer.exe.config"
@@ -170,9 +174,15 @@ Section "TradeLinkSuite"
   File "ASP\bin\release\ASP.exe.config"
   File "Record\bin\release\Record.exe.config"
   File "ServerMB\bin\x86\release\ServerMB.exe.config"
-  File "ServerEsignal\bin\release\ServerEsignal.exe.config"
+
+  ; these may fail if you do not have 3rd party vendor software installed
+  File /nonfatal "ServerIQ-DTN\bin\Release\IQFeedBroker.exe.config"
   File "ServerDBFX\bin\release\ServerDBFX.exe.config"
   File "ServerBlackwood\bin\release\ServerBlackwood.exe.config"
+  File /nonfatal "ServerTD\bin\release\TDServer.exe.config"
+  File /nonfatal "ServerTDX\bin\release\TDServerX.exe.config"
+  File /nonfatal "ServerEsignal\bin\release\ServerEsignal.exe.config"
+
   
   ; done writing config files
   SetOverWrite on

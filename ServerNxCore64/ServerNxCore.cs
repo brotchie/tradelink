@@ -28,7 +28,7 @@ namespace ServerNxCore
             _fn = filename;
             _proc = new System.Threading.Thread(proc);
             tl = tls;
-            tl.newProviderName = Providers.Nanex
+            tl.newProviderName = Providers.Nanex;
            
             tl.newFeatureRequest += new MessageArrayDelegate(ServerNxCore_newFeatureRequest);
             tl.newRegisterStocks += new DebugDelegate(ServerNxCore_newRegisterStocks);
