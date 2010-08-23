@@ -115,7 +115,6 @@ namespace TradeLink.Common
                         debug("recovered connection to: " + serverip[p]);
                     else
                         debug("unable to recover connection to: " + serverip[p]);
-                    break;
                 }
             }
         }

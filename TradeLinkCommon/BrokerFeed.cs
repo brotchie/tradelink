@@ -746,6 +746,18 @@ namespace TradeLink.Common
             return true;
         }
 
+        bool _noverb = true;
+        /// <summary>
+        /// enable/disable extended debugging
+        /// </summary>
+        public bool VerboseDebugging { get { return !_noverb; } set { _noverb = value; } }
+
+        void v(string msg)
+        {
+            if (_noverb) return;
+            debug(msg);
+        }
+
 
         TLClient getsearchclient()
         {
@@ -754,7 +766,11 @@ namespace TradeLink.Common
                 return new TLClient_WM(false);
             }
             else
-                return new TLClient_IP(_servers, _port);
+            {
+                TLClient_IP tmp = new TLClient_IP(_servers, _port);
+                tmp.VerboseDebugging = VerboseDebugging;
+                return tmp;
+            }
         }
 
         TLClient getrealclient(int pidx, string name)
