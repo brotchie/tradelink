@@ -78,10 +78,10 @@ namespace TradeLink.Common
 
         public override string ToString()
         {
-            return ToString(',');
+            return ToString(',',true);
         }
         public string ToString(bool includeid) { return ToString(',', includeid); }
-        public string ToString(char delimiter) { return ToString(delimiter, false); }
+        public string ToString(char delimiter) { return ToString(delimiter, true); }
         public string ToString(char delimiter,bool includeid)
         {
             int usize = Math.Abs(xsize);
