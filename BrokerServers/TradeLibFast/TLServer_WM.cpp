@@ -386,7 +386,8 @@ namespace TradeLibFast
 
 	void TLServer_WM::SrvGotOrder(TLOrder order)
 	{
-		if (order.symbol=="") return;
+		if (!order.isValid()) 
+			return;
 		for (size_t i = 0; i<client.size(); i++)
 			if (client[i]!="")
 				TLSend(ORDERNOTIFY,order.Serialize(),client[i]);

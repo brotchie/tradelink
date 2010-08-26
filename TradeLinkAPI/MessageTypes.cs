@@ -123,6 +123,7 @@ namespace TradeLink.API
         SENDORDERTRAIL,
         SENDORDERMARKETONCLOSE,
         ORDERSTATUSREQUEST,
+        ORDERNOTIFYREQUEST,
         // responses or acks
         TICKNOTIFY = 6000,
         EXECUTENOTIFY,

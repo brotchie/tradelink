@@ -112,6 +112,40 @@
 	{
 		switch (MessageType)
 		{
+		case ORDERNOTIFYREQUEST :
+			{
+				std::vector<CString> r;
+				gsplit(msg,CString("+"),r);
+				if (r.size()<2)
+				{
+					D(CString("Must send ORDERNOTIFY WITH: 'account+client' msg."));
+					break;
+				}
+				Observable* m_account = B_GetAccount(r[0]);
+				if (m_account)
+				{
+					// get all the orders available
+					void* iterator = B_CreateOrderIterator(OS_CANCELLED|OS_FILLED|OS_PENDINGLONG|OS_PENDINGSHORT, (1 << ST_LAST) - 1, m_account);
+					B_StartIteration(iterator);
+					Order* order;
+					while(order = B_GetNextOrder(iterator))
+					{
+						TLOrder o = ProcessOrder(order);
+						if (o.isValid())
+						{
+							TLSend(ORDERNOTIFY,o.Serialize(),r[1]);
+						}
+					}
+					B_DestroyIterator(iterator);
+				}
+				else
+				{
+					CString m;
+					m.Format("Invalid account: %s",r[0]);
+					D(m);
+				}
+			}
+			break;
 		case ISSHORTABLE :
 			{
 				const StockBase* s = preload(msg);
@@ -756,39 +790,9 @@
 						order = info->m_order;
 				}
 
-				// don't process null orders
-				if (order==NULL) return; 
-
-				// send cancel for a dead order update
-				if (order->isDead()) 
-				{
-					//const MsgUpdateOrder* msg2 = (const MsgUpdateOrder*)message;
-					int64 id = fetchOrderIdAndRemove(order);
-					if (id>0)
-						SrvGotCancel(id);
-					return;
-				}
-
-				// try to save this order
-				bool isnew = saveOrder(order,0);
-				// if it fails, we already have it so get the id
-				// if it succeeds, we should be able to get the id anyways
-				int64 id = fetchOrderId(order);
-
-				CTime ct = CTime::GetCurrentTime();
-				TLOrder o;
-				o.id = id;
-				o.price = order->isMarketOrder() ? 0: GetDouble(order->GetOrderPrice());
-				o.stop = GetDouble(order->GetStopPrice());
-				o.time = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
-				o.date = (ct.GetYear()*10000)+(ct.GetMonth()*100)+ct.GetDay();
-				o.size = order->GetSize();
-				o.side = order->GetSide()=='B';
-				o.comment = order->GetUserDescription();
-				o.TIF = TIFName(order->GetTimeInForce());
-				o.account = CString(B_GetAccountName(order->GetAccount()));
-				o.symbol = CString(order->GetSymbol());
+				TLOrder o = ProcessOrder(order);
 				SrvGotOrder(o);
+				
 			}
 				break;
 			case M_ORDER_DELETED: // for regular cancels
@@ -943,6 +947,45 @@
 		return OK;
 	}
 
+	TLOrder AVL_TLWM::ProcessOrder(Order* order)
+	{
+		TLOrder null;
+		// don't process null orders
+		if (order==NULL) 
+			return null; 
+
+		// send cancel for a dead order update
+		if (order->isDead()) 
+		{
+			//const MsgUpdateOrder* msg2 = (const MsgUpdateOrder*)message;
+			int64 id = fetchOrderIdAndRemove(order);
+			if (id>0)
+				SrvGotCancel(id);
+			return null;
+		}
+
+		// try to save this order
+		bool isnew = saveOrder(order,0);
+		// if it fails, we already have it so get the id
+		// if it succeeds, we should be able to get the id anyways
+		int64 id = fetchOrderId(order);
+
+		CTime ct = CTime::GetCurrentTime();
+		TLOrder o;
+		o.id = id;
+		o.price = order->isMarketOrder() ? 0: GetDouble(order->GetOrderPrice());
+		o.stop = GetDouble(order->GetStopPrice());
+		o.time = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
+		o.date = (ct.GetYear()*10000)+(ct.GetMonth()*100)+ct.GetDay();
+		o.size = order->GetSize();
+		o.side = order->GetSide()=='B';
+		o.comment = order->GetUserDescription();
+		o.TIF = TIFName(order->GetTimeInForce());
+		o.account = CString(B_GetAccountName(order->GetAccount()));
+		o.symbol = CString(order->GetSymbol());
+		return o;
+	}
+
 
 	void AVL_TLWM::SrvGotImbAsync(TLImbalance imb)
 	{
@@ -1055,6 +1098,9 @@
 		f.push_back(NYSEPREVIOUSIMBALANCE);
 		f.push_back(INTRADAYHIGH);
 		f.push_back(INTRADAYLOW);
+		f.push_back(POSITIONREQUEST);
+		f.push_back(POSITIONRESPONSE);
+		f.push_back(ORDERNOTIFYREQUEST);
 		bool sim = B_IsAccountSimulation();
 		if (sim)
 			f.push_back(SIMTRADING);
