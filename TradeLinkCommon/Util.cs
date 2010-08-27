@@ -665,7 +665,7 @@ namespace TradeLink.Common
             
             foreach (TradeImpl t in tradelist)
             {
-                string r = t.ToString(delimiter) + delimiter;
+                string r = t.ToString(delimiter,false) + delimiter;
                 string s = t.symbol;
                 decimal cpl = 0;
                 decimal opl = 0;
