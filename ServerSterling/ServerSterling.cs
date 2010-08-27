@@ -99,7 +99,7 @@ namespace SterServer
 
         void stiEvents_OnSTIShutdown()
         {
-            debug("Interface shutdown");
+            debug("Sterling Trader Pro was closed or exited.");
         }
 
         void stiEvents_OnSTIOrderReject(ref structSTIOrderReject structOrderReject)
