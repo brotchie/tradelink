@@ -117,6 +117,7 @@
     <Compile Include="OffsetInfo.cs" />
     <Compile Include="OffsetTracker.cs" />
     <Compile Include="OrderTIFTracker.cs" />
+    <Compile Include="OrderTracker.cs" />
     <Compile Include="PapertradeTracker.cs" />
     <Compile Include="Peg2Midpoint.cs" />
     <Compile Include="PositionTracker.cs" />
