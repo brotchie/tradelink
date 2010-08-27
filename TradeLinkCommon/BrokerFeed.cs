@@ -359,15 +359,15 @@ namespace TradeLink.Common
 
             feedready = false;
             if (IPUtil.hasValidAddress(_servers))
-                debug("At least one valid IpAddress found, using IP transport.");
+                debug("At least one valid IpAddress found, attempting IP transport.");
             else
-                debug("Not ip addresses specified, using Windows IPC.");
+                debug("No ip addresses specified, attempting Windows IPC.");
 
             TLClient tl = getsearchclient();
             
             _pavail = tl.ProvidersAvailable;
             if (_pavail.Length == 0)
-                debug("No providers were found.");
+                debug("No providers were found. Ensure connectors are running.");
 
             bool setquote = false;
             bool setexec = false;
@@ -635,7 +635,7 @@ namespace TradeLink.Common
             {
                 debug("requesting positions for account: " + acct);
                 long r = execute.TLSend(MessageTypes.POSITIONREQUEST, execute.Name + "+" + acct);
-                debug("TLSend return code " + r);
+                v("TLSend return code " + r);
             }
             catch (Exception ex)
             {
@@ -741,6 +741,7 @@ namespace TradeLink.Common
                 System.Windows.Forms.MessageBox.Show(p.ToString() + " does not support quotes.");
                 return false;
             }
+            _feed = p;
             tl.Disconnect();
             Reset();
             return true;
@@ -793,6 +794,7 @@ namespace TradeLink.Common
                 System.Windows.Forms.MessageBox.Show(p.ToString() + " does not support execution.");
                 return false;
             }
+            _broker = p;
             tl.Disconnect();
             Reset();
             return true;

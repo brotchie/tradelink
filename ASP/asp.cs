@@ -99,8 +99,8 @@ namespace ASP
             initfeeds();
             // get asp option events
             _ao.TimeoutChanged += new Int32Delegate(_ao_TimeoutChanged);
-            _ao._datasel.SelectedIndexChanged += new EventHandler(_prefquot_SelectedIndexChanged);
-            _ao._execsel.SelectedIndexChanged += new EventHandler(_prefexec_SelectedIndexChanged);
+            _ao._datasel.SelectionChangeCommitted+= new EventHandler(_prefquot_SelectedIndexChanged);
+            _ao._execsel.SelectionChangeCommitted+= new EventHandler(_prefexec_SelectedIndexChanged);
             // setup right click menu
             _resnames.ContextMenu= new ContextMenu();
             _resnames.ContextMenu.Popup += new EventHandler(ContextMenu_Popup);
@@ -1331,16 +1331,24 @@ namespace ASP
 
         private void _prefquot_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (!((Control)sender).Focused )
+                return;
             if (_bf.ModifyFeed(_ao._datasel.SelectedIndex))
+            {
                 Properties.Settings.Default.prefquote = _bf.Feed;
+            }
         }
 
         BrokerFeed _bf;
 
         private void _prefexec_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (!((Control)sender).Focused)
+                return;
             if (_bf.ModifyBroker(_ao._execsel.SelectedIndex))
+            {
                 Properties.Settings.Default.prefexecute = _bf.Broker;
+            }
         }
 
 
