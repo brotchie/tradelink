@@ -1475,6 +1475,48 @@ namespace TradeLink.Common
         }
 
         /// <summary>
+        /// calculate absolute return only for closed portions of positions
+        /// </summary>
+        /// <param name="pt"></param>
+        /// <returns></returns>
+        public static decimal[] AbsoluteReturn(PositionTracker pt)
+        {
+            return AbsoluteReturn(pt, new GenericTracker<decimal>(0), true);
+
+        }
+        public static decimal[] AbsoluteReturn(PositionTracker pt, GenericTracker<decimal> marketprices)
+        {
+            return AbsoluteReturn(pt, marketprices, true);
+        }
+        /// <summary>
+        /// returns absolute return of all positions in order they are listed in position tracker
+        /// both closed and open pl may be included
+        /// </summary>
+        /// <param name="pt"></param>
+        /// <param name="marketprices"></param>
+        /// <param name="countClosedPL"></param>
+        /// <returns></returns>
+        public static decimal[] AbsoluteReturn(PositionTracker pt, GenericTracker<decimal> marketprices, bool countClosedPL)
+        {
+            decimal[] aret = new decimal[pt.Count];
+            bool countOpenPL = marketprices.Count >= pt.Count;
+            for (int i = 0; i < pt.Count; i++)
+            {
+                // get position
+                Position p = pt[i];
+                // get index
+                int idx = marketprices.getindex(p.Symbol);
+                // see if we're doing open
+                if (countOpenPL && (idx >= 0))
+                    aret[i] += Calc.OpenPL(marketprices[idx], p);
+                if (countClosedPL)
+                    aret[i] += p.ClosedPL;
+            }
+            return aret;
+        }
+
+
+        /// <summary>
         /// calculate maximum drawdown from a PL stream for a given security/portfolio as a dollar value
         /// </summary>
         /// <param name="ret">array containing pl values for portfolio or security</param>
