@@ -235,7 +235,7 @@ namespace TradeLink.Common
         public int Port { get { return _port; } }
         bool _started = false;
         public bool isStarted { get { return _started; } }
-        int _maxoutstandingreq = 10;
+        int _maxoutstandingreq = 50;
         public int MaxOustandingRequests { get { return _maxoutstandingreq; } set { _maxoutstandingreq = value; } }
 
         bool _queueb4send = false;
