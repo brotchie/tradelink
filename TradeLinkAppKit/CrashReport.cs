@@ -152,7 +152,7 @@ namespace TradeLink.AppKit
         static string D = "74726164656C696E6B6D61696C";
 
         public static void Report(string PROGRAM, string username, string password, System.Threading.ThreadExceptionEventArgs e, AssemblaTicketWindow.LoginSucceedDel success) { Report(PROGRAM, username, password, string.Empty,e.Exception,success,true); }
-        public static void Report(string PROGRAM, System.Threading.ThreadExceptionEventArgs e) { Report(PROGRAM, Util.decode(d), Util.decode(D), string.Empty, e.Exception, null, true); }
+        public static void Report(string PROGRAM, System.Threading.ThreadExceptionEventArgs e) { Report(PROGRAM, Util.decode(D), Util.decode(d), string.Empty, e.Exception, null, true); }
         public static void Report(string PROGRAM, Exception ex) { Report(PROGRAM, Util.decode(D), Util.decode(d) , string.Empty, ex, null, true); }
         public static void Report(string PROGRAM, string username, string password, string data, Exception ex, AssemblaTicketWindow.LoginSucceedDel success, bool pause)
         {
