@@ -159,6 +159,7 @@ namespace ASP
                 _ao.archivetickbox.Checked = (_bf.ProvidersAvailable.Length > 0) && !_bf.FeedClient.RequestFeatureList.Contains(MessageTypes.HISTORICALDATA);
                 // monitor quote feed
                 int poll = (int)((double)Properties.Settings.Default.brokertimeoutsec * 1000 / 2);
+                debug(poll == 0 ? "connection timeout disabled." : "using connection timeout: " + poll);
                 _tlt = new TLTracker(poll, (int)Properties.Settings.Default.brokertimeoutsec, _bf.FeedClient, Providers.Unknown, true);
                 _tlt.GotConnectFail += new VoidDelegate(_tlt_GotConnectFail);
                 _tlt.GotConnect += new VoidDelegate(_tlt_GotConnect);

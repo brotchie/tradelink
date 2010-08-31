@@ -85,6 +85,7 @@ namespace Quotopia
             if (_bf.isFeedConnected)
             {
                 int poll = (int)((double)Properties.Settings.Default.brokertimeoutsec * 1000 / 2);
+                debug(poll == 0 ? "connection timeout disabled." : "using connection timeout: " + poll);
                 _tlt = new TLTracker(poll, (int)Properties.Settings.Default.brokertimeoutsec, _bf.FeedClient, Providers.Unknown, true);
                 _tlt.GotConnectFail += new VoidDelegate(_tlt_GotConnectFail);
                 _tlt.GotConnect += new VoidDelegate(_tlt_GotConnect);
