@@ -39,8 +39,9 @@ namespace SterServer
                     tls = new TradeLink.Common.TLServer_IP(Properties.Settings.Default.TLClientAddress, Properties.Settings.Default.TLClientPort);
 
                 tl = new ServerSterling(tls, Properties.Settings.Default.Sleep,Properties.Settings.Default.OrderSleep,debug);
+                tl.AutoCapAccounts = Properties.Settings.Default.AutoCapitilizeAccounts;
                 tl.CoverEnabled = Properties.Settings.Default.CoverEnabled;
-                tl.Account = Properties.Settings.Default.defaultaccount;
+                tl.Accounts = Properties.Settings.Default.defaultaccount.Split(',');
                 tl.CancelWait = Properties.Settings.Default.CancelWait;
                 tl.VerboseDebugging = Properties.Settings.Default.VerboseDebugging;
                 tl.FixOrderDecimalPlace = Properties.Settings.Default.FixOrderDecimalPlaces;
@@ -62,8 +63,8 @@ namespace SterServer
         void setaccount(object sender, EventArgs e)
         {
             string acct = Microsoft.VisualBasic.Interaction.InputBox("Provide default account name: ", "Default Sterling Account", Properties.Settings.Default.defaultaccount, 0, 0);
-            Properties.Settings.Default.defaultaccount = acct;
-            tl.Account = acct;
+            Properties.Settings.Default.defaultaccount = string.Join(",",tl.Accounts);
+            tl.Accounts = acct.Split(',');
         }
 
         void report(object sender, EventArgs e)

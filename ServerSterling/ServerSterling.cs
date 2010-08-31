@@ -278,11 +278,45 @@ namespace SterServer
         string symquotes = "";
         Dictionary<long, string> idacct = new Dictionary<long, string>();
 
-        string _account = string.Empty;
+        bool _autocap = false;
+        public bool AutoCapAccounts { get { return _autocap; } set { _autocap = value; } }
+
         /// <summary>
         /// gets or sets default account
         /// </summary>
-        public string Account { get { return _account; } set { _account = value; debug("default account: " + _account); } }
+        public string Account 
+        { 
+            get { return accts.Count > 0 ? accts[0] : string.Empty; } 
+            set 
+            { 
+                string a = AutoCapAccounts ? value.ToUpper() : value;
+                if (!accts.Contains(a))
+                    accts.Insert(0, a); 
+                debug("default account: " + Account); 
+            } 
+        }
+
+        /// <summary>
+        /// gets or sets all accounts to advertise
+        /// </summary>
+        public string[] Accounts 
+        { 
+            get 
+            { 
+                return accts.ToArray(); 
+            } 
+            set 
+            {
+                accts.Clear();
+                foreach (string a in value)
+                {
+                    string av = AutoCapAccounts ? a.ToUpper() : a;
+                    if (!accts.Contains(a))
+                        accts.Add(av);
+                }
+                debug("Accounts: " + string.Join(",", accts.ToArray())); 
+            } 
+        }
 
         bool _autosetunsetid = true;
 
@@ -317,7 +351,7 @@ namespace SterServer
                         order.Side = getside(o.symbol,o.side);
                         order.Symbol = o.symbol;
                         order.Quantity = o.UnsignedSize;
-                        string acct = _account != string.Empty ? _account : (accts.Count > 0 ? accts[0] : string.Empty);
+                        string acct = Account != string.Empty ? Account : string.Empty;
                         order.Account = o.Account != string.Empty ? o.Account : acct;
                         order.Destination = o.Exchange != "" ? o.ex : "NYSE";
                         bool close = o.TIF == "CLS";
@@ -415,7 +449,7 @@ namespace SterServer
                                     order.Quantity = Math.Abs(o.size);
                                     order.Destination = o.ex;
                                     order.ClOrderID = o.id.ToString();
-                                    string acct = _account != string.Empty ? _account : (accts.Count > 0 ? accts[0] : string.Empty);
+                                    string acct = Account != string.Empty ? Account : string.Empty;
                                     order.Account = o.Account != string.Empty ? o.Account : acct;
                                     int err = order.SubmitOrder();
                                     string tmp = "";

@@ -35,5 +35,8 @@
     <Setting Name="TLClientPort" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">50000</Value>
     </Setting>
+    <Setting Name="AutoCapitilizeAccounts" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
