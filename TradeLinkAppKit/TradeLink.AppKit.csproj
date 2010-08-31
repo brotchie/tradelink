@@ -188,6 +188,7 @@
     <Compile Include="PopupWindow.designer.cs">
       <DependentUpon>PopupWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="Results.cs" />
     <Compile Include="SafeBindingSource.cs">
       <SubType>Component</SubType>
     </Compile>
