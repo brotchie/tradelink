@@ -82,8 +82,11 @@ namespace TradeLink.AppKit
             {
                 lock (SyncRoot)
                 {
-
-                    return base[index];
+                    try
+                    {
+                        return base[index];
+                    }
+                    catch { return base[index]; }
                 }
             }
             set

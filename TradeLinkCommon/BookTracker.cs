@@ -13,7 +13,7 @@ namespace TradeLink.Common
     {
         bool _bizero = false;
         int _minbookwait = 5;
-        Dictionary<string, bool> _update = new Dictionary<string, bool>();
+
         Dictionary<string, bool> _start = new Dictionary<string, bool>();
         Dictionary<string, Book> _book = new Dictionary<string, Book>();
         /// <summary>
@@ -56,22 +56,22 @@ namespace TradeLink.Common
         /// create books from tick updates
         /// </summary>
         /// <param name="k"></param>
+        /// 
+        bool _update = false;
         public void newTick(Tick k)
         {
             // make sure we update every few seconds
             if (!_bizero && ((k.time % _minbookwait) == 0))
             {
-                foreach (string key in _start.Keys)
-                    _update[key] = true;
+                _update = true;
             }
-                        bool update = true;
-            _update.TryGetValue(k.symbol, out update);
             bool NEWFINISHEDBOOK = false;
             // we don't need an update
-            if (!update) return;
+            if (!_update) return;
             // we need an update, have we started?
             bool started = false;
-            _start.TryGetValue(k.symbol, out started);
+            if (!_start.TryGetValue(k.symbol, out started))
+                _start.Add(k.symbol, false);
             // haven't started and not good place to start
             if (!started && (k.depth != 0)) return;
             else if (!started) // ready to start
@@ -82,12 +82,15 @@ namespace TradeLink.Common
                 NEWFINISHEDBOOK = true;
                 // reset flags
                 _start[k.symbol] = false;
-                _update[k.symbol] = false; // wait till next update request
+                _update = false;
             }
             // make sure book exists 
             Book b;
             if (!_book.TryGetValue(k.symbol, out b))
-                _book.Add(k.symbol, new Book(k.symbol));
+            {
+                b = new Book(k.symbol);
+                _book.Add(k.symbol, b);
+            }
             // if we have new book, notify 
             if (NEWFINISHEDBOOK && (NewBook != null))
                 NewBook(k.symbol);

@@ -19,7 +19,7 @@ namespace TradeLink.AppKit
         }
 
         public string Symbol { get { return bookControl1.Symbol; } set { bookControl1.Symbol = value; } }
-
+        public int RefreshEvery { get { return bookControl1.RefreshEvery; } set { bookControl1.RefreshEvery = value; ; } }
         public override void Refresh()
         {
             bookControl1.Refresh();

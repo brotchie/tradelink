@@ -58,7 +58,7 @@ namespace TradeLink.AppKit
             _dg.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             _dg.Size = new System.Drawing.Size(827, 322);
             _dg.TabIndex = 0;
-
+            _dg.DataError += new DataGridViewDataErrorEventHandler(_dg_DataError);
             _dg.RowHeadersVisible = false;
             _dg.ShowEditingIcon = false;
             _dg.ColumnHeadersVisible = true;
@@ -70,7 +70,18 @@ namespace TradeLink.AppKit
             InitializeComponent();
         }
 
+        void _dg_DataError(object sender, DataGridViewDataErrorEventArgs e)
+        {
+            
+        }
 
+        int _count = 0;
+
+        int _updateevery = 10;
+        /// <summary>
+        /// refresh grid every X updates
+        /// </summary>
+        public int RefreshEvery { get { return _updateevery; } set { _updateevery = value; } }
 
         public void GotBook(Book b)
         {
@@ -85,6 +96,9 @@ namespace TradeLink.AppKit
                     _dg.Columns[ASK].DefaultCellStyle.Format = "N2";
                 }
             }
+
+            if (_count++ % _updateevery == 0)
+                Refresh();
 
         }
 
