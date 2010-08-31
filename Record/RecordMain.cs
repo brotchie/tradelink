@@ -27,8 +27,9 @@ namespace Record
             TrackEnabled = Util.TrackUsage();
             Program = PROGRAM;
             InitializeComponent();
-            string[] servers = Properties.Settings.Default.ServerIpAddresses.Split(',');
-            if (servers.Length==0)
+            string ipaddr = Properties.Settings.Default.ServerIpAddresses;
+            string[] servers = ipaddr.Split(',');
+            if (ipaddr==string.Empty)
                 tl = new TLClient_WM();
             else
                 tl = new TLClient_IP(servers, Properties.Settings.Default.ServerPort, debug);
