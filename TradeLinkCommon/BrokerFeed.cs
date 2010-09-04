@@ -243,21 +243,25 @@ namespace TradeLink.Common
             for (int i = 0; i < _pcon.Count; i++)
                 if (_pcon[i].RequestFeatureList.Contains(type))
                 {
+                    bool showret = false;
                     // prepare message
                     switch (type)
                     {
                         case MessageTypes.DOMREQUEST:
                             message = message.Replace(Book.EMPTYREQUESTOR, _pcon[i].Name);
+                            showret = true;
                             break;
                         case MessageTypes.BARREQUEST:
                             {
                                 BarRequest br = BarImpl.ParseBarRequest(message);
                                 br.Client = _pcon[i].Name;
                                 message = BarImpl.BuildBarRequest(br);
+                                showret = true;
                             }
                             break;
                         case MessageTypes.FEATUREREQUEST:
                             message = _pcon[i].Name;
+                            showret = true;
                             break;
                     }
                     long res = _pcon[i].TLSend(type, message);
@@ -635,7 +639,6 @@ namespace TradeLink.Common
             {
                 debug("requesting positions for account: " + acct);
                 long r = execute.TLSend(MessageTypes.POSITIONREQUEST, execute.Name + "+" + acct);
-                v("TLSend return code " + r);
             }
             catch (Exception ex)
             {
@@ -652,7 +655,6 @@ namespace TradeLink.Common
             {
                 debug("requesting accounts on: " + Name);
                 long r = execute.TLSend(MessageTypes.ACCOUNTREQUEST, execute.Name);
-                debug("TLSend return code " + r);
             }
             catch (Exception ex)
             {
