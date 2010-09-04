@@ -1113,6 +1113,20 @@ namespace TradeLink.Common
                 return returnPath;
             }
 
+            public static bool touch(string file) { return touch(file, string.Empty, false); }
+            public static bool touch(string file, string data) { return touch(file, string.Empty, false); }
+            public static bool touch(string file, string data, bool append)
+            {
+                try
+                {
+                    System.IO.StreamWriter sw = new System.IO.StreamWriter(file, append);
+                    sw.WriteLine(data);
+                    sw.Close();
+                }
+                catch { return false; }
+                return true;
+            }
+
         }
     }
 
