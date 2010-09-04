@@ -109,6 +109,7 @@
     </Compile>
     <Compile Include="AssemblaUtil.cs" />
     <Compile Include="Auth.cs" />
+    <Compile Include="AuthInfo.cs" />
     <Compile Include="BookControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

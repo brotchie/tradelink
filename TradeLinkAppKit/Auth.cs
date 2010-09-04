@@ -323,24 +323,7 @@ namespace TradeLink.AppKit
 
             return id;
         }
-        /// <summary>
-        /// hold authentication information.
-        /// </summary>
-        public struct AuthInfo
-        {
-            /// <summary>
-            /// username
-            /// </summary>
-            public string Username;
-            /// <summary>
-            /// password
-            /// </summary>
-            public string Password;
-            /// <summary>
-            /// isvalid auth information
-            /// </summary>
-            public bool isValid { get { return (Username != null) && (Password != null); } }
-        }
+
         /// <summary>
         /// get authentication information from a file with username in first line and password in the second.
         /// </summary>
