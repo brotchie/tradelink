@@ -51,11 +51,12 @@ namespace TradeLink.Common
         /// <param name="txt"></param>
         /// <returns></returns>
         public string Display(string txt) 
-        { 
-            int idx = getindex(txt); 
-            if (idx < 0) return string.Empty;
+        {
             try
             {
+                int idx = getindex(txt); 
+                if (idx < 0) return string.Empty;
+
                 return _tracked[idx].ToString();
             }
             catch
