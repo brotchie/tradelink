@@ -308,7 +308,7 @@ namespace TradeLink.Common
                 case MessageTypes.CLEARSTOCKS:
                     SrvClearStocks(msg);
                     break;
-                case MessageTypes.HEARTBEAT:
+                case MessageTypes.HEARTBEATREQUEST:
                     SrvBeatHeart(msg);
                     break;
                 case MessageTypes.BROKERNAME :
@@ -320,7 +320,7 @@ namespace TradeLink.Common
                 case MessageTypes.FEATUREREQUEST:
                     string msf = "";
                     List<MessageTypes> f = new List<MessageTypes>();
-                    f.Add(MessageTypes.HEARTBEAT);
+                    f.Add(MessageTypes.HEARTBEATREQUEST);
                     f.Add(MessageTypes.CLEARCLIENT);
                     f.Add(MessageTypes.CLEARSTOCKS);
                     f.Add(MessageTypes.REGISTERCLIENT);

@@ -51,6 +51,11 @@ namespace TradeLink.Common
                         debug("connected to server: " + serverip[providerindex]+" via:"+Name);
                         // set buffer size
                         buffer = new byte[server.ReceiveBufferSize];
+                        // reset flags
+                        _reconnectreq = false;
+                        _recvheartbeat = true;
+                        _requestheartbeat = true;
+                        _lastheartbeat = DateTime.Now.Ticks;
 
                     }
                     else
@@ -71,6 +76,15 @@ namespace TradeLink.Common
 
         int bufferoffset = 0;
         byte[] buffer;
+
+        int _sendheartbeat = IPUtil.SENDHEARTBEATMS;
+        long _lastheartbeat = 0;
+        bool _requestheartbeat = false;
+        bool _recvheartbeat = false;
+        int _heartbeatdeadat = IPUtil.HEARTBEATDEADMS;
+        bool _reconnectreq = false;
+
+        bool heartok { get { return _requestheartbeat == _recvheartbeat; } }
 
         void _bw_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
@@ -97,6 +111,26 @@ namespace TradeLink.Common
                     }
                     else
                         Thread.Sleep(_wait);
+                    long now = DateTime.Now.Ticks;
+                    // see if we need heartbeat
+                    long diff = (now - _lastheartbeat)*10000;
+                    if (!_reconnectreq && (diff > _sendheartbeat))
+                    {
+                        // if we're not waiting, request one
+                        if (heartok)
+                        {
+                            v("heartbeat request at: " + now);
+                            _requestheartbeat = !_requestheartbeat;
+                            TLSend(MessageTypes.HEARTBEATREQUEST);
+                        }
+                        else if (diff > _heartbeatdeadat)
+                        {
+                            _reconnectreq = true;
+                            debug("heartbeat is dead, reconnecting at: " + now);
+                            connect();
+                        }
+
+                    }
                 }
                 catch (SocketException ex)
                 {
@@ -506,7 +540,7 @@ namespace TradeLink.Common
 
         public int HeartBeat()
         {
-            return (int)TLSend(MessageTypes.HEARTBEAT, Name);
+            return (int)TLSend(MessageTypes.HEARTBEATREQUEST, Name);
         }
 
         public void RequestDOM()
@@ -635,6 +669,13 @@ namespace TradeLink.Common
                 case MessageTypes.ORDERNOTIFY:
                     Order o = OrderImpl.Deserialize(msg);
                     if (gotOrder != null) gotOrder(o);
+                    break;
+                case MessageTypes.HEARTBEATRESPONSE:
+                    {
+                        _lastheartbeat = DateTime.Now.Ticks;
+                        v("got heartbeat response at: " + _lastheartbeat);
+                        _recvheartbeat = !_recvheartbeat;
+                    }
                     break;
                 case MessageTypes.POSITIONRESPONSE:
                     try

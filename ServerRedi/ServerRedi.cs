@@ -528,7 +528,7 @@ namespace ServerRedi
             f.Add(MessageTypes.CLEARSTOCKS);
             f.Add(MessageTypes.FEATUREREQUEST);
             f.Add(MessageTypes.FEATURERESPONSE);
-            f.Add(MessageTypes.HEARTBEAT);
+            f.Add(MessageTypes.HEARTBEATREQUEST);
             f.Add(MessageTypes.ORDERNOTIFY);
             f.Add(MessageTypes.REGISTERCLIENT);
             f.Add(MessageTypes.REGISTERSTOCK);

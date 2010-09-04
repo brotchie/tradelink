@@ -1036,7 +1036,7 @@
 		f.push_back(BROKERNAME);
 		f.push_back(ACCOUNTREQUEST);
 		f.push_back(ACCOUNTRESPONSE);
-		f.push_back(HEARTBEAT);
+		f.push_back(HEARTBEATREQUEST);
 		f.push_back(SENDORDER);
 		f.push_back(REGISTERCLIENT);
 		f.push_back(REGISTERSTOCK);

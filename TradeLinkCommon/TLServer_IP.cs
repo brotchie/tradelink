@@ -156,13 +156,13 @@ namespace TradeLink.Common
             _at.RunWorkerAsync();
         }
 
+        long _lastheartbeat = 0;
 
         void _at_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
-            int count = 0;
             while (_started)
             {
-
+                int count = 0;
                 while (tickq.hasItems)
                 {
                     if (e.Cancel)
@@ -172,10 +172,34 @@ namespace TradeLink.Common
                     }
                     Tick tick = tickq.Read();
                     sendtick(tick);
+                    count++;
+                    if (count % 1000 == 0)
+                        checkheartbeat();
                 }
+
                 if (tickq.isEmpty)
+                {
                     Thread.Sleep(_wait);
+                    checkheartbeat();
+                }
             }
+        }
+
+        void checkheartbeat()
+        {
+            long now = DateTime.Now.Ticks;
+            long diff = (now-_lastheartbeat)*10000;
+            // don't send heartbeat if not needed
+            if (diff < IPUtil.SENDHEARTBEATMS)
+                return;
+            // otherwise attempt to send heartbeat
+            for (int i = 0; i < client.Count; i++)
+                if (client[i] != string.Empty)
+                {
+                    v("sending heartbeat to: " + client[i]+" at "+now);
+                    TLSend(string.Empty, MessageTypes.HEARTBEATRESPONSE, i);
+                }
+            _lastheartbeat = now;
         }
 
         void sendtick(Tick k)
@@ -337,11 +361,17 @@ namespace TradeLink.Common
                 {
                     debug("error sending: " + type.ToString() + " " + msg);
                     debug("exception: " + ex.Message + ex.StackTrace);
+                    if (DisconnectOnError)
+                    {
+                        debug("disconnecting from: " + s.RemoteEndPoint.ToString());
+                        s.Shutdown(SocketShutdown.Both);
+                        s.Disconnect(true);
+                    }
                 }
             }
         }
 
-        bool _doe = false;
+        bool _doe = true;
         public bool DisconnectOnError { get { return _doe; } set { _doe = value; } }
 
         public void TLSend(byte[] data, int dest)
@@ -580,7 +610,7 @@ namespace TradeLink.Common
                 case MessageTypes.CLEARSTOCKS:
                     SrvClearStocks(msg);
                     break;
-                case MessageTypes.HEARTBEAT:
+                case MessageTypes.HEARTBEATREQUEST:
                     SrvBeatHeart(msg);
                     break;
                 case MessageTypes.BROKERNAME:
@@ -595,7 +625,8 @@ namespace TradeLink.Common
                 case MessageTypes.FEATUREREQUEST:
                     string msf = "";
                     List<MessageTypes> f = new List<MessageTypes>();
-                    f.Add(MessageTypes.HEARTBEAT);
+                    f.Add(MessageTypes.HEARTBEATREQUEST);
+                    f.Add(MessageTypes.HEARTBEATRESPONSE);
                     f.Add(MessageTypes.CLEARCLIENT);
                     f.Add(MessageTypes.CLEARSTOCKS);
                     f.Add(MessageTypes.REGISTERCLIENT);

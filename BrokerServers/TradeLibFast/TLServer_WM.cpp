@@ -227,7 +227,7 @@ namespace TradeLibFast
 				}
 			case REGISTERCLIENT :
 				return RegisterClient(msg);
-			case HEARTBEAT :
+			case HEARTBEATREQUEST :
 				return HeartBeat(msg);
 			case BROKERNAME :
 				return BrokerName();
@@ -239,7 +239,7 @@ namespace TradeLibFast
 					std::vector<int> stub = GetFeatures();
 					// append basic feature we provide as parent
 					stub.push_back(REGISTERCLIENT);
-					stub.push_back(HEARTBEAT);
+					stub.push_back(HEARTBEATREQUEST);
 					stub.push_back(CLEARSTOCKS);
 					stub.push_back(CLEARCLIENT);
 					stub.push_back(VERSION);

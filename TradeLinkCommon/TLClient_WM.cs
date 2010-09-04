@@ -256,7 +256,7 @@ namespace TradeLink.Common
 
         public int HeartBeat()
         {
-            return (int)TLSend(MessageTypes.HEARTBEAT, Text);
+            return (int)TLSend(MessageTypes.HEARTBEATREQUEST, Text);
         }
 
         public void RequestDOM()

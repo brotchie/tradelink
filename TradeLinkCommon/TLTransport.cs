@@ -55,5 +55,8 @@ namespace TradeLink.Common
         public const string LOCALHOST = "127.0.0.1";
         public const string CLIENTNAME = "TradeLinkClient";
         public const string SERVERNAME = "TradeLinkServer";
+
+        public const int SENDHEARTBEATMS = 2000;
+        public const int HEARTBEATDEADMS = SENDHEARTBEATMS * 2;
     }
 }
