@@ -11,6 +11,7 @@ namespace TradeLink.Common
     /// </summary>
     public class TickWatcher : TickIndicator
     {
+        public bool isValid { get { return _continue; } }
         private bool _alertonfirst = true;
         /// <summary>
         ///  returns count of symbols that have ticked at least once
@@ -89,6 +90,15 @@ namespace TradeLink.Common
                     if (_alertonfirst) // if we're notifying when first tick arrives, do it.
                         if (GotFirstTick != null)
                             GotFirstTick(tick.symbol);
+                    if (_ast != null)
+                    {
+                        if (!alltrading && (_ast.Count == Count))
+                        {
+                            alltrading = true;
+                            if (AllsymbolsTicking != null)
+                                AllsymbolsTicking(Util.ToTLTime());
+                        }
+                    }
                     last = tick.time;
                     return false;
                 }
@@ -187,6 +197,25 @@ namespace TradeLink.Common
         /// whether mass alert is firing or not
         /// </summary>
         public bool isMassAlerting { get { return _alerting; } }
+
+        bool sentmissingfirstticks = false;
+        bool _stop = true;
+        int _stoptime = 0;
+        int _starttime = 0;
+        bool alltrading = false;
+        bool massalert = false;
+        int _lastmass = 0;
+        GenericTrackerI _ast = null;
+        public GenericTrackerI ActiveSymbolTracker { get { return _ast; } }
+
+        public event Int32Delegate StarttimeAndMissingTicks;
+        public event Int32Delegate AllsymbolsTicking;
+        public event Int32Delegate StopTime;
+
+        public bool useStartAndStop { get { return _starttime * _stoptime != 0; } }
+
+        public int StartAlertTime { get { return _starttime; } set { _starttime = value; } }
+        public int StopAlertTime { get { return _stoptime; } set { _stoptime = value; } }
         void _bw_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
             while (_continue)
@@ -198,7 +227,9 @@ namespace TradeLink.Common
                 if ((GotMassAlert != null) && (_defaultmass != 0) && (_lasttime!=0))
                 {
                     int span = Util.FTDIFF(_lasttime, Util.DT2FT(DateTime.Now));
-                    bool alert = span > _defaultmass;
+                    bool alert = (span > _defaultmass) && 
+                        (!useStartAndStop 
+                        || ((_lasttime>=_starttime) && (_lasttime<=_stoptime)));
                     if (alert && !_alerting)
                     {
                         _alerting = true;
@@ -206,6 +237,22 @@ namespace TradeLink.Common
                     }
                     else if (!alert && _alerting)
                         _alerting = false;
+                }
+                if (!alltrading && !sentmissingfirstticks 
+                    && (_starttime!=0) && (_lasttime > _starttime))
+                {
+                    sentmissingfirstticks = true;
+                    if (StarttimeAndMissingTicks != null)
+                        StarttimeAndMissingTicks(Util.ToTLTime());
+                }
+
+                if (_stop && (_stoptime!=0) && (_lasttime >= _stoptime))
+                {
+                    _stop = false;
+                    Stop();
+                    if (StopTime != null)
+                        StopTime(_lasttime);
+                    return;
                 }
                 System.Threading.Thread.Sleep((int)_pollint);
             }
