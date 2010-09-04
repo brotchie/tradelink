@@ -779,7 +779,11 @@ namespace TradeLink.Common
             if (!IPUtil.hasValidAddress(_servers))
                 return new TLClient_WM(pidx, name, false);
             else
-                return new TLClient_IP(TLClient_IP.GetEndpoints(_port, _servers), pidx, name, 3, 10, debug);
+            {
+                TLClient_IP tmp = new TLClient_IP(TLClient_IP.GetEndpoints(_port, _servers), pidx, name, 3, 10, debug);
+                tmp.VerboseDebugging = VerboseDebugging;
+                return tmp;
+            }
         }
 
         public bool ModifyBroker(int provider) { return ModifyBroker(provider, true); }
