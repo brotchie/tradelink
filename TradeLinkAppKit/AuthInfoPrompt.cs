@@ -43,19 +43,24 @@ namespace TradeLink.AppKit
             ai.Password = _pw.Text;
             if (NewAuthInfo != null)
                 NewAuthInfo(ai);
+	        DialogResult = System.Windows.Forms.DialogResult.OK;
+            Close();
             
         }
 
         static DebugDelegate d = null;
         static AuthInfoPrompt aip;
         static string PROGRAM = string.Empty;
+        static string BASEPATH = string.Empty;
         public static void Prompt(string program) { Prompt(program, Auth.GetProgramAuth(program), true, null); }
         public static void Prompt(string program, AuthInfo ai) { Prompt(program, ai, true, null); }
         public static void Prompt(string program, bool pause) { Prompt(program, Auth.GetProgramAuth(program), pause, null); }
         public static void Prompt(string program, AuthInfo ai, bool pause) { Prompt(program, ai, pause, null); }
-        public static void Prompt(string program, AuthInfo ai, bool pause, DebugDelegate deb)
+        public static void Prompt(string program, AuthInfo ai, bool pause, DebugDelegate deb) { Prompt(program, Common.Util.ProgramData(program),ai, pause, null); }
+        public static void Prompt(string program, string basepath, AuthInfo ai, bool pause, DebugDelegate deb)
         {
             PROGRAM = program;
+            BASEPATH = basepath+"\\";
             aip = new AuthInfoPrompt(ai);
             aip.NewAuthInfo += new AuthInfoDelegate(aip_NewAuthInfo);
             if (pause)
@@ -66,7 +71,7 @@ namespace TradeLink.AppKit
 
         static void aip_NewAuthInfo(AuthInfo ai)
         {
-            SetProgramAuth(PROGRAM, aip.Accepted, d);
+            SetProgramAuth(BASEPATH,PROGRAM, aip.Accepted, d);
         }
 
         static void debug(string msg)
@@ -77,10 +82,11 @@ namespace TradeLink.AppKit
             }
         }
 
-        public static bool SetProgramAuth(string program, AuthInfo ai) { return SetProgramAuth(program, ai); }
-        public static bool SetProgramAuth(string program, AuthInfo ai, DebugDelegate deb)
+        public static bool SetProgramAuth(string program, AuthInfo ai) { return SetProgramAuth(program, ai,null); }
+        public static bool SetProgramAuth(string program, AuthInfo ai, DebugDelegate deb) { return SetProgramAuth(Common.Util.ProgramData(program), ai, deb); }
+        public static bool SetProgramAuth(string basepath, string program, AuthInfo ai, DebugDelegate deb)
         {
-            return SetAuthInfo(TradeLink.Common.Util.ProgramData(program) + Auth.AuthFile, ai, deb);
+            return SetAuthInfo(basepath+program + Auth.AuthFile, ai, deb);
         }
         public static bool SetAuthInfo(string file, AuthInfo ai) { return SetAuthInfo(file, ai, null); }
         public static bool SetAuthInfo(string file, AuthInfo ai, DebugDelegate deb)

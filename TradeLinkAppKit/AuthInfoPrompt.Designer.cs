@@ -85,9 +85,9 @@
             this._stat.AutoSize = true;
             this._stat.Location = new System.Drawing.Point(13, 13);
             this._stat.Name = "_stat";
-            this._stat.Size = new System.Drawing.Size(198, 20);
+            this._stat.Size = new System.Drawing.Size(242, 20);
             this._stat.TabIndex = 5;
-            this._stat.Text = "Enter your login info below.";
+            this._stat.Text = "Enter your portal login info below.";
             // 
             // AuthInfoPrompt
             // 
