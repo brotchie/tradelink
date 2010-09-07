@@ -31,7 +31,16 @@ namespace ServerMB
         {
             tl = tls;
             m_ComMgr = null;
-            m_ComMgr = new MbtComMgrClass();
+            try
+            {
+                m_ComMgr = new MbtComMgrClass();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Process.Start(@"http://code.google.com/p/tradelink/wiki/ComFactoryErrors");
+                debug("An error occured: " + ex.Message + ex.StackTrace);
+                return;
+            }
             m_ComMgr.SilentMode = true;
             m_ComMgr.EnableSplash(false);
             m_OrderClient = m_ComMgr.OrderClient;
