@@ -41,6 +41,8 @@ namespace TradeLink.Common
         int _nrt = 0;
         int _nwt = 0;
 
+        public bool isValid { get { return _readtick; } }
+
         void ReadTick()
         {
             try
@@ -48,7 +50,7 @@ namespace TradeLink.Common
                 while (_readtick)
                 {
 
-                    if (_tickcache.hasItems && (GotTickQueued!=null))
+                    if (_tickcache.hasItems && (GotTickQueued != null))
                         GotTickQueued();
                     while (_tickcache.hasItems)
                     {
@@ -74,6 +76,18 @@ namespace TradeLink.Common
                     _tickswaiting.WaitOne(SLEEP);
 
                 }
+            }
+            catch (MissingMethodException ex)
+            {
+                
+                System.Diagnostics.Process.Start(@"http://code.google.com/p/tradelink/wiki/MissingMethodException");
+                Stop();
+
+            }
+            catch (MissingMemberException ex)
+            {
+                System.Diagnostics.Process.Start(@"http://code.google.com/p/tradelink/wiki/MissingMethodException");
+                Stop();
             }
             catch (ThreadInterruptedException) { }
         }
