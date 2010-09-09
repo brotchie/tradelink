@@ -59,19 +59,19 @@ namespace TradeLink.API
         /// </summary>
         decimal ask { get; set; } 
         /// <summary>
-        /// condensed bid size (100->1)
+        /// normal bid size (size/100 for equities, /1 for others)
         /// </summary>
         int bs { get; set; } 
         /// <summary>
-        /// condensed offer size (100 ->1)
+        /// normal ask size (size/100 for equities, /1 for others)
         /// </summary>
         int os { get; set; } 
         /// <summary>
-        /// full bid size 
+        /// tick.bs*100 (only for equities)
         /// </summary>
         int BidSize { get; set; } 
         /// <summary>
-        /// full ask size 
+        /// tick.os*100 (only for equities)
         /// </summary>
         int AskSize { get; set; } 
         /// <summary>

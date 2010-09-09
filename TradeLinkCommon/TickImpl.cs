@@ -16,7 +16,13 @@ namespace TradeLink.Common
         public int date { get { return _date; } set { _date = value; } }
         public int time { get { return _time; } set { _time = value; } }
         public long datetime { get { return _datetime; } set { _datetime = value; } }
+        /// <summary>
+        /// normal bid size (size/100 for equities, /1 for others)
+        /// </summary>
         public int bs { get { return _bs; } set { _bs = value; } }
+        /// <summary>
+        /// normal ask size (size/100 for equities, /1 for others)
+        /// </summary>
         public int os { get { return _os; } set { _os = value; } }
         public decimal trade { get { return _trade*Const.IPRECV; } set { _trade = (ulong)(value*Const.IPREC); } }
         public decimal bid { get { return _bid * Const.IPRECV; } set { _bid = (ulong)(value * Const.IPREC); } }
@@ -34,7 +40,13 @@ namespace TradeLink.Common
         public bool isValid { get { return (_sym!= "") && (isIndex || hasTick); } }
         public bool atHigh(decimal high) { return (isTrade && (_trade>=high)); }
         public bool atLow(decimal low) { return (isTrade && (_trade <= low)); }
+        /// <summary>
+        /// tick.bs*100 (only for equities)
+        /// </summary>
         public int BidSize { get { return _bs * 100; } set { _bs = (int)((double)value / 100); } }
+        /// <summary>
+        /// tick.os*100 (only for equities)
+        /// </summary>
         public int AskSize { get { return _os * 100; } set { _os = (int)((double)value / 100); } }
         public int TradeSize { get { return ts*100; } set { _size = (int)(value / 100); } }
         public int ts { get { return _size / 100; } } // normalized to bs/os
