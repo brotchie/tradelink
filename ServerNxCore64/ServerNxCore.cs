@@ -61,9 +61,12 @@ namespace ServerNxCore
             {
                 try
                 {
-                    NxCore.ProcessTape(_fn,
-                     null, 0, 0,
-                     OnNxCoreCallback);
+                    if (!QUIT)
+                    {
+                        NxCore.ProcessTape(_fn,
+                         null, 0, 0,
+                         OnNxCoreCallback);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -75,11 +78,6 @@ namespace ServerNxCore
         {
             QUIT = true;
             _go = false;
-            try
-            {
-                _proc.Abort();
-            }
-            catch { }
         }
         static bool QUIT = false;
         static unsafe int OnNxCoreCallback(IntPtr pSys, IntPtr pMsg)

@@ -129,10 +129,11 @@ Section "TradeLinkSuite"
   
   
   
-  File "ServerNxCore\bin\release\ServerNxCore32.exe"
-  File "ServerNxCore64\bin\x64\release\ServerNxCore64.exe"
-  File "ServerNxCore\bin\release\NxCoreAPI.dll"
   File "ServerNxCore\bin\release\NxCoreAPI64.dll"
+  File "ServerNxCore64\bin\x64\release\ServerNxCore64.exe"
+  File "ServerNxCore\bin\x86\release\ServerNxCore32.exe"
+  File "ServerNxCore\bin\x86\release\NxCoreAPI.dll"
+  
 
   File "TikConverter\bin\release\TikConverter.exe"
   

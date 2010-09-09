@@ -53,16 +53,23 @@ namespace ServerNxCore
             }
             debug(ServerNxCoreMain.PROGRAM + " started ok.");
         }
-        bool _go = true;
+        volatile bool _go = true;
         void proc()
         {
-            while (_go)
+
+            while (!QUIT)
             {
                 try
                 {
-                    NxCore.ProcessTape(_fn,
-                     null, 0, 0,
-                     OnNxCoreCallback);
+                    if (!QUIT)
+                    {
+                        NxCore.ProcessTape(_fn,
+                         null, 0, 0,
+                         OnNxCoreCallback);
+
+                    }
+                    else
+                        break;
                 }
                 catch (Exception ex)
                 {
@@ -74,11 +81,6 @@ namespace ServerNxCore
         {
             QUIT = true;
             _go = false;
-            try
-            {
-                _proc.Abort();
-            }
-            catch { }
         }
         static bool QUIT = false;
         static unsafe int OnNxCoreCallback(IntPtr pSys, IntPtr pMsg)
@@ -86,8 +88,7 @@ namespace ServerNxCore
             // Alias structure pointers to the pointers passed in.
             NxCoreSystem* pNxCoreSys = (NxCoreSystem*)pSys;
             NxCoreMessage* pNxCoreMsg = (NxCoreMessage*)pMsg;
-            if (QUIT)
-                return (int)NxCore.NxCALLBACKRETURN_STOP;
+
             // Do something based on the message type
             switch (pNxCoreMsg->MessageType)
             {
@@ -107,6 +108,11 @@ namespace ServerNxCore
                 case NxCore.NxMSG_MMQUOTE:
                     //OnNxCoreMMQuote(pNxCoreSys, pNxCoreMsg);
                     break;
+            }
+            if (QUIT)
+            {
+                D("NxCore thread received exit signal.");
+                return (int)NxCore.NxCALLBACKRETURN_STOP;
             }
             // Continue running the tape
             return (int)NxCore.NxCALLBACKRETURN_CONTINUE;
