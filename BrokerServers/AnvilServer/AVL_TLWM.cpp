@@ -529,6 +529,7 @@
 			return SYMBOL_NOT_LOADED;
 
 		uint error = 0;
+		uint size = abs(o.size);
 
 		// anvil has seperate call for trailing stop orders
 		if (!o.isTrail() && (o.isLimit() || o.isMarket()))
@@ -538,9 +539,9 @@
 		error = B_SendOrder(Stock,
 				side,
 				o.exchange,
-				o.size,
+				size,
 				OVM_VISIBLE, //visability mode
-				o.size, //visable size
+				size, //visable size
 				pricem,//const Money& price,0 for Market
 				&stopm,//const Money* stopPrice,
 				NULL,//const Money* discrtetionaryPrice,
@@ -568,7 +569,7 @@
 				else stopPriceOffset = insideMarketQuote - stopm;
 				Observable* stopOrder = B_SendSmartStopOrder(Stock,
 					side,
-					o.size,
+					size,
 					NULL,//const Money* priceOffset,//NULL for Stop Market
 					stopPriceOffset,
 					true, // price 2 decimal places
@@ -605,7 +606,7 @@
 		{
 			Observable* stopOrder = B_SendSmartStopOrder(Stock,
 				side,
-				o.size,
+				size,
 				NULL,//const Money* priceOffset,//NULL for Stop Market
 				trailm,//trail by this amount
 				true, // price 2 decimal places
