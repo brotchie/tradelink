@@ -162,15 +162,17 @@ namespace TradeLink.Common
         long _pollint = 0;
         public const int DEFAULTPOLLINT = 1000;
         public int BackgroundPollInterval { get { return (int)_pollint; } set { _pollint = (long)Math.Abs(value); if (_pollint == 0) Stop(); } }
-        public TickWatcher() : this(DEFAULTPOLLINT) { }
+        public TickWatcher(int BackgroundPollIntervalms) : this(BackgroundPollIntervalms,null) { }
+        public TickWatcher() : this(DEFAULTPOLLINT,null) { }
         /// <summary>
         /// creates a tickwatcher and polls specificed millseconds
         /// if timer has expired, sends alert.
         /// Background polling occurs in addition to tick-induced time checks.
         /// </summary>
         /// <param name="BackgroundPollIntervalms">Value in millseconds to wait between checks.  0 = disable background checks</param>
-        public TickWatcher(int BackgroundPollIntervalms)
+        public TickWatcher(int BackgroundPollIntervalms, GenericTrackerI symboltracker)
         {
+            _ast = symboltracker;
             _pollint = (long)Math.Abs(BackgroundPollIntervalms);
             if (_pollint != 0)
                 Start();
@@ -206,6 +208,9 @@ namespace TradeLink.Common
         bool massalert = false;
         int _lastmass = 0;
         GenericTrackerI _ast = null;
+        /// <summary>
+        /// gets reference to active symbol tracker
+        /// </summary>
         public GenericTrackerI ActiveSymbolTracker { get { return _ast; } }
 
         public event Int32Delegate StarttimeAndMissingTicks;
