@@ -132,6 +132,7 @@
     <Compile Include="TikWriter.cs" />
     <Compile Include="TLClient_IP.cs" />
     <Compile Include="Packet.cs" />
+    <Compile Include="TLCS.cs" />
     <Compile Include="TLServer_IP.cs" />
     <Compile Include="Listener.cs" />
     <Compile Include="MarketOrder.cs" />
