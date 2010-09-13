@@ -49,10 +49,10 @@ namespace TradeLink.AppKit
             // 
             this.sendbut.BackColor = System.Drawing.SystemColors.Window;
             this.sendbut.FlatAppearance.BorderSize = 0;
-            this.sendbut.Location = new System.Drawing.Point(128, 4);
+            this.sendbut.Location = new System.Drawing.Point(150, 4);
             this.sendbut.Margin = new System.Windows.Forms.Padding(0);
             this.sendbut.Name = "sendbut";
-            this.sendbut.Size = new System.Drawing.Size(79, 24);
+            this.sendbut.Size = new System.Drawing.Size(74, 24);
             this.sendbut.TabIndex = 0;
             this.sendbut.Text = "Send";
             this.sendbut.UseVisualStyleBackColor = false;
@@ -62,7 +62,7 @@ namespace TradeLink.AppKit
             // 
             this.obuybut.AutoSize = true;
             this.obuybut.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.obuybut.Location = new System.Drawing.Point(0, 0);
+            this.obuybut.Location = new System.Drawing.Point(3, 0);
             this.obuybut.Margin = new System.Windows.Forms.Padding(0);
             this.obuybut.Name = "obuybut";
             this.obuybut.Size = new System.Drawing.Size(59, 24);
@@ -76,7 +76,7 @@ namespace TradeLink.AppKit
             this.osellbut.AutoSize = true;
             this.osellbut.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.osellbut.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.osellbut.Location = new System.Drawing.Point(63, 0);
+            this.osellbut.Location = new System.Drawing.Point(81, 0);
             this.osellbut.Margin = new System.Windows.Forms.Padding(0);
             this.osellbut.Name = "osellbut";
             this.osellbut.Size = new System.Drawing.Size(58, 24);
@@ -88,7 +88,7 @@ namespace TradeLink.AppKit
             // pricelabel
             // 
             this.pricelabel.AutoSize = true;
-            this.pricelabel.Location = new System.Drawing.Point(9, 55);
+            this.pricelabel.Location = new System.Drawing.Point(9, 57);
             this.pricelabel.Margin = new System.Windows.Forms.Padding(0);
             this.pricelabel.Name = "pricelabel";
             this.pricelabel.Size = new System.Drawing.Size(48, 20);
@@ -115,7 +115,7 @@ namespace TradeLink.AppKit
             // 
             this.stopbut.AutoSize = true;
             this.stopbut.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.stopbut.Location = new System.Drawing.Point(64, 28);
+            this.stopbut.Location = new System.Drawing.Point(79, 28);
             this.stopbut.Margin = new System.Windows.Forms.Padding(0);
             this.stopbut.Name = "stopbut";
             this.stopbut.Size = new System.Drawing.Size(55, 24);
@@ -126,7 +126,7 @@ namespace TradeLink.AppKit
             // marketbut
             // 
             this.marketbut.AutoSize = true;
-            this.marketbut.Location = new System.Drawing.Point(126, 28);
+            this.marketbut.Location = new System.Drawing.Point(150, 28);
             this.marketbut.Margin = new System.Windows.Forms.Padding(0);
             this.marketbut.Name = "marketbut";
             this.marketbut.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
@@ -188,9 +188,9 @@ namespace TradeLink.AppKit
             this.panel1.Controls.Add(this.obuybut);
             this.panel1.Controls.Add(this.osellbut);
             this.panel1.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.panel1.Location = new System.Drawing.Point(-2, 4);
+            this.panel1.Location = new System.Drawing.Point(-5, 4);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(128, 24);
+            this.panel1.Size = new System.Drawing.Size(152, 24);
             this.panel1.TabIndex = 18;
             // 
             // Ticket
@@ -200,7 +200,7 @@ namespace TradeLink.AppKit
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.ClientSize = new System.Drawing.Size(216, 88);
+            this.ClientSize = new System.Drawing.Size(233, 88);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.osize);
             this.Controls.Add(this.oprice);
