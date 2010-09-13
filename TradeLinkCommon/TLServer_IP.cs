@@ -376,7 +376,7 @@ namespace TradeLink.Common
 
         public void TLSend(byte[] data, int dest)
         {
-            if ((dest<0) || (dest>_sock.Count))
+            if ((dest<0) || (dest>=_sock.Count))
                 return;
             Socket s = _sock[dest];
             if (s == null) 

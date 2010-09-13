@@ -179,7 +179,14 @@ namespace ServerNxCore
             k.trade = (decimal)Price;
             k.ex = ex;
             k.size = size;
-            tl.newTick(k);
+            try
+            {
+                tl.newTick(k);
+            }
+            catch (Exception e)
+            {
+                D("bad tick: " + k.symbol + " " + Price + " " + size + " " + ex+" "+e.Message+e.StackTrace);
+            }
         }
         static unsafe void OnNxCoreExgQuote(NxCoreSystem* pNxCoreSys, NxCoreMessage* pNxCoreMsg)
 	    {
@@ -246,7 +253,14 @@ namespace ServerNxCore
                   k.os = os;
                   k.oe = oe;
               }
-              tl.newTick(k);
+              try
+              {
+                  tl.newTick(k);
+              }
+              catch (Exception ex)
+              {
+                  D("bad tick: " + k.ToString()+" "+ex.Message+ex.StackTrace);
+              }
           }
       }
         static unsafe void OnNxCoreMMQuote(NxCoreSystem* pNxCoreSys, NxCoreMessage* pNxCoreMsg)
