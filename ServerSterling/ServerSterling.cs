@@ -449,6 +449,7 @@ namespace SterServer
                                     order.Quantity = Math.Abs(o.size);
                                     order.Destination = o.ex;
                                     order.ClOrderID = o.id.ToString();
+                                    order.Tif = "D";
                                     string acct = Account != string.Empty ? Account : string.Empty;
                                     order.Account = o.Account != string.Empty ? o.Account : acct;
                                     int err = order.SubmitOrder();
@@ -491,6 +492,8 @@ namespace SterServer
             {
                 return string.Empty;
             }
+            if (incoming == string.Empty)
+                return "D";
             return incoming;
         }
 
