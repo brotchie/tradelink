@@ -56,7 +56,7 @@ namespace TradeLink.Common
         public const string CLIENTNAME = "TradeLinkClient";
         public const string SERVERNAME = "TradeLinkServer";
 
-        public const int SENDHEARTBEATMS = 2000;
+        public const int SENDHEARTBEATMS = 3000;
         public const int HEARTBEATDEADMS = SENDHEARTBEATMS * 2;
     }
 }

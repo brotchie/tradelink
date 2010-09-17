@@ -13,12 +13,12 @@ namespace TestTradeLink
     public class TestTradeLink_IP
     {
         // each side of our "link"
-        TLClient c;
+        TLClient_IP c;
         TLClient c2;
         TLServer_IP s;
 
         // counters used to test link events are working
-        int ticks;
+        int ticks = 0;
         int fills;
         int orders;
         int fillrequest;
@@ -39,14 +39,16 @@ namespace TestTradeLink
 
         void start()
         {
+            debug("starting setup...");
             s = new TLServer_IP(IPUtil.LOCALHOST, IPUtil.TLDEFAULTTESTPORT, 0, 100000);
+            s.VerboseDebugging = true;
             s.SendDebugEvent += new DebugDelegate(debug);
             s.newProviderName = Providers.TradeLink;
             s.Start();
 
             // make sure we select our own loopback, if other servers are running
-            c = new TLClient_IP(TLClient_IP.GetEndpoints(IPUtil.TLDEFAULTTESTPORT,new string[] { System.Net.IPAddress.Loopback.ToString() }),0,"tlclient",0,0,debug);
-
+            c = new TLClient_IP(TLClient_IP.GetEndpoints(IPUtil.TLDEFAULTTESTPORT,new string[] { System.Net.IPAddress.Loopback.ToString() }),0,"tlclient",0,0,debugc,true);
+            c.VerboseDebugging = true;
 
             // create a second client to verify order and fill copying work
             //c2 = new TLClient_IP(TLClient_IP.GetEndpoints(IPUtil.TLDEFAULTTESTPORT, new string[] { System.Net.IPAddress.Loopback.ToString() }), 0, "tlclient2", 0, 0, debug);
@@ -61,10 +63,43 @@ namespace TestTradeLink
             c.gotTick += new TickDelegate(tlclient_gotTick);
             c.gotImbalance += new ImbalanceDelegate(c_gotImbalance);
             c.gotFeatures += new MessageTypesMsgDelegate(c_gotFeatures);
+            c.GotConnectEvent += new Int32Delegate(c_GotConnectEvent);
+            c.GotDisconnectEvent += new Int32Delegate(c_GotDisconnectEvent);
+            
+            
             // setup second client events to check copying
             //c2.gotFill += new FillDelegate(c2_gotFill);
             //c2.gotOrder += new OrderDelegate(c2_gotOrder);
             //c2.gotTick += new TickDelegate(c2_gotTick);
+            debug("ending setup.");
+            startt = DateTime.Now.Ticks;
+
+            // prepare to playback ticks continuously
+            bw = new System.ComponentModel.BackgroundWorker();
+            bw.DoWork += new System.ComponentModel.DoWorkEventHandler(bw_DoWork);
+            bw.RunWorkerAsync();
+            debug("waiting for helper to start...");
+            while (!_looping)
+                sleep(50);
+        }
+        System.ComponentModel.BackgroundWorker bw;
+
+        bool up = false;
+        bool downspecialhit = false;
+        bool checkdownspecial = false;
+        void c_GotDisconnectEvent(int val)
+        {
+            up = false;
+            if (checkdownspecial)
+                downspecialhit = true;
+            
+            debug("C disconnect. ");
+        }
+
+        void c_GotConnectEvent(int val)
+        {
+            up = true;
+            debug("C connect. ");
         }
 
         MessageTypes[] cfeatures = new MessageTypes[0];
@@ -73,9 +108,24 @@ namespace TestTradeLink
             cfeatures = messages;
         }
 
+        void debugc(string msg)
+        {
+            debug("C " + msg);
+        }
+
+        string ts
+        {
+            get
+            {
+                DateTime dt = DateTime.Now;
+                return Util.ToTLTime(dt) + "." + dt.Millisecond;
+            }
+        }
+
         void debug(string msg)
         {
-            Console.WriteLine(msg);
+            
+            Console.WriteLine(ts+": "+msg);
         }
 
         void s_SendDebugEvent(string msg)
@@ -83,27 +133,29 @@ namespace TestTradeLink
             debug(msg);
         }
 
+        long startt = 0;
 
-        [TestFixtureSetUp]
-        [Test]
-        public void StartupTests()
-        {
-
-            // discover our states
-            Providers[] p = c.ProvidersAvailable;
-            Assert.Greater(p.Length, 0);
-            Assert.GreaterOrEqual(c.ProviderSelected, 0);
-            Assert.AreEqual(Providers.TradeLink, p[c.ProviderSelected]);
-            debug("done startup");
-        }
 
         
         [Test]
         public void FeatureTests()
         {
+            debug("begin features");
             sleep(200);
-            Assert.GreaterOrEqual(cfeatures.Length, 1);
+            Providers[] p = c.ProvidersAvailable;
+            Assert.Greater(p.Length, 0);
+            Assert.GreaterOrEqual(c.ProviderSelected, 0);
+            Assert.AreEqual(Providers.TradeLink, p[c.ProviderSelected]);
+            Assert.GreaterOrEqual(cfeatures.Length, 1,features());
             debug("done features");
+        }
+
+        string features()
+        {
+            string s = string.Empty;
+            foreach (MessageTypes mt in cfeatures)
+                s += mt.ToString() + " ";
+            return s;
         }
 
         void sleep(int ms)
@@ -111,81 +163,233 @@ namespace TestTradeLink
             System.Threading.Thread.Sleep(ms);
         }
 
-        [Test]
-        public void TickTests()
-        {
-            // havent' sent any ticks, so shouldn't have any counted
-            Assert.That(ticks == 0, ticks.ToString());
 
-            // have to subscribe to a stock to get notified on fills for said stock
-            c.Subscribe(new BasketImpl(new SecurityImpl(SYM)));
-
-            //send a tick from the server
-            TickImpl t = TickImpl.NewTrade(SYM, 10, 100);
-            s.newTick(t);
-
-            sleep(150);
-            // make sure the client got it
-            Assert.That(ticks == 1, ticks.ToString());
-            // make sure other clients did not get ticks 
-            // (cause we didnt' subscribe from other clients)
-            Assert.AreNotEqual(copyticks, ticks);
-
-        }
-
-
-
+        DateTime st;
         const int TICKSENT = 5000;
-        
+        // netstat -n -p TCP 1
         [Test]
         public void TickPerformance()
         {
-
+            debug("begin tick performance");
             // expected performance
             const decimal EXPECT = .8m;
-            // get ticks for test
-            
-            Tick[] tick = TradeLink.Research.RandomTicks.GenerateSymbol(SYM, TICKSENT);
+            SLEEP = 0;
+
+           
             // subscribe to symbol
-            c.Unsubscribe();
             c.Subscribe(new BasketImpl(SYM));
-            // reset ticks
-            int save = ticks;
-            ticks = 0;
             // start clock
-            DateTime st = DateTime.Now;
+            st = DateTime.Now;
 
-            // process ticks
-            for (int i = 0; i < tick.Length; i++)
-                s.newTick(tick[i]);
-
-            sleep(200);
+            // wait for some to arrive
+            // reset ticks
+            ticks = 0;
+            sentticks = 0;
+            while (ticks < TICKSENT)
+                sleep(1);
             // stop clock
             double time = DateTime.Now.Subtract(st).TotalSeconds;
-            decimal ticksec = TICKSENT / (decimal)time;
+            decimal ticksec = ticks / (decimal)time;
             // make sure time exists
             Assert.Greater(time, 0);
             // make sure it's less than expected
             Assert.LessOrEqual(time, EXPECT);
-            // make sure we got all the ticks
-            Assert.AreEqual(TICKSENT, ticks);
-            Assert.AreEqual(0, copyticks);
-            debug("protocol performance (tick/sec): " + ticksec.ToString("N0"));
 
-            // restore ticks
-            ticks = save;
+            Assert.AreEqual(0, copyticks);
+            debug("end protocol performance (tick/sec): " + ticksec.ToString("N0")+" got/sent: "+ticks+"/"+sentticks);
+            c.Subscribe(new BasketImpl());
+        }
+
+        [Test]
+        public void ServerDisconnect()
+        {
+            debug("begin test: serverdisconnect");
+            _runtest = true;
+            SLEEP = 1;
+
+            // reset ticks
+            ticks = 0;
+            up = true;
+            checkdownspecial = false;
+            downspecialhit = false;
+            // subscribe to symbol
+            c.Subscribe(new BasketImpl(SYM));
+            // reset ticks
+            ticks = 0;
+            sentticks = 0;
+            // wait for ticks to arrive
+            while (!up || (ticks == 0))
+            {
+                sleep(50);
+            }
+            // ensure some ticks arrived
+            Assert.IsTrue(up, ts);
+            Assert.Greater(ticks, 0,ts);
+            
+            // disconnect on server side
+            debug("sending disconnect... waiting for detection.");
+            checkdownspecial = true;
+            s.SrvClearClient(c.Name,false);
+            // wait until failure detected on client
+            while (!downspecialhit)
+            {
+                sleep(10);
+            }
+            debug("disconnect detected... waiting for recovery...");
+            // wait until reconnect
+            while (!up)
+            {
+                sleep(10);
+            }
+            
+            // verify up
+            Assert.IsTrue(up,ts);
+            // verify ticks are still being sent
+            Assert.IsTrue(_runtest);
+            //debug("connection is back up... waiting for more ticks...");
+            // save ticks
+            int lastticks = ticks;
+            // wait for more ticks to arrive
+            const decimal FAILMULT = 2;
+            decimal WAIT = (ticks*FAILMULT) ;
+            while (ticks < WAIT)
+            {
+                if (sentticks % 100 == 0)
+                {
+                    //debug("ticks sent: " + sentticks + " recv: " + ticks);
+                }
+                sleep(50);
+            }
+            // ensure more ticks have arrived
+            Assert.GreaterOrEqual(ticks, WAIT);
+            // stop test
+            debug("end serverdisconnect.  beforefail: "+lastticks+" total: "+ticks);
+            c.Subscribe(new BasketImpl());
+            
+        }
+
+        [Test]
+        public void ClientDisconnect()
+        {
+            debug("begin test: clientdisconnect");
+            _runtest = true;
+            SLEEP = 1;
+
+            // reset ticks
+            ticks = 0;
+            up = true;
+            checkdownspecial = false;
+            downspecialhit = false;
+            // subscribe to symbol
+            c.Subscribe(new BasketImpl(SYM));
+            // reset ticks
+            ticks = 0;
+            sentticks = 0;
+
+            // wait for ticks to arrive
+            while (!up || (ticks == 0))
+            {
+                sleep(50);
+            }
+            // ensure some ticks arrived
+            Assert.IsTrue(up, ts);
+            Assert.Greater(ticks, 0, ts);
+
+            // disconnect on server side
+            debug("sending disconnect... waiting for detection.");
+            checkdownspecial = true;
+            c.Disconnect(false);
+            
+            // wait until failure detected on client
+            while (!downspecialhit)
+            {
+                sleep(10);
+            }
+            debug("disconnect detected... waiting for recovery...");
+            // wait until reconnect
+            while (!up)
+            {
+                sleep(10);
+            }
+
+            // verify up
+            Assert.IsTrue(up, ts);
+            // verify ticks are still being sent
+            Assert.IsTrue(_runtest);
+            //debug("connection is back up... waiting for more ticks...");
+            // save ticks
+            int lastticks = ticks;
+            // wait for more ticks to arrive
+            const decimal FAILMULT = 2;
+            decimal WAIT = (ticks * FAILMULT);
+            while (ticks < WAIT)
+            {
+                if (sentticks % 100 == 0)
+                {
+                    //debug("ticks sent: " + sentticks + " recv: " + ticks);
+                }
+                sleep(50);
+            }
+            // ensure more ticks have arrived
+            Assert.GreaterOrEqual(ticks, WAIT);
+            // stop test
+            debug("end serverdisconnect.  beforefail: " + lastticks + " total: " + ticks);
+            c.Subscribe(new BasketImpl());
+
+        }
+
+        Tick[] tick = TradeLink.Research.RandomTicks.GenerateSymbol(SYM, TICKSENT);
+
+        bool _runtest = true;
+        int sentticks = 0;
+        int SLEEP = 0;
+        bool _looping = false;
+        void bw_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+            _runtest = true;
+            // send ticks continuously while test is running
+            try
+            {
+                debug("starting helper sending ticks...");
+
+
+                int i = 0;
+                while (_runtest)
+                {
+                    _looping = true;
+                    Tick k = tick[i++];
+                    if (i >= tick.Length)
+                        i= 0;
+                    
+                    s.newTick(k);
+                    sentticks++;
+                    if (SLEEP!=0)
+                        sleep(SLEEP);
+                }
+                debug("completed helper sending ticks");
+            }
+            catch (Exception ex)
+            {
+                debug("got error running test thread." + ex.Message + ex.StackTrace);
+                _runtest = false;
+            }
         }
 
         [TestFixtureTearDown]
         public void StopTests()
         {
+            debug("begin stop tests");
             stop();
+            debug("end stop tests.");
         }
 
         void stop()
         {
+
+            
             try
             {
+                _runtest = false;
                 c.Stop();
                 c.Stop();
                 s.Stop();
@@ -207,6 +411,7 @@ namespace TestTradeLink
 
         void tlclient_gotTick(Tick t)
         {
+            //debug("recv: " + t);
             ticks++;
 
         }

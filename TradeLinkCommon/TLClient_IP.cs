@@ -17,6 +17,7 @@ namespace TradeLink.Common
     {
         Socket server;
         System.ComponentModel.BackgroundWorker _bw;
+        System.ComponentModel.BackgroundWorker _bw2;
         int port = IPUtil.TLDEFAULTBASEPORT;
         int _wait = 50;
 
@@ -29,50 +30,81 @@ namespace TradeLink.Common
                 debug("Ensure provider is running and Mode() is called with correct provider number.   invalid provider: " + providerindex);
                 return false;
             }
-            if ((server == null) || (!server.Connected && (_curprovider==providerindex)) || (_curprovider!=providerindex))
+
+            try
             {
-                try
+                debug("Attempting connection to server: " + serverip[providerindex]);
+                // shutdown cleanly if connected and we're switching servers
+                if ((server!=null) && (server.Connected))
                 {
-                    debug("Attempting connection to server: " + serverip[providerindex]);
-                    // shutdown cleanly if connected and we're switching servers
-                    if ((server!=null) && (server.Connected))
-                    {
-                        server.Shutdown(SocketShutdown.Both);
-                        server.Disconnect(true);
-                    }
-                    // create socket
-                    server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    server.Connect(serverip[providerindex]);
-                    if (server.Connected)
-                    {
-                        // set our name
-                        _name = server.LocalEndPoint.ToString();
-                        // notify
-                        debug("connected to server: " + serverip[providerindex]+" via:"+Name);
-                        // set buffer size
-                        buffer = new byte[server.ReceiveBufferSize];
-                        // reset flags
-                        _reconnectreq = false;
-                        _recvheartbeat = true;
-                        _requestheartbeat = true;
-                        _lastheartbeat = DateTime.Now.Ticks;
-
-                    }
-                    else
-                        debug("unable to connect to client at: " + serverip[providerindex].ToString());
-
+                    server.Shutdown(SocketShutdown.Both);
+                    server.Disconnect(true);
+                    markdisconnect();
                 }
-                catch (Exception ex)
+                // create socket
+                server = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                server.Connect(serverip[providerindex]);
+                //server.ReceiveTimeout = 500;
+                _lastheartbeat = DateTime.Now.Ticks;
+                if (server.Connected)
                 {
-                    debug("exception creating connection to: " + serverip[providerindex].ToString());
-                    debug(ex.Message + ex.StackTrace);
-                    return false;
+                    // set our name
+                    _name = server.LocalEndPoint.ToString();
+                    // notify
+                    debug("connected to server: " + serverip[providerindex] + " via:" + Name);
+                    // set buffer size
+                    buffer = new byte[server.ReceiveBufferSize];
+                    // reset flags
+                    bufferoffset = 0;
+                    _reconnectreq = false;
+                    _recvheartbeat = true;
+                    _requestheartbeat = true;
+                    _connect = true;
                 }
-                return true;
+                else
+                {
+                    _connect = false;
+                    debug("unable to connect to server at: " + serverip[providerindex].ToString());
+                }
 
             }
-            return true;
+            catch (Exception ex)
+            {
+                debug("exception creating connection to: " + serverip[providerindex].ToString());
+                debug(ex.Message + ex.StackTrace);
+                _connect = false;
+            }
+            if (_connect && _b.Count > 0)
+            {
+                debug("resubscribing basket: " + _b.ToString());
+                Register();
+                Subscribe(_b);
+                updateheartbeat();
+            }
+            if (GotConnectEvent != null)
+                GotConnectEvent(Util.ToTLTime());
+            return _connect;
         }
+
+        public event Int32Delegate GotConnectEvent;
+        public event Int32Delegate GotDisconnectEvent;
+
+        void updateheartbeat()
+        {
+            _lastheartbeat = DateTime.Now.Ticks;
+        }
+
+        void markdisconnect()
+        {
+            _connect = false;
+            if (GotDisconnectEvent != null)
+                GotDisconnectEvent(Util.ToTLTime());
+        }
+    
+
+        bool _connect = false;
+
+        Basket _b = new BasketImpl();
 
         int bufferoffset = 0;
         byte[] buffer;
@@ -84,7 +116,49 @@ namespace TradeLink.Common
         int _heartbeatdeadat = IPUtil.HEARTBEATDEADMS;
         bool _reconnectreq = false;
 
-        bool heartok { get { return _requestheartbeat == _recvheartbeat; } }
+        public bool isHeartbeatOk { get { return _connect && (_requestheartbeat == _recvheartbeat); } }
+
+        
+
+        void _bw2_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+            int p = (int)e.Argument;
+            while (_started)
+            {
+                if (!e.Cancel)
+                    Thread.Sleep(_wait * 10);
+                else
+                {
+                    _started = false;
+                }
+                // get current timestamp
+                long now = DateTime.Now.Ticks;
+                // get time since last heartbeat in MS
+                long diff = (now - _lastheartbeat) * 10000;
+                // if we're not waiting for reconnect and we're due for heartbeat
+                if (false && _connect && !_reconnectreq && (diff > _sendheartbeat))
+                {
+                    // our heartbeat is presently ok but it shouldn't be
+                    if (isHeartbeatOk)
+                    {
+                        // notify 
+                        v("heartbeat request at: " + DateTime.Parse(now.ToString()));
+                        // mark heartbeat as bad
+                        _requestheartbeat = !_recvheartbeat;
+                        // try to jumpstart by requesting heartbeat
+                        TLSend(MessageTypes.HEARTBEATREQUEST);
+                    }
+                        // if we're waiting for response but never get one, reconnect
+                    else if (diff > _heartbeatdeadat)
+                    {
+                        _reconnectreq = true;
+                        debug("heartbeat is dead, reconnecting at: " + DateTime.Parse(now.ToString()));
+                        connect(p,false);
+                    }
+
+                }
+            }
+        }
 
         void _bw_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
@@ -92,59 +166,44 @@ namespace TradeLink.Common
             // run until client stopped
             while (_started)
             {
+                // quit thread if requested
+                if (e.Cancel)
+                {
+                    _started = false;
+                    break;
+                }
+
                 try
                 {
-                    // quit thread if requested
-                    if (e.Cancel)
-                    {
-                        _started = false;
-                        break;
-                    }
-                    int ret = server.Receive(buffer, bufferoffset,buffer.Length-bufferoffset, SocketFlags.None);
+                    int ret = server.Receive(buffer, bufferoffset, buffer.Length - bufferoffset, SocketFlags.None);
                     if (ret > 0)
                     {
                         // get messages from data
-                        Message[] msgs = Message.gotmessages(ref buffer,ref bufferoffset);
+                        Message[] msgs = Message.gotmessages(ref buffer, ref bufferoffset);
                         // handle messages
-                        for (int i = 0; i<msgs.Length; i++)
+                        for (int i = 0; i < msgs.Length; i++)
                             handle(msgs[i].Type, msgs[i].Content);
                     }
-                    else
-                        Thread.Sleep(_wait);
-                    long now = DateTime.Now.Ticks;
-                    // see if we need heartbeat
-                    long diff = (now - _lastheartbeat)*10000;
-                    if (!_reconnectreq && (diff > _sendheartbeat))
-                    {
-                        // if we're not waiting, request one
-                        if (heartok)
-                        {
-                            v("heartbeat request at: " + now);
-                            _requestheartbeat = !_requestheartbeat;
-                            TLSend(MessageTypes.HEARTBEATREQUEST);
-                        }
-                        else if (diff > _heartbeatdeadat)
-                        {
-                            _reconnectreq = true;
-                            debug("heartbeat is dead, reconnecting at: " + now);
-                            connect();
-                        }
-
-                    }
                 }
+
                 catch (SocketException ex)
                 {
-                    debug("socket exception: " + ex.SocketErrorCode + ex.Message + ex.StackTrace);
+                    v("socket exception: " + ex.SocketErrorCode + ex.Message + ex.StackTrace);
 
                 }
                 catch (Exception ex)
                 {
                     debug(ex.Message + ex.StackTrace);
                 }
-                if ((server == null) || !server.Connected)
+                
+                
+                if (_connect && ((server == null) || !server.Connected))
                 {
                     if ((p >= 0) && (p < serverip.Count))
+                    {
+                        markdisconnect();
                         debug("client lost connection to server: " + serverip[p]);
+                    }
                     if (connect(p, false))
                         debug("recovered connection to: " + serverip[p]);
                     else
@@ -167,23 +226,32 @@ namespace TradeLink.Common
 
 
         }
-
+        /// <summary>
+        /// stop the client
+        /// </summary>
         public void Stop()
         {
             _started = false;
 
             try
             {
-                _bw.CancelAsync();
+                if (_bw.IsBusy)
+                    _bw.CancelAsync();
+                if (_bw2.IsBusy)
+                    _bw2.CancelAsync();
 
-                server.Shutdown(SocketShutdown.Both);
-                server.Close();
+                if (server.Connected)
+                {
+                    try
+                    {
+                        server.Shutdown(SocketShutdown.Both);
+                        server.Close();
+                    }
+                    catch { }
+                }
 
 
-            }
-            catch (SocketException ex)
-            {
-                debug("socket exception: " + ex.Message + ex.StackTrace);
+
             }
             catch (Exception ex)
             {
@@ -314,8 +382,11 @@ namespace TradeLink.Common
         public TLClient_IP(List<IPEndPoint> servers, int ProviderIndex, string Clientname) : this(servers, ProviderIndex, Clientname, DEFAULTRETRIES, DEFAULTWAIT, null) { }
         public TLClient_IP(List<IPEndPoint> servers, int ProviderIndex, string Clientname, int disconnectretries) : this(servers, ProviderIndex, Clientname, disconnectretries, DEFAULTWAIT, null) { }
         public TLClient_IP(List<IPEndPoint> servers, int ProviderIndex, string Clientname, int disconnectretries, int wait) : this(servers, ProviderIndex, Clientname, disconnectretries,wait, null) { }
-        public TLClient_IP(List<IPEndPoint> servers, int ProviderIndex, string Clientname, int disconnectretries, int wait, DebugDelegate deb)
+        public TLClient_IP(List<IPEndPoint> servers, int ProviderIndex, string Clientname, int disconnectretries, int wait, DebugDelegate deb) : this(servers, ProviderIndex, Clientname, disconnectretries, wait, deb, false) { }
+        public TLClient_IP(List<IPEndPoint> servers, int ProviderIndex, string Clientname, int disconnectretries, int wait, DebugDelegate deb,bool verbose)
+            
         {
+            VerboseDebugging = verbose;
             _wait = wait;
             SendDebugEvent = deb;
             serverip = servers;
@@ -365,6 +436,13 @@ namespace TradeLink.Common
                 _bw.WorkerSupportsCancellation = true;
                 _bw.DoWork += new System.ComponentModel.DoWorkEventHandler(_bw_DoWork);
                 _bw.RunWorkerAsync(ProviderIndex);
+                
+                
+                _bw2 = new System.ComponentModel.BackgroundWorker();
+                _bw2.WorkerSupportsCancellation = true;
+                _bw2.DoWork+=new System.ComponentModel.DoWorkEventHandler(_bw2_DoWork);
+                _bw2.RunWorkerAsync(ProviderIndex);
+                
             }
             if (!ok)
             {
@@ -374,8 +452,6 @@ namespace TradeLink.Common
 
             try
             {
-                // disconnect from provider if we were already registered
-                Disconnect();
                 // register ourselves with provider
                 Register();
                 // request list of features from provider
@@ -421,23 +497,23 @@ namespace TradeLink.Common
             int len = 0;
             try
             {
-                // send request
-                len = server.Send(data);
-                return 0;
+                if (server.Connected)
+                {
+                    // send request
+                    len = server.Send(data);
+                    return 0;
+                }
+                else
+                {
+                    retryconnect();
+                    return 0;
+                }
             }
             catch (SocketException ex)
             {
-                debug("exception: "+ex.Message+ex.StackTrace);
-                debug("disconnected from server: " + serverip[_curprovider] + ", attempting reconnect...");
-                int count = 0;
-                bool rok = false;
-                while (count++<_disconnectretry)
-                {
-                    rok = connect(_curprovider,false);
-                    if (rok)
-                        break;
-                }
-                debug(rok ? "reconnect suceeded." : "reconnect failed.");
+                debug("exception: "+ex.SocketErrorCode+ex.Message+ex.StackTrace);
+                retryconnect();
+                
                 
             }
             catch (Exception ex)
@@ -448,6 +524,22 @@ namespace TradeLink.Common
             }
             return (long)MessageTypes.UNKNOWN_ERROR;
         }
+
+        bool retryconnect()
+        {
+            debug("disconnected from server: " + serverip[_curprovider] + ", attempting reconnect...");
+            bool rok = false;
+            int count = 0;
+            while (count++ < _disconnectretry)
+            {
+                rok = connect(_curprovider, false);
+                if (rok)
+                    break;
+            }
+            debug(rok ? "reconnect suceeded." : "reconnect failed.");
+            return rok;
+        }
+
         /// <summary>
         /// Sends the order.
         /// </summary>
@@ -514,14 +606,23 @@ namespace TradeLink.Common
 
         public int ServerVersion { get { return (int)TLSend(MessageTypes.VERSION); } }
 
-        public void Disconnect()
+        public void Disconnect() { Disconnect(true); }
+        public void Disconnect(bool nice)
         {
-            try
+            if (nice)
             {
+                _connect = false;
                 TLSend(MessageTypes.CLEARCLIENT, Name);
+                if (GotDisconnectEvent != null)
+                    GotDisconnectEvent(Util.ToTLTime());
             }
-            catch (TLServerNotFound) { }
+            else
+            {
+                server.Close();
+            }
         }
+
+        
 
         public void Register()
         {
@@ -530,6 +631,8 @@ namespace TradeLink.Common
 
         public void Subscribe(TradeLink.API.Basket mb)
         {
+            // save last basket
+            _b = mb;
             TLSend(MessageTypes.REGISTERSTOCK, Name + "+" + mb.ToString());
         }
 
@@ -632,6 +735,7 @@ namespace TradeLink.Common
                     Tick t;
                     try
                     {
+                        _lastheartbeat = DateTime.Now.Ticks;
                         t = TickImpl.Deserialize(msg);
 
                     }
@@ -648,12 +752,14 @@ namespace TradeLink.Common
                     break;
                 case MessageTypes.IMBALANCERESPONSE:
                     Imbalance i = ImbalanceImpl.Deserialize(msg);
+                    _lastheartbeat = DateTime.Now.Ticks;
                     if (gotImbalance != null)
                         gotImbalance(i);
                     break;
                 case MessageTypes.ORDERCANCELRESPONSE:
                     {
                         long id = 0;
+                        _lastheartbeat = DateTime.Now.Ticks;
                         if (gotOrderCancel != null)
                             if (long.TryParse(msg, out id))
                                 gotOrderCancel(id);
@@ -662,11 +768,13 @@ namespace TradeLink.Common
                     }
                     break;
                 case MessageTypes.EXECUTENOTIFY:
+                    _lastheartbeat = DateTime.Now.Ticks;
                     // date,time,symbol,side,size,price,comment
                     Trade tr = TradeImpl.Deserialize(msg);
                     if (gotFill != null) gotFill(tr);
                     break;
                 case MessageTypes.ORDERNOTIFY:
+                    _lastheartbeat = DateTime.Now.Ticks;
                     Order o = OrderImpl.Deserialize(msg);
                     if (gotOrder != null) gotOrder(o);
                     break;
@@ -680,6 +788,7 @@ namespace TradeLink.Common
                 case MessageTypes.POSITIONRESPONSE:
                     try
                     {
+                        _lastheartbeat = DateTime.Now.Ticks;
                         Position pos = PositionImpl.Deserialize(msg);
                         if (gotPosition != null) gotPosition(pos);
                     }
@@ -691,9 +800,11 @@ namespace TradeLink.Common
                     break;
 
                 case MessageTypes.ACCOUNTRESPONSE:
+                    _lastheartbeat = DateTime.Now.Ticks;
                     if (gotAccounts != null) gotAccounts(msg);
                     break;
                 case MessageTypes.FEATURERESPONSE:
+                    _lastheartbeat = DateTime.Now.Ticks;
                     string[] p = msg.Split(',');
                     List<MessageTypes> f = new List<MessageTypes>();
                     _rfl.Clear();
@@ -719,6 +830,7 @@ namespace TradeLink.Common
                         gotServerUp(msg);
                     break;
                 default:
+                    _lastheartbeat = DateTime.Now.Ticks;
                     if (gotUnknownMessage != null)
                     {
                         gotUnknownMessage(type, 0, 0, 0, string.Empty, ref msg);

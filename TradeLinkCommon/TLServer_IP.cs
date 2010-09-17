@@ -52,8 +52,15 @@ namespace TradeLink.Common
             string name = client.RemoteEndPoint.ToString();
             // notify
             debug("Connection from: " + name);
-            // receive data that arrives
-            client.BeginReceive(csi.buffer, csi.startidx, csi.freebuffersize, SocketFlags.None, new AsyncCallback(ReadData), csi);
+            try
+            {
+                // receive data that arrives
+                client.BeginReceive(csi.buffer, csi.startidx, csi.freebuffersize, SocketFlags.None, new AsyncCallback(ReadData), csi);
+            }
+            catch (SocketException ex)
+            {
+                v(client.RemoteEndPoint + " " + ex.SocketErrorCode + ex.Message + ex.StackTrace);
+            }
             // wait for new connection
             list.BeginAccept(new AsyncCallback(ReadSocket), si);
             
@@ -106,7 +113,8 @@ namespace TradeLink.Common
             try
             {
                 // wait for more data to arrive
-                csi.sock.BeginReceive(csi.buffer, csi.startidx, csi.freebuffersize, SocketFlags.None, new AsyncCallback(ReadData), csi);
+                if (csi.sock.Connected)
+                    csi.sock.BeginReceive(csi.buffer, csi.startidx, csi.freebuffersize, SocketFlags.None, new AsyncCallback(ReadData), csi);
             }
             catch (SocketException ex)
             {
@@ -133,7 +141,12 @@ namespace TradeLink.Common
                 _list.Listen(MaxOustandingRequests);
                 _myresult = _list.BeginAccept(new AsyncCallback(ReadSocket), new socketinfo(_list));
                 debug("Server can handle pending requests: " + MaxOustandingRequests);
-                startthread();
+                debug("Starting background threads to process requests and ticks.");
+                _started = true;
+                _at = new System.ComponentModel.BackgroundWorker();
+                _at.DoWork += new System.ComponentModel.DoWorkEventHandler(_at_DoWork);
+                _at.WorkerSupportsCancellation = true;
+                _at.RunWorkerAsync();
                 debug("Server started.");
 
             }
@@ -146,15 +159,6 @@ namespace TradeLink.Common
             
         }
 
-        void startthread()
-        {
-            debug("Starting background threads to process requests and ticks.");
-            _started = true;
-            _at = new System.ComponentModel.BackgroundWorker();
-            _at.DoWork += new System.ComponentModel.DoWorkEventHandler(_at_DoWork);
-            _at.WorkerSupportsCancellation = true;
-            _at.RunWorkerAsync();
-        }
 
         long _lastheartbeat = 0;
 
@@ -210,26 +214,33 @@ namespace TradeLink.Common
                 if ((client[i] != null) && stocks[i].Contains(k.symbol))
                     TLSend(data, i);
         }
-
+        /// <summary>
+        /// stop the server
+        /// </summary>
         public virtual void Stop()
         {
             _started = false;
             try
             {
-                _at.CancelAsync();
-
-                    _list.Shutdown(SocketShutdown.Both);
-                    _list.Close();
-
-                for (int i = 0; i<_sock.Count; i++)
+                for (int i = 0; i < _sock.Count; i++)
                 {
-                    if (_sock[i] == null) 
+                    if (_sock[i] == null)
                         continue;
-
-                        _sock[i].Shutdown(SocketShutdown.Both);
-                        _sock[i].Close();
+                    if (!_sock[i].Connected)
+                        continue;
+                    _sock[i].Shutdown(SocketShutdown.Both);
+                    _sock[i].Close();
 
                 }
+
+                if (_list.Connected)
+                {
+                    _list.Shutdown(SocketShutdown.Both);
+                    _list.Close();
+                }
+                if (_at.IsBusy)
+                    _at.CancelAsync();
+
 
             }
             catch (Exception ex)
@@ -381,29 +392,40 @@ namespace TradeLink.Common
             Socket s = _sock[dest];
             if (s == null) 
                 return;
-            if (s.Connected)
+            try
             {
-                try
+                if (s.Connected)
                 {
-                    s.Send(data);
-                }
-                catch (SocketException ex)
-                {
-                    debug("socket exception: " + ex.SocketErrorCode + ex.Message + ex.StackTrace);
-                }
-                catch (Exception ex)
-                {
-                    debug("exception sending data: " + ex.Message + ex.StackTrace);
+                    try
+                    {
+                        s.Send(data);
+                    }
+                    catch (SocketException ex)
+                    {
+                        debug("socket exception: " + ex.SocketErrorCode + ex.Message + ex.StackTrace);
+                        handleerror(dest);
+                    }
+                    catch (Exception ex)
+                    {
+                        debug("exception sending data: " + ex.Message + ex.StackTrace);
+                    }
                 }
             }
-            if ((s != null) && !s.Connected)
+            catch (SocketException ex)
             {
-                if (DisconnectOnError)
-                {
-                    debug("Disconnecting errored client: " + client[dest]);
-                    SrvClearClient(client[dest]);
-                }
+                debug(ex.SocketErrorCode + ex.Message + ex.StackTrace);
+                handleerror(dest);
+            }
 
+
+        }
+
+        void handleerror(int dest)
+        {
+            if (DisconnectOnError)
+            {
+                debug("Disconnecting errored client: " + client[dest]);
+                SrvClearClient(dest);
             }
         }
 
@@ -482,9 +504,13 @@ namespace TradeLink.Common
         {
             int cid = client.IndexOf(cname);
             if (cid == -1) return;
+            v("got registration request: " + stklist + " from: " + cname);
             stocks[cid] = stklist;
             SrvBeatHeart(cname);
-            if (newRegisterStocks != null) newRegisterStocks(stklist);
+            if (newRegisterStocks != null)
+            {
+                newRegisterStocks(stklist);
+            }
         }
 
         void SrvClearStocks(string cname)
@@ -502,19 +528,37 @@ namespace TradeLink.Common
             SrvBeatHeart(cname);
         }
 
-
+        public void SrvClearClient(string client, bool niceclose)
+        {
+            int cid = client.IndexOf(client);
+            if (cid == -1) return; // don't have this client to clear him
+            SrvClearClient(cid,niceclose);
+        }
         void SrvClearClient(string him)
         {
             int cid = client.IndexOf(him);
             if (cid == -1) return; // don't have this client to clear him
+            SrvClearClient(cid);
+        }
+        void SrvClearClient(int cid) { SrvClearClient(cid, true); }
+        void SrvClearClient(int cid, bool niceclose)
+        {
+            if ((cid >= client.Count) || (cid < 0)) return;
             client.RemoveAt(cid);
             stocks.RemoveAt(cid);
             heart.RemoveAt(cid);
             index.RemoveAt(cid);
             try
             {
-                _sock[cid].Shutdown(SocketShutdown.Both);
-                _sock[cid].Disconnect(true);
+                if (niceclose)
+                {
+                    _sock[cid].Shutdown(SocketShutdown.Both);
+                    _sock[cid].Disconnect(true);
+                }
+                else
+                {
+                    _sock[cid].Close();
+                }
             }
             catch { }
             _sock.RemoveAt(cid);
