@@ -364,6 +364,25 @@ namespace TradeLink.Common
         }
 
         /// <summary>
+        /// get single readable line of indicators for output when response debugging
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <param name="gts"></param>
+        /// <returns></returns>
+        public static string GetIndicatorPairs(int idx, params GenericTrackerI[] gts) { return GetIndicatorPairs(idx, " ", gts); }
+        /// <summary>
+        /// get single readable line of indicators (with custom delimiter) for output when response debugging
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <param name="delim"></param>
+        /// <param name="gts"></param>
+        /// <returns></returns>
+        public static string GetIndicatorPairs(int idx, string delim, params GenericTrackerI[] gts)
+        {
+            return string.Join(delim, GenericTracker.GetIndicatorPrettyPairs(idx, gts));
+        }
+
+        /// <summary>
         /// write a generic tracker to one column of a csv file, leaving rest of file untouched.
         /// </summary>
         /// <typeparam name="T"></typeparam>
