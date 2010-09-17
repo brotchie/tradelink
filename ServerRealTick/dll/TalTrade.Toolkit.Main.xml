@@ -1,0 +1,3966 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TalTrade.Toolkit.Main</name>
+    </assembly>
+    <members>
+        <member name="T:TalTrade.Toolkit.Talipc.TalipcClientConnection">
+            <summary>
+            The TalipcClientConnection class is the TALIPC implementation of the ClientConnection base class.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.ClientConnection">
+            <summary>
+            The ClientConnection object encapsulates a client's connection to the server.
+            Use the ClientConnection object to register events for various messages from the client.
+            The ClientConnection class serves as a base class for the protocol implementation's client connection class.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientConnection.#ctor(System.String,System.Byte[])">
+            <summary>
+            Constructor, just records parameters for later use.
+            </summary>
+            <param name="peer">Name of the machine from which connection is incoming.</param>
+            <param name="cookie">Permissions cookie supplied with incoming connection.</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientConnection.Terminate">
+            <summary>
+            The Terminate() method is used to allow the server to terminate a client's connection.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientConnection._RequestRespond(System.String,TalTrade.Toolkit.RawData)">
+            <summary>
+            Send response data to this client.
+            </summary>
+            <param name="item">TQL item.</param>
+            <param name="data">TAL4 data.</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientConnection._RequestNak(System.String,TalTrade.Toolkit.DataFormat,System.UInt16)">
+            <summary>
+            Sends OtherAck message to this client.
+            </summary>
+            <param name="item"></param>
+            <param name="format"></param>
+            <param name="status"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientConnection._AdviseAck(System.UInt16,System.String,TalTrade.Toolkit.DataFormat)">
+            <summary>
+            Sends OtherAck message to this client.
+            </summary>
+            <param name="status"></param>
+            <param name="item"></param>
+            <param name="format"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientConnection._AdviseData(TalTrade.Toolkit.RawData,System.String)">
+            <summary>
+            Sends update data to this client.
+            </summary>
+            <param name="data"></param>
+            <param name="item"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientConnection._ExecuteAck(System.String,System.UInt16)">
+            <summary>
+            Sends ExecuteAck message to this client.
+            </summary>
+            <param name="exe"></param>
+            <param name="status"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientConnection._PokeAck(System.String,TalTrade.Toolkit.DataFormat,System.UInt16)">
+            <summary>
+            Sends OtherAck message to this client.
+            </summary>
+            <param name="Item"></param>
+            <param name="format"></param>
+            <param name="status"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientConnection._Execute(System.String)">
+            <summary>
+            Sends Execute message to this client
+            </summary>
+            <param name="command"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientConnection.MkFormatString(TalTrade.Toolkit.DataFormat)">
+            <summary>
+            Converts a DataFormat to its text representation (i.e. Binary -> TAL4).
+            </summary>
+            <param name="fmt"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientConnection.MkFormat(System.String)">
+            <summary>
+            Converts a text representation to a DataFormat (i.e. TAL4 -> Binary).
+            </summary>
+            <param name="szFormat"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientConnection.MakeData(System.Byte[],System.String)">
+            <summary>
+            Constructs a RawData object from the values.
+            </summary>
+            <param name="data"></param>
+            <param name="format"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientConnection.Dispose">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ClientConnection.Peer">
+            <summary>
+            Returns the ip address of the client.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ClientConnection.Cookie">
+            <summary>
+            Returns the perm cookie from the client.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ClientConnection.Connected">
+            <summary>
+            Indicates whether client is currently connected.
+            </summary>
+        </member>
+        <member name="E:TalTrade.Toolkit.ClientConnection.OnNewAdvise">
+            <summary>
+            Raised when client registers a new advise.
+            </summary>
+        </member>
+        <member name="E:TalTrade.Toolkit.ClientConnection.OnNewUnadvise">
+            <summary>
+            Raised when client closes and advise.  If the client closes this advise, the server can be notified both by this event from the actual
+            ClientConnection object and also from the equivalent event on the child ClientAdvise object.  They 
+            both get raised, so either one may be used to note the unadvise.
+            </summary>
+        </member>
+        <member name="E:TalTrade.Toolkit.ClientConnection.OnNewRequest">
+            <summary>
+            Raised when client sends a request.
+            </summary>
+        </member>
+        <member name="E:TalTrade.Toolkit.ClientConnection.OnNewPoke">
+            <summary>
+            raised when client sends a poke.
+            </summary>
+        </member>
+        <member name="E:TalTrade.Toolkit.ClientConnection.OnNewExecute">
+            <summary>
+            Raised when client sends an execute.
+            </summary>
+        </member>
+        <member name="E:TalTrade.Toolkit.ClientConnection.OnNewExecuteAck">
+            <summary>
+            Raised when client sends an execute ack.
+            </summary>
+        </member>
+        <member name="E:TalTrade.Toolkit.ClientConnection.OnClientTerminate">
+            <summary>
+            Raised when client sends a terminate.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ClientConnection.Store">
+            <summary>
+            List of advises currently registered by this client.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.ClientConnection.NewAdviseHandler">
+            <summary>
+            Delegate type used for OnNewAdvise event.
+            </summary>
+            <param name="sender"></param>
+            <param name="naea"></param>
+        </member>
+        <member name="T:TalTrade.Toolkit.ClientConnection.NewUnadviseHandler">
+            <summary>
+            Delegate type used for OnNewUnadvise event.
+            </summary>
+            <param name="sender"></param>
+            <param name="naea"></param>
+        </member>
+        <member name="T:TalTrade.Toolkit.ClientConnection.NewRequestHandler">
+            <summary>
+            delegate type for OnNewRequest event.
+            </summary>
+            <param name="sender"></param>
+            <param name="nrea"></param>
+        </member>
+        <member name="T:TalTrade.Toolkit.ClientConnection.NewPokeHandler">
+            <summary>
+            delegate type for OnNewPoke event.
+            </summary>
+            <param name="sender"></param>
+            <param name="npea"></param>
+        </member>
+        <member name="T:TalTrade.Toolkit.ClientConnection.NewExecuteHandler">
+            <summary>
+            delegate type for OnNewExecute handler.
+            </summary>
+            <param name="sender"></param>
+            <param name="neea"></param>
+        </member>
+        <member name="T:TalTrade.Toolkit.ClientConnection.NewExecuteAckHandler">
+            <summary>
+            delegate type for OnNewExecuteAck handler.
+            </summary>
+            <param name="sender"></param>
+            <param name="neea"></param>
+        </member>
+        <member name="T:TalTrade.Toolkit.ClientConnection.ClientTerminateHandler">
+            <summary>
+            Delegate type for OnClientTermiante event.
+            </summary>
+            <param name="sender"></param>
+            <param name="ea"></param>
+        </member>
+        <member name="T:TalTrade.Toolkit.ClientConnection.AdviseStore">
+            <summary>
+            Holds all the currently-registered advises for this client.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientConnection.AdviseStore.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientConnection.AdviseStore.NewAdvise(System.String)">
+            <summary>
+            Checks whether a proposed advise will be new or not.
+            </summary>
+            <param name="item"></param>
+            <returns>True if the advise will be new, false if the same advise was already registered.</returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientConnection.AdviseStore.AddAdvise(System.String,TalTrade.Toolkit.ClientAdvise)">
+            <summary>
+            Registers the advise.
+            </summary>
+            <param name="item"></param>
+            <param name="advise"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientConnection.AdviseStore.Unadvise(System.String)">
+            <summary>
+            Deregisters the advise.
+            </summary>
+            <param name="item"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientConnection.AdviseStore.UnadviseAll">
+            <summary>
+            Deregisters all advises.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientConnection.AdviseStore.GetEnumerator">
+            <summary>
+            Returns enumerator of all currently registered advises.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Talipc.TalipcClientConnection.Terminate">
+            <summary>
+            Requests that a terminate be sent.  Note that terminates are mediated behind the scenes so that 
+            there is always one terminate each direction at the end of the conversation, so calling this more
+            than once is harmless but also doesn't accomplish anything.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Talipc.TalipcClientConnection._RequestRespond(System.String,TalTrade.Toolkit.RawData)">
+            <summary>
+            Sends response data to the client.
+            </summary>
+            <param name="item"></param>
+            <param name="data"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.Talipc.TalipcClientConnection._RequestNak(System.String,TalTrade.Toolkit.DataFormat,System.UInt16)">
+            <summary>
+            Sends OtherAck to the client.
+            </summary>
+            <param name="item"></param>
+            <param name="format"></param>
+            <param name="status"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.Talipc.TalipcClientConnection._AdviseAck(System.UInt16,System.String,TalTrade.Toolkit.DataFormat)">
+            <summary>
+            Sends OtherAck to the client.
+            </summary>
+            <param name="status"></param>
+            <param name="item"></param>
+            <param name="format"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.Talipc.TalipcClientConnection._AdviseData(TalTrade.Toolkit.RawData,System.String)">
+            <summary>
+            Sends update data to the client.
+            </summary>
+            <param name="data"></param>
+            <param name="item"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.Talipc.TalipcClientConnection._ExecuteAck(System.String,System.UInt16)">
+            <summary>
+            Sends ExecAck to the client.
+            </summary>
+            <param name="exe"></param>
+            <param name="status"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.Talipc.TalipcClientConnection._Execute(System.String)">
+            <summary>
+            Sends execute to the client.
+            </summary>
+            <param name="command"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.Talipc.TalipcClientConnection._PokeAck(System.String,TalTrade.Toolkit.DataFormat,System.UInt16)">
+            <summary>
+            Sends OtherAck to the client.
+            </summary>
+            <param name="Item"></param>
+            <param name="format"></param>
+            <param name="status"></param>
+        </member>
+        <member name="P:TalTrade.Toolkit.Talipc.TalipcClientConnection.Connected">
+            <summary>
+            Indicates whether the client is currently connected.  (Becomes false after conversation is terminated.)
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.FieldError">
+            <summary>
+            The FieldError class is used to indicate what type of error is
+            contained in an error field.
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldError.InvalidError">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldError.FieldNotFound">
+            <summary>
+            field not member of current record
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldError.UnknownFormat">
+            <summary>
+            can't represent field data: format is bogus
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldError.FieldNoValue">
+            <summary>
+            field value in current record uninitialized
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldError.RequestPending">
+            <summary>
+            record is currently being requested (cascaded servers only)
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldError.NoRecord">
+            <summary>
+            record does not exist
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldError.NotPermissioned">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldError.FieldReset">
+            <summary>
+            field value has been reset (uninitialized)
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldError.InvalidData">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.Connection">
+            <summary>
+            The Connection class is an abstract base class for the classes which
+            represent a connection to a server.  A Connection represents a connection
+            to a machine,service,topic triplet.  A Connection can have many conversations
+            (the toolkit class Query represents a conversation), associated, but it will
+            always have at least one conversation as long as it remains connected to the
+            server.  Different protocols will provide their own implementation of Connection. 
+            Connection objects are not constructed directly, but are usally returned from the
+            GetConnection method of the application class.  Although clients can also create
+            them using the GetConnection method of the appropiate Protocol implementation.
+            When the client is finished with the Connection, it should be destroyed with the
+            Dispose() method of the IDisposable interface. This will disconnect it from the server.
+            Also, when the application terminates, the connection will automatically be severed.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Connection.AttachQuery(TalTrade.Toolkit.Query)">
+            <summary>
+            Attaches a Query object to the connection, and creates a new conversation 
+            to service the query.
+            </summary>
+            <param name="query">The Query object which is to be attached to the Connection object.</param>
+            <returns>Returns true if the query was successfully attached, otherwise false.</returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Connection.DetachQuery(TalTrade.Toolkit.Query)">
+            <summary>
+            Detaches a Query object that was connected to this Connection object.  it
+            will close the conversation that the Query was using. If the Connection object
+            loses its connection, all Queries which are attached will be automaticly detached. 
+            This will also happen when the Connection is destroyed via the Dispose() method.
+            </summary>
+            <param name="query">The Query object which is to be detached from the Connection object.</param>
+            <returns>Returns true if the query was successfully detached, otherwise false.</returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Connection.Finalize">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Connection.Dispose">
+            <summary>
+            Disposes the object.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Connection.Dispose(System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="disposing"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.Connection.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Connection.Connected">
+            <summary>
+            Returns true if the Connection object is currently connected to the server.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Connection.Machine">
+            <summary>
+            Returns the name of the machine the Connection object is connected to.  If the 
+            connection was opened using an alias, this will return the name of the 
+            machine the alias resolved to.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Connection.Service">
+            <summary>
+            Returns the name of the service the Connection object is connected to.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Connection.Topic">
+            <summary>
+            Returns the name of the topic the Connection object is connected to.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Connection.AttachedQueries">
+            <summary>
+            Returns a collection of all the attached queries to this connection.
+            </summary>
+        </member>
+        <member name="E:TalTrade.Toolkit.Connection.OnTerminate">
+            <summary>
+            This event is fired when the socket is closed, not through calling Connection.Dispose
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Connection.Disposed">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.Connection.Conversation">
+            <summary>
+            In the current implementation, instances of this class are required to be passed around some places
+            (for backward compatibility) but the objects are inert and not currently used to contain logic or state.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.ClientExecuteAck">
+            <summary>
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientExecuteAck.#ctor(TalTrade.Toolkit.ClientConnection,System.UInt32,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="client"></param>
+            <param name="status"></param>
+            <param name="execute"></param>
+        </member>
+        <member name="P:TalTrade.Toolkit.ClientExecuteAck.ExecuteString">
+            <summary>
+            The execute string the client sent with this execute.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ClientExecuteAck.Client">
+            <summary>
+            A reference to the ClientConnection object assoicated with this execute.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ClientExecuteAck.Status">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.IField">
+            <summary>
+            This is the IField interface.  Any class which represents a field in a TAL
+            data block will implement this interface.  The interface allows the client
+            to retreive the name and type of the field, convert the field to a string,
+            and get the value in its native type.  Class objects which implement IField
+            are immuttable, and cannot change after they are constructed.  Therefore no
+            thread synchronization is required.")
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.IField.Name">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.IField.FieldInfo">
+            <summary>
+            Returns the FieldInformation reference that cooresponds to this field's.
+            field ID. FieldInformation references are unique, so two IField interfaces
+            (f and g) refer to the same field ID if and only if f.FieldInfo == g.FieldInfo.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.IField.Type">
+            <summary>
+            Returns the field type.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.IField.Elements">
+            <summary>
+            Returns the number of elements in a field.  If it is a scaler, this will be 1.
+            If it is a vector, it will be the number of elements in the vector. If the field is
+            a vector and has nullptr value, it will be 0.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.IField.StringValue">
+            <summary>
+            Returns the string value of the field.  It will return nullptr if the field cannot be
+            represented as a string.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.IField.StringVectorValue">
+            <summary>
+            Returns the string vector value of the field.  It will return nullptr if the type
+            is not StringVector.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.IField.DoubleValue">
+            <summary>
+            Returns the floating point value of the field.  It will return 0 if it is not
+            a numeric field.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.IField.DoubleVectorValue">
+            <summary>
+            Returns the double vector value of the field.  It will return nullptr if the type
+            is not DoubleVector
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.IField.PriceValue">
+            <summary>
+            Returns the price value of the field.  It will return 0 if the type is not PriceScalar.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.IField.PriceVectorValue">
+            <summary>
+            Returns the price vector value.  It will return nullptr if the type is not
+            PriceVector.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.IField.IntValue">
+            <summary>
+            Returns the integer value.  It will return 0 if the type is not
+            IntegerScalar.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.IField.IntVectorValue">
+            <summary>
+            Returns the integer vector value.  It will return nullptr if the type is
+            not IntegetVector.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.IField.TimeValue">
+            <summary>
+            Returns the time span value.  It will return 0 if the type is not
+            TimeScalar.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.IField.TimeVectorValue">
+            <summary>
+            Returns the time vector value.  It will return nullptr if the type is not
+            TimeVector.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.IField.DateValue">
+            <summary>
+            Returns the date value.  It will return DateTime.MinValue if the type is
+            not DateScalar.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.IField.DateVectorValue">
+            <summary>
+            Returns the date vector value.  It will return nullptr if the type is not
+            DateVector.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.IField.ErrorValue">
+            <summary>
+            Returns the error code associated with the field if the type is ErrorScalar,
+            otherwise, it returns FieldError.InvalidError
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.IField.BlobValue">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.Query">
+            <summary>
+            The Query class is used by the client to communicate with the server via a
+            conversation.  The Query class is abstract, so the client should use the class
+            derrived from Query which fits its needs.  To use a Query object, the client
+            attaches it to a connection using the Connection.AttachQuery() method, this
+            will cause the connection to allocate a conversation to service the Query object.
+            A Query can be used again after is has been detached from a connection, but a Query
+            object can only be used with one connection at a time.
+            The Query class is protocol independent, so the same Query objects can be used
+            with Connection objects of different protocols.  The client can derive its own
+            Query class to perform specific tasks.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Query.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Query.Finalize">
+            <summary>
+            The Query finalizer will detach the Query object from its connection, if it is attached
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Query.Dispose">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Query.Dispose(System.Boolean)">
+            <summary>
+            Dispost the object, detach from its connection if attached.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Query._AttachToConnection(TalTrade.Toolkit.Connection.Conversation,TalTrade.Toolkit.Connection)">
+            <summary>
+            Internal method used when attaching query to a connection.  Exposed for use by unit tests, but you
+            should probably not be calling this -- use connection.Attach instead.
+            </summary>
+            <param name="pConv"></param>
+            <param name="pConnection"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.Query.Close">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Query.TerminateNotify">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Query.SendExecute(System.String)">
+            <summary>
+            sends Execute to the server
+            </summary>
+            <param name="szItem"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Query.SendRequest(System.String,System.String)">
+            <summary>
+            sends request to the server
+            </summary>
+            <param name="szItem"></param>
+            <param name="szFormat"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Query.SendAdvise(System.String,System.String)">
+            <summary>
+            sends advise to the server
+            </summary>
+            <param name="szItem"></param>
+            <param name="szFormat"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Query.SendUnadvise(System.String,System.String)">
+            <summary>
+            sends unadvise to the server
+            </summary>
+            <param name="szItem"></param>
+            <param name="szFormat"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Query.SendPoke(System.String,System.String,System.Byte[],System.Int32)">
+            <summary>
+            sends poke to the server
+            </summary>
+            <param name="szItem"></param>
+            <param name="szFormat"></param>
+            <param name="pData"></param>
+            <param name="nLen"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Query.SendExecuteAck(System.UInt32,System.String)">
+            <summary>
+            Sends ExecuteAck to the server; only supported for Talipc conversations, not ClientAdapter
+            </summary>
+            <param name="nStatus"></param>
+            <param name="szItem"></param>
+            <returns></returns>
+        </member>
+        <member name="F:TalTrade.Toolkit.Query.m_pConnection">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.Query.m_pConv">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Query.Disposed">
+            <summary>
+            Indicates whether the object has already been disposed.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Query.Connected">
+            <summary>
+            Returns true if the Query object is attached, and the Connection it is attached to is connected. 
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Query.Attached">
+            <summary>
+            Returns true if the Query object is attached.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Query.TerminateCode">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Query.CurrentConnection">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.NewUnadviseEventArgs">
+            <summary>
+            The NewUnadviseEventArgs class is used to pass arguments to a NewUnadvise event handler.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.NewUnadviseEventArgs.#ctor(TalTrade.Toolkit.ClientAdvise)">
+            <summary>
+            
+            </summary>
+            <param name="advise"></param>
+        </member>
+        <member name="P:TalTrade.Toolkit.NewUnadviseEventArgs.Advise">
+            <summary>
+            A reference to the ClientAdvise object associated with the advise for which the event was raised.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.NewPokeEventArgs">
+            <summary>
+            The NewPokeEventArgs class is used to send arguments to a NewPoke event handler.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.NewPokeEventArgs.#ctor(TalTrade.Toolkit.ClientPoke)">
+            <summary>
+            
+            </summary>
+            <param name="poke"></param>
+        </member>
+        <member name="P:TalTrade.Toolkit.NewPokeEventArgs.Poke">
+            <summary>
+            Returns a reference to the ClientPoke object associated with the poke that raised the event.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.ExecuteEventArgs">
+            <summary>
+            The ExecuteEventArgs class provides data to an Ack event handler.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ExecuteEventArgs.#ctor(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="command"></param>
+        </member>
+        <member name="P:TalTrade.Toolkit.ExecuteEventArgs.Command">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.Talipc.TalipcDataServer">
+            <summary>
+            The TalipcDataServer class is the TALIPC implementation of the DataServer base class.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.DataServer">
+            <summary>
+            The DataServer class is a base class for a protocol's implementation of a data server class.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.DataServer.DispatchClient(TalTrade.Toolkit.NewClientEventArgs)">
+            <summary>
+            Inform any listeners that a new client has connected to this server.
+            </summary>
+            <param name="arg"></param>
+        </member>
+        <member name="E:TalTrade.Toolkit.DataServer.OnNewClient">
+            <summary>
+            raised when a new client connects to this server.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.DataServer.NewClientHandler">
+            <summary>
+            delegate type for OnNewClient handler.
+            </summary>
+            <param name="sender"></param>
+            <param name="ncea"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.Talipc.TalipcDataServer.Dispose">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.AsyncQuery">
+            <summary>
+            The AsyncQuery class is a subclass of Query that allows asynchronous
+            operations against a server.  The methods return immediatly, and the
+            client must either register event handlers, or subclass AsyncQuery,
+            and provide its own implementation for the callback functions.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.AsyncQuery.#ctor">
+            <summary>
+            The AsyncQuery default constructor will construct an AsyncQuery that uses"
+            free threading via an instance of the FreeAsyncThreading class.")
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.AsyncQuery.#ctor(TalTrade.Toolkit.IAsyncThreading)">
+            <summary>
+            This AsyncQuery constructor allows the client to specify a threading model
+            by providing an IAsyncThrading reference.
+            </summary>
+            <param name="threadModel">An IAsyncThreading reference which implements
+            the threading module to be used by the AsyncQuery object.
+            </param>
+        </member>
+        <member name="M:TalTrade.Toolkit.AsyncQuery.ExecuteAckCallback(TalTrade.Toolkit.AckEventArgs)">
+            <summary>
+            The ExecuteAckCallback virtual method is called when an ExecuteAck 
+            is received from the server.  The default implementation fires the 
+            OnExecuteAck event.
+            </summary>
+            <param name="aea"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.AsyncQuery.OtherAckCallback(TalTrade.Toolkit.AckEventArgs)">
+            <summary>
+            The OtherAckCallback virtual method is called when an OtherAck
+            is received from the server.  The default implementation fires the
+            OnOtherAck event.
+            </summary>
+            <param name="aea"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.AsyncQuery.RequestDataCallback(TalTrade.Toolkit.DataEventArgs)">
+            <summary>
+            The RequestDataCallback virtual method is called when request data
+            is received from the server.  The default implementation fires the
+            OnRequestData event.
+            </summary>
+            <param name="dea"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.AsyncQuery.AdviseDataCallback(TalTrade.Toolkit.DataEventArgs)">
+            <summary>
+            The AdviseDataCallback virtual method is called when advise data
+            is received from the server.  The default implementation fires the
+            OnAdviseData event.
+            </summary>
+            <param name="dea"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.AsyncQuery.TerminateCallback(System.EventArgs)">
+            <summary>
+            The TerminateCallback virtual method is called when the assoicated
+            conversation is prematurely terminated.  The default implementation
+            fires the OnTerminate event.
+            </summary>
+            <param name="ea"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.AsyncQuery.ExecuteCallback(TalTrade.Toolkit.ExecuteEventArgs)">
+            <summary>
+            The ExecuteCallback virtual method is called when the server 
+            sends an Execute to the client. This is only supported for Talipc
+            conversations, not ClientAdapter.
+            </summary>
+            <param name="ea"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.AsyncQuery.Execute(System.String)">
+            <summary>
+            Sends an Execute message to the server.
+            </summary>
+            <param name="execute">The execute string to send to the server</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.AsyncQuery.ExecuteAck(System.UInt32,System.String)">
+            <summary>
+            Sends an ExecuteAck message to the server.
+            </summary>
+            <param name="status"></param>
+            <param name="execute">The execute string to send to the server</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.AsyncQuery.Advise(System.String,System.String)">
+            <summary>
+            Sends an Advise message to the server.
+            </summary>
+            <param name="item">The TQL query string to send to the server</param>
+            <param name="format">The format the server should use to encode the data.</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.AsyncQuery.Advise(System.String,TalTrade.Toolkit.DataFormat)">
+            <summary>
+            Sends an Advise message to the server.
+            </summary>
+            <param name="item">The TQL query string to send to the server</param>
+            <param name="format">The format code of the format the server should use to encode the data</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.AsyncQuery.Advise(TalTrade.Toolkit.TqlStatement)">
+            <summary>
+            Sends an Advise message to the server.  This overload is not yet implemented.
+            </summary>
+            <param name="tql"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.AsyncQuery.Unadvise(System.String,System.String)">
+            <summary>
+            Cancels an active advise on the server.
+            </summary>
+            <param name="item">The TQL query of the advise to cancel</param>
+            <param name="format">The format of the advise to cancel</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.AsyncQuery.Unadvise(System.String,TalTrade.Toolkit.DataFormat)">
+            <summary>
+            Cancels an active advise on the server.
+            </summary>
+            <param name="item">The TQL query of the advise to cancel</param>
+            <param name="format">The format code of the advise to cancel</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.AsyncQuery.Request(System.String,System.String)">
+            <summary>
+            Sends a request to the server.
+            </summary>
+            <param name="item">The TQL query string to send to the server</param>
+            <param name="format">The format the server should use to encode the data.</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.AsyncQuery.Request(System.String,TalTrade.Toolkit.DataFormat)">
+            <summary>
+            Sends a request to the server.
+            </summary>
+            <param name="item">The TQL query string to send to the server</param>
+            <param name="format">The format code of the format the server should use to encode the data</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.AsyncQuery.Request(TalTrade.Toolkit.TqlStatement)">
+            <summary>
+            Sends a request to the server.  This overload is not yet implemented.
+            </summary>
+            <param name="tql"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.AsyncQuery.Poke(System.String,TalTrade.Toolkit.RawData)">
+            <summary>
+            Pokes a data block into the server.
+            </summary>
+            <param name="item">The item string identifing the data being poked.</param>
+            <param name="data">The data to poke into the server.</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.AsyncQuery.Close">
+            <summary>
+            Inert -- does nothing.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.AsyncQuery.TerminateNotify">
+            <summary>
+            Informs any attached listeners that a terminate has arrived from the server.
+            </summary>
+        </member>
+        <member name="E:TalTrade.Toolkit.AsyncQuery.OnExecuteAck">
+            <summary>
+            The OnExecuteAck event fires when an ExecuteAck is sent by the server.
+            </summary>
+        </member>
+        <member name="E:TalTrade.Toolkit.AsyncQuery.OnExecute">
+            <summary>
+            The OnExecute event fires when an Execute is sent by the server.
+            </summary>
+        </member>
+        <member name="E:TalTrade.Toolkit.AsyncQuery.OnOtherAck">
+            <summary>
+            The OnOtherAck event fires when an OtherAck is sent by the server.
+            </summary>
+        </member>
+        <member name="E:TalTrade.Toolkit.AsyncQuery.OnRequestData">
+            <summary>
+            The OnRequestData event fires when the server returns data in response to a sucessful request.
+            </summary>
+        </member>
+        <member name="E:TalTrade.Toolkit.AsyncQuery.OnAdviseData">
+            <summary>
+            The OnAdviseData event fires when the server sends data for an active advise.
+            </summary>
+        </member>
+        <member name="E:TalTrade.Toolkit.AsyncQuery.OnTerminate">
+            <summary>
+            The OnTerminate event fires when the conversation associated with the Query object is prematurely terminated.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.AsyncQuery.AckHandler">
+            <summary>
+            The AckHandler is the event handler type for receiving ACK messages,
+            these include OtherAck and ExecuteAck.
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="T:TalTrade.Toolkit.AsyncQuery.DataHandler">
+            <summary>
+            The DataHandler is the event handler type for receiving data messages,
+            these include RequestData and AdviseData.
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="T:TalTrade.Toolkit.AsyncQuery.ExecuteHandler">
+            <summary>
+            The ExecuteHandler is the event handler type for receiving execute messages.
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="T:TalTrade.Toolkit.AsyncQuery.TerminateHandler">
+            <summary>
+            The TerminateHandler is the event handler type for receiving terminate
+            notifications.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.AckEventArgs">
+            <summary>
+            The AckEventArgs class provides data to an Ack event handler.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.AckEventArgs.#ctor(System.String,System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="item"></param>
+            <param name="status"></param>
+        </member>
+        <member name="P:TalTrade.Toolkit.AckEventArgs.Item">
+            <summary>
+            Returns the item, (usually a TQL query), that the ACK is associated with.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.AckEventArgs.Status">
+            <summary>
+            Returns the status code associated with the ACK.  The meaning of the code 
+            depends on the server, and the type of ACK.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.ClientAdapter.ClientAdapterProtocol">
+            <summary>
+            The ClientAdapterProtocol class is a subclass of Protocol, and it
+            implements the infrastructure of the client adapter protocol.
+            An application that uses the client adapter protocol should
+            Create an instance of ClientAdapterProtocol in its constructor,
+            and call the Initialize() method.  It should also call the CleanUp()
+            method in the finalizer.  A client can subclass ClientAdapterToolkitApp
+            which already does this. The ClientAdapterProtocol requires the
+            DOTNETTOOLKIT/CA=YES permit in order to instantiate.
+            The ClientAdapterProtocol supports the use of class aliases,
+            so it is not necessary to supply the address of an actual machine
+            when creating a connection, instead one only has to supply the
+            name of the desired server class bracketed by $s, e.g. \"$QUOTES$\". 
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.Protocol">
+            <summary>
+            The Protocol class is subclassed to implement a network protocol for the
+            toolkit to communicate with the toolkit.  Right now there are two Protocol
+            subclasses, TalipcProtocol and ClientAdapterProtocol.  The client uses the
+            protocol object to create Connection objects to talk to the server.  This
+            is usally done through the application object, via the ToolkitApp.GetConnection()
+            method.  The application class should make sure that the Initialize() and Cleanip()
+            methods for the Protocol object are called.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Protocol.Initialize">
+            <summary>
+            This virtual method is called when the application starts up to initialize
+            the Protocol object.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Protocol.Cleanup">
+            <summary>
+            This virtual method is called when the application is shutting down,
+            to call any clean-up code assoicated with the Protocol object.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Protocol.CreateConnection(System.String,System.String,System.String)">
+            <summary>
+            This virtual method is called by the application class or the client
+            to create a Connection object
+            </summary>
+            <param name="machine"></param>
+            <param name="service"></param>
+            <param name="topic"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientAdapter.ClientAdapterProtocol.#ctor(TalTrade.Toolkit.ClientAdapter.ClientAdapterToolkitApp)">
+            <summary>
+            
+            </summary>
+            <param name="app"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientAdapter.ClientAdapterProtocol.Initialize">
+            <summary>
+            Initializes the ClientAdapter library.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientAdapter.ClientAdapterProtocol.Cleanup">
+            <summary>
+            Closes the ClientAdapter library.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientAdapter.ClientAdapterProtocol.Cleanup(System.Boolean)">
+            <summary>
+            Closes the ClientAdapter library.
+            <param name="force"></param>
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientAdapter.ClientAdapterProtocol.CreateConnection(System.String,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="machine"></param>
+            <param name="service"></param>
+            <param name="topic"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientAdapter.ClientAdapterProtocol.CreateConnectionWithMode(System.String,System.String,System.String,TalTrade.Toolkit.ClientAdapter.ClientAdapterConnection.Mode)">
+            <summary>
+            
+            </summary>
+            <param name="machine"></param>
+            <param name="service"></param>
+            <param name="topic"></param>
+            <param name="mode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientAdapter.ClientAdapterProtocol.CreateConnectionForUser(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="machine"></param>
+            <param name="service"></param>
+            <param name="topic"></param>
+            <param name="user"></param>
+            <param name="domain"></param>
+            <returns></returns>
+        </member>
+        <member name="P:TalTrade.Toolkit.ClientAdapter.ClientAdapterProtocol.Tracer">
+            <summary>
+            Returns currently attached protocol tracer.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.ToolkitArgumentNullException">
+            <summary>
+            This exception is thrown if an invalid null argument is passed to a toolkit method.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.MessageAppEx">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.MessageAppEx.LogSev(TalTrade.Toolkit.Severity,System.String,System.Object[])">
+            <summary>
+            
+            </summary>
+            <param name="sev"></param>
+            <param name="fmt"></param>
+            <param name="args"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.MessageAppEx.LogException(System.Exception)">
+            <summary>
+            
+            </summary>
+            <param name="ex"></param>
+        </member>
+        <member name="E:TalTrade.Toolkit.MessageAppEx.OnLog">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="E:TalTrade.Toolkit.MessageAppEx.OnData">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.MessageAppEx.LogData">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.MessageAppEx.LogMessages">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.MessageAppEx.LogObjects">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.IRow">
+            <summary>
+            This is the IRow interface.  Any class which represents a row in a TAL
+            data block implements IRow.  It extends ICollection, so it can be enumerated
+            with constructs like C#'s foreach statement.  The indexers allow it to be used
+            as a sequential collection, or a associative collection, of IField interface references.
+            Class objects that implement IRow are immuttable, and cannot change after they are
+            constructed.  Therefore no thread synchronization is required.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.IRow.Item(System.Int32)">
+            <summary>
+            This indexer allows the client to retreive a field at a particular position
+            treating the row as a sequential collection.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.IRow.Item(System.String)">
+            <summary>
+            This indexer allows the client to retreive a field that is identified by a particular name,
+            treating the row as a associate collection.  For improved performance, use the FieldInformation
+            reference indexer.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.IRow.Item(TalTrade.Toolkit.FieldInformation)">
+            <summary>
+            This indexer allows the client to retreive a field that is identified by a particular
+            FieldInformation reference.  Treating thr row as an associateive collection.  This
+            indexer performes better than the name string indexer.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.TraceMessage">
+            <summary>
+            The TraceMessage class contains all the data sent from the Protocol to an
+            IProtocolTracer implementation when a network message is traced.
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.TraceMessage.m_type">
+            <summary>
+            The type of message
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.TraceMessage.m_dir">
+            <summary>
+            The direction of the message, incoming or outgoing.
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.TraceMessage.m_machine">
+            <summary>
+            The machine this message came from, or was sent to.
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.TraceMessage.m_service">
+            <summary>
+            The service this message came from, or was sent to.
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.TraceMessage.m_topic">
+            <summary>
+            The topic this message came from, or was sent to.
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.TraceMessage.m_item">
+            <summary>
+            The item string associated with this message.  nullptr if message type has no item string.
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.TraceMessage.m_format">
+            <summary>
+            The format string assoicated with this message.  nullptr if the message type has no format string.
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.TraceMessage.m_result">
+            <summary>
+            The result code for an ACK message.
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.TraceMessage.m_data">
+            <summary>
+            The data for a data message, nullptr if the message type is not RequestData or AdviseData.
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.TraceMessage.m_objectId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.TraceMessage.#ctor(System.Int64,TalTrade.Toolkit.TraceMessage.MessageType,TalTrade.Toolkit.TraceMessage.MessageDir,System.String,System.String,System.String,System.String,System.String,System.Nullable{System.Int32},TalTrade.Toolkit.RawData)">
+            <summary>
+            
+            </summary>
+            <param name="objectId"></param>        
+            <param name="type"></param>
+            <param name="dir"></param>
+            <param name="machine"></param>
+            <param name="service"></param>
+            <param name="topic"></param>
+            <param name="item"></param>
+            <param name="format"></param>
+            <param name="result"></param>
+            <param name="data"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.TraceMessage.PrettyPrint(System.Boolean)">
+            <summary>
+            returns a legible, multi-line text block suitable for logging to the msg_app, a text window, etc.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:TalTrade.Toolkit.TraceMessage.MessageType">
+            <summary>
+            This enumeration is used to indicate the type of message contained in a TraceMessage object.
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.TraceMessage.MessageType.Init">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.TraceMessage.MessageType.InitAck">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.TraceMessage.MessageType.Execute">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.TraceMessage.MessageType.ExecuteAck">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.TraceMessage.MessageType.OtherAck">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.TraceMessage.MessageType.Request">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.TraceMessage.MessageType.RequestData">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.TraceMessage.MessageType.Advise">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.TraceMessage.MessageType.Unadvise">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.TraceMessage.MessageType.AdviseData">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.TraceMessage.MessageType.Poke">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.TraceMessage.MessageType.Terminate">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.TraceMessage.MessageDir">
+            <summary>
+            This enumeration is used to indicate the direction of the message contained in a TraceMessage object.
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.TraceMessage.MessageDir.Incoming">
+            <summary>
+            Message received 
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.TraceMessage.MessageDir.Outgoing">
+            <summary>
+            Message sent
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.NewRequestEventArgs">
+            <summary>
+            The NewRequestEventArgs class is used to pass arguements to new request event handlers.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.NewRequestEventArgs.#ctor(TalTrade.Toolkit.ClientRequest)">
+            <summary>
+            
+            </summary>
+            <param name="req"></param>
+        </member>
+        <member name="P:TalTrade.Toolkit.NewRequestEventArgs.Request">
+            <summary>
+            Returns a ClientRequest reference that cooresponds to the request for which this event was raised.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.Internal.ExecuteMessage">
+            <summary>
+            Sent when an Execute callback is received
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.Internal.TalipcMessage">
+            <summary>
+            Base class for messages passed from TalipcConnection to queries.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Internal.TalipcMessage.GetMsgType">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:TalTrade.Toolkit.Internal.TalipcMessage.MessageType">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.Internal.TalipcMessage.MessageType.InitAck">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.Internal.TalipcMessage.MessageType.OtherAck">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.Internal.TalipcMessage.MessageType.ExecuteAck">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.Internal.TalipcMessage.MessageType.Data">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.Internal.TalipcMessage.MessageType.Terminate">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.Internal.TalipcMessage.MessageType.Execute">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Internal.ExecuteMessage.#ctor(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="command"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.Internal.ExecuteMessage.GetMsgType">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:TalTrade.Toolkit.Internal.ExecuteMessage.Command">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.ClientPoke">
+            <summary>
+            The ClientPoke class is used to store the item string and RawData object 
+            associated with a poke.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientPoke.#ctor(TalTrade.Toolkit.ClientConnection,System.String,TalTrade.Toolkit.RawData)">
+            <summary>
+            
+            </summary>
+            <param name="client"></param>
+            <param name="item"></param>
+            <param name="data"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientPoke.Ack(System.UInt16)">
+            <summary>
+            Sends an ACK to the client.
+            </summary>
+            <param name="status">The status code to send with the ACK, use 0x8000 for success, and 0x0000 for failure.</param>
+        </member>
+        <member name="P:TalTrade.Toolkit.ClientPoke.Item">
+            <summary>
+            Returns the item string of the poke.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ClientPoke.Client">
+            <summary>
+            Returns the ClientConnection referecne associated with this poke.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ClientPoke.Data">
+            <summary>
+            Returns a reference to the RawData object that contains the data sent with this poke.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.ClientExecute">
+            <summary>
+            The ClientExecute class is used to store the execute string associated with an execute from the client.
+            The class provides a method to ACK or NAK the execute.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientExecute.#ctor(TalTrade.Toolkit.ClientConnection,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="client"></param>
+            <param name="execute"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientExecute.Ack(System.UInt16)">
+            <summary>
+            Sends ExecuteAck message to the client.
+            </summary>
+            <param name="response"></param>
+        </member>
+        <member name="P:TalTrade.Toolkit.ClientExecute.ExecuteString">
+            <summary>
+            The execute string the client sent with this execute.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ClientExecute.Client">
+            <summary>
+            A reference to the ClientConnection object assoicated with this execute.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.NewAdviseEventArgs">
+            <summary>
+            The NewAdviseEventArgs class is used to pass arguments to a NewAdvise event handler.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.NewAdviseEventArgs.#ctor(TalTrade.Toolkit.ClientAdvise)">
+            <summary>
+            
+            </summary>
+            <param name="advise"></param>
+        </member>
+        <member name="P:TalTrade.Toolkit.NewAdviseEventArgs.Advise">
+            <summary>
+            A reference to the ClientAdvise object associated with the advise for which the event was raised.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.NewAdviseEventArgs.ShouldAckAdvise">
+            <summary>
+            By default, all advises are accepted.  If this advise should not be accepted, then the event
+            handler must set ShouldAckAdvise to false.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.ClientAdapter.ClientAdapterConnection">
+            <summary>
+            The ClientAdapterConnection class is a subclass of Connection, which
+            implements a connection to a TAL server via the client adapter.
+            The ClientAdapterConnection should have the same behaviour as other
+            Connection implementations.
+            ClientAdapterConnections can only be used to connect to price servers
+            and news servers at this time.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientAdapter.ClientAdapterConnection.#ctor(System.String,System.String,System.String,TalTrade.Toolkit.ClientAdapter.ClientAdapterProtocol)">
+            <summary>
+            
+            </summary>
+            <param name="machine"></param>
+            <param name="service"></param>
+            <param name="topic"></param>
+            <param name="protocol"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientAdapter.ClientAdapterConnection.#ctor(System.String,System.String,System.String,TalTrade.Toolkit.ClientAdapter.ClientAdapterProtocol,TalTrade.Toolkit.ClientAdapter.ClientAdapterConnection.Mode)">
+            <summary>
+            
+            </summary>
+            <param name="machine"></param>
+            <param name="service"></param>
+            <param name="topic"></param>
+            <param name="protocol"></param>
+            <param name="mode"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientAdapter.ClientAdapterConnection.#ctor(System.String,System.String,System.String,TalTrade.Toolkit.ClientAdapter.ClientAdapterProtocol,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="machine"></param>
+            <param name="service"></param>
+            <param name="topic"></param>
+            <param name="protocol"></param>
+            <param name="user"></param>
+            <param name="domain"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientAdapter.ClientAdapterConnection.AttachQuery(TalTrade.Toolkit.Query)">
+            <summary>
+            Attach query to connection.  This kicks off the connection process, sending an initiate to the server.
+            </summary>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientAdapter.ClientAdapterConnection.DetachQuery(TalTrade.Toolkit.Query)">
+            <summary>
+            Detach query from the connection.
+            </summary>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientAdapter.ClientAdapterConnection.Dispose(System.Boolean)">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ClientAdapter.ClientAdapterConnection.Connected">
+            <summary>
+            Indicates whether currently connected to server.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ClientAdapter.ClientAdapterConnection.Machine">
+            <summary>
+            Name of server machine.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ClientAdapter.ClientAdapterConnection.Service">
+            <summary>
+            Name of server service.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ClientAdapter.ClientAdapterConnection.Topic">
+            <summary>
+            Name of server topic.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ClientAdapter.ClientAdapterConnection.AttachedQueries">
+            <summary>
+            Returns list of attached queries.  In current implementation, this will always contain
+            either 0 or 1 elements.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.ClientAdapter.ClientAdapterConnection.Mode">
+            <summary>
+            Inidicates the connection style that the client adapter should use.
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.ClientAdapter.ClientAdapterConnection.Mode.CA">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.ClientAdapter.ClientAdapterConnection.Mode.NativeTalipc">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.ClientAdapter.ClientAdapterConnection.Mode.CADirectConnect">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.ConfigItemAttribute">
+            <summary>
+            The ConfigItemAttribute attribute is used to mark public fields in the
+            client's application class as relating to entries in the application's
+            section of the tal.ini file.
+            When the instance of the application class
+            is constructed when the application starts, the constructor reads these
+            fields, and when the application shuts down, an event handler writes
+            the new values back to the tal.ini file.  So all the client has to do to
+            manage the app's configuration is read and set the attributed fields.
+            The cooresponding settings in the tal.ini file will be in the section
+            with same name as the application title, and the setting will have the
+            same name as the field, unless the client specifies otherwise.  The client
+            can also specify a default value, for the case where the value is not
+            present at startup, (in this case the default will be written to the tal.ini
+            the first time the app runs.)  The field can be of any type that can be
+            implicitly converted to and from a string with the Convert.ChangeType
+            method.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ConfigItemAttribute.#ctor">
+            <summary>
+            There are no required parameters for the ConfigItemAttribute attribute.
+            If no optional parameters are set, cooresponding tal.ini setting will
+            have the same name as the field, and be in the section with the same name
+            as the app title.  By default he default value is an empty string.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ConfigItemAttribute.Default">
+            <summary>
+            The Default optional parameter is used to provide a default value
+            for the tal.ini setting that cooresponds to the attributed field.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ConfigItemAttribute.Name">
+            <summary>
+            The Name optional parameter allows the client to specify a different
+            name for the cooresponding tal.ini setting than the name of the
+            attributed field.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ConfigItemAttribute.Section">
+            <summary>
+            The Section optional parameter allows the client to specify a different
+            section name for the cooresponding tal.ini setting than the title of
+            the application.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.Talipc.TalipcConnection">
+            <summary>
+            The TalipcConnection class is a subclass of the Connection class
+            which represents a connection to a TAL server via the TALIPC protocol
+            The TallipcConnection behaves the same as other Connection subclasses.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Talipc.TalipcConnection.AttachQuery(TalTrade.Toolkit.Query)">
+            <summary>
+            
+            </summary>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Talipc.TalipcConnection.DetachQuery(TalTrade.Toolkit.Query)">
+            <summary>
+            
+            </summary>
+            <param name="query"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Talipc.TalipcConnection.Dispose(System.Boolean)">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Talipc.TalipcConnection.Connected">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Talipc.TalipcConnection.Machine">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Talipc.TalipcConnection.Service">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Talipc.TalipcConnection.Topic">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.ToolkitException">
+            <summary>
+            This exception is thrown for general toolkit problems.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ToolkitException.#ctor(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="message"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ToolkitException.#ctor(System.String,System.Exception)">
+            <summary>
+            
+            </summary>
+            <param name="message"></param>
+            <param name="ex"></param>
+        </member>
+        <member name="T:TalTrade.Toolkit.ToolkitArgumentException">
+            <summary>
+            This exception is thrown if an invalid argument is passed to a toolkit method (except for
+            the special case of an invalid null argument, which results in a ToolkitArgumentNullException)
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.ToolkitPerms">
+            <summary>
+            The ToolkitPerms class is used by the toolkit, and assoicated assemblies
+            to retreive toolkit permissions.  The permissions system will be initialized
+            when the "Start()" method is called for the first time.  Usually this
+            happens when the application class is constructed.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ToolkitPerms.Start">
+            <summary>
+            If not already started, initializes YPerms.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ToolkitPerms.Stop">
+            <summary>
+            If initialized, stops and clears YPerms.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ToolkitPerms.IsPermed(System.String)">
+            <summary>
+            Returns true if the specified module of the toolkit is permissioned.
+            </summary>
+            <param name="toolkitModule"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.ToolkitPerms.ConfirmPermedForService(System.String)">
+            <summary>
+            Throws an exception if user not permissioned for connection.
+            </summary>
+            <param name="service"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ToolkitPerms.GetValue(System.String)">
+            <summary>
+            Returns the value of the specified property in the toolkit permissions.
+            </summary>
+            <param name="toolkitModule"></param>
+            <returns></returns>
+        </member>
+        <member name="P:TalTrade.Toolkit.ToolkitPerms.LoggedIn">
+            <summary>
+            Returns true if the users has logged in successfully.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ToolkitPerms.PermsAquired">
+            <summary>
+            Returns true if the toolkit has received permissions from the perms server.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.SyncTimeoutException">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.MessageLoopAsyncThreading">
+            <summary>
+            The MessageLoopAsyncThreading class causes the AsyncQuery class to marshall calls
+            to the event handlers and callbacks to the message loop thread.  This is especially
+            usefully in GUI applications, because you know that a callback that may update your
+            application data will not come in the middle of a Windows.Form event or callback.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.IAsyncThreading">
+            <summary>
+            The IAsyncThreading is an interface which is used by the AsyncQuery object
+            to handle marshalling callbacks to the proper thread.  There are several
+            \"Threading\" classes which implement this interface and allow the client
+            to specify how the AsyncQuery class should thread the callbacks/event handlers
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.IAsyncThreading.DispatchExecuteAck(System.Object,TalTrade.Toolkit.AckEventArgs)">
+            <summary>
+            This method is called by AsyncQuery when it wants to trigger an ExecuteAck callback.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.IAsyncThreading.DispatchOtherAck(System.Object,TalTrade.Toolkit.AckEventArgs)">
+            <summary>
+            This method is called by AsyncQuery when it wants to trigger an OtherAck callback.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.IAsyncThreading.DispatchRequestData(System.Object,TalTrade.Toolkit.DataEventArgs)">
+            <summary>
+            This method is called by AsyncQuery when it wants to trigger a RequestData callback.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.IAsyncThreading.DispatchAdviseData(System.Object,TalTrade.Toolkit.DataEventArgs)">
+            <summary>
+            This method is called by AsyncQuery when it wants to trigger an AdviseData callback.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.IAsyncThreading.DispatchTerminate(System.Object,System.EventArgs)">
+            <summary>
+            This method is called by AsyncQuery when it wants to trigger a Terminate callback.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.IAsyncThreading.DispatchExecute(System.Object,TalTrade.Toolkit.ExecuteEventArgs)">
+            <summary>
+            This method is called by AsyncQuery when it wants to trigger an Execute callback.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.IAsyncThreading.Name">
+            <summary>
+            Returns the name of the Threading class.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.MessageLoopAsyncThreading.#ctor(System.Windows.Forms.Form)">
+            <summary>
+            
+            </summary>
+            <param name="form"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.MessageLoopAsyncThreading.DispatchExecuteAck(System.Object,TalTrade.Toolkit.AckEventArgs)">
+            <summary>
+            
+            </summary>
+            <param name="sender"></param>
+            <param name="aea"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.MessageLoopAsyncThreading.DispatchOtherAck(System.Object,TalTrade.Toolkit.AckEventArgs)">
+            <summary>
+            
+            </summary>
+            <param name="sender"></param>
+            <param name="aea"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.MessageLoopAsyncThreading.DispatchRequestData(System.Object,TalTrade.Toolkit.DataEventArgs)">
+            <summary>
+            
+            </summary>
+            <param name="sender"></param>
+            <param name="dea"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.MessageLoopAsyncThreading.DispatchAdviseData(System.Object,TalTrade.Toolkit.DataEventArgs)">
+            <summary>
+            
+            </summary>
+            <param name="sender"></param>
+            <param name="dea"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.MessageLoopAsyncThreading.DispatchTerminate(System.Object,System.EventArgs)">
+            <summary>
+            
+            </summary>
+            <param name="sender"></param>
+            <param name="ea"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.MessageLoopAsyncThreading.DispatchExecute(System.Object,TalTrade.Toolkit.ExecuteEventArgs)">
+            <summary>
+            
+            </summary>
+            <param name="sender"></param>
+            <param name="dea"></param>
+        </member>
+        <member name="P:TalTrade.Toolkit.MessageLoopAsyncThreading.Name">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.IProtocolTracer">
+            <summary>
+            The IProtocolTracer interface is implemented by a object which wishes to receive
+            trace messages every time a network message is sent or received by a Protocol object.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.IProtocolTracer.Trace(TalTrade.Toolkit.TraceMessage)">
+            <summary>
+            A Protocol object calls this method to inform the object that implements IProtocolTracer
+            that a network message has been sent or received.
+            </summary>
+            <param name="message"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.IProtocolTracer.Trace(System.Int64,TalTrade.Toolkit.TraceMessage.MessageType,TalTrade.Toolkit.TraceMessage.MessageDir,System.String,System.String,System.String,System.String,System.String,System.Nullable{System.Int32},System.Byte[])">
+            <summary>
+            This shortcut just allocates a TraceMessage and then calls the normal Trace method.
+            </summary>
+            <param name="objectId"></param>
+            <param name="type"></param>
+            <param name="dir"></param>
+            <param name="machine"></param>
+            <param name="service"></param>
+            <param name="topic"></param>
+            <param name="item"></param>
+            <param name="format"></param>
+            <param name="result"></param>
+            <param name="data"></param>
+        </member>
+        <member name="T:TalTrade.Toolkit.Internal.ExecuteAckMessage">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Internal.ExecuteAckMessage.#ctor(System.Int32,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="nStatus"></param>
+            <param name="pstnExecute"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.Internal.ExecuteAckMessage.GetMsgType">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:TalTrade.Toolkit.Internal.ExecuteAckMessage.Status">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Internal.ExecuteAckMessage.Execute">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.Field">
+            <summary>
+            The Field class is used to represent the data of a single field.  It is a
+            pair of a field ID (provided as a field name, or FieldInformation ref), and
+            an object reference containing the field data.
+            This class is usally constructed
+            by the RawData class when converting a TAL4 or TAL3 block into .net data.
+            However a client can construct its own field by using the public constructor.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Field.Equals(System.Object)">
+            <summary>
+            Checks two field values for equality.
+            </summary>
+            <param name="operand"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Field.GetHashCode">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Field.Equals(System.Object,System.Object)">
+            <summary>
+            Static version of the equality test.
+            </summary>
+            <param name="operand1"></param>
+            <param name="operand2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Field.CompareTo(System.Object)">
+            <summary>
+            Compares the value of two fields, allows lists of fields to be sorted.
+            </summary>
+            <param name="operand"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Field.#ctor(TalTrade.Toolkit.FieldInformation,TalTrade.Toolkit.FieldType,System.Object)">
+            <summary>
+            This constructor allows the client to construct its own field objects.
+            </summary>
+            <param name="fieldInfo">The field ID</param>
+            <param name="type">The type of field to create</param>
+            <param name="value">The data of the field, boxed into an object reference.</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.Field.#ctor(System.String,TalTrade.Toolkit.FieldType,System.Object)">
+            <summary>
+            This constructor allows the client to construct its own field objects.
+            </summary>
+            <param name="fieldName">The name of the field to create</param>
+            <param name="type">The type of the field to create</param>
+            <param name="value">The data of the field, boxed into an object reference.</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.Field.ToString">
+            <summary>
+             Returns the string representation of the field.  This method allows the
+             client to use the string.Format(), to convert field data into formatted strings.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Field.ToString(System.String,System.IFormatProvider)">
+            <summary>
+            Same as the ToString() method, but allows the use of a format string.
+            </summary>
+            <param name="format"></param>
+            <param name="formatProvider"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Field.op_Explicit(TalTrade.Toolkit.Field)~System.String">
+            <summary>
+            
+            </summary>
+            <param name="f"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Field.op_Explicit(TalTrade.Toolkit.Field)~System.Double">
+            <summary>
+            
+            </summary>
+            <param name="f"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Field.op_Explicit(TalTrade.Toolkit.Field)~TalTrade.Toolkit.Price">
+            <summary>
+            
+            </summary>
+            <param name="f"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Field.op_Explicit(TalTrade.Toolkit.Field)~System.Int32">
+            <summary>
+            
+            </summary>
+            <param name="f"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Field.op_Explicit(TalTrade.Toolkit.Field)~System.TimeSpan">
+            <summary>
+            
+            </summary>
+            <param name="f"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Field.op_Explicit(TalTrade.Toolkit.Field)~System.DateTime">
+            <summary>
+            
+            </summary>
+            <param name="f"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Field.op_Explicit(TalTrade.Toolkit.Field)~TalTrade.Toolkit.FieldError">
+            <summary>
+            
+            </summary>
+            <param name="f"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Field.Value(System.Object)">
+            <summary>
+            
+            </summary>
+            <param name="operand"></param>
+            <returns></returns>
+        </member>
+        <member name="P:TalTrade.Toolkit.Field.Name">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Field.FieldInfo">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Field.Type">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Field.Elements">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Field.StringValue">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Field.StringVectorValue">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Field.DoubleValue">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Field.DoubleVectorValue">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Field.PriceValue">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Field.PriceVectorValue">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Field.IntValue">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Field.IntVectorValue">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Field.TimeValue">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Field.TimeVectorValue">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Field.DateValue">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Field.DateVectorValue">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Field.ErrorValue">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Field.BlobValue">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.ClientAdapter.ClientAdapterToolkitApp">
+            <summary>
+            The ClientAdapterToolkitApp class is a subclass of ToolkitApp that uses
+            the client adapter as the native protocol.  While the client should derive
+            their own application class, it can use this one as is, if it just needs to use
+            the client adapter to talk to servers, and doesn't need any configuration fields.
+            This is useful when writing small applications.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.ToolkitApp">
+            <summary>
+            The ToolkitApp class is an abstract class which controls the infrastructure
+            of a toolkit application.  When writing a toolkit application, the client
+            should subclass ToolkitApp, or a class derrived from it, (TalipcToolkitApp or
+            ClientAdapterToolkitApp.)  If the application is simple the client can
+            just use the TalipcToolkitApp or ClientAdapterToolkitApp as is.  The application
+            class handles the configuration, logging, and connection creating for the app.
+            The title for the application, which is used when logging messages, reading
+            the config from tal.ini, and is reported to talipc, is determined by the
+            AssemblyTitleAttribute attribute for the executing assembly, it should be
+            set for all toolkit applications.  Class derrived from ToolkitApp cannot
+            be constructed unless the machine has the proper toolkit permissions,
+            if it does not, the constructor will throw an exception.  Only one instance
+            of a class derrived from ToolkitApp cab be constructed, attempting to
+            construct a second will throw an exception.  Cleanup code should be placed in the
+            application class finalizer, the toolkit will ensure that it is run when the
+            process exits.
+            The main assembly of the application which uses the toolkit must be indicated when
+            constructing the ToolkitApp object.  If you are using an .exe which is the main assembly
+            use the default constructor.  Otherwise use supply the main assembly as the parameter to the
+            constructor.  The main assembly must have the AssemblyTitle attribute defined.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ToolkitApp.#ctor">
+            <summary>
+            Use this constructor when your main assembly is an exe.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ToolkitApp.#ctor(System.Reflection.Assembly)">
+            <summary>
+            Use this constructor when your main assembly is a dll loaded by another app.
+            </summary>
+            <param name="mainAssembly">The \"main\" assembly of the application.</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ToolkitApp.Dispose(System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="disposing"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ToolkitApp.Dispose">
+            <summary>
+            Close the TAL libraries and clean up resources.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ToolkitApp.Finalize">
+            <summary>
+            Unlike other finalizers, the toolkit will make sure that the finalizer for ToolkitApp is called when the process exits.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ToolkitApp.GetConfigSection(System.String)">
+            <summary>
+            Returns a ConfigSection object for a particular tal.ini section.
+            </summary>
+            <param name="sectionName">The name of the tal.ini section to retrieve.</param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.ToolkitApp.LogMessage(TalTrade.Toolkit.Severity,System.String)">
+            <summary>
+            Sends the value of a string to the message app.
+            </summary>
+            <param name="sev">The severity of the message to send.</param>
+            <param name="message">A string containing the text of the message.</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ToolkitApp.LogMessage(TalTrade.Toolkit.Severity,System.String,System.Object[])">
+            <summary>
+            Formats a string, and sends its value to the message app.  Uses the same
+            syntax and format strings as functions like Console.WriteLine().
+            </summary>
+            <param name="sev">The severity of the message to send.</param>
+            <param name="message">The format string for the message to send</param>
+            <param name="arParam">A varargs style list of objects to use with the format string to generate the message</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ToolkitApp.GetConnection(System.String,System.String,System.String)">
+            <summary>
+            Gets a connection to a server.  What protocol is used depends on the implementation of the 
+            derived class.
+            </summary>
+            <param name="machine">The name of the machine to connect to, or a talipc alias</param>
+            <param name="service">The name of the service on the remote machine</param>
+            <param name="topic">The name of the topic to connect to</param>
+            <returns></returns>
+        </member>
+        <member name="P:TalTrade.Toolkit.ToolkitApp.TheApp">
+            <summary>
+            This static property will return a reference to the one instance of ToolkitApp
+            that can be created.  If it hasn't been constructed yet, it will return null.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ToolkitApp.Disposed">
+            <summary>
+            Returns true if the object has been finalized.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ToolkitApp.AppConfig">
+            <summary>
+            Returns the ConfigSection object which cooresponds to the tal.ini section that has the same name as the assembly title.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ToolkitApp.Name">
+            <summary>
+            The name of the application (the title of the executing assembly)
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ToolkitApp.TalInstallBase">
+            <summary>
+            The root directory of the TAL installation, usually \"C:\\TAL\\\"
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientAdapter.ClientAdapterToolkitApp.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientAdapter.ClientAdapterToolkitApp.GetConnection(System.String,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="machine"></param>
+            <param name="service"></param>
+            <param name="topic"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientAdapter.ClientAdapterToolkitApp.GetConnectionWithMode(System.String,System.String,System.String,TalTrade.Toolkit.ClientAdapter.ClientAdapterConnection.Mode)">
+            <summary>
+            
+            </summary>
+            <param name="machine"></param>
+            <param name="service"></param>
+            <param name="topic"></param>
+            <param name="mode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientAdapter.ClientAdapterToolkitApp.GetConnectionForUser(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="machine"></param>
+            <param name="service"></param>
+            <param name="topic"></param>
+            <param name="user"></param>
+            <param name="domain"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientAdapter.ClientAdapterToolkitApp.Dispose(System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="disposing"></param>
+        </member>
+        <member name="T:TalTrade.Toolkit.Talipc.TalipcToolkitApp">
+            <summary>
+            The TalipcToolkitApp class is a subclass of the ToolkitApp class.
+            It uses the TalipcProtocol as the native protocol.  While
+            the client should subclass its own application class
+            it can use the TalipcToolkitApp class if it only needs
+            to use the TALIPC protocol, and doesn't need any config fields.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Talipc.TalipcToolkitApp.GetConnection(System.String,System.String,System.String)">
+            <summary>
+            The GetConnection() method creates a new Connection object using the TalipcProtocol class.
+            </summary>
+            <param name="machine">The address of the machine to connect to.</param>
+            <param name="service">The service to connect to</param>
+            <param name="topic">The topic of the connection to the service</param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Talipc.TalipcToolkitApp.GetConnectionWithPerms(System.String,System.String,System.String,System.String)">
+            <summary>
+            The GetConnectionWithPerms() method creates a new Connection object using the TalipcProtocol class and passes the desired perm blocks to the server.
+            </summary>
+            <param name="machine">The address of the machine to connect to.</param>
+            <param name="service">The service to connect to</param>
+            <param name="topic">The topic of the connection to the service</param>
+            <param name="permBlocks">A comma seperated list of perm blocks to send to the server</param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Talipc.TalipcToolkitApp.Dispose(System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="disposing"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.Talipc.TalipcToolkitApp.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Talipc.TalipcToolkitApp.#ctor(System.Reflection.Assembly)">
+            <summary>
+            
+            </summary>
+            <param name="mainAssembly"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.Talipc.TalipcToolkitApp.Finalize">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Talipc.TalipcToolkitApp.Talipc">
+            <summary>
+            Returns a reference to the TalipcProtocol instance created by the application.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.FieldType">
+            <summary>
+            The FieldType class is used to indicate what type of data is contained
+            in an IField reference.  If the type is a vector type, then the value
+            anded with 'Vector' will be no zero.
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldType.DoubleScaler">
+            <summary>
+            Scalar double precision floating point value
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldType.PriceScaler">
+            <summary>
+            Scalar price value, (Integer with a base code)
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldType.IntScaler">
+            <summary>
+            Scalar 32 bit integer value
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldType.StringScaler">
+            <summary>
+            Scalar variable length ANSI string value
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldType.DateScaler">
+            <summary>
+            Scalar date value, (date only, time will be set to 12:00am)
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldType.TimeScaler">
+            <summary>
+            Scalar time value, (time past 12:00am)
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldType.EmptyScaler">
+            <summary>
+            Empty field
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldType.BlobScaler">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldType.Tal4Scaler">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldType.ErrorScaler">
+            <summary>
+            Error field, (the server was unable to send this field due to an error)
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldType.Vector">
+            <summary>
+            Vector bit, (a field type t indicates a vector field if and only if t &amp; FieldType.Vector != 0)
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldType.DoubleVec">
+            <summary>
+            Vector of double values
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldType.PriceVec">
+            <summary>
+            Vector of price values
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldType.IntVec">
+            <summary>
+            Vector of integer values
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldType.StringVec">
+            <summary>
+            Vector of string values
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldType.DateVec">
+            <summary>
+            Vector of date values
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldType.TimeVec">
+            <summary>
+            Vector of time values
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.IDataBlock">
+            <summary>
+            The IDataBlock is implemented by any class which represents a TAL data block. "
+            It is derived from ICollection, so it acts as a sequential collection of IRow "
+            references, and is enumerable by constructs such as foreach.",
+            Class which implement IDataBlock are not necessarily immuttable.  But "
+            those that represent simple data blocks (DataBlock and RectDataBlock) are.")
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.IDataBlock.GetFields">
+             <summary>
+             Returns an array containing the FieldInfomration references associated with
+             every field contained in the data block.  The order of the references is not
+             necessarily the same as the order of the fields in the rows, nor is every
+             field contained in the array guarenteed to be in every row.
+            
+             The return value will always be an array of FieldInformation references, and
+             should never have a nullptr value.
+             </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.IDataBlock.Item(System.Int32)">
+            <summary>
+            This indexer allows the client to retrieve the nth row of the data block, just
+            like an array.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.Internal.OtherAckMessage">
+            <summary>
+            Sent when OtherAck callback is received.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Internal.OtherAckMessage.#ctor(System.Int32,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="nStatus"></param>
+            <param name="pstnItem"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.Internal.OtherAckMessage.GetMsgType">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:TalTrade.Toolkit.Internal.OtherAckMessage.Status">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Internal.OtherAckMessage.Item">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.Price">
+            <summary>
+            The Price value type is used to store a price value.  It cooresponds to
+            the TAL LPACK structure.  It contains in integer value, and a base code.
+            The base code determines a fractional multiplier, which is multiplied "
+            by the integer value to get the actual price value.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Price.#ctor(System.Int32,System.Int32)">
+            <summary>
+            This constructor creates a price value from an integer value and a base code.
+            </summary>
+            <param name="val">The integer value</param>
+            <param name="bc">The base code</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.Price.#ctor(System.Int32,TalTrade.Toolkit.Basecode)">
+            <summary>
+            This constructor creates a price value from an integer value and a base code.
+            </summary>
+            <param name="val">The integer value</param>
+            <param name="bc">The base code</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.Price.#ctor(System.String)">
+            <summary>
+            This constructor creates a price value from a string representation of
+            a price value.  (e.g. \"5 1/8\")  The constructor will pick the best
+            base code.
+            </summary>
+            <param name="priceString">A string representation of the price</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.Price.#ctor(System.String,System.Int32)">
+            <summary>
+            This constructor creates a price value from a string representation of 
+            a price value.  (e.g. \"5 1/8\")  The constructor allows the client to
+            specify the base code.
+            </summary>
+            <param name="priceString">A string representation of the price</param>
+            <param name="bc">The desired base code</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.Price.#ctor(System.String,TalTrade.Toolkit.Basecode)">
+            <summary>
+            This constructor creates a price value from a string representation of 
+            a price value.  (e.g. \"5 1/8\")  The constructor allows the client to
+            specify the base code.
+            </summary>
+            <param name="priceString">A string representation of the price</param>
+            <param name="bc">The desired base code</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.Price.Equals(System.Object)">
+            <summary>
+            Test to see if two prices are equal (i.e. the base code and integer value) are the same.
+            </summary>
+            <param name="operand">
+            The value to compare to.  If this object is not of type Price, the
+            comparison automaticaly returns false.
+            </param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Price.GetHashCode">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Price.Equals(System.Object,System.Object)">
+            <summary>
+            Static version of the equality test.
+            </summary>
+            <param name="operand1"></param>
+            <param name="operand2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Price.ToString">
+            <summary>
+            Converts the price to a string representation.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Price.ToString(System.String,System.IFormatProvider)">
+            <summary>
+            Converts the price to a string representation.  Allows the client to
+            provide a formating string (this feature is not yet implemented.)  This
+            method is usally implicitly called by string.Format()
+            </summary>
+            <param name="format">The format string</param>
+            <param name="formatProvider">The format provider, this parameter is not used, and can be null.</param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Price.CompareTo(System.Object)">
+            <summary>
+            Compares two price values
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Price.op_Equality(TalTrade.Toolkit.Price,System.Object)">
+            <summary>
+            The == operator
+            </summary>
+            <param name="operand1"></param>
+            <param name="operand2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Price.op_Inequality(TalTrade.Toolkit.Price,System.Object)">
+            <summary>
+            The != operator
+            </summary>
+            <param name="operand1"></param>
+            <param name="operand2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Price.op_GreaterThan(TalTrade.Toolkit.Price,System.Object)">
+            <summary>
+            The > operator
+            </summary>
+            <param name="operand1"></param>
+            <param name="operand2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Price.op_LessThan(TalTrade.Toolkit.Price,System.Object)">
+            <summary>
+            The &lt; operator
+            </summary>
+            <param name="operand1"></param>
+            <param name="operand2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Price.TBIsValidBaseCode(System.UInt16)">
+             Return Type: BOOL->int
+            wBase: WORD->unsigned short
+        </member>
+        <member name="M:TalTrade.Toolkit.Price.BC_abtop(System.String,System.Int32@,System.Int32@)">
+             Return Type: int
+            szval: char*
+            iBase: int*
+            lplVal: int*
+        </member>
+        <member name="M:TalTrade.Toolkit.Price.BC_atop(System.String,System.Int32,System.Int32@)">
+             Return Type: int
+            szVal: char*
+            iBase: int
+            lplVal: int*
+        </member>
+        <member name="M:TalTrade.Toolkit.Price.TBFormatPriceEx(System.Int32,System.Int32,System.Text.StringBuilder,System.Int32,System.UInt16,System.String)">
+             Return Type: int
+            lVal: LONG->int
+            iBase: int
+            szDest: LPSTR->CHAR*
+            BuffSize: int
+            wFlags: WORD->unsigned short
+            szCurr: LPCSTR->CHAR*
+        </member>
+        <member name="M:TalTrade.Toolkit.Price.TBGetBaseCodeDivisor(System.Int32)">
+             Return Type: int
+            iBase: int
+        </member>
+        <member name="M:TalTrade.Toolkit.Price.TBGetBaseCodeMultiplier(System.Int32)">
+             Return Type: int
+            iBase: int
+        </member>
+        <member name="P:TalTrade.Toolkit.Price.Zero">
+            <summary>
+            This constant is the value of a zero price.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Price.DecimalValue">
+            <summary>
+            Returns the true value of the price as a decimal.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Price.Numerator">
+            <summary>
+            Returns the numerator of the price value, when it is represented as a fraction.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Price.Denominator">
+            <summary>
+            Returns the denominator of the price value, when it is represented as a fraction.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Price.BaseCode">
+            <summary>
+            Returns the base code of the price value, equivilent to the wBase field of the LPACK.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Price.IntegerValue">
+            <summary>
+            Returns the integer value of the price value, equivilent to the lVal field of the LPACK.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.ToolkitPermsException">
+            <summary>
+            This exception is thrown if the application attempts to invoke a toolkit operation for which the
+            user is not currently permissioned.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ToolkitPermsException.CleanExit">
+            <summary>
+            This method will cleanly exit the process, in the case you receive a ToolkitPermsException while constructing a ToolkitApp (or subclass) object.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.FreeAsyncThreading">
+            <summary>
+            The FreeAsyncThreading class causes the AsyncQuery to call the client's callback
+            or event handler on the same thread that the protocol used to trigger the callback.
+            This provides no synchronization, and callbacks can come at any time.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.FreeAsyncThreading.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.FreeAsyncThreading.DispatchExecuteAck(System.Object,TalTrade.Toolkit.AckEventArgs)">
+            <summary>
+            
+            </summary>
+            <param name="sender"></param>
+            <param name="aea"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.FreeAsyncThreading.DispatchOtherAck(System.Object,TalTrade.Toolkit.AckEventArgs)">
+            <summary>
+            
+            </summary>
+            <param name="sender"></param>
+            <param name="aea"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.FreeAsyncThreading.DispatchRequestData(System.Object,TalTrade.Toolkit.DataEventArgs)">
+            <summary>
+            
+            </summary>
+            <param name="sender"></param>
+            <param name="dea"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.FreeAsyncThreading.DispatchAdviseData(System.Object,TalTrade.Toolkit.DataEventArgs)">
+            <summary>
+            
+            </summary>
+            <param name="sender"></param>
+            <param name="dea"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.FreeAsyncThreading.DispatchTerminate(System.Object,System.EventArgs)">
+            <summary>
+            
+            </summary>
+            <param name="sender"></param>
+            <param name="ea"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.FreeAsyncThreading.DispatchExecute(System.Object,TalTrade.Toolkit.ExecuteEventArgs)">
+            <summary>
+            
+            </summary>
+            <param name="sender"></param>
+            <param name="dea"></param>
+        </member>
+        <member name="P:TalTrade.Toolkit.FreeAsyncThreading.Name">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.DataFormat">
+            <summary>
+            The DataFormat enumeration is used to indicate a particular data format.
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.DataFormat.Binary">
+            <summary>
+            Equivalent to the format string "TAL4"
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.DataFormat.Unknown">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.Internal.QueryList">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Internal.QueryList.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Internal.QueryList.Add(TalTrade.Toolkit.Query)">
+            <summary>
+            
+            </summary>
+            <param name="newQuery"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.Internal.QueryList.Remove(TalTrade.Toolkit.Query)">
+            <summary>
+            
+            </summary>
+            <param name="rem"></param>
+        </member>
+        <member name="P:TalTrade.Toolkit.Internal.QueryList.Count">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Internal.QueryList.Item(System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="index"></param>
+            <returns></returns>
+        </member>
+        <member name="P:TalTrade.Toolkit.Internal.QueryList.SafeList">
+            <summary>
+            a list of queries that is safe to enumerate, even if the colleciton
+            is changing at the same time
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.Talipc.TalipcProtocol">
+            <summary>
+            The TalipcProtocol class is a subclass of the Protocol class which implements
+            the infrastructure of the TALIPC protocol.  An application which uses the TALIPC
+            protocol should construct an instance of TalipcProtocol in its application class
+            constructor, and call the Initialize() method.  Also it should call the Cleanup()
+            method in the application class finalizer.  The client can subclass the TalipcToolkitApp
+            class which already does this.  The TalipcProtocol requires the DOTNETTOOLKIT/TALIPC=YES
+            permit in order to instantiate.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Talipc.TalipcProtocol.#ctor(TalTrade.Toolkit.ToolkitApp)">
+            <summary>
+            
+            </summary>
+            <param name="app"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.Talipc.TalipcProtocol.Initialize">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Talipc.TalipcProtocol.Cleanup">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Talipc.TalipcProtocol.CreateConnection(System.String,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="machine"></param>
+            <param name="service"></param>
+            <param name="topic"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Talipc.TalipcProtocol.CreateConnection(System.String,System.String,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="machine"></param>
+            <param name="service"></param>
+            <param name="topic"></param>
+            <param name="perms"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Talipc.TalipcProtocol.RegisterServer(System.String,System.String)">
+            <summary>
+            Use this method to register a talipc service, and create a TalipcDataServer object.
+            </summary>
+            <param name="Service">This string should contain the SERVICE name for the new talipc service.</param>
+            <param name="Topic">This string should contain the TOPIC name for the new talipc service.</param>
+            <returns></returns>
+        </member>
+        <member name="P:TalTrade.Toolkit.Talipc.TalipcProtocol.Tracer">
+            <summary>
+            Returns currently connected protocol tracer.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.DataBlock">
+             <summary>
+             The DataBlock class is used to represent a data block that is not
+             required to be rectangular.  TAL4 data is converted to DataBlock objects.
+            
+             DataBlocks are usually constructed by the RawData.GetDataAsBlock() method,
+             but clients can construct their own.  Usally this is done when the client
+             needs to send data back to the server as TAL4
+             </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.DataBlock.GetFields">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.DataBlock.CopyTo(System.Array,System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="array"></param>
+            <param name="index"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.DataBlock.GetEnumerator">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.DataBlock.#ctor(TalTrade.Toolkit.Row[])">
+            <summary>
+            This constructor allows the client to create a DataBlock object
+            from an array of Row objects.  The function supports variable arguments,
+            so the client can either call it with an array of rows, or with individual rows,
+            each included as its own arguement.  (e.g. DataBlock(rowarray) or DataBlock(row1,row2,row3)
+            </summary>
+            <param name="rows"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.DataBlock.ConvertToBinary">
+            <summary>
+            Constructs a RawData object using this block.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:TalTrade.Toolkit.DataBlock.Item(System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="nIndex"></param>
+            <returns></returns>
+        </member>
+        <member name="P:TalTrade.Toolkit.DataBlock.Count">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.DataBlock.IsSynchronized">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.DataBlock.SyncRoot">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.Basecode">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.Basecode.Cents">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.Basecode.Mills">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.ConfigSection">
+            <summary>
+            The ConfigSection class allows the client to read settings from a section of the
+            tal.ini file.  The class is retreived through the ToolkitApp.GetConfigSection()
+            method, or the ToolkitApp.AppConfig property.  This class cooresponds to one
+            section in the tal.ini file, and allows the client to read and write strings,
+            or to read filenames rooted in the TAL directory.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ConfigSection.#ctor(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="szSection"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ConfigSection.GetFilename(System.String,System.String)">
+            <summary>
+            The GetFilename method retreives a the value of a tal.ini setting, treating it
+            as if it is a filename relative to the TAL directory.  The value returned
+            will be a complete file path.  The client and supply a default value, which
+            will be used if the setting does not exist.
+            </summary>
+            <param name="keyName">The name of the tal.ini setting</param>
+            <param name="defValue">The default value</param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.ConfigSection.GetValue(System.String,System.String)">
+            <summary>
+            The GetValue method retreives the value of a tal.ini setting, and retuns it
+            as a string.  The client can supply a default value, which is used when
+            the setting is not present.
+            </summary>
+            <param name="keyName">The name of the tal.ini setting</param>
+            <param name="defValue">The default value</param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.ConfigSection.SetValue(System.String,System.String)">
+            <summary>
+            "The SetValue method writes a setting to the tal.ini file.  If the setting
+            "already exists, it will be overwritten.
+            </summary>
+            <param name="keyName">The name of the tal.ini setting</param>
+            <param name="defValue">The value to write to the setting</param>
+            <returns></returns>
+        </member>
+        <member name="T:TalTrade.Toolkit.RawDataException">
+            <summary>
+            This exception is thrown if there's a problem reading or writing a RawData object.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.UnadviseEventArgs">
+            <summary>
+            The UnadivseEventArgs is used to pass arguments to unadivse event handlers.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.UnadviseEventArgs.#ctor(TalTrade.Toolkit.ClientAdvise)">
+            <summary>
+            
+            </summary>
+            <param name="advise"></param>
+        </member>
+        <member name="P:TalTrade.Toolkit.UnadviseEventArgs.Advise">
+            <summary>
+            Returns a reference to the ClientAdvise object which cooresponds to the advise which is being unadvised.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.Row">
+            <summary>
+            The Row class represents a row in a non rectangular data block.
+            It is usally constructed by the RawData.GetDataAsBlock() method
+            but can also be constructed by the user.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Row.CopyTo(System.Array,System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="array"></param>
+            <param name="index"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.Row.GetEnumerator">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.Row.#ctor(TalTrade.Toolkit.Field[])">
+            <summary>
+            This constructor can be used by the client to construct a ROW
+            object.  This is done in order to construct a DataBlock object,
+            who's constructor needs an array of Row objects which represent
+            the rows in the data block being constructed.  The constructor
+            supports a variable number of arguments, so the client can pass
+            the fields for the row in as a single array, or each in their own
+            argument.  e.g. Row(fieldArray) or Row(f1,f2,f3,f4).
+            </summary>
+            <param name="fields"></param>
+        </member>
+        <member name="P:TalTrade.Toolkit.Row.Item(System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="P:TalTrade.Toolkit.Row.Item(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="P:TalTrade.Toolkit.Row.Item(TalTrade.Toolkit.FieldInformation)">
+            <summary>
+            
+            </summary>
+            <param name="info"></param>
+            <returns></returns>
+        </member>
+        <member name="P:TalTrade.Toolkit.Row.Count">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Row.IsSynchronized">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.Row.SyncRoot">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.LogDataEventArgs">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.LogDataEventArgs.#ctor(TalTrade.Toolkit.Severity,TalTrade.Toolkit.LogDataEventArgs.DataType,System.String,TalTrade.Toolkit.IDataBlock)">
+            <summary>
+            
+            </summary>
+            <param name="sev"></param>
+            <param name="type"></param>
+            <param name="item"></param>
+            <param name="block"></param>
+        </member>
+        <member name="P:TalTrade.Toolkit.LogDataEventArgs.Data">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.LogDataEventArgs.Item">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.LogDataEventArgs.Severity">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.LogDataEventArgs.Type">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.LogDataEventArgs.DataType">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.LogDataEventArgs.DataType.RequestData">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.LogDataEventArgs.DataType.AdviseData">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.LogDataEventArgs.DataType.PokeData">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.FieldInformation">
+            <summary>
+            The FieldInformation class is used to retreive information about
+            a particular field.  The information is retreived from the parm\\fiddef.lst
+            file from the TAL directory.  Clients can generate custom fields not
+            listed in the fiddef.list file.  If a field number with no fiddef.list entry or
+            custom field is referenced, a blank entry will be created.
+            		   
+            The FieldInformation constructor is private, and FieldInfo instanceses
+            are retreived by the GetFieldInformation static methods.  These methods
+            ensure there is only one instance of a FieldInformation class for a
+            particular field.  So two fields are the same if and only if their
+            Associated FieldInformation objects have the same reference value.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.FieldInformation.ClearFieldInformation">
+            <summary>
+            This is just for unit testing, to let us clear the field map and emulate the case of a totally
+            unknown fid being processed for the first time.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.FieldInformation.GetFieldInformation(System.String)">
+            <summary>
+            Retrieves a FieldInfo instance for a particular field.  If the instance has not
+            yet been constructed, it will be constructed.  If the instance has already
+            been constructed, the already constructed instance will be returned.
+            		   
+            This overload returns nullptr if the field cannot be found in the fiddef.lst, or
+            hasn't already been created as a custom field.
+            </summary>
+            <param name="fieldName">The name of the field</param>
+            <returns>A FieldInformation instance cooresponding to the provided field name is returned.
+            If the field name cannot be found, a nullptr reference is returned.
+            </returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.FieldInformation.GetFieldInformation(System.String,System.Boolean)">
+            <summary>
+            Retreives a FieldInfo instance for a particular field.  If the instance has not
+            yet been constructed, it will be constructed.  If the instance has already
+            been constructed, the already constructed instance will be returned.
+            	   
+            This overload has an option of creating a custom field on the fly if the
+            Indicated field cannot be found.
+            </summary>
+            <param name="fieldName">The name of the field</param>
+            <param name="createTempField">Whether or not to create a custom field if the field name isn't found</param>
+            <returns>A FieldInformation instance cooresponding to the provided field name is returned.
+            If the field name cannot be found, and createCustomField is false, a nullptr
+            reference is returned.
+            </returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.FieldInformation.GetFieldInformation(System.Int32)">
+            <summary>
+            Retreives a FieldInfo instance for a particular field.  If the instance has not
+            yet been constructed, it will be constructed.  If the instance has already
+            been constructed, the already constructed instance will be returned.
+            				   
+            This overload returns nullptr if the field cannot be found in the fiddef.lst, or
+            hasn't already been created as a custom field.
+            </summary>
+            <param name="fieldID">The id number of the field</param>
+            <returns>
+            A FieldInformation instance cooresponding to the provided field id is returned.
+            If the field id cannot be found, a nullptr reference is returned.
+            </returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.FieldInformation.GetFieldInformation(System.Int32,System.Boolean)">
+            <summary>
+            Retreives a FieldInfo instance for a particular field.  If the instance has not
+            yet been constructed, it will be constructed.  If the instance has already
+            been constructed, the already constructed instance will be returned.
+            	   
+            This overload has an option of creating a custom field on the fly if the
+            Indicated field cannot be found.
+            </summary>
+            <param name="fieldID">The id number of the field</param>
+            <param name="createUnlistedField">Whether or not create a custom field if the field id cannot be found.</param>
+            <returns>
+            A FieldInformation instance cooresponding to the provided field id is returned.
+            If the field id cannot be found, and createUnlistedField is false, a nullptr
+            reference is returned.
+            </returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.FieldInformation.GetHashCode">
+            <summary>
+            Returns a hash code for this field.  Can be used to use a field as in index in a hashtable
+            </summary>
+            <returns>
+            The hash code returned is the hash code for the field number
+            </returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.FieldInformation.ToString">
+            <summary>
+            String that contains the number,name,description and type of this field
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.FieldInformation.ForceType(TalTrade.Toolkit.FieldType,System.Boolean)">
+            <summary>
+            When creating an unlisted FID, this function can be used to set the field type.
+            </summary>
+            <param name="t">FieldType for the field</param>
+            <param name="bShort">If an Int field, whether it's a SHORT; otherwise not used</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.FieldInformation.LookupNum(System.Int32)">
+            <summary>
+            Consults FidDef.lst file to get information for given field id.
+            </summary>
+            <param name="iFid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.FieldInformation.LookupName(System.String)">
+            <summary>
+            Consults FidDef.lst file to get information for given field name.
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="P:TalTrade.Toolkit.FieldInformation.ID">
+            <summary>
+            the field ID number
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.FieldInformation.Name">
+            <summary>
+            the field Name
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.FieldInformation.Description">
+            <summary>
+            the field description
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.FieldInformation.Type">
+            <summary>
+            the field type
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.FieldInformation.FidInfo">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldInformation.FidInfo.Name">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldInformation.FidInfo.fid">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldInformation.FidInfo.type">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.FieldInformation.FidInfo.Description">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.NewExecuteAckEventArgs">
+            <summary>
+            The NewExecuteAckEventArgs class is used to pass arguments to a NewExecuteAck event handler.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.NewExecuteAckEventArgs.#ctor(TalTrade.Toolkit.ClientExecuteAck)">
+            <summary>
+            
+            </summary>
+            <param name="exe"></param>
+        </member>
+        <member name="P:TalTrade.Toolkit.NewExecuteAckEventArgs.ExecuteAck">
+            <summary>
+            Returns a reference to the ClientExecute object associated with the execute for which the event was raised.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.ClientAdvise">
+            <summary>
+            The ClientAdvise class is used to store the advise query from the client, and provides
+            methods to respond to the client.  When the client unadvises or terminates the conversation
+            the OnUnadvise event is raised.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientAdvise.#ctor(TalTrade.Toolkit.ClientConnection,System.String,TalTrade.Toolkit.DataFormat)">
+            <summary>
+            
+            </summary>
+            <param name="client"></param>
+            <param name="item"></param>
+            <param name="format"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientAdvise.Ack(System.UInt16)">
+            <summary>
+            OBSOLETE.  You used to use this method to send an ACK or a NAK to the client.  However now the
+            list of advises is entirely managed by the DataServer class.  If you want to reject an incoming
+            advise, you should set the value of NewAdviseEventArgs.ShouldAckAdvise to false in your event handler.
+            </summary>
+            <param name="status">
+            The status of the ACK, the highest bit should be 1 if an ACK, and 0 if a NAK, the other bits are app defined. 
+            If unsure, use 0x0000 for NAK and 0x8000 for ACK.
+            </param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientAdvise.UnadviseAck(System.UInt16)">
+            <summary>
+            Use this method to send an ACK or a NAK for an unadvise of this advise.
+            </summary>
+            <param name="status">The status value, if unsure use 0x0000 for NAK and 0x8000 for ACK.</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientAdvise.SendData(TalTrade.Toolkit.RawData)">
+            <summary>
+            Use this method to send data associated with this advise to the client.
+            </summary>
+            <param name="data">A reference to a RawData object containing the data to send.  The format should match the format specified in the advise.</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientAdvise.Equals(System.Object)">
+            <summary>
+            The Equals method was overriden to allow a ClientAdvise reference to be the key in a HashTable.
+            </summary>
+            <param name="o"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientAdvise.GetHashCode">
+            <summary>
+            The GetHashCode method was overriden to allow a ClientAdvise reference to be the key in a HashTable.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:TalTrade.Toolkit.ClientAdvise.Item">
+            <summary>
+            Returns the item string (TQL query) associated with this advise.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ClientAdvise.Format">
+            <summary>
+            Returns the data format which the client requested for this advise.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ClientAdvise.Client">
+            <summary>
+            Returns a reference to the ClientConnection object associated with this advise.
+            </summary>
+        </member>
+        <member name="E:TalTrade.Toolkit.ClientAdvise.OnUnadvise">
+            <summary>
+            if the client closes this advise, the server can be notified both by this event from the actual
+            ClientAdvise object and also from the equivalent event on the parent ClientConnection object.  They 
+            both get raised, so either one may be used to note the unadvise.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.ClientAdvise.UnadviseHandler">
+            <summary>
+            delegate type for OnUnadvise event
+            </summary>
+            <param name="sender"></param>
+            <param name="ea"></param>
+        </member>
+        <member name="T:TalTrade.Toolkit.ConfigAttributeHelper">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ConfigAttributeHelper.#ctor(System.Object,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="target"></param>
+            <param name="appSection"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ConfigAttributeHelper.GetName(TalTrade.Toolkit.ConfigItemAttribute,System.Reflection.FieldInfo)">
+            <summary>
+            
+            </summary>
+            <param name="item"></param>
+            <param name="field"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.ConfigAttributeHelper.ReadConfig(System.Type)">
+            <summary>
+            
+            </summary>
+            <param name="pType"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ConfigAttributeHelper.WriteConfig(System.Type)">
+            <summary>
+            
+            </summary>
+            <param name="pType"></param>
+        </member>
+        <member name="T:TalTrade.Toolkit.NewExecuteEventArgs">
+            <summary>
+            The NewExecuteEventArgs class is used to pass arguments to a NewExecute event handler.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.NewExecuteEventArgs.#ctor(TalTrade.Toolkit.ClientExecute)">
+            <summary>
+            
+            </summary>
+            <param name="exe"></param>
+        </member>
+        <member name="P:TalTrade.Toolkit.NewExecuteEventArgs.Execute">
+            <summary>
+            Returns a reference to the ClientExecute object associated with the execute for which the event was raised.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.NewClientEventArgs">
+            <summary>
+            Gives details of a newly connected client.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.NewClientEventArgs.#ctor(TalTrade.Toolkit.ClientConnection)">
+            <summary>
+            
+            </summary>
+            <param name="client"></param>
+        </member>
+        <member name="P:TalTrade.Toolkit.NewClientEventArgs.Client">
+            <summary>
+            Returns a reference to a ClientConnection object which cooresponds to the new client.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.Internal.DataMessage">
+            <summary>
+            Sent when Data callback is received.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.RowEnumerator">
+            <summary>
+            This class enumerates the rows contained in an IRow reference.
+            It is generally only used internally by the framework to implement
+            foreach loops.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.RowEnumerator.#ctor(TalTrade.Toolkit.IRow)">
+            <summary>
+            
+            </summary>
+            <param name="row"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.RowEnumerator.MoveNext">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.RowEnumerator.Reset">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.RowEnumerator.Current">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.SyncQuery">
+            <summary>
+            The SyncQuery class is a type of Query.  The SyncQuery allows the client
+            to perform synchronous operations against a server.  (the method doesn't
+            return until the response from the server is ready.)  Only requests, executes
+            and pokes are allowed because advises are intrinsicly asynchronous.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.SyncQuery.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.SyncQuery.Execute(System.String)">
+            <summary>
+            Sends an execute message to the server and waits for the ACK message.
+            </summary>
+            <param name="execute">Returns true if the execute succeeded, otherwise false.</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.SyncQuery.Request(System.String,System.String)">
+            <summary>
+            Sends a request message to the server and waits for the data to return.
+            Returns a RawData reference if the request is successful, and returns
+            a nullptr reference if it fails, or there is no data available.
+            </summary>
+            <param name="item">The TQL query string to send to the server</param>
+            <param name="format">The format the server should use to encode the data.</param>
+            <returns>Returns nullptr if the request was not successfull, otherwise a RawData reference.</returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.SyncQuery.Request(TalTrade.Toolkit.TqlStatement)">
+            <summary>
+            Sends a request message to the server and waits for the data to return.
+            Returns a RawData reference if the request is successful, and returns
+            a nullptr reference if it fails, or there is no data available.
+            </summary>
+            <param name="tql"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.SyncQuery.Request(TalTrade.Toolkit.TqlStatement,TalTrade.Toolkit.DataFormat)">
+            <summary>
+            
+            </summary>
+            <param name="tql"></param>
+            <param name="fmt"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.SyncQuery.Request(System.String,TalTrade.Toolkit.DataFormat)">
+            <summary>
+            
+            </summary>
+            <param name="tql"></param>
+            <param name="fmt"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.SyncQuery.Poke(System.String,TalTrade.Toolkit.RawData)">
+            <summary>
+            Sends a poke message to the server, and waits for the ACK message to return.
+            returns true if the ACK was successful, otherwise false.
+            </summary>
+            <param name="item">The item string identifing the data being poked.</param>
+            <param name="data">The data to poke into the server.</param>
+            <returns>Returns true if the poke was successful, otherwise false.</returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.SyncQuery.Close">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.SyncQuery.TerminateNotify">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.SyncQuery.Timeout">
+            <summary>
+            This property is used to set the timeout for synchronous requests.  The value is the
+            desired timeout in milliseconds.  A value of -1 indicates you want an infinite timeout.
+            The timeout will default to 60 seconds.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.NewTerminateEventArgs.Client">
+            <summary>
+            Returns a reference to a ClientConnection object which cooresponds to the new client.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.Internal.InitAckMessage">
+            <summary>
+            Sent when a InitAck callback is received
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.Internal.InitAckMessage.#ctor(System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="bResult"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.Internal.InitAckMessage.GetMsgType">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:TalTrade.Toolkit.Internal.InitAckMessage.Result">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.LogTextEventArgs">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.LogTextEventArgs.#ctor(TalTrade.Toolkit.Severity,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="sev"></param>
+            <param name="text"></param>
+        </member>
+        <member name="P:TalTrade.Toolkit.LogTextEventArgs.Text">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.TalipcException">
+            <summary>
+            This exception is thrown when there is a communication error in any of the protocols.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.RawData">
+            <summary>
+            The RawData class holds a block of raw binary data.  This can either
+            be data the toolkit has received from a server, or data that the client is going
+            to poke into a server.  A RawData object has a format code associated with it,
+            telling the client what kind of data is contained in it.  Currently only the 
+            "Binary" format is supported, and the client can only access the data as an IDataBlock reference.
+            The class also allows the client to write the data to a stream, and read it back
+            again.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.RawData.#ctor(System.IO.Stream)">
+            <summary>
+            This constructor allows the client to read the contents of a RawData block
+            from a stream.  The contents of the stream must be written with the
+            WriteDataToStream method.
+            </summary>
+            <param name="inputStream"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.RawData.#ctor(System.Byte[],TalTrade.Toolkit.DataFormat)">
+            <summary>
+            This constructor allows the client to create a RawData block from a array of bytes.
+            </summary>
+            <param name="data"></param>
+            <param name="format"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.RawData.GetBinaryData">
+            <summary>
+            Returns a copy of the binary data contained in the object as a managed array of bytes.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.RawData.GetDataAsBlock">
+            <summary>
+            Returns the contents of the RawData object as an IDataBlock
+            reference.  The format must be Binary or BinaryRectangular
+            for this method to work.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.RawData.ConvertToBinary(TalTrade.Toolkit.IDataBlock)">
+            <summary>
+            This static function encodes the data contained in an  IDataBlock
+            reference in the Binary (TAL4) format, and places it in a RawData
+            object.  This is usefull when the client needs to construct a TAL4
+            block to poke into a server.
+            </summary>
+            <param name="block"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.RawData.WriteDataToStream(System.IO.Stream)">
+            <summary>
+            Writes the contents of a RawData object (both the binary data, and
+            the data format code), to an output stream.  It can be read back
+            using the public constructor for RawData.
+            </summary>
+            <param name="outputStream"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.RawData.#ctor(TalTrade.Toolkit.IDataBlock)">
+            <summary>
+            constructs a RawData object from a data block
+            </summary>
+            <param name="block0"></param>
+        </member>
+        <member name="P:TalTrade.Toolkit.RawData.ByteCount">
+            <summary>
+            Returns the byte count of the data contained in the object.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.RawData.Format">
+            <summary>
+            Returns the format of the data contained in the object.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.RawData.FormatString">
+            <summary>
+            Returns data format as a string formatted correctly for the wire (i.e. Binary -> TAL4)
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.BlockEnumerator">
+            <summary>
+            This class enumerates the rows contained in an IDataBlock reference.
+            It is generally only used internally by the framework to implement
+            foreach loops.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.BlockEnumerator.#ctor(TalTrade.Toolkit.IDataBlock)">
+            <summary>
+            
+            </summary>
+            <param name="block"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.BlockEnumerator.MoveNext">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TalTrade.Toolkit.BlockEnumerator.Reset">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.BlockEnumerator.Current">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.DataEventArgs">
+            <summary>
+            The DataEventArgs class provides data to a Data event handler.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.DataEventArgs.#ctor(System.String,System.String,TalTrade.Toolkit.RawData)">
+            <summary>
+            
+            </summary>
+            <param name="item"></param>
+            <param name="format"></param>
+            <param name="data"></param>
+        </member>
+        <member name="P:TalTrade.Toolkit.DataEventArgs.Item">
+            <summary>
+            Returns the item, (usually a TQL query), that the data is associated with.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.DataEventArgs.Format">
+            <summary>
+            Returns the format of the data.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.DataEventArgs.Data">
+            <summary>
+            Returns the actual data as a RawData object.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.ClientRequest">
+            <summary>
+            The ClientRequest class contains the data, and the response methods for
+            a TQL request from the client.
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientRequest.#ctor(TalTrade.Toolkit.ClientConnection,System.String,TalTrade.Toolkit.DataFormat)">
+            <summary>
+            The constructor is usually only used by the protocol implementations, not by the user.
+            </summary>
+            <param name="client"></param>
+            <param name="item"></param>
+            <param name="format"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientRequest.Nak(System.UInt16)">
+            <summary>
+            Use the method to NAK the request.
+            </summary>
+            <param name="status">The status of the NAK, the highest bit of the status should be 0.</param>
+        </member>
+        <member name="M:TalTrade.Toolkit.ClientRequest.Respond(TalTrade.Toolkit.RawData)">
+            <summary>
+            Use the method to send data to the client in response to this request.
+            </summary>
+            <param name="response">
+            A RawData reference that contains the response to the request.
+            The format of the RawData object should match the format specified in the request.
+            </param>
+        </member>
+        <member name="P:TalTrade.Toolkit.ClientRequest.Item">
+            <summary>
+            Returns the item string (TQL query) of the request.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ClientRequest.Format">
+            <summary>
+            Returns the requested format for the request.
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.ClientRequest.Client">
+            <summary>
+            Returns a reference to the ClientConnection that issued the request.
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.MapField">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:TalTrade.Toolkit.MapField.#ctor(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="fieldName"></param>
+        </member>
+        <member name="M:TalTrade.Toolkit.MapField.#ctor(System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="fieldID"></param>
+        </member>
+        <member name="P:TalTrade.Toolkit.MapField.ID">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.TqlStatement">
+            <summary>
+            Encapsulation of an Item and Format
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.TqlStatement.Item">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:TalTrade.Toolkit.TqlStatement.Format">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:TalTrade.Toolkit.Severity">
+            <summary>
+            The Severity enumeration is used to indicate the severity level to use
+            when sending a log message to the TAL message app.
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.Severity.Trace">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.Severity.Info">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.Severity.Warning">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:TalTrade.Toolkit.Severity.Critical">
+            <summary>
+            
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -76,6 +76,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\IQFeed.lnk" "$INSTDIR\IQFeedBroker.exe" "" "$INSTDIR\IQFeedBroker.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\NxCore32.lnk" "$INSTDIR\ServerNxCore32.exe" "" "$INSTDIR\ServerNxCore32.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\NxCore64.lnk" "$INSTDIR\ServerNxCore64.exe" "" "$INSTDIR\ServerNxCore64.exe" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink Connectors\RealTick.lnk" "$INSTDIR\RealTickConnector.exe" "" "$INSTDIR\RealTickConnector.exe" 0  
   
   
   ; install these files
@@ -127,6 +128,8 @@ Section "TradeLinkSuite"
   File "ServerRedi\bin\release\Interop.RediLib.dll"
   File "ServerRedi\bin\release\VBRediClasses.dll"
   
+  File "ServerRealTick\bin\release\RealTickConnector.exe"
+  File "ServerRealTick\dll\*"
   
   
   File "ServerNxCore\bin\release\NxCoreAPI64.dll"

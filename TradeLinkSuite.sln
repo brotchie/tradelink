@@ -55,6 +55,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerFix", "ServerFix\Serv
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerNxCore64", "ServerNxCore64\ServerNxCore64.csproj", "{0FD33798-3620-4544-BB1F-AA4A3E1C70A0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerRealTick", "ServerRealTick\ServerRealTick.csproj", "{A6D4A7B4-ACD2-45DB-9A4A-B42DCFE4FBAE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -369,6 +371,14 @@ Global
 		{0FD33798-3620-4544-BB1F-AA4A3E1C70A0}.Release|Any CPU.Build.0 = Release|x64
 		{0FD33798-3620-4544-BB1F-AA4A3E1C70A0}.Release|x64.ActiveCfg = Release|Any CPU
 		{0FD33798-3620-4544-BB1F-AA4A3E1C70A0}.Release|x86.ActiveCfg = Release|Any CPU
+		{A6D4A7B4-ACD2-45DB-9A4A-B42DCFE4FBAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6D4A7B4-ACD2-45DB-9A4A-B42DCFE4FBAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6D4A7B4-ACD2-45DB-9A4A-B42DCFE4FBAE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A6D4A7B4-ACD2-45DB-9A4A-B42DCFE4FBAE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A6D4A7B4-ACD2-45DB-9A4A-B42DCFE4FBAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6D4A7B4-ACD2-45DB-9A4A-B42DCFE4FBAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6D4A7B4-ACD2-45DB-9A4A-B42DCFE4FBAE}.Release|x64.ActiveCfg = Release|Any CPU
+		{A6D4A7B4-ACD2-45DB-9A4A-B42DCFE4FBAE}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

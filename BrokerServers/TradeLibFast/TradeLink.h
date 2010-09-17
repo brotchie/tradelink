@@ -159,8 +159,8 @@
 
 	enum Brokers
 	{
-		Unknown = -1,
-		Error = 0,
+		        Unknown = -1,
+        Error = 0,
         TradeLink = 1,
         Assent,
         InteractiveBrokers,
@@ -182,7 +182,12 @@
         GAINCapital,
         FxCm,
         OpenEcry,
-        DBFX
+        DBFX,
+        Nanex,
+        KnightTrading,
+        PATS,
+        FIX,
+        RealTick,
 	};
 
 

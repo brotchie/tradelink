@@ -1,6 +1,9 @@
 ﻿
 namespace TradeLink.API
 {
+    /// <summary>
+    /// data feed and broker providers known to tradelink
+    /// </summary>
     public enum Providers
     {
         Unknown = -1,
@@ -31,5 +34,6 @@ namespace TradeLink.API
         KnightTrading,
         PATS,
         FIX,
+        RealTick,
     }
 }
