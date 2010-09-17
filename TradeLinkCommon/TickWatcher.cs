@@ -33,6 +33,13 @@ namespace TradeLink.Common
             }
         }
 
+        bool _ismassalertcleared = false;
+        /// <summary>
+        /// will be true if mass alerted existed previously and was cleared.
+        /// this value can only be checked once as it will reset to false once read
+        /// </summary>
+        public bool isMassAlertCleared { get { bool v = _ismassalertcleared; if (v) _ismassalertcleared = !v; return v; } }
+
         public IEnumerator GetEnumerator()
         {
             foreach (string s in _last.Keys)
@@ -241,7 +248,10 @@ namespace TradeLink.Common
                         GotMassAlert(_lasttime);
                     }
                     else if (!alert && _alerting)
+                    {
                         _alerting = false;
+                        _ismassalertcleared = true;
+                    }
                 }
                 if (!alltrading && !sentmissingfirstticks 
                     && (_starttime!=0) && (_lasttime > _starttime))
