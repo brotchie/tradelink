@@ -833,6 +833,20 @@ histperiod=daily&startdate=" + startdate + "&enddate=" + enddate + "&output=csv&
             return true;
         }
 
+        /// <summary>
+        /// given some number of intervals, return a list of same intervals with duplicates removed
+        /// </summary>
+        /// <param name="ints"></param>
+        /// <returns></returns>
+        public static BarInterval[] GetUniqueIntervals(params BarInterval[] ints)
+        {
+            List<BarInterval> final = new List<BarInterval>(ints.Length);
+            foreach (BarInterval bi in ints)
+                if (!final.Contains(bi))
+                    final.Add(bi);
+            return final.ToArray();
+        }
+
 
     }
 
