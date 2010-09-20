@@ -13,6 +13,7 @@ namespace TradeLink.AppKit
     {
         public delegate void AuthInfoDelegate(TradeLink.AppKit.AuthInfo ai);
         public event AuthInfoDelegate NewAuthInfo;
+        public event DebugDelegate SendDebugEvent;
 
         public AuthInfoPrompt() : this(new TradeLink.AppKit.AuthInfo()) { }
         public AuthInfoPrompt(TradeLink.AppKit.AuthInfo authinfo)
@@ -23,6 +24,17 @@ namespace TradeLink.AppKit
             _pw.Text = ai.Password;
             Invalidate(true);
             
+        }
+
+        public void status(string msg)
+        {
+            if (InvokeRequired)
+                Invoke(new DebugDelegate(status), new object[] { msg });
+            else
+            {
+                _stat.Text = msg;
+                _stat.Invalidate();
+            }
         }
 
         public void Toggle()
@@ -44,6 +56,7 @@ namespace TradeLink.AppKit
             if (NewAuthInfo != null)
                 NewAuthInfo(ai);
 	        DialogResult = System.Windows.Forms.DialogResult.OK;
+            debug("accepted auth info.");
             Close();
             
         }
@@ -52,17 +65,20 @@ namespace TradeLink.AppKit
         static AuthInfoPrompt aip;
         static string PROGRAM = string.Empty;
         static string BASEPATH = string.Empty;
+        public const string DEFAULTPROMPT = @"Enter your portal login info below.";
         public static void Prompt(string program) { Prompt(program, Auth.GetProgramAuth(program), true, null); }
         public static void Prompt(string program, AuthInfo ai) { Prompt(program, ai, true, null); }
         public static void Prompt(string program, bool pause) { Prompt(program, Auth.GetProgramAuth(program), pause, null); }
         public static void Prompt(string program, AuthInfo ai, bool pause) { Prompt(program, ai, pause, null); }
-        public static void Prompt(string program, AuthInfo ai, bool pause, DebugDelegate deb) { Prompt(program, Common.Util.ProgramData(program),ai, pause, null); }
-        public static void Prompt(string program, string basepath, AuthInfo ai, bool pause, DebugDelegate deb)
+        public static void Prompt(string program, AuthInfo ai, bool pause, DebugDelegate deb) { Prompt(program, Common.Util.ProgramData(program),ai, pause, DEFAULTPROMPT,null); }
+        public static void Prompt(string program, string basepath, AuthInfo ai, bool pause, string promptmsg, DebugDelegate deb)
         {
             PROGRAM = program;
             BASEPATH = basepath+"\\";
             aip = new AuthInfoPrompt(ai);
+            aip.status(promptmsg);
             aip.NewAuthInfo += new AuthInfoDelegate(aip_NewAuthInfo);
+            d = deb;
             if (pause)
                 aip.ShowDialog();
             else
@@ -76,7 +92,7 @@ namespace TradeLink.AppKit
 
         static void debug(string msg)
         {
-            if (d != null)
+            if (d!=null)
             {
                 d(msg);
             }

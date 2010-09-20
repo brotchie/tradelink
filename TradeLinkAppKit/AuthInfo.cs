@@ -23,12 +23,12 @@ namespace TradeLink.AppKit
         /// isvalid auth information
         /// </summary>
         public bool isValid { get { return (Username != null) && (Password != null); } }
-
+        public const string AuthFile = "\\_AuthInfo.txt";
         public static bool SetProgramAuth(string program, AuthInfo ai) { return SetProgramAuth(program, ai, null); }
-        public static bool SetProgramAuth(string program, AuthInfo ai, DebugDelegate deb) { return SetProgramAuth(Common.Util.ProgramData(program), ai, deb); }
+        public static bool SetProgramAuth(string program, AuthInfo ai, DebugDelegate deb) { return SetProgramAuth(Common.Util.ProgramData(program),program, ai, deb); }
         public static bool SetProgramAuth(string basepath, string program, AuthInfo ai, DebugDelegate deb)
         {
-            return SetAuthInfo(basepath + program + Auth.AuthFile, ai, deb);
+            return SetAuthInfo(basepath+Auth.AuthFile, ai, deb);
         }
         public static bool SetAuthInfo(string file, AuthInfo ai) { return SetAuthInfo(file, ai, null); }
         public static bool SetAuthInfo(string file, AuthInfo ai, DebugDelegate deb)
