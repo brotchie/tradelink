@@ -324,37 +324,19 @@ namespace TradeLink.AppKit
             return id;
         }
 
-        /// <summary>
-        /// get authentication information from a file with username in first line and password in the second.
-        /// </summary>
-        /// <param name="filepath"></param>
-        /// <returns></returns>
+        [Obsolete("use AuthInfo.GetProgramAuth")]
         public static AuthInfo GetAuthInfo(string filepath)
         {
-            AuthInfo ai = new AuthInfo();
-            try
-            {
-                System.IO.StreamReader sr = new System.IO.StreamReader(filepath);
-                // skip user
-                ai.Username = sr.ReadLine();
-                // get password
-                ai.Password = sr.ReadLine();
-                sr.Close();
-                return ai;
-            }
-            catch { }
-            return ai;
+            return AuthInfo.GetAuthInfo(filepath);
         }
-        /// <summary>
-        /// get authentication information in the program path of PROGRAM
-        /// </summary>
-        /// <param name="PROGRAM"></param>
-        /// <returns></returns>
+
+        [Obsolete("use AuthInfo.GetProgramAuth")]
         public static AuthInfo GetProgramAuth(string PROGRAM)
         {
-            string filepath = Util.ProgramPath(PROGRAM) + TradeLink.AppKit.Auth.AuthFile;
-            return GetAuthInfo(filepath);
+            return AuthInfo.GetProgramAuth(PROGRAM);
         }
+
+
     }
 
 
