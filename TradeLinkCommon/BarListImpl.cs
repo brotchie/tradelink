@@ -781,6 +781,58 @@ histperiod=daily&startdate=" + startdate + "&enddate=" + enddate + "&output=csv&
             return DayFromURL(urlTemplate, symbol);
         }
 
+        /// <summary>
+        /// load previous days bar data from tick files located in tradelink tick folder
+        /// </summary>
+        /// <param name="PreviousDay"></param>
+        /// <param name="syms"></param>
+        /// <param name="AttemptToLoadPreviousDayBars"></param>
+        /// <param name="_blt"></param>
+        /// <param name="NewBarEvents"></param>
+        /// <param name="deb"></param>
+        /// <returns></returns>
+        public static bool LoadPreviousBars(int PreviousDay, string[] syms, bool AttemptToLoadPreviousDayBars, ref BarListTracker _blt, SymBarIntervalDelegate NewBarEvents, DebugDelegate deb)
+        {
+            if (AttemptToLoadPreviousDayBars)
+            {
+                bool errors = false;
+                foreach (string sym in syms)
+                {
+                    string fn = Util.TLTickDir + "\\" + sym + PreviousDay + TikConst.DOT_EXT;
+                    if (System.IO.File.Exists(fn))
+                    {
+                        try
+                        {
+                            BarList test = BarListImpl.FromTIK(fn);
+                            _blt[sym] = BarListImpl.FromTIK(fn, true, false, _blt[sym].CustomIntervals, _blt[sym].Intervals);
+                            _blt[sym].GotNewBar += NewBarEvents;
+                            if (deb != null)
+                                deb(sym + " loaded historical bars from: " + fn);
+                        }
+                        catch (Exception ex)
+                        {
+                            errors = true;
+                            if (deb != null)
+                            {
+                                deb(sym + " error loading historical bars from: " + fn);
+                                deb(ex.Message + ex.StackTrace);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        errors = true;
+                        if (deb != null)
+                        {
+                            deb(sym + " starting from zero, no historical bar data at: " + fn);
+                        }
+                    }
+                }
+                return !errors;
+            }
+            return true;
+        }
+
 
     }
 
