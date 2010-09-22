@@ -27,6 +27,16 @@ namespace TradeLink.AppKit
             Comission = com;
             ReportTime = reporttime;
         }
+        int _livecheckafterXticks = 1;
+        /// <summary>
+        /// wait to do live test after X ticks have arrived
+        /// </summary>
+        public int CheckLiveAfterTickCount { get { return _livecheckafterXticks; } set { _livecheckafterXticks = value; } }
+        int _livetickdelaymax = 60;
+        /// <summary>
+        /// if a tick is within this many seconds of current system time on same day, tick stream is considered live and reports can be sent
+        /// </summary>
+        public int CheckLiveMaxDelaySec { get { return _livetickdelaymax; } set { _livetickdelaymax = value; } }
         decimal rfr = .01m;
         decimal RiskFreeRate { get { return rfr; } set { rfr = value; } }
         decimal com = .01m;
@@ -80,6 +90,7 @@ namespace TradeLink.AppKit
             _msg.AppendLine(_time + ": " + msg);
         }
         int _time = 0;
+        int _ticks = 0;
         /// <summary>
         /// pass ticks as they arrive (only necessary if using report time)
         /// </summary>
@@ -87,21 +98,29 @@ namespace TradeLink.AppKit
         public void newTick(Tick k)
         {
             _time = k.time;
-            if (_livecheck)
+            if (_livecheck && (_ticks++>CheckLiveAfterTickCount))
             {
                 bool dmatch = k.date == Util.ToTLDate();
-                bool tmatch = Util.FTDIFF(k.time, Util.ToTLTime()) < 60;
+                bool tmatch = Util.FTDIFF(k.time, Util.ToTLTime()) < CheckLiveMaxDelaySec;
                 _islive = dmatch && tmatch;
                 _livecheck = false;
 
             }
-            if (_islive && sendreport && (k.time >= _rt))
+            ScheduledReportHit(k.time);
+        }
+
+        public bool ScheduledReportHit(int time)
+        {
+            if (_islive && sendreport && (time>=_rt))
             {
                 sendreport = false;
-                debug(k.symbol + " hit report time: " + ReportTime + " at: " + k.time);
+                debug("hit report time: " + ReportTime + " at: " + time);
                 Report();
+                return true;
             }
+            return false;
         }
+
 
         const int bufsize = 100000;
         /// <summary>
