@@ -87,7 +87,7 @@ namespace TradeLink.Common
         public bool newTick(Tick tick) 
         {
             _lasttime = tick.time;
-            if ((GotAlert != null) || (GotFirstTick != null))
+            if ((AllsymbolsTicking != null) || (GotAlert != null) || (GotFirstTick != null))
             {
                 int last = tick.time;
                 // ensure we are storing per-symbol times
