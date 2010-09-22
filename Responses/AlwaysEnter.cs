@@ -76,6 +76,9 @@ namespace Responses
             // keep track of position
             D(fill.symbol + " fill: " + fill.ToString());
             _pt.Adjust(fill);
+            // ensure fill comes from this response
+            int idx = _entrysignal.getindex(fill.symbol);
+            if (idx < 0) return;
             // reset signals if we're flat (allows re-entry)
             if (_pt[fill.symbol].isFlat)
             {
