@@ -21,7 +21,8 @@ namespace TradeLink.API
         int date { get; set; }
         /// <summary>
         /// date and time represented as long, eg 8:05pm on 4th of July:
-        /// 200907042005
+        /// 200907042005.
+        /// this is not guaranteed to be set.
         /// </summary>
         long datetime { get; set; } // datetime as long
         /// <summary>
@@ -93,6 +94,11 @@ namespace TradeLink.API
         bool isQuote { get; }
         bool isValid { get; }
         bool isIndex { get; }
+        /// <summary>
+        /// index of symbol associated with this tick.
+        /// this is not guaranteed to be set
+        /// </summary>
+        int symidx { get; set; }
     }
 
     public class InvalidTick : Exception { }

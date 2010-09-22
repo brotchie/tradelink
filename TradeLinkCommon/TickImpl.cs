@@ -10,6 +10,8 @@ namespace TradeLink.Common
     [Serializable]
     public struct TickImpl : TradeLink.API.Tick
     {
+        int _symidx;
+        public int symidx { get { return _symidx; } set { _symidx = value; } }
         public string symbol { get { return _sym; } set { _sym = value; } }
         public int size { get { return _size; } set { _size = value; } }
         public int depth { get { return _depth; } set { _depth = value; } }
@@ -84,6 +86,7 @@ namespace TradeLink.Common
             _bid = 0;
             _ask = 0;
             _datetime = 0;
+            _symidx = 0;
         }
         public static TickImpl Copy(Tick c)
         {
@@ -102,6 +105,7 @@ namespace TradeLink.Common
             k.be = c.be;
             k.oe = c.oe;
             k.ex = c.ex;
+            k.symidx = c.symidx;
             return k;
         }
         /// <summary>
@@ -120,7 +124,7 @@ namespace TradeLink.Common
             k.datetime = b.datetime;
             k.symbol = b.symbol;
             k.depth = b.depth;
-
+            k.symidx = b.symidx;
             if (b.isTrade)
             {
                 k.trade = b.trade;
