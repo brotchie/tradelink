@@ -23,7 +23,7 @@ namespace ServerFix
             ContextMenu.MenuItems.Add("report", new EventHandler(report));
             _dc.Parent = this;
             _dc.Dock = DockStyle.Fill;
-            TradeLink.API.TradeLinkServer tls;
+            TradeLink.API.TLServer tls;
             if (Properties.Settings.Default.TLClientAddress == string.Empty)
                 tls = new TradeLink.Common.TLServer_WM();
             else

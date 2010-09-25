@@ -14,7 +14,7 @@ namespace Replay
 {
     public partial class Replay : AppTracker
     {
-        TradeLinkServer tl;
+        TLServer tl;
             
         Playback _playback = null;
         HistSimImpl h = new HistSimImpl();

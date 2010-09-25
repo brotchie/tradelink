@@ -49,12 +49,26 @@ namespace RealTickConnector
             _app = app;
             newProviderName = Providers.RealTick;
             _bw = new Thread(new ParameterizedThreadStart(doqueues));
-            newRegisterStocks += new DebugDelegate(ServerRealTick_newRegisterStocks);
+            newRegisterSymbols += new SymbolRegisterDel(ServerRealTick_newRegisterSymbols);
             newSendOrderRequest += new OrderDelegateStatus(ServerRealTick_newSendOrderRequest);
             newOrderCancelRequest += new LongDelegate(ServerRealTick_newOrderCancelRequest);
             newFeatureRequest += new MessageArrayDelegate(ServerRealTick_newFeatureRequest);
             newPosList += new PositionArrayDelegate(ServerRealTick_gotSrvPosList);
             newAcctRequest += new StringDelegate(ServerRealTick_newAcctRequest);
+        }
+
+        void ServerRealTick_newRegisterSymbols(string client, string symbols)
+        {
+            debug("Subscribe request: " + symbols);
+            if (!isConnected)
+            {
+                debug("not connected.");
+                return;
+            }
+            // save list of symbols to subscribe
+            _newsymlist = AllClientBasket.ToString();
+            // notify other thread to subscribe to them
+            _newsyms.Write(true);
         }
 
         void doqueues(object obj)
@@ -417,19 +431,7 @@ namespace RealTickConnector
         long _numDisplayed = 0;
         long _numIgnored = 0;
         System.Threading.AutoResetEvent _done = new System.Threading.AutoResetEvent(false);
-        public void ServerRealTick_newRegisterStocks(string msg)
-        {
-            debug("Subscribe request: " + msg);
-            if (!isConnected)
-            {
-                debug("not connected.");
-                return;
-            }
-            // save list of symbols to subscribe
-            _newsymlist = msg;
-            // notify other thread to subscribe to them
-            _newsyms.Write(true);
-        }
+
 
 
         internal bool Start()

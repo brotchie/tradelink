@@ -6,32 +6,109 @@ using TradeLink.AppKit;
 using NxCoreAPI;
 namespace ServerNxCore
 {
-    public class ServerNxCore 
+    public class ServerNxCore
     {
-        static GenericTracker<bool> _ssym = new GenericTracker<bool>();
-        static TradeLinkServer tl;
+
+        static TLServer tl;
         public event DebugDelegate SendDebugEvent;
         void debug(string msg)
         {
             if (SendDebugEvent != null)
                 SendDebugEvent(msg);
         }
-        GenericTracker<bool> _syms = new GenericTracker<bool>(2000);
+        const int ESTMAXSYMBOLS = 10000;
+        static GenericTracker<bool> _syms = new GenericTracker<bool>(ESTMAXSYMBOLS);
+        static GenericTracker<string> _realsymbol = new GenericTracker<string>(ESTMAXSYMBOLS);
         public const string LIVEFEED = "";
 
         string _fn = LIVEFEED;
-        public bool isLive { get { return _fn == LIVEFEED; } }
-        public ServerNxCore(TradeLinkServer tls, string filename,DebugDelegate debugs)
+        bool _islive = true;
+        bool hasstate { get { return isLive && System.IO.File.Exists(statefilepath); } }
+        string statefilepath { get { return Environment.CurrentDirectory + "\\nxstate." + Util.ToTLDate() + ".tmp"; } }
+        public bool isLive { get { return _islive; } }
+        public ServerNxCore(TLServer tls, string filename, DebugDelegate debugs)
         {
+            _fn = filename;
+            _islive = _fn == LIVEFEED;
+            _syms.NewTxt += new TextIdxDelegate(_syms_NewTxt);
             SendDebugEvent = debugs;
             d = debugs;
-            _fn = filename;
+
             _proc = new System.Threading.Thread(proc);
             tl = tls;
             tl.newProviderName = Providers.Nanex;
-           
             tl.newFeatureRequest += new MessageArrayDelegate(ServerNxCore_newFeatureRequest);
-            tl.newRegisterStocks += new DebugDelegate(ServerNxCore_newRegisterStocks);
+            tl.newRegisterSymbols += new SymbolRegisterDel(tl_newRegisterSymbols);
+            if (isLive)
+            {
+                DOLIVESKIPTEST = true;
+                // if live and no previous state, remove old state files
+                if (!hasstate)
+                {
+                    System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(Environment.CurrentDirectory);
+                    System.IO.FileInfo[] fis = di.GetFiles("nxstate.*.tmp");
+                    foreach (System.IO.FileInfo fi in fis)
+                    {
+                        try
+                        {
+                            System.IO.File.Delete(fi.FullName);
+                        }
+                        catch { }
+                    }
+                }
+                else
+                    _fn = statefilepath;
+            }
+
+        }
+
+        void _syms_NewTxt(string txt, int idx)
+        {
+
+        }
+
+        Basket old = new BasketImpl();
+
+        void tl_newRegisterSymbols(string client, string symbols)
+        {
+            D("got subscribe request: " + client + ": " + symbols);
+
+            // ensure new symbols are added
+            Basket newb = tl.AllClientBasket;
+            // ensure we have an id
+            foreach (string sym in newb.ToSymArray())
+            {
+                Security sec = SecurityImpl.Parse(sym);
+                char p;
+                if (sec.Type == SecurityType.STK)
+                    p = 'e';
+                else if (sec.Type == SecurityType.BND)
+                    p = 'b';
+                else if (sec.Type == SecurityType.FUT)
+                    p = 'f';
+                else if (sec.Type == SecurityType.IDX)
+                    p = 'i';
+                else if (sec.Type == SecurityType.OPT)
+                    p = 'o';
+                else if (sec.Type == SecurityType.CASH)
+                    p = 'c';
+                else if (sec.Type == SecurityType.FOP)
+                    p = 'p';
+                else
+                    p = 'e';
+                string nxsym = p + sec.Symbol;
+                _syms.addindex(nxsym, true);
+                _realsymbol.addindex(nxsym, sec.Symbol);
+            }
+            // ensure old symbols are removed
+            if (old.Count > 0)
+            {
+                Basket rem = BasketImpl.Subtract(old, newb);
+                foreach (Security s in rem)
+                    _syms[s.Symbol] = false;
+            }
+            // save new as old
+            old = newb;
         }
         System.Threading.Thread _proc;
 
@@ -54,10 +131,11 @@ namespace ServerNxCore
             }
             debug(ServerNxCoreMain.PROGRAM + " started ok.");
         }
-        bool _go = true;
+        volatile bool _go = true;
         void proc()
         {
-            while (_go)
+
+            while (!QUIT)
             {
                 try
                 {
@@ -66,7 +144,10 @@ namespace ServerNxCore
                         NxCore.ProcessTape(_fn,
                          null, 0, 0,
                          OnNxCoreCallback);
+
                     }
+                    else
+                        break;
                 }
                 catch (Exception ex)
                 {
@@ -80,13 +161,13 @@ namespace ServerNxCore
             _go = false;
         }
         static bool QUIT = false;
+        static bool DOLIVESKIPTEST = false;
         static unsafe int OnNxCoreCallback(IntPtr pSys, IntPtr pMsg)
         {
             // Alias structure pointers to the pointers passed in.
             NxCoreSystem* pNxCoreSys = (NxCoreSystem*)pSys;
             NxCoreMessage* pNxCoreMsg = (NxCoreMessage*)pMsg;
-            if (QUIT)
-                return (int)NxCore.NxCALLBACKRETURN_STOP;
+
             // Do something based on the message type
             switch (pNxCoreMsg->MessageType)
             {
@@ -107,13 +188,18 @@ namespace ServerNxCore
                     //OnNxCoreMMQuote(pNxCoreSys, pNxCoreMsg);
                     break;
             }
+            if (QUIT)
+            {
+                D("NxCore thread received exit signal.");
+                return (int)NxCore.NxCALLBACKRETURN_STOP;
+            }
             // Continue running the tape
             return (int)NxCore.NxCALLBACKRETURN_CONTINUE;
         }
         static DebugDelegate d;
         static void D(string msg)
         {
-            if (d!=null)
+            if (d != null)
                 d(msg);
         }
         static unsafe void OnNxCoreStatus(NxCoreSystem* pNxCoreSys, NxCoreMessage* pNxCoreMsg)
@@ -143,14 +229,26 @@ namespace ServerNxCore
                     break;
                 case NxCore.NxCORESTATUS_RUNNING:
                     break;
+                case NxCore.NxCORESTATUS_LOADED_STATE:
+                    D("Nxcore has been loaded from a saved state.");
+                    break;
+                case NxCore.NxCORESTATUS_SAVING_STATE:
+                    D("Nxcore is now saving it's current state.");
+                    break;
             }
         }
         static unsafe void OnNxCoreTrade(NxCoreSystem* pNxCoreSys, NxCoreMessage* pNxCoreMsg)
         {
+            if (DOLIVESKIPTEST)
+            {
+                if (pNxCoreSys->nxTime.MsOfDay < (DateTime.UtcNow.TimeOfDay.TotalMilliseconds - (DateTime.Now.IsDaylightSavingTime() ? (1000 * 60 * 60 * 4) : (1000 * 60 * 60 * 5))))
+                    return;
+                DOLIVESKIPTEST = false;
+                D("NxCore starting realtime data");
+            }
             // Get the symbol for category message
-            String Symbol = new String(&pNxCoreMsg->coreHeader.pnxStringSymbol->String);
-            Symbol = Symbol.Remove(0, 1);
-            int idx = _ssym.getindex(Symbol);
+
+            int idx = _syms.getindex(new string(&pNxCoreMsg->coreHeader.pnxStringSymbol->String));
             if (idx < 0) return;
             // Assign a pointer to the Trade data
             NxCoreTrade* Trade = &pNxCoreMsg->coreData.Trade;
@@ -166,7 +264,7 @@ namespace ServerNxCore
             // check for index
             if (size <= 0) return;
             Tick k = new TickImpl();
-            k.symbol = Symbol;
+            k.symbol = _realsymbol[idx];
             k.date = tldate;
             k.time = tltime;
             k.trade = (decimal)Price;
@@ -178,21 +276,27 @@ namespace ServerNxCore
             }
             catch (Exception e)
             {
-                D("bad tick: " + k.symbol + " " + Price + " " + size + " " + ex+" "+e.Message+e.StackTrace);
+                D("bad tick: " + k.symbol + " " + Price + " " + size + " " + ex + " " + e.Message + e.StackTrace);
             }
         }
         static unsafe void OnNxCoreExgQuote(NxCoreSystem* pNxCoreSys, NxCoreMessage* pNxCoreMsg)
-	    {
-	      // Get the symbol for category message
-	      String Symbol = new String(&pNxCoreMsg->coreHeader.pnxStringSymbol->String);
-          Symbol = Symbol.Remove(0, 1);
-              int idx = _ssym.getindex(Symbol);
-              if (idx < 0) return;
-          
-	      // Assign a pointer to the ExgQuote data
-	      NxCoreExgQuote* Quote = &pNxCoreMsg->coreData.ExgQuote;
+        {
+            if (DOLIVESKIPTEST)
+            {
+                if (pNxCoreSys->nxTime.MsOfDay < (DateTime.UtcNow.TimeOfDay.TotalMilliseconds - (DateTime.Now.IsDaylightSavingTime() ? (1000 * 60 * 60 * 4) : (1000 * 60 * 60 * 5))))
+                    return;
+                DOLIVESKIPTEST = false;
+                D("NxCore starting realtime data");
+            }
+            // Get the symbol for category message
+
+            int idx = _syms.getindex(new string(&pNxCoreMsg->coreHeader.pnxStringSymbol->String));
+            if (idx < 0) return;
+
+            // Assign a pointer to the ExgQuote data
+            NxCoreExgQuote* Quote = &pNxCoreMsg->coreData.ExgQuote;
             NxCoreQuote cq = Quote->coreQuote;
-	      // Get bid and ask price
+            // Get bid and ask price
             double bid = 0;
             double ask = 0;
             int bs = 0;
@@ -201,78 +305,64 @@ namespace ServerNxCore
             string oe = string.Empty;
             bool bbid = false;
             bool bask = false;
-          if ((cq.BidPriceChange != 0) || (cq.BidSizeChange != 0))
-          {
-              bid = NxCore.PriceToDouble(Quote->coreQuote.BidPrice, Quote->coreQuote.PriceType);
-              bs = Quote->coreQuote.BidSize;
-              be = excode2name(Quote->BestBidExg);
-              bbid = true;
-          }
-          if ((cq.AskPriceChange != 0) || (cq.AskSizeChange != 0))
-          {
-              ask = NxCore.PriceToDouble(Quote->coreQuote.AskPrice, Quote->coreQuote.PriceType);
-              os = Quote->coreQuote.AskSize;
-              oe = excode2name(Quote->BestAskExg);
-              bask = true;
-          }
-          if (bask || bbid)
-          {
-              NxTime time = pNxCoreMsg->coreHeader.nxExgTimestamp;
-              int tltime = time.Hour * 10000 + time.Minute * 100 + time.Second;
-              NxDate date = pNxCoreMsg->coreHeader.nxSessionDate;
-              int tldate = (int)date.Year * 10000 + (int)date.Month * 100 + (int)date.Day;
-              Tick k = new TickImpl();
-              k.symbol = Symbol;
-              k.date = tldate;
-              k.time = tltime;
-              if (bask && bbid)
-              {
-                  k.bid = (decimal)bid;
-                  k.bs = bs;
-                  k.be = be;
-                  k.ask = (decimal)ask;
-                  k.os = os;
-                  k.oe = oe;
-              }
-              else if (bbid)
-              {
-                  k.bid = (decimal)bid;
-                  k.bs = bs;
-                  k.be = be;
-              }
-              else
-              {
-                  k.ask = (decimal)ask;
-                  k.os = os;
-                  k.oe = oe;
-              }
-              try
-              {
-                  tl.newTick(k);
-              }
-              catch (Exception ex)
-              {
-                  D("bad tick: " + k.ToString()+" "+ex.Message+ex.StackTrace);
-              }
-          }
-      }
+            if ((cq.BidPriceChange != 0) || (cq.BidSizeChange != 0))
+            {
+                bid = NxCore.PriceToDouble(Quote->coreQuote.BidPrice, Quote->coreQuote.PriceType);
+                bs = Quote->coreQuote.BidSize;
+                be = excode2name(Quote->BestBidExg);
+                bbid = true;
+            }
+            if ((cq.AskPriceChange != 0) || (cq.AskSizeChange != 0))
+            {
+                ask = NxCore.PriceToDouble(Quote->coreQuote.AskPrice, Quote->coreQuote.PriceType);
+                os = Quote->coreQuote.AskSize;
+                oe = excode2name(Quote->BestAskExg);
+                bask = true;
+            }
+            if (bask || bbid)
+            {
+                NxTime time = pNxCoreMsg->coreHeader.nxExgTimestamp;
+                int tltime = time.Hour * 10000 + time.Minute * 100 + time.Second;
+                NxDate date = pNxCoreMsg->coreHeader.nxSessionDate;
+                int tldate = (int)date.Year * 10000 + (int)date.Month * 100 + (int)date.Day;
+                Tick k = new TickImpl();
+                k.symbol = _realsymbol[idx];
+                k.date = tldate;
+                k.time = tltime;
+                if (bask && bbid)
+                {
+                    k.bid = (decimal)bid;
+                    k.bs = bs;
+                    k.be = be;
+                    k.ask = (decimal)ask;
+                    k.os = os;
+                    k.oe = oe;
+                }
+                else if (bbid)
+                {
+                    k.bid = (decimal)bid;
+                    k.bs = bs;
+                    k.be = be;
+                }
+                else
+                {
+                    k.ask = (decimal)ask;
+                    k.os = os;
+                    k.oe = oe;
+                }
+                try
+                {
+                    tl.newTick(k);
+                }
+                catch (Exception ex)
+                {
+                    D("bad tick: " + k.ToString() + " " + ex.Message + ex.StackTrace);
+                }
+            }
+        }
         static unsafe void OnNxCoreMMQuote(NxCoreSystem* pNxCoreSys, NxCoreMessage* pNxCoreMsg)
         {
-            // Get the symbol for category message
-            String Symbol = new String(&pNxCoreMsg->coreHeader.pnxStringSymbol->String);
-            // Assign a pointer to the MMQuote data
-            NxCoreMMQuote* Quote = &pNxCoreMsg->coreData.MMQuote;
-            if ((IntPtr)Quote->pnxStringMarketMaker == IntPtr.Zero) return;
-            //String MarketMaker = new String(&Quote->pnxStringMarketMaker->String);
-            // Get bid and ask price
-            //double Bid = NxCore.PriceToDouble(Quote->coreQuote.BidPrice, Quote->coreQuote.PriceType);
-            //double Ask = NxCore.PriceToDouble(Quote->coreQuote.AskPrice, Quote->coreQuote.PriceType);
-            
-            /*D(string.Format("MMQuote for Symbol: {0:S}, MarketMaker: {1:S}  Time: {2:d}:{3:d}:{4:d}  Bid: {5:f}  Ask: {6:f}  BidSize: {7:d}  AskSise: {8:d}  Exchg: {9:d} ",
-                              Symbol, MarketMaker,
-                              pNxCoreMsg->coreHeader.nxExgTimestamp.Hour, pNxCoreMsg->coreHeader.nxExgTimestamp.Minute, pNxCoreMsg->coreHeader.nxExgTimestamp.Second,
-                              Bid, Ask, Quote->coreQuote.BidSize, Quote->coreQuote.AskSize,
-                              pNxCoreMsg->coreHeader.ReportingExg));*/
+
         }
         static string excode2name(uint code)
         {
@@ -294,18 +384,7 @@ namespace ServerNxCore
             catch { }
             return string.Empty;
         }
-        void ServerNxCore_newRegisterStocks(string msg)
-        {
-            D("got quote request for: " + msg);
-            // get new basket
-            Basket b = BasketImpl.FromString(msg);
-            _syms = new GenericTracker<bool>(2000);
-            // ensure we have an id
-            foreach (string sym in b.ToSymArray())
-                _syms.addindex(sym, true);
-            // save it
-            _ssym = _syms;
-        }
+
         MessageTypes[] ServerNxCore_newFeatureRequest()
         {
             List<MessageTypes> f = new List<MessageTypes>();

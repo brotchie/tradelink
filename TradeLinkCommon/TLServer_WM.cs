@@ -11,15 +11,45 @@ namespace TradeLink.Common
     /// this version of server supports communication with clients via windows messaging.
     /// </summary>
     [System.ComponentModel.DesignerCategory("")]
-    public class TLServer_WM : Form, TradeLinkServer
+    public class TLServer_WM : Form, TLServer
     {
+        public Basket AllClientBasket
+        {
+            get
+            {
+
+                Basket b = new BasketImpl();
+                for (int i = 0; i < stocks.Count; i++)
+                    b.Add(BasketImpl.FromString(stocks[i]));
+                return b;
+            }
+        }
+        public bool SymbolSubscribed(string sym)
+        {
+            for (int i = 0; i < client.Count; i++)
+            {
+                if (client[i] == string.Empty) continue;
+                else if (stocks[i].Contains(sym))
+                        return true;
+            }
+            return false;
+        }
+        public string ClientName(int num) { return client[num]; }
+
+        public string ClientSymbols(string client)
+        {
+            int cid = client.IndexOf(client);
+            if (cid < 0) return string.Empty;
+            return stocks[cid];
+        }
+
         Providers _pn = Providers.Unknown;
         public Providers newProviderName { get { return _pn; } set { _pn = value; } }
         public event StringDelegate newAcctRequest;
         public event OrderDelegateStatus newSendOrderRequest;
         public event LongDelegate newOrderCancelRequest;
         public event PositionArrayDelegate newPosList;
-        public event DebugDelegate newRegisterStocks;
+        public event SymbolRegisterDel newRegisterSymbols;
         public event MessageArrayDelegate newFeatureRequest;
         public event UnknownMessageDelegate newUnknownRequest;
         public event VoidDelegate newImbalanceRequest;
@@ -196,7 +226,7 @@ namespace TradeLink.Common
             if (cid == -1) return;
             stocks[cid] = stklist;
             SrvBeatHeart(cname);
-            if (newRegisterStocks != null) newRegisterStocks(stklist);
+            if (newRegisterSymbols != null) newRegisterSymbols(cname, stklist);
             debug(cname + " registered symbols: " + stklist);
         }
 

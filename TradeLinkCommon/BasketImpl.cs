@@ -13,6 +13,33 @@ namespace TradeLink.Common
     public class BasketImpl : TradeLink.API.Basket
     {
         /// <summary>
+        /// gets symbols removed from new list of symbols, given original list
+        /// </summary>
+        /// <param name="old"></param>
+        /// <param name="newb"></param>
+        /// <returns></returns>
+        public static Basket Subtract(string[] old, string[] newb)
+        {
+            return Subtract(new BasketImpl(old), new BasketImpl(newb));
+        }
+        /// <summary>
+        /// gets symbols removed from newbasket, given original basket
+        /// </summary>
+        /// <param name="old"></param>
+        /// <param name="newb"></param>
+        /// <returns></returns>
+        public static Basket Subtract(Basket old, Basket newb)
+        {
+            if (old.Count == 0) return new BasketImpl();
+            Basket rem = new BasketImpl();
+            foreach (Security sec in old)
+            {
+                if (!newb.ToString().Contains(sec.Symbol))
+                    rem.Add(sec);
+            }
+            return rem;
+        }
+        /// <summary>
         /// Create a basket of securities
         /// </summary>
         /// <param name="onesymbol">first symbol</param>

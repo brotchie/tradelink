@@ -29,7 +29,7 @@ namespace SterServer
             ContextMenu.MenuItems.Add("report", new EventHandler(report));
             try
             {
-                TradeLink.API.TradeLinkServer tls;
+                TradeLink.API.TLServer tls;
                 if (Properties.Settings.Default.TLClientAddress == string.Empty)
                 {
                     tls = new TradeLink.Common.TLServer_WM();

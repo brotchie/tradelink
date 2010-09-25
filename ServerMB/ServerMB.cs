@@ -11,7 +11,7 @@ namespace ServerMB
 {
     public class ServerMB : IMbtQuotesNotify
     {
-        TradeLinkServer tl;
+        TLServer tl;
         public MbtComMgr m_ComMgr;
         public MbtOrderClient m_OrderClient;
         public MbtQuotes m_Quotes;
@@ -27,7 +27,7 @@ namespace ServerMB
         //TODO: make this configurable from the app.config
         bool DisableOldTicks;
 
-        public ServerMB(TradeLinkServer tls)
+        public ServerMB(TLServer tls)
         {
             tl = tls;
             m_ComMgr = null;
@@ -56,7 +56,7 @@ namespace ServerMB
             tl.newProviderName = Providers.MBTrading;
             tl.newFeatureRequest += new MessageArrayDelegate(tl_newFeatureRequest);
             tl.newSendOrderRequest += new OrderDelegateStatus(tl_newSendOrderRequest);
-            tl.newRegisterStocks += new DebugDelegate(tl_newRegisterStocks);
+            tl.newRegisterSymbols += new SymbolRegisterDel(tl_newRegisterSymbols);
             tl.newOrderCancelRequest += new LongDelegate(tl_newOrderCancelRequest);
             tl.newAcctRequest += new StringDelegate(tl_newAcctRequest);
             tl.newPosList += new PositionArrayDelegate(tl_newPosList);
@@ -86,6 +86,33 @@ namespace ServerMB
             //disable old ticks
             //DisableOldTicks = Convert.ToBoolean(ConfigurationSettings.AppSettings["DisableOldTicks"]);
             DisableOldTicks = true;
+        }
+
+        void tl_newRegisterSymbols(string client, string symbols)
+        {
+            test();
+            string[] syms = tl.AllClientBasket.ToString().Split(',');
+            m_Quotes.UnadviseAll(this);
+            for (int i = 0; i < syms.Length; i++)
+            {
+                if (syms[i].Contains("."))
+                {
+                    //we can reasonably assume this is an options request
+                    m_Quotes.AdviseSymbol(this, syms[i], (int)enumQuoteServiceFlags.qsfOptions);
+                }
+                else if (syms[i].Contains("/"))
+                {
+                    //we know (or can at least reasonably assume) this is forex
+                    //advise only level1 bid-ask quotes
+                    m_Quotes.AdviseSymbol(this, syms[i], (int)enumQuoteServiceFlags.qsfLevelOne);
+                    //m_Quotes.AdviseSymbol(this, syms[i], (int)enumQuoteServiceFlags.qsfLevelTwo);
+                }
+                else
+                {
+                    //probably equity, advise time and sales
+                    m_Quotes.AdviseSymbol(this, syms[i], ((int)enumQuoteServiceFlags.qsfTimeAndSales));
+                }
+            }
         }
 
         long tl_newUnknownRequest(MessageTypes t, string msg)
@@ -595,32 +622,7 @@ namespace ServerMB
                 debug(String.Format("No matching broker order found to cancel for {0}", tlid));
         }
 
-        void tl_newRegisterStocks(string msg)
-        {
-            test();
-            string[] syms = msg.Split(',');
-            m_Quotes.UnadviseAll(this);
-            for (int i = 0; i < syms.Length; i++)
-            {
-                if (syms[i].Contains("."))
-                {
-                    //we can reasonably assume this is an options request
-                    m_Quotes.AdviseSymbol(this, syms[i], (int)enumQuoteServiceFlags.qsfOptions);
-                }
-                else if (syms[i].Contains("/"))
-                {
-                    //we know (or can at least reasonably assume) this is forex
-                    //advise only level1 bid-ask quotes
-                    m_Quotes.AdviseSymbol(this, syms[i], (int)enumQuoteServiceFlags.qsfLevelOne);
-                    //m_Quotes.AdviseSymbol(this, syms[i], (int)enumQuoteServiceFlags.qsfLevelTwo);
-                }
-                else
-                {
-                    //probably equity, advise time and sales
-                    m_Quotes.AdviseSymbol(this, syms[i], ((int)enumQuoteServiceFlags.qsfTimeAndSales));
-                }
-            }
-        }
+
 
         void SendNewTick(TickImpl k)
         {

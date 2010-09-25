@@ -24,7 +24,7 @@ namespace ServerEsignal
         
         public EsignalMain()
         {
-            TradeLinkServer tls;
+            TLServer tls;
             if (Properties.Settings.Default.TLClientAddress == string.Empty)
                 tls = new TLServer_WM();
             else

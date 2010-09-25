@@ -17,7 +17,7 @@ namespace ServerDBFX
         Log _log = new Log(PROGRAM);
         public ServerDBFXMain()
         {
-            TradeLink.API.TradeLinkServer tl;
+            TradeLink.API.TLServer tl;
             if (Properties.Settings.Default.TLClientAddress == string.Empty)
                 tl = new TLServer_WM();
             else

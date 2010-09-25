@@ -25,7 +25,7 @@ namespace ServerBlackwood
         public bool isValid { get { return _valid; } }
         PositionTracker pt = new PositionTracker();
         
-        public ServerBlackwood(TradeLinkServer tls)
+        public ServerBlackwood(TLServer tls)
         {
             tl = tls;
             // broker stuff
@@ -44,12 +44,47 @@ namespace ServerBlackwood
             tl.newFeatureRequest += new MessageArrayDelegate(ServerBlackwood_newFeatureRequest);
             tl.newOrderCancelRequest += new LongDelegate(ServerBlackwood_newOrderCancelRequest);
             tl.newSendOrderRequest += new OrderDelegateStatus(ServerBlackwood_newSendOrderRequest);
-            tl.newRegisterStocks += new DebugDelegate(ServerBlackwood_newRegisterStocks);
+            tl.newRegisterSymbols += new SymbolRegisterDel(tl_newRegisterSymbols);
             tl.newPosList += new PositionArrayDelegate(ServerBlackwood_newPosList);
             //tl.newImbalanceRequest += new VoidDelegate(ServerBlackwood_tl.newImbalanceRequest);
             //DOMRequest += new IntDelegate(ServerBlackwood_DOMRequest);
             
             
+        }
+
+        void tl_newRegisterSymbols(string client, string symbols)
+        {
+            Basket b = BasketImpl.FromString(symbols);
+            foreach (Security s in b)
+            {
+                // make sure we don't already have a subscription for this
+                if (_symstk.Contains(s.Symbol)) continue;
+                BWStock stk = m_Session.GetStock(s.Symbol);
+                stk.Subscribe();
+                stk.OnTrade += new BWStock.TradeHandler(stk_OnTrade);
+                //stk.OnLevel2Update += new BWStock.Level2UpdateHandler(stk_OnLevel2Update);
+                stk.OnLevel1Update += new BWStock.Level1UpdateHandler(stk_OnLevel1Update);
+                _stocks.Add(stk);
+                _symstk.Add(s.Symbol);
+            }
+            // get existing list
+            Basket list = tl.AllClientBasket;
+            // remove old subscriptions
+            for (int i = 0; i < _symstk.Count; i++)
+            {
+
+                if (!list.ToString().Contains(_symstk[i]) && (_stocks[i]!=null))
+                {
+                    debug(_symstk[i] + " not needed, removing...");
+                    try
+                    {
+                        _stocks[i].Unsubscribe();
+                        _stocks[i] = null;
+                        _symstk[i] = string.Empty;
+                    }
+                    catch { }
+                }
+            }
         }
         Position[] ServerBlackwood_newPosList(string account)
         {
@@ -63,22 +98,7 @@ namespace ServerBlackwood
         List<BWStock> _stocks = new List<BWStock>();
         List<string> _symstk = new List<string>();
         
-        void ServerBlackwood_newRegisterStocks(string msg)
-        {
-            Basket b = BasketImpl.FromString(msg);
-            foreach (Security s in b)
-            {
-                // make sure we don't already have a subscription for this
-                if (_symstk.Contains(s.Symbol)) continue;
-                BWStock stk = m_Session.GetStock(s.Symbol);
-                stk.Subscribe();
-                stk.OnTrade += new BWStock.TradeHandler(stk_OnTrade);
-                //stk.OnLevel2Update += new BWStock.Level2UpdateHandler(stk_OnLevel2Update);
-                stk.OnLevel1Update += new BWStock.Level1UpdateHandler(stk_OnLevel1Update);
-                _stocks.Add(stk);
-                _symstk.Add(s.Symbol);
-            }
-        }
+
         void ServerBlackwood_newImbalanceRequest()
         {
             m_Session.RequestNYSEImbalances();
@@ -257,7 +277,7 @@ namespace ServerBlackwood
             k.time = TradeLink.Common.Util.ToTLTime();
             tl.newTick(k);
         }
-        TradeLinkServer tl;
+        TLServer tl;
         public void Start()
         {
             if (tl != null)

@@ -19,7 +19,7 @@ namespace SterServer
         STIPosition stiPos;
         STIQuote stiQuote;
         STIBook stiBook;
-        TradeLinkServer tl;
+        TLServer tl;
 
         bool _ignoreoutoforderticks = true;
         public bool IgnoreOutOfOrderTicks { get { return _ignoreoutoforderticks; } set { _ignoreoutoforderticks = value; } }
@@ -35,7 +35,7 @@ namespace SterServer
         bool _supportcover = true;
         public bool CoverEnabled { get { return _supportcover; } set { _supportcover = value; } }
         
-        public ServerSterling(TradeLinkServer tls, int sleepOnNodata, int sleepAfterOrder, DebugDelegate deb)
+        public ServerSterling(TLServer tls, int sleepOnNodata, int sleepAfterOrder, DebugDelegate deb)
         {
             SendDebug = deb;
             tl = tls;
@@ -80,7 +80,7 @@ namespace SterServer
                 tl.newProviderName = Providers.Sterling;
                 tl.newSendOrderRequest += new OrderDelegateStatus(tl_gotSrvFillRequest);
                 tl.newPosList += new PositionArrayDelegate(tl_gotSrvPosList);
-                tl.newRegisterStocks += new DebugDelegate(tl_RegisterStocks);
+                tl.newRegisterSymbols += new SymbolRegisterDel(tl_newRegisterSymbols);
                 tl.newOrderCancelRequest += new LongDelegate(tl_OrderCancelRequest);
                 tl.newFeatureRequest += new MessageArrayDelegate(tl_newFeatureRequest);
                 tl.newUnknownRequest += new UnknownMessageDelegate(tl_newUnknownRequest);
@@ -95,6 +95,24 @@ namespace SterServer
             debug(PROGRAM + " started.");
             _connected = true;
             return _connected;
+        }
+
+        RingBuffer<string> removesym = new RingBuffer<string>(1000);
+        void tl_newRegisterSymbols(string client, string symbols)
+        {
+            if (VerboseDebugging)
+                debug("client subscribe request received: " + symbols);
+            // get original basket
+            Basket org = BasketImpl.FromString(symquotes);
+            // if we had something before, check if something was removed
+            if (org.Count > 0)
+            {
+                Basket rem = BasketImpl.Subtract(org, tl.AllClientBasket);
+                foreach (Security s in rem)
+                    removesym.Write(s.Symbol);
+            }
+            symquotes = tl.AllClientBasket.ToString();
+            _symsq.Write(true);
         }
 
         void stiEvents_OnSTIShutdown()
@@ -393,12 +411,18 @@ namespace SterServer
                             debug("Make sure you have set the account in sending program.");
                     }
 
-                    // quotes
+                    // new quotes
                     if (!_symsq.isEmpty)
                     {
                         _symsq.Read();
                         foreach (string sym in symquotes.Split(','))
                             stiQuote.RegisterQuote(sym, "*");
+                    }
+                    // old quotes
+                    while (removesym.hasItems)
+                    {
+                        string rem = removesym.Read();
+                        stiQuote.DeRegisterQuote(rem, "*");
                     }
 
                     // cancels
@@ -519,10 +543,7 @@ namespace SterServer
 
         void tl_RegisterStocks(string msg)
         {
-            if (VerboseDebugging)
-                debug("client subscribe request received: " + msg);
-            symquotes = msg;
-            _symsq.Write(true);
+
         }
 
 

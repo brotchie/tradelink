@@ -19,7 +19,7 @@ namespace ServerBlackwood
 
         public ServerBlackwoodMain()
         {
-            TradeLinkServer tl;
+            TLServer tl;
             if (Properties.Settings.Default.TLClientAddress == string.Empty)
                 tl = new TLServer_WM();
             else

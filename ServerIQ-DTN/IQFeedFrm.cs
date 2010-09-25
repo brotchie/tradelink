@@ -22,7 +22,7 @@ namespace IQFeedBroker
 
         public IQFeedFrm()
         {
-            TradeLink.API.TradeLinkServer tls;
+            TradeLink.API.TLServer tls;
             if (Properties.Settings.Default.TLClientAddress == string.Empty)
                 tls = new TradeLink.Common.TLServer_WM();
             else
@@ -33,6 +33,7 @@ namespace IQFeedBroker
             InitializeComponent();
             this.FormClosing += IQFeedFrm_FormClosing;
             _helper = new IQFeedHelper(tls);
+            _helper.ReleaseDeadSymbols = Properties.Settings.Default.ReleaseDeadSymbols;
             _helper.MktCodes = parsemkts(Properties.Resources.marketcenters);
             _helper.SendDebug += new DebugDelegate(_helper_SendDebug);
             _helper.Connected += new IQFeedHelper.booldel(_helper_Connected);

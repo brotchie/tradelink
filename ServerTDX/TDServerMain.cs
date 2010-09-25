@@ -20,7 +20,7 @@ namespace TDServer
         private bool LOGGEDIN;
        // AmeritradeBrokerAPI api = new AmeritradeBrokerAPI();
         const string APIVER = "1";
-        TradeLinkServer tl = new TLServer_WM();
+        TLServer tl = new TLServer_WM();
         public const string PROGRAM = "ServerTDX BETA";
         Log _log = new Log(PROGRAM);
         public TDServerMain()
@@ -42,7 +42,7 @@ namespace TDServer
             tl.newAcctRequest += new StringDelegate(tl_gotSrvAcctRequest);
             tl.newOrderCancelRequest += new LongDelegate(tl_newOrderCancelRequest);
             tl.newUnknownRequest += new UnknownMessageDelegate(tl_newUnknownRequest);
-            tl.newRegisterStocks += new DebugDelegate(tl_newRegisterStocks);
+            tl.newRegisterSymbols +=new SymbolRegisterDel(tl_newRegisterSymbols);
             tl.newPosList += new PositionArrayDelegate(tl_newPosList);
 
             api.OnStatusChange += new Axtdaactx.ITDAAPICommEvents_OnStatusChangeEventHandler(api_OnStatusChange);
@@ -52,6 +52,27 @@ namespace TDServer
             //api.rs_ActivesStreaming.TickWithArgs += new AmeritradeBrokerAPI.EventHandlerWithArgs(rs_ActivesStreaming_TickWithArgs);
             api.OnL1Quote += new Axtdaactx.ITDAAPICommEvents_OnL1QuoteEventHandler(api_LevelOneStreaming);
             doLogin();
+        }
+
+        
+        void tl_newRegisterSymbols(string client, string symbols)
+        {
+            Basket mb = tl.AllClientBasket;
+            api.UnsubscribeAll();
+            // clear idx values
+            _isidx.Clear();
+            //Close_Connections(false);
+            foreach (Security s in mb)
+            {
+                //if (api.SymbTD_IsStockSymbolValid(s.Symbol))
+                {
+                    if (s.Symbol.Contains("$"))
+                        _isidx.Add(s.Symbol, true);
+                    api.Subscribe(s.Symbol, tdaactx.TxTDASubTypes.TDAPI_SUB_L1);//, service, this);
+
+                }
+            }
+
         }
 
         void rs_ActivesStreaming_TickWithArgs(DateTime time, AmeritradeBrokerAPI.ATradeArgument args)
@@ -152,25 +173,7 @@ namespace TDServer
                 return y;
             return false;
         }
-        void tl_newRegisterStocks(string msg)
-        {
-            api.UnsubscribeAll();
-            Basket mb = BasketImpl.Deserialize(msg);
-            // clear idx values
-            _isidx.Clear();
-            //Close_Connections(false);
-            foreach (Security s in mb)
-            {                
-                //if (api.SymbTD_IsStockSymbolValid(s.Symbol))
-                {
-                    if (s.Symbol.Contains("$"))
-                        _isidx.Add(s.Symbol, true);
-                    api.Subscribe(s.Symbol, tdaactx.TxTDASubTypes.TDAPI_SUB_L1);//, service, this);
 
-                }
-            }
-            
-        }
 
         string GetExchange(string sym)
         {

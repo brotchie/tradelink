@@ -4,8 +4,11 @@ using TradeLink.API;
 
 namespace TradeLink.Common
 {
-    public class TLCS : TradeLinkServer, TLClient
+    public class TLCS : TLServer, TLClient
     {
+        public string ClientName(int clientnum) { return _name; }
+        public Basket AllClientBasket { get { return new BasketImpl(); } }
+        public bool SymbolSubscribed(string sym) { return true; }
         string _name = string.Empty;
         /// <summary>
         /// send order
@@ -144,7 +147,7 @@ namespace TradeLink.Common
         public string Name { get { return string.Empty; } set { } }
 
 
-
+        public string ClientSymbols(string client) { return string.Empty; }
 
 
 
@@ -200,7 +203,7 @@ namespace TradeLink.Common
         public event OrderDelegateStatus newSendOrderRequest;
         public event LongDelegate newOrderCancelRequest;
         public event PositionArrayDelegate newPosList;
-        public event DebugDelegate newRegisterStocks;
+        public event SymbolRegisterDel newRegisterSymbols;
         public event MessageArrayDelegate newFeatureRequest;
         public event UnknownMessageDelegate newUnknownRequest;
         public event VoidDelegate newImbalanceRequest;

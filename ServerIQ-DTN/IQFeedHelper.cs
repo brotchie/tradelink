@@ -43,17 +43,33 @@ namespace IQFeedBroker
         }
         #endregion
         #region Constructors
-        public IQFeedHelper(TradeLinkServer tls)
+        public IQFeedHelper(TLServer tls)
         {
             _basket = new BasketImpl();
             _connect = new BackgroundWorker();
             _connect.DoWork += new DoWorkEventHandler(bw_DoWork);
             tl = tls;
             tl.newProviderName = Providers.IQFeed;
-            tl.newRegisterStocks += new DebugDelegate(IQFeedHelper_newRegisterStocks);
+            tl.newRegisterSymbols += new SymbolRegisterDel(tl_newRegisterSymbols);
             tl.newFeatureRequest += new MessageArrayDelegate(IQFeedHelper_newFeatureRequest);
             tl.newUnknownRequest += new UnknownMessageDelegate(IQFeedHelper_newUnknownRequest);
             _cb_hist = new AsyncCallback(OnReceiveHist);
+        }
+
+        void tl_newRegisterSymbols(string client, string symbols)
+        {
+            // get existing basket
+            Basket old = new BasketImpl(_basket);
+            // update new basket
+            AddBasket(BasketImpl.FromString(symbols));
+            // remove unused symbols
+            if (ReleaseDeadSymbols && (old.Count > 0))
+            {
+                Basket rem = BasketImpl.Subtract(old, tl.AllClientBasket);
+                foreach (Security s in rem)
+                    unsubscribe(s.Symbol);
+            }
+
         }
         void bw_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -145,10 +161,7 @@ namespace IQFeedBroker
             f.Add(MessageTypes.DAYLOW);
             return f.ToArray();
         }
-        void IQFeedHelper_newRegisterStocks(string msg)
-        {
-            AddBasket(BasketImpl.FromString(msg));
-        }
+
         void connect(bool iscon)
         {
             if (Connected != null)
@@ -221,13 +234,26 @@ namespace IQFeedBroker
             watchCommand = Encoding.ASCII.GetBytes(command);
             m_sockIQConnect.Send(watchCommand, watchCommand.Length, SocketFlags.None);
         }
+
+        bool _releasedeadsymbols = true;
+        public bool ReleaseDeadSymbols { get { return _releasedeadsymbols; } set { _releasedeadsymbols = value; } }
+
+        void unsubscribe(string sym)
+        {
+            debug(sym + " removing.");
+            _basket.Remove(sym);
+            string command = String.Format("r{0}\r\n", sym);
+            byte[] clearcommand = new byte[command.Length];
+            clearcommand = Encoding.ASCII.GetBytes(command);
+            m_sockIQConnect.Send(clearcommand, clearcommand.Length, SocketFlags.None);
+        }
         bool havesymbol(string sym)
         {
             for (int i = 0; i < _basket.Count; i++)
                 if (_basket[i].Symbol == sym) return true;
             return false;
         }
-	public TradeLinkServer tl;
+	public TLServer tl;
 
         public void Start(string username, string password, string data1, int data2)
         {

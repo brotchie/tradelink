@@ -27,7 +27,7 @@ namespace TDServer
 
         AmeritradeBrokerAPI api = new AmeritradeBrokerAPI();
         const string APIVER = "1";
-        TradeLinkServer tl;
+        TLServer tl;
         public const string PROGRAM = "ServerTD BETA";
         Log _log = new Log(PROGRAM);
         public TDServerMain()
@@ -50,7 +50,7 @@ namespace TDServer
             tl.newAcctRequest += new StringDelegate(tl_gotSrvAcctRequest);
             tl.newOrderCancelRequest += new LongDelegate(tl_newOrderCancelRequest);
             tl.newUnknownRequest += new UnknownMessageDelegate(tl_newUnknownRequest);
-            tl.newRegisterStocks += new DebugDelegate(tl_newRegisterStocks);
+            tl.newRegisterSymbols += new SymbolRegisterDel(tl_newRegisterSymbols);
             tl.newPosList += new PositionArrayDelegate(tl_newPosList);
 
             api.rs_LevelOneStreaming = new AmeritradeBrokerAPI.RequestState();
@@ -58,6 +58,31 @@ namespace TDServer
             api.rs_ActivesStreaming = new AmeritradeBrokerAPI.RequestState();
             api.rs_ActivesStreaming.TickWithArgs += new AmeritradeBrokerAPI.EventHandlerWithArgs(rs_ActivesStreaming_TickWithArgs);
             
+        }
+
+        Basket b = new BasketImpl();
+        void tl_newRegisterSymbols(string client, string symbols)
+        {
+            // get original basket
+            Basket org = new BasketImpl(b);
+            // get new basket
+            Basket mb = BasketImpl.FromString(symbols);
+            // track it
+            b.Add(mb);
+            
+            //Close_Connections(false);
+            foreach (Security s in mb)
+            {
+                // skip symbol if we already have it
+                if (org.ToString().Contains(s.Symbol))
+                    continue;
+                if (api.TD_IsStockSymbolValid(s.Symbol))
+                {
+                    string service = GetExchange(s.Symbol);
+                    api.TD_RequestAsyncLevel1QuoteStreaming(s.Symbol, service, this);
+
+                }
+            }
         }
 
         void rs_ActivesStreaming_TickWithArgs(DateTime time, AmeritradeBrokerAPI.ATradeArgument args)
@@ -125,21 +150,6 @@ namespace TDServer
             
         }
 
-        void tl_newRegisterStocks(string msg)
-        {
-            Basket mb = BasketImpl.Deserialize(msg);
-            //Close_Connections(false);
-            foreach (Security s in mb)
-            {
-                if (api.TD_IsStockSymbolValid(s.Symbol))
-                {
-                    string service = GetExchange(s.Symbol);
-                    api.TD_RequestAsyncLevel1QuoteStreaming(s.Symbol, service, this);
-
-                }
-            }
-
-        }
 
         string GetExchange(string sym)
         {

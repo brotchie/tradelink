@@ -6,10 +6,12 @@ namespace TradeLink.API
 {
     /// <summary>
     /// For providing execution and data subscription services to tradelink clients.
-    /// 
     /// </summary>
-    public interface TradeLinkServer
+    public interface TLServer
     {
+        /// <summary>
+        /// provider name of the server
+        /// </summary>
         Providers newProviderName { get; set; }
 
         /// <summary>
@@ -73,16 +75,37 @@ namespace TradeLink.API
         event OrderDelegateStatus newSendOrderRequest;
         event LongDelegate newOrderCancelRequest;
         event PositionArrayDelegate newPosList;
-        event DebugDelegate newRegisterStocks;
+        event SymbolRegisterDel newRegisterSymbols;
         event MessageArrayDelegate newFeatureRequest;
         event UnknownMessageDelegate newUnknownRequest;
         event VoidDelegate newImbalanceRequest;
+        /// <summary>
+        /// gets current list of symbols for a given client
+        /// </summary>
+        /// <param name="client"></param>
+        /// <returns></returns>
+        string ClientSymbols(string client);
+        /// <summary>
+        /// gets a name of given client
+        /// </summary>
+        /// <param name="clientnum"></param>
+        /// <returns></returns>
+        string ClientName(int clientnum);
 
         /// <summary>
         /// notify clients of a new imbalance
         /// </summary>
         /// <param name="imb"></param>
         void newImbalance(Imbalance imb);
+
+        /// <summary>
+        /// returns true if any client is subscribed to a given symbol
+        /// </summary>
+        /// <param name="sym"></param>
+        /// <returns></returns>
+        bool SymbolSubscribed(string sym);
+
+        Basket AllClientBasket { get; }
     }
 
 

@@ -31,18 +31,32 @@ namespace ServerRedi
         PositionTracker pt = new PositionTracker();
         List<string> accts = new List<string>();
         
-        public ServerRedi(TradeLinkServer tls) : this(tls, 50) { }
-        public ServerRedi(TradeLinkServer tls, int sleepvalue)
+        public ServerRedi(TLServer tls) : this(tls, 50) { }
+        public ServerRedi(TLServer tls, int sleepvalue)
         {
             tl = tls;
             _bw = new Thread(new ParameterizedThreadStart(doqueues));
             tl.newProviderName = Providers.REDI;
-            tl.newRegisterStocks += new DebugDelegate(ServerRedi_newRegisterStocks);
+            tl.newRegisterSymbols += new SymbolRegisterDel(tl_newRegisterSymbols);
             tl.newSendOrderRequest += new OrderDelegateStatus(ServerRedi_newSendOrderRequest);
             tl.newOrderCancelRequest += new LongDelegate(ServerRedi_newOrderCancelRequest);
             tl.newFeatureRequest += new MessageArrayDelegate(ServerRedi_newFeatureRequest);
             tl.newPosList += new PositionArrayDelegate(ServerRedi_gotSrvPosList);
             tl.newAcctRequest += new StringDelegate(ServerRedi_newAccountRequest);
+        }
+
+        void tl_newRegisterSymbols(string client, string symbols)
+        {
+            debug("Subscribe request: " + symbols);
+            if (!isConnected)
+            {
+                debug("not connected.");
+                return;
+            }
+            // save list of symbols to subscribe
+            _newsymlist = tl.AllClientBasket.ToString();
+            // notify other thread to subscribe to them
+            _newsyms.Write(true);
         }
         void ServerRedi_newOrderCancelRequest(long val)
         {
@@ -489,23 +503,7 @@ namespace ServerRedi
                 }
             }
         }
-        // after you are done watching a symbol (eg not subscribed)
-        // you should close message table for that symbol
-        void ServerRedi_newRegisterStocks(string msg)
-        {
-            debug("Subscribe request: " + msg);
-            if (!isConnected)
-            {
-                debug("not connected.");
-                return;
-            }
-            // save list of symbols to subscribe
-            _newsymlist = msg;
-            // notify other thread to subscribe to them
-            _newsyms.Write(true);
-            
-            
-        }
+
         IdTracker _idt = new IdTracker();
         long ServerRedi_newSendOrderRequest(Order o)
         {
@@ -703,7 +701,7 @@ namespace ServerRedi
             if (SendDebug != null)
                 SendDebug(msg);
         }
-        public TradeLinkServer tl;
+        public TLServer tl;
         public bool Start(string user,string pw, string accnt)
         {
             try

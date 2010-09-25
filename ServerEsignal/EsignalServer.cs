@@ -20,7 +20,7 @@ namespace ServerEsignal
         public bool isValid { get { return _valid; } }
         bool _barrequestsgetalldata = true;
         public bool BarRequestsGetAllData { get { return _barrequestsgetalldata; } set { _barrequestsgetalldata = value; } }
-        public EsignalServer(TradeLinkServer tls)
+        public EsignalServer(TLServer tls)
             : base()
         {
             tl = tls;
@@ -30,12 +30,19 @@ namespace ServerEsignal
             // set provider
             tl.newProviderName = Providers.eSignal;
             // handle subscription requests
-            tl.newRegisterStocks += new DebugDelegate(tl_newRegisterStocks);
+            tl.newRegisterSymbols += new SymbolRegisterDel(tl_newRegisterSymbols);
             // handle feature requests
             tl.newFeatureRequest += new MessageArrayDelegate(tl_newFeatureRequest);
             // handle unknown messages
             tl.newUnknownRequest += new UnknownMessageDelegate(EsignalServer_newUnknownRequest);
             tl.Start();
+        }
+
+        void tl_newRegisterSymbols(string client, string symbols)
+        {
+            verb("got new symbol list: " + symbols);
+            _tmpregister = tl.AllClientBasket.ToString();
+            qc++;
         }
         void bw_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -165,7 +172,7 @@ namespace ServerEsignal
             }
             return (long)MessageTypes.FEATURE_NOT_IMPLEMENTED;
         }
-	public TradeLinkServer tl;
+	public TLServer tl;
 
         public void Start(string user, string password, string data1, int data2)
         {
@@ -319,12 +326,7 @@ namespace ServerEsignal
             esig = null;
         }
         int qc, qr;
-        void tl_newRegisterStocks(string msg)
-        {
-            verb("got new symbol list: " + msg);
-            _tmpregister = msg;
-            qc++;
-        }
+
         // see if we already subscribed to this guy
         bool contains(string sym)
         {

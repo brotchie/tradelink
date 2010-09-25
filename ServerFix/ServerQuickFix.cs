@@ -92,7 +92,7 @@ namespace ServerFix
         string _target = string.Empty;
         public string TargetCompId { get { return _target; } set { _target = value; } }
         string _setpath = string.Empty;
-        public ServerQuickFix(TradeLinkServer tls, string settingpath)
+        public ServerQuickFix(TLServer tls, string settingpath)
         {
             tl = tls;
             _setpath = settingpath;
@@ -137,7 +137,7 @@ namespace ServerFix
                 SendDebugEvent(msg);
         }
         SocketAcceptor acceptor;
-        public TradeLinkServer tl;
+        public TLServer tl;
         public bool Start(string user, string pw)
         {
             try

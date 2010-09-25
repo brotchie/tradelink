@@ -15,7 +15,7 @@ namespace ServerDBFX
         FXCore.TradeDeskEventsSinkClass sink;
         public event DebugFullDelegate SendDebug;
         int _sub = 0;
-        public ServerDBFX(TradeLinkServer tls)
+        public ServerDBFX(TLServer tls)
         {
             tl = tls;
             // dbfx events
@@ -64,7 +64,7 @@ namespace ServerDBFX
                 if (o.id == id) return false;
             return true;
         }
-        public TradeLinkServer tl;
+        public TLServer tl;
 
         IdTracker _id = new IdTracker();
         long ServerDBFX_newSendOrderRequest(Order o)

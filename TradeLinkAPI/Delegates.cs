@@ -19,6 +19,7 @@ namespace TradeLink.API
     public delegate void DecimalDelgate(decimal val);
     public delegate void MessageTypesMsgDelegate(MessageTypes[] messages);
     public delegate void DebugDelegate(string msg);
+    public delegate void SymbolRegisterDel(string client, string symbols);
     public delegate void ObjectArrayDelegate(object[] parameters);
     public delegate void PositionDelegate(Position pos);
     public delegate void DebugFullDelegate(Debug debug);

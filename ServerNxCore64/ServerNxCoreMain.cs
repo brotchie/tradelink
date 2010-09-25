@@ -19,7 +19,7 @@ namespace ServerNxCore
             InitializeComponent();
             ContextMenu = new ContextMenu();
             ContextMenu.MenuItems.Add(new MenuItem("report", new EventHandler(report)));
-            TradeLink.API.TradeLinkServer tls;
+            TradeLink.API.TLServer tls;
             if (Properties.Settings.Default.TLClientAddress== string.Empty)
                 tls = new TradeLink.Common.TLServer_WM() ;
             else
