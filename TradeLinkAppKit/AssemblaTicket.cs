@@ -6,6 +6,8 @@ using System.Xml;
 using System.ServiceModel.Web;
 using TradeLink.API;
 using TradeLink.Common;
+using System.IO;
+
 namespace TradeLink.AppKit
 {
     /// <summary>
@@ -13,6 +15,13 @@ namespace TradeLink.AppKit
     /// </summary>
     public class AssemblaTicket
     {
+        public AssemblaTicket()
+        {
+            _ticknum = 0;
+            _milestone = 0;
+            _assign = 0;
+
+        }
         public static string GetTicketsUrl(string space)
         {
             return "http://www.assembla.com/spaces/" + space + "/tickets";
@@ -234,6 +243,73 @@ namespace TradeLink.AppKit
             string[] r = new string[] { "Product:" + space, "Program:" + program, "Exception:" + (ex != null ? ex.Message : "n/a"), "StackTrace:" + (ex != null ? ex.StackTrace : "n/a"), "CommandLine:" + Environment.CommandLine, "OS:" + Environment.OSVersion.VersionString + " " + (IntPtr.Size * 8).ToString() + "bit", "CLR:" + Environment.Version.ToString(4), "TradeLink:" + TradeLink.Common.Util.TLSIdentity(), "Memory:" + Environment.WorkingSet.ToString(), "Processors:" + Environment.ProcessorCount.ToString(), "MID: "+Auth.GetCPUId() };
             string desc = string.Join(Environment.NewLine, r);
             return desc;
+        }
+
+        int _ticknum;
+        int _milestone;
+        int _assign;
+
+        public int Number { get { return _ticknum; } set { _ticknum = value; } }
+        public int Milestone { get { return _milestone; } set { _milestone = value; } }
+        public int Owner { get { return _assign; } set { _assign = value; } }
+
+        /// <summary>
+        /// true if given ticket is valid
+        /// </summary>
+        public bool isValid { get { return (Space != null) && (Space != string.Empty) && (Summary != null) && (Summary != string.Empty) && (Number!=0); } }
+
+        /// <summary>
+        /// get list of tickets on space (limited to first 1000)
+        /// </summary>
+        /// <param name="space"></param>
+        /// <param name="user"></param>
+        /// <param name="pw"></param>
+        /// <returns></returns>
+        public static List<AssemblaTicket> GetTickets(string space, string user, string pw)
+        {
+            string url = AssemblaTicket.GetTicketsUrl(space);
+            HttpWebRequest hr = WebRequest.Create(url) as HttpWebRequest;
+            hr.Credentials = new System.Net.NetworkCredential(user, pw);
+            hr.PreAuthenticate = true;
+            hr.Method = "GET";
+            hr.ContentType = "application/xml";
+            HttpWebResponse wr = (HttpWebResponse)hr.GetResponse();
+            StreamReader sr = new StreamReader(wr.GetResponseStream());
+
+            string result = sr.ReadToEnd();
+
+            XmlDocument xd = new XmlDocument();
+            xd.LoadXml(result);
+            List<AssemblaTicket> docs = new List<AssemblaTicket>();
+            XmlNodeList xnl = xd.GetElementsByTagName("ticket");
+            foreach (XmlNode xn in xnl)
+            {
+                AssemblaTicket doc = new AssemblaTicket();
+
+                doc.Space = space;
+                foreach (XmlNode dc in xn.ChildNodes)
+                {
+                    string m = dc.InnerText;
+                    if (dc.Name == "summary")
+                        doc.Summary = m;
+                    else if (dc.Name == "status")
+                        doc.Status = (TradeLink.API.TicketStatus)Convert.ToInt32(m);
+                    else if (dc.Name == "description")
+                        doc.Description = m;
+                    else if (dc.Name == "priority")
+                        doc.Priority = (TradeLink.API.Priority)Convert.ToInt32(m);
+                    else if (dc.Name == "number")
+                        doc.Number = Convert.ToInt32(m);
+                    else if (dc.Name == "assign-to-id")
+                        doc.Owner = Convert.ToInt32(m);
+                    else if (dc.Name == "milestone-id")
+                        doc.Milestone = Convert.ToInt32(m);
+
+                }
+                if (doc.isValid)
+                    docs.Add(doc);
+            }
+            return docs;
         }
     }
 
