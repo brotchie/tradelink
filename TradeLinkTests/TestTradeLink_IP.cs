@@ -12,6 +12,9 @@ namespace TestTradeLink
     [TestFixture]
     public class TestTradeLink_IP
     {
+        // max time (sec) for all ip tests
+        const int MAXTIMESEC = 15;
+
         // each side of our "link"
         TLClient_IP c;
         TLClient c2;
@@ -72,7 +75,7 @@ namespace TestTradeLink
             //c2.gotOrder += new OrderDelegate(c2_gotOrder);
             //c2.gotTick += new TickDelegate(c2_gotTick);
             debug("ending setup.");
-            startt = DateTime.Now.Ticks;
+            startt = DateTime.Now;
 
             // prepare to playback ticks continuously
             bw = new System.ComponentModel.BackgroundWorker();
@@ -133,7 +136,7 @@ namespace TestTradeLink
             debug(msg);
         }
 
-        long startt = 0;
+        DateTime startt ;
 
 
         
@@ -218,7 +221,7 @@ namespace TestTradeLink
             ticks = 0;
             sentticks = 0;
             // wait for ticks to arrive
-            while (!up || (ticks == 0))
+            while (_runtest && (!up || (ticks == 0)))
             {
                 sleep(50);
             }
@@ -231,13 +234,13 @@ namespace TestTradeLink
             checkdownspecial = true;
             s.SrvClearClient(c.Name,false);
             // wait until failure detected on client
-            while (!downspecialhit)
+            while (!downspecialhit && _runtest)
             {
                 sleep(10);
             }
             debug("disconnect detected... waiting for recovery...");
             // wait until reconnect
-            while (!up)
+            while (!up && _runtest)
             {
                 sleep(10);
             }
@@ -252,7 +255,7 @@ namespace TestTradeLink
             // wait for more ticks to arrive
             const decimal FAILMULT = 2;
             decimal WAIT = (ticks*FAILMULT) ;
-            while (ticks < WAIT)
+            while (_runtest && (ticks < WAIT))
             {
                 if (sentticks % 100 == 0)
                 {
@@ -287,7 +290,7 @@ namespace TestTradeLink
             sentticks = 0;
 
             // wait for ticks to arrive
-            while (!up || (ticks == 0))
+            while (_runtest && (!up || (ticks == 0)))
             {
                 sleep(50);
             }
@@ -301,7 +304,7 @@ namespace TestTradeLink
             c.Disconnect(false);
             
             // wait until failure detected on client
-            while (!downspecialhit)
+            while (!downspecialhit && _runtest)
             {
                 sleep(10);
             }
@@ -322,7 +325,7 @@ namespace TestTradeLink
             // wait for more ticks to arrive
             const decimal FAILMULT = 2;
             decimal WAIT = (ticks * FAILMULT);
-            while (ticks < WAIT)
+            while (_runtest && (ticks < WAIT))
             {
                 if (sentticks % 100 == 0)
                 {
@@ -365,6 +368,14 @@ namespace TestTradeLink
                     sentticks++;
                     if (SLEEP!=0)
                         sleep(SLEEP);
+                    if (i % 250 == 0)
+                    {
+                        if (DateTime.Now.Subtract(startt).TotalSeconds > MAXTIMESEC)
+                        {
+                            _runtest = false;
+                            break;
+                        }
+                    }
                 }
                 debug("completed helper sending ticks");
             }
