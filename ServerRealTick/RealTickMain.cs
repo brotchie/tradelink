@@ -15,45 +15,28 @@ namespace RealTickConnector
     public partial class RealTickMain : AppTracker
     {
 
-        ToolkitApp _app;
+        
         DebugWindow _dw = new DebugWindow();
         public const string PROGRAM = "RealTickServer";
         Log _log = new Log(PROGRAM);
 
         private ServerRealTick tl;
-        public RealTickMain(ToolkitApp app)
-        {
-            _app = app;
-            tl = new ServerRealTick(app);
-            InitializeComponent();
-            tl.SendDebug += new TradeLink.API.DebugDelegate(tl_SendDebug);
-            ConfigSection cfg = new ConfigSection("ToolkitExamples");
-            // The default test symbols for this example are ZVZZT and ZWZZT.  You can add an
-            // additional symbol in your TAL.INI file, e.g.:
-            //    [ToolkitExamples]
-            //    TestSymbol=TEST
-            // but be extremely cautious ... if you use a real symbol, you may in fact execute shares
-            // of your stock!
-            string symbol = cfg.GetValue("IBM", "");
-
-            // The default test routes for this example are DEMO, DEMOEUR, and TALX.  You can add an
-            // additional route in your TAL.INI file, e.g.:
-            //    [ToolkitExamples]
-            //    TestRoute=MYTESTROUTE
-            // but be extremely cautious ... if you use a live route, you may in fact execute shares
-            // of your stock!
-
-            Text = "RealTick v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-        }
-
         public RealTickMain()
         {
             TrackEnabled = Util.TrackUsage();
             Program = PROGRAM;
             InitializeComponent();
+
+            tl = new ServerRealTick();
             tl.SendDebug += tl_SendDebug;
             FormClosing += RediMain_FormClosing;
+            InitializeComponent();
+            tl.SendDebug += new TradeLink.API.DebugDelegate(tl_SendDebug);
+
+            Text = "RealTick Connector";
+            start();
         }
+
 
         void success(string u, string p)
         {
@@ -81,13 +64,18 @@ namespace RealTickConnector
             _log.GotDebug(msg);
         }
 
-        private void _start_Click(object sender, EventArgs e)
+        void start()
         {
             if (tl.Start())
                 BackColor = Color.Green;
             else
                 BackColor = Color.Red;
             Invalidate(true);
+        }
+
+        private void _start_Click(object sender, EventArgs e)
+        {
+            start();
         }
 
         private void _msg_Click(object sender, EventArgs e)

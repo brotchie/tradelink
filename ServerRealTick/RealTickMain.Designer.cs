@@ -37,20 +37,18 @@
             // _report
             // 
             this._report.Image = ((System.Drawing.Image)(resources.GetObject("_report.Image")));
-            this._report.Location = new System.Drawing.Point(153, 35);
-            this._report.Margin = new System.Windows.Forms.Padding(2);
+            this._report.Location = new System.Drawing.Point(230, 54);
             this._report.Name = "_report";
-            this._report.Size = new System.Drawing.Size(17, 20);
+            this._report.Size = new System.Drawing.Size(26, 31);
             this._report.TabIndex = 18;
             this._report.UseVisualStyleBackColor = true;
             this._report.Click += new System.EventHandler(this._report_Click);
             // 
             // _msg
             // 
-            this._msg.Location = new System.Drawing.Point(129, 35);
-            this._msg.Margin = new System.Windows.Forms.Padding(2);
+            this._msg.Location = new System.Drawing.Point(194, 54);
             this._msg.Name = "_msg";
-            this._msg.Size = new System.Drawing.Size(20, 20);
+            this._msg.Size = new System.Drawing.Size(30, 31);
             this._msg.TabIndex = 17;
             this._msg.Text = "!";
             this._msg.UseVisualStyleBackColor = true;
@@ -58,10 +56,9 @@
             // 
             // _start
             // 
-            this._start.Location = new System.Drawing.Point(74, 35);
-            this._start.Margin = new System.Windows.Forms.Padding(2);
+            this._start.Location = new System.Drawing.Point(111, 54);
             this._start.Name = "_start";
-            this._start.Size = new System.Drawing.Size(50, 20);
+            this._start.Size = new System.Drawing.Size(75, 31);
             this._start.TabIndex = 16;
             this._start.Text = "Start";
             this._start.UseVisualStyleBackColor = true;
@@ -69,12 +66,14 @@
             // 
             // RealTickMain
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(274, 72);
+            this.ClientSize = new System.Drawing.Size(411, 111);
             this.Controls.Add(this._report);
             this.Controls.Add(this._msg);
             this.Controls.Add(this._start);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "RealTickMain";
             this.Text = "RealTickServer";
             this.ResumeLayout(false);

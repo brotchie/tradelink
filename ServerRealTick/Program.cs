@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows.Forms;
-
 using TalTrade.Toolkit.ClientAdapter;
 using TalTrade.Toolkit;
 
@@ -17,10 +16,7 @@ namespace RealTickConnector
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             try
             {
-                using (var app = new ClientAdapterToolkitApp())
-                {
-                    Application.Run(new RealTickMain(app));
-                }
+                    Application.Run(new RealTickMain());
             }
             catch (ToolkitPermsException ex)
             {

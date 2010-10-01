@@ -12,6 +12,8 @@ using TalTrade.Toolkit.Domain.XPerms;
 using TradeLink.API;
 using TradeLink.Common;
 using System.Threading;
+using TalTrade.Toolkit.ClientAdapter;
+using TalTrade.Toolkit;
 
 namespace RealTickConnector
 {
@@ -32,7 +34,7 @@ namespace RealTickConnector
         RingBuffer<bool> _newsyms = new RingBuffer<bool>(5);
 
         string _newsymlist = string.Empty;
-        Thread _bw;
+        System.ComponentModel.BackgroundWorker _bw;
         int _SLEEP = 50;
         bool _bwgo = true;
 
@@ -43,12 +45,13 @@ namespace RealTickConnector
         bool _conn = false;
         public bool isConnected { get { return _conn; } }
 
-        public ServerRealTick(ToolkitApp app)
+        public ServerRealTick()
         {
 
-            _app = app;
+            
             newProviderName = Providers.RealTick;
-            _bw = new Thread(new ParameterizedThreadStart(doqueues));
+            _bw = new System.ComponentModel.BackgroundWorker();
+            _bw.DoWork += new System.ComponentModel.DoWorkEventHandler(_bw_DoWork);
             newRegisterSymbols += new SymbolRegisterDel(ServerRealTick_newRegisterSymbols);
             newSendOrderRequest += new OrderDelegateStatus(ServerRealTick_newSendOrderRequest);
             newOrderCancelRequest += new LongDelegate(ServerRealTick_newOrderCancelRequest);
@@ -57,21 +60,7 @@ namespace RealTickConnector
             newAcctRequest += new StringDelegate(ServerRealTick_newAcctRequest);
         }
 
-        void ServerRealTick_newRegisterSymbols(string client, string symbols)
-        {
-            debug("Subscribe request: " + symbols);
-            if (!isConnected)
-            {
-                debug("not connected.");
-                return;
-            }
-            // save list of symbols to subscribe
-            _newsymlist = AllClientBasket.ToString();
-            // notify other thread to subscribe to them
-            _newsyms.Write(true);
-        }
-
-        void doqueues(object obj)
+        void _bw_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
             while (_bwgo)
             {
@@ -171,6 +160,22 @@ namespace RealTickConnector
             }
         }
 
+        void ServerRealTick_newRegisterSymbols(string client, string symbols)
+        {
+            debug("Subscribe request: " + symbols);
+            if (!isConnected)
+            {
+                debug("not connected.");
+                return;
+            }
+            // save list of symbols to subscribe
+            _newsymlist = AllClientBasket.ToString();
+            // notify other thread to subscribe to them
+            _newsyms.Write(true);
+        }
+
+
+
 
 
         private void initTables()
@@ -193,7 +198,8 @@ namespace RealTickConnector
             TBL = new LiveQuoteTable(_app);
             TBL.OnData += TBL_OnData;
 
-            _bw.Start();
+            _bw.RunWorkerAsync();
+
             _conn = true;
         }
 
@@ -203,18 +209,27 @@ namespace RealTickConnector
             {
                 try
                 {
-                    Tick t = new TickImpl(r.DispName)
+                    Tick t = new TickImpl(r.DispName);
+                    if (r.Ask!=null)
                     {
-                        ask = r.Ask.Value.DecimalValue,
-                        os = r.Asksize.Value,
-                        bid = r.Bid.Value.DecimalValue,
-                        bs = r.Bidsize.Value,
-                        ex = r.Exchid,
-                        date = Util.ToTLDate(r.TrdDate.Value),
-                        time = Util.DT2FT(r.TrdDate.Value + r.Trdtim1.Value),
-                        trade = r.Trdprc1.Value.DecimalValue,
-                        size = r.Trdvol1.Value
-                    };
+                        t.ask =r.Ask.Value.DecimalValue;
+                        t.os = r.Asksize.Value;
+                        t.oe = r.Askexid;
+                    }
+                    if (r.Bid!=null)
+                    {
+                        t.bid = r.Bid.Value.DecimalValue;
+                        t.bs = r.Bidsize.Value;
+                        t.be = r.Bidexid;
+                    }
+                    if (r.Trdprc1!=null)
+                    {
+                        t.ex = r.Exchid;
+                        t.trade = r.Trdprc1.Value.DecimalValue;
+                        t.size = r.Trdvol1.Value;
+                    }
+                     t.time = Util.DT2FT(r.TrdDate.Value + r.Trdtim1.Value);
+                    t.date =Util.ToTLDate(r.TrdDate.Value);
                     newTick(t);
                     _numDisplayed++;
                     _done.Set();
@@ -434,16 +449,19 @@ namespace RealTickConnector
 
 
 
-        internal bool Start()
+        public bool Start()
         {
             try
             {
+                if (isConnected)
+                    return true;
+                _app = new ClientAdapterToolkitApp();
                 initTables();
                 return true;
             }
             catch (Exception ee)
             {
-                debug(ee.Message);
+                debug(ee.Message+ee.StackTrace);
                 return false;
             }
         }
@@ -452,11 +470,14 @@ namespace RealTickConnector
         {
             try
             {
+                TBL.Stop();
                 _bwgo = false;
-                _bw.Abort();
+                _bw.CancelAsync();
+                
+                
             }
             catch { }
-            Stop();
+            
         }
     }
 }
