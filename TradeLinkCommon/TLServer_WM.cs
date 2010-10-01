@@ -98,8 +98,17 @@ namespace TradeLink.Common
                 this.Invoke(new DebugDelegate(SrvDoExecute), new object[] { msg });
             else
             {
-                Order o = OrderImpl.Deserialize(msg);
-                if (newSendOrderRequest != null) newSendOrderRequest(o); //request fill
+                try
+                {
+                    Order o = OrderImpl.Deserialize(msg);
+                    if (newSendOrderRequest != null) 
+                        newSendOrderRequest(o); //request fill
+
+                }
+                catch (Exception ex)
+                {
+                    debug("Error unpacking order: " + msg + " " + ex.Message + ex.StackTrace);
+                }
             }
         }
 
