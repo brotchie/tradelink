@@ -423,13 +423,15 @@ namespace Quotopia
 
         void rightchart(object sender, EventArgs e)
         {
-            string sym = GetVisibleSecurity(CurrentRow).Symbol;
-            Chart c = null;
-            try
+            Security sec = GetVisibleSecurity(CurrentRow);
+            string sym = sec.Symbol;
+            BarList bl;
+            if (!bardict.TryGetValue(sec.FullName,out bl))
             {
-                c = new Chart(bardict[sym]);
+                debug("Unable to locate chart for: "+sec.FullName);
+                return;
             }
-            catch (Exception) { return; }
+            Chart c = new Chart(bl);
             c.Symbol = sym;
             c.Show();
         }
@@ -555,7 +557,7 @@ namespace Quotopia
             }
         }
 
-        Dictionary<string, BarListImpl> bardict = new Dictionary<string, BarListImpl>();
+        Dictionary<string, BarList> bardict = new Dictionary<string, BarList>();
 
         void addsymbol(string sym)
         {
@@ -568,8 +570,9 @@ namespace Quotopia
                 qt.Rows[qt.Rows.Count - 1][CLOSEDPL] = pt[sym].ClosedPL;
             }
             catch { }
+            Security sec = SecurityImpl.Parse(sym);
             if (!bardict.ContainsKey(sym))
-                bardict.Add(sym, new BarListImpl(BarInterval.FiveMin, sym));
+                bardict.Add(sec.FullName, new BarListImpl(sym));
             status("Added " + sym);
             symindex();
             mb.Add(sym);
@@ -750,19 +753,31 @@ namespace Quotopia
         }
 
         PositionTracker pt = new PositionTracker();
-
+        bool usebidonfx = Properties.Settings.Default.UseBidNotAskOnFxCharts;
+        TickTracker _kt = new TickTracker(100);
         void tl_gotTick(Tick t)
         {
 
             try
             {
                 _tlt.newTick(t);
+                _kt.newTick(t);
                 if (spillTick != null)
                     spillTick(t);
                 RefreshRow(t);
-                BarListImpl bl = null;
+                BarList bl = null;
                 if (bardict.TryGetValue(t.symbol, out bl))
-                    bardict[t.symbol].newTick(t);
+                {
+                    if (SecurityImpl.Parse(t.symbol).Type == SecurityType.CASH)
+                    {
+                        Tick k = _kt[t.symbol];
+                        decimal p = usebidonfx ? k.bid : k.ask;
+                        int s = usebidonfx ? k.bs : k.os;
+                        bardict[t.symbol].newPoint(p, k.time, k.date, s);
+                    }
+                    else
+                        bardict[t.symbol].newTick(t);
+                }
             }
             catch (System.Threading.ThreadInterruptedException) { }
         }

@@ -71,7 +71,7 @@ namespace TradeLink.AppKit
             {
                 Symbol = string.Empty;
                 highesth = SMALLVAL;
-                bl = new BarListImpl(BarInterval.FiveMin, string.Empty);
+                bl = new BarListImpl(string.Empty);
             }
             bl.newPoint(p, time, date, size);
             if (p!=0)
