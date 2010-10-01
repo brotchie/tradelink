@@ -66,6 +66,38 @@ namespace TradeLink.Common
         /// </summary>
         public int AlertThreshold { get { return _defaultwait; } set { _defaultwait = value; } }
 
+        /// <summary>
+        /// gets list of symbols that have never had ticks pass through watcher
+        /// </summary>
+        public string SymbolsNeverTicked
+        {
+            get
+            {
+                List<string> syms = new List<string>(this._ast.Count);
+                for (int i = 0; i<_ast.Count; i++)
+                {
+                    string sym = _ast.getlabel(i);
+                    if (this[sym] == 0)
+                        syms.Add(sym);
+                }
+                return string.Join(",",syms.ToArray());
+            }
+        }
+        /// <summary>
+        /// gets stringified symbols which have had ticks pass through the watcher
+        /// </summary>
+        public string SymbolsTicked
+        {
+            get
+            {
+                List<string> syms = new List<string>(_last.Count);
+                foreach (string sym in _last.Keys)
+                    if (_last[sym]!=0)
+                        syms.Add(sym);
+                return string.Join(",", syms.ToArray());
+            }
+        }
+
         int _defaultmass = 60;
         /// <summary>
         /// minimum threshold when no ticks have been received for many symbols
