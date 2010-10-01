@@ -69,46 +69,61 @@ namespace ServerNxCore
 
         Basket old = new BasketImpl();
 
+
+
         void tl_newRegisterSymbols(string client, string symbols)
         {
             D("got subscribe request: " + client+": "+symbols);
 
-            // ensure new symbols are added
-            Basket newb = tl.AllClientBasket;
-            // ensure we have an id
-            foreach (string sym in newb.ToSymArray())
-            {
-                Security sec = SecurityImpl.Parse(sym);
-                char p;
-                if (sec.Type == SecurityType.STK)
-                    p = 'e';
-                else if (sec.Type == SecurityType.BND)
-                    p = 'b';
-                else if (sec.Type == SecurityType.FUT)
-                    p = 'f';
-                else if (sec.Type == SecurityType.IDX)
-                    p = 'i';
-                else if (sec.Type == SecurityType.OPT)
-                    p = 'o';
-                else if (sec.Type == SecurityType.CASH)
-                    p = 'c';
-                else if (sec.Type == SecurityType.FOP)
-                    p = 'p';
-                else
-                    p = 'e';
-                string nxsym = p + sec.Symbol;
-                _syms.addindex(nxsym, true);
-                _realsymbol.addindex(nxsym, sec.Symbol);
-            }
-            // ensure old symbols are removed
-            if (old.Count > 0)
-            {
-                Basket rem = BasketImpl.Subtract(old, newb);
-                foreach (Security s in rem)
-                    _syms[s.Symbol] = false;
-            }
-            // save new as old
-            old = newb;
+
+                // ensure new symbols are added
+                Basket newb = tl.AllClientBasket;
+                // ensure we have an id
+                foreach (string sym in newb.ToSymArray())
+                {
+                    Security sec = SecurityImpl.Parse(sym);
+                    char p;
+                    if (sec.Type == SecurityType.STK)
+                        p = 'e';
+                    else if (sec.Type == SecurityType.BND)
+                        p = 'b';
+                    else if (sec.Type == SecurityType.FUT)
+                        p = 'f';
+                    else if (sec.Type == SecurityType.IDX)
+                        p = 'i';
+                    else if (sec.Type == SecurityType.OPT)
+                        p = 'o';
+                    else if (sec.Type == SecurityType.CASH)
+                        p = 'c';
+                    else if (sec.Type == SecurityType.FOP)
+                        p = 'p';
+                    else
+                        p = 'e';
+                    string nxsym = p + sec.Symbol;
+                    _syms.addindex(nxsym, true);
+                    _realsymbol.addindex(nxsym, sec.Symbol);
+                }
+                // ensure old symbols are removed
+                if (old.Count > 0)
+                {
+                    Basket rem = BasketImpl.Subtract(old, newb);
+                    foreach (Security s in rem)
+                    {
+                        string tsym = string.Empty;
+                        try
+                        {
+                            tsym = s.Symbol.Substring(1, s.Symbol.Length - 1);
+                            _syms[tsym] = false;
+                        }
+                        catch (Exception ex)
+                        {
+                            debug("error unsubscribing: " + s.Symbol + " with: " + tsym + " " + ex.Message + ex.StackTrace);
+                        }
+                    }
+                }
+                // save new as old
+                old = newb;
+            
         }
         System.Threading.Thread _proc;
 
