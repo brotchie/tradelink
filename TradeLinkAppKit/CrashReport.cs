@@ -140,7 +140,8 @@ namespace TradeLink.AppKit
         static string DecodedBody(string program, Exception ex, string data, bool addtemplate)
         {
 
-            string[] r = new string[] { (addtemplate ? template() : string.Empty), "App:" + program, "Err:" + (ex != null ? ex.Message : "n/a"), "Trace:" + (ex != null ? ex.StackTrace : "n/a"), "OS:" + Environment.OSVersion.VersionString + " " + (IntPtr.Size * 8).ToString() + "bit", "CLR:" + Environment.Version.ToString(4), "TL:" + TradeLink.Common.Util.TLSIdentity(), "Mem:" + Environment.WorkingSet.ToString(), "Proc:" + Environment.ProcessorCount.ToString(), "MID:"+Auth.GetNetworkAddress(), data };
+
+            string[] r = new string[] { (addtemplate ? template() : string.Empty), "App:" + program, "Err:" + (ex != null ? ex.Message : "n/a"), "Trace:" + (ex != null ? ex.StackTrace : "n/a"), "OS:" + Environment.OSVersion.VersionString + " " + (IntPtr.Size * 8).ToString() + "bit", "CLR:" + Environment.Version.ToString(4), "TL:" + TradeLink.Common.Util.TLSIdentity(), "Mem:" + Environment.WorkingSet.ToString(), "Proc:" + Environment.ProcessorCount.ToString(), "MID:" + Auth.GetNetworkAddress(), "Date:Time" + Util.ToTLDate() + ":" + Util.ToTLTime(), "Culture: " + System.Globalization.CultureInfo.CurrentCulture.EnglishName,data };
 
             string decoded = string.Join(Environment.NewLine, r);
             return decoded;
