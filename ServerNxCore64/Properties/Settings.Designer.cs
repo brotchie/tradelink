@@ -58,5 +58,17 @@ namespace ServerNxCore.Properties {
                 this["HistoricalFile"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("600")]
+        public int StateSaveInterval {
+            get {
+                return ((int)(this["StateSaveInterval"]));
+            }
+            set {
+                this["StateSaveInterval"] = value;
+            }
+        }
     }
 }

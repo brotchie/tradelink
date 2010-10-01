@@ -8,7 +8,7 @@ namespace ServerNxCore
 {
     public class ServerNxCore
     {
-
+        public const string PROGRAM = "ServerNxCore";
         static TLServer tl;
         public event DebugDelegate SendDebugEvent;
         void debug(string msg)
@@ -24,8 +24,10 @@ namespace ServerNxCore
         string _fn = LIVEFEED;
         bool _islive = true;
         bool hasstate { get { return isLive && System.IO.File.Exists(statefilepath); } }
-        string statefilepath { get { return Environment.CurrentDirectory + "\\nxstate." + Util.ToTLDate() + ".tmp"; } }
+        static string statefilepath { get { return Util.ProgramData(PROGRAM) + "\\nxstate." + Util.ToTLDate() + ".tmp"; } }
         public bool isLive { get { return _islive; } }
+        int _ssi = 0;
+        public int SaveStateIntervalSec { get { return _ssi; } set { _ssi = value; } }
         public ServerNxCore(TLServer tls, string filename, DebugDelegate debugs)
         {
             _fn = filename;
@@ -39,13 +41,14 @@ namespace ServerNxCore
             tl.newProviderName = Providers.Nanex;
             tl.newFeatureRequest += new MessageArrayDelegate(ServerNxCore_newFeatureRequest);
             tl.newRegisterSymbols += new SymbolRegisterDel(tl_newRegisterSymbols);
+            savestateint = (uint)(SaveStateIntervalSec * 1000);
             if (isLive)
             {
                 DOLIVESKIPTEST = true;
                 // if live and no previous state, remove old state files
                 if (!hasstate)
                 {
-                    System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(Environment.CurrentDirectory);
+                    System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(Util.ProgramData(PROGRAM));
                     System.IO.FileInfo[] fis = di.GetFiles("nxstate.*.tmp");
                     foreach (System.IO.FileInfo fi in fis)
                     {
@@ -57,10 +60,19 @@ namespace ServerNxCore
                     }
                 }
                 else
+                {
+                    debug("Will use saved state to advance tape position at startup: " + statefilepath);
                     _fn = statefilepath;
+                }
+                DOSAVESTATE = SaveStateIntervalSec != 0;
+                if (DOSAVESTATE)
+                    debug("Will save tape position every: " + SaveStateIntervalSec + " seconds.");
+
             }
 
         }
+
+        static bool DOSAVESTATE = false;
 
         void _syms_NewTxt(string txt, int idx)
         {
@@ -69,9 +81,12 @@ namespace ServerNxCore
 
         Basket old = new BasketImpl();
 
+
+
         void tl_newRegisterSymbols(string client, string symbols)
         {
             D("got subscribe request: " + client + ": " + symbols);
+
 
             // ensure new symbols are added
             Basket newb = tl.AllClientBasket;
@@ -105,10 +120,22 @@ namespace ServerNxCore
             {
                 Basket rem = BasketImpl.Subtract(old, newb);
                 foreach (Security s in rem)
-                    _syms[s.Symbol] = false;
+                {
+                    string tsym = string.Empty;
+                    try
+                    {
+                        tsym = s.Symbol.Substring(1, s.Symbol.Length - 1);
+                        _syms[tsym] = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        debug("error unsubscribing: " + s.Symbol + " with: " + tsym + " " + ex.Message + ex.StackTrace);
+                    }
+                }
             }
             // save new as old
             old = newb;
+
         }
         System.Threading.Thread _proc;
 
@@ -132,6 +159,7 @@ namespace ServerNxCore
             debug(ServerNxCoreMain.PROGRAM + " started ok.");
         }
         volatile bool _go = true;
+        int loops = 0;
         void proc()
         {
 
@@ -141,6 +169,7 @@ namespace ServerNxCore
                 {
                     if (!QUIT)
                     {
+                        debug("starting run: " + loops++ + " on nxcore tape: " + (isLive ? "LIVE" : _fn));
                         NxCore.ProcessTape(_fn,
                          null, 0, 0,
                          OnNxCoreCallback);
@@ -202,8 +231,20 @@ namespace ServerNxCore
             if (d != null)
                 d(msg);
         }
+        static uint nextstatesavetime = 0;
+        static uint savestateint = 0;
         static unsafe void OnNxCoreStatus(NxCoreSystem* pNxCoreSys, NxCoreMessage* pNxCoreMsg)
         {
+            if (DOSAVESTATE)
+            {
+                if (pNxCoreSys->nxTime.MsOfDay >= nextstatesavetime)
+                {
+                    D("saving state at: " + nextstatesavetime + " " + statefilepath);
+                    NxCore.SaveState(statefilepath, NxCore.NxSAVESTATE_ONEPASS);
+                    nextstatesavetime += savestateint;
+                    D("save complete.  next save time: " + nextstatesavetime);
+                }
+            }
             // Print the specific NxCore status message
             switch (pNxCoreSys->Status)
             {

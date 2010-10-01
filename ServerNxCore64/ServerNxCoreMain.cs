@@ -26,6 +26,7 @@ namespace ServerNxCore
                 tls = new TradeLink.Common.TLServer_IP(Properties.Settings.Default.TLClientAddress, Properties.Settings.Default.TLClientPort);
             string start = Properties.Settings.Default.HistoricalFile == string.Empty ? ServerNxCore.LIVEFEED : Properties.Settings.Default.HistoricalFile;
             tl = new ServerNxCore(tls,start, debug);
+            tl.SaveStateIntervalSec = Properties.Settings.Default.StateSaveInterval;
             FormClosing += new FormClosingEventHandler(ServerNxCoreMain_FormClosing);
             tl.Start();
         }
