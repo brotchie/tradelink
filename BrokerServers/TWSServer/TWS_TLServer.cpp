@@ -289,7 +289,11 @@ namespace TradeLibFast
 			contract->exchange= "SMART";
 		contract->symbol = tl2ibspace(contract->symbol);
 		contract->localSymbol = tl2ibspace(contract->localSymbol);
-		
+		if (tmpsec.type== FUT)
+		{
+			CString cpy(contract->localSymbol);
+			contract->symbol = cpy.Left(cpy.GetLength()-2);
+		}
 		
 
 		// get the TWS session associated with our account
