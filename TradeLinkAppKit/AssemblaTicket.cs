@@ -253,6 +253,23 @@ namespace TradeLink.AppKit
         public int Milestone { get { return _milestone; } set { _milestone = value; } }
         public int Owner { get { return _assign; } set { _assign = value; } }
 
+        string _reporter = string.Empty;
+        public string Reporter { get { return _reporter; } set { _reporter = value; } }
+
+        int _tickdocid = 0;
+        public int TicketDocumentId { get { return _tickdocid; } set { _tickdocid = value; } }
+
+        string _updated = string.Empty;
+        public string UpdatedAt { get { return _updated; } set { _updated = value; } }
+        public DateTime UpdatedAtDateTime
+        {
+            get
+            {
+                return DateTime.Parse(UpdatedAt);
+            }
+        }
+
+
         /// <summary>
         /// true if given ticket is valid
         /// </summary>
@@ -304,6 +321,12 @@ namespace TradeLink.AppKit
                         doc.Owner = Convert.ToInt32(m);
                     else if (dc.Name == "milestone-id")
                         doc.Milestone = Convert.ToInt32(m);
+                    else if (dc.Name == "updated-at")
+                        doc.UpdatedAt = m;
+                    else if (dc.Name == "id")
+                        doc.TicketDocumentId = Convert.ToInt32(m);
+                    else if (dc.Name == "reporter-id")
+                        doc.Reporter = m;
 
                 }
                 if (doc.isValid)
