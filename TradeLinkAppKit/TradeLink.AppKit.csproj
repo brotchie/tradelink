@@ -109,6 +109,7 @@
     <Compile Include="AssemblaTicketWindow.Designer.cs">
       <DependentUpon>AssemblaTicketWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="AssemblaUser.cs" />
     <Compile Include="AssemblaUtil.cs" />
     <Compile Include="Auth.cs" />
     <Compile Include="AuthInfo.cs" />
