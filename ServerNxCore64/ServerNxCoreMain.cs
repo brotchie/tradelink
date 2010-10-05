@@ -27,6 +27,7 @@ namespace ServerNxCore
             string start = Properties.Settings.Default.HistoricalFile == string.Empty ? ServerNxCore.LIVEFEED : Properties.Settings.Default.HistoricalFile;
             tl = new ServerNxCore(tls,start, debug);
             tl.SaveStateIntervalSec = Properties.Settings.Default.StateSaveInterval;
+            tl.VerboseDebugging = Properties.Settings.Default.VerboseDebugging;
             FormClosing += new FormClosingEventHandler(ServerNxCoreMain_FormClosing);
             tl.Start();
         }

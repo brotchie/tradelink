@@ -8,18 +8,24 @@ namespace ServerNxCore
 {
     public class ServerNxCore
     {
-        public const string PROGRAM = "ServerNxCore";
+        volatile bool _go = true;
+        int loops = 0;
         static TLServer tl;
-        public event DebugDelegate SendDebugEvent;
-        void debug(string msg)
-        {
-            if (SendDebugEvent != null)
-                SendDebugEvent(msg);
-        }
-        const int ESTMAXSYMBOLS = 10000;
-        static GenericTracker<bool> _syms = new GenericTracker<bool>(ESTMAXSYMBOLS);
-        static GenericTracker<string> _realsymbol = new GenericTracker<string>(ESTMAXSYMBOLS);
-        public const string LIVEFEED = "";
+
+        static GenericTracker<bool> _nxsyms = new GenericTracker<bool>(ESTMAXSYMBOLS);
+        static GenericTracker<int> _realsym2nxidx = new GenericTracker<int>(ESTMAXSYMBOLS);
+        static uint nextstatesavetime = 0;
+        static uint savestateint = 0;
+
+        static Basket old = new BasketImpl();
+
+        static bool QUIT = false;
+        static bool DOLIVESKIPTEST = false;
+
+        static bool DOSAVESTATE = false;
+        static bool _noverb = true;
+        public bool VerboseDebugging { get { return _noverb; } set { _noverb = value; } }
+
 
         string _fn = LIVEFEED;
         bool _islive = true;
@@ -28,11 +34,24 @@ namespace ServerNxCore
         public bool isLive { get { return _islive; } }
         int _ssi = 0;
         public int SaveStateIntervalSec { get { return _ssi; } set { _ssi = value; } }
+
+
+        public const string PROGRAM = "ServerNxCore";
+        public event DebugDelegate SendDebugEvent;
+
+        void debug(string msg)
+        {
+            if (SendDebugEvent != null)
+                SendDebugEvent(msg);
+        }
+        const int ESTMAXSYMBOLS = 10000;
+        public const string LIVEFEED = "";
+
         public ServerNxCore(TLServer tls, string filename, DebugDelegate debugs)
         {
             _fn = filename;
             _islive = _fn == LIVEFEED;
-            _syms.NewTxt += new TextIdxDelegate(_syms_NewTxt);
+            _nxsyms.NewTxt += new TextIdxDelegate(_syms_NewTxt);
             SendDebugEvent = debugs;
             d = debugs;
 
@@ -72,16 +91,25 @@ namespace ServerNxCore
 
         }
 
-        static bool DOSAVESTATE = false;
+
 
         void _syms_NewTxt(string txt, int idx)
         {
 
         }
 
-        Basket old = new BasketImpl();
 
+        void verb(string msg)
+        {
+            if (_noverb) return;
+            D(msg);
+        }
 
+        static void V(string msg)
+        {
+            if (_noverb) return;
+            D(msg);
+        }
 
         void tl_newRegisterSymbols(string client, string symbols)
         {
@@ -112,8 +140,8 @@ namespace ServerNxCore
                 else
                     p = 'e';
                 string nxsym = p + sec.Symbol;
-                _syms.addindex(nxsym, true);
-                _realsymbol.addindex(nxsym, sec.Symbol);
+                int idx = _nxsyms.addindex(nxsym, true);
+                _realsym2nxidx.addindex(sec.Symbol, idx);
             }
             // ensure old symbols are removed
             if (old.Count > 0)
@@ -121,16 +149,13 @@ namespace ServerNxCore
                 Basket rem = BasketImpl.Subtract(old, newb);
                 foreach (Security s in rem)
                 {
-                    string tsym = string.Empty;
-                    try
+                    int idx = _realsym2nxidx.getindex(s.Symbol);
+                    if (idx < 0)
                     {
-                        tsym = s.Symbol.Substring(1, s.Symbol.Length - 1);
-                        _syms[tsym] = false;
+                        debug("Unable to locate subscription for: " + s.Symbol);
+                        continue;
                     }
-                    catch (Exception ex)
-                    {
-                        debug("error unsubscribing: " + s.Symbol + " with: " + tsym + " " + ex.Message + ex.StackTrace);
-                    }
+                    _nxsyms[idx] = false;
                 }
             }
             // save new as old
@@ -158,8 +183,7 @@ namespace ServerNxCore
             }
             debug(ServerNxCoreMain.PROGRAM + " started ok.");
         }
-        volatile bool _go = true;
-        int loops = 0;
+
         void proc()
         {
 
@@ -189,8 +213,7 @@ namespace ServerNxCore
             QUIT = true;
             _go = false;
         }
-        static bool QUIT = false;
-        static bool DOLIVESKIPTEST = false;
+
         static unsafe int OnNxCoreCallback(IntPtr pSys, IntPtr pMsg)
         {
             // Alias structure pointers to the pointers passed in.
@@ -231,8 +254,7 @@ namespace ServerNxCore
             if (d != null)
                 d(msg);
         }
-        static uint nextstatesavetime = 0;
-        static uint savestateint = 0;
+
         static unsafe void OnNxCoreStatus(NxCoreSystem* pNxCoreSys, NxCoreMessage* pNxCoreMsg)
         {
             if (DOSAVESTATE)
@@ -243,6 +265,21 @@ namespace ServerNxCore
                     NxCore.SaveState(statefilepath, NxCore.NxSAVESTATE_ONEPASS);
                     nextstatesavetime += savestateint;
                     D("save complete.  next save time: " + nextstatesavetime);
+                    if (!_noverb)
+                    {
+                        try
+                        {
+                            int index1 = System.Runtime.InteropServices.Marshal.SizeOf(_nxsyms);
+                            int index2 = System.Runtime.InteropServices.Marshal.SizeOf(_realsym2nxidx);
+                            int pbask = System.Runtime.InteropServices.Marshal.SizeOf(old);
+                            V("memsize index1+2: " + (index1 + index2).ToString() + " currentbasket: " + pbask);
+                        }
+                        catch (Exception ex)
+                        {
+                            V("exception checking memory size: " + ex.Message + ex.StackTrace);
+                        }
+                    }
+
                 }
             }
             // Print the specific NxCore status message
@@ -289,8 +326,9 @@ namespace ServerNxCore
             }
             // Get the symbol for category message
 
-            int idx = _syms.getindex(new string(&pNxCoreMsg->coreHeader.pnxStringSymbol->String));
+            int idx = _nxsyms.getindex(new string(&pNxCoreMsg->coreHeader.pnxStringSymbol->String));
             if (idx < 0) return;
+            if (!_nxsyms[idx]) return;
             // Assign a pointer to the Trade data
             NxCoreTrade* Trade = &pNxCoreMsg->coreData.Trade;
             // Get the price and net change
@@ -305,7 +343,7 @@ namespace ServerNxCore
             // check for index
             if (size <= 0) return;
             Tick k = new TickImpl();
-            k.symbol = _realsymbol[idx];
+            k.symbol = _realsym2nxidx.getlabel(idx);
             k.date = tldate;
             k.time = tltime;
             k.trade = (decimal)Price;
@@ -331,8 +369,9 @@ namespace ServerNxCore
             }
             // Get the symbol for category message
 
-            int idx = _syms.getindex(new string(&pNxCoreMsg->coreHeader.pnxStringSymbol->String));
+            int idx = _nxsyms.getindex(new string(&pNxCoreMsg->coreHeader.pnxStringSymbol->String));
             if (idx < 0) return;
+            if (!_nxsyms[idx]) return;
 
             // Assign a pointer to the ExgQuote data
             NxCoreExgQuote* Quote = &pNxCoreMsg->coreData.ExgQuote;
@@ -367,7 +406,7 @@ namespace ServerNxCore
                 NxDate date = pNxCoreMsg->coreHeader.nxSessionDate;
                 int tldate = (int)date.Year * 10000 + (int)date.Month * 100 + (int)date.Day;
                 Tick k = new TickImpl();
-                k.symbol = _realsymbol[idx];
+                k.symbol = _realsym2nxidx.getlabel(idx);
                 k.date = tldate;
                 k.time = tltime;
                 if (bask && bbid)

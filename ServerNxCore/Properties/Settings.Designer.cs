@@ -70,5 +70,17 @@ namespace ServerNxCore.Properties {
                 this["StateSaveInterval"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool VerboseDebugging {
+            get {
+                return ((bool)(this["VerboseDebugging"]));
+            }
+            set {
+                this["VerboseDebugging"] = value;
+            }
+        }
     }
 }
