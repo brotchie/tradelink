@@ -701,7 +701,7 @@ namespace TradeLink.Common
             bool exists = File.Exists(filepath);
             StreamWriter sw = new StreamWriter(filepath, append);
             string header = string.Join(delimiter.ToString(), Enum.GetNames(typeof(TradePLField)));
-            if (!exists)
+            if (!append || !exists)
                 sw.WriteLine(header);
             string[] lines = TradesToClosedPL(tradelist, delimiter);
             foreach (string line in lines)
