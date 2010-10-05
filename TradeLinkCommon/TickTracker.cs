@@ -10,6 +10,20 @@ namespace TradeLink.Common
     public class TickTracker : TickIndicator, GenericTrackerI
     {
 
+        public void Clear()
+        {
+            bid.Clear();
+            ask.Clear();
+            bs.Clear();
+            be.Clear();
+            oe.Clear();
+            os.Clear();
+            ts.Clear();
+            ex.Clear();
+            date.Clear();
+            time.Clear();
+            last.Clear();
+        }
         int _estlabels = 10;
         /// <summary>
         /// create ticktracker

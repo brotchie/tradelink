@@ -11,6 +11,10 @@ namespace TradeLink.API
     public interface GenericTrackerI
     {
         /// <summary>
+        /// clears all tracked values and labels
+        /// </summary>
+        void Clear();
+        /// <summary>
         /// name of tracker
         /// </summary>
         string Name { get; set; }

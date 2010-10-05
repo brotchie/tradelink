@@ -165,7 +165,7 @@ namespace TradeLink.Common
         }
 
         /// <summary>
-        /// clears all tracked values
+        /// clears all tracked values and labels
         /// </summary>
         public void Clear()
         {
@@ -196,7 +196,11 @@ namespace TradeLink.Common
     public static class GenericTracker
     {
         public const int UNKNOWN = -1;
-
+        public static void clearindicators(params GenericTrackerI[] gts)
+        {
+            foreach (GenericTrackerI gt in gts)
+                gt.Clear();
+        }
         /// <summary>
         /// import a csv file into a generic tracker
         /// </summary>
