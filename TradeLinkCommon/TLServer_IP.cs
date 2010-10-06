@@ -240,8 +240,10 @@ namespace TradeLink.Common
             
             byte[] data = Message.sendmessage(MessageTypes.TICKNOTIFY, TickImpl.Serialize(k));
             for (int i = 0; i < client.Count; i++) // send tick to each client that has subscribed to tick's stock
-                if ((client[i] != null) && stocks[i].Contains(k.symbol))
-                    TLSend(data, i);
+            {
+                    if ((client[i] != null) && stocks[i].Contains(k.symbol))
+                        TLSend(data, i);
+            }
         }
         /// <summary>
         /// stop the server
@@ -418,11 +420,12 @@ namespace TradeLink.Common
         {
             if ((dest<0) || (dest>=_sock.Count))
                 return;
-            Socket s = _sock[dest];
-            if (s == null) 
-                return;
+
             try
             {
+                Socket s = _sock[dest];
+                if (s == null)
+                    return;
                 if (s.Connected)
                 {
                     try
