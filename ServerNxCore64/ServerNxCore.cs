@@ -263,6 +263,8 @@ namespace ServerNxCore
                 {
                     D("saving state at: " + nextstatesavetime + " " + statefilepath);
                     NxCore.SaveState(statefilepath, NxCore.NxSAVESTATE_ONEPASS);
+                    if (nextstatesavetime == 0)
+                        nextstatesavetime = pNxCoreSys->nxTime.MsOfDay;
                     nextstatesavetime += savestateint;
                     D("save complete.  next save time: " + nextstatesavetime);
                     if (!_noverb)
