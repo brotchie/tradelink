@@ -186,10 +186,14 @@ namespace Responses
 
         public override void GotFill(Trade fill)
         {
-            // stop waiting
-            _wait[fill.symbol] = false;
             // make sure every fill is tracked against a position
             pt.Adjust(fill);
+            // get index for this symbol
+            int idx = _wait.getindex(fill.symbol);
+            // ignore unknown symbols
+            if (idx < 0) return;
+            // stop waiting
+            _wait[fill.symbol] = false;
             // chart fills
             sendchartlabel(fill.xprice,time,TradeImpl.ToChartLabel(fill), fill.side ? System.Drawing.Color.Green : System.Drawing.Color.Red);
         }
