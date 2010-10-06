@@ -323,6 +323,7 @@ namespace Kadina
                     }
                     catch (Exception ex)
                     {
+                        debug("An error occured inside your response Reset method: ");
                         debug(ex.Message + ex.StackTrace);
                     }
                 }
@@ -582,7 +583,15 @@ namespace Kadina
                 updatetitle();
                 igridinit();
                 myres.ID = 0;
-                myres.Reset();
+                try
+                {
+                    myres.Reset();
+                }
+                catch (Exception ex)
+                {
+                    debug("An error occured inside your response Reset method: ");
+                    debug(ex.Message + ex.StackTrace);
+                }
             }
             else status("Response did not load.");
             hasprereq();
