@@ -54,7 +54,7 @@ namespace ServerNxCore
             _nxsyms.NewTxt += new TextIdxDelegate(_syms_NewTxt);
             SendDebugEvent = debugs;
             d = debugs;
-
+            debug(Util.TLSIdentity());
             _proc = new System.Threading.Thread(proc);
             tl = tls;
             tl.newProviderName = Providers.Nanex;
