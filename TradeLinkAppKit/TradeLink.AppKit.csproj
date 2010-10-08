@@ -199,6 +199,7 @@
       <DependentUpon>PopupWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="Results.cs" />
+    <Compile Include="RunTracker.cs" />
     <Compile Include="SafeBindingSource.cs">
       <SubType>Component</SubType>
     </Compile>
