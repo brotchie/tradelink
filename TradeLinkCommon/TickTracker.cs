@@ -10,6 +10,37 @@ namespace TradeLink.Common
     public class TickTracker : TickIndicator, GenericTrackerI
     {
 
+        public Type TrackedType
+        {
+            get
+            {
+                return typeof(Tick);
+            }
+        }
+
+        /// <summary>
+        /// gets decimal value of last trade price for given index
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <returns></returns>
+        public decimal ValueDecimal(int idx)
+        {
+            return (decimal)this[idx].trade;
+        }
+
+        /// <summary>
+        /// gets decimal value of last trade price given label
+        /// </summary>
+        /// <param name="txt"></param>
+        /// <returns></returns>
+        public decimal ValueDecimal(string txt)
+        {
+            return (decimal)this[txt].trade;
+        }
+
+        public object Value(int idx) { return this[idx]; }
+        public object Value(string txt) { return this[txt]; }
+
         public void Clear()
         {
             bid.Clear();

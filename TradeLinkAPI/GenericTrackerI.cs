@@ -48,6 +48,33 @@ namespace TradeLink.API
         int Count { get; }
 
         /// <summary>
+        /// gets value of given index
+        /// </summary>
+        object Value(int idx);
+        /// <summary>
+        /// gets value of given label
+        /// </summary>
+        /// <param name="txt"></param>
+        /// <returns></returns>
+        object Value(string txt);
+        /// <summary>
+        /// gets type of tracked values
+        /// </summary>
+        Type TrackedType { get; }
+        /// <summary>
+        /// attempts to get decimal value of index
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <returns></returns>
+        decimal ValueDecimal(int idx);
+        /// <summary>
+        /// attempts to get decimal value of a label
+        /// </summary>
+        /// <param name="txt"></param>
+        /// <returns></returns>
+        decimal ValueDecimal(string txt);
+
+        /// <summary>
         /// called when new text label is added
         /// </summary>
         event TextIdxDelegate NewTxt;

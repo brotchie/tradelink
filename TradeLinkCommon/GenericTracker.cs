@@ -23,6 +23,46 @@ namespace TradeLink.Common
         /// </summary>
         public int Count { get { return _tracked.Count; } }
 
+
+        public Type TrackedType { get 
+        {
+            T val = default(T);
+            return val.GetType();
+        } 
+        }
+        /// <summary>
+        /// attempts to convert tracked value to decimal given label
+        /// </summary>
+        /// <param name="txt"></param>
+        /// <returns></returns>
+        public decimal ValueDecimal(string txt) { return Convert.ToDecimal(this[txt]); }
+        /// <summary>
+        /// attempts to convert tracked value to decimal given index
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <returns></returns>
+        public decimal ValueDecimal(int idx) { return Convert.ToDecimal(this[idx]); }
+
+        /// <summary>
+        /// gets value of given label
+        /// </summary>
+        /// <param name="txt"></param>
+        /// <returns></returns>
+        public object Value(string txt)
+        {
+            return this[txt];
+        }
+
+        /// <summary>
+        /// gets value of give index
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <returns></returns>
+        public object Value(int idx)
+        {
+            return this[idx];
+        }
+
         string _name = string.Empty;
         /// <summary>
         /// name of this tracker

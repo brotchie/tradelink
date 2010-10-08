@@ -21,7 +21,7 @@ namespace TradeLink.Common
         /// this.MyBarList.newTick(tick);
         /// </summary>
         /// <param name="tick"></param>
-        public virtual void GotTick(Tick tick)
+        public virtual void GotTick(Tick k)
         {
         }
         /// <summary>
@@ -30,7 +30,7 @@ namespace TradeLink.Common
         /// this.MyOrders.Add(order);
         /// </summary>
         /// <param name="order"></param>
-        public virtual void GotOrder(Order order)
+        public virtual void GotOrder(Order o)
         {
         }
         /// <summary>
@@ -39,14 +39,14 @@ namespace TradeLink.Common
         /// positionTracker.Adjust(fill);
         /// </summary>
         /// <param name="fill"></param>
-        public virtual void GotFill(Trade fill)
+        public virtual void GotFill(Trade f)
         {
         }
         /// <summary>
         /// Called if a cancel has been processed
         /// </summary>
         /// <param name="cancelid"></param>
-        public virtual void GotOrderCancel(long cancelid)
+        public virtual void GotOrderCancel(long id)
         {
 
         }
@@ -295,33 +295,27 @@ namespace TradeLink.Common
         /// <summary>
         /// shutdown a response entirely, flat all positions and notify user
         /// </summary>
-        /// <param name="ResponseisValid"></param>
-        /// <param name="D"></param>
         /// <param name="_pt"></param>
-        /// <param name="sendorder"></param>
         /// <param name="gt"></param>
-        public static void shutdown(ref bool ResponseisValid, DebugDelegate D, PositionTracker _pt, OrderDelegate sendorder, GenericTracker<bool> gt)
+        public void shutdown(PositionTracker _pt, GenericTrackerI gt)
         {
-            if (ResponseisValid) return;
-            if (D != null)
-                D("ShutdownTime");
-            ResponseisValid = false;
+            if (!isValid) return;
+            D("ShutdownTime");
+            isValid = false;
             bool ShutdownFlat = _pt != null;
             bool usegt = gt != null;
             if (ShutdownFlat)
             {
-                if (D != null)
-                    D("flatting positions at shutdown.");
+                
+                D("flatting positions at shutdown.");
                 foreach (Position p in _pt)
                 {
                     if (usegt && (gt.getindex(p.Symbol) < 0)) continue;
                     Order o = new MarketOrderFlat(p);
-                    if (D != null)
-                        D("flat order: " + o.ToString());
+                    D("flat order: " + o.ToString());
                     sendorder(o);
                 }
             }
-            ResponseisValid = true;
         }
         /// <summary>
         /// flat a symbol and flag it to prevent it from trading in future
