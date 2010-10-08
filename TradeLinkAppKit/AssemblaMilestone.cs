@@ -50,6 +50,29 @@ namespace TradeLink.AppKit
         {
             return "http://www.assembla.com/spaces/" + space + "/milestones/";
         }
+
+        /// <summary>
+        /// delete a milestone given a valid milestone instance
+        /// </summary>
+        /// <param name="space"></param>
+        /// <param name="user"></param>
+        /// <param name="password"></param>
+        /// <param name="milestone"></param>
+        /// <returns></returns>
+        public static bool DeleteMilestone(string user, string password, AssemblaMilestone milestone)
+        {
+            string space = milestone.Space;
+            string url = GetMilestonesUrl(space)+"//"+milestone.Id;
+            HttpWebRequest hr = WebRequest.Create(url) as HttpWebRequest;
+            hr.Credentials = new System.Net.NetworkCredential(user, password);
+            hr.PreAuthenticate = true;
+            hr.Method = "GET";
+            hr.ContentType = "application/xml";
+            HttpWebResponse wr = (HttpWebResponse)hr.GetResponse();
+            return wr.StatusCode == HttpStatusCode.OK;
+
+        }
+
         /// <summary>
         /// get list of all milestones on a space
         /// </summary>
