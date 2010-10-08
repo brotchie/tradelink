@@ -24,7 +24,7 @@ namespace ServerNxCore
 
         static bool DOSAVESTATE = false;
         static bool _noverb = true;
-        public bool VerboseDebugging { get { return _noverb; } set { _noverb = value; } }
+        public bool VerboseDebugging { get { return !_noverb; } set { _noverb = !value; } }
 
 
         string _fn = LIVEFEED;
@@ -67,13 +67,16 @@ namespace ServerNxCore
                 // if live and no previous state, remove old state files
                 if (!hasstate)
                 {
+                    verb("No state file found for today, removing previous states...");
                     System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(Util.ProgramData(PROGRAM));
                     System.IO.FileInfo[] fis = di.GetFiles("nxstate.*.tmp");
                     foreach (System.IO.FileInfo fi in fis)
                     {
                         try
                         {
+                            
                             System.IO.File.Delete(fi.FullName);
+                            verb("removed: " + fi.FullName);
                         }
                         catch { }
                     }
@@ -86,6 +89,8 @@ namespace ServerNxCore
                 DOSAVESTATE = SaveStateIntervalSec != 0;
                 if (DOSAVESTATE)
                     debug("Will save tape position every: " + SaveStateIntervalSec + " seconds.");
+                else
+                    verb("State saving disabled because SaveStateInterval is 0");
 
             }
 
@@ -271,6 +276,7 @@ namespace ServerNxCore
                     {
                         try
                         {
+                           
                             int index1 = System.Runtime.InteropServices.Marshal.SizeOf(_nxsyms);
                             int index2 = System.Runtime.InteropServices.Marshal.SizeOf(_realsym2nxidx);
                             int pbask = System.Runtime.InteropServices.Marshal.SizeOf(old);
