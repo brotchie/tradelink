@@ -11,13 +11,26 @@ namespace Responses
     {
         PairsTracker pairs;
         PositionTracker pt = new PositionTracker();
+        bool _auto = false;
         public PairsResponse() : this(false) { }
         public PairsResponse(bool auto)
         {
+            _auto = auto;
             Name = "PairsResponse";
             isValid = true;
+
+        }
+
+        public override void Reset()
+        {
             // get parameters from user if we're not running in auto
-            ParamPrompt.Popup(this, auto);
+            ParamPrompt.Popup(this, !_auto,_auto);
+            // create pairs tracker if not already
+            if (pairs == null)
+            {
+                pairs = new PairsTracker(Asym, Bsym, RatioA2B, BasisPointEntry);
+                pairs.SpreadOutsideBounds += new DecimalDelegate(pairs_SpreadOutsideBounds);
+            }
         }
 
         void pairs_SpreadOutsideBounds(decimal difference)
@@ -58,12 +71,7 @@ namespace Responses
 
         public override void GotTick(Tick tick)
         {
-            // create pairs tracker if not already
-            if (pairs == null)
-            {
-                pairs = new PairsTracker(Asym, Bsym, RatioA2B, BasisPointEntry);
-                pairs.SpreadOutsideBounds += new DecimalDelegate(pairs_SpreadOutsideBounds);
-            }
+
             pairs.GotTick(tick);
         }
         public override void GotOrder(Order order)
