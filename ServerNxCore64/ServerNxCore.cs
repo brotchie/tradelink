@@ -47,12 +47,14 @@ namespace ServerNxCore
         const int ESTMAXSYMBOLS = 10000;
         public const string LIVEFEED = "";
 
-        public ServerNxCore(TLServer tls, string filename, DebugDelegate debugs)
+        public ServerNxCore(TLServer tls, string filename, int SaveStateInterval, bool Verbose, DebugDelegate debugs)
         {
             _fn = filename;
             _islive = _fn == LIVEFEED;
             _nxsyms.NewTxt += new TextIdxDelegate(_syms_NewTxt);
             SendDebugEvent = debugs;
+            SaveStateIntervalSec = SaveStateInterval;
+            VerboseDebugging = Verbose;
             d = debugs;
             debug(Util.TLSIdentity());
             _proc = new System.Threading.Thread(proc);
@@ -61,13 +63,15 @@ namespace ServerNxCore
             tl.newFeatureRequest += new MessageArrayDelegate(ServerNxCore_newFeatureRequest);
             tl.newRegisterSymbols += new SymbolRegisterDel(tl_newRegisterSymbols);
             savestateint = (uint)(SaveStateIntervalSec * 1000);
+            debug((tl.VerboseDebugging ? "Verbose is on" : "Verbose is off"));
             if (isLive)
             {
+                debug("Running in live mode.");
                 DOLIVESKIPTEST = true;
                 // if live and no previous state, remove old state files
                 if (!hasstate)
                 {
-                    verb("No state file found for today, removing previous states...");
+                    debug("No state file found for today, removing previous states...");
                     System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(Util.ProgramData(PROGRAM));
                     System.IO.FileInfo[] fis = di.GetFiles("nxstate.*.tmp");
                     foreach (System.IO.FileInfo fi in fis)
@@ -76,7 +80,7 @@ namespace ServerNxCore
                         {
 
                             System.IO.File.Delete(fi.FullName);
-                            verb("removed: " + fi.FullName);
+                            debug("removed: " + fi.FullName);
                         }
                         catch { }
                     }
@@ -90,7 +94,7 @@ namespace ServerNxCore
                 if (DOSAVESTATE)
                     debug("Will save tape position every: " + SaveStateIntervalSec + " seconds.");
                 else
-                    verb("State saving disabled because SaveStateInterval is 0");
+                    debug("State saving disabled because SaveStateInterval is 0");
 
             }
 
@@ -272,21 +276,7 @@ namespace ServerNxCore
                         nextstatesavetime = pNxCoreSys->nxTime.MsOfDay;
                     nextstatesavetime += savestateint;
                     D("save complete.  next save time: " + nextstatesavetime);
-                    if (!_noverb)
-                    {
-                        try
-                        {
 
-                            int index1 = System.Runtime.InteropServices.Marshal.SizeOf(_nxsyms);
-                            int index2 = System.Runtime.InteropServices.Marshal.SizeOf(_realsym2nxidx);
-                            int pbask = System.Runtime.InteropServices.Marshal.SizeOf(old);
-                            V("memsize index1+2: " + (index1 + index2).ToString() + " currentbasket: " + pbask);
-                        }
-                        catch (Exception ex)
-                        {
-                            V("exception checking memory size: " + ex.Message + ex.StackTrace);
-                        }
-                    }
 
                 }
             }
