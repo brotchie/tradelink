@@ -131,6 +131,7 @@ namespace TradeLibFast
 		case IDX : t = "IDX"; break;
 		case BND : t = "BND"; break;
 		case CASH: t = "CASH"; break;
+		case BAG: t = "BAG"; break;
 		}
 		return t;
 	}
@@ -147,6 +148,7 @@ namespace TradeLibFast
 		else if (TLSecurityName=="IDX") return IDX;
 		else if (TLSecurityName=="BND") return BND;
 		else if (TLSecurityName=="CASH") return CASH;
+		else if (TLSecurityName=="BAG") return BAG; //IB Supported combo type
 		return -1;
 	}
 }

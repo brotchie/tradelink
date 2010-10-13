@@ -18,5 +18,6 @@ namespace TradeLink.API
         IDX,
         BND,
         CASH,
+        BAG,
     }
 }

@@ -17,6 +17,7 @@ namespace TradeLibFast
         IDX,
         BND,
 		CASH,
+		BAG,  //IB Supported combo type
     };
 
 	enum TLSecurityField
