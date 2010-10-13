@@ -51,6 +51,48 @@ namespace TradeLink.Common
         {
             return OpenPL(LastTrade, Pos.AvgPrice, Pos.Size);
         }
+        /// <summary>
+        /// <summary>
+        /// populate generic tracker with most recent TA-lib result
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <param name="nb">number of elements (returned from ta lib)</param>
+        /// <param name="res">result (returned from ta-lib)</param>
+        /// <param name="gt"></param>
+        /// <returns></returns>
+        public static bool TAPopulateGT(int idx, int nb, ref double[] res, GenericTracker<decimal> gt)
+        {
+            return TAPopulateGT(idx, nb, 2, ref res, gt);
+        }
+        /// <summary>
+        /// populate generic tracker with most recent TA-lib result
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <param name="nb">number of elements (returned from ta lib)</param>
+        /// <param name="dplaces">round to this many decimal places</param>
+        /// <param name="res">result (returned from ta-lib)</param>
+        /// <param name="gt"></param>
+        /// <returns></returns>
+        public static bool TAPopulateGT(int idx, int nb, int dplaces, ref double[] res, GenericTracker<decimal> gt)
+        {
+            if (nb <= 0) return false;
+            gt[idx] = Math.Round(Convert.ToDecimal(res[nb - 1]), dplaces);
+            return true;
+
+        }
+
+        /// <summary>
+        /// convert double array to decimal
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
+        public static decimal[] Double2Decimal(ref double[] a)
+        {
+            decimal[] b = new decimal[a.Length];
+            for (int i = 0; i < a.Length; i++)
+                b[i] = (decimal)a[i];
+            return b;
+        }
 
         // these are for calculating closed pl
         // they do not adjust positions themselves
@@ -1563,12 +1605,32 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="array"></param>
         /// <returns></returns>
-        public static double[] Decimal2Double(decimal[] array)
+        public static double[] Decimal2Double(ref decimal[] array)
         {
             double[] vals = new double[array.Length];
             for (int i = 0; i < array.Length; i++)
                 vals[i] = (double)array[i];
             return vals;
+        }
+        /// <summary>
+        /// convert an array of decimals to less precise doubles
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="vals"></param>
+        public static void Decimal2Double(decimal[] array, ref double[] vals)
+        {
+            for (int i = 0; i < array.Length; i++)
+                vals[i] = (double)array[i];
+        }
+        /// <summary>
+        /// convert an array of decimals to less precise doubles
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="vals"></param>
+        public static void Decimal2Double(ref decimal[] array, ref double[] vals)
+        {
+            for (int i = 0; i < array.Length; i++)
+                vals[i] = (double)array[i];
         }
 
     }
