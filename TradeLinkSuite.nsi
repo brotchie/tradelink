@@ -84,7 +84,7 @@ Section "TradeLinkSuite"
   File "Kadina\bin\release\Kadina.exe"
   File "Replay\bin\release\Replay.exe"
   File "ServerSterling\bin\release\SterServer.exe"
-  File "ServerSterling\Interop.SterlingLib.dll"
+  File "ServerSterling\bin\release\Interop.SterlingLib.dll"
 
   
   

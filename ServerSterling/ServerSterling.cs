@@ -122,7 +122,7 @@ namespace SterServer
 
         void stiEvents_OnSTIOrderReject(ref structSTIOrderReject structOrderReject)
         {
-            debug("reject: " + structOrderReject.bstrClOrderId + " reason: " + structOrderReject.nRejectReason+ " "+sterrejectpretty(structOrderReject.nRejectReason));
+            debug("reject: " + structOrderReject.bstrClOrderId + " reason: " + structOrderReject.nRejectReason + " " + sterrejectpretty(structOrderReject.nRejectReason) + " additional info: " + structOrderReject.bstrText);
         }
 
         void stiEvents_OnSTIOrderRejectMsg(STIOrderRejectMsg oSTIOrderRejectMsg)
