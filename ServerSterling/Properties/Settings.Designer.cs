@@ -166,5 +166,17 @@ namespace SterServer.Properties {
                 this["AutoCapitilizeAccounts"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool UseXMLQuotes {
+            get {
+                return ((bool)(this["UseXMLQuotes"]));
+            }
+            set {
+                this["UseXMLQuotes"] = value;
+            }
+        }
     }
 }

@@ -6,6 +6,9 @@ using TradeLink.API;
 using TradeLink.Common;
 using System.Threading;
 using SterlingLib;
+using System.Xml.Serialization;
+using System.Xml;
+
 namespace SterServer
 {
 
@@ -19,6 +22,7 @@ namespace SterServer
         STIPosition stiPos;
         STIQuote stiQuote;
         STIBook stiBook;
+        STIApp stiApp;
         TLServer tl;
 
         bool _ignoreoutoforderticks = true;
@@ -41,8 +45,9 @@ namespace SterServer
             tl = tls;
             _SLEEP = 50;
             _ORDERSLEEP = sleepAfterOrder;
-            Start();
         }
+        bool _xmlquotes = false;
+        public bool UseXmlQuotes { get { return _xmlquotes; } set { _xmlquotes = value; debug("xml quotes: " + (_xmlquotes ? "on" : "off")); } }
         bool _connected = false;
         public bool isConnected { get { return _connected; } }
         bool _verbosedebug = false;
@@ -60,6 +65,7 @@ namespace SterServer
                 stiPos = new STIPosition();
                 stiQuote = new STIQuote();
                 stiBook = new STIBook();
+                stiApp = new STIApp();
                 _bw = new Thread(new ParameterizedThreadStart(background));
                 _runbg = true;
                 _bw.Start();
@@ -74,6 +80,8 @@ namespace SterServer
                 stiQuote.OnSTIQuoteSnap += new _ISTIQuoteEvents_OnSTIQuoteSnapEventHandler(stiQuote_OnSTIQuoteSnap);
                 stiEvents.OnSTIOrderRejectMsg += new _ISTIEventsEvents_OnSTIOrderRejectMsgEventHandler(stiEvents_OnSTIOrderRejectMsg);
                 stiEvents.OnSTIOrderReject += new _ISTIEventsEvents_OnSTIOrderRejectEventHandler(stiEvents_OnSTIOrderReject);
+                stiQuote.OnSTIQuoteUpdateXML += new _ISTIQuoteEvents_OnSTIQuoteUpdateXMLEventHandler(stiQuote_OnSTIQuoteUpdateXML);
+                stiQuote.OnSTIQuoteSnapXML += new _ISTIQuoteEvents_OnSTIQuoteSnapXMLEventHandler(stiQuote_OnSTIQuoteSnapXML);
                 stiPos.GetCurrentPositions();
 
                 tl.newAcctRequest += new StringDelegate(tl_newAcctRequest);
@@ -85,6 +93,15 @@ namespace SterServer
                 tl.newFeatureRequest += new MessageArrayDelegate(tl_newFeatureRequest);
                 tl.newUnknownRequest += new UnknownMessageDelegate(tl_newUnknownRequest);
                 tl.newImbalanceRequest += new VoidDelegate(tl_newImbalanceRequest);
+                stiApp.SetModeXML(UseXmlQuotes);
+                string trader = stiApp.GetTraderName().ToUpper();
+                debug("trader: " + trader);
+                if (!accts.Contains(trader))
+                {
+                    accts.Add(trader);
+                    debug("accounts: " + string.Join(",", Accounts));
+                }
+                
             }
             catch (Exception ex)
             {
@@ -95,6 +112,37 @@ namespace SterServer
             debug(PROGRAM + " started.");
             _connected = true;
             return _connected;
+        }
+
+        void stiQuote_OnSTIQuoteSnapXML(ref string bstrQuote)
+        {
+            try
+            {
+                XmlSerializer xs = new XmlSerializer(typeof(SterlingLib.structSTIQuoteSnap));
+                structSTIQuoteSnap q = (structSTIQuoteSnap)xs.Deserialize(new System.IO.StringReader(bstrQuote));
+                dosnap(ref q);
+            }
+            catch (Exception ex)
+            {
+                debug("Error deserializing quote: " + bstrQuote);
+                debug(ex.Message + ex.StackTrace);
+            }
+        }
+
+        void stiQuote_OnSTIQuoteUpdateXML(ref string bstrQuote)
+        {
+            try
+            {
+                XmlSerializer xs = new XmlSerializer(typeof(SterlingLib.structSTIQuoteUpdate));
+                structSTIQuoteUpdate q = (structSTIQuoteUpdate)xs.Deserialize(new System.IO.StringReader(bstrQuote));
+                doquote(ref q);
+            }
+            catch (Exception ex)
+            {
+                debug("Error deserializing quote: " + bstrQuote);
+                debug(ex.Message + ex.StackTrace);
+            }
+
         }
 
         RingBuffer<string> removesym = new RingBuffer<string>(1000);
@@ -329,7 +377,7 @@ namespace SterServer
                 foreach (string a in value)
                 {
                     string av = AutoCapAccounts ? a.ToUpper() : a;
-                    if (!accts.Contains(a))
+                    if (!accts.Contains(av) && (av!=string.Empty))
                         accts.Add(av);
                 }
                 debug("Accounts: " + string.Join(",", accts.ToArray())); 
@@ -416,7 +464,9 @@ namespace SterServer
                     {
                         _symsq.Read();
                         foreach (string sym in symquotes.Split(','))
+                        {
                             stiQuote.RegisterQuote(sym, "*");
+                        }
                     }
                     // old quotes
                     while (removesym.hasItems)
@@ -635,7 +685,7 @@ namespace SterServer
 
         int _lasttime = 0;
 
-        void stiQuote_OnSTIQuoteUpdate(ref structSTIQuoteUpdate q)
+        void doquote(ref structSTIQuoteUpdate q)
         {
             Tick k = new TickImpl(q.bstrSymbol);
             k.bid = (decimal)q.fBidPrice;
@@ -658,13 +708,19 @@ namespace SterServer
             // if imbalances are not enabled we're done
             if (!_imbalance) return;
             // if there is no imbalance we're done
-            if (q.nMktImbalance==0) return;
+            if (q.nMktImbalance == 0) return;
             Imbalance imb = new ImbalanceImpl(k.symbol, GetExPretty(k.ex), q.nMktImbalance, k.time, 0, 0, q.nMktImbalance);
             tl.newImbalance(imb);
+        }
+
+        void stiQuote_OnSTIQuoteUpdate(ref structSTIQuoteUpdate q)
+        {
+            if (UseXmlQuotes) return;
+            doquote(ref q);
 
         }
 
-        void stiQuote_OnSTIQuoteSnap(ref structSTIQuoteSnap q)
+        void dosnap(ref structSTIQuoteSnap q)
         {
             TickImpl k = new TickImpl();
             k.symbol = q.bstrSymbol;
@@ -681,6 +737,12 @@ namespace SterServer
             k.trade = (decimal)q.fLastPrice;
             k.size = q.nLastSize;
             tl.newTick(k);
+        }
+
+        void stiQuote_OnSTIQuoteSnap(ref structSTIQuoteSnap q)
+        {
+            if (UseXmlQuotes) return;
+            dosnap(ref q);
         }
         IdTracker _idt = new IdTracker();
         long tl_gotSrvFillRequest(Order o)
@@ -712,7 +774,7 @@ namespace SterServer
             if (!accts.Contains(ac))
                 accts.Add(ac);
             if (VerboseDebugging)
-                debug("new position sent: " + p.ToString());
+                debug("new position recv: " + p.ToString());
         }
 
         void stiEvents_OnSTIOrderUpdateMsg(STIOrderUpdateMsg oSTIOrderUpdateMsg)
