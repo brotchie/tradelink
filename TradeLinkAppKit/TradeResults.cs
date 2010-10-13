@@ -58,7 +58,7 @@ namespace TradeLink.AppKit
 
         }
 
-        decimal _rfr = .001m;
+        decimal _rfr = .01m;
         decimal _comm = .01m;
         void changerfr(object sender, EventArgs e)
         {
@@ -351,6 +351,10 @@ namespace TradeLink.AppKit
 
     public class TradeResult : TradeLink.Common.TradeImpl
     {
+        public override string ToString()
+        {
+            return Source.ToString()+" cpl: "+ClosedPL.ToString("F2");
+        }
         public Trade Source;
         public decimal OpenPL;
         public decimal ClosedPL;

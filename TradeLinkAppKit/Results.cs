@@ -178,6 +178,7 @@ namespace TradeLink.AppKit
                 decimal winpl = 0;
                 decimal losepl = 0;
                 Dictionary<string, int> tradecount = new Dictionary<string, int>();
+                List<decimal> negret = new List<decimal>(results.Count);
 
                 foreach (TradeResult tr in results)
                 {
@@ -187,13 +188,26 @@ namespace TradeLink.AppKit
                         tradecount.Add(tr.Source.symbol, 1);
                     if (!days.Contains(tr.Source.xdate))
                         days.Add(tr.Source.xdate);
+                    int usizebefore = pt[tr.Source.symbol].UnsignedSize;
                     pt.Adjust(tr.Source);
+                    bool isclosing = pt[tr.Source.symbol].UnsignedSize<usizebefore;
                     // calculate MIU and store on array
                     decimal miu = Calc.Sum(Calc.MoneyInUse(pt));
-                    _MIU.Add(miu);
-                    // get p&l
-                    decimal pl = Calc.Sum(Calc.AbsoluteReturn(pt, new decimal[pt.Count], true, false));
-                    _return.Add(pl);
+                    if (miu!=0)
+                        _MIU.Add(miu);
+                    // if we closed something, update return
+                    if (isclosing)
+                    {
+                        // get p&l for portfolio
+                        decimal pl = Calc.Sum(Calc.AbsoluteReturn(pt));
+                        // count return
+                        _return.Add(pl);
+                        // get pct return for portfolio
+                        decimal pctret = _MIU[_MIU.Count - 1] == 0 ? 0 : pl / _MIU[_MIU.Count - 1];
+                        // if it is below our zero, count it as negative return
+                        if (pctret < 0)
+                            negret.Add(pl);
+                    }
 
                     if (!r.Symbols.Contains(tr.Source.symbol))
                         r.Symbols += tr.Source.symbol + ",";
@@ -201,6 +215,7 @@ namespace TradeLink.AppKit
                     r.HundredLots += (int)(tr.Source.xsize / 100);
                     r.GrossPL += tr.ClosedPL;
 
+                    
 
                     if ((tr.ClosedPL > 0) && !exitscounted.Contains(tr.Source.id))
                     {
@@ -253,17 +268,6 @@ namespace TradeLink.AppKit
 
                 }
 
-
-                try
-                {
-                    r.SharpeRatio = _return.Count < 2 ? 0 : Math.Round(Calc.SharpeRatio(_return[_return.Count - 1], Calc.StdDev(_return.ToArray()), RiskFreeRate), 3);
-                }
-                catch (Exception ex)
-                {
-                    if (d != null)
-                        d("sharp error: " + ex.Message);
-                }
-
                 if (r.Trades != 0)
                 {
                     r.AvgPerTrade = Math.Round((losepl + winpl) / r.Trades, 2);
@@ -294,6 +298,41 @@ namespace TradeLink.AppKit
                     r.GrossPerDay = 0;
                     r.GrossPerSymbol = 0;
                 }
+
+
+                try
+                {
+                    r.SharpeRatio = _return.Count < 2 ? 0 : Math.Round(Calc.SharpeRatio(_return[_return.Count - 1], Calc.StdDev(_return.ToArray()), (RiskFreeRate*r.MoneyInUse)), 3);
+                }
+                catch (Exception ex)
+                {
+                    if (d != null)
+                        d("sharp error: " + ex.Message);
+                }
+
+                try
+                {
+                    if (_return.Count == 0)
+                        r.SortinoRatio = 0;
+                    else if (negret.Count == 1)
+                        r.SortinoRatio = 0;
+                    else if ((negret.Count == 0) && (_return[_return.Count - 1] == 0))
+                        r.SortinoRatio = 0;
+                    else if ((negret.Count == 0) && (_return[_return.Count - 1] > 0))
+                        r.SortinoRatio = decimal.MaxValue;
+                    else if ((negret.Count == 0) && (_return[_return.Count - 1] < 0))
+                        r.SortinoRatio = decimal.MinValue;
+                    else
+                        r.SortinoRatio = Math.Round(Calc.SortinoRatio(_return[_return.Count - 1], Calc.StdDev(negret.ToArray()), (RiskFreeRate * r.MoneyInUse)), 3);
+                }
+                catch (Exception ex)
+                {
+                    if (d != null)
+                        d("sortino error: " + ex.Message);
+                }
+
+
+                
 
                 return r;
             }
@@ -357,6 +396,7 @@ namespace TradeLink.AppKit
         public decimal GrossPerDay = 0;
         public decimal GrossPerSymbol = 0;
         public decimal SharpeRatio = 0;
+        public decimal SortinoRatio = 0;
         public decimal ComPerShare = 0.01m;
         public int ConsecWin = 0;
         public int ConsecLose = 0;
