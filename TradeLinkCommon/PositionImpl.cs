@@ -7,8 +7,121 @@ namespace TradeLink.Common
     /// <summary>
     /// A position type used to describe the position in a stock or instrument.
     /// </summary>
-    public class PositionImpl : TradeLink.API.Position
+    public class PositionImpl : TradeLink.API.Position, IConvertible
     {
+        public decimal ToDecimal(IFormatProvider provider)
+        {
+            return AvgPrice;
+        }
+
+        byte IConvertible.ToByte(IFormatProvider provider)
+        {
+            throw new InvalidCastException();
+        }
+
+        char IConvertible.ToChar(IFormatProvider provider)
+        {
+            throw new InvalidCastException();
+        }
+
+        DateTime IConvertible.ToDateTime(IFormatProvider provider)
+        {
+            throw new InvalidCastException();
+        }
+
+        double IConvertible.ToDouble(IFormatProvider provider)
+        {
+            return (double)AvgPrice;
+        }
+
+        short IConvertible.ToInt16(IFormatProvider provider)
+        {
+            return (Int16)Size;
+        }
+
+        int IConvertible.ToInt32(IFormatProvider provider)
+        {
+            return Size;
+        }
+
+        long IConvertible.ToInt64(IFormatProvider provider)
+        {
+            return Size;
+        }
+
+        public TypeCode GetTypeCode()
+        {
+            return TypeCode.Object;
+        }
+
+        sbyte IConvertible.ToSByte(IFormatProvider provider)
+        {
+            throw new InvalidCastException();
+        }
+
+        float IConvertible.ToSingle(IFormatProvider provider)
+        {
+            throw new InvalidCastException();
+        }
+
+        bool IConvertible.ToBoolean(IFormatProvider provider)
+        {
+            return !isFlat;
+        }
+
+        string IConvertible.ToString(IFormatProvider provider)
+        {
+            return ToString();
+        }
+
+        object IConvertible.ToType(Type conversionType, IFormatProvider provider)
+        {
+            return Convert.ChangeType(Size, conversionType);
+        }
+
+        ushort IConvertible.ToUInt16(IFormatProvider provider)
+        {
+            throw new InvalidCastException();
+        }
+
+        uint IConvertible.ToUInt32(IFormatProvider provider)
+        {
+            throw new InvalidCastException();
+        }
+
+        ulong IConvertible.ToUInt64(IFormatProvider provider)
+        {
+            throw new InvalidCastException();
+        }
+
+        /// <summary>
+        /// convert from position to decimal (price)
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        public static implicit operator decimal(PositionImpl p)
+        {
+            return p.AvgPrice;
+        }
+        /// <summary>
+        /// convert from position to integer (size)
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        public static implicit operator int(PositionImpl p)
+        {
+            return p.Size;
+        }
+        /// <summary>
+        /// convert from
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        public static implicit operator bool(PositionImpl p)
+        {
+            return !p.isFlat;
+        }
+    
         public PositionImpl() : this("") { }
         public PositionImpl(Position p) : this(p.Symbol, p.AvgPrice, p.Size, p.ClosedPL,p.Account) { }
         public PositionImpl(string symbol) { _sym = symbol; }
