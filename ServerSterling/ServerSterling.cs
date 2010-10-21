@@ -47,7 +47,7 @@ namespace SterServer
             _ORDERSLEEP = sleepAfterOrder;
         }
         bool _xmlquotes = false;
-        public bool UseXmlQuotes { get { return _xmlquotes; } set { _xmlquotes = value; debug("xml quotes: " + (_xmlquotes ? "on" : "off")); } }
+        public bool UseXmlMode { get { return _xmlquotes; } set { _xmlquotes = value; debug("xml mode: " + (_xmlquotes ? "on" : "off")); } }
         bool _connected = false;
         public bool isConnected { get { return _connected; } }
         bool _verbosedebug = false;
@@ -74,11 +74,15 @@ namespace SterServer
                 stiEvents.SetOrderEventsAsStructs(true);
 
                 stiEvents.OnSTIOrderUpdate += new _ISTIEventsEvents_OnSTIOrderUpdateEventHandler(stiEvents_OnSTIOrderUpdate);
+                stiEvents.OnSTIOrderUpdateXML += new _ISTIEventsEvents_OnSTIOrderUpdateXMLEventHandler(stiEvents_OnSTIOrderUpdateXML);
                 stiEvents.OnSTITradeUpdate += new _ISTIEventsEvents_OnSTITradeUpdateEventHandler(stiEvents_OnSTITradeUpdate);
+                stiEvents.OnSTITradeUpdateXML += new _ISTIEventsEvents_OnSTITradeUpdateXMLEventHandler(stiEvents_OnSTITradeUpdateXML);
                 stiPos.OnSTIPositionUpdate += new _ISTIPositionEvents_OnSTIPositionUpdateEventHandler(stiPos_OnSTIPositionUpdate);
+                stiPos.OnSTIPositionUpdateXML += new _ISTIPositionEvents_OnSTIPositionUpdateXMLEventHandler(stiPos_OnSTIPositionUpdateXML);
                 stiQuote.OnSTIQuoteUpdate += new _ISTIQuoteEvents_OnSTIQuoteUpdateEventHandler(stiQuote_OnSTIQuoteUpdate);
                 stiQuote.OnSTIQuoteSnap += new _ISTIQuoteEvents_OnSTIQuoteSnapEventHandler(stiQuote_OnSTIQuoteSnap);
                 stiEvents.OnSTIOrderRejectMsg += new _ISTIEventsEvents_OnSTIOrderRejectMsgEventHandler(stiEvents_OnSTIOrderRejectMsg);
+                stiEvents.OnSTIOrderRejectXML += new _ISTIEventsEvents_OnSTIOrderRejectXMLEventHandler(stiEvents_OnSTIOrderRejectXML);
                 stiEvents.OnSTIOrderReject += new _ISTIEventsEvents_OnSTIOrderRejectEventHandler(stiEvents_OnSTIOrderReject);
                 stiQuote.OnSTIQuoteUpdateXML += new _ISTIQuoteEvents_OnSTIQuoteUpdateXMLEventHandler(stiQuote_OnSTIQuoteUpdateXML);
                 stiQuote.OnSTIQuoteSnapXML += new _ISTIQuoteEvents_OnSTIQuoteSnapXMLEventHandler(stiQuote_OnSTIQuoteSnapXML);
@@ -93,7 +97,7 @@ namespace SterServer
                 tl.newFeatureRequest += new MessageArrayDelegate(tl_newFeatureRequest);
                 tl.newUnknownRequest += new UnknownMessageDelegate(tl_newUnknownRequest);
                 tl.newImbalanceRequest += new VoidDelegate(tl_newImbalanceRequest);
-                stiApp.SetModeXML(UseXmlQuotes);
+                stiApp.SetModeXML(UseXmlMode);
                 string trader = stiApp.GetTraderName().ToUpper();
                 debug("trader: " + trader);
                 if (!accts.Contains(trader))
@@ -112,6 +116,66 @@ namespace SterServer
             debug(PROGRAM + " started.");
             _connected = true;
             return _connected;
+        }
+
+        void stiEvents_OnSTIOrderRejectXML(ref string bstrOrder)
+        {
+            try
+            {
+                XmlSerializer xs = new XmlSerializer(typeof(SterlingLib.structSTIOrderReject));
+                structSTIOrderReject q = (structSTIOrderReject)xs.Deserialize(new System.IO.StringReader(bstrOrder));
+                doupdatereject(ref q);
+            }
+            catch (Exception ex)
+            {
+                debug("Error deserializing reject: " + bstrOrder);
+                debug(ex.Message + ex.StackTrace);
+            }
+        }
+
+        void stiPos_OnSTIPositionUpdateXML(ref string bstrPosition)
+        {
+            try
+            {
+                XmlSerializer xs = new XmlSerializer(typeof(SterlingLib.structSTIPositionUpdate));
+                structSTIPositionUpdate q = (structSTIPositionUpdate)xs.Deserialize(new System.IO.StringReader(bstrPosition));
+                dopositionupdate(ref q);
+            }
+            catch (Exception ex)
+            {
+                debug("Error deserializing position: " + bstrPosition);
+                debug(ex.Message + ex.StackTrace);
+            }
+        }
+
+        void stiEvents_OnSTIOrderUpdateXML(ref string bstrOrder)
+        {
+            try
+            {
+                XmlSerializer xs = new XmlSerializer(typeof(SterlingLib.structSTIOrderUpdate));
+                structSTIOrderUpdate q = (structSTIOrderUpdate)xs.Deserialize(new System.IO.StringReader(bstrOrder));
+                doorderupdate(ref q);
+            }
+            catch (Exception ex)
+            {
+                debug("Error deserializing order: " + bstrOrder);
+                debug(ex.Message + ex.StackTrace);
+            }
+        }
+
+        void stiEvents_OnSTITradeUpdateXML(ref string bstrTrade)
+        {
+            try
+            {
+                XmlSerializer xs = new XmlSerializer(typeof(SterlingLib.structSTITradeUpdate));
+                structSTITradeUpdate q = (structSTITradeUpdate)xs.Deserialize(new System.IO.StringReader(bstrTrade));
+                dofillupdate(ref q);
+            }
+            catch (Exception ex)
+            {
+                debug("Error deserializing fill: " + bstrTrade);
+                debug(ex.Message + ex.StackTrace);
+            }
         }
 
         void stiQuote_OnSTIQuoteSnapXML(ref string bstrQuote)
@@ -170,12 +234,24 @@ namespace SterServer
 
         void stiEvents_OnSTIOrderReject(ref structSTIOrderReject structOrderReject)
         {
+            if (UseXmlMode) return;
+            doupdatereject(ref structOrderReject);
+        }
+
+        void doupdatereject(ref structSTIOrderReject structOrderReject)
+        {
             debug("reject: " + structOrderReject.bstrClOrderId + " reason: " + structOrderReject.nRejectReason + " " + sterrejectpretty(structOrderReject.nRejectReason) + " additional info: " + structOrderReject.bstrText);
+        }
+
+        void doupdatereject(STIOrderRejectMsg oSTIOrderRejectMsg)
+        {
+            debug("reject: " + oSTIOrderRejectMsg.ClOrderID + " reason: " + oSTIOrderRejectMsg.RejectReason.ToString());
         }
 
         void stiEvents_OnSTIOrderRejectMsg(STIOrderRejectMsg oSTIOrderRejectMsg)
         {
-            debug("reject: " + oSTIOrderRejectMsg.ClOrderID + " reason: " + oSTIOrderRejectMsg.RejectReason.ToString());
+            if (UseXmlMode) return;
+            doupdatereject(oSTIOrderRejectMsg);
         }
 
         string sterrejectpretty(string rint)
@@ -602,9 +678,7 @@ namespace SterServer
             _cancelq.Write(number);
         }
 
-
-
-        void stiEvents_OnSTITradeUpdate(ref structSTITradeUpdate t)
+        void dofillupdate(ref structSTITradeUpdate t)
         {
             Trade f = new TradeImpl();
             f.symbol = t.bstrSymbol;
@@ -627,9 +701,21 @@ namespace SterServer
                 debug("new trade sent: " + f.ToString() + " " + f.id);
         }
 
+        void stiEvents_OnSTITradeUpdate(ref structSTITradeUpdate t)
+        {
+            if (UseXmlMode) return;
+            dofillupdate(ref t);
+        }
+
         List<long> _onotified = new List<long>(MAXRECORD);
 
         void stiEvents_OnSTIOrderUpdate(ref structSTIOrderUpdate structOrderUpdate)
+        {
+            if (UseXmlMode) return;
+            doorderupdate(ref structOrderUpdate);
+        }
+
+        void doorderupdate(ref structSTIOrderUpdate structOrderUpdate)
         {
             Order o = new OrderImpl();
             o.symbol = structOrderUpdate.bstrSymbol;
@@ -715,7 +801,7 @@ namespace SterServer
 
         void stiQuote_OnSTIQuoteUpdate(ref structSTIQuoteUpdate q)
         {
-            if (UseXmlQuotes) return;
+            if (UseXmlMode) return;
             doquote(ref q);
 
         }
@@ -741,7 +827,7 @@ namespace SterServer
 
         void stiQuote_OnSTIQuoteSnap(ref structSTIQuoteSnap q)
         {
-            if (UseXmlQuotes) return;
+            if (UseXmlMode) return;
             dosnap(ref q);
         }
         IdTracker _idt = new IdTracker();
@@ -753,8 +839,7 @@ namespace SterServer
             return (long)MessageTypes.OK;
         }
 
-        List<string> accts = new List<string>();
-        void stiPos_OnSTIPositionUpdate(ref structSTIPositionUpdate structPositionUpdate)
+        void dopositionupdate(ref structSTIPositionUpdate structPositionUpdate)
         {
             // symbol
             string sym = structPositionUpdate.bstrSym;
@@ -775,6 +860,14 @@ namespace SterServer
                 accts.Add(ac);
             if (VerboseDebugging)
                 debug("new position recv: " + p.ToString());
+        }
+
+        List<string> accts = new List<string>();
+        void stiPos_OnSTIPositionUpdate(ref structSTIPositionUpdate structPositionUpdate)
+        {
+            if (UseXmlMode)
+                return;
+            dopositionupdate(ref structPositionUpdate);
         }
 
         void stiEvents_OnSTIOrderUpdateMsg(STIOrderUpdateMsg oSTIOrderUpdateMsg)

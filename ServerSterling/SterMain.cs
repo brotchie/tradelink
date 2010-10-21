@@ -39,7 +39,7 @@ namespace SterServer
                     tls = new TradeLink.Common.TLServer_IP(Properties.Settings.Default.TLClientAddress, Properties.Settings.Default.TLClientPort);
 
                 tl = new ServerSterling(tls, Properties.Settings.Default.Sleep,Properties.Settings.Default.OrderSleep,debug);
-                tl.UseXmlQuotes = Properties.Settings.Default.UseXMLQuotes;
+                tl.UseXmlMode = Properties.Settings.Default.UseXMLQuotes;
                 tl.AutoCapAccounts = Properties.Settings.Default.AutoCapitilizeAccounts;
                 tl.CoverEnabled = Properties.Settings.Default.CoverEnabled;
                 tl.Accounts = Properties.Settings.Default.defaultaccount.Split(',');
