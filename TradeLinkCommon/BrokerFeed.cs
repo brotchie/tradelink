@@ -704,31 +704,39 @@ namespace TradeLink.Common
 
         static bool hasminquote(TLClient tl, int provider)
         {
-            bool v = (tl.ProviderSelected== provider) || tl.Mode(provider, false);
-            bool test = true;
-            int count = 0;
-            while ((tl.BrokerName != Providers.Unknown) && (tl.BrokerName != Providers.Error)
-                && (tl.RequestFeatureList.Count == 0) && (count++<MAXFEATUREWAIT))
-                Thread.Sleep(10);
-            test &= tl.RequestFeatureList.Contains(MessageTypes.TICKNOTIFY);
-            tl.Disconnect();
-            return test && v;
+            try
+            {
+                bool v = (tl.ProviderSelected == provider) || tl.Mode(provider, false);
+                bool test = true;
+                int count = 0;
+                while ((tl.BrokerName != Providers.Unknown) && (tl.BrokerName != Providers.Error)
+                    && (tl.RequestFeatureList.Count == 0) && (count++ < MAXFEATUREWAIT))
+                    Thread.Sleep(10);
+                test &= tl.RequestFeatureList.Contains(MessageTypes.TICKNOTIFY);
+                tl.Disconnect();
+                return test && v;
+            }
+            catch { return false; }
         }
 
         static bool hasminexec(TLClient tl, int provider)
         {
-            bool v = (tl.ProviderSelected == provider) || tl.Mode(provider, false);
-            bool test = true;
-            int count = 0;
-            while ((tl.BrokerName != Providers.Unknown) && (tl.BrokerName != Providers.Error)
-                && (tl.RequestFeatureList.Count == 0) && (count++ < MAXFEATUREWAIT))
-                Thread.Sleep(10);
-            test &= tl.RequestFeatureList.Contains(MessageTypes.EXECUTENOTIFY);
-            test &= tl.RequestFeatureList.Contains(MessageTypes.SENDORDER);
-            test &= tl.RequestFeatureList.Contains(MessageTypes.ORDERCANCELREQUEST);
-            test &= tl.RequestFeatureList.Contains(MessageTypes.ORDERCANCELRESPONSE);
-            tl.Disconnect();
-            return test && v;
+            try
+            {
+                bool v = (tl.ProviderSelected == provider) || tl.Mode(provider, false);
+                bool test = true;
+                int count = 0;
+                while ((tl.BrokerName != Providers.Unknown) && (tl.BrokerName != Providers.Error)
+                    && (tl.RequestFeatureList.Count == 0) && (count++ < MAXFEATUREWAIT))
+                    Thread.Sleep(10);
+                test &= tl.RequestFeatureList.Contains(MessageTypes.EXECUTENOTIFY);
+                test &= tl.RequestFeatureList.Contains(MessageTypes.SENDORDER);
+                test &= tl.RequestFeatureList.Contains(MessageTypes.ORDERCANCELREQUEST);
+                test &= tl.RequestFeatureList.Contains(MessageTypes.ORDERCANCELRESPONSE);
+                tl.Disconnect();
+                return test && v;
+            }
+            catch { return false; }
         }
 
         public bool ModifyFeed(int provider) { return ModifyFeed(provider, true); }

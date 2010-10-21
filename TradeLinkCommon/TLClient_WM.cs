@@ -173,6 +173,7 @@ namespace TradeLink.Common
                 return res;
             }
         }
+
         /// <summary>
         /// Sends the order.
         /// </summary>
@@ -222,7 +223,8 @@ namespace TradeLink.Common
         public Providers BrokerName 
         { 
             get 
-            { 
+            {
+                //long res = WMUtil.SendMsg(string.Empty, himh, MeH, (int)MessageTypes.BROKERNAME, 200);
                 long res = TLSend(MessageTypes.BROKERNAME);
                 return (Providers)res;
             } 

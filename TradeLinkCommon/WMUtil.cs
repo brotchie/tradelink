@@ -56,6 +56,26 @@ namespace TradeLink.Common
         [DllImport("user32.dll")]
         static extern IntPtr FindWindow(string ClassName, string WindowName);
 
+
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern IntPtr SendMessageTimeout(
+            IntPtr windowHandle,
+            uint Msg,
+            IntPtr wParam,
+            IntPtr lParam,
+            SendMessageTimeoutFlags flags,
+            uint timeout,
+            out IntPtr result);
+
+        [Flags]
+        enum SendMessageTimeoutFlags : uint
+        {
+            SMTO_NORMAL = 0x0,
+            SMTO_BLOCK = 0x1,
+            SMTO_ABORTIFHUNG = 0x2,
+            SMTO_NOTIMEOUTIFNOTHUNG = 0x8
+        }
+
                 /// <summary>
         /// Gets a handle for a given window name.  Will return InPtr.Zero if no match is found.
         /// </summary>
@@ -128,6 +148,27 @@ namespace TradeLink.Common
             cds.lpData = pData;
 
             IntPtr res = WMUtil.SendMessage(desthandle, WMUtil.WM_COPYDATA, (int)sourcehandle, ref cds);
+            Marshal.FreeCoTaskMem(pData);
+            return res.ToInt64();
+        }
+
+        public static long SendMsg(string str, System.IntPtr desthandle, System.IntPtr sourcehandle, int type, int timeout)
+        {
+            if ((desthandle == IntPtr.Zero) || (sourcehandle == IntPtr.Zero)) return -1; // fail on invalid handles
+            WMUtil.COPYDATASTRUCT cds = new WMUtil.COPYDATASTRUCT();
+            cds.dwData = (IntPtr)type;
+            str = str + '\0';
+            cds.cbData = str.Length + 1;
+
+            System.IntPtr pData = Marshal.AllocCoTaskMem(str.Length);
+            pData = Marshal.StringToCoTaskMemAnsi(str);
+
+            cds.lpData = pData;
+
+            IntPtr res = IntPtr.Zero;
+            IntPtr err = WMUtil.SendMessageTimeout(desthandle, (uint)WM_COPYDATA, (IntPtr)sourcehandle,IntPtr.Zero, SendMessageTimeoutFlags.SMTO_NORMAL, (uint)timeout,out res);
+            if (err == IntPtr.Zero)
+                return 0;
             Marshal.FreeCoTaskMem(pData);
             return res.ToInt64();
         }
