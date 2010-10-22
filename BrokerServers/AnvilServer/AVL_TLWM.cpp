@@ -125,7 +125,7 @@
 				if (m_account)
 				{
 					// get all the orders available
-					void* iterator = B_CreateOrderIterator(OS_CANCELLED|OS_FILLED|OS_PENDINGLONG|OS_PENDINGSHORT, (1 << ST_LAST) - 1, m_account);
+					void* iterator = B_CreateOrderIterator(OS_PENDINGLONG|OS_PENDINGSHORT, (1 << ST_LAST) - 1, m_account);
 					B_StartIteration(iterator);
 					Order* order;
 					while(order = B_GetNextOrder(iterator))
@@ -899,6 +899,10 @@
 			case MSGID_CONNECTION_LOST:
 				{
 					B_IsMarketSummaryPopulationDone();
+				}
+				break;
+			case MS_RESP_SYMBOL_SORTABLE_POPULATION_DONE:
+				{
 				}
 				break;
 		} // switchend
