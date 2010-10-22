@@ -10,7 +10,7 @@ namespace TradeLink.Common
     /// easily trade positions for a collection of securities.
     /// automatically builds positions from existing positions and new trades.
     /// </summary>
-    public class PositionTracker
+    public class PositionTracker : GenericTracker<Position>
     {
         /// <summary>
         /// create a tracker
@@ -20,12 +20,17 @@ namespace TradeLink.Common
         /// create tracker with approximate # of positions
         /// </summary>
         /// <param name="estimatedPositions"></param>
-        public PositionTracker(int estimatedPositions) 
+        public PositionTracker(int estimatedPositions) : base(estimatedPositions,"POSSIZE") 
         {
-            _poslist = new List<Position>(estimatedPositions);
+            NewTxt += new TextIdxDelegate(PositionTracker_NewTxt);
         }
-        List<Position> _poslist = null;
-        Dictionary<string, int> _symidx = new Dictionary<string, int>();
+        void PositionTracker_NewTxt(string txt, int idx)
+        {
+            if (NewSymbol!= null)
+                NewSymbol(txt);
+        }
+        
+        
 
         /// <summary>
         /// clear all positions.  use with caution.
@@ -34,8 +39,7 @@ namespace TradeLink.Common
         public void Clear()
         {
             _defaultacct = string.Empty;
-            _poslist.Clear();
-            _symidx.Clear();
+            base.Clear();
         }
         string _defaultacct = string.Empty;
         /// <summary>
@@ -44,25 +48,18 @@ namespace TradeLink.Common
         /// </summary>
         public string DefaultAccount { get { return _defaultacct; } set { _defaultacct = value; } }
         /// <summary>
-        /// get position given position's index
-        /// </summary>
-        /// <param name="idx"></param>
-        /// <returns></returns>
-        public Position this[int idx] { get { return _poslist[idx]; } }
-        /// <summary>
         /// get position given positions symbol (assumes default account)
         /// </summary>
         /// <param name="symbol"></param>
         /// <returns></returns>
-        public Position this[string symbol] 
+        public new Position this[string symbol] 
         { 
             get 
             {
-                int idx = -1;
-                if (_symidx.TryGetValue(symbol+DefaultAccount, out idx))
-                    return _poslist[idx];
-                Position p = new PositionImpl(symbol,0,0,0,DefaultAccount);  
-                return p;
+                int idx = getindex(symbol + DefaultAccount);
+                if (idx<0)
+                    return new PositionImpl(symbol,0,0,0,DefaultAccount);  
+                return this[idx];
             } 
         }
         /// <summary>
@@ -75,34 +72,13 @@ namespace TradeLink.Common
         { 
             get 
             {
-                int idx = -1;
-                if (_symidx.TryGetValue(symbol+account, out idx))
-                    return _poslist[idx];
-                Position p = new PositionImpl(symbol,0,0,0,account);  
-                return p;
+                int idx = getindex(symbol + account);
+                if (idx<0)
+                    return new PositionImpl(symbol,0,0,0,account);  
+                return this[idx];
             } 
         }
-        /// <summary>
-        /// enumerate through positions in tracker using foreach
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerator GetEnumerator() 
-        { 
-            foreach (Position p in _poslist) 
-                yield return p; 
-        }
-        /// <summary>
-        /// count of positions stored in tracker
-        /// </summary>
-        public int Count { get { return _poslist.Count; } }
-        /// <summary>
-        /// array of positions in tracker
-        /// </summary>
-        /// <returns></returns>
-        public Position[] ToArray()
-        {
-            return _poslist.ToArray();
-        }
+
 
         decimal _totalclosedpl = 0;
         /// <summary>
@@ -116,19 +92,7 @@ namespace TradeLink.Common
         /// <param name="newpos"></param>
         public void NewPosition(Position newpos)
         {
-            _totalclosedpl += newpos.ClosedPL;
-            if (_defaultacct == string.Empty)
-                _defaultacct = newpos.Account;
-            int idx = 0;
-            if (_symidx.TryGetValue(newpos.Symbol+newpos.Account,out idx))
-                _poslist[idx] = new PositionImpl(newpos);
-            else
-            {
-                _poslist.Add(new PositionImpl(newpos));
-                _symidx.Add(newpos.Symbol+newpos.Account,_poslist.Count-1);
-                if (NewSymbol != null)
-                    NewSymbol(newpos.Symbol);
-            }
+            Adjust(newpos);
         }
 
         /// <summary>
@@ -138,19 +102,27 @@ namespace TradeLink.Common
         /// <returns>any closed PL for adjustment</returns>
         public decimal Adjust(Trade fill)
         {
+            int idx = getindex(fill.symbol + fill.Account);
+            return Adjust(fill, idx);
+        }
+        /// <summary>
+        /// Adjust an existing position, or create a new one... given a trade and symbol+account index
+        /// </summary>
+        /// <param name="fill"></param>
+        /// <param name="idx"></param>
+        /// <returns></returns>
+        public decimal Adjust(Trade fill, int idx)
+        {
             decimal cpl = 0;
-            int idx = -1;
+            
             if (_defaultacct == string.Empty)
                 _defaultacct = fill.Account ;
-
-            if (_symidx.TryGetValue(fill.symbol+fill.Account, out idx))
-                cpl += _poslist[idx].Adjust(fill);
+            
+            if (idx < 0)
+                addindex(fill.symbol + fill.Account, new PositionImpl(fill));
             else
             {
-                _poslist.Add(new PositionImpl(fill));
-                _symidx.Add(fill.symbol+fill.Account, _poslist.Count - 1);
-                if (NewSymbol != null)
-                    NewSymbol(fill.symbol);
+                cpl += this[idx].Adjust(fill);
             }
             _totalclosedpl += cpl;
             return cpl;
@@ -165,10 +137,19 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
-        public decimal Adjust(Position p)
+        public decimal Adjust(Position newpos)
         {
-            // overwrite existing position
-            NewPosition(p);
+            
+            if (_defaultacct == string.Empty)
+                _defaultacct = newpos.Account;
+            int idx = getindex(newpos.Symbol + newpos.Account);
+            if (idx < 0)
+                addindex(newpos.Symbol + newpos.Account, new PositionImpl(newpos));
+            else
+            {
+                this[idx] = new PositionImpl(newpos);
+                _totalclosedpl += newpos.ClosedPL;
+            }
             return 0;
         }
 
