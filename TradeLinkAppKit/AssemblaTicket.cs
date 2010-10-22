@@ -22,6 +22,8 @@ namespace TradeLink.AppKit
             _assign = 0;
 
         }
+
+
         public static string GetTicketsUrl(string space)
         {
             return "http://www.assembla.com/spaces/" + space + "/tickets";
@@ -91,6 +93,8 @@ namespace TradeLink.AppKit
             return id;
         }
 
+        
+
         /// <summary>
         /// see https://www.assembla.com/wiki/show/breakoutdocs/Ticket_REST_API
         /// for example of valid xml updates
@@ -112,6 +116,10 @@ namespace TradeLink.AppKit
             int stat = (int)status;
             string xml = "<status>"+stat.ToString()+"</status>";
             return Update(space,user,password,ticket,xml);
+        }
+        public static bool Update(string space, string user, string password, AssemblaTicket at)
+        {
+            return Update(space, user, password, at.TicketDocumentId, at.ToXml());
         }
         public static bool Update(string space, string user, string password, int ticket, string xml)
         {
@@ -166,6 +174,24 @@ namespace TradeLink.AppKit
         public override string ToString()
         {
             return Summary;
+        }
+
+        public string ToXml()
+        {
+            StringBuilder data = new StringBuilder();
+            data.AppendLine("<ticket>");
+            data.AppendLine("<status>" + Status.ToString().Replace("TicketStatus.",string.Empty) + "</status>");
+            data.AppendLine("<priority>" + Priority.ToString().Replace("Priority.",string.Empty) + "</priority>");
+            data.AppendLine("<summary>");
+            data.AppendLine(System.Web.HttpUtility.HtmlEncode(Summary));
+            data.AppendLine("</summary>");
+            data.AppendLine("<description>");
+            data.AppendLine(System.Web.HttpUtility.HtmlEncode(Description));
+            data.AppendLine("</description>");
+            data.AppendLine("<assigned-to-id>" + Owner.ToString() + "</assigned-to-id>");
+            data.AppendLine("<milestone-id>" + Milestone.ToString() + "</milestone-id");
+            data.AppendLine("</ticket>");
+            return data.ToString();
         }
 
         /// <summary>
