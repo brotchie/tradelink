@@ -94,6 +94,19 @@ namespace TradeLink.Common
             return b;
         }
 
+        /// <summary>
+        /// convert double array to decimal
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
+        public static decimal[] Double2Decimal(double[] a)
+        {
+            decimal[] b = new decimal[a.Length];
+            for (int i = 0; i < a.Length; i++)
+                b[i] = (decimal)a[i];
+            return b;
+        }
+
         // these are for calculating closed pl
         // they do not adjust positions themselves
         /// <summary>
@@ -1616,12 +1629,25 @@ namespace TradeLink.Common
         /// convert an array of decimals to less precise doubles
         /// </summary>
         /// <param name="array"></param>
+        /// <returns></returns>
+        public static double[] Decimal2Double(decimal[] array)
+        {
+            double[] vals = new double[array.Length];
+            for (int i = 0; i < array.Length; i++)
+                vals[i] = (double)array[i];
+            return vals;
+        }
+        /// <summary>
+        /// convert an array of decimals to less precise doubles
+        /// </summary>
+        /// <param name="array"></param>
         /// <param name="vals"></param>
         public static void Decimal2Double(decimal[] array, ref double[] vals)
         {
             for (int i = 0; i < array.Length; i++)
                 vals[i] = (double)array[i];
         }
+
         /// <summary>
         /// convert an array of decimals to less precise doubles
         /// </summary>
