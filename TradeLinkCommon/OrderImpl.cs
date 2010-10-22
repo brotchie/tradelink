@@ -271,7 +271,9 @@ namespace TradeLink.Common
             o.Security = (SecurityType)Enum.Parse(typeof(SecurityType), rec[(int)OrderField.Security]);
             o.id = Convert.ToInt64(rec[(int)OrderField.OrderID]);
             o.TIF = rec[(int)OrderField.OrderTIF];
-            o.trail = Convert.ToDecimal(rec[(int)OrderField.Trail], System.Globalization.CultureInfo.InvariantCulture);
+            decimal trail = 0;
+            if (decimal.TryParse(rec[(int)OrderField.Trail], System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.InvariantCulture, out trail))
+                o.trail = trail;
             o.date = Convert.ToInt32(rec[(int)OrderField.oDate]);
             o.time = Convert.ToInt32(rec[(int)OrderField.oTime]);
             return o;
