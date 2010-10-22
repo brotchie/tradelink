@@ -22,6 +22,21 @@ namespace TradeLink.AppKit
             _assign = 0;
 
         }
+        public AssemblaTicket(AssemblaTicket copy)
+        {
+            _ticknum = copy._ticknum;
+            _un = copy._un;
+            _updated = copy._updated;
+            _tickdocid = copy._tickdocid;
+            _sum = copy._sum;
+            _stat = copy._stat;
+            _space = copy._space;
+            _reporter = copy._reporter;
+            _pw = copy._pw;
+            _milestone = copy._milestone;
+            _desc = copy._desc;
+            _assign = copy._assign;
+        }
 
 
         public static string GetTicketsUrl(string space)
