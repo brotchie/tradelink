@@ -41,7 +41,7 @@ namespace TradeLink.AppKit
 
         public static string GetTicketsUrl(string space)
         {
-            return "http://www.assembla.com/spaces/" + space + "/tickets";
+            return "http://www.assembla.com/spaces/" + space + "/tickets/report/0";
         }
         /// <summary>
         /// returns global id of ticket if successful, zero if not successful
@@ -65,8 +65,8 @@ namespace TradeLink.AppKit
             hr.ContentType = "application/xml";
             StringBuilder data = new StringBuilder();
             data.AppendLine("<ticket>");
-            data.AppendLine("<status>"+stat.ToString()+"</status>");
-            data.AppendLine("<priority>" + pri.ToString()+"</priority>");
+            data.AppendLine("<status>" + stat.ToString() + "</status>");
+            data.AppendLine("<priority>" + pri.ToString() + "</priority>");
             data.AppendLine("<summary>");
             data.AppendLine(System.Web.HttpUtility.HtmlEncode(summary));
             data.AppendLine("</summary>");
@@ -93,22 +93,22 @@ namespace TradeLink.AppKit
                 xd.LoadXml(rs);
                 XmlNodeList xnl = xd.GetElementsByTagName("id");
                 string val = xnl[0].InnerText;
-                if ((val!=null) && (val!=string.Empty))
+                if ((val != null) && (val != string.Empty))
                     id = Convert.ToInt32(val);
                 // display it
-                if (SendDebug!=null)
+                if (SendDebug != null)
                     SendDebug(DebugImpl.Create(rs));
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 if (SendDebug != null)
-                    SendDebug(DebugImpl.Create("exception: " + ex.Message+ex.StackTrace)); 
-                return 0; 
+                    SendDebug(DebugImpl.Create("exception: " + ex.Message + ex.StackTrace));
+                return 0;
             }
             return id;
         }
 
-        
+
 
         /// <summary>
         /// see https://www.assembla.com/wiki/show/breakoutdocs/Ticket_REST_API
@@ -123,14 +123,14 @@ namespace TradeLink.AppKit
         public static bool UpdateComment(string space, string user, string password, int ticket, string comment)
         {
             string xml = "<user-comment>" + comment + "</user-comment>";
-            return Update(space,user,password,ticket,xml);
+            return Update(space, user, password, ticket, xml);
         }
 
         public static bool UpdateStatus(string space, string user, string password, int ticket, TicketStatus status)
         {
             int stat = (int)status;
-            string xml = "<status>"+stat.ToString()+"</status>";
-            return Update(space,user,password,ticket,xml);
+            string xml = "<status>" + stat.ToString() + "</status>";
+            return Update(space, user, password, ticket, xml);
         }
         public static bool Update(string space, string user, string password, AssemblaTicket at)
         {
@@ -138,7 +138,7 @@ namespace TradeLink.AppKit
         }
         public static bool Update(string space, string user, string password, int ticket, string xml)
         {
-            string url = "http://www.assembla.com/spaces/" + space + "/tickets/"+ticket.ToString();
+            string url = "http://www.assembla.com/spaces/" + space + "/tickets/" + ticket.ToString();
             HttpWebRequest hr = WebRequest.Create(url) as HttpWebRequest;
             hr.Credentials = new System.Net.NetworkCredential(user, password);
             hr.Method = "PUT";
@@ -173,7 +173,7 @@ namespace TradeLink.AppKit
         private string _un = string.Empty;
         public string Username { get { return _un; } set { _un = value; } }
         internal string _pw = string.Empty;
-        public string Password { set { _pw = value ; } }
+        public string Password { set { _pw = value; } }
 
         string _sum = string.Empty;
         public string Summary { get { return _sum; } set { _sum = value; } }
@@ -195,8 +195,8 @@ namespace TradeLink.AppKit
         {
             StringBuilder data = new StringBuilder();
             data.AppendLine("<ticket>");
-            data.AppendLine("<status>" + Status.ToString().Replace("TicketStatus.",string.Empty) + "</status>");
-            data.AppendLine("<priority>" + Priority.ToString().Replace("Priority.",string.Empty) + "</priority>");
+            data.AppendLine("<status>" + Status.ToString().Replace("TicketStatus.", string.Empty) + "</status>");
+            data.AppendLine("<priority>" + Priority.ToString().Replace("Priority.", string.Empty) + "</priority>");
             data.AppendLine("<summary>");
             data.AppendLine(System.Web.HttpUtility.HtmlEncode(Summary));
             data.AppendLine("</summary>");
@@ -240,7 +240,7 @@ namespace TradeLink.AppKit
         /// <param name="desc"></param>
         /// <param name="pri"></param>
         /// <param name="stat"></param>
-        public AssemblaTicket(string space, string username, string pw,string summary, string desc, Priority pri, TicketStatus stat)
+        public AssemblaTicket(string space, string username, string pw, string summary, string desc, Priority pri, TicketStatus stat)
         {
             _space = space;
             _un = username;
@@ -281,7 +281,7 @@ namespace TradeLink.AppKit
         /// <returns></returns>
         public static string TicketContext(string space, string program, Exception ex)
         {
-            string[] r = new string[] { "Product:" + space, "Program:" + program, "Exception:" + (ex != null ? ex.Message : "n/a"), "StackTrace:" + (ex != null ? ex.StackTrace : "n/a"), "CommandLine:" + Environment.CommandLine, "OS:" + Environment.OSVersion.VersionString + " " + (IntPtr.Size * 8).ToString() + "bit", "CLR:" + Environment.Version.ToString(4), "TradeLink:" + TradeLink.Common.Util.TLSIdentity(), "Memory:" + Environment.WorkingSet.ToString(), "Processors:" + Environment.ProcessorCount.ToString(), "MID: "+Auth.GetCPUId() };
+            string[] r = new string[] { "Product:" + space, "Program:" + program, "Exception:" + (ex != null ? ex.Message : "n/a"), "StackTrace:" + (ex != null ? ex.StackTrace : "n/a"), "CommandLine:" + Environment.CommandLine, "OS:" + Environment.OSVersion.VersionString + " " + (IntPtr.Size * 8).ToString() + "bit", "CLR:" + Environment.Version.ToString(4), "TradeLink:" + TradeLink.Common.Util.TLSIdentity(), "Memory:" + Environment.WorkingSet.ToString(), "Processors:" + Environment.ProcessorCount.ToString(), "MID: " + Auth.GetCPUId() };
             string desc = string.Join(Environment.NewLine, r);
             return desc;
         }
@@ -309,12 +309,22 @@ namespace TradeLink.AppKit
                 return DateTime.Parse(UpdatedAt);
             }
         }
+        string _created = string.Empty;
+        public string CreatedAt { get { return _created; } set { _created = value; } }
+
+        public DateTime CreatedAtDateTime
+        {
+            get
+            {
+                return DateTime.Parse(CreatedAt);
+            }
+        }
 
 
         /// <summary>
         /// true if given ticket is valid
         /// </summary>
-        public bool isValid { get { return (Space != null) && (Space != string.Empty) && (Summary != null) && (Summary != string.Empty) && (Number!=0); } }
+        public bool isValid { get { return (Space != null) && (Space != string.Empty) && (Summary != null) && (Summary != string.Empty) && (Number != 0); } }
 
         /// <summary>
         /// get list of tickets on space (limited to first 1000)
@@ -323,59 +333,78 @@ namespace TradeLink.AppKit
         /// <param name="user"></param>
         /// <param name="pw"></param>
         /// <returns></returns>
-        public static List<AssemblaTicket> GetTickets(string space, string user, string pw)
+        public static List<AssemblaTicket> GetTickets(string space, string user, string pw, DebugDelegate deb)
         {
-            string url = AssemblaTicket.GetTicketsUrl(space);
-            HttpWebRequest hr = WebRequest.Create(url) as HttpWebRequest;
-            hr.Credentials = new System.Net.NetworkCredential(user, pw);
-            hr.PreAuthenticate = true;
-            hr.Method = "GET";
-            hr.ContentType = "application/xml";
-            HttpWebResponse wr = (HttpWebResponse)hr.GetResponse();
-            StreamReader sr = new StreamReader(wr.GetResponseStream());
-
-            string result = sr.ReadToEnd();
-
-            XmlDocument xd = new XmlDocument();
-            xd.LoadXml(result);
             List<AssemblaTicket> docs = new List<AssemblaTicket>();
-            XmlNodeList xnl = xd.GetElementsByTagName("ticket");
-            foreach (XmlNode xn in xnl)
+            try
             {
-                AssemblaTicket doc = new AssemblaTicket();
+                string url = AssemblaTicket.GetTicketsUrl(space);
+                HttpWebRequest hr = WebRequest.Create(url) as HttpWebRequest;
+                hr.Credentials = new System.Net.NetworkCredential(user, pw);
+                hr.PreAuthenticate = true;
+                hr.Method = "GET";
+                hr.ContentType = "application/xml";
+                HttpWebResponse wr = (HttpWebResponse)hr.GetResponse();
+                StreamReader sr = new StreamReader(wr.GetResponseStream());
 
-                doc.Space = space;
-                foreach (XmlNode dc in xn.ChildNodes)
+                string result = sr.ReadToEnd();
+
+                XmlDocument xd = new XmlDocument();
+                xd.LoadXml(result);
+
+                XmlNodeList xnl = xd.GetElementsByTagName("ticket");
+                foreach (XmlNode xn in xnl)
                 {
-                    string m = dc.InnerText;
-                    if (dc.Name == "summary")
-                        doc.Summary = m;
-                    else if (dc.Name == "status")
-                        doc.Status = (TradeLink.API.TicketStatus)Convert.ToInt32(m);
-                    else if (dc.Name == "description")
-                        doc.Description = m;
-                    else if (dc.Name == "priority")
-                        doc.Priority = (TradeLink.API.Priority)Convert.ToInt32(m);
-                    else if (dc.Name == "number")
-                        doc.Number = Convert.ToInt32(m);
-                    else if (dc.Name == "assign-to-id")
-                        doc.Owner = Convert.ToInt32(m);
-                    else if (dc.Name == "milestone-id")
-                        doc.Milestone = Convert.ToInt32(m);
-                    else if (dc.Name == "updated-at")
-                        doc.UpdatedAt = m;
-                    else if (dc.Name == "id")
-                        doc.TicketDocumentId = Convert.ToInt32(m);
-                    else if (dc.Name == "reporter-id")
-                        doc.Reporter = m;
+                    AssemblaTicket doc = new AssemblaTicket();
 
+                    doc.Space = space;
+                    foreach (XmlNode dc in xn.ChildNodes)
+                    {
+                        try
+                        {
+                            string m = dc.InnerText;
+                            if (dc.Name == "summary")
+                                doc.Summary = m;
+                            else if (dc.Name == "status")
+                                doc.Status = (TradeLink.API.TicketStatus)Convert.ToInt32(m);
+                            else if (dc.Name == "description")
+                                doc.Description = m;
+                            else if (dc.Name == "priority")
+                                doc.Priority = (TradeLink.API.Priority)Convert.ToInt32(m);
+                            else if (dc.Name == "number")
+                                doc.Number = Convert.ToInt32(m);
+                            else if (dc.Name == "assign-to-id")
+                                doc.Owner = Convert.ToInt32(m);
+                            else if (dc.Name == "milestone-id")
+                                doc.Milestone = Convert.ToInt32(m);
+                            else if (dc.Name == "updated-at")
+                                doc.UpdatedAt = m;
+                            else if (dc.Name == "id")
+                                doc.TicketDocumentId = Convert.ToInt32(m);
+                            else if (dc.Name == "reporter-id")
+                                doc.Reporter = m;
+                            else if (dc.Name == "created-on")
+                                doc.CreatedAt = m;
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
+
+                    }
+                    if (doc.isValid)
+                        docs.Add(doc);
                 }
-                if (doc.isValid)
-                    docs.Add(doc);
+            }
+            catch (Exception ex)
+            {
+                if (deb != null)
+                {
+                    deb("error getting tickets for space: " + space + " error: " + ex.Message + ex.StackTrace);
+                }
             }
             return docs;
         }
     }
-
 
 }
