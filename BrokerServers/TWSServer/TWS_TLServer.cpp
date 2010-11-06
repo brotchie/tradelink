@@ -767,6 +767,7 @@ namespace TradeLibFast
 		pos.Size = position;
 		pos.AvgPrice = marketPrice;
 		pos.ClosedPL = realizedPNL;
+		pos.Account = accountName;
 		if (!havepos(pos))
 			poslist.push_back(pos);
 
