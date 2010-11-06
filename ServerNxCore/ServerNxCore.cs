@@ -280,6 +280,7 @@ namespace ServerNxCore
 
                 }
             }
+            STATUS = pNxCoreSys->StatusData;
             // Print the specific NxCore status message
             switch (pNxCoreSys->Status)
             {
@@ -313,8 +314,11 @@ namespace ServerNxCore
                     break;
             }
         }
+        static int STATUS = 4;
+        static bool keepcurrent = true;
         static unsafe void OnNxCoreTrade(NxCoreSystem* pNxCoreSys, NxCoreMessage* pNxCoreMsg)
         {
+            if (keepcurrent && (STATUS < 4)) return;
             if (DOLIVESKIPTEST)
             {
                 if (pNxCoreSys->nxTime.MsOfDay < (DateTime.UtcNow.TimeOfDay.TotalMilliseconds - (DateTime.Now.IsDaylightSavingTime() ? (1000 * 60 * 60 * 4) : (1000 * 60 * 60 * 5))))
@@ -358,6 +362,7 @@ namespace ServerNxCore
         }
         static unsafe void OnNxCoreExgQuote(NxCoreSystem* pNxCoreSys, NxCoreMessage* pNxCoreMsg)
         {
+            if (keepcurrent && (STATUS < 4)) return;
             if (DOLIVESKIPTEST)
             {
                 if (pNxCoreSys->nxTime.MsOfDay < (DateTime.UtcNow.TimeOfDay.TotalMilliseconds - (DateTime.Now.IsDaylightSavingTime() ? (1000 * 60 * 60 * 4) : (1000 * 60 * 60 * 5))))
