@@ -718,10 +718,21 @@ namespace Kadina
                 h.GotTick += new TickDelegate(h_GotTick);
                 h.SimBroker.UseBidAskFills = Properties.Settings.Default.UseBidAskFills;
                 h.SimBroker.GotOrderCancel += new OrderCancelDelegate(broker_GotOrderCancel);
-                h.Initialize();
-                updatetitle();
-                status("Loaded tickdata: "+PrettyEPF());
-                success = true;
+                try
+                {
+                    h.Initialize();
+
+                    updatetitle();
+                    status("Loaded tickdata: " + PrettyEPF());
+                    success = true;
+                }
+                catch (IOException ex)
+                {
+                    if (ex.Message.Contains("used by another process"))
+                    {
+                        status("Try again, file in use: " + f);
+                    }
+                }
             }
             hasprereq();
 
