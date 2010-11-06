@@ -91,6 +91,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppTracker.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="AssemblaComment.cs" />
     <Compile Include="AssemblaDocument.cs" />

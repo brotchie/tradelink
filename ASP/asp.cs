@@ -359,8 +359,14 @@ namespace ASP
                 // ignore where we don't have an index
                 if ((idx < 0) || (idx>_reslist.Count)) 
                     continue;
+                string dll = string.Empty;
+                if (!_class2dll.TryGetValue(_reslist[idx].FullName,out dll))
+                {
+                    debug("unable to find skin class: " + _reslist[idx].FullName);
+                    continue;
+                }
                 // save them as skin
-                bool worked = SkinImpl.SkinFile(_reslist[idx], _reslist[idx].FullName, _class2dll[_reslist[idx].FullName], SKINPATH + name + "." + startidx.ToString() + SKINEXT, new DebugDelegate(debug));
+                bool worked = SkinImpl.SkinFile(_reslist[idx], _reslist[idx].FullName, dll, SKINPATH + name + "." + startidx.ToString() + SKINEXT, new DebugDelegate(debug));
                 // notify errors
                 if (!worked)
                     debug("skin failed on: " + _reslist[idx].FullName + " " + _reslist[idx].ID);
