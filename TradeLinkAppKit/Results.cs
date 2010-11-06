@@ -414,7 +414,7 @@ namespace TradeLink.AppKit
         /// <returns></returns>
         public override string ToString()
         {
-            return ToString(": ");
+            return ToString(":\t");
         }
         /// <summary>
         /// get results like calc => value where '=>' is the delim
