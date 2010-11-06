@@ -202,5 +202,41 @@ namespace ASP.Properties {
                 this["VerboseDebugging"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string portal {
+            get {
+                return ((string)(this["portal"]));
+            }
+            set {
+                this["portal"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string un {
+            get {
+                return ((string)(this["un"]));
+            }
+            set {
+                this["un"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string pw {
+            get {
+                return ((string)(this["pw"]));
+            }
+            set {
+                this["pw"] = value;
+            }
+        }
     }
 }

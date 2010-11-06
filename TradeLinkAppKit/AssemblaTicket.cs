@@ -38,10 +38,14 @@ namespace TradeLink.AppKit
             _assign = copy._assign;
         }
 
-
-        public static string GetTicketsUrl(string space)
+        public static string GetTicketUrl(string space)
         {
-            return "http://www.assembla.com/spaces/" + space + "/tickets/report/0";
+            return "http://www.assembla.com/spaces/" + space + "/tickets/";
+        }
+        public static string GetTicketsUrl(string space) { return GetTicketsUrl(space, 0); }
+        public static string GetTicketsUrl(string space,int page)
+        {
+            return "http://www.assembla.com/spaces/" + space + "/tickets/report/"+page.ToString();
         }
         /// <summary>
         /// returns global id of ticket if successful, zero if not successful
@@ -57,7 +61,7 @@ namespace TradeLink.AppKit
         {
             int stat = (int)status;
             int pri = (int)priority;
-            string url = GetTicketsUrl(space);
+            string url = GetTicketUrl(space);
             HttpWebRequest hr = WebRequest.Create(url) as HttpWebRequest;
             hr.Credentials = new System.Net.NetworkCredential(user, password);
             hr.PreAuthenticate = true;
@@ -333,12 +337,14 @@ namespace TradeLink.AppKit
         /// <param name="user"></param>
         /// <param name="pw"></param>
         /// <returns></returns>
-        public static List<AssemblaTicket> GetTickets(string space, string user, string pw, DebugDelegate deb)
+        public static List<AssemblaTicket> GetTickets(string space, string user, string pw) { return GetTickets(space, user, pw, 0, null); }
+        public static List<AssemblaTicket> GetTickets(string space, string user, string pw, DebugDelegate deb) { return GetTickets(space, user, pw, 0, deb); }
+        public static List<AssemblaTicket> GetTickets(string space, string user, string pw, int page, DebugDelegate deb)
         {
             List<AssemblaTicket> docs = new List<AssemblaTicket>();
             try
             {
-                string url = AssemblaTicket.GetTicketsUrl(space);
+                string url = AssemblaTicket.GetTicketsUrl(space,page);
                 HttpWebRequest hr = WebRequest.Create(url) as HttpWebRequest;
                 hr.Credentials = new System.Net.NetworkCredential(user, pw);
                 hr.PreAuthenticate = true;
@@ -388,7 +394,11 @@ namespace TradeLink.AppKit
                         }
                         catch (Exception ex)
                         {
-
+                            if (deb != null)
+                            {
+                                deb("Error getting: " + dc.InnerText + " Error: " + ex.Message + ex.StackTrace);
+                                continue;
+                            }
                         }
 
                     }

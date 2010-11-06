@@ -30,6 +30,8 @@
         {
             this.components = new System.ComponentModel.Container();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this._portal = new System.Windows.Forms.TextBox();
             this._dest = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this._virtids = new System.Windows.Forms.CheckBox();
@@ -52,6 +54,8 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.label6);
+            this.groupBox1.Controls.Add(this._portal);
             this.groupBox1.Controls.Add(this._dest);
             this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this._virtids);
@@ -64,6 +68,24 @@
             this.groupBox1.TabIndex = 20;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "General";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(162, 67);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(100, 20);
+            this.label6.TabIndex = 22;
+            this.label6.Text = "Portal Name:";
+            // 
+            // _portal
+            // 
+            this._portal.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::ASP.Properties.Settings.Default, "portal", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this._portal.Location = new System.Drawing.Point(264, 64);
+            this._portal.Name = "_portal";
+            this._portal.Size = new System.Drawing.Size(90, 26);
+            this._portal.TabIndex = 21;
+            this._portal.Text = global::ASP.Properties.Settings.Default.portal;
             // 
             // _dest
             // 
@@ -259,5 +281,7 @@
         public System.Windows.Forms.ComboBox _execsel;
         private System.Windows.Forms.Label label5;
         public System.Windows.Forms.TextBox _dest;
+        private System.Windows.Forms.Label label6;
+        public System.Windows.Forms.TextBox _portal;
     }
 }

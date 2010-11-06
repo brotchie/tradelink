@@ -66,7 +66,7 @@ namespace TradeLink.AppKit
                 if (_attachdataasfile)
                     if (!AssemblaDocument.Create(space.Text, user.Text, pass.Text, path + DATAFILE, id))
                         status("data attach failed.");
-                System.Diagnostics.Process.Start(AssemblaTicket.GetTicketsUrl(space.Text));
+                System.Diagnostics.Process.Start(AssemblaTicket.GetTicketUrl(space.Text));
                 if (TicketSucceed != null)
                     TicketSucceed();
 

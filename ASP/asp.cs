@@ -1322,7 +1322,16 @@ namespace ASP
 
         private void _twithelp_Click_1(object sender, EventArgs e)
         {
-            CrashReport.Report(PROGRAM, string.Empty, string.Empty, _dw.Content, null, null, false);
+            if (_ao._portal.Text == string.Empty)
+                CrashReport.Report(PROGRAM, _dw.Content, null, null, false,PROGRAM+" Bug Report "+Util.ToTLDate());
+            else
+                ATW.Report(_ao._portal.Text, _log.Content, null, true, Properties.Settings.Default.un, Properties.Settings.Default.pw, new AssemblaTicketWindow.LoginSucceedDel(success), false);
+        }
+
+        void success(string u, string p)
+        {
+            Properties.Settings.Default.un = u;
+            Properties.Settings.Default.pw = p;
         }
 
         static int getprocesscount(string PROGRAM)
