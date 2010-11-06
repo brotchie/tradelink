@@ -104,6 +104,19 @@ namespace TradeLink.Common
             return filled[idx];
         }
 
+        /// <summary>
+        /// gets entire sent order
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public Order SentOrder(long id)
+        {
+            if (orders.getindex(id.ToString()) != GenericTracker.UNKNOWN)
+                return orders[id.ToString()];
+            else
+                return new OrderImpl();
+        }
+
 
 
         /// <summary>
