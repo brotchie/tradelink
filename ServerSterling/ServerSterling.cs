@@ -844,9 +844,9 @@ namespace SterServer
             // symbol
             string sym = structPositionUpdate.bstrSym;
             // size
-            int size = structPositionUpdate.nSharesBot - structPositionUpdate.nSharesSld + structPositionUpdate.nOpeningPosition;
+            int size = (structPositionUpdate.nSharesBot - structPositionUpdate.nSharesSld) + structPositionUpdate.nOpeningPosition;
             // price
-            decimal price = Math.Abs((decimal)structPositionUpdate.fPositionCost / size);
+            decimal price = size == 0 ? 0 :Math.Abs((decimal)structPositionUpdate.fPositionCost / size);
             // closed pl
             decimal cpl = (decimal)structPositionUpdate.fReal;
             // account
