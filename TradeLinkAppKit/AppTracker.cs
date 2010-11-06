@@ -13,6 +13,7 @@ namespace TradeLink.AppKit
     /// <summary>
     /// record application custom application events, mouse-clicks, etc to a URL
     /// </summary>
+    [System.ComponentModel.DesignerCategory("")]
     public partial class AppTracker : System.Windows.Forms.Form
     {
         public AppTracker() :base() { }
@@ -40,7 +41,7 @@ namespace TradeLink.AppKit
 
         bool _track = true;
         /// <summary>
-        /// enable or disable tracking
+        /// enable or disable server tracking (debugging still tracked)
         /// </summary>
         public bool TrackEnabled { get { return _track; } set { _track = value; } }
         BackgroundWorker _bw = new BackgroundWorker();
@@ -216,13 +217,15 @@ namespace TradeLink.AppKit
         /// <param name="data"></param>
         public void Track(TrackType type, string data)
         {
-            if (!TrackEnabled) return;
-            _tc++;
             // get clicked item name
-            Track t = new Track(type,data);
+            Track t = new Track(type, data);
             t.id = Auth.GetCPUId();
             t.tag = Program;
-            debug(_tc.ToString()+" "+t.ToString());
+            debug(_tc.ToString() + " " + t.ToString());
+            if (!TrackEnabled) return;
+            _tc++;
+
+            
             _untrackedqueue.Write(t);
         }
 
