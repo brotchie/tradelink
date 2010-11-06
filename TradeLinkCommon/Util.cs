@@ -191,7 +191,13 @@ namespace TradeLink.Common
         /// path to tradelink tick folder
         /// </summary>
         public static string TLTickDir 
-        { get { return Util.ProgramData("TradeLinkTicks"); } }
+        
+        { 
+            get 
+            { 
+                return Util.ProgramData("TradeLinkTicks"); 
+            } 
+        }
 
 
         public static TickFileInfo ParseFile(string filepath)
