@@ -8,3 +8,7 @@
 USD
 // VERBOSE
 0
+// historical bar price (TRADES/MIDPOINT/BID/ASK/BID_ASK/HISTORICAL_VOLATILITY/OPTIONA_IMPLIED_VOLATILITY/OPTION_VOLUME)
+BID
+// historical bars include regular trading hours (1 = true, 0 = false)
+0

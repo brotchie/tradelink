@@ -7,7 +7,7 @@
 #include "orderstate.h"
 #include "Contract.h"
 #include "TLServer_IP.h"
-
+#include "BarRequest.h"
 
 
 namespace TradeLibFast
@@ -33,6 +33,7 @@ namespace TradeLibFast
 
 
 	private:
+		void getcontract(CString symbol, CString currency, CString localsymbol,CString exchange,Contract* contract);
 		CString truncateat(CString original,CString after);
 		CString truncatebefore(CString original,CString before);
 		void pcont(Contract* c);
@@ -70,6 +71,12 @@ namespace TradeLibFast
 		std::vector<TLTick> stockticks;
 		// default currency
 		CString _currency;
+		// historical bar prices requested
+		CString histBarWhatToShow;
+		// historical bars use regular trading hours
+		int histBarRTH;
+		// historical bar symbols
+		std::vector<BarRequest> histBarSymbols;
 
 		// these are the IB-api methods we'll override (from EWrapper above)
 		void tickPrice( TickerId ddeId, TickType field, double price, int canAutoExecute);

@@ -198,6 +198,14 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath=".\BarRequest.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\BarRequest.h"
+			>
+		</File>
+		<File
 			RelativePath=".\CONNECTS.CPP"
 			>
 		</File>
@@ -287,6 +295,14 @@
 		</File>
 		<File
 			RelativePath=".\stdafx.h"
+			>
+		</File>
+		<File
+			RelativePath=".\TLBar.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\TLBar.h"
 			>
 		</File>
 		<File

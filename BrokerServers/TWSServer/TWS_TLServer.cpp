@@ -4,6 +4,7 @@
 #include "Execution.h"
 #include <fstream>
 #include "IBUtil.h"
+#include "TLBar.h"
 
 namespace TradeLibFast
 {
@@ -15,7 +16,8 @@ namespace TradeLibFast
 		IGNOREERRORS = false;
 		_currency = CString("USD");
 		noverb = true;
-
+		histBarRTH = 0;
+		histBarWhatToShow = CString("TRADES");
 	}
 
 	void TWS_TLServer::v(CString msg)
@@ -45,24 +47,44 @@ namespace TradeLibFast
 		std::ifstream file;
 		file.open(CONFIGFILE);
 		int sessionid = 0;
-		char skip[100];
-		char data[8];
-		file.getline(skip,100);
-		file.getline(data,8);
+		const int ss = 200;
+		char skip[ss];
+		const int ds = 20;
+		char data[ds];
+		file.getline(skip,ss);
+		file.getline(data,ds);
 		this->FIRSTSOCKET = atoi(data);
-		file.getline(skip,100);
-		file.getline(data,8);
+		file.getline(skip,ss);
+		file.getline(data,ds);
 		int maxsockets = atoi(data); // get the # of sockets first
-		file.getline(skip,100);
-		file.getline(data,8);
+		file.getline(skip,ss);
+		file.getline(data,ds);
 		sessionid = atoi(data); // get the session id next 
-		file.getline(skip,100);
-		file.getline(data,8); 
+		file.getline(skip,ss);
+		file.getline(data,ds); 
 		_currency = CString(data); // get currency
 		// get verbosity
-		file.getline(skip,100);
-		file.getline(data,8);
+		file.getline(skip,ss);
+		file.getline(data,ds);
 		noverb = 0==atoi(data);
+		// get historical bar type
+		file.getline(skip,ss);
+		file.getline(data,ds);
+		histBarWhatToShow = CString(data);
+		CString m;
+		m.Format("Using bar price data: %s",histBarWhatToShow);
+		D(m);
+		// get historical bar regular trading hours
+		file.getline(skip,ss);
+		file.getline(data,ds);
+		histBarRTH = atoi(data);
+
+		if (histBarRTH)
+			D("Using bar data from regular trading hours.");
+		else
+			D("Using all bar data available.");
+
+
 		file.close();
 		if (!noverb)
 			D("verbosity is on");
@@ -85,6 +107,7 @@ namespace TradeLibFast
 		msg.Format("Using currency: %s",_currency);
 		D(msg);
 	}
+
 
 	void TWS_TLServer::InitSockets(int maxsockets, int clientid)
 	{
@@ -144,13 +167,127 @@ namespace TradeLibFast
 		f.push_back(SIMTRADING);
 		f.push_back(POSITIONRESPONSE);
 		f.push_back(POSITIONREQUEST);
+		f.push_back(BARREQUEST);
+		f.push_back(BARRESPONSE);
 		return f;
 	}
-
+	
+	void gettime(int tltime, std::vector<int>& r)
+	{
+		int sec = tltime % 100;
+		r.push_back(sec);
+		int n = (tltime - sec)/100;
+		int min = n % 100;
+		r.push_back(min);
+		n = (n-min)/100;
+		r.push_back(n);
+	}
+	void getdate(int tldate, std::vector<int>& r)
+	{
+		int day = tldate % 100;
+		r.push_back(day);
+		int n = (tldate - day)/100;
+		int month = n % 100;
+		r.push_back(month);
+		n = (n - month)/100;
+		r.push_back(n);
+	}
 	int TWS_TLServer::UnknownMessage(int MessageType, CString msg)
 	{
+		switch (MessageType)
+		{
+		case BARREQUEST:
+			{
+				// parse bar request
+				BarRequest br = BarRequest::Deserialize(msg);
+				if (!br.isValid()) break;
+				// get contract
+				Contract contract;
+				TLSecurity sec = TLSecurity::Deserialize(br.Symbol);
+				getcontract(br.Symbol,CString(""),sec.sym,sec.dest,&contract);
+				// get request duration
+				std::vector<int> st;
+				std::vector<int> et;
+				std::vector<int> sd;
+				std::vector<int> ed;
+				gettime(br.StartTime,st);
+				getdate(br.StartDate,sd);
+				gettime(br.EndTime,et);
+				getdate(br.EndDate,ed);
+				CTime t1 = CTime(sd[2],sd[1],sd[0],st[2],st[1],st[0]);
+				CTime t2 = CTime(ed[2],ed[1],ed[0],et[2],et[1],et[0]);
+				CTimeSpan ts = t2 -t1;
+				bool usesec = ts.GetTotalSeconds()<86400;
+				bool usedays = ts.GetDays()<30;
+				int weeks = (int)(((double)ts.GetDays())/(double)7);
+				
+				CString edt;
+				edt.Format("%i %i:%i:%i",br.StartDate,st[2],st[1],st[0]);
+				// get duration
+				CString dur;
+				if (usesec)
+					dur.Format("%i S",ts.GetTotalSeconds());
+				else if (usedays)
+					dur.Format("%i D",ts.GetDays());
+				else 
+					dur.Format("%i W",weeks);
+				// get bar size
+				CString bs;
+				if (br.Interval==1)
+					bs = "1 sec";
+				else if (br.Interval<60)
+					bs.Format("%i secs",br.Interval);
+				else if (br.Interval==60)
+					bs = "1 min";
+				else if (br.Interval<3600)
+					bs.Format("%i mins",(int)(br.Interval/60));
+				else if (br.Interval==3600)
+					bs = "1 hour";
+				else if (br.Interval<86400)
+					bs.Format("%i hours",(int)(br.Interval/3600));
+				else if (br.Interval==86400)
+					bs = "1 day";
+				// save request
+				histBarSymbols.push_back(br);
+				// request data
+				this->m_link[this->validlinkids[0]]->reqHistoricalData((TickerId)histBarSymbols.size()-1,contract,edt,dur,bs,histBarWhatToShow,histBarRTH,2);
+
+			}
+			break;
+		}
 		return UNKNOWN_MESSAGE;
 	}
+
+	void TWS_TLServer::historicalData(TickerId reqId, const CString& datestring, double open, 
+		double high, double low,double close, int volume, 
+		int barCount, double WAP, int hasGaps) 
+	{
+		// get date from bar
+		CString dates = CString(datestring);
+		int64 unix = _atoi64(dates.GetBuffer());
+		CTime ct(unix);
+		int date = (ct.GetYear()*10000) + (ct.GetMonth()*100) + ct.GetDay();
+		int time = (ct.GetHour()*10000)+(ct.GetMinute()*100) + ct.GetSecond();
+		// get request
+		BarRequest br = histBarSymbols[reqId];
+		// build bar
+		TLBar b;
+		b.symbol = br.Symbol;
+		b.open = open;
+		b.high = high;
+		b.close = close;
+		b.Vol = volume;
+		b.interval = br.Interval;
+		b.time = time;
+		b.date = date;
+		// send bar to requesting client
+		TLSend(BARRESPONSE,TLBar::Serialize(b),br.Client);
+		
+
+
+
+	}
+
 
 	OrderId TWS_TLServer::TL2IBID(int64 tlid)
 	{
@@ -213,6 +350,65 @@ namespace TradeLibFast
 		v(m);
 	}
 
+	void TWS_TLServer::getcontract(CString symbol, CString currency, CString localsymbol,CString exchange,Contract* contract)
+	{
+		TLSecurity tmpsec = TLSecurity::Deserialize(symbol);
+		contract->symbol = symbol;
+		if (symbol.FindOneOf(" ")!=-1)
+		{
+			contract->symbol = tmpsec.sym;
+			// options stuff
+			if (tmpsec.isCall()|| tmpsec.isPut())
+			{
+				CString expire;
+				expire.Format("%i",tmpsec.date);
+				contract->expiry = expire;
+				contract->strike = tmpsec.strike;
+				contract->right = tmpsec.details;
+				//contract->currency = _currency;			
+			}
+			else 
+				contract->localSymbol = localsymbol!="" ? localsymbol : tmpsec.sym;
+			if (tmpsec.hasDest())
+				contract->exchange = tmpsec.dest;
+			if (tmpsec.hasType())
+				contract->secType = tmpsec.SecurityTypeName(tmpsec.type);
+			else if (tmpsec.hasDest())
+				contract->secType = TLSecurity::SecurityTypeName(TypeFromExchange(tmpsec.dest));
+		}
+		else 
+		{
+			contract->localSymbol = localsymbol!="" ? localsymbol : symbol;
+			contract->exchange = exchange;
+			contract->secType = tmpsec.SecurityTypeName(tmpsec.type);
+
+		}
+		if (tmpsec.type==CASH)
+		{
+			// remove base currency from symbol
+			CString cpy = CString(localsymbol);
+			int pidx = cpy.Find(CString("."));
+			if (pidx!=-1)
+			{
+
+				cpy.Delete(pidx,cpy.GetLength()-pidx);
+			}
+			contract->symbol = cpy;
+			contract->currency = truncateat(localsymbol,CString("."));
+		}
+		else
+			contract->currency = currency;
+		if (contract->exchange=="")
+			contract->exchange= "SMART";
+		contract->symbol = tl2ibspace(contract->symbol);
+		contract->localSymbol = tl2ibspace(contract->localSymbol);
+		if (tmpsec.type== FUT)
+		{
+			CString cpy(contract->localSymbol);
+			contract->symbol = cpy.Left(cpy.GetLength()-2);
+		}
+	}
+
 	int TWS_TLServer::SendOrder(TLOrder o)
 	{
 		// check our order
@@ -238,62 +434,10 @@ namespace TradeLibFast
 		order->orderId = newOrder(o.id,o.account);
 		order->transmit = true;
 
+		
+		
 		Contract* contract(new Contract);
-		TLSecurity tmpsec = TLSecurity::Deserialize(o.symbol);
-		contract->symbol = o.symbol;
-		if (o.symbol.FindOneOf(" ")!=-1)
-		{
-			contract->symbol = tmpsec.sym;
-			// options stuff
-			if (tmpsec.isCall()|| tmpsec.isPut())
-			{
-				CString expire;
-				expire.Format("%i",tmpsec.date);
-				contract->expiry = expire;
-				contract->strike = tmpsec.strike;
-				contract->right = tmpsec.details;
-				//contract->currency = _currency;			
-			}
-			else 
-				contract->localSymbol = o.localsymbol!="" ? o.localsymbol : tmpsec.sym;
-			if (tmpsec.hasDest())
-				contract->exchange = tmpsec.dest;
-			if (tmpsec.hasType())
-				contract->secType = tmpsec.SecurityTypeName(tmpsec.type);
-			else if (tmpsec.hasDest())
-				contract->secType = TLSecurity::SecurityTypeName(TypeFromExchange(tmpsec.dest));
-		}
-		else 
-		{
-			contract->localSymbol = o.localsymbol!="" ? o.localsymbol : o.symbol;
-			contract->exchange = o.exchange;
-			contract->secType = o.security;
-
-		}
-		if (tmpsec.type==CASH)
-		{
-			// remove base currency from symbol
-			CString cpy = CString(o.localsymbol);
-			int pidx = cpy.Find(CString("."));
-			if (pidx!=-1)
-			{
-
-				cpy.Delete(pidx,cpy.GetLength()-pidx);
-			}
-			contract->symbol = cpy;
-			contract->currency = truncateat(o.localsymbol,CString("."));
-		}
-		else
-			contract->currency = o.currency;
-		if (contract->exchange=="")
-			contract->exchange= "SMART";
-		contract->symbol = tl2ibspace(contract->symbol);
-		contract->localSymbol = tl2ibspace(contract->localSymbol);
-		if (tmpsec.type== FUT)
-		{
-			CString cpy(contract->localSymbol);
-			contract->symbol = cpy.Left(cpy.GetLength()-2);
-		}
+		getcontract(o.symbol,o.currency,o.localsymbol,o.exchange,contract);
 		
 
 		// get the TWS session associated with our account
@@ -811,8 +955,6 @@ namespace TradeLibFast
 			double price, int size) { }
 	void TWS_TLServer::updateNewsBulletin(int msgId, int msgType, const CString& newsMessage, const CString& originExch) { }
 	void TWS_TLServer::receiveFA(faDataType pFaDataType, const CString& cxml) { }
-	void TWS_TLServer::historicalData(TickerId reqId, const CString& date, double open, double high, double low,
-								   double close, int volume, int barCount, double WAP, int hasGaps) {}
 	void TWS_TLServer::scannerParameters(const CString &xml) { }
 	void TWS_TLServer::scannerData(int reqId, int rank, const ContractDetails &contractDetails, const CString &distance,
 		const CString &benchmark, const CString &projection, const CString &legsStr) { }
