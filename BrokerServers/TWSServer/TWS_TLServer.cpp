@@ -276,6 +276,7 @@ namespace TradeLibFast
 		b.open = open;
 		b.high = high;
 		b.close = close;
+		b.low = low;
 		b.Vol = volume;
 		b.interval = br.Interval;
 		b.time = time;
