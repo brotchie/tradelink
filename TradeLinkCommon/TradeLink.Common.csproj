@@ -114,6 +114,7 @@
     <Compile Include="MarketOrderFlat.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="MessageTracker.cs" />
+    <Compile Include="OCOTracker.cs" />
     <Compile Include="OffsetInfo.cs" />
     <Compile Include="OffsetTracker.cs" />
     <Compile Include="OrderTIFTracker.cs" />
