@@ -24,7 +24,7 @@ namespace ASP
             }
             catch (Exception ex)
             {
-                TradeLink.AppKit.CrashReport.Report(ASP.PROGRAM, ex);
+                report(ex,true);
             }
             try
             {
@@ -43,12 +43,13 @@ namespace ASP
             report(e.Exception);
         }
 
-        static void report(Exception e)
+        static void report(Exception e) { report(e, false); }
+        static void report(Exception e,bool pause)
         {
             if (Properties.Settings.Default.portal==string.Empty)
                 TradeLink.AppKit.CrashReport.Report(ASP.PROGRAM, e);
             else
-                TradeLink.AppKit.ATW.Report(Properties.Settings.Default.portal, string.Empty, null, true, Properties.Settings.Default.un, Properties.Settings.Default.pw, new TradeLink.AppKit.AssemblaTicketWindow.LoginSucceedDel(ASP.success),true);
+                TradeLink.AppKit.ATW.Report(Properties.Settings.Default.portal, string.Empty, null, true, Properties.Settings.Default.un, Properties.Settings.Default.pw, new TradeLink.AppKit.AssemblaTicketWindow.LoginSucceedDel(ASP.success),pause);
         }
     }
 }

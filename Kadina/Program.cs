@@ -22,18 +22,27 @@ namespace Kadina
             }
             catch (Exception e)
             {
-                TradeLink.AppKit.CrashReport.Report(kadinamain.PROGRAM, e);
+                report(e,true);
             }
         }
 
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            TradeLink.AppKit.CrashReport.Report(kadinamain.PROGRAM, (Exception)e.ExceptionObject); 
+            report((Exception)e.ExceptionObject);
         }
 
         static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
-            TradeLink.AppKit.CrashReport.Report(kadinamain.PROGRAM, e);
+            report(e.Exception);
+        }
+
+        static void report(Exception e) { report(e, false); }
+        static void report(Exception e, bool pause)
+        {
+            if (Properties.Settings.Default.portal == string.Empty)
+                TradeLink.AppKit.CrashReport.Report(kadinamain.PROGRAM, e);
+            else
+                TradeLink.AppKit.ATW.Report(Properties.Settings.Default.portal, string.Empty, null, true, Properties.Settings.Default.user, Properties.Settings.Default.pw, new TradeLink.AppKit.AssemblaTicketWindow.LoginSucceedDel(kadinamain.success), true);
         }
     }
 }

@@ -1332,6 +1332,7 @@ namespace ASP
         {
             Properties.Settings.Default.un = u;
             Properties.Settings.Default.pw = p;
+            Properties.Settings.Default.Save();
         }
 
         static int getprocesscount(string PROGRAM)

@@ -939,6 +939,13 @@ namespace Kadina
         {
             playto(PlayTo.OneSec);
         }
+
+        public static void success(string u, string p)
+        {
+            Properties.Settings.Default.user = u;
+            Properties.Settings.Default.pw = p;
+            Properties.Settings.Default.Save();
+        }
     }
 
     enum PlayTo
