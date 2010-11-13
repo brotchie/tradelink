@@ -57,6 +57,7 @@ namespace TDServer
         
         void tl_newRegisterSymbols(string client, string symbols)
         {
+            debug("got symbol request: " + client + " for: " + symbols);
             Basket mb = tl.AllClientBasket;
             api.UnsubscribeAll();
             // clear idx values

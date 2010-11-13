@@ -63,6 +63,7 @@ namespace TDServer
         Basket b = new BasketImpl();
         void tl_newRegisterSymbols(string client, string symbols)
         {
+            debug("got symbol request: " + client + " for: " + symbols);
             // get original basket
             Basket org = new BasketImpl(b);
             // get new basket
