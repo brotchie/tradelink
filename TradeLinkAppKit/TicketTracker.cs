@@ -80,6 +80,15 @@ namespace TradeLink.AppKit
             catch { }
         }
 
+        bool _duplicatesafety = true;
+        /// <summary>
+        /// if enabled, will ignore a ticket which has same description and summary as last tracked ticket
+        /// </summary>
+        public bool DuplicateSafetyOn { get { return _duplicatesafety; } set { _duplicatesafety = value; } }
+
+        string _lastticketsum = string.Empty;
+        string _lasttickdesc = string.Empty;
+
         /// <summary>
         /// submit a ticket to portal in background
         /// </summary>
@@ -88,6 +97,19 @@ namespace TradeLink.AppKit
         {
             if (!TrackEnabled) return;
             if (!_go) Start();
+            if (DuplicateSafetyOn)
+            {
+                if ((ticket.Summary == _lastticketsum) && (ticket.Description == _lasttickdesc))
+                {
+                    debug("Duplicate ticket content detected, ignoring ticket.");
+                    return;
+                }
+                else
+                {
+                    _lasttickdesc = ticket.Description;
+                    _lastticketsum = ticket.Summary;
+                }
+            }
             _tickets++;
             _untrackedqueue.Write(ticket);
         }
