@@ -31,6 +31,9 @@ namespace Responses
                 pairs = new PairsTracker(Asym, Bsym, RatioA2B, BasisPointEntry);
                 pairs.SpreadOutsideBounds += new DecimalDelegate(pairs_SpreadOutsideBounds);
             }
+            // subscribe to symbols
+            sendbasket(new string[] { Asym, Bsym });
+            D("Subscribed to pair: [" + Asym + "," + Bsym+"]");
         }
 
         void pairs_SpreadOutsideBounds(decimal difference)
