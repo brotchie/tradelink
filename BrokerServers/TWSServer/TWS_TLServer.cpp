@@ -18,6 +18,7 @@ namespace TradeLibFast
 		noverb = true;
 		histBarRTH = 0;
 		histBarWhatToShow = CString("TRADES");
+		PROGRAM = "TWSServer";
 	}
 
 	void TWS_TLServer::v(CString msg)

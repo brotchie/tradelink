@@ -69,6 +69,7 @@ bool ServerGenesis::LoadConfig()
 ServerGenesis::ServerGenesis()
 {
 	_depth = 0;
+	PROGRAM = "GenesisServer";
 	autoattempt = false;
 	gtw = new GTWrap();
 	LoadConfig();

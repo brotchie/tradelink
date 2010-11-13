@@ -15,10 +15,12 @@ namespace TradeLibFast
 	const char* VERFILE = "\\tradelink\\VERSION.txt";
 	TLServer_WM::TLServer_WM(void)
 	{
+		PROGRAM = CString("BROKER");
 		MajorVer = 0.1;
 		MinorVer = 0;
 		TLDEBUG = true;
 		ENABLED = false;
+		LOGENABLED = true;
 		debugbuffer = CString("");
 		std::ifstream file;
 		TCHAR path[MAX_PATH];
@@ -378,8 +380,10 @@ namespace TradeLibFast
 			CString line;
 			vector<int> now;
 			TLTimeNow(now);
-			line.Format("%i %s%s",now[TLtime],message,NEWLINE);
+			line.Format("%i %s",now[TLtime],message);
 			debugbuffer.Append(line);
+			if (LOGENABLED)
+				log<<line<<endl;
 			__raise this->GotDebug(line);
 		}
 	}
@@ -516,12 +520,43 @@ namespace TradeLibFast
 					return true;
 		return false;
 	}
+	bool checkFileExists(LPCTSTR dirName) 
+	{ 
+	  WIN32_FIND_DATA  data; 
+	  HANDLE handle = FindFirstFile(dirName,&data); 
+	  if (handle != INVALID_HANDLE_VALUE)
+	  {
+		FindClose(handle);
+		return true;
+	  }
+
+	  return false;
+	}
 	void TLServer_WM::Start() 
 	{
 		
 		if (!ENABLED)
 		{
 			ENABLED = true;
+
+			if (LOGENABLED)
+			{
+				// get log path
+				TCHAR path[MAX_PATH];
+				SHGetFolderPath(NULL,CSIDL_LOCAL_APPDATA,NULL,0,path);
+				CString augpath;
+				augpath.Format("%s\\%s",path,PROGRAM);
+				// see if folder exists
+				if (!checkFileExists(augpath.GetBuffer()))
+					CreateDirectory(augpath,NULL);
+				// get log file name
+				std::vector<int> now;
+				TLTimeNow(now);
+				CString fn;
+				fn.Format("%s\\%s.%i.txt",augpath,PROGRAM,now[0]);
+				log.open(fn,ios::app);
+			}
+
 			CString servername = UniqueWindowName("TradeLinkServer");
 			CWnd* parent = CWnd::GetDesktopWindow();
 			this->Create(NULL, servername, 0,CRect(0,0,20,20),parent ,NULL);

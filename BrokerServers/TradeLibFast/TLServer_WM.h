@@ -1,6 +1,7 @@
 #pragma once
 #include "TradeLibFast.h"
 #include <vector>
+#include <fstream>
 using namespace std;
 
 namespace TradeLibFast
@@ -17,6 +18,7 @@ const int MAXTICKS = 10000;
 		~TLServer_WM(void);
 		bool TLDEBUG;
 		bool ENABLED;
+		bool LOGENABLED;
 		__event void GotDebug(LPCTSTR msg);
 		CString debugbuffer;
 		long TLSend(int type,LPCTSTR msg, int clientid);
@@ -39,6 +41,8 @@ const int MAXTICKS = 10000;
 		vector<TLTick> _tickcache;
 
 	protected:
+		ofstream log;
+		CString PROGRAM;
 		bool needStock(CString stock);
 		int FindClient(CString clientname);
 		double MajorVer;

@@ -16,6 +16,8 @@
 	{
 		instance = this;
 
+		PROGRAM = "AnvilServer";
+
 		// remove canceled orders
 		B_KeepCancelledOrders(false);
 
