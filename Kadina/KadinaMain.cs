@@ -227,12 +227,7 @@ namespace Kadina
 
         void cleardebugs()
         {
-            if (msgbox.InvokeRequired)
-                msgbox.Invoke(new VoidDelegate(cleardebugs));
-            else
-            {
-                msgbox.Clear(); 
-            }
+            debugControl1.Clear();
         }
 
 
@@ -270,7 +265,7 @@ namespace Kadina
         {
             // clear all GUIs
             _msg = new StringBuilder(10000);
-            msgbox.Clear();
+            debugControl1.Clear();
             dt.Clear();
             ptab.Clear();
             _tradelist.Clear();
@@ -742,19 +737,7 @@ namespace Kadina
        
         void debug(string msg)
         {
-            if (msgbox.InvokeRequired)
-            {
-                try
-                {
-                    Invoke(new DebugDelegate(debug), new object[] { msg });
-                }
-                catch (ObjectDisposedException) { }
-            }
-            else
-            {
-                msgbox.AppendText(msg + Environment.NewLine);
-                msgbox.Refresh();
-            }
+            debugControl1.GotDebug(msg);
         }
 
         private void kadinamain_DragEnter(object sender, DragEventArgs e)
@@ -770,7 +753,9 @@ namespace Kadina
 
         void PlayComplete(object sender, RunWorkerCompletedEventArgs e)
         {
-            debug(_msg.ToString());
+            string[] r = _msg.ToString().Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            foreach (string l in r)
+                debug(l);
             ig.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
             SafeBindingSource.refreshgrid(dg, tbs);
             SafeBindingSource.refreshgrid(ig, ibs);

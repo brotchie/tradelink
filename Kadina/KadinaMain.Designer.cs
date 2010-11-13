@@ -35,7 +35,7 @@ namespace Kadina
             this.reslist = new System.Windows.Forms.ToolStripDropDownButton();
             this._tabs = new System.Windows.Forms.TabControl();
             this.msgtab = new System.Windows.Forms.TabPage();
-            this.msgbox = new System.Windows.Forms.RichTextBox();
+            this.debugControl1 = new TradeLink.AppKit.DebugControl();
             this.ticktab = new System.Windows.Forms.TabPage();
             this.itab = new System.Windows.Forms.TabPage();
             this.postab = new System.Windows.Forms.TabPage();
@@ -128,7 +128,7 @@ namespace Kadina
             // 
             // msgtab
             // 
-            this.msgtab.Controls.Add(this.msgbox);
+            this.msgtab.Controls.Add(this.debugControl1);
             this.msgtab.Location = new System.Drawing.Point(4, 32);
             this.msgtab.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.msgtab.Name = "msgtab";
@@ -138,16 +138,15 @@ namespace Kadina
             this.msgtab.Text = "Messages";
             this.msgtab.UseVisualStyleBackColor = true;
             // 
-            // msgbox
+            // debugControl1
             // 
-            this.msgbox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.msgbox.Location = new System.Drawing.Point(4, 5);
-            this.msgbox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.msgbox.Name = "msgbox";
-            this.msgbox.ReadOnly = true;
-            this.msgbox.Size = new System.Drawing.Size(785, 236);
-            this.msgbox.TabIndex = 0;
-            this.msgbox.Text = "";
+            this.debugControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.debugControl1.EnableSearching = true;
+            this.debugControl1.Location = new System.Drawing.Point(4, 5);
+            this.debugControl1.Name = "debugControl1";
+            this.debugControl1.Size = new System.Drawing.Size(785, 236);
+            this.debugControl1.TabIndex = 0;
+            this.debugControl1.TimeStamps = false;
             // 
             // ticktab
             // 
@@ -355,7 +354,6 @@ namespace Kadina
         private System.Windows.Forms.ToolStripDropDownButton reslist;
         private System.Windows.Forms.TabControl _tabs;
         private System.Windows.Forms.TabPage msgtab;
-        private System.Windows.Forms.RichTextBox msgbox;
         private System.Windows.Forms.TabPage ticktab;
         private System.Windows.Forms.ToolStripDropDownButton recent;
         private System.Windows.Forms.TabPage itab;
@@ -375,6 +373,7 @@ namespace Kadina
         private System.Windows.Forms.Button ptend;
         private System.Windows.Forms.Button onesec;
         private System.Windows.Forms.Label label1;
+        private TradeLink.AppKit.DebugControl debugControl1;
     }
 }
 
