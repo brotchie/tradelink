@@ -55,7 +55,7 @@ namespace Kadina
             h.SimBroker.UseBidAskFills = Properties.Settings.Default.UseBidAskFills;
             InitializeComponent();
             initgrids();
-            InitContext();
+            
             sizetabs();
             restorerecentfiles();
             restorerecentlibs();
@@ -244,19 +244,7 @@ namespace Kadina
             Kadina.Properties.Settings.Default.Save();
         }
         const string PLAYTO = "Play +";
-        void InitContext()
-        {
-            ContextMenu = new ContextMenu();
-            ContextMenu.MenuItems.Add("LastPlayTo", new EventHandler(rightplay));
-            string[] list = Enum.GetNames(typeof(PlayTo));
-            for (int i = 0; i < list.Length; i++)
-                if (list[i]!="LastPlayTo")
-                    ContextMenu.MenuItems.Add(PLAYTO+list[i],new EventHandler(rightplay));
-            ContextMenu.MenuItems.Add("Reset", new EventHandler(rightreset));
-            //ContextMenu.MenuItems.Add("NewStudy", new EventHandler(rightstudy));
-            msgbox.ContextMenu = ContextMenu;
-            
-        }
+        
 
         bool hasprereq() { return hasprereq(true); }
         bool hasprereq(bool stat)
@@ -265,34 +253,17 @@ namespace Kadina
             if (myres == null) { if (stat) status("Add response."); return false; }
             if (epffiles.Count == 0) { if (stat) status("Add study data."); return false; }
             if (stat)
-                status("Right click to choose play duration.");
+                status("Click on desired play duration to begin.");
             return true;
         }
 
-        void rightplay(object sender, EventArgs e)
+
+        void playto(PlayTo pt)
         {
-            MenuItem mi = (MenuItem)sender;
-            string tmp = mi.Text;
-            tmp = tmp.Replace(PLAYTO, "");
-            PlayTo pttmp = (PlayTo)Enum.Parse(typeof(PlayTo), tmp);
-            if (pttmp != PlayTo.LastPlayTo)
-                pt = pttmp;
             if (!hasprereq(true))
                 return;
             bw.RunWorkerAsync(pt);
-            ContextMenu.MenuItems.Add("Cancel", new EventHandler(rightcancel));
-            status("Playing...");
-        }
-        void rightcancel(object sender, EventArgs e) { bw.CancelAsync(); }
-
-        void rightreset(object sender, EventArgs e)
-        {
-            reset(true);
-        }
-
-        void rightstudy(object sender, EventArgs e)
-        {
-            reset(false);
+            status("Playing next " + pt.ToString().Replace(PLAYTO, string.Empty) + "...");
         }
 
         void reset(bool keepparams)
@@ -816,8 +787,7 @@ namespace Kadina
             }
             else if (e.Cancelled) status("Canceled play.");
             else status("Reached next " + pt.ToString() + " at time " + KadTime);
-            if (ContextMenu.MenuItems[ContextMenu.MenuItems.Count-1].Text=="Cancel") // remove cancel option
-                ContextMenu.MenuItems.RemoveAt(ContextMenu.MenuItems.Count - 1);
+
         }
 
         string KadTime
@@ -948,6 +918,41 @@ namespace Kadina
         void dg_DataError(object sender, DataGridViewDataErrorEventArgs e)
         {
             e.Cancel = true;
+        }
+
+        private void onemin_Click(object sender, EventArgs e)
+        {
+            playto(PlayTo.OneMin);
+        }
+
+        private void fivemin_Click(object sender, EventArgs e)
+        {
+            playto(PlayTo.FiveMin);
+        }
+
+        private void tenmin_Click(object sender, EventArgs e)
+        {
+            playto(PlayTo.TenMin);
+        }
+
+        private void thirtymin_Click(object sender, EventArgs e)
+        {
+            playto(PlayTo.HalfHour);
+        }
+
+        private void onehour_Click(object sender, EventArgs e)
+        {
+            playto(PlayTo.Hour);
+        }
+
+        private void ptend_Click(object sender, EventArgs e)
+        {
+            playto(PlayTo.End);
+        }
+
+        private void onesec_Click(object sender, EventArgs e)
+        {
+            playto(PlayTo.OneSec);
         }
     }
 
