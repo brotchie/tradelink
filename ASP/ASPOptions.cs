@@ -21,12 +21,17 @@ namespace ASP
         {
             this.Hide();
             e.Cancel = true;
+            Properties.Settings.Default.Save();
         }
         public event Int32Delegate TimeoutChanged;
         private void _brokertimeout_ValueChanged(object sender, EventArgs e)
         {
             if (TimeoutChanged != null)
                 TimeoutChanged((int)_brokertimeout.Value);
+        }
+
+        private void _portal_TextChanged(object sender, EventArgs e)
+        {
         }
 
 

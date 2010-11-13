@@ -35,12 +35,20 @@ namespace ASP
 
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            TradeLink.AppKit.CrashReport.Report(ASP.PROGRAM, (Exception)e.ExceptionObject);
+            report((Exception)e.ExceptionObject);
         }
 
         static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
-            TradeLink.AppKit.CrashReport.Report(ASP.PROGRAM, e.Exception);
+            report(e.Exception);
+        }
+
+        static void report(Exception e)
+        {
+            if (Properties.Settings.Default.portal==string.Empty)
+                TradeLink.AppKit.CrashReport.Report(ASP.PROGRAM, e);
+            else
+                TradeLink.AppKit.ATW.Report(Properties.Settings.Default.portal, string.Empty, null, true, Properties.Settings.Default.un, Properties.Settings.Default.pw, new TradeLink.AppKit.AssemblaTicketWindow.LoginSucceedDel(ASP.success),true);
         }
     }
 }

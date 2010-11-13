@@ -1325,10 +1325,10 @@ namespace ASP
             if (_ao._portal.Text == string.Empty)
                 CrashReport.Report(PROGRAM, _dw.Content, null, null, false,PROGRAM+" Bug Report "+Util.ToTLDate());
             else
-                ATW.Report(_ao._portal.Text, _log.Content, null, true, Properties.Settings.Default.un, Properties.Settings.Default.pw, new AssemblaTicketWindow.LoginSucceedDel(success), false);
+                ATW.Report(_ao._portal.Text, _dw.Content, null, true, Properties.Settings.Default.un, Properties.Settings.Default.pw, new AssemblaTicketWindow.LoginSucceedDel(success), false);
         }
 
-        void success(string u, string p)
+        public static void success(string u, string p)
         {
             Properties.Settings.Default.un = u;
             Properties.Settings.Default.pw = p;

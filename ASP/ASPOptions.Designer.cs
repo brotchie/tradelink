@@ -86,6 +86,7 @@
             this._portal.Size = new System.Drawing.Size(90, 26);
             this._portal.TabIndex = 21;
             this._portal.Text = global::ASP.Properties.Settings.Default.portal;
+            this._portal.TextChanged += new System.EventHandler(this._portal_TextChanged);
             // 
             // _dest
             // 
