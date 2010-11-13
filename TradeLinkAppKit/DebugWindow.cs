@@ -11,25 +11,32 @@ namespace TradeLink.AppKit
 {
     public partial class DebugWindow : Form
     {
+        string preface = string.Empty;
         public DebugWindow()
         {
             InitializeComponent();
-
+            debugControl1.NewSearchEvent += new TradeLink.API.DebugDelegate(debugControl1_NewSearchEvent);
         }
-        public string Content { get { return _msg.ToString(); } }
-        StringBuilder _msg = new StringBuilder();
+
+        void debugControl1_NewSearchEvent(string msg)
+        {
+            if (preface == string.Empty)
+                preface = Text;
+            Text = preface + " " + msg;
+            Invalidate(true);
+        }
+        public string Content { get { return debugControl1.Content; } }
+
         public bool isValid = true;
         public bool TimeStamps { get { return debugControl1.TimeStamps; } set { debugControl1.TimeStamps = value; } }
 
         public void GotDebug(TradeLink.API.Debug deb)
         {
-            _msg.AppendLine(deb.Msg);
             debugControl1.GotDebug(deb);
         }
 
         public void GotDebug(string msg)
         {
-            _msg.AppendLine(msg);
             debugControl1.GotDebug(msg);
         }
 
@@ -46,7 +53,6 @@ namespace TradeLink.AppKit
 
         public void Clear()
         {
-            _msg = new StringBuilder();
             debugControl1.Clear();
         }
 
