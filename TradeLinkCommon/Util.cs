@@ -25,6 +25,7 @@ namespace TradeLink.Common
         static string REGPATH = @"Software\Microsoft\Windows\CurrentVersion\Uninstall";
         static string REGPATH64 = REGPATH + @"\wow6432Node";
         static string KEY_PATH = "Path";
+        static string KEY_TICKDATAPATH = "TickDataPath";
         static string KEY_VERSION = "Version";
         static string KEY_TRACKUSAGE = "TrackUsage";
 
@@ -136,6 +137,42 @@ namespace TradeLink.Common
             return Environment.CurrentDirectory;
         }
 
+        static string getregvalue(string PROGRAM, string key,DebugDelegate deb)
+        {
+            _deb = deb;
+            RegistryKey r = Registry.LocalMachine;
+            string path = string.Empty;
+            try
+            {
+                debug("trying standard registry path...");
+                // check registry first
+                path = REGPATH + @"\" + PROGRAM;
+                return r.OpenSubKey(path).GetValue(key).ToString();
+            }
+            catch (NullReferenceException)
+            {
+                try
+                {
+                    debug("standard path failed, must be 64bit... trying 32bit compatibility...");
+                    string ppath = PlatFormInvoke.GetKeyValue(path, key);
+                    debug("success.");
+                    return ppath;
+                }
+                catch (Exception ex)
+                {
+                    debug("all paths failed, path:" + path);
+                    debug("error: " + ex.Message + ex.StackTrace);
+                }
+            }
+            catch (Exception ex)
+            {
+                // then check program files
+                debug("unknown error." + path);
+                debug("error: " + ex.Message + ex.StackTrace);
+            }
+            return string.Empty;
+        }
+
         public static string ProgramDataBasePath
         {
             get
@@ -194,8 +231,11 @@ namespace TradeLink.Common
         
         { 
             get 
-            { 
-                return Util.ProgramData("TradeLinkTicks"); 
+            {
+                string path = getregvalue(PROGRAM, KEY_TICKDATAPATH, null);
+                if (path == string.Empty)
+                    path = Util.ProgramData("TradeLinkTicks");
+                return path;
             } 
         }
 

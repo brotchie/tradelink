@@ -223,6 +223,7 @@ tickdata:
   StrCmp $0 "Yes" vcredistinstall
   ExecWait "TickDataInstall.exe"
   WriteRegStr HKLM SOFTWARE\TradeLinkSuite "InstalledTickData" "Yes"
+  WriteRegStr HKLM SOFTWARE\TradeLinkSuite "TickDataPath" "$LOCALAPPDIR\TradeLinkTicks"
   DetailPrint "TickData was installed."
   
   
