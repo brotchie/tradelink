@@ -10,16 +10,13 @@ using System.IO;
 
 namespace TradeLink.AppKit
 {
-    /// <summary>
-    /// to create and update assembla tickets
-    /// </summary>
     public class AssemblaTicket
     {
         public AssemblaTicket()
         {
             _ticknum = 0;
             _milestone = 0;
-            _assign = 0;
+            _assign = string.Empty;
 
         }
         public AssemblaTicket(AssemblaTicket copy)
@@ -43,9 +40,9 @@ namespace TradeLink.AppKit
             return "http://www.assembla.com/spaces/" + space + "/tickets/";
         }
         public static string GetTicketsUrl(string space) { return GetTicketsUrl(space, 0); }
-        public static string GetTicketsUrl(string space,int page)
+        public static string GetTicketsUrl(string space, int page)
         {
-            return "http://www.assembla.com/spaces/" + space + "/tickets/report/"+page.ToString();
+            return "http://www.assembla.com/spaces/" + space + "/tickets/report/" + page.ToString();
         }
         /// <summary>
         /// returns global id of ticket if successful, zero if not successful
@@ -136,19 +133,41 @@ namespace TradeLink.AppKit
             string xml = "<status>" + stat.ToString() + "</status>";
             return Update(space, user, password, ticket, xml);
         }
+        public static bool UpdateMilestone(string space, string user, string password, int ticket, int milestone)
+        {
+            string xml = "<milestone-id>" + milestone.ToString() + "</milestone-id>";
+            return Update(space, user, password, ticket, xml);
+        }
+
+        public static bool UpdateOwner(string space, string user, string password, int ticket, string NewOwnerId)
+        {
+            string xml = "<assigned-to-id>" + NewOwnerId + "</assigned-to-id>";
+            return Update(space, user, password, ticket, xml);
+        }
+
+        public static bool UpdatePriority(string space, string user, string password, int ticket, Priority pri)
+        {
+            int p = (int)pri;
+            string xml = "<priority>" + p + "</priority>";
+            return Update(space, user, password, ticket, xml);
+
+        }
         public static bool Update(string space, string user, string password, AssemblaTicket at)
         {
-            return Update(space, user, password, at.TicketDocumentId, at.ToXml());
+            return Update(space, user, password, at.Number, at.ToXml());
         }
         public static bool Update(string space, string user, string password, int ticket, string xml)
         {
             string url = "http://www.assembla.com/spaces/" + space + "/tickets/" + ticket.ToString();
             HttpWebRequest hr = WebRequest.Create(url) as HttpWebRequest;
             hr.Credentials = new System.Net.NetworkCredential(user, password);
+            hr.PreAuthenticate = true;
             hr.Method = "PUT";
             hr.ContentType = "application/xml";
             StringBuilder data = new StringBuilder();
-            data.AppendLine(System.Web.HttpUtility.HtmlEncode(xml));
+            if (!xml.Contains("<ticket>"))
+                xml = "<ticket>" + xml + "</ticket>";
+            data.AppendLine(xml);
             // encode
             byte[] bytes = UTF8Encoding.UTF8.GetBytes(data.ToString());
             hr.ContentLength = bytes.Length;
@@ -199,16 +218,18 @@ namespace TradeLink.AppKit
         {
             StringBuilder data = new StringBuilder();
             data.AppendLine("<ticket>");
-            data.AppendLine("<status>" + Status.ToString().Replace("TicketStatus.", string.Empty) + "</status>");
-            data.AppendLine("<priority>" + Priority.ToString().Replace("Priority.", string.Empty) + "</priority>");
+            data.AppendLine("<number>" + Number + "</number>");
+            data.AppendLine("<reporter-id>" + Reporter + "</reporter-id>");
+            data.AppendLine("<status>" + ((int)Status).ToString() + "</status>");
+            data.AppendLine("<priority>" + ((int)Priority).ToString() + "</priority>");
             data.AppendLine("<summary>");
             data.AppendLine(System.Web.HttpUtility.HtmlEncode(Summary));
             data.AppendLine("</summary>");
             data.AppendLine("<description>");
             data.AppendLine(System.Web.HttpUtility.HtmlEncode(Description));
             data.AppendLine("</description>");
-            data.AppendLine("<assigned-to-id>" + Owner.ToString() + "</assigned-to-id>");
-            data.AppendLine("<milestone-id>" + Milestone.ToString() + "</milestone-id");
+            data.AppendLine("<assigned-to-id>" + OwnerId + "</assigned-to-id>");
+            data.AppendLine("<milestone-id>" + Milestone.ToString() + "</milestone-id>");
             data.AppendLine("</ticket>");
             return data.ToString();
         }
@@ -285,18 +306,18 @@ namespace TradeLink.AppKit
         /// <returns></returns>
         public static string TicketContext(string space, string program, Exception ex)
         {
-            string[] r = new string[] { "Product:" + space, "Program:" + program, "Exception:" + (ex != null ? ex.Message : "n/a"), "StackTrace:" + (ex != null ? ex.StackTrace : "n/a"), "CommandLine:" + Environment.CommandLine, "OS:" + Environment.OSVersion.VersionString + " " + (IntPtr.Size * 8).ToString() + "bit", "CLR:" + Environment.Version.ToString(4), "TradeLink:" + TradeLink.Common.Util.TLSIdentity(), "Memory:" + Environment.WorkingSet.ToString(), "Processors:" + Environment.ProcessorCount.ToString(), "MID: " + Auth.GetCPUId() };
+            string[] r = new string[] { "Product:" + space, "Program:" + program, "Exception:" + (ex != null ? ex.Message : "n/a"), "StackTrace:" + (ex != null ? ex.StackTrace : "n/a"), "CommandLine:" + Environment.CommandLine, "OS:" + Environment.OSVersion.VersionString + " " + (IntPtr.Size * 8).ToString() + "bit", "CLR:" + Environment.Version.ToString(4), "TradeLink:" + TradeLink.Common.Util.TLSIdentity(), "Memory:" + Environment.WorkingSet.ToString(), "Processors:" + Environment.ProcessorCount.ToString(), "MID: " + Auth.GetNetworkAddress(), "Date/Time: "+Util.ToTLDate()+"/"+Util.ToTLTime() };
             string desc = string.Join(Environment.NewLine, r);
             return desc;
         }
 
         int _ticknum;
         int _milestone;
-        int _assign;
+        string _assign;
 
         public int Number { get { return _ticknum; } set { _ticknum = value; } }
         public int Milestone { get { return _milestone; } set { _milestone = value; } }
-        public int Owner { get { return _assign; } set { _assign = value; } }
+        public string OwnerId { get { return _assign; } set { _assign = value; } }
 
         string _reporter = string.Empty;
         public string Reporter { get { return _reporter; } set { _reporter = value; } }
@@ -344,7 +365,7 @@ namespace TradeLink.AppKit
             List<AssemblaTicket> docs = new List<AssemblaTicket>();
             try
             {
-                string url = AssemblaTicket.GetTicketsUrl(space,page);
+                string url = AssemblaTicket.GetTicketsUrl(space, page);
                 HttpWebRequest hr = WebRequest.Create(url) as HttpWebRequest;
                 hr.Credentials = new System.Net.NetworkCredential(user, pw);
                 hr.PreAuthenticate = true;
@@ -379,8 +400,8 @@ namespace TradeLink.AppKit
                                 doc.Priority = (TradeLink.API.Priority)Convert.ToInt32(m);
                             else if (dc.Name == "number")
                                 doc.Number = Convert.ToInt32(m);
-                            else if (dc.Name == "assign-to-id")
-                                doc.Owner = Convert.ToInt32(m);
+                            else if (dc.Name == "assigned-to-id")
+                                doc.OwnerId = m;
                             else if (dc.Name == "milestone-id")
                                 doc.Milestone = Convert.ToInt32(m);
                             else if (dc.Name == "updated-at")
