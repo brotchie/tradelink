@@ -499,6 +499,18 @@ namespace TradeLink.Common
             return true;
         }
 
+        /// <summary>
+        /// attempts to get year worth of daily data from google, if fails tries yahoo.
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <returns></returns>
+        public static BarList DayFromAny(string symbol)
+        {
+            BarList bl = BarListImpl.DayFromGoogle(symbol);
+            if (bl.Count == 0)
+                bl = BarListImpl.DayFromYahoo(symbol);
+            return bl;
+        }
 
         public static BarList DayFromGoogle(string symbol, int startdate)
         {
