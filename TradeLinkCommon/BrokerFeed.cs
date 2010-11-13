@@ -271,6 +271,8 @@ namespace TradeLink.Common
 
                     return res;
                 }
+                else if (VerboseDebugging)
+                    v(_pcon[i].BrokerName + " " + _pcon[i].Name + " does not support feature " + type + ", dropping message.");
             return 0;
             
         }
