@@ -8,10 +8,10 @@ namespace TradeLink.Common
     /// <summary>
     /// enforce time limits for orders
     /// </summary>
-    public class TIFTracker
+    public class TIFTracker : GenericTracker<long>
     {
 
-        
+
         List<long> _id = new List<long>();
         List<int> _tifs = new List<int>();
         public TIFTracker() : this(new IdTracker()) { }
@@ -25,20 +25,21 @@ namespace TradeLink.Common
         int _tif = 0;
         public int DefaultTif { get { return _tif; } set { _tif = value; } }
         IdTracker _idt = null;
-        Dictionary<string, int> _symidx = new Dictionary<string, int>();
+
         Dictionary<long, int> _ididx = new Dictionary<long, int>();
         List<int> _senttime = new List<int>();
 
         const int NOIDX = -1;
         int _lasttime = 0;
 
-        int symidx(string sym)
-        {
-            int idx = NOIDX;
-            if (_symidx.TryGetValue(sym, out idx))
-                return idx;
-            return idx;
-        }
+        /// <summary>
+        /// gets tif in seconds for a given order id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public int gettif(long id) { return _tifs[_ididx[id]]; }
+
+        public long[] Orderids { get { return _id.ToArray(); } }
 
         void checktifs()
         {
@@ -47,8 +48,15 @@ namespace TradeLink.Common
             // check time
             for (int i = 0; i < _senttime.Count; i++)
             {
+                // skip if order has been canceled/filled
+                if (_id[i] == 0)
+                    continue;
+                // skip if tif is zero
+                int tif = _tifs[i];
+                if (tif == 0)
+                    continue;
                 int diff = Util.FTDIFF(_senttime[i], _lasttime);
-                if (diff >= _tifs[i])
+                if (diff >= tif)
                 {
                     debug("Tif expired for: " + _id[i]);
                     if (SendCancel != null)
@@ -57,6 +65,42 @@ namespace TradeLink.Common
                         debug("SendCancel unhandled! can't enforce TIF!");
                 }
             }
+        }
+
+        public void GotCancel(long id)
+        {
+            int idx = -1;
+            // not our id
+            if (!_ididx.TryGetValue(id, out idx))
+                return;
+            // mark as canceled
+            _tifs[idx] = 0;
+            // get symbol
+            debug(sym[idx] + " cancel received for: " + id);
+        }
+
+        public void GotFill(Trade fill)
+        {
+            long id = fill.id;
+            int idx = -1;
+            // not our id
+            if (!_ididx.TryGetValue(id, out idx))
+                return;
+            // mark as filled
+            filledsize[idx] += Math.Abs(fill.xsize);
+            // get symbol
+            string sym = fill.symbol;
+            // see if completed
+            if (filledsize[idx] == sentsize[idx])
+            {
+                // mark as done
+                _tifs[idx] = 0;
+                debug(sym + " completely filled: " + id);
+            }
+            else
+                debug(sym + " partial fill: " + id);
+
+
         }
 
         void debug(string msg)
@@ -72,6 +116,11 @@ namespace TradeLink.Common
                 checktifs();
             }
         }
+
+        List<string> sym = new List<string>();
+        List<int> sentsize = new List<int>();
+        List<int> filledsize = new List<int>();
+
         public void SendOrderTIF(Order o, int TIF)
         {
             // update time
@@ -95,11 +144,18 @@ namespace TradeLink.Common
             if (!_ididx.TryGetValue(o.id, out idx))
             {
                 debug("tracking tif for: " + o.id + " " + o.symbol);
-                _symidx.Add(o.symbol, _tifs.Count);
+                int sidx = getindex(o.symbol);
+                if (sidx < 0)
+                    addindex(o.symbol, o.id);
+                else
+                    this[sidx] = o.id;
                 _ididx.Add(o.id, _tifs.Count);
                 _senttime.Add(_lasttime);
                 _tifs.Add(_tif);
                 _id.Add(o.id);
+                sym.Add(o.symbol);
+                sentsize.Add(o.UnsignedSize);
+                filledsize.Add(0);
             }
             // pass order along if required
             if (SendOrder != null)
