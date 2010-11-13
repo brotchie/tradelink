@@ -187,9 +187,9 @@ namespace TradeLink.Common
         /// gets index of label, adding it if it doesn't exist.
         /// </summary>
         /// <param name="txtidx">label</param>
-        /// <param name="initialval">initial value to associate with label</param>
+        /// <param name="initialval">value to associate with label</param>
         /// <returns></returns>
-        public int addindex(string txtidx, T initialval)
+        public int addindex(string txtidx, T val)
         {
             int idx = UNKNOWN;
             if (!_txtidx.TryGetValue(txtidx, out idx))
@@ -197,9 +197,13 @@ namespace TradeLink.Common
                 idx = _tracked.Count;
                 _txt.Add(txtidx);
                 _txtidx.Add(txtidx, idx);
-                _tracked.Add(initialval);
+                _tracked.Add(val);
                 if (NewTxt != null)
                     NewTxt(txtidx, idx);
+            }
+            else
+            {
+                _tracked[idx] = val;
             }
             return idx;
         }
