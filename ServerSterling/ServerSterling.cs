@@ -686,6 +686,8 @@ namespace SterServer
             long id = 0;
             if (long.TryParse(t.bstrClOrderId, out id))
                 f.id = id;
+            else
+                f.id = t.nOrderRecordId;
             f.xprice = (decimal)t.fExecPrice;
             f.xsize = t.nQuantity;
             long now = Convert.ToInt64(t.bstrUpdateTime);
@@ -715,13 +717,16 @@ namespace SterServer
             doorderupdate(ref structOrderUpdate);
         }
 
+
         void doorderupdate(ref structSTIOrderUpdate structOrderUpdate)
         {
             Order o = new OrderImpl();
             o.symbol = structOrderUpdate.bstrSymbol;
             long id = 0;
             if (!long.TryParse(structOrderUpdate.bstrClOrderId, out id))
+            {
                 id = (long)structOrderUpdate.nOrderRecordId;
+            }
             // if this is a cancel notification, pass along
             if (structOrderUpdate.nOrderStatus == (int)STIOrderStatus.osSTICanceled)
             {
