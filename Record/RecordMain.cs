@@ -44,14 +44,17 @@ namespace Record
             ContextMenu.MenuItems.Add("Timeout", new EventHandler(timeout));
             ContextMenu.MenuItems.Add("ReportBug", new EventHandler(report));
             ContextMenu.MenuItems.Add("Messages", new EventHandler(togdebug));
-            if (tl.BrokerName!= Providers.TradeLink )
+            if (tl.ProvidersAvailable.Length > 0)
             {
-                if (Environment.ProcessorCount == 1)
-                    tl.gotTick += new TickDelegate(tl_gotTick);
-                else
+                if (tl.BrokerName != Providers.TradeLink)
                 {
-                    tl.gotTick += new TickDelegate(tl_gotTick2);
-                    _ar.GotTick+=new TickDelegate(tl_gotTick);
+                    if (Environment.ProcessorCount == 1)
+                        tl.gotTick += new TickDelegate(tl_gotTick);
+                    else
+                    {
+                        tl.gotTick += new TickDelegate(tl_gotTick2);
+                        _ar.GotTick += new TickDelegate(tl_gotTick);
+                    }
                 }
             }
             TradeLink.AppKit.Versions.UpgradeAlert(tl);
