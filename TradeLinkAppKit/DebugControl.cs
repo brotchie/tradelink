@@ -18,7 +18,7 @@ namespace TradeLink.AppKit
         public DebugControl(bool timestamp)
         {
             InitializeComponent();
-
+            toggleselectall();
         }
         public string Content { get { return sb.ToString(); } }
         StringBuilder sb = new StringBuilder();
@@ -29,6 +29,20 @@ namespace TradeLink.AppKit
         string search = string.Empty;
         int sidx = 0;
         int lastsidx = -1;
+
+        bool selall = true;
+        void toggleselectall()
+        {
+            selall = !selall;
+            if (selall)
+            {
+                for (int i = 0; i < _msg.Items.Count; i++)
+                    _msg.SelectedIndices.Add(i);
+            }
+            else
+                _msg.SelectedIndices.Clear();
+            Invalidate(true);
+        }
 
         void update()
         {
@@ -72,6 +86,17 @@ namespace TradeLink.AppKit
                         sidx = 0;
                     // go to next one
                     update();
+                }
+                else if (keyData == (Keys.A | Keys.Control))
+                {
+                    toggleselectall();
+                }
+                else if (keyData == (Keys.C | Keys.Control))
+                {
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < _msg.SelectedItems.Count; i++)
+                        sb.AppendLine(_msg.SelectedItems[i].ToString());
+                    Clipboard.SetText(sb.ToString());
                 }
                 else if ((keyData == Keys.OemPipe))
                 {

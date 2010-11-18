@@ -39,6 +39,7 @@
             this._msg.ItemHeight = 20;
             this._msg.Location = new System.Drawing.Point(0, 0);
             this._msg.Name = "_msg";
+            this._msg.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this._msg.Size = new System.Drawing.Size(150, 144);
             this._msg.TabIndex = 0;
             // 
