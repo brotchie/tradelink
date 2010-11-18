@@ -22,9 +22,41 @@ namespace TradeLink.Common
         /// gets count of items being tracked
         /// </summary>
         public int Count { get { return _tracked.Count; } }
+        /// <summary>
+        /// reset all tracked values to their default value
+        /// </summary>
+        public void Reset()
+        {
+            for (int i = 0; i < _tracked.Count; i++)
+                _tracked[i] = Default;
+        }
+        /// <summary>
+        /// reset given index to it's default value
+        /// </summary>
+        /// <param name="idx"></param>
+        public void Reset(int idx)
+        {
+            _tracked[idx] = Default;
+        }
+        /// <summary>
+        /// reset given label to it's default value
+        /// </summary>
+        /// <param name="txt"></param>
+        public void Reset(string txt)
+        {
+            int idx = getindex(txt);
+            _tracked[idx] = Default;
+        }
 
+        T _defval = default(T);
+        /// <summary>
+        /// gets default value for a given type
+        /// </summary>
+        public T Default { get { return _defval; } set { _defval = value; } }
 
-        public Type TrackedType { get 
+        public Type TrackedType
+        {
+            get 
         {
             T val = default(T);
             return val.GetType();
@@ -183,6 +215,16 @@ namespace TradeLink.Common
         /// <param name="idx"></param>
         /// <returns></returns>
         public string getlabel(int idx) { return _txt[idx]; }
+        /// <summary>
+        /// gets index of a label, adding it if it doesn't exist.
+        /// initial value associated with index will be Default
+        /// </summary>
+        /// <param name="txt"></param>
+        /// <returns></returns>
+        public int addindex(string txt)
+        {
+            return addindex(txt, Default);
+        }
         /// <summary>
         /// gets index of label, adding it if it doesn't exist.
         /// </summary>

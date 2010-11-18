@@ -46,6 +46,13 @@ namespace TradeLink.API
         /// get total number of labels/values
         /// </summary>
         int Count { get; }
+        /// <summary>
+        /// gets index associated with a given label, adding index if it doesn't exist
+        /// (default value of index will be used)
+        /// </summary>
+        /// <param name="txt"></param>
+        /// <returns></returns>
+        int addindex(string txt);
 
         /// <summary>
         /// gets value of given index
