@@ -205,7 +205,7 @@ namespace TradeLibFast
 				// get contract
 				Contract contract;
 				TLSecurity sec = TLSecurity::Deserialize(br.Symbol);
-				getcontract(br.Symbol,CString(""),sec.sym,sec.dest,&contract);
+				getcontract(br.Symbol,_currency,sec.sym,sec.dest,&contract);
 				// get request duration
 				std::vector<int> st;
 				std::vector<int> et;
@@ -223,7 +223,7 @@ namespace TradeLibFast
 				int weeks = (int)(((double)ts.GetDays())/(double)7);
 				
 				CString edt;
-				edt.Format("%i %i:%i:%i",br.StartDate,st[2],st[1],st[0]);
+				edt.Format("%i %i:%i:%i",br.EndDate,et[2],et[1],et[0]);
 				// get duration
 				CString dur;
 				if (usesec)
