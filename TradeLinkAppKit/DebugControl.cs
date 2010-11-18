@@ -29,6 +29,7 @@ namespace TradeLink.AppKit
         string search = string.Empty;
         int sidx = 0;
         int lastsidx = -1;
+
         void update()
         {
             string[] r = sb.ToString().ToUpper().Split(Environment.NewLine.ToCharArray(),  StringSplitOptions.RemoveEmptyEntries);
@@ -62,11 +63,15 @@ namespace TradeLink.AppKit
         {
             if (_oksearch)
             {
+                string csearch = search;
+                bool updateok = true;
                 if (keyData == Keys.Enter)
                 {
                     sidx++;
                     if (sidx == _msg.Items.Count)
                         sidx = 0;
+                    // go to next one
+                    update();
                 }
                 else if ((keyData == Keys.OemPipe))
                 {
@@ -83,6 +88,9 @@ namespace TradeLink.AppKit
                 else if ((keyData == Keys.Escape) || (keyData == Keys.Delete))
                 {
                     search = "";
+                    // don't modify screen if deleting search term
+                    updateok = false;
+                    newsearch();
                 }
                 else if ((keyData == Keys.Back) && (search.Length > 0))
                 {
@@ -108,8 +116,9 @@ namespace TradeLink.AppKit
                 {
                     search += "-";
                 }
-                // go to next one
-                update();
+                // if there was a change
+                if (updateok && (csearch!=search))
+                    update();
             }
             return base.ProcessCmdKey(ref msg, keyData);
         }
