@@ -2,7 +2,7 @@
 7496	
 // max number of TWS to connect to
 5	
-// session number (0 = ALLORDERS, 1 = FROM THIS MACHINE ONLY)
+// clientid (0 = ALLORDERS, 1 = FROM THIS MACHINE ONLY)
 0
 // default currency
 USD
