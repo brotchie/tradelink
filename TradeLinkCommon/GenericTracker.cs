@@ -4,6 +4,7 @@ using System.Collections;
 using System.Text;
 using System.IO;
 using TradeLink.API;
+using System.Net;
 
 namespace TradeLink.Common
 {
@@ -454,6 +455,24 @@ namespace TradeLink.Common
         }
 
         /// <summary>
+        /// gets all current values of every tracker for every symbol being tracked
+        /// </summary>
+        /// <param name="gts"></param>
+        /// <returns></returns>
+        public static string GetIndicatorPairs(params GenericTrackerI[] gts)
+        {
+            if (gts.Length == 0) 
+                return string.Empty;
+            // get first tracker
+            GenericTrackerI gt = gts[0];
+            // use to index every symbol
+            StringBuilder all = new StringBuilder();
+            for (int i = 0; i < gt.Count; i++)
+                all.AppendLine(GetIndicatorPairs(i, gts));
+            return all.ToString();
+        }
+
+        /// <summary>
         /// get single readable line of indicators for output when response debugging
         /// </summary>
         /// <param name="idx"></param>
@@ -782,6 +801,253 @@ namespace TradeLink.Common
             }
             return display.ToArray();
         }
+
+
+        public static string get(string url) { return get(url, true, 3); }
+        public static string get(string url, bool removenewlines, int retries)
+        {
+            bool retry = true;
+            int count = 0;
+            string data = string.Empty;
+            while (retry && (count++ < retries))
+            {
+                try
+                {
+                    WebClient wc = new WebClient();
+                    data = wc.DownloadString(url);
+                    retry = data != string.Empty;
+                }
+                catch (Exception ex)
+                {
+                    retry = true;
+                    System.Threading.Thread.Sleep(100);
+                }
+                if (removenewlines)
+                {
+                    data = data.Replace(Environment.NewLine, " ");
+                    data = data.Replace("\n", " ");
+                }
+
+            }
+            return data;
+        }
+
+        const string ROWDELIM = "rowdelimROWDELIM";
+        const string COLDELIM = "coldelimCOLDELIM";
+
+        static string[] tablerows(string table) { return tablerows(table, true); }
+        static string[] tablerows(string table, bool ignorefirstrow)
+        {
+            string[] data = table.Split(new string[] { ROWDELIM }, StringSplitOptions.RemoveEmptyEntries);
+            if (!ignorefirstrow)
+                return data;
+            string[] d2 = new string[data.Length - 1];
+            Array.Copy(data, 1, d2, 0, data.Length - 1);
+            return d2;
+        }
+
+        static string[] tablecols(string row)
+        {
+            return row.Split(new string[] { COLDELIM }, StringSplitOptions.RemoveEmptyEntries);
+        }
+
+        static string StripHtml(string text)
+        {
+            return System.Text.RegularExpressions.Regex.Replace(text, @"<(.|\n)*?>", string.Empty);
+        }
+
+        static string slice(string data, string begintag, string endtag, bool includestart, bool includeend)
+        {
+            int start = data.IndexOf(begintag);
+            string news = data;
+            if (start != -1)
+                news = data.Remove(0, includestart ? start : start + begintag.Length);
+            int end = news.IndexOf(endtag);
+            string newe = news;
+
+            if (end != -1)
+                newe = news.Remove(end + (includeend ? endtag.Length : 0), news.Length - (includeend ? end - endtag.Length : end));
+            return newe;
+        }
+        /// <summary>
+        /// import a url into a generic tracker
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="csvfile"></param>
+        /// <param name="gt"></param>
+        /// <returns></returns>
+        public static bool TBLInitGeneric<T>(string url, ref GenericTracker<T> gt) { return TBLInitGeneric(url, true, ref gt, 0, default(T), ',', null); }
+        /// <summary>
+        /// import a url into a generic tracker
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="csvfile"></param>
+        /// <param name="gt"></param>
+        /// <param name="coldefault"></param>
+        /// <returns></returns>
+        public static bool TBLInitGeneric<T>(string url, ref GenericTracker<T> gt, T coldefault) { return TBLInitGeneric(url, true, ref gt, 0, coldefault, ',', null); }
+        /// <summary>
+        /// import a url into a generic tracker
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="csvfile"></param>
+        /// <param name="hasheader"></param>
+        /// <param name="gt"></param>
+        /// <param name="symcol"></param>
+        /// <param name="coldefault"></param>
+        /// <returns></returns>
+        public static bool TBLInitGeneric<T>(string url, bool hasheader, ref GenericTracker<T> gt, int symcol, T coldefault) { return TBLInitGeneric(url, hasheader, ref gt, symcol, coldefault, ',', null); }
+        /// <summary>
+        /// import a csv file into a generic tracker
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="csvfile"></param>
+        /// <param name="hasheader"></param>
+        /// <param name="gt"></param>
+        /// <param name="symcol"></param>
+        /// <param name="coldefault"></param>
+        /// <param name="delim"></param>
+        /// <returns></returns>
+
+        public static bool TBLInitGeneric<T>(string url, bool hasheader, ref GenericTracker<T> gt, int symcol, T coldefault, char delim) { return TBLInitGeneric(url, hasheader, ref gt, symcol, coldefault, delim, null); }
+        public static bool TBLInitGeneric<T>(string url, bool hasheader, ref GenericTracker<T> gt, int symcol, T coldefault, char delim, TradeLink.API.DebugDelegate debug)
+        {
+            try
+            {
+                string data = get(url);
+                int sidx = url.LastIndexOf("/");
+                string starttag = url.Substring(sidx,url.Length-sidx);
+                string endtag = @"<!-- /wiki-content-body -->";
+                data = slice(data, starttag, endtag, false, false);
+                data = data.Replace("</tr>", ROWDELIM);
+                data = data.Replace("</td>", COLDELIM);
+                data = StripHtml(data);
+                string[] rows = tablerows(data, hasheader);
+                for (int r = 0; r < rows.Length; r++)
+                {
+                    string line = string.Empty;
+                    try
+                    {
+                        // get line
+                        line = rows[r];
+                        // get columns
+                        string[] cols = tablecols(line);
+                        // get symbol
+                        string sym = cols[symcol];
+                        // add symbol to tracker 
+                        gt.addindex(sym, coldefault);
+
+                    }
+                    catch (Exception ex)
+                    {
+                        if (debug != null)
+                        {
+                            debug("error on: " + line);
+                            debug(ex.Message + ex.StackTrace);
+                            continue;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (debug != null)
+                {
+                    debug(ex.Message + ex.StackTrace);
+                }
+                return false;
+            }
+            return true;
+        }
+
+
+        public static bool TBLCOL2Generic<T>(string url, ref GenericTracker<T> gt, int col) { return TBLCOL2Generic<T>(url, true, ref gt, 0, col, ',', null); }
+        public static bool TBLCOL2Generic<T>(string url, ref GenericTracker<T> gt, int symcol, int col) { return TBLCOL2Generic<T>(url, true, ref gt, symcol, col, ',', null); }
+        public static bool TBLCOL2Generic<T>(string url, bool hasheader, ref GenericTracker<T> gt, int symcol, int col) { return TBLCOL2Generic<T>(url, hasheader, ref gt, symcol, col, ',', null); }
+        public static bool TBLCOL2Generic<T>(string url, bool hasheader, ref GenericTracker<T> gt, int symcol, int col, T coldefaultOnFail) { return TBLCOL2Generic<T>(url, hasheader, ref gt, symcol, col, ',', null); }
+        public static bool TBLCOL2Generic<T>(string url, bool hasheader, ref GenericTracker<T> gt, int symcol, int col, T coldefaultOnFail, char delim) { return TBLCOL2Generic<T>(url, hasheader, ref gt, symcol, col, delim, null); }
+        /// <summary>
+        /// import url column to a generic tracker value
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="url"></param>
+        /// <param name="hasheader"></param>
+        /// <param name="gt"></param>
+        /// <param name="symcol"></param>
+        /// <param name="col"></param>
+        /// <param name="coldefaultOnFail"></param>
+        /// <param name="delim"></param>
+        /// <param name="debug"></param>
+        /// <returns></returns>
+        public static bool TBLCOL2Generic<T>(string url, bool hasheader, ref GenericTracker<T> gt, int symcol, int col, char delim, TradeLink.API.DebugDelegate debug)
+        {
+            try
+            {
+                string data = get(url);
+                int sidx = url.LastIndexOf("/");
+                string starttag = url.Substring(sidx, url.Length - sidx);
+                string endtag = @"<!-- /wiki-content-body -->";
+                data = slice(data, starttag, endtag, false, false);
+                data = data.Replace("</tr>", ROWDELIM);
+                data = data.Replace("</td>", COLDELIM);
+                data = StripHtml(data);
+                string[] rows = tablerows(data, hasheader);
+                for (int r = 0; r<rows.Length; r++)
+                {
+                    string line = string.Empty;
+                    try
+                    {
+                        // get line
+                        line = rows[r];
+                        // get columns
+                        string[] cols = tablecols(line);
+                        // see if this is a symbol column
+                        // bool issym = symcol==col;
+                        // get symbol
+                        string sym = cols[symcol];
+                        // add symbol to tracker 
+                        int idx = gt.getindex(sym);
+                        // skip if we don't know the symbol
+                        if (idx < 0)
+                            continue;
+                        // otherwise get column data
+                        string coldata = cols[col];
+                        // save it
+                        try
+                        {
+                            gt[idx] = (T)Convert.ChangeType(coldata, typeof(T));
+                        }
+                        catch (InvalidCastException)
+                        {
+
+                        }
+                        // thanks to : http://predicatet.blogspot.com/2009/04/c-string-to-generic-type-conversion.html
+
+                    }
+                    catch (Exception ex)
+                    {
+                        if (debug != null)
+                        {
+                            debug("error on: " + line);
+                            debug(ex.Message + ex.StackTrace);
+                            continue;
+                        }
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                if (debug != null)
+                {
+                    debug(ex.Message + ex.StackTrace);
+                }
+                return false;
+            }
+            return true;
+
+        }
+
 
 
     }
