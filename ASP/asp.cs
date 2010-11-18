@@ -228,7 +228,10 @@ namespace ASP
 
         void _ao_TimeoutChanged(int val)
         {
-            _tlt.AlertThreshold = val;
+            if (_tlt != null)
+                _tlt.AlertThreshold = val;
+            else
+                debug("Timeout changes will not take effect until feed is connected.");
         }
 
         void _tlt_GotDebug(string msg)
