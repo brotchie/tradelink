@@ -110,25 +110,39 @@ namespace TradeLink.Common
         /// most recent time received
         /// </summary>
         public int RecentTime { get { return _lasttime; } }
+
+        int _ticks = 0;
+        /// <summary>
+        /// gets count of ticks which have passed through watcher
+        /// </summary>
+        public int TickCount { get { return _ticks; } }
         /// <summary>
         /// Watches the specified tick.
         /// Alerts if wait time exceeded.
         /// </summary>
         /// <param name="tick">The tick.</param>
         /// <returns></returns>
-        public bool newTick(Tick tick) 
+        public bool newTick(Tick k) 
         {
-            _lasttime = tick.time;
+            _lasttime = k.time;
+            if (_livecheck && (_ticks++ > CheckLiveAfterTickCount))
+            {
+                bool dmatch = k.date == Util.ToTLDate();
+                bool tmatch = Util.FTDIFF(k.time, Util.ToTLTime()) < CheckLiveMaxDelaySec;
+                _islive = dmatch && tmatch;
+                _livecheck = false;
+
+            }
             if ((AllsymbolsTicking != null) || (GotAlert != null) || (GotFirstTick != null))
             {
-                int last = tick.time;
+                int last = k.time;
                 // ensure we are storing per-symbol times
-                if (!_last.TryGetValue(tick.symbol, out last))
+                if (!_last.TryGetValue(k.symbol, out last))
                 {
-                    _last.Add(tick.symbol, tick.time);
+                    _last.Add(k.symbol, k.time);
                     if (_alertonfirst) // if we're notifying when first tick arrives, do it.
                         if (GotFirstTick != null)
-                            GotFirstTick(tick.symbol);
+                            GotFirstTick(k.symbol);
                     if (_ast != null)
                     {
                         if (!alltrading && (_ast.Count == Count))
@@ -138,20 +152,20 @@ namespace TradeLink.Common
                                 AllsymbolsTicking(Util.ToTLTime());
                         }
                     }
-                    last = tick.time;
+                    last = k.time;
                     return false;
                 }
                 // if alerts requested, check for idle symbol
                 if (GotAlert != null)
                 {
-                    int span = Util.FTDIFF(last, tick.time);
+                    int span = Util.FTDIFF(last, k.time);
                     bool alert = span > _defaultwait;
                     if (alert)
-                        GotAlert(tick.symbol);
+                        GotAlert(k.symbol);
                     return alert;
                 }
                 // store time
-                _last[tick.symbol] = tick.time;
+                _last[k.symbol] = k.time;
             }
             return false; 
         }
@@ -203,6 +217,9 @@ namespace TradeLink.Common
         public int BackgroundPollInterval { get { return (int)_pollint; } set { _pollint = (long)Math.Abs(value); if (_pollint == 0) Stop(); } }
         public TickWatcher(int BackgroundPollIntervalms) : this(BackgroundPollIntervalms,null) { }
         public TickWatcher() : this(DEFAULTPOLLINT,null) { }
+        public TickWatcher(bool islive) : this(islive ? DEFAULTPOLLINT : 0, null) { }
+        public TickWatcher(bool islive, GenericTrackerI symtracker) : this(islive ? DEFAULTPOLLINT : 0, symtracker) { }
+        public TickWatcher(GenericTrackerI symboltracker) : this(DEFAULTPOLLINT, symboltracker) { }
         /// <summary>
         /// creates a tickwatcher and polls specificed millseconds
         /// if timer has expired, sends alert.
@@ -304,6 +321,21 @@ namespace TradeLink.Common
                 System.Threading.Thread.Sleep((int)_pollint);
             }
         }
+
+        int _livecheckafterXticks = 1;
+        /// <summary>
+        /// wait to do live test after X ticks have arrived
+        /// </summary>
+        public int CheckLiveAfterTickCount { get { return _livecheckafterXticks; } set { _livecheckafterXticks = value; } }
+        int _livetickdelaymax = 60;
+        /// <summary>
+        /// if a tick is within this many seconds of current system time on same day, tick stream is considered live and reports can be sent
+        /// </summary>
+        public int CheckLiveMaxDelaySec { get { return _livetickdelaymax; } set { _livetickdelaymax = value; } }
+        bool _livecheck = true;
+        bool _islive = false;
+        public bool isLive { get { return _islive; } }
+
 
         public void Stop()
         {
