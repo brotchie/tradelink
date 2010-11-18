@@ -202,6 +202,7 @@ namespace Kadina
             long date = (h.NextTickTime / 100000)*100000;
             int t = (int)type;
             long val = 0;
+            pt = type;
             switch (type)
             {
                 case PlayTo.End : 
@@ -214,15 +215,47 @@ namespace Kadina
                     val = date + Util.FTADD(time, (t / 10)*60);
                     break;
                 case PlayTo.Hour:
-                    val = date + Util.FTADD(time,(t/1000)*3660);
+                    val = date + Util.FTADD(time,(t/1000)*3600);
+                    break;
+                case PlayTo.TwoHour:
+                    val = date + Util.FTADD(time, 2 * 60 * 60);
+                    break;
+                case PlayTo.FourHour:
+                    val = date + Util.FTADD(time, 4 * 60 * 60);
                     break;
                 case PlayTo.OneSec:
                 case PlayTo.ThirtySec:
                     val = date+ Util.FTADD(time, t); 
                     break;
+                case PlayTo.Custom:
+                    int ctime = getcusttime();
+                    if (ctime == 0)
+                    {
+                        pt = PlayTo.OneSec;
+                        val = 0;
+                        status("Invalid custom time, playing to next second.");
+                    }
+                    else 
+                        val = date + ctime;
+                    break;
             }
             cleardebugs(); // clear the message box on first box run
             h.PlayTo(val);
+        }
+
+        delegate int intvoiddel();
+        int getcusttime()
+        {
+            if (InvokeRequired)
+                return (int)Invoke(new intvoiddel(getcusttime));
+            else
+            {
+                string cts = Microsoft.VisualBasic.Interaction.InputBox("Enter PlayTo Time: (eg 4:15:01pm = 161501)", "Custom Play Time", "161501", 0, 0);
+                int ct = 0;
+                if (int.TryParse(cts, out ct))
+                    return ct;
+                return 0;
+            }
         }
 
         void cleardebugs()
@@ -946,6 +979,21 @@ namespace Kadina
             Properties.Settings.Default.pw = p;
             Properties.Settings.Default.Save();
         }
+
+        private void twohour_Click(object sender, EventArgs e)
+        {
+            playto(PlayTo.TwoHour);
+        }
+
+        private void fourhour_Click(object sender, EventArgs e)
+        {
+            playto(PlayTo.FourHour);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            playto(PlayTo.Custom);
+        }
     }
 
     enum PlayTo
@@ -958,6 +1006,9 @@ namespace Kadina
         TenMin = 100,
         HalfHour = 300,
         Hour = 1000,
+        TwoHour,
+        FourHour,
+        Custom,
         End,
 
     }
