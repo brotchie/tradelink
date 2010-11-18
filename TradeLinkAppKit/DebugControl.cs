@@ -57,13 +57,21 @@ namespace TradeLink.AppKit
             }
             if (lastsidx != -1)
             {
-                _msg.SetSelected(lastsidx, false);
-                lastsidx = -1;
+                try
+                {
+                    _msg.SetSelected(lastsidx, false);
+                    lastsidx = -1;
+                }
+                catch { }
             }
             if (sidx != lastsidx)
             {
-                _msg.SetSelected(sidx, true);
-                lastsidx = sidx;
+                try
+                {
+                    _msg.SetSelected(sidx, true);
+                    lastsidx = sidx;
+                }
+                catch { }
             }
             newsearch();
         }
