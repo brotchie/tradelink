@@ -16,7 +16,16 @@ namespace TradeLink.AppKit
         {
             InitializeComponent();
             debugControl1.NewSearchEvent += new TradeLink.API.DebugDelegate(debugControl1_NewSearchEvent);
+            debugControl1.NewCreateTicketEvent += new TradeLink.API.DebugDelegate(debugControl1_NewCreateTicketEvent);
         }
+
+        void debugControl1_NewCreateTicketEvent(string msg)
+        {
+            if (NewCreateTicketEvent != null)
+                NewCreateTicketEvent(msg);
+        }
+
+        public event TradeLink.API.DebugDelegate NewCreateTicketEvent;
 
         void debugControl1_NewSearchEvent(string msg)
         {

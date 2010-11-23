@@ -18,7 +18,18 @@ namespace TradeLink.AppKit
         public DebugControl(bool timestamp)
         {
             InitializeComponent();
+            ContextMenu = new ContextMenu();
+            ContextMenu.MenuItems.Add("Create Ticket", new EventHandler(createticket));
             toggleselectall();
+        }
+        public event DebugDelegate NewCreateTicketEvent;
+
+        void createticket(object o, EventArgs e)
+        {
+            if (NewCreateTicketEvent != null)
+            {
+                NewCreateTicketEvent(selectedtext());
+            }
         }
         public string Content { get { return sb.ToString(); } }
         StringBuilder sb = new StringBuilder();
@@ -81,6 +92,13 @@ namespace TradeLink.AppKit
             if (NewSearchEvent != null)
                 NewSearchEvent(search);
         }
+        string selectedtext()
+        {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < _msg.SelectedItems.Count; i++)
+                sb.AppendLine(_msg.SelectedItems[i].ToString());
+            return sb.ToString();
+        }
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (_oksearch)
@@ -101,10 +119,7 @@ namespace TradeLink.AppKit
                 }
                 else if (keyData == (Keys.C | Keys.Control))
                 {
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < _msg.SelectedItems.Count; i++)
-                        sb.AppendLine(_msg.SelectedItems[i].ToString());
-                    Clipboard.SetText(sb.ToString());
+                    Clipboard.SetText(selectedtext());
                 }
                 else if ((keyData == Keys.OemPipe))
                 {

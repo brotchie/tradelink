@@ -83,6 +83,7 @@ namespace ASP
             _remskin.Click+=new EventHandler(_remskin_Click);
             _saveskins.Click+=new EventHandler(_saveskins_Click);
             _skins.SelectedIndexChanged+=new EventHandler(_skins_SelectedIndexChanged);
+            _dw.NewCreateTicketEvent += new DebugDelegate(_dw_NewCreateTicketEvent);
             _ar.GotTick += new TickDelegate(tl_gotTick);
             _ar.GotBadTick += new VoidDelegate(_ar_GotBadTick);
             _ar.GotTickOverrun += new VoidDelegate(_ar_GotTickOverrun);
@@ -119,6 +120,11 @@ namespace ASP
             // process command line
             processcommands();
 
+        }
+
+        void _dw_NewCreateTicketEvent(string msg)
+        {
+            ATW.Report(_ao._portal.Text, _dw.Content, null, msg, Properties.Settings.Default.un, Properties.Settings.Default.pw, new AssemblaTicketWindow.LoginSucceedDel(success), false, ATW.Summary(_ao._portal.Text));
         }
 
 

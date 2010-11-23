@@ -55,7 +55,7 @@ namespace Kadina
             h.SimBroker.UseBidAskFills = Properties.Settings.Default.UseBidAskFills;
             InitializeComponent();
             initgrids();
-            
+            debugControl1.NewCreateTicketEvent += new DebugDelegate(debugControl1_NewCreateTicketEvent);
             sizetabs();
             restorerecentfiles();
             restorerecentlibs();
@@ -77,6 +77,11 @@ namespace Kadina
             fg.DataError += new DataGridViewDataErrorEventHandler(fg_DataError);
             og.DataError += new DataGridViewDataErrorEventHandler(og_DataError);
             pg.DataError += new DataGridViewDataErrorEventHandler(pg_DataError);
+        }
+
+        void debugControl1_NewCreateTicketEvent(string msg)
+        {
+            TradeLink.AppKit.ATW.Report(Properties.Settings.Default.portal, debugControl1.Content, null,msg,Properties.Settings.Default.user, Properties.Settings.Default.pw, new TradeLink.AppKit.AssemblaTicketWindow.LoginSucceedDel(kadinamain.success), true,ATW.Summary(Properties.Settings.Default.portal));
         }
 
         void bw2_DoWork(object sender, DoWorkEventArgs e)
@@ -356,7 +361,6 @@ namespace Kadina
             pg.Parent = postab;
             pg.DataSource = ptab;
             pg.RowHeadersVisible = false;
-            pg.ContextMenu = ContextMenu;
             pg.ReadOnly = true;
             pg.AllowUserToAddRows = false;
             pg.AllowUserToDeleteRows = false;
@@ -382,7 +386,6 @@ namespace Kadina
             obs.DataSource = ot;
             og.DataSource = obs;
             og.RowHeadersVisible = false;
-            og.ContextMenu = ContextMenu;
             og.ReadOnly = true;
             og.AllowUserToAddRows = false;
             og.AllowUserToDeleteRows = false;
@@ -408,7 +411,6 @@ namespace Kadina
             fbs.DataSource = ft;
             fg.DataSource = fbs;
             fg.RowHeadersVisible = false;
-            fg.ContextMenu = ContextMenu;
             fg.ReadOnly = true;
             fg.AllowUserToAddRows = false;
             fg.AllowUserToDeleteRows = false;
@@ -437,7 +439,6 @@ namespace Kadina
             dt.Columns.Add("TExch");
             dt.Columns.Add("BidExch");
             dt.Columns.Add("AskExch");
-            dg.ContextMenu = this.ContextMenu;
             tbs.DataSource = dt;
             dg.DataSource = tbs;
             dg.AllowUserToAddRows = false;
@@ -464,7 +465,6 @@ namespace Kadina
             ig.ScrollBars = ScrollBars.Both;
             ig.DataSource = ibs;
             ig.RowHeadersVisible = false;
-            ig.ContextMenu = this.ContextMenu;
             ig.ReadOnly = true;
             ig.Width = itab.Width;
             ig.Height = itab.Height;
@@ -503,11 +503,34 @@ namespace Kadina
             // clear existing indicators
             it.Clear();
             it.Columns.Clear();
+            ig.ContextMenuStrip = new ContextMenuStrip();
+            ig.ContextMenuStrip.Items.Add("Create Ticket", null,new EventHandler(getindicatorrows));
             // load new ones
             for (int i = 0; i < myres.Indicators.Length; i++)
                 it.Columns.Add(myres.Indicators[i]);
             // refresh screen
                 ig.Invalidate();
+        }
+
+        void getindicatorrows(object o, EventArgs e)
+        {
+            // get selected indicator data
+            StringBuilder sb = new StringBuilder();
+            // get header
+            sb.AppendLine(string.Join("\t",myres.Indicators));
+            int lr = -1;
+            foreach (DataGridViewCell cell in ig.SelectedCells)
+            {
+                if ((cell==null) || (cell.Value==null))
+                    continue;
+                bool newrol = (lr!=-1) && (cell.RowIndex!=lr);
+                lr = cell.RowIndex;
+                if (newrol)
+                    sb.AppendLine();
+                sb.Append(cell.Value.ToString()+"\t");
+            }
+            // throw ticket
+            debugControl1_NewCreateTicketEvent(sb.ToString());
         }
 
 

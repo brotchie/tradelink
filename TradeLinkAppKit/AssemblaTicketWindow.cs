@@ -17,11 +17,11 @@ namespace TradeLink.AppKit
             InitializeComponent();
             
         }
-        static string Desc(string space)
+        public static string Summary(string space)
         {
             return space + " " + TradeLink.Common.Util.ToTLDate(DateTime.Now).ToString() + ":" + TradeLink.Common.Util.DT2FT(DateTime.Now).ToString();
         }
-        public AssemblaTicketWindow(string space, string user, string pass, string description, string data) : this(space, user, pass, description, data, Desc(space)) { }
+        public AssemblaTicketWindow(string space, string user, string pass, string description, string data) : this(space, user, pass, description, data, Summary(space)) { }
         
         public AssemblaTicketWindow(string space, string user, string pass, string description, string data,string summary)
         {
@@ -30,12 +30,13 @@ namespace TradeLink.AppKit
             assemblaTicketControl1.TicketSucceed += new TradeLink.API.VoidDelegate(assemblaTicketControl1_TicketSucceed);
             assemblaTicketControl1.Update(space, summary, data, description,user,pass);
         }
-
-        static string templatequest() { return templatequest(string.Empty); }
-        static string templatequest(string reportdata)
+        public const string LINE = "\r\n---------------------------------------------------------\r\n" ;
+        public static string templatequest()
         {
-            return "what was expected, and what happened instead?"+Environment.NewLine+Environment.NewLine+"What steps lead you to seeing this?" + Environment.NewLine + Environment.NewLine + "1. " + Environment.NewLine + "2." + Environment.NewLine + "3." + Environment.NewLine + Environment.NewLine + "---------------------------------------------------------" + Environment.NewLine + reportdata;
+            return "what was expected, and what happened instead?"+Environment.NewLine+Environment.NewLine+"What steps lead you to seeing this?" + Environment.NewLine + Environment.NewLine + "1. " + Environment.NewLine + "2." + Environment.NewLine + "3." +Environment.NewLine;
         }
+
+
         public static string LogData(string path)
         {
             try
@@ -55,13 +56,40 @@ namespace TradeLink.AppKit
         public static void Report(string space, string data, Exception ex, bool showtemplate) { Report(space, data, ex, showtemplate, string.Empty, string.Empty,null,false); }
         public static void Report(string space, string data, Exception ex, bool showtemplate, string user, string pass, LoginSucceedDel handlesuceed, bool pause)
         {
-            Report(space, data, ex, showtemplate, user, pass, handlesuceed, pause,Desc(space));
+            Report(space, data, ex, showtemplate, user, pass, handlesuceed, pause,Summary(space));
+        }
+        public static string Header() { return Header("n/a", null); }
+        public static string Header(string product) { return Header(product, null); }
+        public static string Header(string product,Exception ex)
+        {
+            string[] r = new string[] { 
+                "Product:" + product, 
+                "Exception:" + (ex != null ? ex.Message : "n/a"), 
+                "StackTrace:" + (ex != null ? ex.StackTrace : "n/a"), 
+                "CommandLine:" + Environment.CommandLine, 
+                "OS:" + Environment.OSVersion.VersionString + " " + (IntPtr.Size * 8).ToString() + "bit", 
+                "CLR:" + Environment.Version.ToString(4), 
+                "TradeLink:" + TradeLink.Common.Util.TLSIdentity(), 
+                "Memory:" + Environment.WorkingSet.ToString(), 
+                "Processors:" + Environment.ProcessorCount.ToString(), 
+                "MID:" + Auth.GetNetworkAddress(), 
+                "Date/Time: " + TradeLink.Common.Util.ToTLDate() + "/" + TradeLink.Common.Util.ToTLTime(), 
+                "Culture: " + System.Globalization.CultureInfo.CurrentCulture.EnglishName };
+            string desc = LINE+string.Join(Environment.NewLine, r)+LINE;
+            return desc;
+
+
         }
         public static void Report(string space, string data, Exception ex, bool showtemplate, string user, string pass, LoginSucceedDel handlesuceed, bool pause,string summary)
         {
-            string[] r = new string[] { "Product:" + space, "Exception:" + (ex != null ? ex.Message : "n/a"), "StackTrace:" + (ex != null ? ex.StackTrace : "n/a"), "CommandLine:" + Environment.CommandLine, "OS:" + Environment.OSVersion.VersionString + " " + (IntPtr.Size * 8).ToString() + "bit", "CLR:" + Environment.Version.ToString(4), "TradeLink:" + TradeLink.Common.Util.TLSIdentity(), "Memory:" + Environment.WorkingSet.ToString(), "Processors:" + Environment.ProcessorCount.ToString(), "MID:" + Auth.GetNetworkAddress(), "Date/Time: " + TradeLink.Common.Util.ToTLDate() + "/" + TradeLink.Common.Util.ToTLTime(), "Culture: " + System.Globalization.CultureInfo.CurrentCulture.EnglishName };
-            string desc = string.Join(Environment.NewLine, r);
-            AssemblaTicketWindow atw = new AssemblaTicketWindow(space, user, pass, showtemplate ? templatequest(desc) : desc,data,summary);
+            Report(space, data, ex, (showtemplate ? templatequest() : string.Empty), user, pass, handlesuceed, pause,summary); 
+        }
+        public static void Report(string space, string data, Exception ex, string highlight, string user, string pass, LoginSucceedDel handlesuceed, bool pause,string summary)
+        {
+            string header = Header(space, ex);
+            AssemblaTicketWindow atw = 
+                new AssemblaTicketWindow(space, user, pass, 
+                    highlight + header,data,summary);
             if (ex != null)
             {
                 atw.Text = "Create ticket for crash report";
