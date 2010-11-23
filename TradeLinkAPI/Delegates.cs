@@ -3,6 +3,7 @@
 
 namespace TradeLink.API
 {
+    public delegate void BoolDelegate(bool v);
     public delegate void TextIdxDelegate(string txt, int idx);
     public delegate void SymDelegate(string sym);
     public delegate void Int32Delegate(int val);
