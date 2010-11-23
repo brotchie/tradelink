@@ -86,4 +86,44 @@ namespace TradeLink.API
         /// </summary>
         event TextIdxDelegate NewTxt;
     }
+
+    public interface GenericTrackerDecimal
+    {
+        void setvalue(int idx, decimal v);
+        decimal getvalue(int idx);
+        decimal getvalue(string txt);
+        int addindex(string txt, decimal v);
+    }
+
+    public interface GenericTrackerInt
+    {
+        void setvalue(int idx, int v);
+        int getvalue(int idx);
+        int getvalue(string txt);
+        int addindex(string txt, int v);
+    }
+
+    public interface GenericTrackerBool
+    {
+        void setvalue(int idx, bool v);
+        bool getvalue(int idx);
+        bool getvalue(string txt);
+        int addindex(string txt, bool v);
+    }
+
+    public interface GenericTrackerLong
+    {
+        void setvalue(int idx, long v);
+        long getvalue(int idx);
+        long getvalue(string txt);
+        int addindex(string txt, long v);
+    }
+
+    public interface GenericTrackerString
+    {
+        void setvalue(int idx, string s);
+        string getvalue(int idx);
+        string getvalue(string txt);
+        int addindex(string txt, string s);
+    }
 }

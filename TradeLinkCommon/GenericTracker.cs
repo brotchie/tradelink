@@ -282,6 +282,20 @@ namespace TradeLink.Common
     /// </summary>
     public static class GenericTracker
     {
+        public static bool One(int idx, params GenericTracker<bool>[] gts)
+        {
+            bool ok = false;
+            for (int i = 0; i < gts.Length; i++)
+                ok |= gts[i][idx];
+            return ok;
+        }
+        public static bool All(int idx, params GenericTracker<bool>[] gts)
+        {
+            bool ok = true;
+            for (int i = 0; i < gts.Length; i++)
+                ok &= gts[i][idx];
+            return ok;
+        }
         public const int UNKNOWN = -1;
         public static void clearindicators(params GenericTrackerI[] gts)
         {
