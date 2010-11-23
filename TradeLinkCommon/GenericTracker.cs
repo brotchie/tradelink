@@ -288,6 +288,11 @@ namespace TradeLink.Common
             foreach (GenericTrackerI gt in gts)
                 gt.Clear();
         }
+
+        public static GenericTrackerI[] geninds(params GenericTrackerI[] gts)
+        {
+            return gts;
+        }
         /// <summary>
         /// import a csv file into a generic tracker
         /// </summary>
