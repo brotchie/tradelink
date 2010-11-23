@@ -1057,6 +1057,28 @@ namespace TradeLink.Common
         /// <summary>
         /// takes slice of first N elements of array
         /// </summary>
+        /// <param name="a"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public static long[] Slice(long[] a, int count) { return Slice(a, 0, count); }
+        /// <summary>
+        /// takes slice of some N elements of array
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="start"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public static long[] Slice(long[] a, int start, int count)
+        {
+            long[] f = new long[count];
+            for (int i = start; (i < (start + count)) && (i < a.Length); i++)
+                f[i] = a[i];
+            return f;
+        }
+
+        /// <summary>
+        /// takes slice of first N elements of array
+        /// </summary>
         /// <param name="input"></param>
         /// <param name="count"></param>
         /// <returns></returns>
