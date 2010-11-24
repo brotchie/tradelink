@@ -8,8 +8,12 @@ namespace TradeLink.Common
     /// <summary>
     /// track whether a given value flips (or crosses) from a previous state
     /// </summary>
-    public class FlipTracker : GenericTracker<bool>
+    public class FlipTracker : GenericTracker<bool>, GenericTrackerBool
     {
+        public bool getvalue(int idx) { return this[idx]; }
+        public bool getvalue(string txt) { return this[txt]; }
+        public void setvalue(int idx,bool v) { this[idx] = v; }
+
         GenericTracker<bool> prev;
         GenericTracker<bool> flip;
         GenericTracker<int> vcount;

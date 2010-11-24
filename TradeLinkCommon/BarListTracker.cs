@@ -11,7 +11,7 @@ namespace TradeLink.Common
     /// BarListTracker (blt) will accept ticks and auto-create bars as barlists as needed.
     /// Access bars via blt["IBM"].RecentBar.Close
     /// </summary>
-    public class BarListTracker
+    public class BarListTracker : newTickIndicator
     {
         public event SymBarIntervalDelegate GotNewBar;
         /// <summary>

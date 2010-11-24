@@ -3,7 +3,7 @@ using TradeLink.API;
 
 namespace TradeLink.Common
 {
-    public struct Book
+    public struct Book : GotTickIndicator
     {
         public const int MAXBOOK = 40;
         public Book(Book b)

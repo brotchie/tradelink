@@ -7,75 +7,26 @@ using TradeLink.Common;
 namespace TradeLink.Common
 {
     /// <summary>
-    /// track highs and lows
+    /// track highs
     /// </summary>
-    public class HighLowTracker
+    public class HighTracker : GenericTracker<decimal>,TickIndicator,GenericTrackerDecimal
     {
-        GenericTracker<decimal> _highs;
-        GenericTracker<decimal> _lows;
+        public decimal getvalue(int idx) { return this[idx]; }
+        public decimal getvalue(string txt) { return this[txt]; }
+        public void setvalue(int idx, decimal v) { this[idx] = v; }
         /// <summary>
-        /// tracks highs and lows
-        /// </summary>
-        public HighLowTracker() : this(50) { }
-        /// <summary>
-        /// tracks highs and lows for approx # of symbols
+        /// 
         /// </summary>
         /// <param name="estSymbols"></param>
-        public HighLowTracker(int estSymbols)
+        /// <param name="name"></param>
+        public HighTracker(int estSymbols,string name) : base(estSymbols,name)
         {
-            _highs = new GenericTracker<decimal>(estSymbols);
-            _lows = new GenericTracker<decimal>(estSymbols);
-        }
-        /// <summary>
-        /// create new high or low index 
-        /// </summary>
-        /// <param name="txt"></param>
-        /// <param name="idx"></param>
-        public void NewTxt(string txt, int idx)
-        {
-            _highs.addindex(txt, decimal.MinValue);
-            _lows.addindex(txt, decimal.MaxValue);
         }
 
-        public event SymDelegate NewHighEvent;
-        public event SymDelegate NewLowEvent;
+        public HighTracker(int estSymbols) : base(estSymbols, "HIGH") { }
+        public HighTracker(string name) : base(100, name) { }
+        public HighTracker() : this(100, "HIGH") { }
 
-        /// <summary>
-        /// get high
-        /// </summary>
-        /// <param name="sym"></param>
-        /// <returns></returns>
-        public decimal High(string sym) 
-        { 
-            return _highs[sym]; 
-        }
-        /// <summary>
-        /// get low
-        /// </summary>
-        /// <param name="sym"></param>
-        /// <returns></returns>
-        public decimal Low(string sym) 
-        { 
-            return _lows[sym]; 
-        }
-        /// <summary>
-        /// set a new high
-        /// </summary>
-        /// <param name="sym"></param>
-        /// <param name="high"></param>
-        public void newHigh(string sym, decimal high) 
-        { 
-            _highs[sym] = high; 
-        }
-        /// <summary>
-        /// set a new low
-        /// </summary>
-        /// <param name="sym"></param>
-        /// <param name="low"></param>
-        public void newLow(string sym, decimal low) 
-        { 
-            _lows[sym] = low; 
-        }
         /// <summary>
         /// set high/low from tick, return true if new high or low was reached
         /// </summary>
@@ -84,7 +35,7 @@ namespace TradeLink.Common
         public bool newTick(Tick k)
         {
             if (!k.isTrade) return false;
-            return newPoint(k.symbol,k.trade );
+            return newPoint(k.symbol, k.trade);
         }
         /// <summary>
         /// sets high/low from tick, given an index
@@ -98,20 +49,15 @@ namespace TradeLink.Common
             return newPoint(idx, k.trade);
         }
         /// <summary>
-        /// set high/low from a point
+        /// set low from a point
         /// </summary>
         /// <param name="p"></param>
         /// <param name="sym"></param>
         /// <returns></returns>
-        public bool newPoint(string sym,decimal p)
+        public bool newPoint(string sym, decimal p)
         {
-            int idx = _highs.getindex(sym);
-            if (idx<0)
-            {
-                NewTxt(sym, 0);
-                idx = _highs.Count - 1;
-            }
-            return newPoint(idx,p);
+            int idx = addindex(sym, decimal.MaxValue);
+            return newPoint(idx, p);
         }
         /// <summary>
         /// set high low for a point given an index
@@ -122,31 +68,99 @@ namespace TradeLink.Common
         public bool newPoint(int idx, decimal p)
         {
             bool v = false;
-            if (p > _highs[idx])
+
+            if (p > this[idx])
             {
-                _highs[idx] = p;
+                this[idx] = p;
                 v |= true;
-                if (NewHighEvent != null)
-                    NewHighEvent(_highs.getlabel(idx));
-            }
-            if (p < _lows[idx])
-            {
-                _lows[idx] = p;
-                v |= true;
-                if (NewLowEvent!= null)
-                    NewLowEvent(_highs.getlabel(idx));
+                if (NewHighEvent!= null)
+                    NewHighEvent(getlabel(idx));
             }
             return v;
-            
-        }
-        /// <summary>
-        /// clear all highs and lows
-        /// </summary>
-        public void Reset()
-        {
-            _highs.Clear();
-            _lows.Clear();
+
         }
 
+
+        public event SymDelegate NewHighEvent;
     }
+    /// <summary>
+    /// track lows
+    /// </summary>
+    public class LowTracker : GenericTracker<decimal>,TickIndicator,GenericTrackerDecimal
+    {
+        public decimal getvalue(int idx) { return this[idx]; }
+        public decimal getvalue(string txt) { return this[txt]; }
+        public void setvalue(int idx, decimal v) { this[idx] = v; }
+        /// <summary>
+        /// set high/low from tick, return true if new high or low was reached
+        /// </summary>
+        /// <param name="k"></param>
+        /// <returns></returns>
+        public bool newTick(Tick k)
+        {
+            if (!k.isTrade) return false;
+            return newPoint(k.symbol, k.trade);
+        }
+        /// <summary>
+        /// sets high/low from tick, given an index
+        /// </summary>
+        /// <param name="k"></param>
+        /// <param name="idx"></param>
+        /// <returns></returns>
+        public bool newTick(Tick k, int idx)
+        {
+            if (!k.isTrade) return false;
+            return newPoint(idx, k.trade);
+        }
+        /// <summary>
+        /// set low from a point
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="sym"></param>
+        /// <returns></returns>
+        public bool newPoint(string sym, decimal p)
+        {
+            int idx = addindex(sym,decimal.MaxValue);
+            return newPoint(idx, p);
+        }
+        /// <summary>
+        /// set high low for a point given an index
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        public bool newPoint(int idx, decimal p)
+        {
+            bool v = false;
+
+            if (p < this[idx])
+            {
+                this[idx] = p;
+                v |= true;
+                if (NewLowEvent != null)
+                    NewLowEvent(getlabel(idx));
+            }
+            return v;
+
+        }
+
+        public LowTracker() : this(100, "LOW") { }
+        public LowTracker(string name) : this(100, name) { }
+        public LowTracker(int estsym) : this(estsym, "LOW") { }
+
+     
+                /// <summary>
+        /// tracks highs and lows
+        /// </summary>
+        public LowTracker(int estSymbols, string name)
+            : base(estSymbols, name)
+        {
+        }
+
+
+
+
+        public event SymDelegate NewLowEvent;
+    }
+
 }

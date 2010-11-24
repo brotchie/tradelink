@@ -81,6 +81,8 @@ namespace TradeLink.Common
             // setup generic trackers to track tick information
             last.NewTxt += new TextIdxDelegate(last_NewTxt);
         }
+        public TickTracker(string name) { _name = name; }
+        
 
         /// <summary>
         /// called when new text label is added
@@ -121,7 +123,7 @@ namespace TradeLink.Common
 
         public string getlabel(int idx) { return last.getlabel(idx); }
 
-        string _name = string.Empty;
+        string _name = "TICKS";
         public string Name { get { return _name; } set { _name = value; } }
 
         public int Count { get { return last.Count; } }
@@ -376,4 +378,167 @@ namespace TradeLink.Common
             return true;
         }
     }
+    /// <summary>
+    /// track only bid price
+    /// </summary>
+    public class BidTracker : GenericTracker<decimal>,GenericTrackerDecimal
+    {
+        public BidTracker() : base("BID") { }
+        public decimal getvalue(int idx) { return this[idx]; }
+        public decimal getvalue(string txt) { return this[txt]; }
+        public void setvalue(int idx, decimal v) { this[idx] = v; }
+        public int addindex(string txt, decimal v) { return getindex(txt); }
+
+        public void newTick(Tick k)
+        {
+            if (!k.hasBid) return;
+            int idx = addindex(k.symbol);
+            this[idx] = k.bid;
+        }
+    }
+    /// <summary>
+    /// track only ask price
+    /// </summary>
+    public class AskTracker : GenericTracker<decimal>, GenericTrackerDecimal
+    {
+        public AskTracker() : base("ASK") { }
+        public decimal getvalue(int idx) { return this[idx]; }
+        public decimal getvalue(string txt) { return this[txt]; }
+        public void setvalue(int idx, decimal v) { this[idx] = v; }
+        public int addindex(string txt, decimal v) { return getindex(txt); }
+
+        public void newTick(Tick k)
+        {
+            if (!k.hasAsk) return;
+            int idx = addindex(k.symbol);
+            this[idx] = k.ask;
+        }
+    }
+    /// <summary>
+    /// track only last price
+    /// </summary>
+    public class LastTracker : GenericTracker<decimal>, GenericTrackerDecimal
+    {
+        public LastTracker() : base("LAST") { }
+        public decimal getvalue(int idx) { return this[idx]; }
+        public decimal getvalue(string txt) { return this[txt]; }
+        public void setvalue(int idx, decimal v) { this[idx] = v; }
+        public int addindex(string txt, decimal v) { return getindex(txt); }
+
+        public void newTick(Tick k)
+        {
+            if (!k.isTrade) return;
+            int idx = addindex(k.symbol);
+            this[idx] = k.trade;
+        }
+    }
+
+    /// <summary>
+    /// track only last trade size
+    /// </summary>
+    public class SizeTracker : GenericTracker<int>, GenericTrackerInt
+    {
+        public SizeTracker() : base("SIZE") { }
+        public int getvalue(int idx) { return this[idx]; }
+        public int getvalue(string txt) { return this[txt]; }
+        public void setvalue(int idx, int v) { this[idx] = v; }
+        public int addindex(string txt, int v) { return getindex(txt); }
+
+        public void newTick(Tick k)
+        {
+            if (!k.isTrade) return;
+            int idx = addindex(k.symbol);
+            this[idx] = k.size;
+        }
+    }
+
+    /// <summary>
+    /// track only last bid size
+    /// </summary>
+    public class BidSizeTracker : GenericTracker<int>, GenericTrackerInt
+    {
+        public BidSizeTracker() : base("BIDSIZE") { }
+        public int getvalue(int idx) { return this[idx]; }
+        public int getvalue(string txt) { return this[txt]; }
+        public void setvalue(int idx, int v) { this[idx] = v; }
+        public int addindex(string txt, int v) { return getindex(txt); }
+
+        public void newTick(Tick k)
+        {
+            if (!k.hasBid) return;
+            int idx = addindex(k.symbol);
+            this[idx] = k.bs;
+        }
+    }
+
+    /// <summary>
+    /// track only last ask size
+    /// </summary>
+    public class AskSizeTracker : GenericTracker<int>, GenericTrackerInt
+    {
+        public AskSizeTracker() : base("ASKSIZE") { }
+        public int getvalue(int idx) { return this[idx]; }
+        public int getvalue(string txt) { return this[txt]; }
+        public void setvalue(int idx, int v) { this[idx] = v; }
+        public int addindex(string txt, int v) { return getindex(txt); }
+
+        public void newTick(Tick k)
+        {
+            if (!k.hasAsk) return;
+            int idx = addindex(k.symbol);
+            this[idx] = k.os;
+        }
+    }
+    /// <summary>
+    /// whether last tick in given symbol was a trade
+    /// </summary>
+    public class IsTradeTracker : GenericTracker<bool>, GenericTrackerBool
+    {
+        public IsTradeTracker() : base("ISTRADE") {}
+        public bool getvalue(int idx) { return this[idx]; }
+        public bool getvalue(string txt) { return this[txt]; }
+        public void setvalue(int idx, bool v) { this[idx] = v; }
+        public int addindex(string txt, bool v) { return getindex(txt); }
+
+        public void newTick(Tick k)
+        {
+            int idx = addindex(k.symbol);
+            this[idx] = k.isTrade;
+        }
+    }
+    /// <summary>
+    /// whether last tick in given symbol had bid information
+    /// </summary>
+    public class IsBidTracker : GenericTracker<bool>, GenericTrackerBool
+    {
+        public IsBidTracker() : base("ISBID") { }
+        public bool getvalue(int idx) { return this[idx]; }
+        public bool getvalue(string txt) { return this[txt]; }
+        public void setvalue(int idx, bool v) { this[idx] = v; }
+        public int addindex(string txt, bool v) { return getindex(txt); }
+
+        public void newTick(Tick k)
+        {
+            int idx = addindex(k.symbol);
+            this[idx] = k.hasBid;
+        }
+    }
+    /// <summary>
+    /// whether last tick in given symbol had ask information
+    /// </summary>
+    public class IsAskTracker : GenericTracker<bool>, GenericTrackerBool
+    {
+        public IsAskTracker() : base("ISASK") { }
+        public bool getvalue(int idx) { return this[idx]; }
+        public bool getvalue(string txt) { return this[txt]; }
+        public void setvalue(int idx, bool v) { this[idx] = v; }
+        public int addindex(string txt, bool v) { return getindex(txt); }
+
+        public void newTick(Tick k)
+        {
+            int idx = addindex(k.symbol);
+            this[idx] = k.hasAsk;
+        }
+    }
+
 }

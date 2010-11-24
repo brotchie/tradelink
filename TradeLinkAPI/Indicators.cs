@@ -12,6 +12,11 @@ namespace TradeLink.API
         bool newBar(BarList bl);
     }
 
+    public interface newTickIndicator
+    {
+        void newTick(Tick k);
+    }
+
     public interface GotTickIndicator
     {
         void GotTick(Tick k);

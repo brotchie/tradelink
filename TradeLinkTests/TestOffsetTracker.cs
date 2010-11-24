@@ -23,8 +23,8 @@ namespace TestTradeLink
         void reset()
         {
             ot = new OffsetTracker();
-            ot.SendCancel += new LongDelegate(ot_SendCancel);
-            ot.SendOrder += new OrderDelegate(ot_SendOffset);
+            ot.SendCancelEvent += new LongDelegate(ot_SendCancel);
+            ot.SendOrderEvent += new OrderDelegate(ot_SendOffset);
             ot.SendDebug += new DebugDelegate(ot_SendDebug);
             ot.HitOffset += new HitOffsetDelegate(ot_HitOffset);
             profits.Clear();

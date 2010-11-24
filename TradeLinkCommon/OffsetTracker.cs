@@ -8,8 +8,9 @@ namespace TradeLink.Common
     /// allows automatic sending of profit targets and stop orders for a set of positions.
     /// automatically manages partial fills.
     /// </summary>
-    public class OffsetTracker
+    public class OffsetTracker : GenericTracker<OffsetInfo>,newTickIndicator,SendOrderIndicator,SendCancelIndicator,GotFillIndicator,GotCancelIndicator,GotPositionIndicator
     {
+        
         public event DebugDelegate SendDebug;
         public event HitOffsetDelegate HitOffset;
         void debug(string msg) { if (SendDebug != null) SendDebug(msg); }
@@ -29,8 +30,8 @@ namespace TradeLink.Common
         /// </summary>
         public string[] IgnoreSyms { get { return _ignore; } set { _ignore = value; } }
         bool _hasevents = false;
-        public event OrderDelegate SendOrder;
-        public event LongDelegate SendCancel;
+        public event OrderDelegate SendOrderEvent;
+        public event LongDelegate SendCancelEvent;
         PositionTracker _pt = new PositionTracker();
         /// <summary>
         /// a position tracker you can reuse 
@@ -59,11 +60,7 @@ namespace TradeLink.Common
         /// clear single custom offset
         /// </summary>
         /// <param name="sym"></param>
-        public void ClearCustom(string sym) { _offvals.Remove(sym); }
-        /// <summary>
-        /// clear all custom offsets
-        /// </summary>
-        public void ClearCustom() { _offvals.Clear(); }
+        public void ClearCustom(string sym) { this[sym] = IgnoreDefault ? OffsetInfo.DISABLEOFFSET() : DefaultOffset; }
 
         object _lock = new object();
 
@@ -138,7 +135,7 @@ namespace TradeLink.Common
                 {
                     stop.id = Ids.AssignId;
                     off.StopId = stop.id;
-                    SendOrder(stop);
+                    SendOrderEvent(stop);
                     // notify
                     debug(string.Format("sent new stop: {0} {1}", stop.id, stop.ToString(DebugDecimals)));
                     sentorder = true;
@@ -163,7 +160,7 @@ namespace TradeLink.Common
                 {
                     profit.id = Ids.AssignId;
                     off.ProfitId = profit.id;
-                    SendOrder(profit);
+                    SendOrderEvent(profit);
                     // notify
                     debug(string.Format("sent new profit: {0} {1}", profit.id, profit.ToString(DebugDecimals)));
                     sentorder = true;
@@ -202,7 +199,10 @@ namespace TradeLink.Common
         /// </summary>
         public bool AllowSimulatenousCancels { get { return _cancelsametime; } set { _cancelsametime = value; } }
 
-        bool hascustom(string symbol) { OffsetInfo oi; return _offvals.TryGetValue(symbol, out oi); }
+        bool hascustom(string symbol)
+        {
+            return getindex(symbol) >= 0;
+        }
 
         void cancel(OffsetInfo offset) 
         {
@@ -225,7 +225,7 @@ namespace TradeLink.Common
                 debug("canceling offsets: " + ids);
             
         }
-        void cancel(long id) { if (id != 0) SendCancel(id); }
+        void cancel(long id) { if (id != 0) SendCancelEvent(id); }
         /// <summary>
         /// cancels all offsets (profit+stops) for given side
         /// </summary>
@@ -334,15 +334,15 @@ namespace TradeLink.Common
         public void CancelAll()
         {
             debug("canceling all pending offsets");
-            foreach (string sym in _offvals.Keys)
-                cancel(GetOffset(sym));
+            foreach (OffsetInfo oi in this)
+                cancel(oi);
         }
 
 
         bool HasEvents()
         {
             if (_hasevents) return true;
-            if ((SendCancel == null) || (SendOrder == null))
+            if ((SendCancelEvent == null) || (SendOrderEvent == null))
                 throw new Exception("You must define targets for SendCancel and SendOffset events.");
             _hasevents = true;
             return _hasevents;
@@ -360,24 +360,29 @@ namespace TradeLink.Common
             return false; 
         }
 
+        public void ClearCustom()
+        {
+            Clear();
+        }
+
         long ProfitId(string sym)
         {
-            OffsetInfo val;
-            // if we have an offset, return the id
-            if (_offvals.TryGetValue(sym, out val))
-                return val.ProfitId;
+            int idx = getindex(sym);
             // no offset id
-            return 0;
+            if (idx < 0)
+                return 0;
+            // if we have offset, return it's id
+            return base[idx].ProfitId;
         }
 
         long StopId(string sym)
         {
-            OffsetInfo val;
-            // if we have offset, return it's id
-            if (_offvals.TryGetValue(sym, out val))
-                return val.StopId;
+            int idx = getindex(sym);
             // no offset id
-            return 0;
+            if (idx < 0)
+                return 0;
+            // if we have offset, return it's id
+            return base[idx].StopId;
         }
 
         bool _shutonreinit = true;
@@ -385,6 +390,9 @@ namespace TradeLink.Common
         /// if a position is provided twice in the same session, assume this is bad and cancel/shutdown offsets.
         /// </summary>
         public bool ShutdownOnReinit { get { return _shutonreinit; } set { _shutonreinit = value; } }
+
+        public void GotPosition(Position p) { Adjust(p); }
+        public void GotFill(Trade f) { Adjust(f); }
 
         /// <summary>
         /// must send new positions here (eg from GotPosition on Response)
@@ -490,16 +498,25 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="symbol"></param>
         /// <returns></returns>
-        public OffsetInfo this[string symbol] { get { return GetOffset(symbol); } set { SetOffset(symbol, value); } }
+        public new OffsetInfo this[string symbol] { get { return GetOffset(symbol); } set { SetOffset(symbol, value); } }
+
+        bool _addcust = false;
+        public bool AddCustom { get { return _addcust; } set { _addcust = value; } }
 
         OffsetInfo GetOffset(string sym)
         {
-            OffsetInfo val;
             // see if we have a custom offset
-            if (_offvals.TryGetValue(sym, out val))
-                return val;
-            // otherwise use default
-            return DefaultOffset;
+            int idx = getindex(sym);
+            // if we don't have a custom but we're adding one, add from default
+            if (AddCustom && (idx < 0))
+            {
+                idx = addindex(sym, DefaultOffset);
+            }
+            else if (idx < 0) // otherwise use default
+                return DefaultOffset;
+            // return custom
+            return base[idx];
+            
         }
 
         bool _verbdebug = false;
@@ -510,14 +527,8 @@ namespace TradeLink.Common
 
         void SetOffset(string sym, OffsetInfo off)
         {
-            OffsetInfo v;
-            lock (_offvals)
-            {
-                if (_offvals.TryGetValue(sym, out v))
-                    _offvals[sym] = off;
-                else
-                    _offvals.Add(sym, off);
-            }
+            // check for index
+            int idx = addindex(sym, off);
             if (_verbdebug)
                 debug(sym + " set offset: " + off.ToString(DebugDecimals));
         }
@@ -528,23 +539,17 @@ namespace TradeLink.Common
         public void GotCancel(long id)
         {
             // find any matching orders and reflect them as canceled
-            foreach (string sym in _offvals.Keys)
+            foreach (string sym in ToLabelArray())
             {
-                if (_offvals[sym].StopId == id)
+                if (base[sym].StopId == id)
                 {
                     debug(string.Format("stop canceled: {0} {1}", sym, id.ToString()));
-                    lock (_offvals)
-                    {
-                        _offvals[sym].StopId = 0;
-                    }
+                    base[sym].StopId = 0;
                 }
-                else if (_offvals[sym].ProfitId == id)
+                else if (base[sym].ProfitId == id)
                 {
                     debug(string.Format("profit canceled: {0} {1}", sym, id.ToString()));
-                    lock (_offvals)
-                    {
-                        _offvals[sym].ProfitId = 0;
-                    }
+                    base[sym].ProfitId = 0;
                 }
             }
 
@@ -563,8 +568,6 @@ namespace TradeLink.Common
         // track offset ids
         Dictionary<string, long> _profitids = new Dictionary<string, long>();
         Dictionary<string, long> _stopids = new Dictionary<string, long>();
-        // per-symbol offset values
-        Dictionary<string, OffsetInfo> _offvals = new Dictionary<string, OffsetInfo>();
         
 
     }

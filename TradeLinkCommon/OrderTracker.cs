@@ -8,8 +8,35 @@ namespace TradeLink.Common
     /// <summary>
     /// track status of orders
     /// </summary>
-    public class OrderTracker  
+    public class OrderTracker  : GotOrderIndicator,GotCancelIndicator,GotFillIndicator,GenericTrackerI
     {
+        public void Clear()
+        {
+            orders.Clear();
+            sent.Clear();
+            filled.Clear();
+            canceled.Clear();
+        }
+        public int addindex(string txt, int ignore)
+        {
+            return orders.addindex(txt);
+        }
+        public string Display(string txt) { return string.Empty; }
+        public string Display(int idx) { return this[idx].ToString(); }
+        public string getlabel(int idx) { return orders.getlabel(idx); }
+        public int Count { get { return orders.Count; } }
+        public decimal ValueDecimal(string txt) { int idx = getindex(txt); if (idx < 0) return 0; return this[idx]; }
+        public decimal ValueDecimal(int idx) { return this[idx]; }
+        public object Value(string txt) { return ValueDecimal(txt); }
+        public object Value(int idx) { return ValueDecimal(idx); }
+        string _name = string.Empty;
+        public string Name { get { return _name; } set { _name = value; } }
+        public int addindex(string txt)
+        {
+            return orders.addindex(txt);
+        }
+        public int getindex(string txt) { return orders.getindex(txt); }
+        public Type TrackedType { get { return typeof(int); } }
         /// <summary>
         /// get orders from tracker
         /// </summary>
@@ -22,12 +49,14 @@ namespace TradeLink.Common
         {
             orders.NewTxt += new TextIdxDelegate(orders_NewTxt);
         }
-
+        public event TextIdxDelegate NewTxt;
         void orders_NewTxt(string txt, int idx)
         {
             sent.addindex(txt, orders[idx].size);
             filled.addindex(txt, 0);
             canceled.addindex(txt, false);
+            if (NewTxt != null)
+                NewTxt(txt, idx);
 
             
         }

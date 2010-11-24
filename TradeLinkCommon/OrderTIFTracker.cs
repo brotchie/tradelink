@@ -8,9 +8,11 @@ namespace TradeLink.Common
     /// <summary>
     /// enforce time limits for orders
     /// </summary>
-    public class TIFTracker : GenericTracker<long>
+    public class TIFTracker : GenericTracker<long>,newTickIndicator,GenericTrackerLong,SendOrderIndicator,SendCancelIndicator,GotCancelIndicator,GotFillIndicator
     {
-
+        public long getvalue(int idx) { return this[idx]; }
+        public long getvalue(string txt) { return this[txt]; }
+        public void setvalue(int idx, long v) { this[idx] = v; }
 
         List<long> _id = new List<long>();
         List<int> _tifs = new List<int>();
@@ -19,9 +21,9 @@ namespace TradeLink.Common
         {
             _idt = id;
         }
-        public event LongDelegate SendCancel;
-        public event OrderDelegate SendOrder;
-        public event DebugDelegate SendDebug;
+        public event LongDelegate SendCancelEvent;
+        public event OrderDelegate SendOrderEvent;
+        public event DebugDelegate SendDebugEvent;
         int _tif = 0;
         public int DefaultTif { get { return _tif; } set { _tif = value; } }
         IdTracker _idt = null;
@@ -59,8 +61,8 @@ namespace TradeLink.Common
                 if (diff >= tif)
                 {
                     debug("Tif expired for: " + _id[i]);
-                    if (SendCancel != null)
-                        SendCancel(_id[i]);
+                    if (SendCancelEvent != null)
+                        SendCancelEvent(_id[i]);
                     else
                         debug("SendCancel unhandled! can't enforce TIF!");
                 }
@@ -105,8 +107,8 @@ namespace TradeLink.Common
 
         void debug(string msg)
         {
-            if (SendDebug != null)
-                SendDebug(msg);
+            if (SendDebugEvent != null)
+                SendDebugEvent(msg);
         }
         public void newTick(Tick k)
         {
@@ -120,6 +122,16 @@ namespace TradeLink.Common
         List<string> sym = new List<string>();
         List<int> sentsize = new List<int>();
         List<int> filledsize = new List<int>();
+
+        public void SendOrder(Order o)
+        {
+            // get tif from order
+            int tif = 0;
+            if (int.TryParse(o.TIF, out tif))
+                SendOrderTIF(o, tif);
+            else
+                SendOrderTIF(o, 0);
+        }
 
         public void SendOrderTIF(Order o, int TIF)
         {
@@ -158,8 +170,8 @@ namespace TradeLink.Common
                 filledsize.Add(0);
             }
             // pass order along if required
-            if (SendOrder != null)
-                SendOrder(o);
+            if (SendOrderEvent != null)
+                SendOrderEvent(o);
         }
 
 

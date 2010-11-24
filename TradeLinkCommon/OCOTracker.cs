@@ -10,7 +10,7 @@ namespace TradeLink.Common
     /// create and manage one-cancels-other orders in tradelink
     /// Oco groups are managed on per-symbol basis
     /// </summary>
-    public class OCOTracker : GenericTracker<OCOGroup>
+    public class OCOTracker : GenericTracker<OCOGroup>,SendOrderIndicator,SendCancelIndicator,GotFillIndicator,GotCancelIndicator
     {
         IdTracker _idt;
         public OCOTracker() : this(new IdTracker()) { }

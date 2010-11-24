@@ -618,10 +618,13 @@ namespace Quotopia
             if (res == null) return new int[0];
             return res;
         }
-        HighLowTracker _hlt = new HighLowTracker();
+        HighTracker _ht = new HighTracker();
+        LowTracker _lt = new LowTracker();
+        
         void RefreshRow(Tick t)
         {
-            _hlt.newTick(t);
+            _ht.newTick(t);
+            _lt.newTick(t);
             if (qg.InvokeRequired)
             {
                 qg.Invoke(new TickDelegate(RefreshRow), new object[] { t });
@@ -683,8 +686,8 @@ namespace Quotopia
                     }
                     try
                     {
-                        qt.Rows[r]["High"] = _hlt.High(t.symbol).ToString(_dispdecpointformat);
-                        qt.Rows[r]["Low"] = _hlt.Low(t.symbol).ToString(_dispdecpointformat);
+                        qt.Rows[r]["High"] = _ht[t.symbol].ToString(_dispdecpointformat);
+                        qt.Rows[r]["Low"] = _lt[t.symbol].ToString(_dispdecpointformat);
                     }
                     catch { }
                     if (_dispdecpoints.Value > 2)
