@@ -338,17 +338,21 @@ namespace TradeLibFast
 		return NOTSPECIAL;
 	}
 
+	CString lastcontract;
 	void TWS_TLServer::pcont(Contract* c)
 	{
 		CString m;
 		m.Format("sym: %s local: %s currency: %s ex: %s primaryex: %s security: %s strike: %f expiry: %s",c->symbol,c->localSymbol,c->currency,c->exchange,c->primaryExchange,c->secType,c->strike,c->expiry);
+		lastcontract = m;
 		v(m);
 	}
 
+	CString lastorder;
 	void TWS_TLServer::pord(Order* o)
 	{
 		CString m;
 		m.Format("size: %i price: %f stop: %f",o->totalQuantity,o->lmtPrice,o->auxPrice);
+		lastorder = m;
 		v(m);
 	}
 
@@ -400,8 +404,11 @@ namespace TradeLibFast
 		}
 		else
 			contract->currency = currency;
+		// if we dont' have exchange or security type, guess defaults
 		if (contract->exchange=="")
 			contract->exchange= "SMART";
+		if (contract->secType=="")
+			contract->secType = "STK";
 		contract->symbol = tl2ibspace(contract->symbol);
 		contract->localSymbol = tl2ibspace(contract->localSymbol);
 		if (tmpsec.type== FUT)
@@ -440,7 +447,8 @@ namespace TradeLibFast
 		
 		Contract* contract(new Contract);
 		getcontract(o.symbol,o.currency,o.localsymbol,o.exchange,contract);
-		
+		pcont(contract);
+		pord(order);		
 
 		// get the TWS session associated with our account
 		EClient* client;
@@ -449,8 +457,7 @@ namespace TradeLibFast
 		else // otherwise get the session our account is logged into
 			client	= GetOrderSink(o.account);
 
-		pcont(contract);
-		pord(order);
+
 
 		// place our order
 		if (client!=NULL)
@@ -654,7 +661,7 @@ namespace TradeLibFast
 		// as an order update message
 		int64 tlid = IB2TLID(id);
 		CString msg;
-		msg.Format("%s [err:%i] [ibid:%i] [tlid:%lld]",errorString,errorCode,id,tlid);
+		msg.Format("%s [err:%i] [ibid:%i] [tlid:%lld] [lastcontract:%s] [lastorder:%s]",errorString,errorCode,id,tlid,lastcontract,lastorder);
 		if (errorCode==202) 
 			this->SrvGotCancel(tlid); // cancels
 		else if (IGNOREERRORS) return; // ignore errors during init
