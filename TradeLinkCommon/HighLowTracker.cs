@@ -9,8 +9,9 @@ namespace TradeLink.Common
     /// <summary>
     /// track highs
     /// </summary>
-    public class HighTracker : GenericTracker<decimal>,TickIndicator,GenericTrackerDecimal
+    public class HighTracker : GenericTracker<decimal>, GotTickIndicator, GenericTrackerDecimal
     {
+        public void GotTick(Tick k) { newTick(k); }
         public decimal getvalue(int idx) { return this[idx]; }
         public decimal getvalue(string txt) { return this[txt]; }
         public void setvalue(int idx, decimal v) { this[idx] = v; }
@@ -86,8 +87,9 @@ namespace TradeLink.Common
     /// <summary>
     /// track lows
     /// </summary>
-    public class LowTracker : GenericTracker<decimal>,TickIndicator,GenericTrackerDecimal
+    public class LowTracker : GenericTracker<decimal>, GotTickIndicator, GenericTrackerDecimal
     {
+        public void GotTick(Tick k) { newTick(k); }
         public decimal getvalue(int idx) { return this[idx]; }
         public decimal getvalue(string txt) { return this[txt]; }
         public void setvalue(int idx, decimal v) { this[idx] = v; }

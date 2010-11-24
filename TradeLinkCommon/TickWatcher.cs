@@ -9,8 +9,9 @@ namespace TradeLink.Common
     /// <summary>
     /// Used to watch a stream of ticks, and send alerts when the stream goes idle for a specified time.
     /// </summary>
-    public class TickWatcher : TickIndicator
+    public class TickWatcher : GotTickIndicator
     {
+        public void GotTick(Tick k) { newTick(k); }
         public bool isValid { get { return _continue; } }
         private bool _alertonfirst = true;
         /// <summary>

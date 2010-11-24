@@ -9,8 +9,9 @@ namespace TradeLink.Common
     /// <summary>
     /// A single bar of price data, which represents OHLC and volume for an interval of time.
     /// </summary>
-    public class BarImpl : TickIndicator, TradeLink.API.Bar
+    public class BarImpl : GotTickIndicator, TradeLink.API.Bar
     {
+        public void GotTick(Tick k) { newTick(k); }
         string _sym = "";
         public string Symbol { get { return _sym; } }
         private ulong h = ulong.MinValue;

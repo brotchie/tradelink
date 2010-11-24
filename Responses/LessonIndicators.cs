@@ -47,7 +47,7 @@ namespace Responses
         public override void GotTick(Tick tick)
         {
             // update our indicator
-            _csi.newTick(tick);
+            _csi.GotTick(tick);
             // verify our indicator has enough data
             if (!_csi.hasSpread(tick.symbol)) return;
             // when we have enough data, we can now get spread
@@ -68,7 +68,7 @@ namespace Responses
     /// <summary>
     /// keeps track of spreads for many symbols
     /// </summary>
-    public class ComplexSpreadIndicator : TickIndicator
+    public class ComplexSpreadIndicator : GotTickIndicator
     {
         // some dictionaries which hold bid and ask for each symbol
         Dictionary<string, decimal> _bid = new Dictionary<string, decimal>();
@@ -80,7 +80,7 @@ namespace Responses
             return _bid.ContainsKey(sym) && _ask.ContainsKey(sym);
         }
         // tracks spreads from ticks
-        public bool newTick(Tick k)
+        public void GotTick(Tick k)
         {
             // create a temp value so we can quickly query dictionaries
             decimal v = 0;
@@ -97,8 +97,6 @@ namespace Responses
                     _ask[k.symbol] = k.ask;
                 else 
                     _ask.Add(k.symbol,k.ask);
-            // return whether spread is good
-            return hasSpread(k.symbol);
         }
         /// <summary>
         /// obtains current spread, or zero for no spread

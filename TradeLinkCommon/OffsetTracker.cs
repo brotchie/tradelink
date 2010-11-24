@@ -8,9 +8,9 @@ namespace TradeLink.Common
     /// allows automatic sending of profit targets and stop orders for a set of positions.
     /// automatically manages partial fills.
     /// </summary>
-    public class OffsetTracker : GenericTracker<OffsetInfo>,newTickIndicator,SendOrderIndicator,SendCancelIndicator,GotFillIndicator,GotCancelIndicator,GotPositionIndicator
+    public class OffsetTracker : GenericTracker<OffsetInfo>, GotTickIndicator, SendOrderIndicator, SendCancelIndicator, GotFillIndicator, GotCancelIndicator, GotPositionIndicator
     {
-        
+        public void GotTick(Tick k) { newTick(k); }
         public event DebugDelegate SendDebug;
         public event HitOffsetDelegate HitOffset;
         void debug(string msg) { if (SendDebug != null) SendDebug(msg); }

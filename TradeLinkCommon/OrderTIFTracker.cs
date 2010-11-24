@@ -8,8 +8,10 @@ namespace TradeLink.Common
     /// <summary>
     /// enforce time limits for orders
     /// </summary>
-    public class TIFTracker : GenericTracker<long>,newTickIndicator,GenericTrackerLong,SendOrderIndicator,SendCancelIndicator,GotCancelIndicator,GotFillIndicator
+    public class TIFTracker : GenericTracker<long>, GotTickIndicator, GenericTrackerLong, SendOrderIndicator, SendCancelIndicator, GotCancelIndicator, GotFillIndicator
     {
+
+        public void GotTick(Tick k) { newTick(k); }
         public long getvalue(int idx) { return this[idx]; }
         public long getvalue(string txt) { return this[txt]; }
         public void setvalue(int idx, long v) { this[idx] = v; }

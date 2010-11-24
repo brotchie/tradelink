@@ -7,9 +7,12 @@ namespace TradeLink.Common
     /// <summary>
     /// keep track of bid/ask and last data for symbols
     /// </summary>
-    public class TickTracker : TickIndicator, GenericTrackerI
+    public class TickTracker : GenericTrackerI, GotTickIndicator
     {
-
+        public void GotTick(Tick k)
+        {
+            newTick(k);
+        }
         public Type TrackedType
         {
             get
@@ -381,7 +384,7 @@ namespace TradeLink.Common
     /// <summary>
     /// track only bid price
     /// </summary>
-    public class BidTracker : GenericTracker<decimal>,GenericTrackerDecimal
+    public class BidTracker : GenericTracker<decimal>, GenericTrackerDecimal, GotTickIndicator
     {
         public BidTracker() : base("BID") { }
         public decimal getvalue(int idx) { return this[idx]; }
@@ -389,7 +392,7 @@ namespace TradeLink.Common
         public void setvalue(int idx, decimal v) { this[idx] = v; }
         public int addindex(string txt, decimal v) { return getindex(txt); }
 
-        public void newTick(Tick k)
+        public void GotTick(Tick k)
         {
             if (!k.hasBid) return;
             int idx = addindex(k.symbol);
@@ -399,7 +402,7 @@ namespace TradeLink.Common
     /// <summary>
     /// track only ask price
     /// </summary>
-    public class AskTracker : GenericTracker<decimal>, GenericTrackerDecimal
+    public class AskTracker : GenericTracker<decimal>, GenericTrackerDecimal, GotTickIndicator
     {
         public AskTracker() : base("ASK") { }
         public decimal getvalue(int idx) { return this[idx]; }
@@ -407,7 +410,7 @@ namespace TradeLink.Common
         public void setvalue(int idx, decimal v) { this[idx] = v; }
         public int addindex(string txt, decimal v) { return getindex(txt); }
 
-        public void newTick(Tick k)
+        public void GotTick(Tick k)
         {
             if (!k.hasAsk) return;
             int idx = addindex(k.symbol);
@@ -417,7 +420,7 @@ namespace TradeLink.Common
     /// <summary>
     /// track only last price
     /// </summary>
-    public class LastTracker : GenericTracker<decimal>, GenericTrackerDecimal
+    public class LastTracker : GenericTracker<decimal>, GenericTrackerDecimal, GotTickIndicator
     {
         public LastTracker() : base("LAST") { }
         public decimal getvalue(int idx) { return this[idx]; }
@@ -425,7 +428,7 @@ namespace TradeLink.Common
         public void setvalue(int idx, decimal v) { this[idx] = v; }
         public int addindex(string txt, decimal v) { return getindex(txt); }
 
-        public void newTick(Tick k)
+        public void GotTick(Tick k)
         {
             if (!k.isTrade) return;
             int idx = addindex(k.symbol);
@@ -436,7 +439,7 @@ namespace TradeLink.Common
     /// <summary>
     /// track only last trade size
     /// </summary>
-    public class SizeTracker : GenericTracker<int>, GenericTrackerInt
+    public class SizeTracker : GenericTracker<int>, GenericTrackerInt, GotTickIndicator
     {
         public SizeTracker() : base("SIZE") { }
         public int getvalue(int idx) { return this[idx]; }
@@ -444,7 +447,7 @@ namespace TradeLink.Common
         public void setvalue(int idx, int v) { this[idx] = v; }
         public int addindex(string txt, int v) { return getindex(txt); }
 
-        public void newTick(Tick k)
+        public void GotTick(Tick k)
         {
             if (!k.isTrade) return;
             int idx = addindex(k.symbol);
@@ -455,7 +458,7 @@ namespace TradeLink.Common
     /// <summary>
     /// track only last bid size
     /// </summary>
-    public class BidSizeTracker : GenericTracker<int>, GenericTrackerInt
+    public class BidSizeTracker : GenericTracker<int>, GenericTrackerInt, GotTickIndicator
     {
         public BidSizeTracker() : base("BIDSIZE") { }
         public int getvalue(int idx) { return this[idx]; }
@@ -463,7 +466,7 @@ namespace TradeLink.Common
         public void setvalue(int idx, int v) { this[idx] = v; }
         public int addindex(string txt, int v) { return getindex(txt); }
 
-        public void newTick(Tick k)
+        public void GotTick(Tick k)
         {
             if (!k.hasBid) return;
             int idx = addindex(k.symbol);
@@ -474,7 +477,7 @@ namespace TradeLink.Common
     /// <summary>
     /// track only last ask size
     /// </summary>
-    public class AskSizeTracker : GenericTracker<int>, GenericTrackerInt
+    public class AskSizeTracker : GenericTracker<int>, GenericTrackerInt, GotTickIndicator
     {
         public AskSizeTracker() : base("ASKSIZE") { }
         public int getvalue(int idx) { return this[idx]; }
@@ -482,7 +485,7 @@ namespace TradeLink.Common
         public void setvalue(int idx, int v) { this[idx] = v; }
         public int addindex(string txt, int v) { return getindex(txt); }
 
-        public void newTick(Tick k)
+        public void GotTick(Tick k)
         {
             if (!k.hasAsk) return;
             int idx = addindex(k.symbol);
@@ -492,7 +495,7 @@ namespace TradeLink.Common
     /// <summary>
     /// whether last tick in given symbol was a trade
     /// </summary>
-    public class IsTradeTracker : GenericTracker<bool>, GenericTrackerBool
+    public class IsTradeTracker : GenericTracker<bool>, GenericTrackerBool, GotTickIndicator
     {
         public IsTradeTracker() : base("ISTRADE") {}
         public bool getvalue(int idx) { return this[idx]; }
@@ -500,7 +503,7 @@ namespace TradeLink.Common
         public void setvalue(int idx, bool v) { this[idx] = v; }
         public int addindex(string txt, bool v) { return getindex(txt); }
 
-        public void newTick(Tick k)
+        public void GotTick(Tick k)
         {
             int idx = addindex(k.symbol);
             this[idx] = k.isTrade;
@@ -509,7 +512,7 @@ namespace TradeLink.Common
     /// <summary>
     /// whether last tick in given symbol had bid information
     /// </summary>
-    public class IsBidTracker : GenericTracker<bool>, GenericTrackerBool
+    public class IsBidTracker : GenericTracker<bool>, GenericTrackerBool, GotTickIndicator
     {
         public IsBidTracker() : base("ISBID") { }
         public bool getvalue(int idx) { return this[idx]; }
@@ -517,7 +520,7 @@ namespace TradeLink.Common
         public void setvalue(int idx, bool v) { this[idx] = v; }
         public int addindex(string txt, bool v) { return getindex(txt); }
 
-        public void newTick(Tick k)
+        public void GotTick(Tick k)
         {
             int idx = addindex(k.symbol);
             this[idx] = k.hasBid;
@@ -526,7 +529,7 @@ namespace TradeLink.Common
     /// <summary>
     /// whether last tick in given symbol had ask information
     /// </summary>
-    public class IsAskTracker : GenericTracker<bool>, GenericTrackerBool
+    public class IsAskTracker : GenericTracker<bool>, GenericTrackerBool, GotTickIndicator
     {
         public IsAskTracker() : base("ISASK") { }
         public bool getvalue(int idx) { return this[idx]; }
@@ -534,7 +537,7 @@ namespace TradeLink.Common
         public void setvalue(int idx, bool v) { this[idx] = v; }
         public int addindex(string txt, bool v) { return getindex(txt); }
 
-        public void newTick(Tick k)
+        public void GotTick(Tick k)
         {
             int idx = addindex(k.symbol);
             this[idx] = k.hasAsk;

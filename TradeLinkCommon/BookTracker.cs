@@ -9,8 +9,9 @@ namespace TradeLink.Common
     /// <summary>
     /// helps create books from ticks and keep track of book events
     /// </summary>
-    public class BookTracker : newTickIndicator
+    public class BookTracker : GotTickIndicator
     {
+        public void GotTick(Tick k) { newTick(k); }
         bool _bizero = false;
         int _minbookwait = 5;
 
