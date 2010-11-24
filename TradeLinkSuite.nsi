@@ -132,10 +132,10 @@ Section "TradeLinkSuite"
   File "ServerRealTick\dll\*"
   
   
-  File "ServerNxCore\bin\release\NxCoreAPI64.dll"
+  File "ServerNxCore\dll\NxCoreAPI64.dll"
   File "ServerNxCore64\bin\x64\release\ServerNxCore64.exe"
   File "ServerNxCore\bin\x86\release\ServerNxCore32.exe"
-  File "ServerNxCore\bin\x86\release\NxCoreAPI.dll"
+  File "ServerNxCore\dll\NxCoreAPI.dll"
   
 
   File "TikConverter\bin\release\TikConverter.exe"
