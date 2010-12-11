@@ -6,7 +6,7 @@ using TradeLink.Common;
 
 namespace TestTradeLink
 {
-    [TestFixture]
+    [TestFixture, Explicit]
     public class TestHistSim
     {
         public TestHistSim() { }

@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 
 namespace TestTradeLink
 {
-    [TestFixture(Description="May not work on machines without brokerserver installed to default location.")]
+    [TestFixture(Description="May not work on machines without brokerserver installed to default location."),Explicit]
     public class TestTLFastInterop
     {
         [DllImport("c:\\program files\\tradelink\\TradeLibFast.dll",EntryPoint="TLSENDORDER")]
