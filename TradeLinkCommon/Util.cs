@@ -782,17 +782,25 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="boxdll">The assembly.</param>
         /// <returns>list of response names</returns>
-        public static List<string> GetResponseList(Assembly responseassembly)
+        public static List<string> GetResponseList(Assembly responseassembly) { return GetResponseList(responseassembly, null); }
+        public static List<string> GetResponseList(Assembly responseassembly,DebugDelegate deb)
         {
             List<string> reslist = new List<string>();
             Type[] t;
             try
             {
                 t = responseassembly.GetTypes();
+                for (int i = 0; i < t.GetLength(0); i++)
+                    if (IsResponse(t[i])) reslist.Add(t[i].FullName);
             }
-            catch (Exception ex) { reslist.Add(ex.Message); return reslist; }
-            for (int i = 0; i < t.GetLength(0); i++)
-                if (IsResponse(t[i])) reslist.Add(t[i].FullName);
+            catch (Exception ex) 
+            {
+                if (deb != null)
+                {
+                    deb(ex.Message + ex.StackTrace);
+                }
+            }
+
             return reslist;
         }
 
