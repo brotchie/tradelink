@@ -10,7 +10,29 @@ namespace TradeLink.Common
     /// </summary>
     public static class ResponseLoader
     {
+        /// <summary>
+        /// Create a single Response from a DLL containing many Responses.  
+        /// </summary>
+        /// <param name="fullname"></param>
+        /// <param name="dllname"></param>
+        /// <param name="deb"></param>
+        /// <returns></returns>
+        public static Response FromDLL(string fullname, string dllname, DebugDelegate deb)
+        {
+            try
+            {
+                return FromDLL(fullname, dllname);
+            }
+            catch (Exception ex)
+            {
+                if (deb != null)
+                {
+                    deb(ex.Message + ex.StackTrace);
 
+                }
+            }
+            return null;
+        }
         /// <summary>
         /// Create a single Response from a DLL containing many Responses.  
         /// </summary>
@@ -28,6 +50,28 @@ namespace TradeLink.Common
             a = System.Reflection.Assembly.Load(raw);
 #endif
             return FromAssembly(a, fullname);
+        }
+        /// <summary>
+        /// Create a single Response from an Assembly containing many Responses. 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="fullname"></param>
+        /// <param name="deb"></param>
+        /// <returns></returns>
+        public static Response FromAssembly(System.Reflection.Assembly a, string fullname, DebugDelegate deb)
+        {
+            try
+            {
+                return FromAssembly(a, fullname);
+            }
+            catch (Exception ex)
+            {
+                if (deb != null)
+                {
+                    deb(ex.Message + ex.StackTrace);
+                }
+            }
+            return null;
         }
         /// <summary>
         /// Create a single Response from an Assembly containing many Responses. 
