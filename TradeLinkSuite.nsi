@@ -65,6 +65,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\Record.lnk" "$INSTDIR\Record.EXE" "" "$INSTDIR\Record.EXE" 0  
 
   CreateDirectory "$SMPROGRAMS\TradeLink Connectors"
+  CreateShortCut "$SMPROGRAMS\TradeLink Connectors\HoldBros-GrayBox.lnk" "$INSTDIR\GbTLServer.exe" "" "$INSTDIR\GbTLServer.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\SterlingPro.lnk" "$INSTDIR\SterServer.EXE" "" "$INSTDIR\SterServer.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\TDAmeritrade.lnk" "$INSTDIR\TDServer.EXE" "" "$INSTDIR\TDServer.EXE" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\TDAmeritradeX.lnk" "$INSTDIR\TDServerX.EXE" "" "$INSTDIR\TDServerX.EXE" 0  
@@ -115,6 +116,11 @@ Section "TradeLinkSuite"
   File "Install\TickDataInstall.exe"
   File "Install\TickDataMigrate.exe"
   File "ServerEsignal\bin\release\Interop.IESignal.dll"
+  
+  File "ServerGrayBox\bin\release\GbTLServer.exe"
+  File "ServerGrayBox\bin\release\GBAPILibrary.dll"
+  File "ServerGrayBox\bin\release\Interop.GBXCTRLLib.dll"
+  File "ServerGrayBox\bin\release\Interop.GBQUOTESLib.dll"
 
 
   File "ServerDBFX\bin\release\ServerDBFX.exe"

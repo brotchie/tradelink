@@ -35,5 +35,7 @@ namespace TradeLink.API
         PATS,
         FIX,
         RealTick,
+        GrayBox,
+        Avatar,
     }
 }
