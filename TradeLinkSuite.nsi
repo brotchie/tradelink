@@ -204,7 +204,7 @@ Section "TradeLinkSuite"
   RMDir /r "$PROGRAMFILES\TradeLink\TradeLinkSuite"
   
   ; Write the installation path into the registry
-  WriteRegStr HKLM SOFTWARE\TradeLinkSuite "Install_Dir" "$INSTDIR"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "Install_Dir" "$INSTDIR"
     
   ; make sure TickData folder is present
   CreateDirectory "$LOCALAPPDATA\TradeLinkTicks"
@@ -212,7 +212,7 @@ Section "TradeLinkSuite"
   ; check for .net35
   File "Install\DotNetInstaller.exe"
   DetailPrint "Checking for .net35..."
-  ReadRegStr $0 HKLM SOFTWARE\TradeLinkSuite "InstalledDOTNET35"
+  ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "InstalledDOTNET35"
   StrCmp $0 "Yes" dotnetinstalled
   Call IsNetfx35Installed
   
@@ -225,21 +225,21 @@ Section "TradeLinkSuite"
 
 tickdata:  
   DetailPrint "Checking for TickData..."
-  ReadRegStr $0 HKLM SOFTWARE\TradeLinkSuite "InstalledTickData"
+  ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "InstalledTickData"
   StrCmp $0 "Yes" vcredistinstall
   ExecWait "TickDataInstall.exe"
-  WriteRegStr HKLM SOFTWARE\TradeLinkSuite "InstalledTickData" "Yes"
-  WriteRegStr HKLM SOFTWARE\TradeLinkSuite "TickDataPath" "$LOCALAPPDIR\TradeLinkTicks"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "InstalledTickData" "Yes"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "TickDataPath" "$LOCALAPPDIR\TradeLinkTicks"
   DetailPrint "TickData was installed."
   
   
  vcredistinstall:
   DetailPrint "Checking for VCRedistributable..."
-  ReadRegStr $0 HKLM SOFTWARE\TradeLinkSuite "InstalledVcRedist"
+  ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "InstalledVcRedist"
   StrCmp $0 "Yes" finishinstall
   ExecWait "VCRedistInstall.exe"
   DetailPrint "VCRedistributable was installed."
-  WriteRegStr HKLM SOFTWARE\TradeLinkSuite "InstalledVcRedist" "Yes"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "InstalledVcRedist" "Yes"
   
 finishinstall:  
   ; Write the uninstall keys for Windows
