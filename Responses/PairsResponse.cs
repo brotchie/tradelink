@@ -38,16 +38,21 @@ namespace Responses
 
         void pairs_SpreadOutsideBounds(decimal difference)
         {
-            // b is relatively expensive here
-            if (difference>0)
+            if (!entrysignal)
             {
-              sendorder(new BuyMarket(pairs.Asym, 100));
-              sendorder(new SellMarket(pairs.Bsym, 100));
-            }
-            else // b is cheap here
-            {
-                sendorder(new BuyMarket(pairs.Bsym, 100));
-                sendorder(new SellMarket(pairs.Asym, 100));
+                // b is relatively expensive here
+                if (difference > 0)
+                {
+                    sendorder(new BuyMarket(pairs.Asym, 100));
+                    sendorder(new SellMarket(pairs.Bsym, 100));
+                    entrysignal = true;
+                }
+                else // b is cheap here
+                {
+                    sendorder(new BuyMarket(pairs.Bsym, 100));
+                    sendorder(new SellMarket(pairs.Asym, 100));
+                    entrysignal = true;
+                }
             }
         }
 
@@ -72,10 +77,24 @@ namespace Responses
         [Description("pl profit target")]
         public int PlProfit { get { return _profit; } set { _profit = value; } }
 
+
+        bool entrysignal = false;
+        bool exitsignal = false;
         public override void GotTick(Tick tick)
         {
-
+            // check for spread break
             pairs.GotTick(tick);
+            // check for return
+            if (entrysignal && !pt[Asym].isFlat && !exitsignal)
+            {
+                if (pairs.Spread == 0)
+                {
+                    exitsignal = true;
+                    D("pairs hit zero again, exiting trade.");
+                    shutdown();
+                }
+                
+            }
         }
         public override void GotOrder(Order order)
         {
@@ -90,6 +109,11 @@ namespace Responses
             decimal openpl = Calc.OpenPL(pairs.Aprice, pt[pairs.Asym]) + Calc.OpenPL(pairs.Bprice, pt[pairs.Bsym]);
             if ((openpl > _profit) || (openpl< _loss))
                 shutdown();
+            if (pt[Asym].isFlat && pt[Bsym].isFlat)
+            {
+                entrysignal = false;
+                exitsignal = false;
+            }
         }
         void shutdown()
         {
