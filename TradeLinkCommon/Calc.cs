@@ -141,10 +141,16 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="size">The size.</param>
         /// <returns></returns>
-        public static int Norm2Min(decimal size,int MINSIZE)
+        public static int Norm2Min(decimal size, int MINSIZE) { return Norm2Min(size, MINSIZE, true); }
+        public static int Norm2Min(decimal size, int MINSIZE, bool roundup)
         {
-            int wmult = (int)Math.Ceiling(size / MINSIZE);
-            return wmult * MINSIZE;
+            if (roundup)
+            {
+                int wmult = (int)Math.Ceiling(size / MINSIZE);
+                return wmult * MINSIZE;
+            }
+            int mult = (int)Math.Floor(size / MINSIZE);
+            return mult * MINSIZE;
         }
 
         /// <summary>
