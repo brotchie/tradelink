@@ -250,6 +250,11 @@ namespace TradeLibFast
 					bs = "1 day";
 				// save request
 				histBarSymbols.push_back(br);
+				// notify
+				CString m;
+				m.Format("Bar request: %s end date: %s dur: %s size: %s",br.Symbol,edt,dur,bs);
+				D(m);
+
 				// request data
 				this->m_link[this->validlinkids[0]]->reqHistoricalData((TickerId)histBarSymbols.size()-1,contract,edt,dur,bs,histBarWhatToShow,histBarRTH,2);
 
