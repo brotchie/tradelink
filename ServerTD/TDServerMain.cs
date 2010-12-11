@@ -213,7 +213,11 @@ namespace TDServer
         Dictionary<long, long> idmap = new Dictionary<long, long>();
         long tl_gotSrvFillRequest(Order o)
         {
-            if (!ok) { debug("not logged in."); return (long)MessageTypes.BROKERSERVER_NOT_FOUND; }
+            if (!ok) 
+            { 
+                debug("not logged in.");
+                return (long)MessageTypes.SYMBOL_NOT_LOADED;
+            }
 
             string action = o.side ? "buy" : "sell";
             string otype = o.isLimit ? "limit" : "market";
