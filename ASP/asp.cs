@@ -52,6 +52,7 @@ namespace ASP
         int _INITIALRESPONSEID = 0;
         int _NEXTRESPONSEID = 0;
         BackgroundWorker bw = new BackgroundWorker();
+        BackgroundWorker cc = new BackgroundWorker();
 
         public ASP()
         {
@@ -113,6 +114,8 @@ namespace ASP
             this.FormClosing += new FormClosingEventHandler(ASP_FormClosing);
             bw.DoWork += new DoWorkEventHandler(bw_DoWork);
             bw.RunWorkerAsync();
+            // handle capital connections on seperate thread
+            cc.DoWork += new DoWorkEventHandler(cc_DoWork);
             // get last loaded response library
             LoadResponseDLL(Properties.Settings.Default.boxdll);
             // load any skins we can find
@@ -120,6 +123,16 @@ namespace ASP
             // process command line
             processcommands();
 
+        }
+
+        void cc_DoWork(object sender, DoWorkEventArgs e)
+        {
+            if (!_ao._capconprompt.Checked)
+            {
+                return;
+            }
+            if (CapitalRequestConfim.ConfirmSubmitCapitalRequest(_rs, false, debug))
+                status("Sent capital connection request.");
         }
 
         void _dw_NewCreateTicketEvent(string msg)
@@ -874,7 +887,7 @@ namespace ASP
 
 
 
-
+        Results _rs = new Results();
        
         void tl_gotTick(Tick t)
         {
@@ -899,6 +912,8 @@ namespace ASP
 
         void tl_gotFill(Trade t)
         {
+            // track results
+            _rs.GotFill(t);
             // keep track of position
             _pt.Adjust(t);
             // see if we're using virtual ids
@@ -923,12 +938,22 @@ namespace ASP
             for (int i = 0; i < _reslist.Count; i++)
                 if (_reslist[i].isValid)
                     _reslist[i].GotFill(t);
+            // check for capital connection request
+            if (docapcon)
+            {
+                docapcon = false;
+                docc();
+            }
         }
+
+        bool docapcon = true;
 
         void tl_gotPosition(Position pos)
         {
             // keep track of position
             _pt.Adjust(pos);
+            // keep track of results
+            _rs.GotPosition(pos);
         }
 
         void debug(string message)
@@ -1375,6 +1400,19 @@ namespace ASP
             {
                 Properties.Settings.Default.prefexecute = _bf.Broker;
             }
+        }
+
+        void docc()
+        {
+            if (!cc.IsBusy)
+                cc.RunWorkerAsync();
+            else
+                debug("Already running capital connection request.");
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            docc();
         }
 
 

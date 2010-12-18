@@ -195,6 +195,8 @@ namespace WinGauntlet
                 string msg = "Done.  Ticks: " + gargs.TicksProcessed + " Speed:" + gargs.TicksSecond.ToString("N0") + " t/s  Fills: " + gargs.Executions.ToString();
                 debug(msg);
                 status(msg);
+                if (CapitalRequestConfim.ConfirmSubmitCapitalRequest(tradeResults1.CurrentResults, _capitalprompt.Checked, debug))
+                    status("sent capital connection request.");
             }
             else debug("Canceled.");
             // close indicators
@@ -690,6 +692,11 @@ namespace WinGauntlet
         private void button5_Click(object sender, EventArgs e)
         {
             System.Diagnostics.Process.Start(Util.TLProgramDir + "\\Tattle.exe");
+        }
+
+        private void _docapcon_Click(object sender, EventArgs e)
+        {
+            CapitalRequestConfim.ConfirmSubmitCapitalRequest(tradeResults1.CurrentResults, false, debug);
         }
 
 

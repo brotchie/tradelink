@@ -112,11 +112,14 @@ namespace TradeLink.Common
         /// </summary>
         public int RecentTime { get { return _lasttime; } }
 
-        int _ticks = 0;
+        int _ticks = -1;
         /// <summary>
         /// gets count of ticks which have passed through watcher
         /// </summary>
         public int TickCount { get { return _ticks; } }
+
+        int _firsttime = 0;
+        public int TickStartTime { get { return _firsttime; } }
         /// <summary>
         /// Watches the specified tick.
         /// Alerts if wait time exceeded.
@@ -126,6 +129,8 @@ namespace TradeLink.Common
         public bool newTick(Tick k) 
         {
             _lasttime = k.time;
+            if (_firsttime < 0)
+                _firsttime = k.time;
             if (_livecheck && (_ticks++ > CheckLiveAfterTickCount))
             {
                 bool dmatch = k.date == Util.ToTLDate();

@@ -309,9 +309,11 @@ namespace TradeLink.AppKit
             DisplayResults(Results.FetchResults(_resultlists[idx],_rfr,_comm,debug));
         }
 
+        public Results CurrentResults = new Results();
 
         void DisplayResults(Results r)
         {
+            CurrentResults = r;
             dt.BeginLoadData();
             dt.Clear();
             Type t = r.GetType();

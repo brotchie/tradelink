@@ -238,5 +238,17 @@ namespace ASP.Properties {
                 this["pw"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool capitalconnections {
+            get {
+                return ((bool)(this["capitalconnections"]));
+            }
+            set {
+                this["capitalconnections"] = value;
+            }
+        }
     }
 }

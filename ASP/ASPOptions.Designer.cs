@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this._capconprompt = new System.Windows.Forms.CheckBox();
             this.label6 = new System.Windows.Forms.Label();
             this._portal = new System.Windows.Forms.TextBox();
             this._dest = new System.Windows.Forms.TextBox();
@@ -54,6 +55,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this._capconprompt);
             this.groupBox1.Controls.Add(this.label6);
             this.groupBox1.Controls.Add(this._portal);
             this.groupBox1.Controls.Add(this._dest);
@@ -64,10 +66,23 @@
             this.groupBox1.Controls.Add(this._account);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(381, 109);
+            this.groupBox1.Size = new System.Drawing.Size(381, 154);
             this.groupBox1.TabIndex = 20;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "General";
+            // 
+            // _capconprompt
+            // 
+            this._capconprompt.AutoSize = true;
+            this._capconprompt.Checked = global::ASP.Properties.Settings.Default.capitalconnections;
+            this._capconprompt.CheckState = System.Windows.Forms.CheckState.Checked;
+            this._capconprompt.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::ASP.Properties.Settings.Default, "capitalconnections", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this._capconprompt.Location = new System.Drawing.Point(162, 109);
+            this._capconprompt.Name = "_capconprompt";
+            this._capconprompt.Size = new System.Drawing.Size(208, 24);
+            this._capconprompt.TabIndex = 23;
+            this._capconprompt.Text = "Allow capital connections";
+            this._capconprompt.UseVisualStyleBackColor = true;
             // 
             // label6
             // 
@@ -204,7 +219,7 @@
             this.groupBox2.Controls.Add(this._execsel);
             this.groupBox2.Controls.Add(this.label3);
             this.groupBox2.Controls.Add(this.label2);
-            this.groupBox2.Location = new System.Drawing.Point(13, 127);
+            this.groupBox2.Location = new System.Drawing.Point(13, 172);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(380, 180);
             this.groupBox2.TabIndex = 21;
@@ -249,7 +264,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(415, 319);
+            this.ClientSize = new System.Drawing.Size(415, 374);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
@@ -284,5 +299,6 @@
         public System.Windows.Forms.TextBox _dest;
         private System.Windows.Forms.Label label6;
         public System.Windows.Forms.TextBox _portal;
+        public System.Windows.Forms.CheckBox _capconprompt;
     }
 }
