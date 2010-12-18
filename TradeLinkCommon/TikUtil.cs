@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using TradeLink.API;
 
 namespace TradeLink.Common
 {
@@ -80,5 +81,30 @@ namespace TradeLink.Common
             }
             return matching;
         }
+
+
+        /// <summary>
+        /// create file from ticks
+        /// </summary>
+        /// <param name="ticks"></param>
+        public static void TicksToFile(Tick[] ticks)
+        {
+            TikWriter tw = new TikWriter();
+            foreach (Tick k in ticks)
+                tw.newTick(k);
+        }
+        /// <summary>
+        /// create ticks from bars on default interval
+        /// </summary>
+        /// <param name="bl"></param>
+        /// <returns></returns>
+        public static Tick[] Barlist2Tick(BarList bl)
+        {
+            List<Tick> k = new List<Tick>(bl.Count * 4);
+            foreach (Bar b in bl)
+                k.AddRange(BarImpl.ToTick(b));
+            return k.ToArray();
+        }
+
     }
 }

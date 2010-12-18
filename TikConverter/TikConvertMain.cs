@@ -38,6 +38,35 @@ namespace TikConverter
         {
             // make sure we only convert one group at a time
             if (bw.IsBusy) { debug("wait until conversion completes..."); return; }
+            // see if we're converting from files
+            switch (_conval)
+            {
+                case Converter.YahooDaily:
+                case Converter.GoogleDaily:
+                    // reset progress
+                    progress(0);
+                    // get list of symbols
+                    string symi = Microsoft.VisualBasic.Interaction.InputBox("Enter list of symbols to pull from " + _conval.ToString() + Environment.NewLine + "(eg LVS,GOOG,GE)", "Enter symbol list", string.Empty, 0, 0);
+                    // remove spaces and capitalize
+                    symi = symi.Replace(" ", string.Empty).ToUpper();
+                    // parse
+                    string[] syms = symi.Split(',');
+                    int count = 0;
+                    foreach (string sym in syms)
+                    {
+                        // get barlists for those symbols
+                        BarList bl = _conval == Converter.GoogleDaily ? BarListImpl.DayFromGoogle(sym) : BarListImpl.DayFromYahoo(sym);
+                        // convert to tick files
+                        TikUtil.TicksToFile(TikUtil.Barlist2Tick(bl));
+                        // update progress
+                        progress((double)count++ / syms.Length);
+                        // notify
+                        debug("downloaded "+bl.Count+" bars of daily data for " + sym+" from "+_conval.ToString());
+                    }
+                    debug("completed daily download.");
+                    // we're done
+                    return;
+            }
             OpenFileDialog of = new OpenFileDialog();
             // allow selection of multiple inputs
             of.Multiselect = true;

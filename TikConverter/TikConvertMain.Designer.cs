@@ -57,7 +57,7 @@
             this._inputbut.Name = "_inputbut";
             this._inputbut.Size = new System.Drawing.Size(144, 36);
             this._inputbut.TabIndex = 1;
-            this._inputbut.Text = "select input files";
+            this._inputbut.Text = "convert";
             this._inputbut.UseVisualStyleBackColor = true;
             this._inputbut.Click += new System.EventHandler(this._inputbut_Click);
             // 

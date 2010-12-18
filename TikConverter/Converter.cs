@@ -6,5 +6,7 @@ public enum Converter
     TradeStation,
     eSignal_EPF,
     TradingPhysicsTnS,
-    TradingPhysicsTV
+    TradingPhysicsTV,
+    GoogleDaily,
+    YahooDaily,
 }
