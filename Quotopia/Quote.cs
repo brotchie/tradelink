@@ -54,7 +54,8 @@ namespace Quotopia
             Resize += new EventHandler(Quote_Resize);
             _tlt_GotConnect();
             bw.DoWork += new DoWorkEventHandler(bw_DoWork);
-            bw.RunWorkerAsync();
+            if (!bw.IsBusy)
+                bw.RunWorkerAsync();
             processcommands();
 
             _constructed = true;
