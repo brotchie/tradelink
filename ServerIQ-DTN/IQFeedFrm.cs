@@ -33,6 +33,8 @@ namespace IQFeedBroker
             InitializeComponent();
             this.FormClosing += IQFeedFrm_FormClosing;
             _helper = new IQFeedHelper(tls);
+            _helper.DtnPath = Properties.Settings.Default.DtnPath;
+            _helper.port = Properties.Settings.Default.Port;
             _helper.ReleaseDeadSymbols = Properties.Settings.Default.ReleaseDeadSymbols;
             _helper.MktCodes = parsemkts(Properties.Resources.marketcenters);
             _helper.SendDebug += new DebugDelegate(_helper_SendDebug);

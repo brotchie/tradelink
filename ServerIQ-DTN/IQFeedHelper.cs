@@ -43,6 +43,7 @@ namespace IQFeedBroker
         }
         #endregion
         #region Constructors
+        public string DtnPath = string.Empty;
         public IQFeedHelper(TLServer tls)
         {
             _basket = new BasketImpl();
@@ -255,19 +256,28 @@ namespace IQFeedBroker
         }
 	public TLServer tl;
 
+    public static string CheckForDefaultLocation()
+    {
+        return string.Empty;
+    }
+
         public void Start(string username, string password, string data1, int data2)
         {
             _registered = false;
             // get IQConnect Location from registry
             // IQFeed Installation directory is stored in the registry key
-            RegistryKey key = Registry.LocalMachine.OpenSubKey(IQ_FEED_REGISTRY_LOCATION);
-            if (key == null)
+            if (DtnPath == string.Empty)
             {
-                debug("IQ Feed is not installed");
-                return;
+                DtnPath = CheckForDefaultLocation();
+                debug("DtnPath not set in config file, auto-set dtn path to: " + DtnPath);
             }
-            // close the key since we don't need it anymore
-            key.Close();
+            if (port == 0)
+            {
+                port = CheckDefaultPort();
+                if (port == 0)
+                    debug("Dtn port not set in config file, auto-set port to: " + port);
+            }
+
             _user = username;
             _pswd = password;
             _prod = data1;
@@ -343,6 +353,17 @@ namespace IQFeedBroker
             }
         }
         const string HISTSOCKET = "HISTSOCK";
+        public int port = 0;
+        public static int CheckDefaultPort()
+        {
+            RegistryKey rk = Registry.CurrentUser.OpenSubKey(IQ_FEED_REGISTRY_LOCATION + "\\Startup");
+            int p = 0;
+            if (!int.TryParse(rk.GetValue("LookupPort").ToString(), out p))
+            {
+                return 0;
+            }
+            return p;
+        }
         void ConnectHist()
         {
             try
@@ -350,13 +371,6 @@ namespace IQFeedBroker
                 debug("Attempting to connect to historical feed.");
                 m_hist = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 IPAddress local = IPAddress.Loopback;
-                RegistryKey rk = Registry.CurrentUser.OpenSubKey(IQ_FEED_REGISTRY_LOCATION + "\\Startup");
-                int port = 0;
-                if (!int.TryParse(rk.GetValue("LookupPort").ToString(), out port))
-                {
-                    debug("could not find historical data port.");
-                    return;
-                }
                 m_hist.Connect(new IPEndPoint(local, port));
                 if (m_hist.Connected)
                     debug("historical connected.");
