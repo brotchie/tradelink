@@ -5,12 +5,8 @@ using TradeLink.API;
 namespace TradeLink.Common
 {
 
-    
-    /// <summary>
-    /// create and manage one-cancels-other orders in tradelink
-    /// Oco groups are managed on per-symbol basis
-    /// </summary>
-    public class OCOTracker : GenericTracker<OCOGroup>,SendOrderIndicator,SendCancelIndicator,GotFillIndicator,GotCancelIndicator
+
+    public class OCOTracker : GenericTracker<OCOGroup>
     {
         IdTracker _idt;
         public OCOTracker() : this(new IdTracker()) { }
@@ -40,7 +36,9 @@ namespace TradeLink.Common
             {
                 int idx = -1;
                 if (!oid2symidx.TryGetValue(id, out idx))
-                    return new OCOGroup();
+                {
+                    return OCOGroup.EmptyGroup();
+                }
                 return this[idx];
             }
         }
@@ -120,6 +118,11 @@ namespace TradeLink.Common
         }
         void cancelgrp(OCOGroup grp, long ex)
         {
+            if (!grp.isValid)
+            {
+                debug("Invalid oco group: " + grp.ToString());
+                return;
+            }
             debug("Canceling group: " + grp.ToString());
             bool ok = false;
             for (int i = 0; i < grp.Count; i++)
@@ -269,6 +272,16 @@ namespace TradeLink.Common
                 if (groupids[i] == id) return true;
             return false;
         }
+        public static OCOGroup EmptyGroup()
+        {
+            OCOGroup grp = new OCOGroup();
+            grp.SymbolOwner = string.Empty;
+            grp.orders = new Order[0];
+            grp.groupids = new long[0];
+            return grp;
+
+        }
+
         /// <summary>
         /// create an oco group
         /// </summary>
@@ -294,4 +307,5 @@ namespace TradeLink.Common
             return s;
         }
     }
+
 }
