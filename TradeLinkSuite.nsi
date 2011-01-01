@@ -256,7 +256,7 @@ finishinstall:
   
   ; don't open browser on silent
   StrCmp $SILENT "YES" final
-  ExecShell "open" "http://www.pracplay.com/support"
+  ExecShell "open" "http://www.pracplay.com/landings/afterinstallingtradelink"
   final:
 
 SectionEnd
