@@ -126,7 +126,7 @@ namespace TradeLink.Common
         public string ToString(int decimals)
         {
             if (this.isFilled) return base.ToString();
-            return (side ? " BUY" : " SELL") + UnsignedSize + " " + this.symbol + "@" + (isMarket ? "Mkt" : (isLimit ? this.price.ToString("N"+decimals.ToString()) : this.stopp.ToString("N"+decimals.ToString())+"stp")) + " ["+this.Account+"] " +id.ToString() ;
+            return (side ? " BUY" : " SELL") + UnsignedSize + " " + this.symbol + "@" + (isMarket ? "Mkt" : (isLimit ? this.price.ToString("N"+decimals.ToString()) : this.stopp.ToString("N"+decimals.ToString())+"stp")) + " ["+this.Account+"] " +id.ToString()+(isLimit && isStop ? " stop: "+stopp.ToString("N"+decimals.ToString()) : string.Empty);
         }
 
         /// <summary>
