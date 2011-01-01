@@ -34,7 +34,7 @@ namespace TestTradeLink
         public void StandardResponse()
         {
             Never b = new Never();
-            b.SendOrderEvent += new OrderDelegate(b_SendOrder);
+            b.SendOrderEvent += new OrderSourceDelegate(b_SendOrder);
             sbcount = 0;
             Assert.That(b.isValid);
             Assert.That(sbcount == 0);
@@ -49,7 +49,7 @@ namespace TestTradeLink
            
         }
 
-        void b_SendOrder(Order order)
+        void b_SendOrder(Order order, int id)
         {
             sbcount++;
             o = order;
@@ -83,7 +83,7 @@ namespace TestTradeLink
         {
             Always b = new Always();
             b.SendDebugEvent += new DebugFullDelegate(b_SendDebug);
-            b.SendOrderEvent+=new OrderDelegate(b_SendOrder);
+            b.SendOrderEvent += new OrderSourceDelegate(b_SendOrder);
             sbcount = 0;
             debugs = 0;
             Assert.That(b.MinSize == 100);
@@ -128,7 +128,7 @@ namespace TestTradeLink
             // subscribe to news service that will count everytime a debug is sent
             Always b = new Always(); // send debugs from reponse to our news service
             b.SendDebugEvent += new DebugFullDelegate(b_SendDebug);
-            b.SendOrderEvent+=new OrderDelegate(b_SendOrder);
+            b.SendOrderEvent += new OrderSourceDelegate(b_SendOrder);
             int good = 0;
             debugs = 0;
             for (int i = 0; i < timesales.Length; i++)
