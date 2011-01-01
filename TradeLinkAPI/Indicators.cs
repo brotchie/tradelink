@@ -2,7 +2,10 @@
 
 namespace TradeLink.API
 {
-
+    public interface GotResetIndicator
+    {
+        void Reset();
+    }
     public interface GotTickIndicator
     {
         void GotTick(Tick k);
