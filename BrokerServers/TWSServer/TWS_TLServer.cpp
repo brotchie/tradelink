@@ -439,7 +439,7 @@ namespace TradeLibFast
 
 		order->auxPrice = o.isTrail() ? o.trail : o.stop;
 		order->lmtPrice = o.price;
-		order->orderType = (o.isStop()) ? "STP" : (o.isLimit() ? "LMT" : (o.isTrail() ? "TRAIL" : "MKT"));
+		order->orderType = (o.isStop() && o.isLimit()) ? "STPLMT" : (o.isStop()) ? "STP" : (o.isLimit() ? "LMT" : (o.isTrail() ? "TRAIL" : "MKT"));
 		order->totalQuantity = (long)abs(o.size);
 		order->action = (o.side) ? "BUY" : "SELL";
 		order->account = o.account;
