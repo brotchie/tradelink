@@ -211,6 +211,12 @@
     <Compile Include="SafeBindingSource.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="TextPrompt.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextPrompt.Designer.cs">
+      <DependentUpon>TextPrompt.cs</DependentUpon>
+    </Compile>
     <Compile Include="Ticket.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -284,6 +290,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="PopupWindow.resx">
       <DependentUpon>PopupWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextPrompt.resx">
+      <DependentUpon>TextPrompt.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Ticket.resx">
       <DependentUpon>Ticket.cs</DependentUpon>

@@ -150,7 +150,7 @@ namespace Record
 
         void symlist(object sender, EventArgs e)
         {
-            string syms = Microsoft.VisualBasic.Interaction.InputBox("Enter symbols seperated by commas", "Symbols", mb.ToString(), 0, 0);
+            string syms = TextPrompt.Prompt("Enter symbols seperated by commas", "Symbols", mb.ToString());
             Basket b = BasketImpl.FromString(syms);
             subscribe(b);
 
