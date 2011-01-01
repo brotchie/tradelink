@@ -407,8 +407,8 @@ namespace WinGauntlet
             args.Response.SendMessageEvent += new MessageDelegate(Response_SendMessage);
             args.Response.SendIndicatorsEvent += new StringParamDelegate(Response_SendIndicators);
             args.Response.SendDebugEvent += new DebugFullDelegate(Response_GotDebug);
-            args.Response.SendCancelEvent += new LongDelegate(Response_CancelOrderSource);
-            args.Response.SendOrderEvent += new OrderDelegate(Response_SendOrder);
+            args.Response.SendCancelEvent += new LongSourceDelegate(Response_CancelOrderSource);
+            args.Response.SendOrderEvent += new OrderSourceDelegate(Response_SendOrder);
             args.Response.SendBasketEvent += new BasketDelegate(Response_SendBasket);
             args.Response.SendChartLabelEvent += new ChartLabelDelegate(Response_SendChartLabel);
             _boundonce = true;
@@ -465,7 +465,7 @@ namespace WinGauntlet
         }
 
 
-        void Response_SendOrder(Order o)
+        void Response_SendOrder(Order o, int id)
         {
             if (h!=null)
                 h.SimBroker.SendOrderStatus(o);
@@ -477,7 +477,7 @@ namespace WinGauntlet
                 args.Response.GotOrderCancel(id);
         }
 
-        void Response_CancelOrderSource(long number)
+        void Response_CancelOrderSource(long number, int id)
         {
             if (h!=null)
                 h.SimBroker.CancelOrder(number);

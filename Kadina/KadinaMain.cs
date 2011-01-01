@@ -595,8 +595,8 @@ namespace Kadina
                 resname = name;
                 myres.SendTicketEvent += new TicketDelegate(myres_SendTicketEvent);
                 myres.SendDebugEvent += new DebugFullDelegate(myres_GotDebug);
-                myres.SendCancelEvent += new LongDelegate(myres_CancelOrderSource);
-                myres.SendOrderEvent += new OrderDelegate(myres_SendOrder);
+                myres.SendCancelEvent += new LongSourceDelegate(myres_CancelOrderSource);
+                myres.SendOrderEvent += new OrderSourceDelegate(myres_SendOrder);
                 myres.SendIndicatorsEvent += new StringParamDelegate(myres_SendIndicators);
                 myres.SendMessageEvent += new MessageDelegate(myres_SendMessage);
                 myres.SendBasketEvent += new BasketDelegate(myres_SendBasket);
@@ -663,7 +663,7 @@ namespace Kadina
         }
 
 
-        void myres_SendOrder(Order o)
+        void myres_SendOrder(Order o, int id)
         {
             if (o.time == 0)
             {
@@ -679,7 +679,7 @@ namespace Kadina
                 myres.GotOrderCancel(id);
         }
 
-        void myres_CancelOrderSource(long number)
+        void myres_CancelOrderSource(long number, int id)
         {
             h.SimBroker.CancelOrder(number);
         }

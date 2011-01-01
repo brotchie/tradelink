@@ -13,6 +13,8 @@ namespace TradeLink.API
     public delegate void TickDelegate(Tick t);
     public delegate void FillDelegate(Trade t);
     public delegate void OrderDelegate(Order o);
+    public delegate void OrderSourceDelegate(Order o, int source);
+    public delegate void LongSourceDelegate(long val, int source);
     public delegate long OrderDelegateStatus(Order o);
     public delegate void Int64Delegate(Int64 number);
     public delegate void SecurityDelegate(Security sec);

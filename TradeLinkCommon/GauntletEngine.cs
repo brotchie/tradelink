@@ -15,8 +15,8 @@ namespace TradeLink.Common
         public GauntletEngine(TradeLink.API.Response r, TickFileFilter tff)
         {
             _r = r;
-            _r.SendOrderEvent += new OrderDelegate(_r_SendOrder);
-            _r.SendCancelEvent += new LongDelegate(_r_SendCancel);
+            _r.SendOrderEvent += new OrderSourceDelegate(_r_SendOrder);
+            _r.SendCancelEvent += new LongSourceDelegate(_r_SendCancel);
             _tff = tff;
             _h = new HistSimImpl(_tff);
             _h.GotTick += new TickDelegate(_h_GotTick);
@@ -38,12 +38,12 @@ namespace TradeLink.Common
             _r.GotOrder(o);
         }
 
-        void _r_SendOrder(Order o)
+        void _r_SendOrder(Order o, int id)
         {
             _h.SimBroker.SendOrderStatus(o);
         }
 
-        void _r_SendCancel(long number)
+        void _r_SendCancel(long number, int id)
         {
             _h.SimBroker.CancelOrder(number);
         }

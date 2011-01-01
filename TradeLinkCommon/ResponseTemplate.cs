@@ -76,12 +76,12 @@ namespace TradeLink.Common
         /// short form of sendorder
         /// </summary>
         /// <param name="o"></param>
-        public virtual void O(Order o) { o.VirtualOwner = ID;  SendOrderEvent(o); }
+        public virtual void O(Order o) { o.VirtualOwner = ID;  SendOrderEvent(o,ID); }
         /// <summary>
         /// short form of sendcancel
         /// </summary>
         /// <param name="id"></param>
-        public virtual void C(long id) { SendCancelEvent(id); }
+        public virtual void C(long id) { SendCancelEvent(id,ID); }
         /// <summary>
         /// short form of sendindicator
         /// </summary>
@@ -101,12 +101,12 @@ namespace TradeLink.Common
         /// sends an order
         /// </summary>
         /// <param name="o"></param>
-        public virtual void sendorder(Order o) { o.VirtualOwner = ID;  SendOrderEvent(o); }
+        public virtual void sendorder(Order o) { o.VirtualOwner = ID;  SendOrderEvent(o,ID); }
         /// <summary>
         /// cancels an order (must have the id)
         /// </summary>
         /// <param name="id"></param>
-        public virtual void sendcancel(long id) { SendCancelEvent(id); }
+        public virtual void sendcancel(long id) { SendCancelEvent(id,ID); }
         /// <summary>
         /// sends indicators as array of objects for later analysis
         /// </summary>
@@ -281,8 +281,8 @@ namespace TradeLink.Common
         /// </summary>
         public string FullName { get { return _full; } set { _full = value; } }
         public event DebugFullDelegate SendDebugEvent;
-        public event OrderDelegate SendOrderEvent;
-        public event LongDelegate SendCancelEvent;
+        public event OrderSourceDelegate SendOrderEvent;
+        public event LongSourceDelegate SendCancelEvent;
         public event StringParamDelegate SendIndicatorsEvent;
         public event MessageDelegate SendMessageEvent;
         public event BasketDelegate SendBasketEvent;

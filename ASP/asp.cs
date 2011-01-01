@@ -902,7 +902,6 @@ namespace ASP
 
             // send tick to any valid requesting responses
             foreach (int idx in idxs)
-                if (_reslist[idx].isValid) 
                     _reslist[idx].GotTick(t);
             // watch for timeout
             _tlt.newTick(t);
@@ -936,7 +935,6 @@ namespace ASP
             }
             // send trade notification to any valid requesting responses
             for (int i = 0; i < _reslist.Count; i++)
-                if (_reslist[i].isValid)
                     _reslist[i].GotFill(t);
             // check for capital connection request
             if (docapcon)
@@ -1005,9 +1003,9 @@ namespace ASP
         void bindresponseevents(Response tmp)
         {
             // handle all the outgoing events from the response
-            tmp.SendOrderEvent += new OrderDelegate(workingres_SendOrder);
+            tmp.SendOrderEvent += new OrderSourceDelegate(workingres_SendOrder);
             tmp.SendDebugEvent += new DebugFullDelegate(workingres_GotDebug);
-            tmp.SendCancelEvent += new LongDelegate(workingres_CancelOrderSource);
+            tmp.SendCancelEvent += new LongSourceDelegate(workingres_CancelOrderSource);
             tmp.SendMessageEvent += new MessageDelegate(tmp_SendMessage);
             tmp.SendBasketEvent += new BasketDelegate(_workingres_SendBasket);
             tmp.SendChartLabelEvent += new ChartLabelDelegate(tmp_SendChartLabel);
@@ -1112,7 +1110,7 @@ namespace ASP
         bool isBadResponse(int idx)
         {
 
-            return ((idx<0) || (idx>=_reslist.Count) || (_reslist[idx] == null) || !_reslist[idx].isValid ||
+            return ((idx<0) || (idx>=_reslist.Count) || (_reslist[idx] == null) ||
                 !_disp2real.Contains(idx));
         }
 
@@ -1150,8 +1148,14 @@ namespace ASP
             return 0;
         }
 
-        void workingres_SendOrder(Order o)
+        void workingres_SendOrder(Order o, int id)
         {
+            int rid = r2r(id);
+            if (!_reslist[rid].isValid)
+            {
+                debug("Ignoring order from disabled response: " + _reslist[rid].Name + " order: " + o.ToString());
+                return;
+            }
             // process order coming from a response
             if (_bf.BrokerClient== null)
             {
@@ -1217,8 +1221,14 @@ namespace ASP
             }
         }
 
-        void workingres_CancelOrderSource(long number)
+        void workingres_CancelOrderSource(long number, int id)
         {
+            int rid = r2r(id);
+            if (!_reslist[rid].isValid)
+            {
+                debug("Ignoring cancel from disabled response: " + _reslist[rid].Name + " orderid: "+number);
+                return;
+            }
             // see if we need to remap
             if (_ao._virtids.Checked)
             {
