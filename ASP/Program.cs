@@ -49,7 +49,7 @@ namespace ASP
             if (Properties.Settings.Default.portal==string.Empty)
                 TradeLink.AppKit.CrashReport.Report(ASP.PROGRAM, e);
             else
-                TradeLink.AppKit.ATW.Report(Properties.Settings.Default.portal, string.Empty, null, true, Properties.Settings.Default.un, Properties.Settings.Default.pw, new TradeLink.AppKit.AssemblaTicketWindow.LoginSucceedDel(ASP.success),pause);
+                TradeLink.AppKit.ATW.Report(Properties.Settings.Default.portal, string.Empty, e, true, Properties.Settings.Default.un, Properties.Settings.Default.pw, new TradeLink.AppKit.AssemblaTicketWindow.LoginSucceedDel(ASP.success),pause);
         }
     }
 }

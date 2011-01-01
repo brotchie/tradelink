@@ -42,7 +42,7 @@ namespace Kadina
             if (Properties.Settings.Default.portal == string.Empty)
                 TradeLink.AppKit.CrashReport.Report(kadinamain.PROGRAM, e);
             else
-                TradeLink.AppKit.ATW.Report(Properties.Settings.Default.portal, string.Empty, null, true, Properties.Settings.Default.user, Properties.Settings.Default.pw, new TradeLink.AppKit.AssemblaTicketWindow.LoginSucceedDel(kadinamain.success), true);
+                TradeLink.AppKit.ATW.Report(Properties.Settings.Default.portal, string.Empty, e, true, Properties.Settings.Default.user, Properties.Settings.Default.pw, new TradeLink.AppKit.AssemblaTicketWindow.LoginSucceedDel(kadinamain.success), true);
         }
     }
 }
