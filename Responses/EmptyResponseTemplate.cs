@@ -34,8 +34,8 @@ namespace Responses
         public string Name { get { return ""; } set { } }
         public string FullName { get { return ""; } set { } }
         public event DebugFullDelegate SendDebugEvent;
-        public event OrderDelegate SendOrderEvent;
-        public event LongDelegate SendCancelEvent;
+        public event OrderSourceDelegate SendOrderEvent;
+        public event LongSourceDelegate SendCancelEvent;
         public event StringParamDelegate SendIndicatorsEvent;
         public event MessageDelegate SendMessageEvent;
         public event BasketDelegate SendBasketEvent;
