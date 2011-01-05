@@ -324,6 +324,8 @@ namespace Replay
 
         void _playback_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
+            // if application is closing, ignore
+            if (progressbar == null) return;
             // save some UI processing
             if (e.ProgressPercentage <= progressbar.Value) return;
             progressbar.Value = (e.ProgressPercentage < 101) && (e.ProgressPercentage>=0) ? e.ProgressPercentage : 0;
