@@ -229,7 +229,7 @@ tickdata:
   StrCmp $0 "Yes" vcredistinstall
   ExecWait "TickDataInstall.exe"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "InstalledTickData" "Yes"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "TickDataPath" "$LOCALAPPDIR\TradeLinkTicks"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "TickDataPath" "$LOCALAPPDATA\TradeLinkTicks"
   DetailPrint "TickData was installed."
   
   

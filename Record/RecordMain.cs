@@ -163,7 +163,11 @@ namespace Record
             {
                 tl.Subscribe(mb);
             }
-            catch (TLServerNotFound) { }
+            catch (TLServerNotFound) 
+            {
+                debug("Unable to record symbols because no tradelink connector was running.");
+                return;
+            }
             refreshlist();
             debug("Recording: " + mb.ToString());
         }
