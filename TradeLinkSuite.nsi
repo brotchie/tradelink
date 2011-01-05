@@ -88,7 +88,7 @@ Section "TradeLinkSuite"
   File "ServerSterling\bin\release\Interop.SterlingLib.dll"
 
   
-  
+  File "Responses\TA-Lib-Core.dll"
   File "Responses\bin\release\Responses.dll"
   File "Quotopia\bin\release\Quotopia.exe"
   File "Quotopia\bin\release\Multimedia.dll"
