@@ -219,7 +219,7 @@ namespace TradeLink.AppKit
         {
             // get clicked item name
             Track t = new Track(type, data);
-            t.id = Auth.GetCPUId();
+            t.id = Auth.GetNetworkAddress();
             t.tag = Program;
             debug(_tc.ToString() + " " + t.ToString());
             if (!TrackEnabled) return;
