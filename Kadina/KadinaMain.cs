@@ -810,8 +810,10 @@ namespace Kadina
         void PlayComplete(object sender, RunWorkerCompletedEventArgs e)
         {
             string[] r = _msg.ToString().Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            debugControl1.BeginUpdate();
             foreach (string l in r)
                 debug(l);
+            debugControl1.EndUpdate();
             ig.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
             SafeBindingSource.refreshgrid(dg, tbs);
             SafeBindingSource.refreshgrid(ig, ibs);

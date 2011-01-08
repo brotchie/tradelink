@@ -177,6 +177,29 @@ namespace TradeLink.AppKit
             debug(msg.Msg);
             
         }
+        bool _eu = true;
+        public void BeginUpdate()
+        {
+            if (InvokeRequired)
+                Invoke(new VoidDelegate(BeginUpdate));
+            else
+            {
+                _eu = false;
+                _msg.BeginUpdate();
+            }
+        }
+
+        public void EndUpdate()
+        {
+            if (InvokeRequired)
+                Invoke(new VoidDelegate(BeginUpdate));
+            else
+            {
+                _eu = true;
+                _msg.EndUpdate();
+                _msg.Invalidate();
+            }
+        }
 
         public void GotDebug(string msg)
         {
@@ -217,7 +240,8 @@ namespace TradeLink.AppKit
                     else
                         _msg.Items.Add(DateTime.Now.ToString("HHmmss") + ": " + msg);
                     _msg.SelectedIndex = _msg.Items.Count - 1;
-                    _msg.Invalidate(true);
+                    if (_eu)
+                        _msg.Invalidate(true);
                     sb.AppendLine(msg.Replace(Environment.NewLine,string.Empty));
                 }
                 catch { }

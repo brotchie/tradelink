@@ -25,6 +25,16 @@ namespace TradeLink.AppKit
                 NewCreateTicketEvent(msg);
         }
 
+        public void BeginUpdate()
+        {
+            debugControl1.BeginUpdate();
+        }
+
+        public void EndUpdate()
+        {
+            debugControl1.EndUpdate();
+        }
+
         public event TradeLink.API.DebugDelegate NewCreateTicketEvent;
 
         void debugControl1_NewSearchEvent(string msg)
