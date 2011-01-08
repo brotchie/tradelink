@@ -116,10 +116,17 @@ namespace TradeLink.AppKit
             TradeLink.Common.ScreenCapture sc = new TradeLink.Common.ScreenCapture();
             sc.CaptureScreenToFile(path+SSFILE, System.Drawing.Imaging.ImageFormat.Jpeg);
             attach = true;
-            
+            _ss.BackColor = Color.Blue;
+            _ss.Invalidate();
         }
 
         bool _attachdataasfile = false;
         const string DATAFILE = "Log.txt";
+
+        private void _screencast_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("http://screenr.com/record");
+            status("remember to place video link in ticket.");
+        }
     }
 }
