@@ -624,8 +624,7 @@ namespace Quotopia
         
         void RefreshRow(Tick t)
         {
-            _ht.newTick(t);
-            _lt.newTick(t);
+
             if (qg.InvokeRequired)
             {
                 qg.Invoke(new TickDelegate(RefreshRow), new object[] { t });
@@ -633,7 +632,8 @@ namespace Quotopia
             }
             else
             {
-                
+                _ht.newTick(t);
+                _lt.newTick(t);
                 int[] rows = GetSymbolRows(t.symbol);
                 for (int i = 0; i < rows.Length; i++)
                 {

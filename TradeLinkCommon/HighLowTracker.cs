@@ -57,7 +57,7 @@ namespace TradeLink.Common
         /// <returns></returns>
         public bool newPoint(string sym, decimal p)
         {
-            int idx = addindex(sym, decimal.MaxValue);
+            int idx = addindex(sym, decimal.MinValue);
             return newPoint(idx, p);
         }
         /// <summary>
