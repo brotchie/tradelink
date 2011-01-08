@@ -100,11 +100,20 @@ namespace TradeLink.Common
         public void GotFill(Trade f)
         {
             if (!isGroupMember(f.id))
+            {
+                v("oco ignoring fill: " + f.id + " as not a group member.");
                 return;
+            }
             // get group
             OCOGroup grp = this[f.id];
+            // notify
+            debug(f.symbol + " for fill: " + f.id + " found ocogroup: " + grp.ToString());
             // cancel other ids
-            cancelgrp(grp, f.id);
+            if (grp.isValid)
+            {
+                v("ocogroup: " + getindex(grp.SymbolOwner) + " attempting to cancel any open orders.");
+                cancelgrp(grp, f.id);
+            }
         }
 
         /// <summary>
@@ -120,15 +129,17 @@ namespace TradeLink.Common
         {
             if (!grp.isValid)
             {
-                debug("Invalid oco group: " + grp.ToString());
+                v("Invalid oco group: " + grp.ToString());
                 return;
             }
+            int idx = getindex(grp.SymbolOwner);
             debug("Canceling group: " + grp.ToString());
             bool ok = false;
             for (int i = 0; i < grp.Count; i++)
                 if (grp[i] != ex)
                 {
                     ok = true;
+                    v("group: " + idx + " canceling orderid: " + grp[i]);
                     cancel(grp[i]);
                 }
             if (ok && (SendOCOGroupCancelEvent != null))
@@ -215,27 +226,42 @@ namespace TradeLink.Common
                     }
                 }
 
+
                 // ensure we have group
                 int idx = addindex(grp.SymbolOwner, grp);
+                // save group
+                this[grp.SymbolOwner] = grp;
+                // send orders
                 for (int i = 0; i < grp.orders.Length; i++)
                 {
                     // save relationship
-                    isnewid(grp.groupids[i], idx);
+                    bool newid = isnewid(grp.groupids[i], idx);
+                    v("oco group id: " + idx + " sending orderid: " + grp.groupids[i] + " " + grp.orders[i].ToString());
                     // send order
                     SendOrderEvent(grp.orders[i]);
                 }
+
                 // notify
                 if (!exists && (SendOCOGroupEvent != null))
                     SendOCOGroupEvent(grp);
                 if (exists && (SendOCOGroupUpdateEvent != null))
                     SendOCOGroupUpdateEvent(grp);
+                debug("finished sending oco group: " + idx);
 
             }
             else
                 debug("Can't send group as no SendOrderEvent present.");
 
         }
+        void v(string msg)
+        {
+            if (_noverb) return;
+            debug(msg);
+        }
+        bool _noverb = true;
+        public bool VerboseDebugging { get { return !_noverb; } set { _noverb = !value; } }
     }
+
 
     public delegate void OCOGroupDel(OCOGroup group);
     /// <summary>
