@@ -1084,7 +1084,7 @@ namespace ASP
             if (didx == -1) return;
             int idx = getrindx(didx);
             string rname = _reslist[idx].FullName;
-            string syms = Interaction.InputBox("Enter symbols seperated by commas", rname + " Symbols", getsyms(idx,false), 0, 0);
+            string syms = TextPrompt.Prompt("Enter symbols seperated by commas", rname + " Symbols", getsyms(idx,false), 0, 0);
             newsyms(syms.Split(','), idx);
         }
 
