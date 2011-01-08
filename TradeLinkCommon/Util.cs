@@ -1226,6 +1226,10 @@ namespace TradeLink.Common
         Quote_Unavailable_Maximum_Position_Cost = -41,
         Quote_Unavailable_Buying_Power = -42 ,
         Quote_Unavailable_Margin_Control = -43 ,
+        Floating_BP_Violation = -44,
+        Market_order_would_remove_liquidity_frontend_setting = -45,
+        Not_enabled_for_server_stop_orders = -46,
+        Not_enabled_for_trail_stop_orders = -47,
     }
 
 
