@@ -222,12 +222,18 @@ namespace TradeLink.AppKit
             t.id = Auth.GetNetworkAddress();
             t.tag = Program;
             debug(_tc.ToString() + " " + t.ToString());
+            if (SendTrackEvent != null)
+                SendTrackEvent(t);
             if (!TrackEnabled) return;
             _tc++;
 
             
             _untrackedqueue.Write(t);
         }
+
+        public event TrackDelegate SendTrackEvent;
+
+
 
         /// <summary>
         /// track a numeric event
@@ -247,6 +253,8 @@ namespace TradeLink.AppKit
             Track(TrackType.ScorePoints, points);
         }
     }
+
+    public delegate void TrackDelegate(Track t);
 
     public struct Track
     {
