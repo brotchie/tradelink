@@ -53,6 +53,7 @@ namespace ASP
         int _NEXTRESPONSEID = 0;
         BackgroundWorker bw = new BackgroundWorker();
         BackgroundWorker cc = new BackgroundWorker();
+        BackgroundWorker si = new BackgroundWorker();
 
         public ASP()
         {
@@ -116,6 +117,9 @@ namespace ASP
             bw.RunWorkerAsync();
             // handle capital connections on seperate thread
             cc.DoWork += new DoWorkEventHandler(cc_DoWork);
+            // write indicator output
+            si.DoWork += new DoWorkEventHandler(si_DoWork);
+            si.RunWorkerAsync();
             // get last loaded response library
             LoadResponseDLL(Properties.Settings.Default.boxdll);
             // load any skins we can find
@@ -123,6 +127,27 @@ namespace ASP
             // process command line
             processcommands();
 
+        }
+
+        bool go = true;
+        Log _indlog;
+        void si_DoWork(object sender, DoWorkEventArgs e)
+        {
+            while (go)
+            {
+                if (_ao._saveinds.Checked)
+                {
+                    if (_indlog==null)
+                        _indlog = new Log(PROGRAM + ".inds.csv", true, true, Util.ProgramData(PROGRAM), true);
+                    while (bufind.hasItems)
+                    {
+                        _indlog.GotDebug(bufind.Read());
+                    }
+                    System.Threading.Thread.Sleep(500);
+                }
+                else
+                    System.Threading.Thread.Sleep(5000);
+            }
         }
 
         void cc_DoWork(object sender, DoWorkEventArgs e)
@@ -863,6 +888,14 @@ namespace ASP
         {
             try
             {
+                // stop saving indicators
+                go = false;
+                try
+                {
+                    if (_indlog != null)
+                        _indlog.Stop();
+                }
+                catch { }
                 // stop handling tickets
                 _rt.Stop();
                 // stop gui-safe broker-feed operations
@@ -1024,13 +1057,12 @@ namespace ASP
         }
 
         bool _inderror = false;
+        RingBuffer<string> bufind = new RingBuffer<string>(5000);
         void tmp_SendIndicators(string param)
         {
-            if (!_inderror)
-            {
-                debug(PROGRAM + " does not support sendindicator.");
-                _inderror = true;
-            }
+            if (!_ao._saveinds.Checked)
+                return;
+            bufind.Write(param);
         }
 
         bool _charterror = false;

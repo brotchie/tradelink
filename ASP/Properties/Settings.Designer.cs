@@ -250,5 +250,17 @@ namespace ASP.Properties {
                 this["capitalconnections"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool saveindicators {
+            get {
+                return ((bool)(this["saveindicators"]));
+            }
+            set {
+                this["saveindicators"] = value;
+            }
+        }
     }
 }

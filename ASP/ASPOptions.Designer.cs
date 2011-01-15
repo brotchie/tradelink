@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this._saveinds = new System.Windows.Forms.CheckBox();
             this._capconprompt = new System.Windows.Forms.CheckBox();
             this.label6 = new System.Windows.Forms.Label();
             this._portal = new System.Windows.Forms.TextBox();
@@ -55,6 +56,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this._saveinds);
             this.groupBox1.Controls.Add(this._capconprompt);
             this.groupBox1.Controls.Add(this.label6);
             this.groupBox1.Controls.Add(this._portal);
@@ -66,10 +68,23 @@
             this.groupBox1.Controls.Add(this._account);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(381, 154);
+            this.groupBox1.Size = new System.Drawing.Size(412, 154);
             this.groupBox1.TabIndex = 20;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "General";
+            // 
+            // _saveinds
+            // 
+            this._saveinds.Appearance = System.Windows.Forms.Appearance.Button;
+            this._saveinds.AutoSize = true;
+            this._saveinds.Checked = global::ASP.Properties.Settings.Default.saveindicators;
+            this._saveinds.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::ASP.Properties.Settings.Default, "saveindicators", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this._saveinds.Location = new System.Drawing.Point(120, 105);
+            this._saveinds.Name = "_saveinds";
+            this._saveinds.Size = new System.Drawing.Size(129, 30);
+            this._saveinds.TabIndex = 24;
+            this._saveinds.Text = "Save Indicators";
+            this._saveinds.UseVisualStyleBackColor = true;
             // 
             // _capconprompt
             // 
@@ -77,7 +92,7 @@
             this._capconprompt.Checked = global::ASP.Properties.Settings.Default.capitalconnections;
             this._capconprompt.CheckState = System.Windows.Forms.CheckState.Checked;
             this._capconprompt.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::ASP.Properties.Settings.Default, "capitalconnections", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this._capconprompt.Location = new System.Drawing.Point(162, 109);
+            this._capconprompt.Location = new System.Drawing.Point(166, 68);
             this._capconprompt.Name = "_capconprompt";
             this._capconprompt.Size = new System.Drawing.Size(208, 24);
             this._capconprompt.TabIndex = 23;
@@ -87,7 +102,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(162, 67);
+            this.label6.Location = new System.Drawing.Point(162, 31);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(100, 20);
             this.label6.TabIndex = 22;
@@ -96,7 +111,7 @@
             // _portal
             // 
             this._portal.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::ASP.Properties.Settings.Default, "portal", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this._portal.Location = new System.Drawing.Point(264, 64);
+            this._portal.Location = new System.Drawing.Point(264, 31);
             this._portal.Name = "_portal";
             this._portal.Size = new System.Drawing.Size(90, 26);
             this._portal.TabIndex = 21;
@@ -128,7 +143,7 @@
             this._virtids.AutoSize = true;
             this._virtids.Checked = global::ASP.Properties.Settings.Default.usevirtualids;
             this._virtids.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::ASP.Properties.Settings.Default, "usevirtualids", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this._virtids.Location = new System.Drawing.Point(264, 26);
+            this._virtids.Location = new System.Drawing.Point(255, 105);
             this._virtids.Name = "_virtids";
             this._virtids.Size = new System.Drawing.Size(90, 30);
             this._virtids.TabIndex = 18;
@@ -150,7 +165,7 @@
             this.archivetickbox.AutoSize = true;
             this.archivetickbox.Checked = true;
             this.archivetickbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.archivetickbox.Location = new System.Drawing.Point(162, 26);
+            this.archivetickbox.Location = new System.Drawing.Point(19, 105);
             this.archivetickbox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.archivetickbox.Name = "archivetickbox";
             this.archivetickbox.Size = new System.Drawing.Size(95, 30);
@@ -221,7 +236,7 @@
             this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Location = new System.Drawing.Point(13, 172);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(380, 180);
+            this.groupBox2.Size = new System.Drawing.Size(411, 180);
             this.groupBox2.TabIndex = 21;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Providers";
@@ -264,7 +279,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(415, 374);
+            this.ClientSize = new System.Drawing.Size(436, 374);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
@@ -300,5 +315,6 @@
         private System.Windows.Forms.Label label6;
         public System.Windows.Forms.TextBox _portal;
         public System.Windows.Forms.CheckBox _capconprompt;
+        public System.Windows.Forms.CheckBox _saveinds;
     }
 }
