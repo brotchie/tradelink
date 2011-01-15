@@ -1384,8 +1384,11 @@ namespace ASP
             System.Diagnostics.Process[] ps = System.Diagnostics.Process.GetProcesses();
             int count = 0;
             foreach (System.Diagnostics.Process p in ps)
-                if (p.ProcessName.ToLower().Contains(PROGRAM.ToLower()))
+            {
+                string cps = p.ProcessName.ToLower();
+                if ((cps == (PROGRAM.ToLower())) || (cps == (PROGRAM.ToLower() + ".vshost")))
                     count++;
+            }
             return count;
         }
 
