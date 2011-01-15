@@ -99,6 +99,11 @@ namespace TikConverter
             foreach (string file in filenames)
             {
                 debug("input file: " + Path.GetFileNameWithoutExtension(file));
+                if (!File.Exists(file))
+                {
+                    debug("file does not exist: " + file);
+                    continue;
+                }
                 // convert file
                 bool fg = convert(_conval,file, (int)_defaultsize.Value);
                 // report progress
