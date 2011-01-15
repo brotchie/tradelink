@@ -19,7 +19,7 @@ namespace TradeLinkTest
     public partial class GBTradeLink : AppTracker
     {
         GrayBox GB;
-        public const string PROGRAM = "Graybox Server";
+        public const string PROGRAM = "ServerGraybox";
         Log _log = new Log(PROGRAM);
         
        
@@ -38,18 +38,39 @@ namespace TradeLinkTest
                 tls = new TradeLink.Common.TLServer_WM();
             else
                 tls = new TradeLink.Common.TLServer_IP(Properties.Settings.Default.TLClientAddress, Properties.Settings.Default.TLClientPort);
-
-            GB = new GrayBox(tls,this.lstStatusList);
+            try
+            {
+                GB = new GrayBox(tls, debug);
+            }
+            catch (Exception ex)
+            {
+                const string URL = @"http://code.google.com/p/tradelink/wiki/HoldBrosGrayBox";
+                debug("problem connecting to graybox...");
+                debug("please check guide at: " + URL);
+                System.Diagnostics.Process.Start(URL);
+                debug(ex.Message + ex.StackTrace);
+            }
 
 
             UpdateLoginDetails();
-            
+            FormClosing += new FormClosingEventHandler(GBTradeLink_FormClosing);
            
 
              
             
 
             
+        }
+
+        void GBTradeLink_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            _log.Stop();
+        }
+
+        void debug(string msg)
+        {
+            debugControl1.GotDebug(msg);
+            _log.GotDebug(msg);
         }
 
       

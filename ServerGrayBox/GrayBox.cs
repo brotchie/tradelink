@@ -161,14 +161,15 @@ namespace TradeLinkTest
             return ReadGrayBoxRegValues(strPathKey, "LayoutFile");
         }
 
-      
+
+        DebugDelegate deb;
 
        
 
-        public GrayBox(TLServer tls, ListBox lstbox)
+        public GrayBox(TLServer tls, DebugDelegate lstbox)
         {
             tl = tls;
-            lst_box = lstbox;
+            deb = lstbox;
             
 
             // tradelink bindings
@@ -200,8 +201,8 @@ namespace TradeLinkTest
 
         void debug(string msg)
         {
-            lst_box.Items.Add(msg_id.ToString() + "  " + msg);
-            msg_id++;
+            if (deb != null)
+                deb(msg);
         }
 
         void Start()
