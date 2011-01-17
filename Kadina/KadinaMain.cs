@@ -343,10 +343,23 @@ namespace Kadina
             }
         }
 
-
+        bool _missingindnameerrornotifyok = true;
         void NewIRow(object[] values)
         {
-            it.Rows.Add(values);
+            try
+            {
+                it.Rows.Add(values);
+            }
+            catch (ArgumentException ex)
+            {
+                if (_missingindnameerrornotifyok && ex.Message.Contains("array is longer than the number of columns"))
+                {
+                    _missingindnameerrornotifyok = false;
+                    debug("Your indicator names do not match the number of indicators you sent with sendindicators.");
+                    debug("Check to make sure you do not have commas in your sendindicator values.");
+                    status("User error in specifying indicators.");
+                }
+            }
         }
         void initgrids()
         {
