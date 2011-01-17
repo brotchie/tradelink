@@ -74,30 +74,60 @@ namespace TikConverter
             long bytes = 0;
             if (of.ShowDialog() == DialogResult.OK)
             {
+                List<string> symbols = new List<string>();
                 foreach (string file in of.FileNames)
                 {
                     _path = Path.GetDirectoryName(file);
+                    string sn = Path.GetFileName(file);
                     // get size of current file and append to total size
                     FileInfo fi = new FileInfo(file);
                     bytes += fi.Length;
+                    switch (_conval)
+                    {
+                        case Converter.QCollector:
+                            string sym = Microsoft.VisualBasic.Interaction.InputBox("Symbol data represented by file: "+sn, "File's Symbol", string.Empty, 0, 0);
+                            if (sym != string.Empty)
+                                symbols.Add(sym);
+                            break;
+                    }
                 }
                 // estimate total ticks
                 _approxtotal = (int)((double)bytes / 51);
                 // reset progress bar
                 progress(0);
                 // start background thread to convert
-                bw.RunWorkerAsync(of.FileNames);
+                bw.RunWorkerAsync(new convargs(of.FileNames,symbols.ToArray()));
                 debug("started conversion");
 
+            }
+        }
+
+        internal class convargs
+        {
+            
+            internal string[] files;
+            internal string[] syms;
+            internal bool hassyms { get { return (syms.Length == files.Length) && (syms.Length > 0); } }
+            internal convargs(string[] filenames)
+            {
+                files = filenames;
+            }
+            internal convargs(string[] filenames, string[] symbols)
+            {
+                files = filenames;
+                syms = symbols;
             }
         }
         Converter _conval = Converter.None;
         void bw_DoWork(object sender, DoWorkEventArgs e)
         {
-            string[] filenames = (string[])e.Argument;
+            convargs ca = (convargs)e.Argument;
+            string[] filenames = ca.files;
             bool g = e.Result != null ? (bool)e.Result : true;
-            foreach (string file in filenames)
+            int ds = (int)_defaultsize.Value;
+            for (int i = 0; i<filenames.Length; i++)
             {
+                string file = filenames[i];
                 debug("input file: " + Path.GetFileNameWithoutExtension(file));
                 if (!File.Exists(file))
                 {
@@ -105,7 +135,9 @@ namespace TikConverter
                     continue;
                 }
                 // convert file
-                bool fg = convert(_conval,file, (int)_defaultsize.Value);
+                bool fg = ca.hassyms ? 
+                    convert(_conval,file,ds,ca.syms[i]) : 
+                    convert(_conval,file,ds);
                 // report progress
                 if (!fg) debug("error converting file: " + file);
                 g &= fg;
@@ -130,7 +162,8 @@ namespace TikConverter
         int _ticksprocessed = 0;
         int _approxtotal = 0;
         string _sym;
-        bool convert(Converter con, string filename,int tradesize)
+        bool convert(Converter con, string filename, int tradesize) { return convert(con, filename, tradesize, string.Empty); }
+        bool convert(Converter con, string filename,int tradesize,string sym)
         {
             int bads = 0;
             int thistotal = _ticksprocessed;
@@ -173,6 +206,10 @@ namespace TikConverter
                         infile = new StreamReader(filename);
                         infile.ReadLine();//discard header line 
                         break;
+                    case Converter.QCollector:
+                        infile = new StreamReader(filename);
+                        // no header in file
+                        break;
                  }
 
             }
@@ -202,6 +239,9 @@ namespace TikConverter
                             break;
                         case Converter.TradingPhysicsTV:
                             k = TradingPhysicsTV.parseline(infile.ReadLine(), _sym, _date);
+                            break;
+                        case Converter.QCollector:
+                            k = QCollector.parseline(infile.ReadLine(), sym);
                             break;
                     }
                 }
