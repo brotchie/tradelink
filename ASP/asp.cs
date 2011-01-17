@@ -383,8 +383,10 @@ namespace ASP
             {
                 if ((dindex < 0) || (dindex > _resnames.Items.Count)) continue;
                 int index = getrindx(dindex);
-                _resnames.ContextMenu.MenuItems[ENABLED].Checked = !isBadResponse(index);
+                if ((index < 0) || (index > _reslist.Count)) continue;
+                _resnames.ContextMenu.MenuItems[ENABLED].Checked = _reslist[index].isValid;
             }
+            _resnames.Invalidate(true);
 
         }
 
