@@ -194,8 +194,8 @@ namespace ASP
             // try to connect to preferr providers
             _bf.Reset();
             // update ASP gui with available providers
-            _ao._execsel.DataSource = _bf.ProvidersAvailable;
-            _ao._datasel.DataSource = _bf.ProvidersAvailable;
+            _ao._execsel.DataSource = getproviderlist(_bf.ProvidersAvailable);
+            _ao._datasel.DataSource = getproviderlist(_bf.ProvidersAvailable);
             // if we have quotes
             if (_bf.isFeedConnected)
             {
@@ -210,7 +210,7 @@ namespace ASP
                 _tlt.GotDebug += new DebugDelegate(_tlt_GotDebug);
                 // update selected providers in ASP gui
                 _ao._datasel.SelectedIndex = _bf.FeedClient.ProviderSelected;
-                _ao._datasel.Text = _bf.FeedClient.BrokerName.ToString();
+                _ao._datasel.Text = _bf.FeedClient.BrokerName.ToString() + " " + _bf.FeedClient.ProviderSelected;
                 // notify
                 status("Connected: " + _bf.Feed);
             }
@@ -219,7 +219,7 @@ namespace ASP
             {
                 // if we have execs
                 _ao._execsel.SelectedIndex = _bf.BrokerClient.ProviderSelected;
-                _ao._execsel.Text = _bf.BrokerName.ToString();
+                _ao._execsel.Text = _bf.BrokerName.ToString() + " " + _bf.BrokerClient.ProviderSelected;
 
             }
             // hook up events
@@ -247,6 +247,14 @@ namespace ASP
 
 
 
+        }
+
+        string[] getproviderlist(Providers[] ps)
+        {
+            List<string> plist = new List<string>();
+            for (int i = 0; i < ps.Length; i++)
+                plist.Add(ps[i].ToString() + " " + i);
+            return plist.ToArray();
         }
 
 
@@ -1425,7 +1433,6 @@ namespace ASP
             }
             return count;
         }
-
 
         private void _prefquot_SelectedIndexChanged(object sender, EventArgs e)
         {
