@@ -12,6 +12,22 @@
 	
 	AVL_TLWM* AVL_TLWM::instance = NULL;	
 
+	const char* CONFIGFILE = "AnvilServer.Config.txt";
+	void AVL_TLWM::ReadConfig()
+	{
+		std::ifstream file;
+		file.open(CONFIGFILE);
+		int sessionid = 0;
+		const int ss = 200;
+		char skip[ss];
+		const int ds = 20;
+		char data[ds];
+		file.getline(skip,ss);
+		file.getline(data,ds);
+		_proactive = atoi(data) == 1;
+		file.close();
+	}
+
 	AVL_TLWM::AVL_TLWM(void)
 	{
 		instance = this;
@@ -49,6 +65,7 @@
 			TLImbalance imb;
 			_imbcache.push_back(imb);
 		}
+		ReadConfig();
 
 
 	}
@@ -548,7 +565,7 @@
 				&stopm,//const Money* stopPrice,
 				NULL,//const Money* discrtetionaryPrice,
 				mytif,
-				false,//bool proactive,
+				_proactive,//bool proactive,
 				true,//bool principalOrAgency, //principal - true, agency - false
 				SUMO_ALG_UNKNOWN,//char superMontageAlgorithm,
 				OS_RESIZE,

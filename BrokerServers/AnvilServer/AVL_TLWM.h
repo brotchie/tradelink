@@ -31,6 +31,8 @@ using namespace TradeLibFast;
 		void SrvGotImbalance(TLImbalance imb);
 
 	protected:
+		void ReadConfig();
+		bool _proactive;
 		TLOrder ProcessOrder(Order* order);
 		void SrvGotImbAsync(TLImbalance imb);
 		double GetDouble(const Money* m);

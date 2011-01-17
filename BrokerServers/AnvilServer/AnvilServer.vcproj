@@ -122,6 +122,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="copy anvil config file"
+				CommandLine="copy AnvilServer.Config.txt $(TargetDir)"
 			/>
 		</Configuration>
 		<Configuration
@@ -477,6 +479,10 @@
 		</Filter>
 		<File
 			RelativePath="AnvilExtTest.rc"
+			>
+		</File>
+		<File
+			RelativePath=".\AnvilServer.Config.txt"
 			>
 		</File>
 		<File
