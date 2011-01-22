@@ -23,6 +23,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ServerGenesis", "ServerGene
 		{70D6F9FC-3067-4527-8858-D931623554CF} = {70D6F9FC-3067-4527-8858-D931623554CF}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LightspeedServer", "LightspeedServer\LightspeedServer.vcproj", "{9BEDFC5D-E316-43A2-985A-00B576B1C80F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -106,6 +108,18 @@ Global
 		{98EF31FB-959E-4552-8F99-F2AD6DBB3A23}.Unicode Release|Win32.ActiveCfg = Release|Win32
 		{98EF31FB-959E-4552-8F99-F2AD6DBB3A23}.Unicode Release|Win32.Build.0 = Release|Win32
 		{98EF31FB-959E-4552-8F99-F2AD6DBB3A23}.Unicode Release|x64.ActiveCfg = Release|Win32
+		{9BEDFC5D-E316-43A2-985A-00B576B1C80F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9BEDFC5D-E316-43A2-985A-00B576B1C80F}.Debug|Win32.Build.0 = Debug|Win32
+		{9BEDFC5D-E316-43A2-985A-00B576B1C80F}.Debug|x64.ActiveCfg = Debug|Win32
+		{9BEDFC5D-E316-43A2-985A-00B576B1C80F}.Release|Win32.ActiveCfg = Release|Win32
+		{9BEDFC5D-E316-43A2-985A-00B576B1C80F}.Release|Win32.Build.0 = Release|Win32
+		{9BEDFC5D-E316-43A2-985A-00B576B1C80F}.Release|x64.ActiveCfg = Release|Win32
+		{9BEDFC5D-E316-43A2-985A-00B576B1C80F}.Unicode Debug|Win32.ActiveCfg = Debug|Win32
+		{9BEDFC5D-E316-43A2-985A-00B576B1C80F}.Unicode Debug|Win32.Build.0 = Debug|Win32
+		{9BEDFC5D-E316-43A2-985A-00B576B1C80F}.Unicode Debug|x64.ActiveCfg = Debug|Win32
+		{9BEDFC5D-E316-43A2-985A-00B576B1C80F}.Unicode Release|Win32.ActiveCfg = Release|Win32
+		{9BEDFC5D-E316-43A2-985A-00B576B1C80F}.Unicode Release|Win32.Build.0 = Release|Win32
+		{9BEDFC5D-E316-43A2-985A-00B576B1C80F}.Unicode Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
