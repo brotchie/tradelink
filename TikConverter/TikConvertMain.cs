@@ -84,8 +84,15 @@ namespace TikConverter
                     bytes += fi.Length;
                     switch (_conval)
                     {
-                        case Converter.QCollector:
-                            string sym = Microsoft.VisualBasic.Interaction.InputBox("Symbol data represented by file: "+sn, "File's Symbol", string.Empty, 0, 0);
+                        case Converter.QCollector_eSignal:
+                            string sym = string.Empty;
+                            string [] r = Path.GetFileNameWithoutExtension(sn).Split('_');
+                            if (r.Length != 2)
+                            {
+                                sym = Microsoft.VisualBasic.Interaction.InputBox("Symbol data represented by file: " + sn, "File's Symbol", string.Empty, 0, 0);
+                            }
+                            else
+                                sym = r[0];
                             if (sym != string.Empty)
                                 symbols.Add(sym);
                             break;
@@ -206,7 +213,7 @@ namespace TikConverter
                         infile = new StreamReader(filename);
                         infile.ReadLine();//discard header line 
                         break;
-                    case Converter.QCollector:
+                    case Converter.QCollector_eSignal:
                         infile = new StreamReader(filename);
                         // no header in file
                         break;
@@ -240,7 +247,7 @@ namespace TikConverter
                         case Converter.TradingPhysicsTV:
                             k = TradingPhysicsTV.parseline(infile.ReadLine(), _sym, _date);
                             break;
-                        case Converter.QCollector:
+                        case Converter.QCollector_eSignal:
                             k = QCollector.parseline(infile.ReadLine(), sym);
                             break;
                     }

@@ -9,5 +9,5 @@ public enum Converter
     TradingPhysicsTV,
     GoogleDaily,
     YahooDaily,
-    QCollector,
+    QCollector_eSignal,
 }
