@@ -77,8 +77,8 @@ namespace TradeLink.AppKit
             return true;
         }
 
-        public static string GetPrettyRuns(string program) { return string.Join(Environment.NewLine, GetPrettyRunData(program, ":", true, true)); }
-        public static string GetPrettyRuns(string program, string delim) { return string.Join(delim, GetPrettyRunData(program, ":", true, true)); }
+        public static string GetPrettyRuns(string program) { return program+" "+string.Join(Environment.NewLine, GetPrettyRunData(program, ":", true, true)); }
+        public static string GetPrettyRuns(string program, string delim) { return program+" "+string.Join(delim, GetPrettyRunData(program, ":", true, true)); }
         public static string[] GetPrettyRunData(string program) { return GetPrettyRunData(program, ":", true, true); }
         public static string[] GetPrettyRunData(string program, string delim, bool label, bool showlast)
         {

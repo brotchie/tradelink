@@ -70,7 +70,7 @@ namespace Kadina
             bw2.DoWork += new DoWorkEventHandler(bw2_DoWork);
             bw2.RunWorkerAsync();
             debug(Util.TLSIdentity());
-
+            debug(RunTracker.GetPrettyRuns(PROGRAM));
             // grid errors
             dg.DataError += new DataGridViewDataErrorEventHandler(dg_DataError);
             ig.DataError += new DataGridViewDataErrorEventHandler(ig_DataError);

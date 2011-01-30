@@ -97,7 +97,7 @@ namespace ASP
             _rt.PushTracksOnClose = Properties.Settings.Default.TicketsOnClose;
             _rt.TrackEnabled = Properties.Settings.Default.TicketTracking;
             _rt.SendDebug += new DebugDelegate(debug);
-
+            debug(RunTracker.GetPrettyRuns(PROGRAM));
             // get providers
             initfeeds();
             // get asp option events
