@@ -35,6 +35,7 @@ namespace ServerEsignal
             InitializeComponent();
             tl = new EsignalServer(tls);
             // set defaults
+            tl.AllowSendInvalidBars = Properties.Settings.Default.AllowSendOfInvalidBars;
             tl.DefaultBarsBack = Properties.Settings.Default.DefaultBarsBack;
             tl.VerboseDebugging = Properties.Settings.Default.VerboseDebugging;
             tl.ReleaseBarHistoryAfteRequest = Properties.Settings.Default.ReleaseBarHistoryAfterSending;

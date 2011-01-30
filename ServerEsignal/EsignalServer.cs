@@ -209,6 +209,7 @@ namespace ServerEsignal
             else
                 debug("failed.");
         }
+        public bool AllowSendInvalidBars = false;
         public bool ReleaseBarHistoryAfteRequest = true;
         void processhistory(int lHandle,BarRequest br)
         {
@@ -228,6 +229,11 @@ namespace ServerEsignal
                         verb(br.Symbol + " " + bd.dtTime.ToString() + " " + bd.dOpen + " " + bd.dHigh + " " + bd.dLow + " " + bd.dClose + " " + bd.dVolume);
                     Bar b = new BarImpl((decimal)bd.dOpen, (decimal)bd.dHigh, (decimal)bd.dLow, (decimal)bd.dClose, (long)bd.dVolume, Util.ToTLDate(bd.dtTime), Util.ToTLTime(bd.dtTime), br.Symbol, br.Interval);
                     string msg = BarImpl.Serialize(b);
+                    if (!b.isValid && !AllowSendInvalidBars)
+                    {
+                        debug("Not sending invalid bar: " + b.ToString()+" raw: "+msg);
+                        continue;
+                    }
                     tl.TLSend(msg, MessageTypes.BARRESPONSE, br.Client);
                 }
                 catch (Exception ex)
