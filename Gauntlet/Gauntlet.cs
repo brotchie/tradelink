@@ -34,7 +34,7 @@ namespace WinGauntlet
             args.GotDebug += new DebugDelegate(args_GotDebug);
             args.ParseArgs(Environment.GetCommandLineArgs());
             FormClosing += new FormClosingEventHandler(Gauntlet_FormClosing);
-            debug(RunTracker.GetPrettyRuns(PROGRAM));
+            debug(RunTracker.CountNewGetPrettyRuns(PROGRAM, Util.PROGRAM));
             bw.WorkerSupportsCancellation = true;
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_RunWorkerCompleted);
             bw.DoWork += new DoWorkEventHandler(bw_DoWork);

@@ -7,11 +7,22 @@ namespace TradeLink.AppKit
 {
     public struct RunTracker
     {
+        public string BuildName;
         public string Program;
         public int Build;
         public int Runs;
         public int LastRunDate;
         public bool isStable;
+
+        public RunTracker(string program, string buildname, int build)
+        {
+            isStable = false;
+            Program = program;
+            Build = build;
+            Runs = 1;
+            LastRunDate = Util.ToTLDate();
+            BuildName = buildname;
+        }
 
         public RunTracker(string program, int build)
         {
@@ -20,6 +31,7 @@ namespace TradeLink.AppKit
             Build = build;
             Runs = 1;
             LastRunDate = Util.ToTLDate();
+            BuildName = program;
         }
 
         public const string RunTrackerFile = "_RunTracker.txt";
@@ -51,9 +63,10 @@ namespace TradeLink.AppKit
         /// </summary>
         /// <param name="program"></param>
         /// <returns></returns>
-        public static string CountNewGetPrettyRuns(string program)
+        public static string CountNewGetPrettyRuns(string program) { return CountNewGetPrettyRuns(program, program); }
+        public static string CountNewGetPrettyRuns(string program,string buildname)
         {
-            CountNewInstance(program, Util.ProgramBuild(program));
+            CountNewInstance(program, Util.ProgramBuild(buildname));
             return GetPrettyRuns(program);
         }
 
@@ -98,18 +111,20 @@ namespace TradeLink.AppKit
         /// <param name="program"></param>
         /// <returns></returns>
         public static bool CountNewInstance(string program) { return CountNewInstance(program, Util.ProgramBuild(program)); }
+        public static bool CountNewInstance(string program, string buildname) { return CountNewInstance(program, Util.ProgramBuild(buildname)); }
         /// <summary>
         /// count new instance of program and returns true if count successful
         /// </summary>
         /// <param name="program"></param>
         /// <param name="build"></param>
         /// <returns></returns>
-        public static bool CountNewInstance(string program, int build)
+        public static bool CountNewInstance(string program, int build) { return CountNewInstance(program, program, build); }
+        public static bool CountNewInstance(string program, string buildname, int build)
         {
             if (build == 0)
                 return false;
             string fn = RunTrackerPath(program);
-            List<RunTracker> rundata = GetRunCount(program);
+            List<RunTracker> rundata = GetRunCount(buildname);
             // mark if we found build
             bool found = false;
             for (int i = 0; i < rundata.Count; i++)
@@ -177,9 +192,10 @@ namespace TradeLink.AppKit
         /// </summary>
         /// <param name="program"></param>
         /// <returns></returns>
-        public static List<RunTracker> GetRunCount(string program)
+        public static List<RunTracker> GetRunCount(string program) { return GetRunCount(program, program); }
+        public static List<RunTracker> GetRunCount(string program, string programbuild)
         {
-            string fn = RunTrackerPath(program);
+            string fn = RunTrackerPath(programbuild);
             RunTracker[] data = new RunTracker[0];
             List<RunTracker> working = new List<RunTracker>();
             if (Util.FromFile<RunTracker[]>(fn, ref data))
