@@ -12,10 +12,11 @@ namespace TradeLink.Common
     {
         public bool getvalue(int idx) { return this[idx]; }
         public bool getvalue(string txt) { return this[txt]; }
-        public void setvalue(int idx,bool v) { this[idx] = v; }
+        public void setvalue(int idx, bool v) { this[idx] = v; }
+
 
         GenericTracker<bool> prev;
-        GenericTracker<bool> flip;
+        GenericTracker<bool> cur;
         GenericTracker<int> vcount;
         int _minvcount = 2;
         /// <summary>
@@ -48,7 +49,7 @@ namespace TradeLink.Common
         {
             vcount = new GenericTracker<int>(estlabels, name);
             prev = new GenericTracker<bool>(estlabels, name);
-            flip = new GenericTracker<bool>(estlabels, name);
+            cur = new GenericTracker<bool>(estlabels, name);
             NewTxt += new TextIdxDelegate(FlipTracker_NewTxt);
         }
         void debug(string msg)
@@ -66,16 +67,16 @@ namespace TradeLink.Common
         {
             get
             {
-                return flip[idx];
+                return base[idx];
             }
             set
             {
-                bool p = base[idx];
+                bool p = cur[idx];
                 prev[idx] = p;
-                base[idx] = value;
+                cur[idx] = value;
                 vcount[idx]++;
                 bool flp = (value != p) && (vcount[idx] >= MinFlipValueCount);
-                flip[idx] = flp;
+                base[idx] = flp;
                 if (flp && (NewFlipEvent != null))
                 {
                     string sym = getlabel(idx);
@@ -111,7 +112,7 @@ namespace TradeLink.Common
         public new void Clear()
         {
             base.Clear();
-            flip.Clear();
+            cur.Clear();
             prev.Clear();
             vcount.Clear();
         }
@@ -120,14 +121,14 @@ namespace TradeLink.Common
         /// </summary>
         public void Reset()
         {
-            for (int i = 0; i < flip.Count; i++)
+            for (int i = 0; i < cur.Count; i++)
                 Reset(i);
         }
         /// <summary>
         /// reset flip for particular index 
         /// </summary>
         /// <param name="idx"></param>
-        public void Reset(int idx) { Reset(idx, MinFlipValueCount); }
+        public void Reset(int idx) { Reset(idx, 0); }
         /// <summary>
         /// reset flip for particular index
         /// </summary>
@@ -135,8 +136,8 @@ namespace TradeLink.Common
         /// <param name="mincount"></param>
         public void Reset(int idx, int mincount)
         {
-            prev[idx] = base[idx];
-            flip[idx] = false;
+            prev[idx] = false;
+            cur[idx] = false;
             vcount[idx] = mincount;
         }
         /// <summary>
@@ -153,13 +154,13 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="idx"></param>
         /// <returns></returns>
-        public bool Flipped(int idx) { return flip[idx]; }
+        public bool Flipped(int idx) { return cur[idx]; }
         /// <summary>
         /// determine if a particular tracked value flipped
         /// </summary>
         /// <param name="txt"></param>
         /// <returns></returns>
-        public bool Flipped(string txt) { return flip[txt]; }
+        public bool Flipped(string txt) { return cur[txt]; }
         /// <summary>
         /// get previous value
         /// </summary>
@@ -189,8 +190,8 @@ namespace TradeLink.Common
 
         void FlipTracker_NewTxt(string txt, int idx)
         {
-            prev.addindex(txt, base[idx]);
-            flip.addindex(txt, prev[idx] != base[idx]);
+            prev.addindex(txt, false);
+            cur.addindex(txt, false);
             vcount.addindex(txt, 0);
         }
     }
