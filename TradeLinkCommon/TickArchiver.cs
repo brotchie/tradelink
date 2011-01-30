@@ -74,19 +74,24 @@ namespace TradeLink.Common
                         }
                         catch (IOException) { }
                     }
-                    // open new stream
-                    tw = new TikWriter(_path, t.symbol, t.date);
-                    // save tick
-                    tw.newTick((TickImpl)t);
-                    // save stream
-                    if (!havestream)
-                        filedict.Add(t.symbol, tw);
-                    else
-                        filedict[t.symbol] = tw;
-                    // save date if changed
-                    if (!samedate)
+                    // ensure file is writable
+                    string fn = TikWriter.SafeFilename(t.symbol, _path, t.date);
+                    if (TikUtil.IsFileWritetable(fn))
                     {
-                        datedict[t.symbol] = t.date;
+                        // open new stream
+                        tw = new TikWriter(_path, t.symbol, t.date);
+                        // save tick
+                        tw.newTick((TickImpl)t);
+                        // save stream
+                        if (!havestream)
+                            filedict.Add(t.symbol, tw);
+                        else
+                            filedict[t.symbol] = tw;
+                        // save date if changed
+                        if (!samedate)
+                        {
+                            datedict[t.symbol] = t.date;
+                        }
                     }
                 }
                 catch (IOException) { return false; }

@@ -25,6 +25,35 @@ namespace TradeLink.Common
             }
         }
 
+        public static bool IsFileWritetable(string path)
+        {
+            FileStream stream = null;
+
+            try
+            {
+                if (!System.IO.File.Exists(path))
+                    return true;
+                System.IO.FileInfo file = new FileInfo(path);
+                stream = file.Open(FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+            }
+            catch (IOException)
+            {
+                //the file is unavailable because it is:
+                //still being written to
+                //or being processed by another thread
+                //or does not exist (has already been processed)
+                return false;
+            }
+            finally
+            {
+                if (stream != null)
+                    stream.Close();
+            }
+
+            //file is not locked
+            return true;
+        }
+
         static void HistSource_gotTick(TradeLink.API.Tick t)
         {
             _tw.newTick((TickImpl)t);
