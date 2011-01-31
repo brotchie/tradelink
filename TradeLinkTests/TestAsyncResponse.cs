@@ -69,16 +69,22 @@ namespace TestTradeLink
                 ar.newTick(sent[i]);
 
             int waits = 0;
+            bool testtimeout = false;
             // wait for reception
             while (!tickdone)
             {
-                System.Threading.Thread.Sleep(AsyncResponse.SLEEP);
-                if (waits++ > 5)
+                System.Threading.Thread.Sleep(10);
+                if (waits++ % 50 == 0)
                 {
                     if (ar.BadTickWritten + ar.BadTickRead > 0)
                         break;
                     //System.Diagnostics.Debugger.Break();
                     Console.WriteLine(string.Format("waits: {0} tickcount: {1}", waits, tc));
+                }
+                if ((waits * 10) > sent.Length)
+                {
+                    testtimeout = true;
+                    break;
                 }
             }
 
@@ -87,7 +93,9 @@ namespace TestTradeLink
             Assert.AreEqual(0, ar.TickOverrun,"tick overrun");
 
             // verify done
-            Assert.IsTrue(tickdone, tc.ToString() + " ticks recv/"+MAXTICKS.ToString());
+            string reason = testtimeout ? "TICKTESTTIMEOUT " : string.Empty;
+            reason += tc.ToString() + " ticks recv/"+MAXTICKS.ToString();
+            Assert.IsTrue(tickdone, reason);
 
 
             //verify count
@@ -112,16 +120,22 @@ namespace TestTradeLink
 
             // wait for reception
             int waits = 0;
+            bool testtimeout = false;
             // wait for reception
             while (!imbdone)
             {
-                System.Threading.Thread.Sleep(AsyncResponse.SLEEP);
-                if (waits++ > 5)
+                System.Threading.Thread.Sleep(10);
+                if ((waits++ % 50) == 0)
                 {
                     if (ar.BadTickRead + ar.BadTickWritten > 0)
                         break;
                     //System.Diagnostics.Debugger.Break();
                     Console.WriteLine(string.Format("waits: {0} tickcount: {1}", waits, tc));
+                }
+                if ((waits * 10) > sent.Count)
+                {
+                    testtimeout = true;
+                    break;
                 }
 
             }
@@ -132,9 +146,10 @@ namespace TestTradeLink
 
             //verify no overruns
             Assert.AreEqual(0, ar.ImbalanceOverrun,"imbalance overrun");
-
+            string reason = testtimeout ? "IBMTESTTIMEOUT " : string.Empty;
+            reason += tc.ToString() + " imbalances recv/" + MAXIMBS.ToString();
             // verify done
-            Assert.IsTrue(imbdone, ic.ToString() + " imbalances recv/"+MAXIMBS.ToString());
+            Assert.IsTrue(imbdone, reason);
 
             // verify count
             Assert.AreEqual(MAXIMBS, ic);
@@ -181,6 +196,7 @@ namespace TestTradeLink
                     torder = false;
                 trecv[tc++] = t;
                 lastt = t.time;
+                tickdone = tc >= MAXTICKS;
             }
             catch (Exception ex)
             {

@@ -188,7 +188,7 @@ namespace TestTradeLink
             // reset ticks
             ticks = 0;
             sentticks = 0;
-            while (ticks < TICKSENT)
+            while ((ticks < TICKSENT) && _runtest)
                 sleep(1);
             // stop clock
             double time = DateTime.Now.Subtract(st).TotalSeconds;
@@ -307,12 +307,14 @@ namespace TestTradeLink
             while (!downspecialhit && _runtest)
             {
                 sleep(10);
+                checkmaxtime();
             }
             debug("disconnect detected... waiting for recovery...");
             // wait until reconnect
             while (!up)
             {
                 sleep(10);
+                checkmaxtime();
             }
 
             // verify up
@@ -370,11 +372,7 @@ namespace TestTradeLink
                         sleep(SLEEP);
                     if (i % 250 == 0)
                     {
-                        if (DateTime.Now.Subtract(startt).TotalSeconds > MAXTIMESEC)
-                        {
-                            _runtest = false;
-                            break;
-                        }
+                        checkmaxtime();
                     }
                 }
                 debug("completed helper sending ticks");
@@ -382,6 +380,14 @@ namespace TestTradeLink
             catch (Exception ex)
             {
                 debug("got error running test thread." + ex.Message + ex.StackTrace);
+                _runtest = false;
+            }
+        }
+
+        void checkmaxtime()
+        {
+            if (DateTime.Now.Subtract(startt).TotalSeconds > MAXTIMESEC)
+            {
                 _runtest = false;
             }
         }

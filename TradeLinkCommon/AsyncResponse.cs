@@ -92,7 +92,12 @@ namespace TradeLink.Common
             catch (ThreadInterruptedException) { }
         }
 
-        public const int SLEEP = 10;
+        public const int SLEEPDEFAULTMS = 10;
+        int _sleep = SLEEPDEFAULTMS;
+        /// <summary>
+        /// sleep time in milliseconds between checking read buffer
+        /// </summary>
+        public int SLEEP { get { return _sleep; } set { _sleep = value; } }
 
         /// <summary>
         /// pass new ticks through here to be processed asyncrhomously
