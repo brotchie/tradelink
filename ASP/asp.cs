@@ -980,14 +980,14 @@ namespace ASP
             for (int i = 0; i < _reslist.Count; i++)
                     _reslist[i].GotFill(t);
             // check for capital connection request
-            if (docapcon)
+            if (docapcon && _ao._capconprompt.Checked)
             {
                 docapcon = false;
                 docc();
             }
         }
 
-        bool docapcon = true;
+        bool docapcon = Properties.Settings.Default.capitalconnections;
 
         void tl_gotPosition(Position pos)
         {
