@@ -859,6 +859,20 @@ histperiod=daily&startdate=" + startdate + "&enddate=" + enddate + "&output=csv&
             return final.ToArray();
         }
 
+        /// <summary>
+        /// given some number of intervals, return a list of same intervals with duplicates removed
+        /// </summary>
+        /// <param name="ints"></param>
+        /// <returns></returns>
+        public static int[] GetUniqueIntervals(params int[] ints)
+        {
+            List<int> final = new List<int>(ints.Length);
+            foreach (int bi in ints)
+                if (!final.Contains(bi))
+                    final.Add(bi);
+            return final.ToArray();
+        }
+
 
     }
 
