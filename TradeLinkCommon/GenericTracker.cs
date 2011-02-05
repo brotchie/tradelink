@@ -821,6 +821,67 @@ namespace TradeLink.Common
             return display.ToArray();
         }
 
+        /// <summary>
+        /// test a rule made up of trackers
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <param name="rulename"></param>
+        /// <param name="booltrackers"></param>
+        /// <returns></returns>
+        public static bool rulepasses(int idx, string rulename, params GenericTrackerI[] booltrackers) { return rulepasses(idx, rulename, null, false, booltrackers); }
+        /// <summary>
+        /// test a rule made up of trackers
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <param name="rulename"></param>
+        /// <param name="debug"></param>
+        /// <param name="booltrackers"></param>
+        /// <returns></returns>
+        public static bool rulepasses(int idx, string rulename, DebugDelegate debug, params GenericTrackerI[] booltrackers) { return rulepasses(idx, rulename, debug, false, booltrackers); }
+        /// <summary>
+        /// test a rule made up of trackers... optionally display the passes or failures.
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <param name="rulename"></param>
+        /// <param name="debug"></param>
+        /// <param name="debugfails"></param>
+        /// <param name="booltrackers"></param>
+        /// <returns></returns>
+        public static bool rulepasses(int idx, string rulename, DebugDelegate debug, bool debugfails, params GenericTrackerI[] booltrackers)
+        {
+            List<GenericTrackerI> passes = new List<GenericTrackerI>(booltrackers.Length);
+            List<GenericTrackerI> fails = new List<GenericTrackerI>(booltrackers.Length);
+
+            debugfails &= (debug != null);
+            bool ok = true;
+            for (int i = 0; i < booltrackers.Length; i++)
+            {
+                // get tracker
+                GenericTrackerI gt = booltrackers[i];
+                // skip non bool types
+                if (gt.TrackedType != typeof(bool))
+                    continue;
+                // test for pass
+                bool pass = gt.ValueDecimal(idx) == 1;
+                if (pass)
+                    passes.Add(gt);
+                else if (debugfails)
+                    fails.Add(gt);
+                ok &= pass;
+            }
+            // display if need be
+            if ((debug != null) && (booltrackers.Length > 0))
+            {
+                string sym = booltrackers[0].getlabel(idx);
+                if (ok)
+                    debug(sym + " passed rule: " + rulename + " reason: " + GenericTracker.GetIndicatorPairs(idx, passes.ToArray()));
+                else if (debugfails)
+                    debug(sym + " failed rule: " + rulename + " reason: " + GenericTracker.GetIndicatorPairs(idx, fails.ToArray()));
+            }
+            return ok;
+        }
+
+
 
         public static string get(string url) { return get(url, true, 3); }
         public static string get(string url, bool removenewlines, int retries)
