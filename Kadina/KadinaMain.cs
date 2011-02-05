@@ -233,7 +233,7 @@ namespace Kadina
                     val = date+ Util.FTADD(time, t); 
                     break;
                 case PlayTo.Custom:
-                    int ctime = getcusttime();
+                    ctime = getcusttime();
                     if (ctime == 0)
                     {
                         pt = PlayTo.OneSec;
@@ -248,6 +248,8 @@ namespace Kadina
             h.PlayTo(val);
         }
 
+        int ctime = 0;
+
         delegate int intvoiddel();
         int getcusttime()
         {
@@ -255,7 +257,7 @@ namespace Kadina
                 return (int)Invoke(new intvoiddel(getcusttime));
             else
             {
-                string cts = Microsoft.VisualBasic.Interaction.InputBox("Enter PlayTo Time: (eg 4:15:01pm = 161501)", "Custom Play Time", "161501", 0, 0);
+                string cts = Microsoft.VisualBasic.Interaction.InputBox("Enter PlayTo Time: (eg 4:15:01pm = 161501)", "Custom Play Time", ctime.ToString(), 0, 0);
                 int ct = 0;
                 if (int.TryParse(cts, out ct))
                     return ct;
