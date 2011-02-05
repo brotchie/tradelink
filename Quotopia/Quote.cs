@@ -462,14 +462,15 @@ namespace Quotopia
                 Security sec = SecurityImpl.Parse(newsymbol);
                 if (sec.isValid)
                 {
-                    mb.Add(sec);
-                    addsymbol(newsymbol);
-                    newsymbol = "";
-                    try
+                    if (addsymbol(newsymbol))
                     {
-                        _bf.Subscribe(mb);
+                        newsymbol = "";
+                        try
+                        {
+                            _bf.Subscribe(mb);
+                        }
+                        catch (TLServerNotFound) { debug("no broker or feed server running."); }
                     }
-                    catch (TLServerNotFound) { debug("no broker or feed server running."); }
                 }
                 else
                 {
@@ -561,8 +562,13 @@ namespace Quotopia
 
         Dictionary<string, BarList> bardict = new Dictionary<string, BarList>();
 
-        void addsymbol(string sym)
+        bool addsymbol(string sym)
         {
+            if (bardict.ContainsKey(sym))
+            {
+                status("already have " + sym);
+                return false;
+            }
             // SYM,LAST,TSIZE,BID,ASK,BSIZE,ASIZE,SIZES,OHLC(YEST),CHANGE
             DataRow r = qt.Rows.Add(sym, "", "", "", "", "", "", "", "", "", "", "");
             try
@@ -578,6 +584,7 @@ namespace Quotopia
             status("Added " + sym);
             symindex();
             mb.Add(sym);
+            return true;
         }
 
         
