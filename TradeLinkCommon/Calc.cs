@@ -11,6 +11,16 @@ namespace TradeLink.Common
     public static class Calc
     {
         /// <summary>
+        /// round number to nearest decimal places (eg MINTICK)
+        /// </summary>
+        /// <param name="num"></param>
+        /// <param name="round2nearest"></param>
+        /// <returns></returns>
+        public static decimal Round2Decimals(decimal num, decimal round2nearest)
+        {
+            return Math.Round(num * (1 / round2nearest)) / (1 / round2nearest);
+        }
+        /// <summary>
         /// Gets the open PL on a per-share basis, ignoring the size of the position.
         /// </summary>
         /// <param name="LastTrade">The last trade.</param>
