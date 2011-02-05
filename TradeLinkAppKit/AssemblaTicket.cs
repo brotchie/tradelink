@@ -60,7 +60,7 @@ namespace TradeLink.AppKit
         {
             int stat = (int)status;
             int pri = (int)priority;
-            string url = GetTicketsUrl(space);
+            string url = GetTicketUrl(space);
             HttpWebRequest hr = WebRequest.Create(url) as HttpWebRequest;
             hr.Credentials = new System.Net.NetworkCredential(user, password);
             hr.PreAuthenticate = true;
