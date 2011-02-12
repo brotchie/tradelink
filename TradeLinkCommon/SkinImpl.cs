@@ -77,7 +77,8 @@ namespace TradeLink.Common
             _props = serializeprops(GetType(_class, _dll), response,deb);
         }
 
-
+        List<string> _tickfiles = new List<string>();
+        public string[] TickFiles { get { return _tickfiles.ToArray(); } set { _tickfiles.Clear(); _tickfiles.AddRange(value); } }
 
         public string Properties { get { return _props; } set { _props = value; } }
         public string ResponseDLL { get { return _dll; } set { _dll = value; } }
@@ -296,5 +297,42 @@ namespace TradeLink.Common
             if (deb == null) return;
             deb(msg);
         }
+        public const string SKINEXT_WILD = "*.skn";
+        public const string SKINEXT_NODOT = "skn";
+        public const string SKINEXT = ".skn";
+        public static string SKINPATH = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\";
+
+        public static string[] getskinfiles() { return getskinfiles(SKINPATH); }
+        /// <summary>
+        /// find skins in a path
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string[] getskinfiles(string path)
+        {
+            List<string> files = new List<string>();
+            // get info for this directory
+            DirectoryInfo di = new DirectoryInfo(path);
+            // find all skins in this directory
+            FileInfo[] skins = di.GetFiles("*" + SKINEXT);
+            // build list of their names
+            foreach (FileInfo skin in skins)
+                files.Add(skin.Name);
+            // return results
+            return files.ToArray();
+        }
+
+        /// <summary>
+        /// get skin name from filename
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+        public static string skinfromfile(string filename)
+        {
+            string name = Path.GetFileNameWithoutExtension(filename);
+            string[] r = name.Split('.');
+            return r[0];
+        }
+
     }
 }

@@ -79,6 +79,13 @@ namespace Kadina
             pg.DataError += new DataGridViewDataErrorEventHandler(pg_DataError);
         }
 
+        void restoreskins()
+        {
+            string [] skins = SkinImpl.getskinfiles();
+            foreach (string skin in skins)
+                _skinsavail.DropDownItems.Add(SkinImpl.skinfromfile(skin));
+        }
+
         void debugControl1_NewCreateTicketEvent(string msg)
         {
             TradeLink.AppKit.ATW.Report(Properties.Settings.Default.portal, debugControl1.Content, null,msg,Properties.Settings.Default.user, Properties.Settings.Default.pw, new TradeLink.AppKit.AssemblaTicketWindow.LoginSucceedDel(kadinamain.success), true,ATW.Summary(Properties.Settings.Default.portal));
@@ -1028,6 +1035,34 @@ namespace Kadina
         private void _reset_Click(object sender, EventArgs e)
         {
             reset();
+        }
+
+        void loadskin(string fn)
+        {
+            // load skin
+            SkinImpl skn = new SkinImpl();
+            bool ok = Util.FromFile<SkinImpl>(fn,ref skn,debug);
+            // load tickfiles from skin
+            foreach (string file in skn.TickFiles)
+                loadfile(file);
+
+            // load response
+            myres = (Response)SkinImpl.DeskinFile(fn, debug);
+
+        }
+
+        private void _skinsavail_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            string skin = e.ClickedItem.Text;
+            string skinfn = SkinImpl.SKINPATH+"\\"+skin+SkinImpl.SKINEXT;
+            // ensure exists
+            if (!System.IO.File.Exists(skinfn))
+            {
+                status("Cannot locate: " + skin);
+                return;
+            }
+            // load skin
+            loadskin(skinfn);
         }
     }
 

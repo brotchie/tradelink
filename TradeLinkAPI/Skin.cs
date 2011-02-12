@@ -7,6 +7,7 @@ namespace TradeLink.API
 {
     public interface Skin
     {
+        string[] TickFiles { get; set; }
         /// <summary>
         /// xml encoded properties of response and their values
         /// </summary>

@@ -18,8 +18,6 @@ namespace ASP
     public partial class ASP : AppTracker
     {
         public const string PROGRAM = "ASP";
-        const string SKINEXT = ".skn";
-        public string SKINPATH = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)+"\\";
 
         // working variables
         Dictionary<string, SecurityImpl> _seclist = new Dictionary<string, SecurityImpl>();
@@ -411,7 +409,7 @@ namespace ASP
             // get name
             string name = Interaction.InputBox("What is the skin name for these responses?", "Skin name", "Skin" + DateTime.Now.Ticks.ToString(), 0, 0);
             // get next available index for this name
-            int startidx = nextskinidx(SKINPATH,name);
+            int startidx = nextskinidx(SkinImpl.SKINPATH,name);
             // count successes
             int succount = 0;
             // go through all selected responses
@@ -429,7 +427,7 @@ namespace ASP
                     continue;
                 }
                 // save them as skin
-                bool worked = SkinImpl.SkinFile(_reslist[idx], _reslist[idx].FullName, dll, SKINPATH + name + "." + startidx.ToString() + SKINEXT, new DebugDelegate(debug));
+                bool worked = SkinImpl.SkinFile(_reslist[idx], _reslist[idx].FullName, dll, SkinImpl.SKINPATH + name + "." + startidx.ToString() + SkinImpl.SKINEXT, new DebugDelegate(debug));
                 // notify errors
                 if (!worked)
                     debug("skin failed on: " + _reslist[idx].FullName + " " + _reslist[idx].ID);
@@ -459,10 +457,10 @@ namespace ASP
             _skins.Items.Clear();
 
             // go through every skin file
-            foreach (string fn in skinfiles(SKINPATH))
+            foreach (string fn in SkinImpl.getskinfiles())
             {
                 // get skin name
-                string sk = skinfromfile(fn);
+                string sk = SkinImpl.skinfromfile(fn);
                 // if we don't have it, display as an option
                 if (!_skins.Items.Contains(sk))
                     _skins.Items.Add(sk);
@@ -471,40 +469,22 @@ namespace ASP
             _skins.Invalidate(true);
         }
 
-        string[] skinfiles(string path)
-        {
-            List<string> files = new List<string>();
-            // get info for this directory
-            DirectoryInfo di = new DirectoryInfo(path);
-            // find all skins in this directory
-            FileInfo[] skins = di.GetFiles("*" + SKINEXT);
-            // build list of their names
-            foreach (FileInfo skin in skins)
-                files.Add(skin.Name);
-            // return results
-            return files.ToArray();
-        }
 
         int nextskinidx(string path, string skinname)
         {
             // no matching skins
             int count = 0;
             // get all skins 
-            string[] files = skinfiles(path);
+            string[] files = SkinImpl.getskinfiles(path);
             // go through and find only skins with matching name
             foreach (string fn in files)
-                if (skinfromfile(fn) == skinname)
+                if (SkinImpl.skinfromfile(fn) == skinname)
                     count++; // count matches
             // return total matches
             return count;
         }
 
-        string skinfromfile(string filename)
-        {
-            string name = Path.GetFileNameWithoutExtension(filename);
-            string[] r = name.Split('.');
-            return r[0];
-        }
+        
 
 
 
@@ -533,7 +513,7 @@ namespace ASP
         bool tradeskins(string name)
         {
             // get skin files available
-            string[] files = skinfiles(SKINPATH);
+            string[] files = SkinImpl.getskinfiles(SkinImpl.SKINPATH);
             // set status variable
             bool worked = true;
             try
@@ -542,9 +522,9 @@ namespace ASP
                 foreach (string fn in files)
                 {
                     // if it's the skin we want to trade
-                    if (skinfromfile(fn) == name)
+                    if (SkinImpl.skinfromfile(fn) == name)
                     {
-                        worked &= loadskin(SKINPATH+fn);
+                        worked &= loadskin(SkinImpl.SKINPATH+fn);
                     }
                 }
                 return worked;
@@ -563,7 +543,7 @@ namespace ASP
             bool added = id != -1;
             // mark it as loaded
             if (added)
-                _resskinidx.Add(id, skinfromfile(skinfullpath));
+                _resskinidx.Add(id, SkinImpl.skinfromfile(skinfullpath));
             if (added)
                 debug("Loaded skin: " + skinfullpath);
             else
@@ -1262,14 +1242,14 @@ namespace ASP
         void remskin(string name, bool filesonly)
         {
             // get number of repsonses in skin
-            int count = nextskinidx(SKINPATH, name);
+            int count = nextskinidx(SkinImpl.SKINPATH, name);
             // remove file names
             for (int i = 0; i < count; i++)
             {
                 try
                 {
                     // remove skin file
-                    File.Delete(SKINPATH+ name + "." + i.ToString() + SKINEXT);
+                    File.Delete(SkinImpl.SKINPATH+ name + "." + i.ToString() + SkinImpl.SKINEXT);
                 }
                 catch (Exception) { continue; }
             }
@@ -1324,7 +1304,7 @@ namespace ASP
                         // remove skin first
                         remskin(name);
                         // then re-add it
-                        worked &= SkinImpl.SkinFile(r, r.FullName, _class2dll[r.FullName], SKINPATH + name + "." + nextskinidx(SKINPATH, name).ToString() + SKINEXT, new DebugDelegate(debug));
+                        worked &= SkinImpl.SkinFile(r, r.FullName, _class2dll[r.FullName], SkinImpl.SKINPATH + name + "." + nextskinidx(SkinImpl.SKINPATH, name).ToString() + SkinImpl.SKINEXT, new DebugDelegate(debug));
                     }
                     catch (Exception)
                     {
