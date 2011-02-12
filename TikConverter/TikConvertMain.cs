@@ -217,6 +217,13 @@ namespace TikConverter
                         infile = new StreamReader(filename);
                         // no header in file
                         break;
+                    case Converter.MultiCharts:
+                        // The symbol for data being imported is obtained from the filename
+                        // Selected files for import must be named SYMBOL.ext - eg AAPL.txt, GOOG.txt
+                        _sym = System.IO.Path.GetFileNameWithoutExtension(filename);
+                        infile = new StreamReader(filename);
+                        infile.ReadLine(); // ignore first line header of input file
+                        break;
                  }
 
             }
@@ -249,6 +256,9 @@ namespace TikConverter
                             break;
                         case Converter.QCollector_eSignal:
                             k = QCollector.parseline(infile.ReadLine(), sym);
+                            break;
+                        case Converter.MultiCharts:
+                            k = MultiCharts.parseline(infile.ReadLine(), _sym);
                             break;
                     }
                 }
