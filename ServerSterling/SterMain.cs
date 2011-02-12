@@ -102,6 +102,16 @@ namespace SterServer
             }
         }
 
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            setaccount(sender, e);
+        }
+
+        private void toolStripButton2_Click(object sender, EventArgs e)
+        {
+            report(sender, e);
+        }
+
 
 
 
