@@ -16,7 +16,7 @@ namespace TikConverter
         const int TRADE = 4;
 
         // here is where a line is converted
-        public static Tick parseline(string line, int defaultsize)
+        public static Tick parseline(string line, int defaultsize, int decimalplaces )
         {
             // split line
             string[] r = line.Split(',');
@@ -34,7 +34,9 @@ namespace TikConverter
             // parse close as trade price
             if (decimal.TryParse(r[TRADE], out dv))
             {
-                k.trade = (decimal)dv / 100;
+                decimal divisor = (decimal)(  Math.Pow( 10, decimalplaces ) );
+                // k.trade = (decimal)dv / 100;
+                k.trade = (decimal) dv / divisor;
                 k.size = defaultsize;
             }
             // return tick

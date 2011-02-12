@@ -23,14 +23,12 @@ namespace TikConverter
             TrackEnabled = Util.TrackUsage();
             Program = PROGRAM;
             InitializeComponent();
+            _cqgparseoptionsgroupbox.Visible = false;
             _con.Items.AddRange(Enum.GetNames(typeof(Converter)));
             bw.WorkerReportsProgress = true;
             bw.DoWork += new DoWorkEventHandler(bw_DoWork);
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_RunWorkerCompleted);
         }
-
-
-
 
         Dictionary<string, string> _filesyms = new Dictionary<string, string>();
         string _path = string.Empty;
@@ -206,6 +204,8 @@ namespace TikConverter
             // setup input file
             StreamReader infile = null;
             int _date = 0;
+            int cqgdecimalplaces = 2;
+
             try
             {
                 // open input file
@@ -224,6 +224,7 @@ namespace TikConverter
                         break;
                     case Converter.CQG:
                         infile = new StreamReader(filename);
+                        cqgdecimalplaces = (int) this._cqgdecimalplacesinput.Value;
                         // no header
                         break;
                     case Converter.TradingPhysicsTnS:
@@ -264,7 +265,7 @@ namespace TikConverter
                     switch (con)
                     {
                         case Converter.CQG:
-                            k = CQG.parseline(infile.ReadLine(), tradesize);
+                            k = CQG.parseline(infile.ReadLine(), tradesize, cqgdecimalplaces );
                             break;
                         case Converter.eSignal_EPF:
                             k = eSigTick.FromStream(_sym, infile);
@@ -380,8 +381,9 @@ namespace TikConverter
             // esignal convert does not use default size
             _defaultsize.Enabled = _conval != Converter.eSignal_EPF;
             _defaultsize.Invalidate();
-                
 
+            if (_conval == Converter.CQG) _cqgparseoptionsgroupbox.Visible = true;
+            else _cqgparseoptionsgroupbox.Visible = false;
         }
 
         private void TikConvertMain_SizeChanged(object sender, EventArgs e)
