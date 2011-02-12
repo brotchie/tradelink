@@ -87,6 +87,42 @@ namespace TradeLink.Common
             }
         }
         /// <summary>
+        /// fill bars with arbitrary price data for a symbol
+        /// </summary>
+        /// <param name="sym"></param>
+        /// <param name="prices"></param>
+        /// <param name="startdate"></param>
+        /// <param name="blt"></param>
+        /// <param name="interval"></param>
+        /// <param name="debugs"></param>
+        /// <returns></returns>
+        public static bool backfillbars(string sym, decimal[] prices, int startdate, ref BarListTracker blt, int interval, DebugDelegate debugs)
+        {
+            // ensure we have closing data
+            if (prices.Length == 0)
+            {
+                if (debugs != null)
+                    debugs(sym + " no price data provided/available, will have to wait until bars are created from market.");
+                return false;
+            }
+            // get start day
+            int date = startdate;
+            // make desired numbers of ticks
+            DateTime n = DateTime.Now;
+            bool ok = true;
+            for (int i = prices.Length - 1; i >= 0; i--)
+            {
+                // get time now - exitlen*60
+                int nt = Util.ToTLTime(n.Subtract(new TimeSpan(0, i * interval, 0)));
+                Tick k = TickImpl.NewTrade(sym, date, nt, prices[i], 100, string.Empty);
+                ok &= k.isValid && k.isTrade;
+                blt.newTick(k);
+            }
+            if (ok && (debugs != null))
+                debugs(sym + " bars backfilled using: " + Calc.parray(prices));
+            return ok;
+        }
+        /// <summary>
         /// insert a bar at particular place in the list.
         /// REMEMBER YOU MUST REHANDLE GOTNEWBAR EVENT AFTER CALLING THIS.
         /// </summary>

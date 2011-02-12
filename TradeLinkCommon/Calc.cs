@@ -1697,5 +1697,79 @@ namespace TradeLink.Common
                 vals[i] = (double)array[i];
         }
 
+        /// <summary>
+        /// print an array
+        /// </summary>
+        /// <param name="prices"></param>
+        /// <returns></returns>
+        public static string parray(decimal[] prices) { return parray(prices, 0); }
+        /// <summary>
+        /// print an array
+        /// </summary>
+        /// <param name="prices"></param>
+        /// <param name="back"></param>
+        /// <returns></returns>
+        public static string parray(decimal[] prices, int back)
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            int start = prices.Length - back;
+            if (start < 0)
+                start = 0;
+            for (int i = start; i < prices.Length; i++)
+            {
+                decimal c = prices[i];
+                if (c != 0)
+                    sb.Append(c.ToString("N2") + " ");
+            }
+            return sb.ToString();
+        }
+        public static string parray(int[] vals) { return parray(vals, 0); }
+        /// <summary>
+        /// print an array
+        /// </summary>
+        /// <param name="prices"></param>
+        /// <param name="back"></param>
+        /// <returns></returns>
+        public static string parray(int[] vals, int back)
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            int start = vals.Length - back;
+            if (start < 0)
+                start = 0;
+            for (int i = start; i < vals.Length; i++)
+            {
+                decimal c = vals[i];
+                if (c != 0)
+                    sb.Append(c.ToString() + " ");
+            }
+            return sb.ToString();
+        }
+        /// <summary>
+        /// fill an array with a value
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="len"></param>
+        /// <returns></returns>
+        public static decimal[] fillarray(decimal val, int len)
+        {
+            decimal[] a = new decimal[len];
+            for (int i = 0; i < len; i++)
+                a[i] = val;
+            return a;
+        }
+        /// <summary>
+        /// fill an array with a value
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="len"></param>
+        /// <returns></returns>
+        public static int[] fillarray(int val, int len)
+        {
+            int[] a = new int[len];
+            for (int i = 0; i < len; i++)
+                a[i] = val;
+            return a;
+        }
+
     }
 }
