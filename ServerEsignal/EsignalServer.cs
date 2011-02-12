@@ -109,7 +109,7 @@ namespace ServerEsignal
                             else
                             {
                                 interval = (br.Interval / 60).ToString();
-                                barsback = BarImpl.BarsBackFromDate(bi, br.StartDate, br.EndDate);
+                                barsback = BarImpl.BarsBackFromDate(bi, br.StartDateTime, br.EndDateTime);
                             }
                             int alldata = BarRequestsGetAllData ? -1 : 0;
                             int hnd = esig.get_RequestHistory(br.Symbol, interval, (bi == BarInterval.Day) ? barType.btDAYS : barType.btBARS, barsback, alldata, alldata);
