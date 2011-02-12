@@ -11,4 +11,5 @@ public enum Converter
     YahooDaily,
     QCollector_eSignal,
     MultiCharts,
+    EuronextDaily,
 }

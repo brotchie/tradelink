@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections;
+using System.IO;
+using System.Text.RegularExpressions;
+using System.Globalization;
 using TradeLink.API;
 
 namespace TradeLink.Common
@@ -828,6 +831,81 @@ histperiod=daily&startdate=" + startdate + "&enddate=" + enddate + "&output=csv&
             urlTemplate = urlTemplate.Replace("[endYear]", endYear);
             return DayFromURL(urlTemplate, symbol);
         }
+
+
+        /// <summary>
+        /// Populate the day-interval barlist using Euronext.com as the source.
+        /// </summary>
+        /// <param name="isin">The ISIN (mnemonics not accepted)</param>
+        /// <returns></returns>
+        ///
+        public static BarList DayFromEuronext(string isin) { return DayFromEuronext(isin, null, null); }
+        public static BarList DayFromEuronext(string isin, DateTime? startDate, DateTime? endDate)
+        {
+            string market;
+            string urlTemplate =
+                @"http://www.euronext.com/tools/datacentre/dataCentreDownloadExcell.jcsv?cha=2593&lan=EN&fileFormat=txt&separator=.&dateFormat=dd/MM/yy" + 
+                "&isinCode=[symbol]&selectedMep=[market]&indexCompo=&opening=on&high=on&low=on&closing=on&volume=on&dateFrom=[startDay]/[startMonth]/[startYear]&" +
+                "dateTo=[endDay]/[endMonth]/[endYear]&typeDownload=2";
+
+            if (!endDate.HasValue) endDate = DateTime.Now;
+            if (!startDate.HasValue) startDate = DateTime.Now.AddYears(-5);
+            if (isin == null || !Regex.IsMatch(isin, "[A-Za-z0-9]{12}"))
+                throw new ArgumentException("Invalid ISIN: " + isin);
+
+            /* ugly hack to get the market number from the isin (not always valid..) */
+            CompareInfo myComp = CultureInfo.InvariantCulture.CompareInfo;
+            if (myComp.IsPrefix(isin, "BE")) market = "3";
+            else if (myComp.IsPrefix(isin, "FR")) market = "1";
+            else if (myComp.IsPrefix(isin, "NL")) market = "2";
+            else if (myComp.IsPrefix(isin, "PT")) market = "5";
+            else market = "1";
+            
+            string startMonth = startDate.Value.Month.ToString();
+            string startDay = startDate.Value.Day.ToString();
+            string startYear = startDate.Value.Year.ToString();
+
+            string endMonth = endDate.Value.Month.ToString();
+            string endDay = endDate.Value.Day.ToString();
+            string endYear = endDate.Value.Year.ToString();
+
+            urlTemplate = urlTemplate.Replace("[symbol]", isin);
+            urlTemplate = urlTemplate.Replace("[market]", market);
+            urlTemplate = urlTemplate.Replace("[startMonth]", startMonth);
+            urlTemplate = urlTemplate.Replace("[startDay]", startDay);
+            urlTemplate = urlTemplate.Replace("[startYear]", startYear);
+
+            urlTemplate = urlTemplate.Replace("[endMonth]", endMonth);
+            urlTemplate = urlTemplate.Replace("[endDay]", endDay);
+            urlTemplate = urlTemplate.Replace("[endYear]", endYear);
+
+            BarListImpl bl = new BarListImpl(BarInterval.Day, isin);
+            System.Net.WebClient wc = new System.Net.WebClient();
+            StreamReader res;
+            try
+            {
+                res = new StreamReader(wc.OpenRead(urlTemplate));
+                int skipCount = 0;
+                string tmp = null;
+                do
+                {
+                    tmp = res.ReadLine();
+                    if (skipCount++ < 7) 
+                        continue;
+                    tmp = tmp.Replace(";", ",");
+                    Bar b = BarImpl.FromCSV(tmp, isin, (int)BarInterval.Day);
+                    foreach (Tick k in BarImpl.ToTick(b))
+                        bl.newTick(k);
+                } while (tmp != null);
+            }
+            catch (Exception)
+            {
+                return bl;
+            }
+            
+            return bl;
+        }
+
 
         /// <summary>
         /// load previous days bar data from tick files located in tradelink tick folder

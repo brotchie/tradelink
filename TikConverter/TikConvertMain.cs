@@ -38,14 +38,16 @@ namespace TikConverter
         {
             // make sure we only convert one group at a time
             if (bw.IsBusy) { debug("wait until conversion completes..."); return; }
-            // see if we're converting from files
+            // see if we're converting from files or webservices
             switch (_conval)
             {
+                    // webservice list
+                case Converter.EuronextDaily:
                 case Converter.YahooDaily:
                 case Converter.GoogleDaily:
                     // reset progress
                     progress(0);
-                    // get list of symbols
+                    // get list of symbols from user
                     string symi = Microsoft.VisualBasic.Interaction.InputBox("Enter list of symbols to pull from " + _conval.ToString() + Environment.NewLine + "(eg LVS,GOOG,GE)", "Enter symbol list", string.Empty, 0, 0);
                     // remove spaces and capitalize
                     symi = symi.Replace(" ", string.Empty).ToUpper();
@@ -57,7 +59,22 @@ namespace TikConverter
                         try
                         {
                             // get barlists for those symbols
-                            BarList bl = _conval == Converter.GoogleDaily ? BarListImpl.DayFromGoogle(sym) : BarListImpl.DayFromYahoo(sym);
+                            BarList bl;
+                            if (_conval == Converter.GoogleDaily)
+                                bl = BarListImpl.DayFromGoogle(sym);
+                            else if (_conval == Converter.YahooDaily)
+                                bl = BarListImpl.DayFromYahoo(sym);
+                            else if (_conval == Converter.EuronextDaily)
+                            {
+                                if (!System.Text.RegularExpressions.Regex.IsMatch(sym, "[A-Z0-9]{12}", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                                {
+                                    debug("\"" + sym + "\" is not a valid ISIN.  Euronext expects ISINs!");
+                                    continue;
+                                }
+                                bl = BarListImpl.DayFromEuronext(sym);
+                            }
+                            else
+                                continue;
                             // convert to tick files
                             TikUtil.TicksToFile(TikUtil.Barlist2Tick(bl));
                             // notify
