@@ -561,6 +561,8 @@ namespace IQFeedBroker
         GenericTracker<decimal> _lows = new GenericTracker<decimal>();
         private void FireTick(string[] actualData)
         {
+            if (actualData.Length < 65)
+                return;
                 try
                 {
                     if (actualData[0] == "F") return;
