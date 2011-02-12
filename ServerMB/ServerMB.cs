@@ -6,6 +6,7 @@ using TradeLink.AppKit;
 using MBTCOMLib;
 using MBTORDERSLib;
 using MBTQUOTELib;
+using MBTHISTLib;
 
 namespace ServerMB
 {
@@ -16,6 +17,7 @@ namespace ServerMB
         public MbtOrderClient m_OrderClient;
         public MbtQuotes m_Quotes;
         public MbtOpenOrders m_Orders;
+        public MbtHistMgr m_Hist;
         PositionTracker pt = new PositionTracker();
 
         Dictionary<long, string> tl2broker = new Dictionary<long, string>();
@@ -51,6 +53,7 @@ namespace ServerMB
             }
             m_Quotes = m_ComMgr.Quotes;
             m_Orders = m_OrderClient.OpenOrders;
+            m_Hist = m_ComMgr.HistMgr;
 
             // tradelink bindings
             tl.newProviderName = Providers.MBTrading;
@@ -83,6 +86,7 @@ namespace ServerMB
             m_OrderClient.OnCancelRejected += new _IMbtOrderClientEvents_OnCancelRejectedEventHandler(m_OrderClient_OnCancelRejected);
             //m_OrderClient.OnRemove += new _IMbtOrderClientEvents_OnRemoveEventHandler( m_OrderClient_OnRemove );
             m_OrderClient.OnHistoryAdded += new _IMbtOrderClientEvents_OnHistoryAddedEventHandler(m_OrderClient_OnHistoryAdded);
+            m_Hist.OnDataEvent += new _IMbtHistEvents_OnDataEventEventHandler(m_Hist_OnDataEvent);
             //disable old ticks
             //DisableOldTicks = Convert.ToBoolean(ConfigurationSettings.AppSettings["DisableOldTicks"]);
             DisableOldTicks = true;
@@ -115,11 +119,251 @@ namespace ServerMB
             }
         }
 
+        bool waitforhistorical2complete = false;
+        Dictionary<int, BarRequest> _barhandle2barrequest = new Dictionary<int, BarRequest>();
+        RingBuffer<BarRequest> _barrequests = new RingBuffer<BarRequest>(500);
+
         long tl_newUnknownRequest(MessageTypes t, string msg)
         {
             debug(String.Format("Unknown message {0}: {1}", t, msg));
-            return (long)MessageTypes.UNKNOWN_MESSAGE;
+            switch (t)
+            {
+                case MessageTypes.BARREQUEST:
+                    {
+                        debug("got barrequest: " + msg);
+                        try
+                        {
+                            BarRequest br = BarImpl.ParseBarRequest(msg);
+                            if (waitforhistorical2complete) _barrequests.Write(br);
+
+                            else submitBarRequest(br);
+
+
+                        }
+                        catch (Exception ex)
+                        {
+                            debug("error parsing bar request: " + msg);
+                            debug(ex.Message + ex.StackTrace);
+                        }
+                        return 0;
+                    }
+            }
+            return (long)MessageTypes.FEATURE_NOT_IMPLEMENTED;
         }
+
+        public void submitBarRequest(BarRequest br)
+        {
+            waitforhistorical2complete = true;
+            debug("br.Client=" + br.Client);
+            string symbol = br.Symbol;
+            int lRequestID = (int)br.Interval % 100;
+            int lPeriod = (int)br.Interval / 100;
+            int lMaxRecs = br.CustomInterval / 10;
+            bool bUpdate = (br.CustomInterval % 10 == 0) ? false : true;
+            int tlDateS = br.StartDate;
+            int tlTimeS = br.StartTime;
+            DateTime dtStart = TradeLink.Common.Util.ToDateTime(tlDateS, tlTimeS);
+            int tlDateE = br.EndDate;
+            int tlTimeE = br.EndTime;
+            DateTime dtEnd = TradeLink.Common.Util.ToDateTime(tlDateE, tlTimeE);
+
+            if (!_barhandle2barrequest.ContainsKey(lRequestID))
+                _barhandle2barrequest.Add(lRequestID, br);
+            else
+                debug("already had bar request: " + lRequestID + " " + _barhandle2barrequest[lRequestID].ToString());
+
+            int lRequestType = lRequestID % 10;
+
+            switch (lRequestType)
+            {
+                case 1:
+                    MbtHistDayBar moDayBar = m_Hist.CreateHistDayBar();
+                    moDayBar.Clear();
+                    debug(symbol + " " + lRequestID + " " + lPeriod + " " + dtStart + " " + dtEnd + " " + lMaxRecs + " " + bUpdate);
+                    moDayBar.SendRequest(symbol, lRequestID, lPeriod, dtStart.ToUniversalTime(), dtEnd.ToUniversalTime(), lMaxRecs, bUpdate);
+                    break;
+                case 2:
+                    MbtHistMinBar moMinBar = m_Hist.CreateHistMinBar();
+                    moMinBar.Clear();
+                    debug(symbol + " " + lRequestID + " " + lPeriod + " " + dtStart + " " + dtEnd + " " + lMaxRecs + " " + bUpdate);
+                    moMinBar.SendRequest(symbol, lRequestID, lPeriod, dtStart.ToUniversalTime(), dtEnd.ToUniversalTime(), lMaxRecs, bUpdate);
+                    break;
+                case 3:
+                    MbtHistTick moTickBar = m_Hist.CreateHistTick();
+                    moTickBar.Clear();
+                    moTickBar.SendRequest(symbol, lRequestID, lPeriod, dtStart.ToUniversalTime(), dtEnd.ToUniversalTime(), lMaxRecs, bUpdate);
+                    break;
+            }
+
+        }
+
+        public int MbtDayInt2CustInt(int lPeriod)
+        {
+
+            switch (lPeriod)
+            {
+                case -3:
+                    return 365 * (int)BarInterval.Day; break;
+                case -2:
+                    return 30 * (int)BarInterval.Day; break;
+                case -1:
+                    return 7 * (int)BarInterval.Day; break;
+                case 0: return (int)BarInterval.Day; break;
+                default: return lPeriod * (int)BarInterval.Day; break;
+
+            }
+
+
+        }
+
+
+        public int MbtMinInt2CustInt(int lPeriod)
+        {
+
+            switch (lPeriod)
+            {
+                case 0: return (int)BarInterval.Minute; break;
+                default: return lPeriod; break;
+
+            }
+
+        }
+
+        public void m_Hist_OnDataEvent(int lRequestId, object pHist, enumHistEventType evt)
+        {
+            debug("Processing Id: " + lRequestId + "  evt: " + evt);
+            Bar b;
+            int date, time; long vol;
+            decimal open, high, low, close;
+            string symbol;
+
+            // Notice we are using lRequestId in the original SendRequest()s to indicate whether we're
+            // dealing with a Day, Min or Tick bar object. Process accordingly.
+
+            BarRequest br;
+            int MbtCustInt;
+
+            debug("Unknown barrequest handle: ");
+
+            if (!_barhandle2barrequest.TryGetValue(lRequestId, out br))
+            {
+                debug("Unknown barrequest handle: " + lRequestId);
+                return;
+            }
+
+            int lRequestType = lRequestId % 10;
+
+            switch (lRequestType)
+            {
+                case 1:
+                    debug("number of client");
+                    MbtHistDayBar mhd = pHist as MbtHistDayBar;
+                    mhd.Last();
+
+
+                    while (!mhd.Bof)
+                    {
+                        debug("number of client");
+                        open = Convert.ToDecimal(mhd.Open, System.Globalization.CultureInfo.InvariantCulture);
+                        high = Convert.ToDecimal(mhd.High, System.Globalization.CultureInfo.InvariantCulture);
+                        low = Convert.ToDecimal(mhd.Low, System.Globalization.CultureInfo.InvariantCulture);
+                        close = Convert.ToDecimal(mhd.Close, System.Globalization.CultureInfo.InvariantCulture);
+                        vol = Convert.ToInt64(mhd.TotalVolume, System.Globalization.CultureInfo.InvariantCulture);
+                        date = Util.ToTLDate(mhd.CloseDate);
+                        time = 0;
+                        MbtCustInt = MbtDayInt2CustInt((int)br.Interval / 100);
+                        b = new BarImpl(open, high, low, close, vol, date, time, mhd.Symbol, MbtCustInt);
+
+                        debug("number of client" + tl.NumClients);
+
+                        debug("bar" + BarImpl.Serialize(b));
+                        tl.TLSend(BarImpl.Serialize(b), MessageTypes.BARRESPONSE, br.Client);
+
+                        mhd.Previous();
+                    }
+                    //use this mesage to inform that the data for requestID is compeleted
+                    tl.TLSend(Convert.ToString(lRequestId), MessageTypes.CUSTOM40, br.Client);
+                    break;
+
+                case 2:
+
+                    MbtHistMinBar mhm = pHist as MbtHistMinBar;
+
+                    mhm.Last();
+
+                    while (!mhm.Bof)
+                    {
+                        open = Convert.ToDecimal(mhm.Open, System.Globalization.CultureInfo.InvariantCulture);
+                        high = Convert.ToDecimal(mhm.High, System.Globalization.CultureInfo.InvariantCulture);
+                        low = Convert.ToDecimal(mhm.Low, System.Globalization.CultureInfo.InvariantCulture);
+                        close = Convert.ToDecimal(mhm.Close, System.Globalization.CultureInfo.InvariantCulture);
+                        vol = Convert.ToInt64(mhm.TotalVolume, System.Globalization.CultureInfo.InvariantCulture);
+                        date = Util.ToTLDate(mhm.LocalDateTime);
+                        time = Util.ToTLTime(mhm.LocalDateTime);
+                        MbtCustInt = MbtMinInt2CustInt((int)br.Interval / 100);
+                        b = new BarImpl(open, high, low, close, vol, date, time, mhm.Symbol, MbtCustInt);
+
+                        tl.TLSend(BarImpl.Serialize(b), MessageTypes.BARRESPONSE, br.Client);
+
+                        mhm.Previous();
+                    }
+                    //use this mesage to inform that the data for requestID is compeleted
+                    tl.TLSend(Convert.ToString(lRequestId), MessageTypes.CUSTOM40, br.Client);
+
+                    break;
+
+
+
+                case 3:
+
+                    MbtHistTick mht = pHist as MbtHistTick;
+                    TickImpl k = new TickImpl(mht.Symbol);
+                    //MBT default tick data is trade data
+                    int lTickFilter = 1;
+                    mht.First();
+
+                    switch (lTickFilter)
+                    {
+                        case 1:
+
+                            while (!mht.Bof)
+                            {
+                                k.trade = Convert.ToDecimal(mht.Price);
+                                k.ex = mht.Exchange;
+                                k.size = mht.Volume;
+                                k.date = Util.ToTLDate(mht.LocalDateTime);
+                                k.time = Util.ToTLTime(mht.LocalDateTime);
+                                SendNewTick(k);
+                                mht.Previous();
+                            }
+                            ; break;
+
+                    }
+                    break;
+            }
+
+            if (_barrequests.hasItems)
+            {
+                // BarRequest br1= new BarRequest();
+
+
+                try
+                {
+                    br = _barrequests.Read();
+
+                    submitBarRequest(br);
+
+                }
+                catch (Exception ex)
+                {
+                    debug("error on historical bar request: " + br.ToString());
+                    debug(ex.Message + ex.StackTrace);
+                }
+
+            }
+            else waitforhistorical2complete = false;
+        }
+
 
         void m_Quotes_OnClose(int ErrorCode)
         {
@@ -870,6 +1114,8 @@ namespace ServerMB
             f.Add(MessageTypes.LIVEDATA);
             f.Add(MessageTypes.LIVETRADING);
             f.Add(MessageTypes.SIMTRADING);
+            f.Add(MessageTypes.BARREQUEST);
+            f.Add(MessageTypes.BARRESPONSE);
             return f.ToArray();
         }
 
