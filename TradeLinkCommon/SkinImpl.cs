@@ -334,5 +334,12 @@ namespace TradeLink.Common
             return r[0];
         }
 
+        public static string filefromskin(string skinname) { return filefromskin(skinname, 0, SKINPATH); }
+        public static string filefromskin(string skinname, int response) { return filefromskin(skinname, response, SKINPATH); }
+        public static string filefromskin(string skinname, int response, string path)
+        {
+            return path + "\\" + skinname + "." + response + SKINEXT;
+        }
+
     }
 }

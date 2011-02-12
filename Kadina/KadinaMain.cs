@@ -59,7 +59,7 @@ namespace Kadina
             sizetabs();
             restorerecentfiles();
             restorerecentlibs();
-            
+            restoreskins();
             FormClosing += new FormClosingEventHandler(kadinamain_FormClosing);
             Resize += new EventHandler(kadinamain_Resize);
             bw.DoWork += new DoWorkEventHandler(Play);
@@ -713,6 +713,12 @@ namespace Kadina
                 list[i] = Path.GetFileNameWithoutExtension(epffiles[i]);
             return list.Length > 0 ? "[" + string.Join(",", list) + "]" : "[?]";
         }
+
+        bool isSkin(string fn)
+        {
+            return System.IO.Path.GetExtension(fn).ToLower().Contains(SkinImpl.SKINEXT_NODOT);
+
+        }
          private bool loadfile(string path)
          {
             string f = path;
@@ -739,6 +745,10 @@ namespace Kadina
                         recent.DropDownItems.Add(f);
                 epffiles.Add(f);
                 success = loadsim();
+            }
+            else if (isSkin(f))
+            {
+                loadskin(f);
             }
             hasprereq();
 
@@ -1054,7 +1064,7 @@ namespace Kadina
         private void _skinsavail_DropDownItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             string skin = e.ClickedItem.Text;
-            string skinfn = SkinImpl.SKINPATH+"\\"+skin+SkinImpl.SKINEXT;
+            string skinfn = SkinImpl.filefromskin(skin);
             // ensure exists
             if (!System.IO.File.Exists(skinfn))
             {
