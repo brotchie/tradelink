@@ -12,6 +12,10 @@ namespace TradeLink.AppKit
     public struct AuthInfo
     {
         /// <summary>
+        /// program
+        /// </summary>
+        public string Program;
+        /// <summary>
         /// username
         /// </summary>
         public string Username;
@@ -84,11 +88,14 @@ namespace TradeLink.AppKit
         /// </summary>
         /// <param name="PROGRAM"></param>
         /// <returns></returns>
-        public static AuthInfo GetProgramAuth(string PROGRAM) { return GetProgramAuth(TradeLink.Common.Util.ProgramData(PROGRAM), PROGRAM); }
+        public static AuthInfo GetProgramAuth(string PROGRAM) { AuthInfo ai = GetProgramAuth(TradeLink.Common.Util.ProgramData(PROGRAM), PROGRAM); ai.Program = PROGRAM; return ai; }
         public static AuthInfo GetProgramAuth(string basepath, string PROGRAM)
         {
             string filepath = basepath+ TradeLink.AppKit.Auth.AuthFile;
-            return GetAuthInfo(filepath);
+            AuthInfo ai = GetAuthInfo(filepath);
+            // set program
+            ai.Program = PROGRAM;
+            return ai;
         }
     }
 }
