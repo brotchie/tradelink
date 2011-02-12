@@ -34,6 +34,14 @@ namespace ASP
         {
         }
 
+        internal event VoidDelegate MktTimestampChange;
+
+        private void _usemkttime_CheckedChanged(object sender, EventArgs e)
+        {
+            if (MktTimestampChange != null)
+                MktTimestampChange();
+        }
+
 
     }
 }

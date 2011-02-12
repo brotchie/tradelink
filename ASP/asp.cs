@@ -101,6 +101,7 @@ namespace ASP
             // get providers
             initfeeds();
             // get asp option events
+            _ao.MktTimestampChange += new VoidDelegate(_ao_MktTimestampChange);
             _ao.TimeoutChanged += new Int32Delegate(_ao_TimeoutChanged);
             _ao._datasel.SelectionChangeCommitted+= new EventHandler(_prefquot_SelectedIndexChanged);
             _ao._execsel.SelectionChangeCommitted+= new EventHandler(_prefexec_SelectedIndexChanged);
@@ -127,6 +128,11 @@ namespace ASP
             // process command line
             processcommands();
 
+        }
+
+        void _ao_MktTimestampChange()
+        {
+            _dw.UseExternalTimeStamp = _ao._usemkttime.Checked;
         }
 
         bool go = true;
@@ -828,22 +834,7 @@ namespace ASP
 
         void tl_gotOrderCancel(long number)
         {
-            // see if we need to remap
-            if (_ao._virtids.Checked)
-            {
-                long master = number;
-                number = aspid2responseid(number);
-                // if we don't have one, assign one
-                if (number == 0)
-                {
-                    // assign
-                    number = _masteridt.AssignId;
-                    // map
-                    _r2a.Add(number, master);
-                    // other way
-                    _a2r.Add(master, number);
-                }
-            }
+
             // send order cancel notification to every valid box
             for (int idx = 0; idx<_reslist.Count; idx++)
                 if (!isBadResponse(idx))
@@ -852,25 +843,7 @@ namespace ASP
 
         void tl_gotOrder(Order o)
         {
-            // see if we need to remap order ids
-            if (_ao._virtids.Checked && (o.id!=0))
-            {
-                // see if we already have a map
-                long rorderid = aspid2responseid(o.id);
-                // if we don't create one
-                if (rorderid == 0)
-                {
-                    // get an id
-                    rorderid = _masteridt.AssignId;
-                    // save it
-                    _r2a.Add(rorderid, o.id);
-                    // save other way
-                    _a2r.Add(o.id, rorderid);
 
-                }
-                // remap it
-                o.id = rorderid;
-            }
             // send order notification to any valid responses
             for (int i = 0; i<_reslist.Count; i++)
                 if (!isBadResponse(i))
@@ -934,6 +907,8 @@ namespace ASP
        
         void tl_gotTick(Tick t)
         {
+            // set time
+            _dw.ExternalTimeStamp = t.time;
             // see if we are tracking this symbol
             int[] idxs = new int[0];
             if (!_symidx.TryGetValue(t.symbol, out idxs) )
@@ -958,24 +933,7 @@ namespace ASP
             _rs.GotFill(t);
             // keep track of position
             _pt.Adjust(t);
-            // see if we're using virtual ids
-            if (_ao._virtids.Checked && (t.id != 0))
-            {
-                // get the map
-                long rorderid = aspid2responseid(t.id);
-                // if we don't have a map, create one
-                if (rorderid == 0)
-                {
-                    // get id
-                    rorderid = _masteridt.AssignId;
-                    // map it
-                    _r2a.Add(rorderid, t.id);
-                    // map other way
-                    _a2r.Add(t.id, rorderid);
-                }
-                // apply map
-                t.id = rorderid;
-            }
+            
             // send trade notification to any valid requesting responses
             for (int i = 0; i < _reslist.Count; i++)
                     _reslist[i].GotFill(t);
@@ -1241,26 +1199,7 @@ namespace ASP
 
         void assignmasterorderid(ref Order o)
         {
-            // see if we're remaping orders
-            if (_ao._virtids.Checked && (o.id != 0))
-            {
-                // get master id for this order
-                long master = responseid2asp(o.id) ;
-                // if we don't have a master, assign one
-                if (master == 0)
-                {
-                    // get storage location for response
-                    int idx = r2r(o.VirtualOwner);
-                    // get a master id
-                    master = _masteridt.AssignId;
-                    // save association
-                    _r2a.Add(o.id, master);
-                    // save other way association
-                    _a2r.Add(master, o.id);
-                }
-                // apply new id to order
-                o.id = master;
-            }
+            
         }
 
         void workingres_CancelOrderSource(long number, int id)
@@ -1271,11 +1210,7 @@ namespace ASP
                 debug("Ignoring cancel from disabled response: " + _reslist[rid].Name + " orderid: "+number);
                 return;
             }
-            // see if we need to remap
-            if (_ao._virtids.Checked)
-            {
-                number = responseid2asp(number);
-            }
+
             // pass cancels along to tradelink
             _bf.CancelOrder((long)number);
         }

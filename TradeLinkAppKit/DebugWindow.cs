@@ -35,6 +35,18 @@ namespace TradeLink.AppKit
             debugControl1.EndUpdate();
         }
 
+        bool _useexttime = false;
+        /// <summary>
+        /// toggle whether an external time stamp is used (timestamps must be enabled)
+        /// </summary>
+        public bool UseExternalTimeStamp { get { return debugControl1.UseExternalTimeStamp; } set { debugControl1.UseExternalTimeStamp = value; } }
+        int _exttime = 0;
+        /// <summary>
+        /// set an external time stamp
+        /// </summary>
+        public int ExternalTimeStamp { get { return debugControl1.ExternalTimeStamp; } set { debugControl1.ExternalTimeStamp = value; } }
+
+
         public event TradeLink.API.DebugDelegate NewCreateTicketEvent;
 
         void debugControl1_NewSearchEvent(string msg)

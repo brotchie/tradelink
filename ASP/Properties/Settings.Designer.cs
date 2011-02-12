@@ -262,5 +262,17 @@ namespace ASP.Properties {
                 this["saveindicators"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool UseMarketTimeStamps {
+            get {
+                return ((bool)(this["UseMarketTimeStamps"]));
+            }
+            set {
+                this["UseMarketTimeStamps"] = value;
+            }
+        }
     }
 }

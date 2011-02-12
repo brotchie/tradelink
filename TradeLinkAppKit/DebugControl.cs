@@ -220,6 +220,16 @@ namespace TradeLink.AppKit
         }
 
         delegate void stringdel(string msg);
+        bool _useexttime = false;
+        /// <summary>
+        /// toggle whether an external time stamp is used (timestamps must be enabled)
+        /// </summary>
+        public bool UseExternalTimeStamp { get { return _useexttime; } set { _useexttime = value; } }
+        int _exttime = 0;
+        /// <summary>
+        /// set an external time stamp
+        /// </summary>
+        public int ExternalTimeStamp { get { return _exttime; } set { _exttime = value; } }
         void debug(string msg)
         {
             if (_msg.InvokeRequired)
@@ -237,6 +247,8 @@ namespace TradeLink.AppKit
                 {
                     if (!TimeStamps)
                         _msg.Items.Add(msg);
+                    else if (UseExternalTimeStamp)
+                        _msg.Items.Add(_exttime + ": " + msg);
                     else
                         _msg.Items.Add(DateTime.Now.ToString("HHmmss") + ": " + msg);
                     _msg.SelectedIndex = _msg.Items.Count - 1;
