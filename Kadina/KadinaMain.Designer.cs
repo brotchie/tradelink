@@ -57,6 +57,7 @@ namespace Kadina
             this.twohour = new System.Windows.Forms.Button();
             this.fourhour = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
+            this._reset = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this._tabs.SuspendLayout();
             this.msgtab.SuspendLayout();
@@ -145,11 +146,13 @@ namespace Kadina
             // 
             this.debugControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.debugControl1.EnableSearching = true;
+            this.debugControl1.ExternalTimeStamp = 0;
             this.debugControl1.Location = new System.Drawing.Point(4, 5);
             this.debugControl1.Name = "debugControl1";
             this.debugControl1.Size = new System.Drawing.Size(694, 241);
             this.debugControl1.TabIndex = 0;
             this.debugControl1.TimeStamps = false;
+            this.debugControl1.UseExternalTimeStamp = false;
             // 
             // ticktab
             // 
@@ -157,7 +160,7 @@ namespace Kadina
             this.ticktab.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.ticktab.Name = "ticktab";
             this.ticktab.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.ticktab.Size = new System.Drawing.Size(793, 246);
+            this.ticktab.Size = new System.Drawing.Size(702, 251);
             this.ticktab.TabIndex = 1;
             this.ticktab.Text = "Ticks";
             this.ticktab.UseVisualStyleBackColor = true;
@@ -167,7 +170,7 @@ namespace Kadina
             this.itab.Location = new System.Drawing.Point(4, 32);
             this.itab.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.itab.Name = "itab";
-            this.itab.Size = new System.Drawing.Size(793, 246);
+            this.itab.Size = new System.Drawing.Size(702, 251);
             this.itab.TabIndex = 2;
             this.itab.Text = "Indicators";
             this.itab.UseVisualStyleBackColor = true;
@@ -177,7 +180,7 @@ namespace Kadina
             this.postab.Location = new System.Drawing.Point(4, 32);
             this.postab.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.postab.Name = "postab";
-            this.postab.Size = new System.Drawing.Size(793, 246);
+            this.postab.Size = new System.Drawing.Size(702, 251);
             this.postab.TabIndex = 3;
             this.postab.Text = "Position";
             this.postab.UseVisualStyleBackColor = true;
@@ -187,7 +190,7 @@ namespace Kadina
             this.ordertab.Location = new System.Drawing.Point(4, 32);
             this.ordertab.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.ordertab.Name = "ordertab";
-            this.ordertab.Size = new System.Drawing.Size(793, 246);
+            this.ordertab.Size = new System.Drawing.Size(702, 251);
             this.ordertab.TabIndex = 4;
             this.ordertab.Text = "Orders";
             this.ordertab.UseVisualStyleBackColor = true;
@@ -197,7 +200,7 @@ namespace Kadina
             this.filltab.Location = new System.Drawing.Point(4, 32);
             this.filltab.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.filltab.Name = "filltab";
-            this.filltab.Size = new System.Drawing.Size(793, 246);
+            this.filltab.Size = new System.Drawing.Size(702, 251);
             this.filltab.TabIndex = 5;
             this.filltab.Text = "Fills";
             this.filltab.UseVisualStyleBackColor = true;
@@ -206,7 +209,7 @@ namespace Kadina
             // 
             this.charttab.Location = new System.Drawing.Point(4, 32);
             this.charttab.Name = "charttab";
-            this.charttab.Size = new System.Drawing.Size(793, 246);
+            this.charttab.Size = new System.Drawing.Size(702, 251);
             this.charttab.TabIndex = 6;
             this.charttab.Text = "Chart";
             this.charttab.UseVisualStyleBackColor = true;
@@ -216,7 +219,7 @@ namespace Kadina
             this._results.Location = new System.Drawing.Point(4, 32);
             this._results.Name = "_results";
             this._results.Padding = new System.Windows.Forms.Padding(3);
-            this._results.Size = new System.Drawing.Size(793, 246);
+            this._results.Size = new System.Drawing.Size(702, 251);
             this._results.TabIndex = 7;
             this._results.Text = "Results";
             this._results.UseVisualStyleBackColor = true;
@@ -347,12 +350,23 @@ namespace Kadina
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // _reset
+            // 
+            this._reset.Location = new System.Drawing.Point(12, 41);
+            this._reset.Name = "_reset";
+            this._reset.Size = new System.Drawing.Size(223, 29);
+            this._reset.TabIndex = 14;
+            this._reset.Text = "Restart Study";
+            this._reset.UseVisualStyleBackColor = true;
+            this._reset.Click += new System.EventHandler(this._reset_Click);
+            // 
             // kadinamain
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(733, 402);
+            this.Controls.Add(this._reset);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.fourhour);
             this.Controls.Add(this.twohour);
@@ -413,6 +427,7 @@ namespace Kadina
         private System.Windows.Forms.Button twohour;
         private System.Windows.Forms.Button fourhour;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button _reset;
     }
 }
 

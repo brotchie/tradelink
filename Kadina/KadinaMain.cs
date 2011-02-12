@@ -308,48 +308,23 @@ namespace Kadina
             status("Playing next " + pt.ToString().Replace(PLAYTO, string.Empty) + "...");
         }
 
-        void reset(bool keepparams)
+        void reset()
         {
             // clear all GUIs
             _msg = new StringBuilder(10000);
             debugControl1.Clear();
             dt.Clear();
             ptab.Clear();
+            poslist.Clear();
             _tradelist.Clear();
             ot.Clear();
             ft.Clear();
             _tabs.Refresh();
-            c.Reset();
+            c = new ChartControl();
             _tr.Clear();
             if (it != null) { it.Clear(); it.Columns.Clear(); ig.Invalidate(); }
-            // see if we are keeping study or not
-            if (keepparams)
-            {
-                if (h != null) 
-                    h.Reset();
-                loadboxname(resname);
-                if (myres != null)
-                {
-                    try
-                    {
-                        myres.Reset();
-                    }
-                    catch (Exception ex)
-                    {
-                        debug("An error occured inside your response Reset method: ");
-                        debug(ex.Message + ex.StackTrace);
-                    }
-                }
-                status("Reset box " + myres.Name + " " + PrettyEPF());
-            }
-            else
-            {
-                myres = null;
-                h = new HistSimImpl();
-                epffiles.Clear();
-                resname = string.Empty;
-                updatetitle();
-            }
+            loadsim();
+            loadboxname(resname);
         }
 
         bool _missingindnameerrornotifyok = true;
@@ -756,33 +731,41 @@ namespace Kadina
                     if (!isRecentTickfile(f) && SecurityImpl.SecurityFromFileName(f).isValid)
                         recent.DropDownItems.Add(f);
                 epffiles.Add(f);
-                h = new HistSimImpl(epffiles.ToArray());
-                h.SimBroker.GotOrder += new OrderDelegate(broker_GotOrder);
-                h.SimBroker.GotFill += new FillDelegate(broker_GotFill);
-                h.GotTick += new TickDelegate(h_GotTick);
-                h.SimBroker.UseBidAskFills = Properties.Settings.Default.UseBidAskFills;
-                h.SimBroker.GotOrderCancel += new OrderCancelDelegate(broker_GotOrderCancel);
-                try
-                {
-                    h.Initialize();
-
-                    updatetitle();
-                    status("Loaded tickdata: " + PrettyEPF());
-                    success = true;
-                }
-                catch (IOException ex)
-                {
-                    if (ex.Message.Contains("used by another process"))
-                    {
-                        status("Try again, file in use: " + f);
-                    }
-                }
+                success = loadsim();
             }
             hasprereq();
 
             return success;
 
         }
+
+         bool loadsim()
+         {
+             h = new HistSimImpl(epffiles.ToArray());
+             h.SimBroker.GotOrder += new OrderDelegate(broker_GotOrder);
+             h.SimBroker.GotFill += new FillDelegate(broker_GotFill);
+             h.GotTick += new TickDelegate(h_GotTick);
+             h.SimBroker.UseBidAskFills = Properties.Settings.Default.UseBidAskFills;
+             h.SimBroker.GotOrderCancel += new OrderCancelDelegate(broker_GotOrderCancel);
+             try
+             {
+                 h.Initialize();
+
+                 updatetitle();
+                 status("Loaded tickdata: " + PrettyEPF());
+                 return true;
+             }
+             catch (IOException ex)
+             {
+                 if (ex.Message.Contains("used by another process"))
+                 {
+                     status("Simulation file still in use.");
+                     debug("Try again, one of following in use: " + string.Join(",",epffiles.ToArray()));
+                 }
+                 return false;
+             }
+
+         }
 
         
         bool isRecentTickfile(string path)
@@ -1040,6 +1023,11 @@ namespace Kadina
         private void button1_Click(object sender, EventArgs e)
         {
             playto(PlayTo.Custom);
+        }
+
+        private void _reset_Click(object sender, EventArgs e)
+        {
+            reset();
         }
     }
 
