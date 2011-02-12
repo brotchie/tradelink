@@ -94,6 +94,8 @@ namespace Kadina
             sizetabs();
         }
 
+        bool showticks = Properties.Settings.Default.ShowTicksOnTickTab;
+
         void sizetabs()
         {
             _tabs.Size = new Size(Width, Height - (statusStrip1.Height + (int)(statusStrip2.Height * 2.5)));
@@ -132,66 +134,71 @@ namespace Kadina
 
         void h_GotTick(Tick t)
         {
-            _date = t.date;
-            _time = t.time;
-            // get time for display
-            nowtime = t.time.ToString();
-            
-            // don't display ticks for unmatched exchanges
-            string time = nowtime;
-            string trade = "";
-            string bid = "";
-            string ask = "";
-            string ts = "";
-            string bs = "";
-            string os = "";
-            string be = "";
-            string oe = "";
-            string ex = "";
-            if (t.isIndex)
-            {
-                trade = t.trade.ToString(_dps);
-            }
-            else if (t.isTrade)
-            {
-                trade = t.trade.ToString(_dps);
-                ts = t.size.ToString();
-                ex = t.ex;
-            }
-            if (t.hasBid)
-            {
-                bs = t.bs.ToString();
-                be = t.be;
-                bid = t.bid.ToString(_dps);
-            }
-            if (t.hasAsk)
-            {
-                ask = t.ask.ToString(_dps);
-                oe = t.oe;
-                os = t.os.ToString();
-            }
-            
-            // add tick to grid
-            NewTRow(new string[] { nowtime,t.symbol,trade,ts,bid,ask,bs,os,ex,be,oe});
             // send to response
             if (myres != null)
                 myres.GotTick(t);
-            // send to chart
-            if (c != null)
+
+            if (showticks)
             {
-                if (_chartlast)
+                _date = t.date;
+                _time = t.time;
+                // get time for display
+                nowtime = t.time.ToString();
+
+                // don't display ticks for unmatched exchanges
+                string time = nowtime;
+                string trade = "";
+                string bid = "";
+                string ask = "";
+                string ts = "";
+                string bs = "";
+                string os = "";
+                string be = "";
+                string oe = "";
+                string ex = "";
+                if (t.isIndex)
                 {
-                    if (t.isTrade)
-                        c.newPoint(t.trade, t.time, t.date, t.size);
+                    trade = t.trade.ToString(_dps);
                 }
-                else if (_chartbid)
+                else if (t.isTrade)
                 {
-                    if (t.hasBid)
-                        c.newPoint(t.bid, t.time, t.date, t.BidSize);
+                    trade = t.trade.ToString(_dps);
+                    ts = t.size.ToString();
+                    ex = t.ex;
                 }
-                else if (t.hasAsk)
+                if (t.hasBid)
                 {
-                    c.newPoint(t.ask, t.time, t.date, t.AskSize);
+                    bs = t.bs.ToString();
+                    be = t.be;
+                    bid = t.bid.ToString(_dps);
+                }
+                if (t.hasAsk)
+                {
+                    ask = t.ask.ToString(_dps);
+                    oe = t.oe;
+                    os = t.os.ToString();
+                }
+
+                // add tick to grid
+                NewTRow(new string[] { nowtime, t.symbol, trade, ts, bid, ask, bs, os, ex, be, oe });
+
+                // send to chart
+                if (c != null)
+                {
+                    if (_chartlast)
+                    {
+                        if (t.isTrade)
+                            c.newPoint(t.trade, t.time, t.date, t.size);
+                    }
+                    else if (_chartbid)
+                    {
+                        if (t.hasBid)
+                            c.newPoint(t.bid, t.time, t.date, t.BidSize);
+                    }
+                    else if (t.hasAsk)
+                    {
+                        c.newPoint(t.ask, t.time, t.date, t.AskSize);
+                    }
                 }
             }
         }

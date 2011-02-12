@@ -142,5 +142,17 @@ namespace Kadina.Properties {
                 this["pw"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ShowTicksOnTickTab {
+            get {
+                return ((bool)(this["ShowTicksOnTickTab"]));
+            }
+            set {
+                this["ShowTicksOnTickTab"] = value;
+            }
+        }
     }
 }
