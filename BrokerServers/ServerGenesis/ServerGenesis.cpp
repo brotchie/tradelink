@@ -342,7 +342,7 @@ int ServerGenesis::SendOrder(TradeLibFast::TLOrder o)
 	go.dwUserData = (DWORD)o.id;
 	if (o.isStop())
 	{
-		if(pStock->PlaceOrder(go, (o.side ? 'B' : 'S'), o.size, o.price, METHOD_STOP, getTIF(o.TIF))==0)
+		if(pStock->PlaceOrder(go, (o.side ? 'B' : 'S'), abs(o.size), o.price, METHOD_STOP, getTIF(o.TIF))==0)
 		{
 			go.chPriceIndicator = getPI(o);
 			go.dblStopLimitPrice = o.stop;
@@ -352,7 +352,7 @@ int ServerGenesis::SendOrder(TradeLibFast::TLOrder o)
 	}
 	else
 	{
-		if(pStock->PlaceOrder(go, (o.side ? 'B' : 'S'), o.size, o.price, getmethod(o.exchange), getTIF(o.TIF))==0)
+		if(pStock->PlaceOrder(go, (o.side ? 'B' : 'S'), abs(o.size), o.price, getmethod(o.exchange), getTIF(o.TIF))==0)
 		{
 			go.chPriceIndicator = getPI(o);
 			go.dblStopLimitPrice = o.stop;
