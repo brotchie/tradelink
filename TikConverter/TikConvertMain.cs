@@ -54,14 +54,21 @@ namespace TikConverter
                     int count = 0;
                     foreach (string sym in syms)
                     {
-                        // get barlists for those symbols
-                        BarList bl = _conval == Converter.GoogleDaily ? BarListImpl.DayFromGoogle(sym) : BarListImpl.DayFromYahoo(sym);
-                        // convert to tick files
-                        TikUtil.TicksToFile(TikUtil.Barlist2Tick(bl));
+                        try
+                        {
+                            // get barlists for those symbols
+                            BarList bl = _conval == Converter.GoogleDaily ? BarListImpl.DayFromGoogle(sym) : BarListImpl.DayFromYahoo(sym);
+                            // convert to tick files
+                            TikUtil.TicksToFile(TikUtil.Barlist2Tick(bl));
+                            // notify
+                            debug("downloaded " + bl.Count + " bars of daily data for " + sym + " from " + _conval.ToString());
+                        }
+                        catch (Exception ex)
+                        {
+                            debug(sym+" converter error: " + ex.Message + ex.StackTrace);
+                        }
                         // update progress
                         progress((double)count++ / syms.Length);
-                        // notify
-                        debug("downloaded "+bl.Count+" bars of daily data for " + sym+" from "+_conval.ToString());
                     }
                     debug("completed daily download.");
                     // we're done
