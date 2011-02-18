@@ -564,26 +564,23 @@ namespace Quotopia
 
         bool addsymbol(string sym)
         {
-            if (bardict.ContainsKey(sym))
-            {
-                status("already have " + sym);
-                return false;
-            }
-            // SYM,LAST,TSIZE,BID,ASK,BSIZE,ASIZE,SIZES,OHLC(YEST),CHANGE
-            DataRow r = qt.Rows.Add(sym, "", "", "", "", "", "", "", "", "", "", "");
+            Security sec = SecurityImpl.Parse(sym);
             try
             {
+                // SYM,LAST,TSIZE,BID,ASK,BSIZE,ASIZE,SIZES,OHLC(YEST),CHANGE
+                DataRow r = qt.Rows.Add(sym, "", "", "", "", "", "", "", "", "", "", "");
                 qt.Rows[qt.Rows.Count - 1][AVGPRICE] = pt[sym].AvgPrice;
                 qt.Rows[qt.Rows.Count - 1][POSSIZE] = pt[sym].Size;
                 qt.Rows[qt.Rows.Count - 1][CLOSEDPL] = pt[sym].ClosedPL;
             }
             catch { }
-            Security sec = SecurityImpl.Parse(sym);
-            if (!bardict.ContainsKey(sym))
+
+            if (!bardict.ContainsKey(sec.FullName))
                 bardict.Add(sec.FullName, new BarListImpl(sym));
             status("Added " + sym);
+            if (!mb.ToString().Contains(sym))
+                mb.Add(sym);
             symindex();
-            mb.Add(sym);
             return true;
         }
 
