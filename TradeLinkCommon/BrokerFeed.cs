@@ -196,6 +196,7 @@ namespace TradeLink.Common
         public void Subscribe(Basket b)
         {
             if (quote == null) return;
+            v("subscribing via feed to: " + b.ToString());
             quote.Subscribe(b);
         }
         /// <summary>
@@ -240,6 +241,7 @@ namespace TradeLink.Common
         /// <returns></returns>
         public long TLSend(MessageTypes type, long source, long dest, long msgid, string message, ref string result)
         {
+            v(type.ToString() + " sending to all providers: "+message);
             for (int i = 0; i < _pcon.Count; i++)
                 if (_pcon[i].RequestFeatureList.Contains(type))
                 {
@@ -279,6 +281,7 @@ namespace TradeLink.Common
 
         public void Disconnect()
         {
+            v("disconnecting from all providers.");
             if (quote!=null)
                 quote.Disconnect();
             if (execute != null)
@@ -309,12 +312,14 @@ namespace TradeLink.Common
         public void CancelOrder(long id)
         {
             if (execute == null) return;
+            v("sending cancel: " + id);
             execute.CancelOrder(id);
         }
 
         public int SendOrder(Order o)
         {
             if (execute == null) return (int)MessageTypes.BROKERSERVER_NOT_FOUND;
+            v("sending order: " + o.ToString());
             return execute.SendOrder(o);
         }
 
@@ -324,6 +329,7 @@ namespace TradeLink.Common
         {
             try
             {
+                v("got stop request.");
                 Disconnect();
                 if (_threadsafe)
                 {
@@ -748,11 +754,13 @@ namespace TradeLink.Common
             TLClient tl = getsearchclient();
             if ((provider < 0) || (provider > ProvidersAvailable.Length)) return false;
             Providers p = ProvidersAvailable[provider];
-            if (!hasminquote(tl, provider))
+            bool ok = hasminquote(tl, provider);
+            if (!ok)
             {
                 System.Windows.Forms.MessageBox.Show(p.ToString() + " does not support quotes.");
                 return false;
             }
+            this.v(tl.Name + " " + provider + " " + tl.BrokerName + (ok ? " has feed support." : " no feed support."));
             _feed = p;
             tl.Disconnect();
             Reset();
@@ -805,11 +813,13 @@ namespace TradeLink.Common
             TLClient tl = getsearchclient();
             if ((provider < 0) || (provider > ProvidersAvailable.Length)) return false;
             Providers p = ProvidersAvailable[provider];
-            if (!hasminexec(tl, provider))
+            bool ok = hasminexec(tl, provider);
+            if (!ok)
             {
                 System.Windows.Forms.MessageBox.Show(p.ToString() + " does not support execution.");
                 return false;
             }
+            this.v(tl.Name + " " + provider + " " + tl.BrokerName + (ok ? " has feed support." : " no feed support."));
             _broker = p;
             tl.Disconnect();
             Reset();
