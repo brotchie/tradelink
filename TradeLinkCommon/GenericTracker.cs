@@ -280,7 +280,7 @@ namespace TradeLink.Common
     /// <summary>
     /// helper methods to use with GenericTracker T
     /// </summary>
-    public static class GenericTracker
+    public class GenericTracker
     {
         public static bool One(int idx, params GenericTracker<bool>[] gts)
         {
@@ -1130,6 +1130,10 @@ namespace TradeLink.Common
 
 
 
+    }
+
+    public class gt : GenericTracker
+    {
     }
 
 }
