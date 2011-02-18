@@ -97,6 +97,7 @@ namespace SterServer
                 tl.newFeatureRequest += new MessageArrayDelegate(tl_newFeatureRequest);
                 tl.newUnknownRequest += new UnknownMessageDelegate(tl_newUnknownRequest);
                 tl.newImbalanceRequest += new VoidDelegate(tl_newImbalanceRequest);
+                tl.SendDebugEvent += new DebugDelegate(tl_SendDebugEvent);
                 stiApp.SetModeXML(UseXmlMode);
                 string trader = stiApp.GetTraderName().ToUpper();
                 debug("trader: " + trader);
@@ -116,6 +117,13 @@ namespace SterServer
             debug(PROGRAM + " started.");
             _connected = true;
             return _connected;
+        }
+
+        void tl_SendDebugEvent(string message)
+        {
+            if (!tl.VerboseDebugging)
+                return;
+            debug("From Server: " + message);
         }
 
         void stiEvents_OnSTIOrderRejectXML(ref string bstrOrder)
@@ -323,6 +331,7 @@ namespace SterServer
         bool _imbalance = false;
         void tl_newImbalanceRequest()
         {
+            debug("Issued new imbalance request in Server.");
             _imbalance = true;
         }
 
@@ -343,6 +352,8 @@ namespace SterServer
                 case MessageTypes.SENDORDERPEGMIDPOINT:
                     return (long)MessageTypes.OK;
             }
+
+            debug("Message type " + t.GetTypeCode().ToString() + ":" + msg + " was unsupported.");
             return (long)MessageTypes.UNKNOWN_MESSAGE;
         }
 
@@ -775,7 +786,6 @@ namespace SterServer
         }
 
         int _lasttime = 0;
-
         void doquote(ref structSTIQuoteUpdate q)
         {
             Tick k = new TickImpl(q.bstrSymbol);
@@ -796,12 +806,57 @@ namespace SterServer
             k.size = q.nLastSize;
             if (!_imbalance || (_imbalance && k.isValid))
                 tl.newTick(k);
-            // if imbalances are not enabled we're done
-            if (!_imbalance) return;
-            // if there is no imbalance we're done
-            if (q.nMktImbalance == 0) return;
-            Imbalance imb = new ImbalanceImpl(k.symbol, GetExPretty(k.ex), q.nMktImbalance, k.time, 0, 0, q.nMktImbalance);
-            tl.newImbalance(imb);
+
+            /////////////////////////
+            // MDX Processing
+            /////////////////////////
+            if (q.nMdxMsgType == 1)
+            {
+                if (VerboseDebugging)
+                    debug(q.bstrUpdateTime
+                    + "  Received Regulatory Imbalance for: " + q.bstrSymbol
+                    + "  ValidIntradayMarketImb: " + q.bValidIntradayMktImb
+                    + "  ValidMktImb: " + q.bValidMktImb
+                    + "  Imbalance: " + q.nImbalance
+                    + "  iMktImbalance: " + q.nIntradayMktImbalance
+                    + "  MktImbalance: " + q.nMktImbalance);
+
+                Imbalance imb = new ImbalanceImpl(k.symbol, GetExPretty(k.ex), q.nImbalance, k.time, 0, 0, q.nMktImbalance);
+                tl.newImbalance(imb);
+            }
+            else if (q.nMdxMsgType == 2)
+            {
+                if (VerboseDebugging)
+                    debug(q.bstrUpdateTime
+                    + "  Received Informational Imbalance for: " + q.bstrSymbol
+                    + "  ValidIntradayMarketImb: " + q.bValidIntradayMktImb
+                    + "  ValidMktImb: " + q.bValidMktImb
+                    + "  Imbalance: " + q.nImbalance
+                    + "  iMktImbalance: " + q.nIntradayMktImbalance
+                    + "  MktImbalance: " + q.nMktImbalance);
+
+                Imbalance imb = new ImbalanceImpl(k.symbol, GetExPretty(k.ex), q.nImbalance, k.time, 0, 0, q.nMktImbalance);
+                tl.newImbalance(imb);
+            }/* DISABLING UNTIL WE CAN CREATE STRUCTURES TO MANAGE THIS DATA WHILE ITS SENT
+            else if (q.nMdxMsgType == 3)
+            {
+                if (VerboseDebugging)
+                    debug(q.bstrUpdateTime
+                    + "  Received Halt/Delay for: " + q.bstrSymbol
+                    + "  Status: " + q.bstrHaltResumeStatus
+                    + "  Reason: " + q.bstrHaltResumeReason);
+                tl.TLSend("HaltResume;" + q.bstrSymbol + ";" + q.bstrHaltResumeStatus + ";" + q.bstrHaltResumeReason, MessageTypes.HALTRESUME, tl.ClientName(0));
+            }
+            else if (q.nMdxMsgType == 4)
+            {
+                if (VerboseDebugging)
+                    debug(q.bstrUpdateTime
+                    + "  Received Indication for: " + q.bstrSymbol
+                    + "  ValidIndicators: " + q.bValidIndicators
+                    + "  IndicatorHigh: " + q.fIndicatorHigh
+                    + "  IndicatorLow: " + q.fIndicatorLow);
+                tl.TLSend("Indication;" + q.bstrSymbol + ";" + q.fIndicatorHigh + ";" + q.fIndicatorLow, MessageTypes.INDICATION, tl.ClientName(0));
+            }*/
         }
 
         void stiQuote_OnSTIQuoteUpdate(ref structSTIQuoteUpdate q)

@@ -192,7 +192,7 @@ namespace TestTradeLink
                 sleep(1);
             // stop clock
             double time = DateTime.Now.Subtract(st).TotalSeconds;
-            decimal ticksec = ticks / (decimal)time;
+            decimal ticksec = time==0 ? 0 : ticks / (decimal)time;
             // make sure time exists
             Assert.Greater(time, 0);
             // make sure it's less than expected

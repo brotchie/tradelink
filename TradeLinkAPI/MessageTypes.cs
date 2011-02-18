@@ -99,6 +99,8 @@ namespace TradeLink.API
         SENDORDERPEGMIDPOINT,
         INTRADAYHIGH,
         INTRADAYLOW,
+        INDICATION,
+        HALTRESUME,
         // END CUSTOM MESSAGES
         // START TRADELINK MESSAGES
         // requests

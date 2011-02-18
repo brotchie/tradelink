@@ -231,6 +231,10 @@ namespace TradeLink.Common
                     case MessageTypes.FEATUREREQUEST:
                         request = _tl.Name;
                         break;
+
+                    case MessageTypes.IMBALANCEREQUEST:
+                        request = _tl.Name;
+                        break;
                 }
                 // send it
                 long result = _tl.TLSend(type, request);

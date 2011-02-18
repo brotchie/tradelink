@@ -292,7 +292,9 @@ namespace ASP
 
         void _tlt_GotDebug(string msg)
         {
-
+            if (!_bf.VerboseDebugging)
+                return;
+            debug(msg);
         }
 
         void _tlt_GotConnect()
