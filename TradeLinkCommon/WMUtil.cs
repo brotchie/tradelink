@@ -142,8 +142,7 @@ namespace TradeLink.Common
             str = str + '\0';
             cds.cbData = str.Length + 1;
 
-            System.IntPtr pData = Marshal.AllocCoTaskMem(str.Length);
-            pData = Marshal.StringToCoTaskMemAnsi(str);
+            System.IntPtr pData = Marshal.StringToCoTaskMemAnsi(str);
 
             cds.lpData = pData;
 
@@ -160,8 +159,7 @@ namespace TradeLink.Common
             str = str + '\0';
             cds.cbData = str.Length + 1;
 
-            System.IntPtr pData = Marshal.AllocCoTaskMem(str.Length);
-            pData = Marshal.StringToCoTaskMemAnsi(str);
+            System.IntPtr pData = Marshal.StringToCoTaskMemAnsi(str);
 
             cds.lpData = pData;
 
