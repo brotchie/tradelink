@@ -1,8 +1,8 @@
-1	NMS	NASDAQ National market
+1	NMS	Nasdaq National Market
 2	SMCAP	Small Capital Market
-3	OTC	NASDAQ other OTC
-4	OTCBB	NASDAQ OTC Bulletin Board
-5	NASDAQ	NASDAQ
+3	OTC	Nasdaq other OTC
+4	OTCBB	Nasdaq OTC Bulletin Board
+5	NASDAQ	Nasdaq
 6	NYSE_AMEX	NYSE American Exchange
 7	NYSE	New York Stock Exchange
 8	CHX	Chicago Stock Exchange
@@ -12,13 +12,17 @@
 12	BX	Boston Stock Exchange
 13	CBOE	Chicago Board Options Exchange
 14	OPRA	OPRA System
-15	NASD_ADF	NASDAQ Alternate Display facility
+15	NASD_ADF	Nasdaq Alternate Display facility
 16	ISE	International Stock Exchange
 17	BOX	Boston Options Exchange
 18	BATS	Better Alternative Trading System
-20	PBOT	Philadelphia Board of Trade
-25	NYSE_AMEX	NYSE_AMEX Options
-27	DTN	DTN(Calculated/Index/Statistic)
+20	PBOT	Philadelphia Board Of Trade
+23	C2	CBOE C2 Options Exchange
+25	EDGA	Direct Edge A
+26	EDGX	Direct Edge X
+27	DTN	DTN
+28	BYX	BATS Y Exchange
+29	RUSSELL-FL	Russell Investments (Fee Liable)
 30	CBOT	Chicago Board Of Trade
 31	DJ	Dow Jones (CBOT)
 32	CFE	CBOE Futures Exchange
@@ -28,19 +32,21 @@
 36	NYMEX	New York Mercantile Exchange
 37	COMEX	Commodities Exchange Center
 38	ICEFU	International Commodities Exchange Futures US
-39	NYSE_LIFFE	NYSE LIFFE Metals
-40	NYMEX_ECM	NYMEX Exempt Commercial Market LCH
-41	NYMEX_MTF	NYMEX Multilateral trading Facility LCH
+39	NYLMD	NYSE LIFFE Metals Derivatives
+40	CME-FL	CME Indexes (Fee Liable)
 42	CBOTMINI	Chicago Board Of Trade Mini Sized Contracts
 43	CMEMINI	Chicago Mercantile Exchange Mini Sized Contracts
 44	USFE	US Futures Exchange
 45	NYMEXMINI	New York Mercantile Exchange Mini Sized Contracts
 46	GREENX	The Green Exchange
+47	CLEARPORT	New York Mercantile Exchange
+48	COMEXMINI	New York Mercantile Exchange Mini Sized Contracts
 50	TSE	Toronto Stock Exchange
-51	MSE	Montreal Stock Exchange
+51	MSE	Montreal Srock Exchange
 52	CVE	Canadian Venture Exchange
 53	WSE	Winnipeg Stock Exchange
 54	ICEFC	International Commodities Exchange Futures Canada
+55	MX	Montreal Exchange
 60	MDEX	Bursa Malaysia Derivatives
 61	ICEFI	International Commodities Exchange Futures Derivatives
 62	LME	London Metals Exchange
@@ -49,13 +55,38 @@
 66	BMF	Brazilian Mercantile & Future Exchange
 67	SGX	Singapore International Monetary Exchange
 68	EUREX	European Exchange
-69	ENID	EuroNext Index Derivatives
-70	ENIR	EuroNext Interest Rates
-71	ENCOM	EuroNext Commodities
-72	TULLETT	Tullett Liberty
-73	BARCLAYS	Barclays Bank
+69	NYLED	NYSE LIFFE Equity and Index Derivatives
+70	NYLID	NYSE LIFFE Interest Rate Derivatives
+71	NYLCD	NYSE LIFFE Commodities
+72	TULLETT	Tullett Liberty (Forex)
+73	BARCLAYS	Barclays Bank (Forex)
 74	FXCM	Forex Capital Markets
 75	WTB	Warenterminborse Hannover
-76	EUREXNDX	EUREX Indexes
-77	EURNXTNDX	EuroNext Indexes
 78	TENFORE	Tenfore Systems
+79	NYDME	NYMEX-DME (InterCommodity Spreads)
+80	PSX	Philadelphia Stock Exchange
+90	PK_SHEETS	Pink Sheets - No Tier
+91	PK_QXPREM	Pink Sheets - QTCQX - PremierQX Tier
+92	PK_QXPRIME	Pink Sheets - QTCQX - PrimeQX Tier
+93	PK_IQXPREM	Pink Sheets - QTCQX - International PremierQX Tier
+94	PK_IQXPRIME	Pink Sheets - QTCQX - International PrimeQX Tier
+95	PK_OTCQB	Pink Sheets - QTCBB Pink Sheets dually Quoted Tier
+96	PK_BBONLY	Pink Sheets - QTCBB Only Tier
+97	PK_CURRENT	Pink Sheets - Current Tier
+98	PK_LIMITED	Pink Sheets - Limited Tier
+99	PK_NOINFO	Pink Sheets - No Information Tier
+100	PK_GREY	Pink Sheets - Grey Market Tier
+101	PK_YL_SHEETS	Yellow Sheets
+102	PK_PR_SHEETS	Partner Sheets
+103	PK_GL_SHEETS	Global Sheets
+104	PK_NYSE	Pink Sheets - NYSE Listed
+105	PK_NASDAQ	Pink Sheets - NASDAQ Listed
+106	PK_NYSE_AMEX	Pink Sheets - NYSE_AMEX Listed
+107	PK_ARCA	Pink Sheets - ARCA Listed
+109	GLOBEX_RT	CME GLOBEX Group Authorization
+110	CME_GBX	Chicago Mercantile Exchange (GLOBEX)
+111	CBOT_GBX	Chicago Board Of Trade (GLOBEX)
+112	NYMEX_GBX	New York Mercantile Exchange (GLOBEX)
+113	COMEX_GBX	Commodities Exchange Center (GLOBEX)
+114	DME_GBX	Dubai Mercantile Exchange (GLOBEX)
+115	RUSSELL	Russell Investments
