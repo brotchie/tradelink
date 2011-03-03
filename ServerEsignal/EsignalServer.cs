@@ -108,7 +108,11 @@ namespace ServerEsignal
                                 interval = br.CustomInterval + "V";
                             else
                             {
-                                interval = (br.Interval / 60).ToString();
+                                if (br.Interval == (int)BarInterval.Day)
+                                    interval = "D";
+                                else
+                                    interval = (br.Interval / 60).ToString();
+
                                 barsback = BarImpl.BarsBackFromDate(bi, br.StartDateTime, br.EndDateTime);
                             }
                             int alldata = BarRequestsGetAllData ? -1 : 0;
