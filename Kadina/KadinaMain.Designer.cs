@@ -79,7 +79,7 @@ namespace Kadina
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 5, 1, 34);
             this.statusStrip1.ShowItemToolTips = true;
-            this.statusStrip1.Size = new System.Drawing.Size(791, 75);
+            this.statusStrip1.Size = new System.Drawing.Size(791, 98);
             this.statusStrip1.SizingGrip = false;
             this.statusStrip1.TabIndex = 1;
             this.statusStrip1.Text = "statusStrip1";
@@ -133,11 +133,11 @@ namespace Kadina
             this._tabs.Controls.Add(this.filltab);
             this._tabs.Controls.Add(this.charttab);
             this._tabs.Controls.Add(this._results);
-            this._tabs.Location = new System.Drawing.Point(0, 80);
+            this._tabs.Location = new System.Drawing.Point(0, 103);
             this._tabs.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this._tabs.Name = "_tabs";
             this._tabs.SelectedIndex = 0;
-            this._tabs.Size = new System.Drawing.Size(756, 287);
+            this._tabs.Size = new System.Drawing.Size(756, 302);
             this._tabs.TabIndex = 2;
             this._tabs.DragDrop += new System.Windows.Forms.DragEventHandler(this.kadinamain_DragDrop);
             this._tabs.DragEnter += new System.Windows.Forms.DragEventHandler(this.kadinamain_DragEnter);
@@ -149,7 +149,7 @@ namespace Kadina
             this.msgtab.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.msgtab.Name = "msgtab";
             this.msgtab.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.msgtab.Size = new System.Drawing.Size(748, 251);
+            this.msgtab.Size = new System.Drawing.Size(748, 266);
             this.msgtab.TabIndex = 0;
             this.msgtab.Text = "Messages";
             this.msgtab.UseVisualStyleBackColor = true;
@@ -161,7 +161,7 @@ namespace Kadina
             this.debugControl1.ExternalTimeStamp = 0;
             this.debugControl1.Location = new System.Drawing.Point(4, 5);
             this.debugControl1.Name = "debugControl1";
-            this.debugControl1.Size = new System.Drawing.Size(740, 241);
+            this.debugControl1.Size = new System.Drawing.Size(740, 256);
             this.debugControl1.TabIndex = 0;
             this.debugControl1.TimeStamps = false;
             this.debugControl1.UseExternalTimeStamp = false;
@@ -240,7 +240,7 @@ namespace Kadina
             // 
             this.statusStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._stat});
-            this.statusStrip2.Location = new System.Drawing.Point(0, 372);
+            this.statusStrip2.Location = new System.Drawing.Point(0, 410);
             this.statusStrip2.Name = "statusStrip2";
             this.statusStrip2.Size = new System.Drawing.Size(791, 30);
             this.statusStrip2.SizingGrip = false;
@@ -255,9 +255,9 @@ namespace Kadina
             // 
             // onemin
             // 
-            this.onemin.Location = new System.Drawing.Point(501, 12);
+            this.onemin.Location = new System.Drawing.Point(499, 12);
             this.onemin.Name = "onemin";
-            this.onemin.Size = new System.Drawing.Size(60, 25);
+            this.onemin.Size = new System.Drawing.Size(60, 34);
             this.onemin.TabIndex = 3;
             this.onemin.Text = "1m";
             this.onemin.UseVisualStyleBackColor = true;
@@ -265,9 +265,9 @@ namespace Kadina
             // 
             // fivemin
             // 
-            this.fivemin.Location = new System.Drawing.Point(567, 12);
+            this.fivemin.Location = new System.Drawing.Point(565, 12);
             this.fivemin.Name = "fivemin";
-            this.fivemin.Size = new System.Drawing.Size(55, 25);
+            this.fivemin.Size = new System.Drawing.Size(55, 34);
             this.fivemin.TabIndex = 4;
             this.fivemin.Text = "5m";
             this.fivemin.UseVisualStyleBackColor = true;
@@ -277,7 +277,7 @@ namespace Kadina
             // 
             this.tenmin.Location = new System.Drawing.Point(628, 12);
             this.tenmin.Name = "tenmin";
-            this.tenmin.Size = new System.Drawing.Size(61, 25);
+            this.tenmin.Size = new System.Drawing.Size(61, 34);
             this.tenmin.TabIndex = 5;
             this.tenmin.Text = "10m";
             this.tenmin.UseVisualStyleBackColor = true;
@@ -287,7 +287,7 @@ namespace Kadina
             // 
             this.thirtymin.Location = new System.Drawing.Point(695, 12);
             this.thirtymin.Name = "thirtymin";
-            this.thirtymin.Size = new System.Drawing.Size(61, 25);
+            this.thirtymin.Size = new System.Drawing.Size(61, 34);
             this.thirtymin.TabIndex = 6;
             this.thirtymin.Text = "30m";
             this.thirtymin.UseVisualStyleBackColor = true;
@@ -295,9 +295,9 @@ namespace Kadina
             // 
             // onehour
             // 
-            this.onehour.Location = new System.Drawing.Point(437, 43);
+            this.onehour.Location = new System.Drawing.Point(437, 55);
             this.onehour.Name = "onehour";
-            this.onehour.Size = new System.Drawing.Size(58, 25);
+            this.onehour.Size = new System.Drawing.Size(58, 34);
             this.onehour.TabIndex = 7;
             this.onehour.Text = "1hr";
             this.onehour.UseVisualStyleBackColor = true;
@@ -305,9 +305,9 @@ namespace Kadina
             // 
             // ptend
             // 
-            this.ptend.Location = new System.Drawing.Point(628, 43);
+            this.ptend.Location = new System.Drawing.Point(628, 55);
             this.ptend.Name = "ptend";
-            this.ptend.Size = new System.Drawing.Size(61, 25);
+            this.ptend.Size = new System.Drawing.Size(61, 34);
             this.ptend.TabIndex = 8;
             this.ptend.Text = "end";
             this.ptend.UseVisualStyleBackColor = true;
@@ -315,9 +315,9 @@ namespace Kadina
             // 
             // onesec
             // 
-            this.onesec.Location = new System.Drawing.Point(437, 12);
+            this.onesec.Location = new System.Drawing.Point(435, 12);
             this.onesec.Name = "onesec";
-            this.onesec.Size = new System.Drawing.Size(58, 25);
+            this.onesec.Size = new System.Drawing.Size(58, 34);
             this.onesec.TabIndex = 9;
             this.onesec.Text = "1s";
             this.onesec.UseVisualStyleBackColor = true;
@@ -326,7 +326,7 @@ namespace Kadina
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(357, 14);
+            this.label1.Location = new System.Drawing.Point(335, 19);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(74, 20);
             this.label1.TabIndex = 10;
@@ -334,9 +334,9 @@ namespace Kadina
             // 
             // twohour
             // 
-            this.twohour.Location = new System.Drawing.Point(501, 43);
+            this.twohour.Location = new System.Drawing.Point(501, 55);
             this.twohour.Name = "twohour";
-            this.twohour.Size = new System.Drawing.Size(60, 25);
+            this.twohour.Size = new System.Drawing.Size(60, 34);
             this.twohour.TabIndex = 11;
             this.twohour.Text = "2hr";
             this.twohour.UseVisualStyleBackColor = true;
@@ -344,9 +344,9 @@ namespace Kadina
             // 
             // fourhour
             // 
-            this.fourhour.Location = new System.Drawing.Point(567, 43);
+            this.fourhour.Location = new System.Drawing.Point(567, 55);
             this.fourhour.Name = "fourhour";
-            this.fourhour.Size = new System.Drawing.Size(55, 25);
+            this.fourhour.Size = new System.Drawing.Size(55, 34);
             this.fourhour.TabIndex = 12;
             this.fourhour.Text = "4hr";
             this.fourhour.UseVisualStyleBackColor = true;
@@ -354,9 +354,9 @@ namespace Kadina
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(695, 43);
+            this.button1.Location = new System.Drawing.Point(695, 55);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(61, 25);
+            this.button1.Size = new System.Drawing.Size(61, 34);
             this.button1.TabIndex = 13;
             this.button1.Text = "cst";
             this.button1.UseVisualStyleBackColor = true;
@@ -364,9 +364,9 @@ namespace Kadina
             // 
             // _reset
             // 
-            this._reset.Location = new System.Drawing.Point(336, 43);
+            this._reset.Location = new System.Drawing.Point(327, 55);
             this._reset.Name = "_reset";
-            this._reset.Size = new System.Drawing.Size(95, 25);
+            this._reset.Size = new System.Drawing.Size(95, 34);
             this._reset.TabIndex = 14;
             this._reset.Text = "Restart";
             this._reset.UseVisualStyleBackColor = true;
@@ -377,7 +377,7 @@ namespace Kadina
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(791, 402);
+            this.ClientSize = new System.Drawing.Size(791, 440);
             this.Controls.Add(this._reset);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.fourhour);
