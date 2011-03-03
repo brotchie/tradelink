@@ -1,55 +1,7 @@
 
-!define ANVILDIRNAME "AnvilRelease_x32_2_8_4_3"
 
-!include "Install\nsDialogs.nsh"
 
-Page custom nsDialogsPage
-Var Dialog
-Var Label
-Var Text
-Var ANVILDIRNAME
-Var Text_State
-Var Checkbox
-Var Checkbox_State
-Var DOANVIL
 
-Function nsDialogsPage
-
-	${If} $DOANVIL != "INSTALLANVIL"
-		Abort
-	${EndIf}
-	nsDialogs::Create 1018
-	Pop $Dialog
-
-	${If} $Dialog == error
-		Abort
-	${EndIf}
-	
-	${NSD_CreateLabel} 0 0 100% 12u "Provide path to anvil"
-	Pop $Label
-	
-		
-
-	
-	nsDialogs::SelectFolderDialog "Select Anvil Release Folder" "$PROGRAMFILES\Anvil"
-
-	Pop $ANVILDIRNAME 
-	${If} $Text == error
-		Abort
-	${EndIf}
-	
-	nsDialogs::Show
-
-	
-	  CreateShortCut "$SMPROGRAMS\TradeLink Connectors\Assent.lnk" "$INSTDIR\${ANVILDIRNAME}\Anvil.exe" "" "$INSTDIR\${ANVILDIRNAME}\Anvil.exe" 0
-  ; Put file there
-  ;File /nonfatal /r "BrokerServers\Install\${ANVILDIRNAME}" 
-  File "/oname=$INSTDIR\${ANVILDIRNAME}\AnvilServer.dll" "BrokerServers\AnvilServer\Release\AnvilServer.dll"
-  File "/oname=$INSTDIR\${ANVILDIRNAME}\AnvilServer.Config.txt" "BrokerServers\AnvilServer\Release\AnvilServer.Config.txt"
-  WriteINIStr "$INSTDIR\${ANVILDIRNAME}\Anvil.ini" Extension Path "$INSTDIR\${ANVILDIRNAME}\"
-	DetailPrint "Installed AnvilServer in $ANVILDIRNAME"
-
-FunctionEnd
 
 Section "TradeLibFast"
 
@@ -76,13 +28,6 @@ SectionEnd
 
 
 
-; The stuff to install
-Section "AnvilServer"
-
-	StrCpy $DOANVIL "INSTALLANVIL"
-
-
-SectionEnd
 
 Section "InteractiveBrokers Server"
   File "BrokerServers\release\TWSServer.exe"
