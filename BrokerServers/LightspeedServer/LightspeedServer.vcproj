@@ -105,7 +105,7 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
-			UseOfMFC="1"
+			UseOfMFC="2"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
 			>
@@ -128,9 +128,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="include"
+				AdditionalIncludeDirectories="include;..\TradeLibFast"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_USRDLL"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -150,9 +150,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="LightspeedTrader.lib"
+				AdditionalDependencies="LightspeedTrader.lib TradeLibFast.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="$(SolutionDir)..\..\..\lib"
+				AdditionalLibraryDirectories="&quot;..\$(Configurationname)&quot;;&quot;$(OutDir)&quot;;&quot;$(SolutionDir)..\..\..\lib&quot;"
 				ModuleDefinitionFile=".\LightspeedServer.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -190,50 +190,16 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Source Files"
-			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
-			>
-			<File
-				RelativePath=".\LightspeedServer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\LightspeedServer.def"
-				>
-			</File>
-			<File
-				RelativePath=".\MainDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\stdafx.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-			</File>
-		</Filter>
-		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
 				RelativePath=".\GrayBoxSample.h"
+				>
+			</File>
+			<File
+				RelativePath=".\LS_TLWM.h"
 				>
 			</File>
 			<File
@@ -246,6 +212,10 @@
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath="..\TradeLibFast\Util.h"
 				>
 			</File>
 		</Filter>
@@ -264,7 +234,47 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath=".\LightspeedServer.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\LightspeedServer.def"
+			>
+		</File>
+		<File
+			RelativePath=".\LS_TLWM.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\MainDlg.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\ReadMe.txt"
+			>
+		</File>
+		<File
+			RelativePath=".\stdafx.cpp"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					UsePrecompiledHeader="1"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+					UsePrecompiledHeader="1"
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\TradeLibFast\Util.cpp"
 			>
 		</File>
 	</Files>
