@@ -74,7 +74,8 @@ namespace TikConverter
                             else
                                 continue;
                             // convert to tick files
-                            TikUtil.TicksToFile(TikUtil.Barlist2Tick(bl));
+                            if (!TikUtil.TicksToFile(TikUtil.Barlist2Tick(bl), debug))
+                                debug("Error saving downloaded bars.");
                             // notify
                             debug("downloaded " + bl.Count + " bars of daily data for " + sym + " from " + _conval.ToString());
                         }
@@ -342,6 +343,11 @@ namespace TikConverter
             if (outfile == null)
             {
                 debug("Tick file was never opened, likely that input file in wrong format.");
+
+            }
+            else
+            {
+                debug("Saved: " + outfile.Filepath);
                 outfile.Close();
             }
             // close input file

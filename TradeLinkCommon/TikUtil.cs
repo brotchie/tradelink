@@ -116,11 +116,26 @@ namespace TradeLink.Common
         /// create file from ticks
         /// </summary>
         /// <param name="ticks"></param>
-        public static void TicksToFile(Tick[] ticks)
+        public static bool TicksToFile(Tick[] ticks) { return TicksToFile(ticks, null); }
+        public static bool TicksToFile(Tick[] ticks, DebugDelegate debs)
         {
-            TikWriter tw = new TikWriter();
-            foreach (Tick k in ticks)
-                tw.newTick(k);
+            try
+            {
+                TikWriter tw = new TikWriter();
+                foreach (Tick k in ticks)
+                    tw.newTick(k);
+                tw.Close();
+                if (debs != null)
+                    debs(tw.RealSymbol + " saved " + tw.Count + " ticks to: " + tw.Filepath);
+
+            }
+            catch (Exception ex)
+            {
+                if (debs != null)
+                    debs(ex.Message + ex.StackTrace);
+                return false;
+            }
+            return true;
         }
         /// <summary>
         /// create ticks from bars on default interval

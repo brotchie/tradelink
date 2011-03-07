@@ -14,7 +14,8 @@ namespace TradeLink.Common
         bool _hasheader = false;
         string _realsymbol = string.Empty;
         string _file = string.Empty;
-        string _path = Environment.CurrentDirectory;
+        string _path = Util.TLTickDir;
+        public string FolderPath { get { return _path; } set { _path = value; } }
         int _date = 0;
         /// <summary>
         /// real symbol represented by tick file
