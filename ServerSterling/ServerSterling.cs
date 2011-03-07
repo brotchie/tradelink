@@ -573,13 +573,20 @@ namespace SterServer
                             long cancelid = _canceltracker.AssignId;
                             // save cancel to order id relationship
                             _cancel2order.Add(cancelid, number);
+                            bool isman;
+                            // see if it's a manual order
+                            if (!ismanorder.TryGetValue(number,out isman))
+                                isman = false;
                             // send cancel
-                            stiOrder.CancelOrder(acct, 0, number.ToString(), cancelid.ToString());
+                            if (isman) // manual orders use nOrderRercordId
+                                stiOrder.CancelOrder(acct, (int)number,null, cancelid.ToString());
+                            else
+                                stiOrder.CancelOrder(acct, 0, number.ToString(), cancelid.ToString());
                             if (VerboseDebugging)
                                 debug("client cancel requested: " + number.ToString() + " " + cancelid.ToString());
                         }
                         else
-                            debug("No record of id: " + number.ToString());
+                            debug("No record of order id: " + number.ToString());
                         // see if empty yet
                         if (_cancelq.hasItems)
                             Thread.Sleep(_CANCELWAIT);
@@ -728,15 +735,37 @@ namespace SterServer
             doorderupdate(ref structOrderUpdate);
         }
 
+        void v(string msg)
+        {
+            if (VerboseDebugging)
+            {
+                debug(msg);
+            }
+        }
+
+        Dictionary<long, bool> ismanorder = new Dictionary<long, bool>();
 
         void doorderupdate(ref structSTIOrderUpdate structOrderUpdate)
         {
             Order o = new OrderImpl();
             o.symbol = structOrderUpdate.bstrSymbol;
             long id = 0;
+            // see if the order id is unknown
             if (!long.TryParse(structOrderUpdate.bstrClOrderId, out id))
             {
+                // use the norderrecordid as our order id
                 id = (long)structOrderUpdate.nOrderRecordId;
+
+                // ensure this is not a secondary notification of same order
+                string tmp;
+                if (!idacct.TryGetValue(id, out tmp))
+                {
+
+                    // save the id
+                    debug("manual order: " + id + " " + structOrderUpdate.bstrAccount);
+                    idacct.Add(id, structOrderUpdate.bstrAccount);
+                    ismanorder.Add(id, true);
+                }
             }
             // if this is a cancel notification, pass along
             if (structOrderUpdate.nOrderStatus == (int)STIOrderStatus.osSTICanceled)
@@ -751,7 +780,7 @@ namespace SterServer
                         debug("cancel received for: " + orderid);
                 }
                 else
-                    debug("no record for cancel id: " + id);
+                    debug("manual cancel sent with id: " + id);
                 return;
             }
             // don't notify for same order more than once
