@@ -26,20 +26,24 @@ using namespace TradeLibFast;
 		vector<TLImbalance> _imbcache;
 		volatile bool _startimb;
 		void SrvGotImbalance(TLImbalance imb);
+		// L_Observer
+	virtual void HandleMessage(L_Message const *msg);
 
 	protected:
 		void ReadConfig();
 		bool _proactive;
-		//TLOrder ProcessOrder(Order* order);
+		TLOrder ProcessOrder(L_Order* order);
 		void SrvGotImbAsync(TLImbalance imb);
 		//double GetDouble(const Money* m);
 		//double GetDouble(Money m);
 		//Money  Double2Money(double val);
 		static LS_TLWM* instance;
-		vector <L_Observer*> subs;
+		vector <L_Summary*> subs;
 		vector<CString> subsym;
-		//vector<Order*> ordercache;
-		//const StockBase* preload(CString symbol);
+		vector<L_Order*> ordercache;
+		L_Summary* preload(CString symbol);
+		L_Account *account;
+		//L_Summary *summary;
 
 		int BrokerName(void);
 		int SendOrder(TLOrder order);
@@ -51,14 +55,13 @@ using namespace TradeLibFast;
 		vector<int> imbalance_clients;
 		vector<L_Observable*> accounts;
 		vector<int64> orderids;
-		//int64 fetchOrderIdAndRemove(Order* order);
-		//int64 fetchOrderId(Order * order);
+		int64 fetchOrderIdAndRemove(L_Order* order);
+		int64 fetchOrderId(L_Order * order);
 		bool IdIsUnique(int64 id);
-		//bool saveOrder(Order* o,int64 id, bool overwriteexistingid);
-		//bool saveOrder(Order* o,int64 id);
+		bool saveOrder(L_Order* o,int64 id, bool overwriteexistingid);
+		bool saveOrder(L_Order* o,int64 id);
 		unsigned int AnvilId(int64 TLOrderId);
 
-		//virtual void Process(const Message* message, Observable* from, const Message* additionalInfo);
 
 		void RemoveUnused();
 		void RemoveSub(CString stock);

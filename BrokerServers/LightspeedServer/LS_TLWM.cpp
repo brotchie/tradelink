@@ -64,6 +64,9 @@
 		}
 		ReadConfig();
 
+		account = L_GetAccount();
+		account->L_Attach(this);
+		
 
 	}
 
@@ -72,25 +75,19 @@
 	LS_TLWM::~LS_TLWM(void)
 	{
 		// remove account observables
-		/*
-		void* iterator = B_CreateAccountIterator();
-		B_StartIteration(iterator);
-		Observable* acct;
-		while (acct = B_GetNextAccount(iterator)) 
+		if (account)
 		{
-			acct->Remove(this); 
+			account->L_Detach(this);
 		}
-		B_DestroyIterator(iterator);
-		*/
 		// remove all account observables
 		for (uint i = 0; i<accounts.size(); i++)
 			accounts[i] = NULL;
 		accounts.clear();
 		// remove all pointers to orders
-		//for (uint i = 0; i<ordercache.size(); i++)
-		//	ordercache[i] = NULL;
+		for (uint i = 0; i<ordercache.size(); i++)
+			ordercache[i] = NULL;
 		// clear cache
-		//ordercache.clear();
+		ordercache.clear();
 
 		if (imbalance!=NULL)
 		{
@@ -104,6 +101,8 @@
 		{
 			if (subs[i]!=NULL)
 			{
+				subs[i]->L_Detach(this);
+				L_DestroySummary(subs[i]);
 				subs[i] = NULL;
 			}
 		}
@@ -209,21 +208,22 @@
 				return true;
 		return false;
 	}
-	/*
-	const StockBase* LS_TLWM::preload(CString symbol)
+	
+	L_Summary* LS_TLWM::preload(CString symbol)
 	{
 		for (uint i = 0; i<subs.size(); i++)
 		{
 			if (!isIndex(subsym[i]) && (subs[i]!=NULL) && (subsym[i]==symbol))
 			{
-				AVLStock* s = (AVLStock*)subs[i];
-				CString ts = CString(s->GetSymbol().c_str());
-				if ((s==NULL) || !s->isLoaded() || (symbol!=ts)) break;
-				return s->GetStockHandle();
+				return subs[i];
 			}
 		}
-		return B_GetStockHandle(symbol);
-	}*/
+		L_Summary* sec = L_CreateSummary(symbol);
+		sec->L_Attach(this);
+		subs.push_back(sec);
+		subsym.push_back(symbol);
+		return sec;
+	}
 
 	inline int rndup(int val)
 	{
@@ -247,7 +247,18 @@
 
 	int LS_TLWM::SendOrder(TLOrder o) 
 	{
-		uint error = 0;
+		L_Summary* summary = preload(o.symbol);
+		uint error = 
+		account->L_SendOrderSync(
+				summary,
+				L_OrderType::LIMIT,
+				L_Side::BUY,
+				100,
+				summary->L_Bid() - 0.01,
+				"NSDQ",
+				L_TIF::DAY
+				);
+	L_AddMessageToExtensionWnd("OnBnClickedSendOrder");
 		/*
 		const StockBase* Stock = preload(o.symbol);
 
@@ -418,8 +429,8 @@
 				return false;
 		return true;
 	}
-	/*
-	int64 LS_TLWM::fetchOrderId(Order* order)
+	
+	int64 LS_TLWM::fetchOrderId(L_Order* order)
 	{
 		if (order==NULL) return ORDER_NOT_FOUND;
 		for (uint i = 0; i<ordercache.size(); i++)
@@ -428,7 +439,7 @@
 		return 0;
 	}
 
-	int64 LS_TLWM::fetchOrderIdAndRemove(Order* order)
+	int64 LS_TLWM::fetchOrderIdAndRemove(L_Order* order)
 	{
 		if (order==NULL) return ORDER_NOT_FOUND;
 		for (uint i = 0; i<ordercache.size(); i++)
@@ -442,8 +453,8 @@
 		return 0;
 	}
 
-	bool LS_TLWM::saveOrder(Order* o, int64 id) { return saveOrder(o,id,false); }
-	bool LS_TLWM::saveOrder(Order* o,int64 id, bool allowduplicates)
+	bool LS_TLWM::saveOrder(L_Order* o, int64 id) { return saveOrder(o,id,false); }
+	bool LS_TLWM::saveOrder(L_Order* o,int64 id, bool allowduplicates)
 	{
 		// fail if invalid order
 		if (o==NULL) return false;
@@ -470,7 +481,7 @@
 		// we added order and it's id
 		return true; 
 	}
-	*/
+	
 
 	vector<uint> sentids;
 	bool sent(uint id)
@@ -479,6 +490,42 @@
 			if (sentids[i]==id) return true;
 		return false;
 	}
+
+	void LS_TLWM::HandleMessage(L_Message const *msg)
+	{
+		switch (msg->L_Type())
+		{
+		case L_MsgOrderChange::id:
+			//SetDlgItemInt(IDC_PENDINGORDERS, account->L_PendingOrdersCount());
+			break;
+		case L_MsgL1::id:
+		case L_MsgL1Update::id:
+			{
+				CString sym = CString(msg->L_Symbol());
+				L_Summary* summary = preload(sym);
+				double bid = summary->L_Bid();
+				double ask = summary->L_Ask();
+				CString buf;
+				buf.Format("%.2f", bid);
+				D(buf);
+				buf.Format("%.2f", ask);
+				D(buf);
+			}
+			break;
+		case L_MsgL2Update::id:
+		case  L_MsgL2Refresh::id:
+		case L_MsgL2::id:
+			{
+			}
+			break;
+		case L_MsgTrade::id:
+		case L_MsgTradeUpdate::id:
+			break;
+		case L_MsgOrderImbalance::id:
+			break;
+		}
+	}
+
 /*
 	void LS_TLWM::Process(const Message* message, Observable* from, const Message* additionalInfo)
 	{
@@ -785,8 +832,8 @@
 	{
 		for (uint i = 0; i<orderids.size(); i++)
 		{
-//			if ((orderids[i]==TLOrderId) && ordercache[i])
-//				return ordercache[i]->GetId();
+			if ((orderids[i]==TLOrderId) && ordercache[i])
+				return ordercache[i]->L_OrderId();
 		}
 		return 0;
 	}
@@ -797,6 +844,8 @@
 		f.push_back(BROKERNAME);
 		f.push_back(HEARTBEATREQUEST);
 		f.push_back(REGISTERCLIENT);
+		f.push_back(SENDORDER);
+		f.push_back(ORDERCANCELREQUEST);
 		f.push_back(REGISTERSTOCK);
 		f.push_back(CLEARCLIENT);
 		f.push_back(CLEARSTOCKS);
@@ -817,14 +866,14 @@
 		// get current anvil id from tradelink id
 		for (uint i = 0; i<orderids.size(); i++)
 		{
-			/*
+			
 			// make sure it's our order and order isn't NULL
 			if ((orderids[i]==tlsid) && (ordercache[i]!=NULL))
 			{
 				__try 
 				{
 					// try to cancel it
-					ordercache[i]->Cancel();
+					account->L_CancelOrder(ordercache[i]);
 					// mark it as found
 					bool found = true;
 				} 
@@ -835,7 +884,7 @@
 				}
 				
 			}
-			*/
+			
 		}
 		// return
 		if (!found) return ORDER_NOT_FOUND;
@@ -963,12 +1012,16 @@
 		for (size_t i = 0; i<my.size();i++) // subscribe to stocks
 		{
 			if (hasHammerSub(my[i])) continue; // if we've already subscribed once, skip to next stock
-			L_Observer* sec;
+			L_Summary * sec;
 			int symidx = FindSym(my[i]);
 			if (isIndex(my[i]))
 				sec = NULL; //new AVLIndex(my[i],symidx,this);
 			else
 			{
+				
+				sec = L_CreateSummary(my[i]);
+				sec->L_Attach(this);
+
 				//AVLStock *stk = new AVLStock(my[i],this); // create new stock instance
 				//AVLStock *stk = new AVLStock(my[i],symidx,this,true,depth); // create new stock instance with added depth param
 				//sec = stk;

@@ -4,13 +4,39 @@
 #include "stdafx.h"
 #include "GrayBoxSample.h"
 #include "MainDlg.h"
+#include "LS_TLWM.h"
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
+std::string version;
 void CGrayBoxSampleApp::StartExtension()
 {
+	LS_TLWM* frame = LS_TLWM::GetInstance();
+	if (!frame)
+	{
+		frame = new LS_TLWM();
+		version += frame->Version();
+	}
+	frame->Start();
+}
+void CGrayBoxSampleApp::StopExtension()
+{
+	LS_TLWM* frame = LS_TLWM::GetInstance();
+    if(frame)
+    {
+        frame->DestroyWindow();
+    }
+	delete frame;
+	frame = NULL;
+}
+
+/*
+void CGrayBoxSampleApp::StartExtension()
+{
+	
 	MainDlg *pDlg = new MainDlg;
 	if (pDlg->Create(IDD_MAINDLG, CWnd::FromHandle(L_GetMainWnd())))
 	{
@@ -23,12 +49,14 @@ void CGrayBoxSampleApp::StartExtension()
 }
 void CGrayBoxSampleApp::StopExtension()
 {
+	
 	if (m_pMainWnd != 0)
 	{
 		m_pMainWnd->DestroyWindow();
 		m_pMainWnd = 0;
 	}
-}
+}*/
+
 
 //
 //TODO: If this DLL is dynamically linked against the MFC DLLs,
