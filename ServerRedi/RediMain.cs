@@ -26,6 +26,11 @@ namespace ServerRedi
                 tls = new TradeLink.Common.TLServer_IP(Properties.Settings.Default.TLClientAddress, Properties.Settings.Default.TLClientPort);
 
             tl = new ServerRedi(tls);
+            if (Properties.Settings.Default.AccountsAvailable != string.Empty)
+            {
+                tl.Accounts = Properties.Settings.Default.AccountsAvailable.Split(',');
+                debug("Advertising static accounts: " + tl.Accounts);
+            }
             TrackEnabled = Util.TrackUsage();
             Program = PROGRAM;
             InitializeComponent();

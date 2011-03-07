@@ -8,9 +8,6 @@
     <Setting Name="pw" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="accnt" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
     <Setting Name="acronym" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
@@ -18,6 +15,12 @@
       <Value Profile="(Default)">50000</Value>
     </Setting>
     <Setting Name="TLClientAddress" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="AccountsAvailable" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="accnt" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>

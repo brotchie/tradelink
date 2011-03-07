@@ -11,7 +11,8 @@ namespace ServerRedi
     {
         VBCacheClass _cc;
         VBOrderClass _oc;
-        string _account;
+        List<string> _accts = new List<string>();
+        public string[] Accounts { get { return _accts.ToArray(); } set { _accts.Clear(); _accts.AddRange(value); } }
         string _userid;
         string _pwd;
         bool _conn = false;
@@ -79,6 +80,7 @@ namespace ServerRedi
                             _cc.VBSubmit(ref isMsgTableOpen, ref se);
          */
         object vret;
+        public string Account { get { return _accts.Count>0 ? _accts[0] : string.Empty; } set { if (!_accts.Contains(value)) _accts.Add(value); } }
         void doqueues(object obj)
         {
             while (_bwgo)
@@ -117,9 +119,12 @@ namespace ServerRedi
                 while (!_neworders.isEmpty)
                 {                  
                     Order o = _neworders.Read();
-                    RediLib.ORDER rediOrder = new RediLib.ORDERClass();                 
-                    
-                    rediOrder.Account = _account;
+                    RediLib.ORDER rediOrder = new RediLib.ORDERClass();
+
+                    if (o.Account == string.Empty)
+                        o.Account = Account;
+
+                    rediOrder.Account = o.Account;
                     rediOrder.UserID = _userid;
                     rediOrder.Password = _pwd;
                     
@@ -729,7 +734,7 @@ namespace ServerRedi
                 //app.OrderAck += new RediLib.EApplication_OrderAckEventHandler(app_OrderAck);
                 _userid = user;
                 _pwd = pw;
-                _account = accnt;
+                Account = accnt;
                 OrderIdDict = new Dictionary<string, long>();
                 _bw.Start();
             }
