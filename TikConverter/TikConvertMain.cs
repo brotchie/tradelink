@@ -104,10 +104,10 @@ namespace TikConverter
                     // get size of current file and append to total size
                     FileInfo fi = new FileInfo(file);
                     bytes += fi.Length;
+                    string sym = string.Empty;
                     switch (_conval)
                     {
                         case Converter.QCollector_eSignal:
-                            string sym = string.Empty;
                             string [] r = Path.GetFileNameWithoutExtension(sn).Split('_');
                             if (r.Length != 2)
                             {
@@ -115,10 +115,22 @@ namespace TikConverter
                             }
                             else
                                 sym = r[0];
-                            if (sym != string.Empty)
-                                symbols.Add(sym);
                             break;
+                        default:
+                            // guess symbol
+                            string guess = Util.rxm(sn, "[^a-z]*([a-z]{1,6})[^a-z]+");
+                            // remove extension
+                            guess = Util.rxr(guess, "[.].*", string.Empty);
+                            // see if it's a clean match, if not don't guess
+                            if (!Util.rxmok(guess, "^[a-z]+$"))
+                                guess = string.Empty;
+                            sym = Microsoft.VisualBasic.Interaction.InputBox("Symbol data represented by file: " + sn, "File's Symbol", guess, 0, 0);
+                            break;
+
                     }
+                    if (sym != string.Empty)
+                        symbols.Add(sym);
+
                 }
                 // estimate total ticks
                 _approxtotal = (int)((double)bytes / 51);
@@ -327,7 +339,11 @@ namespace TikConverter
             // keep going until input file is exhausted
             while (!infile.EndOfStream);
             // close output file
-            outfile.Close();
+            if (outfile == null)
+            {
+                debug("Tick file was never opened, likely that input file in wrong format.");
+                outfile.Close();
+            }
             // close input file
             infile.Close();
             // get percentage of good ticks

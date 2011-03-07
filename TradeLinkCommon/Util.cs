@@ -1122,6 +1122,30 @@ namespace TradeLink.Common
             return true;
         }
 
+        public static string rxr(string input, string pattern, string replace) { return rxr(input, pattern, replace, false); }
+        public static string rxr(string input, string pattern, string replace, bool casesens)
+        {
+            if (casesens)
+                return Regex.Replace(input, pattern, replace);
+            return Regex.Replace(input, pattern, replace, RegexOptions.IgnoreCase);
+        }
+
+        public static string rxm(string input, string pattern) { return rxm(input, pattern, false); }
+        public static string rxm(string input, string pattern, bool casesens)
+        {
+            Match m = casesens ? Regex.Match(input, pattern) : Regex.Match(input, pattern, RegexOptions.IgnoreCase);
+            if (!m.Success)
+                return string.Empty;
+            return m.Value;
+        }
+        public static bool rxmok(string input, string pattern) { return rxmok(input, pattern, false); }
+        public static bool rxmok(string input, string pattern, bool casesens)
+        {
+            if (casesens)
+                return Regex.IsMatch(input, pattern);
+            return Regex.IsMatch(input, pattern, RegexOptions.IgnoreCase);
+        }
+
 
         private class PlatFormInvoke
         {
@@ -1180,6 +1204,8 @@ namespace TradeLink.Common
                 }
                 return returnPath;
             }
+
+            
 
 
 
