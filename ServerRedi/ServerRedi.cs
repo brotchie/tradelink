@@ -128,8 +128,8 @@ namespace ServerRedi
                     rediOrder.Symbol = o.symbol;
                     if (o.ex == string.Empty)
                         o.ex = o.symbol.Length > 3 ? "ARCA" : "NYSE";
-                    rediOrder.Exchange = o.ex;      
-                    rediOrder.Quantity = o.size;
+                    rediOrder.Exchange = o.ex;
+                    rediOrder.Quantity = o.UnsignedSize;
                     rediOrder.Price = o.price.ToString();
                     string priceType = o.isMarket ? "MKT" : (o.isLimit ? "Limit" : "MKT");
                     rediOrder.PriceType = priceType;
@@ -234,6 +234,7 @@ namespace ServerRedi
                                     long rem = (now - xsec) / 100;
                                     o.time = ((int)(rem % 10000)) * 100 + xsec;
                                     o.date = (int)((rem - o.time) / 10000);
+                                    o.size = o.side ? o.UnsignedSize : o.UnsignedSize * -1;
                                     OrderIdDict.Add(orderReferenceNumber, (long)row);
                                     if (_onotified.Contains((int)row)) return;
                                     _onotified.Add(o.id);
