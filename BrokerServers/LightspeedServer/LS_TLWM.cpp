@@ -130,7 +130,7 @@
 
 	int LS_TLWM::BrokerName(void)
 	{
-		return Assent;
+		return HUBB;
 	}
 
 	int LS_TLWM::UnknownMessage(int MessageType,CString msg)
@@ -504,21 +504,89 @@
 	{
 		switch (msg->L_Type())
 		{
-		case L_MsgOrderChange::id:
+		case L_MsgOrderChange::id: // orders?
+			{
+				L_MsgOrderChange* m = (L_MsgOrderChange*)msg;
+				const L_Execution* x = m->L_Exec();
+				long id = m->L_OrderId();
+				// test if this is an execution or an order
+				// no execution, must be an order
+				if (x==NULL)
+				{
+					// check type of order
+					switch (m->L_Category())
+					{
+					case L_OrderChange::Create:
+						{
+							TLOrder o;
+							o.symbol = CString(msg->L_Symbol());
+							o.id = id;
+							SrvGotOrder(o);
+						}
+						break;
+					case L_OrderChange::Rejection:
+						break;
+					case L_OrderChange::Cancel:
+						{
+						// notify of cancel
+						SrvGotCancel(id);
+						}
+						break;
+
+
+					}
+
+				}
+				else// it's an execution
+				{
+					
+					CTime ct = CTime(x->L_ExecTime());
+					
+					TLTrade f;
+					f.symbol = CString(x->L_Symbol());
+					f.id = x->L_OrderId();
+					f.xprice = x->L_AveragePrice();
+					f.side = x->L_Side()=='B';
+					f.xsize = abs(x->L_Shares()) * (f.side ? 1 : -1);
+					f.xtime = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
+					f.xdate = (ct.GetYear()*10000)+(ct.GetMonth()*100)+ct.GetDay();
+
+					SrvGotFill(f);
+					return;
+			}
+			}
+			
+
 			//SetDlgItemInt(IDC_PENDINGORDERS, account->L_PendingOrdersCount());
 			break;
 		case L_MsgL1::id:
-		case L_MsgL1Update::id:
+		case L_MsgL1Update::id: // bid+ask
 			{
+				TLTick k;
+				/*
 				CString sym = CString(msg->L_Symbol());
 				L_Summary* summary = preload(sym);
-				double bid = summary->L_Bid();
-				double ask = summary->L_Ask();
-				CString buf;
-				buf.Format("%.2f", bid);
-				D(buf);
-				buf.Format("%.2f", ask);
-				D(buf);
+								k.bid = summary->L_Bid();
+				k.ask = summary->L_Ask();
+				k.bs = summary->L_BidSize();
+				k.os = summary->L_AskSize();
+				k.trade = summary->L_LastPrice();
+				k.size = summary->L_LastSize();
+				k.ex = summary->L_Exchange();
+				*/
+
+
+				L_MsgL1Update* m = (L_MsgL1Update*)msg;
+				k.bid = m->L_Bid();
+				k.bs = m->L_BidSize();
+				k.ask = m->L_Ask();
+				k.os = m->L_AskSize();
+				k.sym = CString(m->L_Symbol());
+
+				this->SrvGotTickAsync(k);
+
+
+
 			}
 			break;
 		case L_MsgL2Update::id:
@@ -527,10 +595,36 @@
 			{
 			}
 			break;
-		case L_MsgTrade::id:
-		case L_MsgTradeUpdate::id:
+
+		case L_MsgTradeUpdate::id: // trade
+			{
+				TLTick k;
+				L_MsgTradeUpdate* m = (L_MsgTradeUpdate*)msg;
+				k.trade = m->L_Price();
+				k.size = m->L_Volume();
+				k.sym = CString(m->L_Symbol());
+				k.ex = CString(m->L_Market());
+				this->SrvGotTickAsync(k);
+			}
 			break;
 		case L_MsgOrderImbalance::id:
+			{
+				L_MsgOrderImbalance* m = (L_MsgOrderImbalance*)msg;
+				TLImbalance imb;
+				imb.Symbol = CString(m->L_Symbol());
+				CTime ct = CTime(m->L_Time());
+				imb.ThisTime = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
+				if (m->L_RegImbalance()=='1')
+				{
+					imb.ThisImbalance = m->L_BuyVolumeReg() - m->L_SellVolumeReg();
+				}
+				else if (m->L_RegImbalance()=='0')
+				{
+					imb.InfoImbalance = m->L_BuyVolume() - m->L_SellVolume();
+				}
+				SrvGotImbAsync(imb);
+
+			}
 			break;
 		}
 	}
@@ -860,6 +954,10 @@
 		f.push_back(CLEARSTOCKS);
 		f.push_back(FEATUREREQUEST);
 		f.push_back(FEATURERESPONSE);
+		f.push_back(TICKNOTIFY);
+		f.push_back(IMBALANCEREQUEST);
+		f.push_back(IMBALANCERESPONSE);
+
 /*		bool sim = B_IsAccountSimulation();
 		if (sim)
 			f.push_back(SIMTRADING);

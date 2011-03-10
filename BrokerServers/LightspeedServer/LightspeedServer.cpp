@@ -14,28 +14,12 @@
 std::string version;
 void CGrayBoxSampleApp::StartExtension()
 {
-	LS_TLWM* frame = LS_TLWM::GetInstance();
-
-
-	if (!frame)
-	{
-		frame = new LS_TLWM();
-		return;
-		version += frame->Version();
-	}
-			
-	frame->Start();
+	
 }
 void CGrayBoxSampleApp::StopExtension()
 {
 	
-	LS_TLWM* frame = LS_TLWM::GetInstance();
-    if(frame)
-    {
-        frame->DestroyWindow();
-    }
-	delete frame;
-	frame = NULL;
+	
 }
 
 /*
@@ -110,11 +94,26 @@ CGrayBoxSampleApp theApp;
 
 LSEXPORT void LSInitInstance()
 {
-	theApp.StartExtension();
+	LS_TLWM* frame = LS_TLWM::GetInstance();
+
+
+	if (!frame)
+	{
+		frame = new LS_TLWM();
+		version += frame->Version();
+	}
+			
+	frame->Start();
 }
 LSEXPORT void LSExitInstance()
 {
-	theApp.StopExtension();
+	LS_TLWM* frame = LS_TLWM::GetInstance();
+    if(frame)
+    {
+        frame->DestroyWindow();
+    }
+	delete frame;
+	frame = NULL;
 }
 LSEXPORT BOOL LSPreTranslateMessage(MSG *pMsg)
 {
