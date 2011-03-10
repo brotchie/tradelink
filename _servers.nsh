@@ -3,7 +3,7 @@
 
 
 
-Section "TradeLibFast"
+Section "TradeLink c++"
 
     ; Set output path to the installation directory.
 	DetailPrint "Installing version ${VERSION}..."
@@ -25,18 +25,21 @@ finishinstall:
 SectionEnd
 
 
+Section "Lightspeed Connector"
+	File "/oname=$PROGRAMFILES\Lightspeed\LightspeedServer.dll" "BrokerServers\release\LightspeedServer.dll"
+	File "/oname=$PROGRAMFILES\Lightspeed\TradeLibFast.dll" "BrokerServers\release\TradeLibFast.dll"
+SectionEnd
 
 
 
-
-Section "InteractiveBrokers Server"
+Section "InteractiveBrokers Connector"
   File "BrokerServers\release\TWSServer.exe"
   File "BrokerServers\TWSServer\TwsSocketClient.dll"
   File "BrokerServers\release\TwsServer.Config.txt"
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\InteractiveBrokers.lnk" "$INSTDIR\TWSServer.exe" "" "$INSTDIR\TWSServer.exe" 0
 SectionEnd
 
-Section "Genesis Server"
+Section "Genesis Connector"
   File "BrokerServers\release\ServerGenesis.exe"  
   File "BrokerServers\release\GTAPI.dll"  
   File "BrokerServers\ServerGenesis\GenesisServer.Config.txt"
