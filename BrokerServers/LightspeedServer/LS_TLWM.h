@@ -11,6 +11,7 @@ using namespace TradeLibFast;
 		public TLServer_WM,
 		public L_Observer
 	{
+			DECLARE_DYNAMIC(LS_TLWM)
 	public:
 		LS_TLWM(void);
 		~LS_TLWM(void);
@@ -26,6 +27,7 @@ using namespace TradeLibFast;
 		vector<TLImbalance> _imbcache;
 		volatile bool _startimb;
 		void SrvGotImbalance(TLImbalance imb);
+		void D(const CString &message);
 		// L_Observer
 	virtual void HandleMessage(L_Message const *msg);
 

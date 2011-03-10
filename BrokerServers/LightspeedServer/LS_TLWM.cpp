@@ -9,9 +9,10 @@
 	
 	LS_TLWM* LS_TLWM::instance = NULL;	
 
-	const char* CONFIGFILE = "AnvilServer.Config.txt";
+	const char* CONFIGFILE = "LightSpeed.Config.txt";
 	void LS_TLWM::ReadConfig()
 	{
+		return;
 		std::ifstream file;
 		file.open(CONFIGFILE);
 		int sessionid = 0;
@@ -21,15 +22,22 @@
 		char data[ds];
 		file.getline(skip,ss);
 		file.getline(data,ds);
-		_proactive = atoi(data) == 1;
 		file.close();
 	}
+
+	void LS_TLWM::D(const CString &message)
+	{
+		TLServer_WM::D(message);
+		L_AddMessageToExtensionWnd(message);
+	}
+
+	IMPLEMENT_DYNAMIC(LS_TLWM, CWnd)
 
 	LS_TLWM::LS_TLWM(void)
 	{
 		instance = this;
 
-		PROGRAM = "AnvilServer";
+		PROGRAM = "LightspeedConnector";
 
 		// remove canceled orders
 		//B_KeepCancelledOrders(false);
@@ -39,6 +47,9 @@
 
 		// add this object as observer to every account,
 		// so we can get fill and order notifications
+		
+		account = L_GetAccount();
+		account->L_Attach(this);
 /*
 		void* iterator = B_CreateAccountIterator();
 		B_StartIteration(iterator);
@@ -64,8 +75,6 @@
 		}
 		ReadConfig();
 
-		account = L_GetAccount();
-		account->L_Attach(this);
 		
 
 	}
