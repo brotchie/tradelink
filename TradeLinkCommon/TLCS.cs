@@ -206,6 +206,7 @@ namespace TradeLink.Common
         public event SymbolRegisterDel newRegisterSymbols;
         public event MessageArrayDelegate newFeatureRequest;
         public event UnknownMessageDelegate newUnknownRequest;
+        public event UnknownMessageDelegateSource newUnknownRequestSource;
         public event VoidDelegate newImbalanceRequest;
 
         /// <summary>

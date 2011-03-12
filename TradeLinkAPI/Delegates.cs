@@ -34,6 +34,7 @@ namespace TradeLink.API
     public delegate MessageTypes[] MessageArrayDelegate();
     public delegate void MessageArrayDel(MessageTypes[] messages);
     public delegate long UnknownMessageDelegate(MessageTypes t, string msg);
+    public delegate long UnknownMessageDelegateSource(MessageTypes t, string msg,string source);
     public delegate void SymBarIntervalDelegate(string symbol, int interval);
     public delegate void ImbalanceDelegate(Imbalance imb);
     public delegate void VoidDelegate();

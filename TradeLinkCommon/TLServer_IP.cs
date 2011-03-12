@@ -288,6 +288,7 @@ namespace TradeLink.Common
         public event SymbolRegisterDel newRegisterSymbols;
         public event MessageArrayDelegate newFeatureRequest;
         public event UnknownMessageDelegate newUnknownRequest;
+        public event UnknownMessageDelegateSource newUnknownRequestSource;
         public event VoidDelegate newImbalanceRequest;
         public event Int64Delegate DOMRequest;
 
@@ -737,7 +738,9 @@ namespace TradeLink.Common
                     SrvDOMReq(dom[0], int.Parse(dom[1]));
                     break;
                 default:
-                    if (newUnknownRequest != null)
+                    if (newUnknownRequestSource != null)
+                        result = newUnknownRequestSource(type, msg, sock.RemoteEndPoint.ToString());
+                    else if (newUnknownRequest != null)
                         result = newUnknownRequest(type, msg);
                     else
                         result = (long)MessageTypes.FEATURE_NOT_IMPLEMENTED;

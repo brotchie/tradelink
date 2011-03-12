@@ -78,6 +78,7 @@ namespace TradeLink.API
         event SymbolRegisterDel newRegisterSymbols;
         event MessageArrayDelegate newFeatureRequest;
         event UnknownMessageDelegate newUnknownRequest;
+        event UnknownMessageDelegateSource newUnknownRequestSource;
         event VoidDelegate newImbalanceRequest;
         /// <summary>
         /// gets current list of symbols for a given client
