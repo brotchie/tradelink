@@ -46,6 +46,14 @@ namespace ServerRedi
             tl.newAcctRequest += new StringDelegate(ServerRedi_newAccountRequest);
         }
 
+        bool _noverb = true;
+        public bool VerboseDebugging { get { return !_noverb; } set { _noverb = !value; tl.VerboseDebugging = value; } }
+        void v(string msg)
+        {
+            if (_noverb) return;
+            debug(msg);
+        }
+
         void tl_newRegisterSymbols(string client, string symbols)
         {
             debug("Subscribe request: " + symbols);
@@ -54,6 +62,7 @@ namespace ServerRedi
                 debug("not connected.");
                 return;
             }
+            
             // save list of symbols to subscribe
             _newsymlist = tl.AllClientBasket.ToString();
             // notify other thread to subscribe to them
@@ -61,14 +70,17 @@ namespace ServerRedi
         }
         void ServerRedi_newOrderCancelRequest(long val)
         {
+            v("order cancel request received for: " + val);
             _newcancel.Write(val);
         }
         Position[] ServerRedi_gotSrvPosList(string account)
         {
+            v("position list request received for account: " + account);
             return pt.ToArray();
         }
         string ServerRedi_newAccountRequest()
         {
+            v("accounts request received.");
             return string.Join(",", accts.ToArray());
         }
         /*
@@ -147,15 +159,19 @@ namespace ServerRedi
                     bool IsSuccessful = rediOrder.Submit2(ref transId, ref err);
                     if (IsSuccessful)
                     {
+                        v("successfully sent order: " + o.ToString());
                         object err1 = null;
                         _messageCache.VBRediCache.AddWatch(1, o.symbol, "", ref err1);
                         
                         if (!(err1 == null))
                             debug("FAILED open of Table! Table : Message  Error:" + err1.ToString()); 
+                        else
+                            v("successfully watching symbol: "+o.symbol);
                         
                     }
                     else
                     {
+                        v("error sending order: " + o.ToString());
                         if(!(err == null))
                             debug("order submission was not successful: " + err.ToString());
                     }
@@ -165,6 +181,10 @@ namespace ServerRedi
                     long id = _newcancel.Read();
                     object err = null;                    
                     _messageCache.VBRediCache.Cancel(id, ref err);
+                    if (err != null)
+                        v("error canceling id: " + id);
+                    else
+                        v("cancel request sent for: " + id);
                 }
                 if (_newcancel.isEmpty && _neworders.isEmpty && _newsyms.isEmpty)
                     Thread.Sleep(_SLEEP);
@@ -244,11 +264,13 @@ namespace ServerRedi
                                     if (_onotified.Contains((int)row)) return;
                                     _onotified.Add(o.id);
                                     tl.newOrder(o);
+                                    v("order ack received and sent: " + o.ToString());
                                 }
                                 else if (cv.ToString() == "Canceled")
                                 {
                                     long id = OrderIdDict[orderReferenceNumber];
                                     tl.newCancel(id);
+                                    v("order cancel ack received and sent: " + id);
                                 }
                                 else if (cv.ToString() == "Complete")
                                 {
@@ -305,6 +327,7 @@ namespace ServerRedi
                                     _positionCache.VBRediCache.AddWatch(2, string.Empty, f.Account, ref objErr);
                                     pt.Adjust(f);
                                     tl.newFill(f);
+                                    v("fill ack received and sent: " + f.ToString());
                                 }
                             }                            
                         }
@@ -411,10 +434,10 @@ namespace ServerRedi
             {
                 try
                 {
-                    debug("for position submit row: " + row.ToString());
+                    v("for position submit row: " + row.ToString());
                     int i = row != 0 ? row - 1 : row;                    
                     _positionCache.VBGetCell(i, "SYMBOL", ref cv, ref err);
-                    debug("getcellerr: " + err.ToString());
+                    v("getcellerr: " + err.ToString());
                     if (!(cv == null))
                     {
                         symbol = cv.ToString();
@@ -426,13 +449,13 @@ namespace ServerRedi
                             pl = dv;
                     }
                     _positionCache.VBGetCell(i, "ACCOUNT", ref cv, ref err);
-                    debug("getcellerr: " + err.ToString());
+                    v("getcellerr: " + err.ToString());
                     if (!(cv == null))
                     {
                         acct = cv.ToString();
                     }
                     _positionCache.VBGetCell(i, "SYMBOLPOSITION", ref cv, ref err);
-                    debug("getcellerr: " + err.ToString());
+                    v("getcellerr: " + err.ToString());
                     if (!(cv == null))
                     {
                         int val;
@@ -440,7 +463,7 @@ namespace ServerRedi
                             size = val;
                     }
                     _positionCache.VBGetCell(i, "ACCOUNTSYMBOLVALUE", ref cv, ref err);
-                    debug("getcellerr: " + err.ToString());
+                    v("getcellerr: " + err.ToString());
                     if (!(cv == null))
                     {
                         if (decimal.TryParse(cv.ToString(), out dv))
@@ -448,6 +471,7 @@ namespace ServerRedi
                     }
                     Position p = new PositionImpl(symbol, value, size, pl, acct);
                     pt.NewPosition(p);
+                    v("new position: " + p.ToString());
                     // track account
                     if (!accts.Contains(acct))
                         accts.Add(acct);
@@ -462,10 +486,10 @@ namespace ServerRedi
             {
                 try
                 {
-                    debug("for position submit row: " + row.ToString());
+                    v("for position submit row: " + row.ToString());
                     int i = row;
                     _positionCache.VBGetCell(i, "SYMBOL", ref cv, ref err);
-                    debug("getcellerr: " + err.ToString());
+                    v("getcellerr: " + err.ToString());
                     if (!(cv == null))
                     {
                         symbol = cv.ToString();
@@ -477,13 +501,13 @@ namespace ServerRedi
                             pl = dv;
                     }
                     _positionCache.VBGetCell(i, "ACCOUNT", ref cv, ref err);
-                    debug("getcellerr: " + err.ToString());
+                    v("getcellerr: " + err.ToString());
                     if (!(cv == null))
                     {
                         acct = cv.ToString();
                     }
                     _positionCache.VBGetCell(i, "SYMBOLPOSITION", ref cv, ref err);
-                    debug("getcellerr: " + err.ToString());
+                    v("getcellerr: " + err.ToString());
                     if (!(cv == null))
                     {
                         int val;
@@ -491,7 +515,7 @@ namespace ServerRedi
                             size = val;
                     }
                     _positionCache.VBGetCell(i, "ACCOUNTSYMBOLVALUE", ref cv, ref err);
-                    debug("getcellerr: " + err.ToString());
+                    v("getcellerr: " + err.ToString());
                     if (!(cv == null))
                     {
                         if (decimal.TryParse(cv.ToString(), out dv))
@@ -499,6 +523,7 @@ namespace ServerRedi
                     }
                     Position p = new PositionImpl(symbol, value, size, pl, acct);
                     pt.NewPosition(p);
+                    v(p.ToString());
                     // track account
                     if (!accts.Contains(acct))
                         accts.Add(acct);
@@ -514,11 +539,13 @@ namespace ServerRedi
         long ServerRedi_newSendOrderRequest(Order o)
         {
             if (o.id == 0) o.id = _idt.AssignId;
+            v("received order request: " + o.ToString());
             _neworders.Write(o);
             return (long)MessageTypes.OK;
         }
         MessageTypes[] ServerRedi_newFeatureRequest()
         {
+            v("received feature request.");
             List<MessageTypes> f = new List<MessageTypes>();
             f.Add(MessageTypes.LIVEDATA);
             f.Add(MessageTypes.LIVETRADING);
@@ -555,7 +582,7 @@ namespace ServerRedi
         void checkerror(ref object err, string context)
         {
             if (err != null)
-                debug(context+" result: "+err.ToString());
+                v(context+" result: "+err.ToString());
             err = null;
         }
         // respond to redi events
@@ -565,18 +592,18 @@ namespace ServerRedi
             object cv = new object();
             decimal dv = 0;
             int iv = 0;
-            debug("action: " + action.ToString());
+            v("action: " + action.ToString());
             switch (action)
             {
                 case 1: //CN_SUBMIT
                     {
                         try
                         {
-                            debug("for submit row: " + row.ToString());
+                            v("for submit row: " + row.ToString());
                             int i = row != 0 ? row - 1 : row;
                             Tick k = new TickImpl();
                             _cc.VBGetCell(i, "SYMBOL", ref cv, ref err);
-                            debug("getcellerr: " + err.ToString());
+                            v("getcellerr: " + err.ToString());
                             if (!(cv == null))
                             {
                                 k.symbol = cv.ToString();
@@ -635,11 +662,11 @@ namespace ServerRedi
                     {
                         try
                         {
-                            debug("for update row: " + row.ToString());
+                            v("for update row: " + row.ToString());
                             int i = row;                            
                             Tick k = new TickImpl();
                             _cc.VBGetCell(i, "SYMBOL", ref cv, ref err);
-                            debug("getcellerr: " + err.ToString());                            
+                            v("getcellerr: " + err.ToString());                            
                             if (!(cv == null))
                             {
                                 k.symbol = cv.ToString();

@@ -34,6 +34,7 @@ namespace ServerRedi
             TrackEnabled = Util.TrackUsage();
             Program = PROGRAM;
             InitializeComponent();
+            tl.VerboseDebugging = Properties.Settings.Default.VerboseDebugging;
             tl.SendDebug += new TradeLink.API.DebugDelegate(tl_SendDebug);
 
             FormClosing += new FormClosingEventHandler(RediMain_FormClosing);
