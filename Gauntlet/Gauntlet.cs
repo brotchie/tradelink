@@ -224,8 +224,10 @@ namespace WinGauntlet
 
         int count = 0;
         long lastp = 0;
+        string nowtime = "0";
         void h_GotTick(Tick t)
         {
+            nowtime = t.time.ToString();
             if (args.Response == null) return;
             if (t.depth > _depth) return;
             count++;
@@ -320,6 +322,7 @@ namespace WinGauntlet
                 messages.AppendText(message+Environment.NewLine);
                 messages.Invalidate(true);
             }
+            _log.GotDebug(message);
         }
 
         void status(string message)
@@ -488,7 +491,8 @@ namespace WinGauntlet
 
         void Response_GotDebug(Debug msg)
         {
-            _sb.AppendLine(msg.Msg);
+           // _sb.AppendLine(msg.Msg);
+            _sb.AppendFormat("{0}: {1}{2}", nowtime, msg.Msg, Environment.NewLine);
             
         }
 
