@@ -46,15 +46,22 @@ namespace TradeLink.Common
         //public BarImpl(decimal open, decimal high, decimal low, decimal close, long vol, int date, int time, string symbol) : this(open, high, low, close, vol, date, time, symbol) { }
         public BarImpl(decimal open, decimal high, decimal low, decimal close, long vol, int date, int time, string symbol, int interval)
         {
-            units = interval;
-            h = (ulong)(high * Const.IPREC);
-            o = (ulong)(open * Const.IPREC);
-            l = (ulong)(low * Const.IPREC);
-            c = (ulong)(close * Const.IPREC);
-            v = vol;
-            bardate = date;
-            _time = time;
-            _sym = symbol;
+            if (open < 0 || high < 0 || low < 0 || close < 0)
+            {
+                return;
+            }
+            else
+            {
+                units = interval;
+                h = (ulong)(high * Const.IPREC);
+                o = (ulong)(open * Const.IPREC);
+                l = (ulong)(low * Const.IPREC);
+                c = (ulong)(close * Const.IPREC);
+                v = vol;
+                bardate = date;
+                _time = time;
+                _sym = symbol;
+            }
         }
         public BarImpl(BarImpl b)
         {
