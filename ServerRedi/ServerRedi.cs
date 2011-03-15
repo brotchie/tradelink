@@ -214,6 +214,7 @@ namespace ServerRedi
                             _messageCache.VBGetCell(row, "SIDE", ref cv, ref err);
                             if (!(cv == null))
                             {
+                                v("order side: "+cv.ToString());
                                 if (cv.ToString() == "BUY")
                                 {
                                     o.side = true;
