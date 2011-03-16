@@ -318,8 +318,7 @@ namespace TradeLibFast
 		if (tlid!=0)
 			return tlid;
 		// if no id, auto-assign one
-		if (tlid==0) 
-			tlid = GetTickCount(); 
+		tlid = GetTickCount(); 
 		// save relationship
 		tlorders.push_back(tlid);
 		iborders.push_back(ibid);
@@ -625,9 +624,9 @@ namespace TradeLibFast
 			// see if it's an order with no id (manual/front-end order)
 			if (o.id==0)
 			{
-				o.id = saveOrder(order.permId,order.account);
+				o.id = saveOrder(orderId,order.account);
 				CString tmp;
-				tmp.Format("assigning tlid: %lld to manual order permid: %i",o.id,order.permId);
+				tmp.Format("assigning tlid: %lld to manual ibid: %i",o.id,orderId);
 				v(tmp);
 			}
 			o.side = (order.action=="BUY");
@@ -682,7 +681,13 @@ namespace TradeLibFast
 		OrderId ibid = TL2IBID(orderid);
 		// gets mlink associated with order
 		int mlink = getMlinkId(ibid);
-		if (ibid==0) return ORDER_NOT_FOUND;
+		if (ibid==0)
+		{
+			CString tmp;
+			tmp.Format("unable to cancel, can't find ibid for tlid: %lld",orderid);
+			v(tmp);
+			return ORDER_NOT_FOUND;
+		}
 		CString m;
 		m.Format("trying to cancel order: %lld",orderid);
 		v(m);
