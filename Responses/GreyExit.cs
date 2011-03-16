@@ -57,7 +57,7 @@ namespace Responses
             if (!tick.isTrade) return;
 
             // this is a grey box that manages exits, so wait until we have a position
-            if (pt[tick.symbol].isFlat) return;
+            if (!pt[tick.symbol].isFlat) return;
 
             // calculate the MA from closing bars
             decimal MA = Calc.Avg(Calc.Closes(blt[tick.symbol], BarsBack));
