@@ -59,6 +59,7 @@ namespace TradeLibFast
 		vector<int64> tlorders;
 		OrderId TL2IBID(int64 tlid);
 		int64 IB2TLID(OrderId ibid);
+		int64 saveOrder(OrderId ibid, CString acct);
 		OrderId newOrder(int64 tlid,CString acct);
 		void IncOrderId(CString account);
 		bool hasAccount(CString account);

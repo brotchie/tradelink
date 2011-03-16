@@ -311,6 +311,22 @@ namespace TradeLibFast
 		return 0;
 	}
 
+	int64 TWS_TLServer::saveOrder(OrderId ibid, CString acct)
+	{
+		int tlid = IB2TLID(ibid);
+		// don't save if it's already been saved
+		if (tlid!=0)
+			return tlid;
+		// if no id, auto-assign one
+		if (tlid==0) 
+			tlid = GetTickCount(); 
+		// save relationship
+		tlorders.push_back(tlid);
+		iborders.push_back(ibid);
+		// return tradelink id
+		return tlid;
+	}
+
 	OrderId TWS_TLServer::newOrder(int64 tlid,CString acct)
 	{
 		if (tlid==0) tlid = GetTickCount(); // if no id, auto-assign one
@@ -590,12 +606,30 @@ namespace TradeLibFast
 	void TWS_TLServer::openOrder( OrderId orderId, const Contract& contract,
 								const Order& order, const OrderState& orderState)
 	{
+		// log warnings
+		if (orderState.warningText!="")
+		{
+			v(orderState.warningText);
+		}
+		// only notify on submit status
+		if (orderState.status!="Submitted")
+		{
+			return;
+		}
 			// count order
 			IncOrderId(order.account);
 
 			// prepare client order and notify client
 			TradeLibFast::TLOrder o;
 			o.id = IB2TLID(orderId);
+			// see if it's an order with no id (manual/front-end order)
+			if (o.id==0)
+			{
+				o.id = saveOrder(order.permId,order.account);
+				CString tmp;
+				tmp.Format("assigning tlid: %lld to manual order permid: %i",o.id,order.permId);
+				v(tmp);
+			}
 			o.side = (order.action=="BUY");
 			o.size = abs(order.totalQuantity) * ((o.side) ? 1 : -1);
 			o.symbol = contract.localSymbol;
