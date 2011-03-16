@@ -151,6 +151,9 @@ public:
 	C_PointerIterator(l_Container const *cont, l_Value const *ptrInit) : _const_iter(cont, ptrInit)
 	{
 	}
+	C_PointerIterator(C_PointerConstIterator const &rhs) : _const_iter(rhs)
+	{
+	}
 	reference operator*() const
 	{
 		return *const_cast<value_type *>(&**static_cast<_const_iter *>(this));
@@ -247,14 +250,14 @@ public:
 	C_WrappedConstIterator() : lit(0)
 	{
 	}
-	C_WrappedConstIterator(l_Iterator const *litInit) : lit(litInit->Copy())
+	C_WrappedConstIterator(l_Iterator const *litInit) : lit(litInit ? litInit->L_Copy() : 0)
 	{
 	}
 	C_WrappedConstIterator(C_WrappedConstIterator const &rhs) : lit(0)
 	{
 		if (rhs.lit)
 		{
-			lit = rhs.lit->Copy();
+			lit = rhs.lit->L_Copy();
 		}
 	}
 	~C_WrappedConstIterator()
@@ -263,6 +266,25 @@ public:
 		{
 			lit->L_Destroy();
 		}
+	}
+	C_WrappedConstIterator &operator=(C_WrappedConstIterator const &rhs)
+	{
+		if (lit != rhs.lit)
+		{
+			if (lit)
+			{
+				lit->L_Destroy();
+			}
+			if (rhs.lit)
+			{
+				lit = rhs.lit->L_Copy();
+			}
+			else
+			{
+				lit = 0;
+			}
+		}
+		return *this;
 	}
 	const_reference operator*() const
 	{
@@ -333,13 +355,13 @@ public:
 	}
 	bool operator==(C_WrappedConstIterator const &rhs) const
 	{
-		if (rhs.lit)
+		if (rhs.lit && lit)
 		{
 			return lit->L_IsEqual(rhs.lit);
 		}
 		else
 		{
-			return false;
+			return true;
 		}
 	}
 	bool operator!=(C_WrappedConstIterator const &rhs) const
@@ -348,7 +370,7 @@ public:
 	}
 	bool operator<(C_WrappedConstIterator const &rhs) const
 	{
-		if (rhs.lit)
+		if (rhs.lit && lit)
 		{
 			return lit->L_IsLess(rhs.lit);
 		}
@@ -401,6 +423,16 @@ public:
 
 	C_WrappedIterator()
 	{
+	}
+	C_WrappedIterator(l_Iterator const *litInit) : _const_iter(litInit)
+	{
+	}
+	C_WrappedIterator(C_WrappedConstIterator const &rhs) : _const_iter(rhs)
+	{
+	}
+	C_WrappedIterator &operator=(C_WrappedConstIterator const &rhs)
+	{
+		return _const_iter::operator=(rhs);
 	}
 	reference operator*() const
 	{

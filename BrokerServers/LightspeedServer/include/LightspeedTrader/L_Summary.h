@@ -63,7 +63,7 @@ public:
 	virtual double L_PrimaryPrevClose() const = 0;
 	virtual char L_SSRI() const = 0;
 
-	virtual L_Chart const *L_GetChart() const = 0;
+	virtual L_Chart *L_GetChart() const = 0;
 
 	virtual double L_TFHigh(long timeframe) const = 0;
 	virtual double L_TFLow(long timeframe) const = 0;

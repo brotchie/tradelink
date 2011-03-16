@@ -10,6 +10,8 @@
 #include "L_BPType.h"
 #include "L_Side.h"
 #include "L_TIF.h"
+#include "L_Constants.h"
+#include "L_Symbols.h"
 #include "L_Iterator.h"
 #include "L_Execution.h"
 
@@ -17,6 +19,32 @@ namespace LightspeedTrader
 {
 
 class L_Summary;
+
+class __declspec(novtable) L_LocateSymbolIterator
+{
+public:
+	typedef std::forward_iterator_tag l_iterator_category;
+	typedef ptrdiff_t l_distance_type;
+	typedef char const *l_value_type;
+	typedef l_value_type *l_pointer;
+	typedef l_value_type l_reference;
+	typedef size_t l_size_type;
+	typedef l_value_type const *l_const_pointer;
+	typedef l_value_type l_const_reference;
+	typedef L_LocateSymbolIterator l_this_iterator;
+
+	virtual l_this_iterator *L_Copy() const = 0;
+	virtual void L_Destroy() = 0;
+	virtual bool L_IsEqual(l_this_iterator const *) const = 0;
+	virtual void L_Increment() = 0;
+	virtual l_const_reference L_ConstDeref() const = 0;
+	virtual void const *L_DirectData() const = 0;
+};
+
+#if !defined(LS_EXCLUDE_CLIENT_COMPILER_SPECIFIC)
+typedef C_WrappedConstIterator<L_LocateSymbolIterator> locate_symbol_iterator;
+#endif // !defined(LS_EXCLUDE_CLIENT_COMPILER_SPECIFIC)
+
 
 class __declspec(novtable) L_Account : public L_Observable
 {
@@ -71,8 +99,8 @@ public:
 		bool hidden = false,
 		unsigned long visibleShares = 0,
 		unsigned long *sharesSent = 0,
-		L_Order const **order1 = 0,
-		L_Order const **order2 = 0
+		L_Order **order1 = 0,
+		L_Order **order2 = 0
 		) = 0;
 
 	virtual void L_CancelOrder(
@@ -144,6 +172,13 @@ public:
 	virtual L_OrderListIterator const *L_ActiveOrdersBuyEnd() const = 0;
 	virtual L_OrderListIterator const *L_ActiveOrdersSellBegin() const = 0;
 	virtual L_OrderListIterator const *L_ActiveOrdersSellEnd() const = 0;
+
+	virtual void L_CloseAllPositions(long securityFlags = L_SecFlag::ANY, long posFlags = L_PosFlag::ANY) = 0;
+	virtual void L_CancelAllOrders(long dayFlags = L_DayFlag::ANY, long sideFlags = L_SideFlag::ANY, long securityFlags = L_SecFlag::ANY, long posFlags = L_PosFlag::ANY) = 0;
+	virtual void L_CancelPositionOrders(L_Position const *pos, long dayFlags = L_DayFlag::ANY, long sideFlags = L_SideFlag::ANY) = 0;
+
+	virtual L_LocateSymbolIterator const *L_LocateSymbolsBegin() const = 0;
+	virtual L_LocateSymbolIterator const *L_LocateSymbolsEnd() const = 0;
 
 #if !defined(LS_EXCLUDE_CLIENT_COMPILER_SPECIFIC)
 	position_iterator positions_begin() const
@@ -227,6 +262,16 @@ public:
 	{
 		return order_iterator(L_ActiveOrdersSellEnd());
 	}
+
+	locate_symbol_iterator locate_symbols_begin() const
+	{
+		return locate_symbol_iterator(L_LocateSymbolsBegin());
+	}
+	locate_symbol_iterator locate_symbols_end() const
+	{
+		return locate_symbol_iterator(L_LocateSymbolsEnd());
+	}
+
 #endif // !defined(LS_EXCLUDE_CLIENT_COMPILER_SPECIFIC)
 };
 

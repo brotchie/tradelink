@@ -263,7 +263,7 @@ public:
 		typedef l_value_type l_const_reference;
 		typedef L_ECNListIterator l_this_iterator;
 
-		virtual l_this_iterator *Copy() const = 0;
+		virtual l_this_iterator *L_Copy() const = 0;
 		virtual void L_Destroy() = 0;
 		virtual bool L_IsEqual(l_this_iterator const *) const = 0;
 		virtual void L_Increment() = 0;
@@ -293,7 +293,7 @@ class __declspec(novtable) L_MsgECN : public L_Message
 public:
 	enum { id = L_Msg::ECN };
 
-	class L_ECNQuote
+	class __declspec(novtable) L_ECNQuote
 	{
 	public:
 		virtual double L_Price() const = 0;
@@ -365,6 +365,14 @@ public:
 	enum { id = L_Msg::StockResumed };
 
 	virtual time_t L_Time() const = 0;
+};
+
+class __declspec(novtable) L_MsgDirectQuotesLost : public L_Message
+{
+public:
+	enum { id = L_Msg::DirectQuotesLost };
+
+	virtual char const *L_MMID() const = 0;
 };
 
 class __declspec(novtable) L_MsgOrderImbalance : public L_Message
@@ -447,7 +455,7 @@ public:
 
 };
 
-class L_MsgOrderRequested : public L_Message
+class __declspec(novtable) L_MsgOrderRequested : public L_Message
 {
 public:
 	enum { id = L_Msg::OrderRequested };
@@ -493,7 +501,7 @@ public:
 
 };
 
-class L_MsgShortLimitChange : public L_Message
+class __declspec(novtable) L_MsgShortLimitChange : public L_Message
 {
 public:
 	enum { id = L_Msg::ShortLimitChange };
@@ -507,13 +515,25 @@ public:
 ///
 // App Notifier Messages
 
-class L_MsgSymbolChanged : public L_Message
+class __declspec(novtable) L_MsgSymbolChanged : public L_Message
 {
 public:
 	enum { id = L_Msg::SymbolChanged };
 };
 
+class __declspec(novtable) L_MsgLinkStatus : public L_Message
+{
+public:
+	enum { id = L_Msg::LinkStatus };
+
+	virtual long L_Status() const = 0;
+};
+
+// App Notifier Messages
+///
+
 } // namespace LightspeedTrader
+
 
 
 #endif // !defined(LS_L_MESSAGES_H)

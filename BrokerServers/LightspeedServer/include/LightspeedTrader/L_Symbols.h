@@ -7,6 +7,18 @@
 namespace LightspeedTrader
 {
 
+namespace L_SecFlag
+{
+	enum L_SecFlagType
+	{
+		ANY = -1,
+		NONE = 0,
+		EQUITY = 1,
+		FUTURE = 2,
+		OPTION = 4
+	};
+}
+
 extern "C" bool L_IsListed(char const *symbol);
 
 extern "C" bool L_IsEquity(char const *symbol);

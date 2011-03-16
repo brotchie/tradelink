@@ -26,7 +26,7 @@ public:
 	typedef l_value_type l_const_reference;
 	typedef L_PositionListIterator l_this_iterator;
 
-	virtual l_this_iterator *Copy() const = 0;
+	virtual l_this_iterator *L_Copy() const = 0;
 	virtual void L_Destroy() = 0;
 	virtual bool L_IsEqual(l_this_iterator const *) const = 0;
 	virtual void L_Increment() = 0;

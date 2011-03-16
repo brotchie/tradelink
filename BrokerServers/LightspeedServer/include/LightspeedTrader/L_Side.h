@@ -15,6 +15,27 @@ namespace LightspeedTrader
 		inline bool IsSell(char s) { return !IsBuy(s); }
 		inline bool IsShort(char s) { return s == SHORT; }
 	}
+	namespace L_SideFlag
+	{
+		enum L_SideFlagType
+		{
+			ANY = -1,
+			NONE = 0,
+			BUY = 1,
+			SELL = 2,
+		};
+	}
+	namespace L_PosFlag
+	{
+		enum L_PosFlagType
+		{
+			ANY = -1,
+			NONE = 0,
+			LONG = 1,
+			SHORT = 2,
+			FLAT = 4,
+		};
+	}
 }
 
 #endif // !defined(LS_L_SIDE_H)

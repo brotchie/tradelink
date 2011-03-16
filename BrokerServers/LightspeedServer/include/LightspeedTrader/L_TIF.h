@@ -12,6 +12,16 @@ namespace LightspeedTrader
 		const long FOK = 99997;
 		const long DAY = 99999;
 	}
+	namespace L_DayFlag
+	{
+		enum L_DayFlagType
+		{
+			ANY = -1,
+			NONE = 0,
+			DAY = 1,
+			NONDAY = 2,
+		};
+	}
 }
 
 #endif // !defined(LS_L_TIF_H)

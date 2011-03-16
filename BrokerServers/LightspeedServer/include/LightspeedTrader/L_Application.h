@@ -9,6 +9,7 @@ namespace LightspeedTrader
 
 class L_Account;
 class L_Summary;
+class L_FullQuote;
 class L_Observer;
 
 extern "C" void L_ExitLightspeedExtension(unsigned int exitCode);
@@ -24,6 +25,9 @@ extern "C" void L_AddMessageToExtensionWnd(char const *message, COLORREF color =
 
 extern "C" L_Summary *L_CreateSummary(char const *symbol);
 extern "C" void L_DestroySummary(L_Summary *sum);
+
+extern "C" L_FullQuote *L_CreateFullQuote(char const *symbol);
+extern "C" void L_DestroyFullQuote(L_FullQuote *fullQuote);
 
 extern "C" char const *L_GetFocusedSymbol();
 extern "C" void L_SetFocusedSymbol(char const *symbol);
@@ -51,6 +55,14 @@ extern "C" void L_UnsubscribeFromECNList(L_Observer *dest);
 
 extern "C" void L_SubscribeToECN(char const *ecn, char const *symbol, L_Observer *dest);
 extern "C" void L_UnsubscribeFromECN(char const *ecn, char const *symbol, L_Observer *dest);
+
+extern "C" void L_SubscribeToMarketStatus(L_Observer *dest);
+extern "C" void L_UnsubscribeFromMarketStatus(L_Observer *dest);
+
+extern "C" bool L_IsExecutorConnected();
+extern "C" bool L_IsQuoteConnected();
+
+extern "C" char L_MarketStatus();
 
 } // namespace LightspeedTrader
 

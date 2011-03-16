@@ -257,17 +257,21 @@
 	int LS_TLWM::SendOrder(TLOrder o) 
 	{
 		L_Summary* summary = preload(o.symbol);
+		
+			char side = o.side ? L_Side::BUY : L_Side::SELL;
+		long type = o.isStop() ? L_OrderType::STOP : ( o.isLimit() ? L_OrderType::LIMIT : L_OrderType::MARKET);
+		double price = o.isStop() ? o.stop : o.price;
 		uint error = 
 		account->L_SendOrderSync(
 				summary,
-				L_OrderType::LIMIT,
-				L_Side::BUY,
+				type,
+				side,
 				100,
-				summary->L_Bid() - 0.01,
-				"NSDQ",
+				price,
+				o.exchange,
 				L_TIF::DAY
 				);
-	L_AddMessageToExtensionWnd("OnBnClickedSendOrder");
+		L_AddMessageToExtensionWnd(o.Serialize());
 		/*
 		const StockBase* Stock = preload(o.symbol);
 
@@ -948,6 +952,9 @@
 		f.push_back(HEARTBEATREQUEST);
 		f.push_back(REGISTERCLIENT);
 		f.push_back(SENDORDER);
+		f.push_back(EXECUTENOTIFY);
+		f.push_back(ORDERNOTIFY);
+		f.push_back(ORDERCANCELRESPONSE);
 		f.push_back(ORDERCANCELREQUEST);
 		f.push_back(REGISTERSTOCK);
 		f.push_back(CLEARCLIENT);

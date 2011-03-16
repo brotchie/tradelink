@@ -6,32 +6,47 @@
 
 namespace LightspeedTrader
 {
-	const char tick_none				= 'N';
-	const char tick_up					= 'U';
-	const char tick_down				= 'D';
-	const char tick_halted				= 'H';
 
-	const char imbalance_add			= '+';
-	const char imbalance_remove			= '-';
+namespace L_L2Source
+{
+	const char Nasdaq	= 'Q';
+	const char National	= 'N';
+}
 
-	const char market_morning_before	= 'M';
-	const char market_premarket			= 'J';
-	const char market_preopening		= 'P';
-	const char market_reg_session_open	= 'F';
-	const char market_ext_session_open	= 'G';
-	const char market_us_market_closed	= 'D';
-	const char market_halted			= 'H';
-	const char market_resumed			= 'I';
+namespace L_Market
+{
+	const char MorningBefore	= 'M';
+	const char Premarket		= 'J';
+	const char Preopening		= 'P';
+	const char RegSessionOpen	= 'F';
+	const char ExtSessionOpen	= 'G';
+	const char Closed			= 'D';
+	const char Halted			= 'H';
+	const char Resumed			= 'I';
+}
 
-	const int borrowable_unknown		= -1;
-	const int borrowable_easy			= 0;
-	const int borrowable_hard			= 1;
-	const int borrowable_threshold		= 2;
+namespace L_Borrowable
+{
+	const int Unknown		= -1;
+	const int Easy			= 0;
+	const int Hard			= 1;
+	const int Threshold		= 2;
+}
 
+namespace L_Link
+{
+	enum L_LinkStatus : long
+	{
+		ExecutorLost		= 0,
+		ExecutorEstablished	= 1,
+		QuoteLost			= 2,
+		QuoteEstablished	= 3
+	};
+}
 namespace L_Liquidity
 {
-	const char Add = 'A';
-	const char Remove = 'R';
+	const char Add		= 'A';
+	const char Remove	= 'R';
 }
 namespace L_Source
 {
