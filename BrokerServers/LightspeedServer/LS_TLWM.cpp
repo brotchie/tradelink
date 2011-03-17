@@ -49,19 +49,12 @@
 		// add this object as observer to every account,
 		// so we can get fill and order notifications
 		
-		account = L_GetAccount();
+		L_Account* account = L_GetAccount();
 		account->L_Attach(this);
-/*
-		void* iterator = B_CreateAccountIterator();
-		B_StartIteration(iterator);
-		Observable* acct;
-		while (acct = B_GetNextAccount(iterator)) // loop through every available account
-		{
-			acct->Add(this); // add this object to account as an observer
-			accounts.push_back(acct); // save the account
-		}
-		B_DestroyIterator(iterator);
-*/
+		accounts.push_back(account);
+
+		
+
 		depth = 0;
 
 		
@@ -85,14 +78,12 @@
 
 	LS_TLWM::~LS_TLWM(void)
 	{
-		// remove account observables
-		if (account)
-		{
-			account->L_Detach(this);
-		}
 		// remove all account observables
 		for (uint i = 0; i<accounts.size(); i++)
+		{
+			accounts[i]->L_Detach(this);
 			accounts[i] = NULL;
+		}
 		accounts.clear();
 		// remove all pointers to orders
 		for (uint i = 0; i<ordercache.size(); i++)
@@ -260,7 +251,17 @@
 
 	int LS_TLWM::SendOrder(TLOrder o) 
 	{
+		if (accounts.size()==0)
+			return INVALID_ACCOUNT;
 		L_Summary* summary = preload(o.symbol);
+		L_Account* account = NULL;
+		for (uint i = 0; i<accounts.size(); i++)
+		{
+			if (CString(accounts[i]->L_TraderId())==o.account)
+				account = accounts[i];
+		}
+		if (account==NULL)
+			account = accounts[0];
 		
 			char side = o.side ? L_Side::BUY : L_Side::SELL;
 		long type = o.isStop() ? L_OrderType::STOP : ( o.isLimit() ? L_OrderType::LIMIT : L_OrderType::MARKET);
@@ -622,11 +623,12 @@
 				imb.Symbol = CString(m->L_Symbol());
 				CTime ct = CTime(m->L_Time());
 				imb.ThisTime = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
+
 				if (m->L_RegImbalance()=='1')
 				{
 					imb.ThisImbalance = m->L_BuyVolumeReg() - m->L_SellVolumeReg();
 				}
-				else if (m->L_RegImbalance()=='0')
+				if (m->L_RegImbalance()=='0')
 				{
 					imb.ThisImbalance = m->L_BuyVolumeReg() - m->L_SellVolumeReg();
 					imb.InfoImbalance = m->L_BuyVolume() - m->L_SellVolume();
@@ -983,6 +985,12 @@
 
 	int LS_TLWM::CancelRequest(int64 tlsid)
 	{
+		if (accounts.size()==0)
+		{
+			D("No accounts available for cancel.");
+			return OK;
+		}
+		L_Account* account = accounts[0];
 		bool found = false;
 		// get current anvil id from tradelink id
 		for (uint i = 0; i<orderids.size(); i++)
@@ -991,95 +999,66 @@
 			// make sure it's our order and order isn't NULL
 			if ((orderids[i]==tlsid) && (ordercache[i]!=NULL))
 			{
-				__try 
-				{
 					// try to cancel it
 					account->L_CancelOrder(ordercache[i]);
 					// mark it as found
 					bool found = true;
-				} 
-				__except (EXCEPTION_EXECUTE_HANDLER) // catch errors
-				{
-					// mark this order as null
-					ordercache[i] = NULL;
-				}
+
 				
 			}
 			
 		}
+		account = NULL;
 		// return
-		if (!found) return ORDER_NOT_FOUND;
+		if (!found) 
+			return ORDER_NOT_FOUND;
 		return OK;
 	}
 
 	int LS_TLWM::AccountResponse(CString client)
 	{
-		/*
-		void* iterator = B_CreateAccountIterator();
-		B_StartIteration(iterator);
-		Observable* a;
+		
 		std::vector<CString> accts;
-		while (a = B_GetNextAccount(iterator)) // loop through every available account
+		// loop through every available account
+		for (uint i = 0; i<accounts.size(); i++)
 		{
-			PTCHAR username = (PTCHAR)B_GetAccountName(a);
-			CString un(username);
-			accts.push_back(un);
+			accts.push_back(CString(accounts[i]->L_TraderId()));
 		}
-		B_DestroyIterator(iterator);
 		CString msg = ::gjoin(accts,CString(","));
 		TLSend(ACCOUNTRESPONSE,msg,client);
-		*/
+		
 		return OK;
 	}
 
-	/*
-	double LS_TLWM::GetDouble(const Money* m)
-	{
-		double v = m->GetWhole();
-		int tf = m->GetThousandsFraction();
-		double f = ((double)tf/1000);
-		v += f;
-		return v;
-
-	}
-	double LS_TLWM::GetDouble(Money  m)
-	{
-		double v = m.GetWhole();
-		int tf = m.GetThousandsFraction();
-		double f = ((double)tf/1000);
-		v += f;
-		return v;
-	}
-	*/
+	
 
 	int LS_TLWM::PositionResponse(CString account, CString client)
 	{
 		if (account=="") 
 			return INVALID_ACCOUNT;
-				int count = 0;
-		/*
-		Observable* m_account = B_GetAccount(account);
-		void* iterator = B_CreatePositionIterator(POSITION_FLAT|POSITION_LONG|POSITION_SHORT, (1 << ST_LAST) - 1,m_account);
-		B_StartIteration(iterator);
-		const Position* pos;
+		if (accounts.size()==0)
+			return INVALID_ACCOUNT;
+		
+		int count = 0;
+		
+		L_Account* acct = accounts[0];
+		
 
-		while(pos = B_GetNextPosition(iterator))
+		for (position_iterator pi = acct->positions_end();pi != acct->positions_end(); ++pi)
 		{
+			L_Position* pos = (*pi);
 			TradeLibFast::TLPosition p;
-			bool overnight = pos->isOvernight();
-			p.AvgPrice = GetDouble((Money)pos->GetAveragePrice());
-			p.ClosedPL = GetDouble(pos->GetClosedPnl());
-			p.Size = pos->GetSize();
-			p.Symbol = CString(pos->GetSymbol());
-			p.Account = account;
+			p.AvgPrice = pos->L_AveragePrice();;
+			p.ClosedPL = pos->L_ClosedPL();;
+			p.Size = pos->L_Shares();
+			p.Symbol = CString(pos->L_Symbol());
+			p.Account = CString(acct->L_TraderId());
 			CString msg = p.Serialize();
 			TLSend(POSITIONRESPONSE,msg,client);
 			count++;
 		}
-		B_DestroyIterator(iterator);
-		m_account = NULL;
-		pos = NULL;
-		*/
+		acct = NULL;
+		
 		return count;
 	}
 

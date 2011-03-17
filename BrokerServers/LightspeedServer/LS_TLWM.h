@@ -44,8 +44,6 @@ using namespace TradeLibFast;
 		vector<CString> subsym;
 		vector<L_Order*> ordercache;
 		L_Summary* preload(CString symbol);
-		L_Account *account;
-		//L_Summary *summary;
 
 		int BrokerName(void);
 		int SendOrder(TLOrder order);
@@ -55,7 +53,7 @@ using namespace TradeLibFast;
 		// account monitoring stuff
 		bool imbreq;
 		vector<int> imbalance_clients;
-		vector<L_Observable*> accounts;
+		vector<L_Account*> accounts;
 		vector<int64> orderids;
 		int64 fetchOrderIdAndRemove(L_Order* order);
 		int64 fetchOrderId(L_Order * order);
