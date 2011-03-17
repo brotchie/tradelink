@@ -132,7 +132,7 @@
 
 	int LS_TLWM::BrokerName(void)
 	{
-		return HUBB;
+		return LightspeedDesktop;
 	}
 
 	int LS_TLWM::UnknownMessage(int MessageType,CString msg)

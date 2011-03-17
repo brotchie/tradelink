@@ -18,7 +18,7 @@ namespace TradeLink.API
         TDAmeritrade,
         Blackwood,
         MBTrading,
-        HUBB,
+        LightspeedDesktop,
         Tradespeed,
         REDI,
         eSignal,
@@ -37,5 +37,6 @@ namespace TradeLink.API
         RealTick,
         GrayBox,
         Avatar,
+        LightspeedColo,
     }
 }
