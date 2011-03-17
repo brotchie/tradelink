@@ -53,7 +53,7 @@ using namespace TradeLibFast;
 		int CancelRequest(int64 order);
 
 		// account monitoring stuff
-		L_Observable* imbalance;
+		bool imbreq;
 		vector<int> imbalance_clients;
 		vector<L_Observable*> accounts;
 		vector<int64> orderids;

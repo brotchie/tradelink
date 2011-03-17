@@ -173,7 +173,7 @@
         TDAmeritrade,
         Blackwood,
         MBTrading,
-        HUBB,
+        LightspeedDesktop,
         Tradespeed,
         REDI,
         eSignal,
@@ -190,6 +190,9 @@
         PATS,
         FIX,
         RealTick,
+        GrayBox,
+        Avatar,
+        LightspeedColo,
 	};
 
 

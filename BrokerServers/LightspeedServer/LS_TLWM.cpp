@@ -27,8 +27,9 @@
 
 	void LS_TLWM::D(const CString &message)
 	{
-		TLServer_WM::D(message);
 		L_AddMessageToExtensionWnd(message);
+		TLServer_WM::D(message);
+		
 	}
 
 	IMPLEMENT_DYNAMIC(LS_TLWM, CWnd)
@@ -43,7 +44,7 @@
 		//B_KeepCancelledOrders(false);
 
 		// imbalances are off by default
-		imbalance = NULL;
+		imbreq = false;
 
 		// add this object as observer to every account,
 		// so we can get fill and order notifications
@@ -63,6 +64,7 @@
 */
 		depth = 0;
 
+		
 		_startimb = false;
 		_readimb = 0;
 		_writeimb = 0;
@@ -98,10 +100,10 @@
 		// clear cache
 		ordercache.clear();
 
-		if (imbalance!=NULL)
+		if (imbreq)
 		{
-			imbalance->L_Detach(this);
-			imbalance = NULL;
+			L_UnsubscribeFromOrderImbalances(this);
+			imbreq = false;
 		}
 		_imbcache.clear();
 
@@ -188,15 +190,17 @@
 				int id = FindClient(msg);
 				// ignore invalid clients
 				if (id<0) return OK;
+				CString m;
+				m.Format("got imbalance request from: %s",client[id]);
+				D(m);
 				// only request imbalances once on broker side
-				if (imbalance==NULL)
+				if (!imbreq)
 				{
-					/*
-					// get an observable for imbalances, 
-					imbalance = B_GetMarketImbalanceObservable();
+					// get an observable for imbalances
 					// make this object watch it
-					imbalance->Add(this);
-					*/
+					L_SubscribeToOrderImbalances(this);
+					// mark it
+					imbreq = true;
 				}
 				// set this client to receive imbalances
 				imbalance_clients.push_back(id);
