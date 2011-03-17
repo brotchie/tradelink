@@ -628,8 +628,11 @@
 				}
 				else if (m->L_RegImbalance()=='0')
 				{
+					imb.ThisImbalance = m->L_BuyVolumeReg() - m->L_SellVolumeReg();
 					imb.InfoImbalance = m->L_BuyVolume() - m->L_SellVolume();
 				}
+				if ((imb.ThisImbalance==0) && (imb.InfoImbalance==0))
+					break;
 				SrvGotImbAsync(imb);
 
 			}
