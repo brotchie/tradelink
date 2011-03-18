@@ -371,11 +371,16 @@ namespace TradeLink.AppKit
             string[] res = resultline.Split(',');
             TradeResult r = new TradeResult();
             r.Source = TradeLink.Common.TradeImpl.FromString(resultline);
-            r.OpenPL = Convert.ToDecimal(res[s]);
-            r.ClosedPL = Convert.ToDecimal(res[s + 1]);
-            r.OpenSize = Convert.ToInt32(res[s + 2]);
-            r.ClosedSize = Convert.ToInt32(res[s + 3]);
-            r.AvgPrice = Convert.ToDecimal(res[s + 4]);
+            if (res[s] != string.Empty || res[s] != "")
+                r.OpenPL = Convert.ToDecimal(res[s]);
+            if (res[s + 1] != string.Empty || res[s + 1] != "")
+                r.ClosedPL = Convert.ToDecimal(res[s + 1]);
+            if (res[s + 2] != string.Empty || res[s + 2] != "")
+                r.OpenSize = Convert.ToInt32(res[s + 2]);
+            if (res[s + 3] != string.Empty || res[s + 3] != "")
+                r.ClosedSize = Convert.ToInt32(res[s + 3]);
+            if (res[s + 4] != string.Empty || res[s + 4] != "")          
+                r.AvgPrice = Convert.ToDecimal(res[s + 4]);
             return r;
         }
 
