@@ -363,6 +363,8 @@ namespace SterServer
         MessageTypes[] tl_newFeatureRequest()
         {
             List<MessageTypes> f = new List<MessageTypes>();
+            f.Add(MessageTypes.HALTRESUME);
+            f.Add(MessageTypes.INDICATION);
             f.Add(MessageTypes.LIVEDATA);
             f.Add(MessageTypes.LIVETRADING);
             f.Add(MessageTypes.SIMTRADING);
