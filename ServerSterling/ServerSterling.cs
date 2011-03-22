@@ -106,6 +106,9 @@ namespace SterServer
                     accts.Add(trader);
                     debug("accounts: " + string.Join(",", Accounts));
                 }
+
+                if(VerboseDebugging)
+                    debug("Verbose Mode On.");
                 
             }
             catch (Exception ex)
@@ -829,12 +832,17 @@ namespace SterServer
             k.date = Util.ToTLDate(DateTime.Now);
             //int sec = now % 100;
             k.time = now;
-            if (IgnoreOutOfOrderTicks && (k.time < _lasttime)) return;
-            _lasttime = k.time;
-            k.trade = (decimal)q.fLastPrice;
-            k.size = q.nLastSize;
-            if (!_imbalance || (_imbalance && k.isValid))
-                tl.newTick(k);
+
+            // we don't want to simply return on out-of-order ticks because it'll prevent processing
+            // of the mdx messages further in this function.
+            if (!IgnoreOutOfOrderTicks || (k.time > _lasttime))
+            {
+                _lasttime = k.time;
+                k.trade = (decimal)q.fLastPrice;
+                k.size = q.nLastSize;
+                if (!_imbalance || (_imbalance && k.isValid))
+                    tl.newTick(k);
+            }
 
             /////////////////////////
             // MDX Processing
@@ -850,8 +858,12 @@ namespace SterServer
                     + "  iMktImbalance: " + q.nIntradayMktImbalance
                     + "  MktImbalance: " + q.nMktImbalance);
 
-                Imbalance imb = new ImbalanceImpl(k.symbol, GetExPretty(k.ex), q.nImbalance, k.time, 0, 0, q.nMktImbalance);
-                tl.newImbalance(imb);
+                int time;
+                if (int.TryParse(q.bstrUpdateTime, out time))
+                {
+                    Imbalance imb = new ImbalanceImpl(q.bstrSymbol, GetExPretty(q.bstrExch), q.nImbalance, time, 0, 0, q.nMktImbalance);
+                    tl.newImbalance(imb);
+                }
             }
             else if (q.nMdxMsgType == 2)
             {
@@ -864,9 +876,13 @@ namespace SterServer
                     + "  iMktImbalance: " + q.nIntradayMktImbalance
                     + "  MktImbalance: " + q.nMktImbalance);
 
-                Imbalance imb = new ImbalanceImpl(k.symbol, GetExPretty(k.ex), q.nImbalance, k.time, 0, 0, q.nMktImbalance);
-                tl.newImbalance(imb);
-            }/* DISABLING UNTIL WE CAN CREATE STRUCTURES TO MANAGE THIS DATA WHILE ITS SENT
+                int time;
+                if (int.TryParse(q.bstrUpdateTime, out time))
+                {
+                    Imbalance imb = new ImbalanceImpl(q.bstrSymbol, GetExPretty(q.bstrExch), q.nImbalance, time, 0, 0, q.nMktImbalance);
+                    tl.newImbalance(imb);
+                }
+            }
             else if (q.nMdxMsgType == 3)
             {
                 if (VerboseDebugging)
@@ -874,7 +890,14 @@ namespace SterServer
                     + "  Received Halt/Delay for: " + q.bstrSymbol
                     + "  Status: " + q.bstrHaltResumeStatus
                     + "  Reason: " + q.bstrHaltResumeReason);
-                tl.TLSend("HaltResume;" + q.bstrSymbol + ";" + q.bstrHaltResumeStatus + ";" + q.bstrHaltResumeReason, MessageTypes.HALTRESUME, tl.ClientName(0));
+
+                int time;
+                if (int.TryParse(q.bstrUpdateTime, out time))
+                {
+                    HaltResume h = new HaltResumeImpl(q.bstrSymbol, GetExPretty(q.bstrExch), time, q.bstrHaltResumeStatus, q.bstrHaltResumeReason);
+                    for (int clientNumber = 0; clientNumber < tl.NumClients; clientNumber++)
+                        tl.TLSend(HaltResumeImpl.Serialize(h), MessageTypes.HALTRESUME, clientNumber);
+                }
             }
             else if (q.nMdxMsgType == 4)
             {
@@ -884,8 +907,15 @@ namespace SterServer
                     + "  ValidIndicators: " + q.bValidIndicators
                     + "  IndicatorHigh: " + q.fIndicatorHigh
                     + "  IndicatorLow: " + q.fIndicatorLow);
-                tl.TLSend("Indication;" + q.bstrSymbol + ";" + q.fIndicatorHigh + ";" + q.fIndicatorLow, MessageTypes.INDICATION, tl.ClientName(0));
-            }*/
+
+                int time;
+                if (int.TryParse(q.bstrUpdateTime, out time))
+                {
+                    Indication ind = new IndicationImpl(q.bstrSymbol, GetExPretty(q.bstrExch), time, q.bValidIndicators, (decimal)q.fIndicatorHigh, (decimal)q.fIndicatorLow);
+                    for (int clientNumber = 0; clientNumber < tl.NumClients; clientNumber++)
+                        tl.TLSend(IndicationImpl.Serialize(ind), MessageTypes.INDICATION, clientNumber);
+                }
+            }
         }
 
         void stiQuote_OnSTIQuoteUpdate(ref structSTIQuoteUpdate q)

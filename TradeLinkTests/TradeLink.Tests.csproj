@@ -84,20 +84,23 @@
   <ItemGroup>
     <Reference Include="nunit-console-runner, Version=2.4.7.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\InstallSuite\nunit-console-runner.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\NUnit 2.5.7\bin\net-2.0\lib\nunit-console-runner.dll</HintPath>
     </Reference>
     <Reference Include="nunit.core, Version=2.4.7.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\InstallSuite\nunit.core.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\NUnit 2.5.7\bin\net-2.0\lib\nunit.core.dll</HintPath>
     </Reference>
     <Reference Include="nunit.core.interfaces, Version=2.4.7.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\InstallSuite\nunit.core.interfaces.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\NUnit 2.5.7\bin\net-2.0\lib\nunit.core.interfaces.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework, Version=2.4.7.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
+    <Reference Include="nunit.framework, Version=2.4.7.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Documents\Visual Studio 2008\Projects\simtest\dll\nunit.framework.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.util, Version=2.4.7.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\InstallSuite\nunit.util.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\NUnit 2.5.7\bin\net-2.0\lib\nunit.util.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -105,8 +108,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TestMessage.cs" />
+    <Compile Include="TestIndicationHaltResume.cs" />
     <Compile Include="TestMessageTracker.cs" />
+    <Compile Include="TestMessage.cs" />
     <Compile Include="TestMultiSim.cs" />
     <Compile Include="TestPapertradeTracker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -137,7 +141,6 @@
     <Compile Include="TestCalc.cs" />
     <Compile Include="TestBroker.cs" />
     <Compile Include="TesteSigTick.cs" />
-    <Compile Include="TestHistSim.cs" />
     <Compile Include="TestBasket.cs" />
     <Compile Include="TestOrder.cs" />
     <Compile Include="TestPosition.cs" />
