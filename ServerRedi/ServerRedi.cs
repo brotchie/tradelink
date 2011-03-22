@@ -135,13 +135,17 @@ namespace ServerRedi
 
                     if (o.Account == string.Empty)
                         o.Account = Account;
+                    // get any current position in symbol
+                    Position p = pt[o.symbol];
+                    // determine if a sell order should be a long exit or a short entry
+                    string side = !o.side && !p.isLong ? "Short" : (o.side ? "Buy" : "Sell");   
 
                     rediOrder.Account = o.Account;
                     rediOrder.UserID = _userid;
                     rediOrder.Password = _pwd;
                     
                     rediOrder.TIF = o.TIF;
-                    rediOrder.Side = o.side ? "Buy" : "Sell";             
+                    rediOrder.Side = side;
                     rediOrder.Symbol = o.symbol;
                     if (o.ex == string.Empty)
                         o.ex = o.symbol.Length > 3 ? "ARCA" : "NYSE";
@@ -220,6 +224,10 @@ namespace ServerRedi
                                     o.side = true;
                                 }
                                 else if (cv.ToString() == "SELL")
+                                {
+                                    o.side = false;
+                                }
+                                else if (cv.ToString().Contains("SHORT"))
                                 {
                                     o.side = false;
                                 }
@@ -315,6 +323,10 @@ namespace ServerRedi
                                             f.side = true;
                                         }
                                         else if (cv.ToString() == "SELL")
+                                        {
+                                            f.side = false;
+                                        }
+                                        else if (cv.ToString().Contains("SHORT"))
                                         {
                                             f.side = false;
                                         }
