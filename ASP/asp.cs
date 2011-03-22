@@ -493,8 +493,13 @@ namespace ASP
 
         private void _skins_SelectedIndexChanged(object sender, EventArgs e)
         {
-            // user has selected a new skin
+            // check for bad selections
+            if (_skins == null)
+                return;
+            if (_skins.SelectedItem == null)
+                return;
 
+            // user has selected a new skin
             // get the name
             string skin = _skins.SelectedItem.ToString();
             //confirm loading
