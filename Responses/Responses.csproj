@@ -84,6 +84,7 @@
     <Compile Include="LessonParamPrompt.cs" />
     <Compile Include="LessonTradingRules.cs" />
     <Compile Include="LimitCancel.cs" />
+    <Compile Include="MOCOrder_ResponseTest.cs" />
     <Compile Include="OpenAsymetry.cs" />
     <Compile Include="AlwaysEnter.cs" />
     <Compile Include="BigTradeUI.cs">

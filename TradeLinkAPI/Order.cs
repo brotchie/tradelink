@@ -16,6 +16,10 @@ namespace TradeLink.API
         /// </summary>
         string TIF { get; set; }
         /// <summary>
+        /// valid time in force
+        /// </summary>
+        TIFTypes TIFValid { get; set; }
+        /// <summary>
         /// true if buy, otherwise sell
         /// </summary>
         bool side { get; set; }

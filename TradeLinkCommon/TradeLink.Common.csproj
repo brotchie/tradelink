@@ -97,6 +97,7 @@
     <Compile Include="Calc.cs" />
     <Compile Include="Broker.cs" />
     <Compile Include="IndicationHaltResumeImpl.cs" />
+    <Compile Include="MarketOnCloseOrder.cs" />
     <Compile Include="OnceTracker.cs" />
     <Compile Include="PresentlyTickingTracker.cs" />
     <Compile Include="DebugImpl.cs" />

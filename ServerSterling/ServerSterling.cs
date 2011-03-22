@@ -395,6 +395,7 @@ namespace SterServer
             f.Add(MessageTypes.SENDORDERLIMIT);
             f.Add(MessageTypes.SENDORDERTRAIL);
             f.Add(MessageTypes.SENDORDERPEGMIDPOINT);
+            f.Add(MessageTypes.SENDORDERMARKETONCLOSE);
             return f.ToArray();
         }
 
@@ -512,7 +513,7 @@ namespace SterServer
                         string acct = Account != string.Empty ? Account : string.Empty;
                         order.Account = o.Account != string.Empty ? o.Account : acct;
                         order.Destination = o.Exchange != "" ? o.ex : "NYSE";
-                        bool close = o.TIF == "CLS";
+                        bool close = o.TIFValid == TIFTypes.MOC;
                         order.Tif = tif2tif(o.TIF);
                         if (close)
                         {
@@ -661,9 +662,9 @@ namespace SterServer
             {
                 return "O";
             }
-            if (incoming == "CLS")
+            if (incoming == "MOC")
             {
-                return string.Empty;
+                return "D";
             }
             if (incoming == string.Empty)
                 return "D";
