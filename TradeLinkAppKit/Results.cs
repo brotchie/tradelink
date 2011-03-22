@@ -346,6 +346,8 @@ namespace TradeLink.AppKit
 
         }
 
+        public string ResultsId = string.Empty;
+
         bool _persymbol = true;
         bool ShowPerSymbolStats { get { return _persymbol; } set { _persymbol = value; } }
         /// <summary>
