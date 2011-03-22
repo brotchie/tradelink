@@ -170,6 +170,7 @@ namespace TradeLink.AppKit
                 PositionTracker pt = new PositionTracker(results.Count);
                 // setup new results
                 Results r = new Results();
+                r.ResultsDateTime = Util.ToTLDate() * 1000000 + Util.ToTLTime();
                 r.ComPerShare = CommissionPerContractShare;
                 r.RiskFreeRet = string.Format("{0:P2}", RiskFreeRate);
                 int consecWinners = 0;
@@ -366,6 +367,7 @@ namespace TradeLink.AppKit
 
         internal List<string> PerSymbolStats = new List<string>();
 
+        public long ResultsDateTime = 0;
         public string Symbols = "";
         public decimal GrossPL = 0;
         public string NetPL { get { return v2s(GrossPL - (HundredLots * 100 * ComPerShare)); } }
