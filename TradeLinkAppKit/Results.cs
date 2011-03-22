@@ -212,7 +212,7 @@ namespace TradeLink.AppKit
                     if (!r.Symbols.Contains(tr.Source.symbol))
                         r.Symbols += tr.Source.symbol + ",";
                     r.Trades++;
-                    r.HundredLots += (int)(tr.Source.xsize / 100);
+                    r.SharesTraded += Math.Abs(tr.Source.xsize);
                     r.GrossPL += tr.ClosedPL;
 
                     
@@ -389,7 +389,8 @@ namespace TradeLink.AppKit
         public decimal MaxLoss = 0;
         public decimal MaxOpenWin = 0;
         public decimal MaxOpenLoss = 0;
-        public int HundredLots = 0;
+        public int SharesTraded = 0;
+        public int HundredLots { get { return (int)Math.Round((double)SharesTraded / 100, 0); } }
         public int Trades = 0;
         public int SymbolCount = 0;
         public int DaysTraded = 0;
