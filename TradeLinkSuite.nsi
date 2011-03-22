@@ -78,6 +78,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\NxCore32.lnk" "$INSTDIR\ServerNxCore32.exe" "" "$INSTDIR\ServerNxCore32.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\NxCore64.lnk" "$INSTDIR\ServerNxCore64.exe" "" "$INSTDIR\ServerNxCore64.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\RealTick.lnk" "$INSTDIR\RealTickConnector.exe" "" "$INSTDIR\RealTickConnector.exe" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink Connectors\DAS.lnk" "$INSTDIR\ServerDAS.exe" "" "$INSTDIR\ServerDAS.exe" 0  
   
   
   ; install these files
@@ -121,6 +122,10 @@ Section "TradeLinkSuite"
   File "ServerGrayBox\bin\release\GBAPILibrary.dll"
   File "ServerGrayBox\bin\release\Interop.GBXCTRLLib.dll"
   File "ServerGrayBox\bin\release\Interop.GBQUOTESLib.dll"
+  
+  File "ServerDAS\bin\release\ServerDAS.exe"
+  File "ServerDAS\bin\release\daslibrary.dll"
+  File "ServerDAS\bin\release\Imass.EventPool.dll"
 
 
   File "ServerDBFX\bin\release\ServerDBFX.exe"
@@ -173,7 +178,7 @@ Section "TradeLinkSuite"
   File "ServerNxCore\bin\release\ServerNxCore32.exe.config"
   File "ServerNxCore64\bin\x64\release\ServerNxCore64.exe.config"
   File "ServerRedi\bin\release\ServerRedi.exe.config"
-
+	File "ServerDAS\bin\release\ServerDAS.exe.config"
   File "Kadina\bin\release\Kadina.exe.config"
   File "ServerSterling\bin\release\SterServer.exe.config"
   File "Replay\bin\release\Replay.exe.config"

@@ -38,5 +38,6 @@ namespace TradeLink.API
         GrayBox,
         Avatar,
         LightspeedColo,
+        DAS,
     }
 }

@@ -1,0 +1,33 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ServerDAS.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="TLClientAddress" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="sourceid" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="username" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="password" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="TLClientPort" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">50000</Value>
+    </Setting>
+    <Setting Name="QuoteserverAddress" Type="System.String" Scope="User">
+      <Value Profile="(Default)">206.252.196.251</Value>
+    </Setting>
+    <Setting Name="QuoteserverPort" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">9510</Value>
+    </Setting>
+    <Setting Name="OrderserverAddress" Type="System.String" Scope="User">
+      <Value Profile="(Default)">68.168.209.226</Value>
+    </Setting>
+    <Setting Name="OrderserverPort" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">7500</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

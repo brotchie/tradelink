@@ -193,6 +193,7 @@
         GrayBox,
         Avatar,
         LightspeedColo,
+	DAS,
 	};
 
 
