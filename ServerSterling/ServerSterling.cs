@@ -353,7 +353,7 @@ namespace SterServer
                     return (long)MessageTypes.OK;
             }
 
-            debug("Message type " + t.GetTypeCode().ToString() + ":" + msg + " was unsupported.");
+            debug("Message type " + t.ToString() + ":" + msg + " was unsupported.");
             return (long)MessageTypes.UNKNOWN_MESSAGE;
         }
 
