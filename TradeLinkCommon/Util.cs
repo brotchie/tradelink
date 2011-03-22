@@ -823,6 +823,9 @@ namespace TradeLink.Common
                 case Providers.Sterling:
                     err = Enum.GetName(typeof(SterlingSubmitOrderError), errorcode);
                     break;
+                case Providers.LightspeedDesktop:
+                    err = Enum.GetName(typeof(LightspeedDesktopSendOrderMsg), errorcode);
+                    break;
             }
             if ((err != null) && (err != "") && (err != " ")) return err;
             return "UnknownError: " + errorcode.ToString();
@@ -1259,7 +1262,39 @@ namespace TradeLink.Common
     }
 
 
-
+    enum LightspeedDesktopSendOrderMsg
+    {
+        ORDER_SENT_OK,
+        SOES_ORDER_DISABLED,
+        MM_IN_EXCLUSION_LIST,
+        ZERO_SHARES_ORDERED,
+        EXECUTIONS_DISABLED,
+        BUYING_POWER_EXCEEDED,
+        SHORT_SELL_VIOLATION,
+        STOCK_NOT_SHORTABLE,
+        EXECUTOR_NOT_CONNECTED,
+        MAXORDERSHARES_EXCEEDED,
+        WAIT_CONSTRAINT_VIOLATION,
+        STOCK_HALTED,
+        MKXT_BOOK_OR_KILL,
+        SMALL_CAPS_NOT_SOESABLE,
+        OWN_CROSSING,
+        CANNOT_TRADE_SYMBOL,
+        CANNOT_TRADE_BULLETS_AFTER_MARKET,
+        MAXBULLETS_EXCEEDED,
+        MARKET_HALTED,
+        FUTURES_MARGINABILITY_UNKNOWN,
+        NO_EXEMPT_ORDERS,
+        TRADINGMONITOR_BLOCKED_ORDER,
+        DECLINED_AT_CONFIRM_BY_USER,
+        SUPERVISOR_CREATED_NO_ORDERS,
+        ROUTING_BLOCKED_ORDER,
+        OTHER_REJECTION,
+        EXECUTOR_NOT_LOGGED_IN,
+        UNINITIALIZED_SUMMARY,
+        INVALID_SUMMARY,
+        INVALID_ORDER_TYPE
+    }
  
 
     enum AnvilSendOrderError
