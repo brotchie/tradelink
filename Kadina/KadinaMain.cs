@@ -511,7 +511,16 @@ namespace Kadina
             ig.ContextMenuStrip.Items.Add("Create Ticket", null,new EventHandler(getindicatorrows));
             // load new ones
             for (int i = 0; i < myres.Indicators.Length; i++)
-                it.Columns.Add(myres.Indicators[i]);
+            {
+                try
+                {
+                    it.Columns.Add(myres.Indicators[i]);
+                }
+                catch (DuplicateNameException)
+                {
+                    debug("You have duplicate column name: " + myres.Indicators[i] + " defined in your response.  Please remove this and try again.");
+                }
+            }
             // refresh screen
                 ig.Invalidate();
         }
