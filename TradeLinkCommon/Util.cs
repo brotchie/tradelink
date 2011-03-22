@@ -915,8 +915,14 @@ namespace TradeLink.Common
             }
             catch (Exception ex)
             {
+                string inner = string.Empty;
+                try
+                {
+                    inner = (ex.InnerException == null) ? string.Empty : " inner err: " + ex.InnerException.Message + ex.InnerException.StackTrace;
+                }
+                catch { }
                 if (deb != null)
-                    deb("Error dumping: "+o.ToString()+" "+ex.Message + ex.StackTrace);
+                    deb("Error dumping: "+o.ToString()+" "+ex.Message + ex.StackTrace+inner);
             }
             return string.Empty;
         }
@@ -975,8 +981,14 @@ namespace TradeLink.Common
             {
                 if (debug != null)
                 {
+                    string inner = string.Empty;
+                    try
+                    {
+                        inner = (ex.InnerException == null) ? string.Empty : " inner err: " + ex.InnerException.Message + ex.InnerException.StackTrace;
+                    }
+                    catch { }
                     debug("unable to save " + TradeLink.Common.Util.DumpObjectProperties(o));
-                    debug(ex.Message + ex.StackTrace);
+                    debug(ex.Message + ex.StackTrace+inner);
                 }
             }
             return string.Empty;
@@ -1022,8 +1034,14 @@ namespace TradeLink.Common
             {
                 if (debug != null)
                 {
+                    string inner = string.Empty;
+                    try
+                    {
+                        inner = (ex.InnerException == null) ? string.Empty : " inner err: " + ex.InnerException.Message + ex.InnerException.StackTrace;
+                    }
+                    catch { }
                     debug("UNABLE TO read: " + msg);
-                    debug(ex.Message + ex.StackTrace);
+                    debug(ex.Message + ex.StackTrace+inner);
                 }
             }
             return default(T);
