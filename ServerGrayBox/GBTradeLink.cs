@@ -117,7 +117,7 @@ namespace TradeLinkTest
 
         private void UpdateLoginDetails()
         {
-            if (GB.GetGrayboxPath() != null)
+            if ((GB!=null) && (GB.GetGrayboxPath() != null))
             {
                 
                 txt_GBLoginName.Text = GB.GetLastUserID();
