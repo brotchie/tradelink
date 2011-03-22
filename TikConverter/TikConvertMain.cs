@@ -284,7 +284,7 @@ namespace TikConverter
                             k = eSigTick.FromStream(_sym, infile);
                             break;
                         case Converter.TradeStation:
-                            k = TradeStation.parseline(infile.ReadLine(), _sym, tradesize);
+                            k = TradeStation.parseline(infile.ReadLine(), sym, tradesize);
                             break;
                         case Converter.TradingPhysicsTnS:
                             k = TradingPhysicsTnS.parseline(infile.ReadLine(), _sym, _date);
