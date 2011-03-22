@@ -13,6 +13,10 @@ namespace TradeLink.Common
     public class Broker
     {
         /// <summary>
+        /// occurs when [got order cancel], response compatible
+        /// </summary>
+        public event LongDelegate GotOrderCancelEvent;
+        /// <summary>
         /// Occurs when [got order cancel].
         /// </summary>
         public event OrderCancelDelegate GotOrderCancel;
@@ -202,6 +206,8 @@ namespace TradeLink.Common
                 {
                     if ((GotOrderCancel != null) && a.Notify)
                         GotOrderCancel(orderlist[i].symbol, orderlist[i].side,orderid); //send cancel notifcation to any subscribers
+                    if ((GotOrderCancelEvent != null) && a.Notify)
+                        GotOrderCancelEvent(orderid);
                     cancelidx = i;
                 }
             if (cancelidx == -1) return false;
@@ -376,8 +382,12 @@ namespace TradeLink.Common
             for (int i = 0; i < orders.Count; i++)
             {
                 Order o = orders[i];
+                //send cancel notifcation to any subscribers
                 if ((GotOrderCancel != null) && a.Notify)
-                    GotOrderCancel(o.symbol, o.side, o.id); //send cancel notifcation to any subscribers
+                    GotOrderCancel(o.symbol, o.side, o.id);
+                if ((GotOrderCancelEvent != null) && a.Notify)
+                    GotOrderCancelEvent(o.id); 
+
             }
             MasterOrders[a].Clear();  // clear the account
         }
