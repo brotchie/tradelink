@@ -106,7 +106,7 @@
     <Compile Include="GenericTracker.cs" />
     <Compile Include="GZip.cs" />
     <Compile Include="HighLowTracker.cs" />
-    <Compile Include="HistSimImpl.cs">
+    <Compile Include="MultiSimImpl.cs">
     </Compile>
     <Compile Include="IdTracker.cs" />
     <Compile Include="ImbalanceImpl.cs" />
@@ -127,6 +127,7 @@
     <Compile Include="PositionTracker.cs" />
     <Compile Include="ResponseTemplate.cs" />
     <Compile Include="RingBuffer.cs" />
+    <Compile Include="SingleSimImpl.cs" />
     <Compile Include="SkinImpl.cs" />
     <Compile Include="StopLimit.cs" />
     <Compile Include="ThroughputTracker.cs" />

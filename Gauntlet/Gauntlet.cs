@@ -14,7 +14,7 @@ namespace WinGauntlet
     {
 
 
-        HistSimImpl h;
+        MultiSimImpl h;
         BackgroundWorker bw = new BackgroundWorker();
         BackgroundWorker getsymwork = new BackgroundWorker();
         static GauntArgs args = new GauntArgs();
@@ -142,7 +142,7 @@ namespace WinGauntlet
             debug("Run started: " + ga.Name);
             status("Started: " + ga.ResponseName);
             // prepare simulator
-            h = new HistSimImpl(ga.Folder,ga.Filter);
+            h = new MultiSimImpl(ga.Folder,ga.Filter);
             h.GotDebug += new DebugDelegate(h_GotDebug);
             h.CacheWait = 1000;
             h.Initialize();
@@ -525,7 +525,7 @@ namespace WinGauntlet
             public string Name;
             public int TicksProcessed = 0;
             public int Executions = 0;
-            public long PlayTo = HistSimImpl.ENDSIM;
+            public long PlayTo = MultiSimImpl.ENDSIM;
             public DateTime Started = DateTime.MaxValue;
             public DateTime Stopped = DateTime.MaxValue;
             public double Seconds { get { return Stopped.Subtract(Started).TotalSeconds; } }

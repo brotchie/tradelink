@@ -44,7 +44,7 @@ namespace Kadina
 
         BackgroundWorker bw = new BackgroundWorker();
         BackgroundWorker bw2 = new BackgroundWorker();
-        HistSimImpl h = new HistSimImpl();
+        MultiSimImpl h = new MultiSimImpl();
         ChartControl c = new ChartControl();
 
         public kadinamain()
@@ -225,7 +225,7 @@ namespace Kadina
             switch (type)
             {
                 case PlayTo.End : 
-                    val = HistSimImpl.ENDSIM; 
+                    val = MultiSimImpl.ENDSIM; 
                     break;
                 case PlayTo.FiveMin : 
                 case PlayTo.OneMin:
@@ -758,7 +758,7 @@ namespace Kadina
 
          bool loadsim()
          {
-             h = new HistSimImpl(epffiles.ToArray());
+             h = new MultiSimImpl(epffiles.ToArray());
              h.SimBroker.GotOrder += new OrderDelegate(broker_GotOrder);
              h.SimBroker.GotFill += new FillDelegate(broker_GotFill);
              h.GotTick += new TickDelegate(h_GotTick);

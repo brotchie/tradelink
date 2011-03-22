@@ -9,8 +9,8 @@ namespace TradeLink.Common
     {
         TradeLink.API.Response _r;
         TickFileFilter _tff;
-        HistSimImpl _h;
-        public HistSimImpl Engine { get { return _h; } }
+        MultiSimImpl _h;
+        public MultiSimImpl Engine { get { return _h; } }
         public TradeLink.API.Response response { get { return _r; } }
         public GauntletEngine(TradeLink.API.Response r, TickFileFilter tff)
         {
@@ -18,7 +18,7 @@ namespace TradeLink.Common
             _r.SendOrderEvent += new OrderSourceDelegate(_r_SendOrder);
             _r.SendCancelEvent += new LongSourceDelegate(_r_SendCancel);
             _tff = tff;
-            _h = new HistSimImpl(_tff);
+            _h = new MultiSimImpl(_tff);
             _h.GotTick += new TickDelegate(_h_GotTick);
             _h.SimBroker.GotOrderCancel += new OrderCancelDelegate(SimBroker_GotOrderCancel);
             _h.SimBroker.GotOrder += new OrderDelegate(_r.GotOrder);
@@ -26,7 +26,7 @@ namespace TradeLink.Common
 
         }
 
-        public void Go() { _h.PlayTo(HistSimImpl.ENDSIM); }
+        public void Go() { _h.PlayTo(MultiSimImpl.ENDSIM); }
 
         void SimBroker_GotOrderCancel(string sym, bool side, long id)
         {

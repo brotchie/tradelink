@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using TradeLink.API;
+using TradeLink.Common;
 using System.ComponentModel;
 
 namespace TradeLink.Common
@@ -13,7 +14,7 @@ namespace TradeLink.Common
     /// also processes orders and executions against same tickfiles (via embedded Broker component).
     /// </summary>
     [System.ComponentModel.DesignerCategory("")]
-    public class HistSimImpl : HistSim
+    public class MultiSimImpl : HistSim
     {
         // working variables
         string _folder = Util.TLTickDir;
@@ -59,23 +60,23 @@ namespace TradeLink.Common
         /// <summary>
         /// Create a historical simulator using default tick folder and null filter
         /// </summary>
-        public HistSimImpl() : this(Util.TLTickDir, null) { }
+        public MultiSimImpl() : this(Util.TLTickDir, null) { }
         /// <summary>
         /// Create historical simulator with your own tick folder
         /// </summary>
         /// <param name="TickFolder"></param>
-        public HistSimImpl(string TickFolder) : this(TickFolder, null) { }
+        public MultiSimImpl(string TickFolder) : this(TickFolder, null) { }
         /// <summary>
         /// Create a historical simulator
         /// </summary>
         /// <param name="tff"></param>
-        public HistSimImpl(TickFileFilter tff) : this(Util.TLTickDir, tff) { }
+        public MultiSimImpl(TickFileFilter tff) : this(Util.TLTickDir, tff) { }
         /// <summary>
         /// Create a historical simulator
         /// </summary>
         /// <param name="TickFolder">tick folder to use</param>
         /// <param name="tff">filter to determine what tick files from folder to use</param>
-        public HistSimImpl(string TickFolder, TickFileFilter tff)
+        public MultiSimImpl(string TickFolder, TickFileFilter tff)
         {
             _folder = TickFolder;
             if (tff != null)
@@ -93,7 +94,7 @@ namespace TradeLink.Common
         /// Create a historical simulator
         /// </summary>
         /// <param name="filenames">list of tick files to use</param>
-        public HistSimImpl(string[] filenames)
+        public MultiSimImpl(string[] filenames)
         {
             _tickfiles = filenames;
         }
@@ -106,6 +107,9 @@ namespace TradeLink.Common
         /// </summary>
         public void Reset()
         {
+            orderok = true;
+            simstart = 0;
+            simend = 0;
             _inited = false;
             _tickfiles = new string[0];
             Workers.Clear();
@@ -115,6 +119,13 @@ namespace TradeLink.Common
             _availticks = 0;
             _tickcount = 0;
 
+        }
+
+        SecurityImpl getsec(int tickfileidx) { return getsec(_tickfiles[tickfileidx]); } 
+        SecurityImpl getsec(string file)
+        {
+            SecurityImpl s = SecurityImpl.FromTIK(file);
+            return s;
         }
 
         const string tickext = TikConst.WILDCARD_EXT;
@@ -132,9 +143,9 @@ namespace TradeLink.Common
             }
 
             // now we have our list, initialize instruments from files
-            foreach (string file in _tickfiles)
+            for (int i = 0; i<_tickfiles.Length; i++)
             {
-                SecurityImpl s = SecurityImpl.FromTIK(file);
+                SecurityImpl s = getsec(i);
                 if ((s!=null) && s.isValid && s.HistSource.isValid)
                     Workers.Add(new simworker(s));
             }
@@ -158,12 +169,31 @@ namespace TradeLink.Common
             // set first time as hint for user
             setnexttime();
         }
+
+        long simstart = 0;
+        long simend = 0;
+        TimeSpan runtime
+        {
+            get
+            {
+                DateTime start = new DateTime(simstart);
+                DateTime end = new DateTime(simend);
+                return end.Subtract(start);
+            }
+        }
+
+        public double RunTimeSec { get { return runtime.TotalSeconds; } }
+        public double RunTimeSecMs { get { return runtime.TotalMilliseconds; } }
+        public double RunTimeTicksPerSec { get { return _tickcount / RunTimeSec; } }
+        
         /// <summary>
         /// Run simulation to specific time
         /// </summary>
         /// <param name="time">Simulation will run until this time (use HistSim.ENDSIM for last time)</param>
         public void PlayTo(long ftime)
         {
+            simstart = DateTime.Now.Ticks;
+            orderok = true;
             if (!_inited)
                 Initialize();
             if (_inited)
@@ -212,7 +242,11 @@ namespace TradeLink.Common
 
             // set next tick time as hint to user
             setnexttime();
+            // mark end of simulation
+            simend = DateTime.Now.Ticks;
         }
+
+        
 
         int _cachepause = 10;
         /// <summary>
@@ -227,10 +261,36 @@ namespace TradeLink.Common
             // start all the workers not running
             // have them read 'readahead' ticks in advance
             for (int i = 0; i < Workers.Count; i++)
-                if (!Workers[i].IsBusy)
-                    Workers[i].RunWorkerAsync(readahead);
+            {
+                // for some reason background worker is slow exiting, recreate
+                if (Workers[i].IsBusy)
+                {
+                    v(Workers[i].workersec.HistSource.Symbol + " worker#" + i + " is busy, waiting till free...");
+                    // retry
+                    while (Workers[i].isWorking)
+                    {
+                        System.Threading.Thread.Sleep(10);
+                    }
+                    System.Threading.Thread.Sleep(10);
+                }
+                Workers[i].RunWorkerAsync(readahead);
+                v(Workers[i].workersec.HistSource.Symbol + " worker#" + i + " is working.");
+
+            }
 
         }
+
+
+        long lasttime = long.MinValue;
+        bool orderok = true;
+
+
+        void v(string msg)
+        {
+            D(lasttime + " " + msg);
+        }
+
+        public bool isTickPlaybackOrdered { get { return orderok; } }
 
         void FlushCache(long endsim)
         {
@@ -248,12 +308,30 @@ namespace TradeLink.Common
                 while ((nextidx<times.Length) && (times[nextidx] == -1))
                     nextidx++;
                 // test to see if ticks left in simulation
-                simrunning = (nextidx<times.Length) && (times[nextidx]<=endsim);
+                bool ticksleft = (nextidx<times.Length);
+                bool simtimeleft = ticksleft && (times[nextidx]<=endsim);
+                simrunning = ticksleft && simtimeleft;
                 // if no ticks left or we exceeded simulation time, quit
-                if (!simrunning) 
+                if (!simrunning)
+                {
+                    if (!ticksleft)
+                        v("No ticks left.");
+                    if (!simtimeleft)
+                        v("Hit end of simulation.");
+
                     break;
+                }
                 // get next tick
                 Tick k = Workers[cidx[nextidx]].NextTick();
+                // time check
+                orderok &= k.datetime >= lasttime;
+                if (orderok != lastorderok)
+                {
+                    v("tick out of order: " + k.symbol + " w/" + k.datetime + " behind: " + lasttime);
+                    lastorderok = orderok;
+                }
+                // update time
+                lasttime = k.datetime;
                 // process pending orders
                 _executions += SimBroker.Execute(k);
                 // notify tick
@@ -261,7 +339,10 @@ namespace TradeLink.Common
                 // count tick
                 _tickcount++;
             }
+            v("simulating exiting.");
         }
+
+        bool lastorderok = true;
 
         void FillCacheSingleCore(int readhead)
         {
@@ -315,7 +396,7 @@ namespace TradeLink.Common
             while ((i<times.Length) && (times[i] == COMPLETED))
                 i++;
             // set next time to first available time, or end of simulation if none available
-            _nextticktime = i==times.Length ? HistSimImpl.ENDSIM : times[i];
+            _nextticktime = i==times.Length ? MultiSimImpl.ENDSIM : times[i];
         }
 
 
@@ -330,7 +411,12 @@ namespace TradeLink.Common
                 while (!Workers[i].hasTicks)
                 {
                     // or the worker is done reading tick stream
-                    if (!Workers[i].isWorking) break;
+                    if (!Workers[i].isWorking)
+                    {
+                        if (Workers[i].isWorkingChange)
+                            v(Workers[i].workersec.Name + " worker#" + i + " stopped working.");
+                        break;
+                    }
                     // if we're not done, wait for the I/O thread to catch up
                     System.Threading.Thread.Sleep(YIELDTIME);
                 }
@@ -356,6 +442,9 @@ namespace TradeLink.Common
         volatile int readcount = 0;
         public bool isWorking = false;
 
+        bool lastworking = false;
+        public bool isWorkingChange { get { bool r = lastworking != isWorking; lastworking = isWorking; return r; } }
+
         public bool hasTicks { get { lock (Ticks) { return (Ticks.Count > 0); } } }
         public Tick NextTick() { lock (Ticks) { return Ticks.Dequeue(); } } 
         public long NextTime() { return Ticks.Peek().datetime; }
@@ -375,6 +464,7 @@ namespace TradeLink.Common
             {
                 workersec.HistSource.gotTick += new TickDelegate(HistSource_gotTick);
             }
+
  
         }
 
@@ -397,6 +487,7 @@ namespace TradeLink.Common
         public void SingleCoreFillCache(int readahead)
         {
             isWorking = true;
+            lastworking = true;
             readcount = 0;
             while (!CancellationPending && workersec.HistSource.NextTick()
                 && (readcount++ < readahead)) ;
@@ -411,12 +502,15 @@ namespace TradeLink.Common
             readcount = 0;
             // mark as done
             isWorking = false;
+            Dispose();
         }
+
 
         // fill cache for multi-core
         void simworker_DoWork(object sender, DoWorkEventArgs e)
         {
             isWorking = true;
+            lastworking = true;
             int readahead = (int)e.Argument;
             // while simulation hasn't been canceled, we still have historical ticks to read and we haven't read too many, cache a tick
             while ((!e.Cancel && workersec.NextTick()

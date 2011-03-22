@@ -8,9 +8,9 @@ namespace Replay
 {
     public class Playback : BackgroundWorker
     {
-        private HistSimImpl h = null;
+        private MultiSimImpl h = null;
 
-        public Playback(HistSimImpl simulator) 
+        public Playback(MultiSimImpl simulator) 
         { 
             h = simulator;
             WorkerSupportsCancellation = true;
@@ -52,7 +52,7 @@ namespace Replay
                 }
                 
             }
-            while (h.NextTickTime != HistSimImpl.ENDSIM);
+            while (h.NextTickTime != MultiSimImpl.ENDSIM);
             // reset last progress
             lastprogress = 0;
             base.OnDoWork(e);
