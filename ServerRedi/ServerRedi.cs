@@ -330,6 +330,8 @@ namespace ServerRedi
                                         {
                                             f.side = false;
                                         }
+                                        else
+                                            v("invalid fill side: " + cv.ToString());
                                     }
                                     long now = Util.ToTLDate(DateTime.Now);
                                     int xsec = (int)(now % 100);
