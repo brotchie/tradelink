@@ -438,7 +438,7 @@
 			{
 				L_MsgOrderChange* m = (L_MsgOrderChange*)msg;
 				const L_Execution* x = m->L_Exec();
-				long lsid = m->L_OrderId();
+				long lsid = m->L_ReferenceId();
 				// test if this is an execution or an order
 				// no execution, must be an order
 				if (x==NULL)
@@ -454,7 +454,7 @@
 							if (accounts.size()>0)
 							{
 								// get order
-								L_Order* order = accounts[0]->L_FindOrderByOrderId(lsid);
+								L_Order* order = accounts[0]->L_FindOrder(lsid);
 								// ensure it exists
 								if (order)
 								{
