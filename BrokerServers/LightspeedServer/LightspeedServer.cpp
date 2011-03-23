@@ -104,6 +104,9 @@ LSEXPORT void LSInitInstance()
 	}
 			
 	frame->Start();
+	CString tmp;
+	tmp.Format("TradeLink LightspeedConnector %s",frame->Version());
+	frame->D(tmp);
 }
 LSEXPORT void LSExitInstance()
 {

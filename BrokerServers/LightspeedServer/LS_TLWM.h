@@ -32,17 +32,19 @@ using namespace TradeLibFast;
 	virtual void HandleMessage(L_Message const *msg);
 
 	protected:
+		void v(const CString &msg);
+		bool _noverb;
+		bool saveOrderId(int64 tlid, long lsid);
 		void ReadConfig();
-		bool _proactive;
+		bool _imbexch;
+		long _date;
 		TLOrder ProcessOrder(L_Order* order);
 		void SrvGotImbAsync(TLImbalance imb);
-		//double GetDouble(const Money* m);
-		//double GetDouble(Money m);
-		//Money  Double2Money(double val);
 		static LS_TLWM* instance;
 		vector <L_Summary*> subs;
 		vector<CString> subsym;
 		vector<L_Order*> ordercache;
+		vector<long> lsids;
 		L_Summary* preload(CString symbol);
 
 		int BrokerName(void);

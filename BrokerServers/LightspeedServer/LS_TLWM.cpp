@@ -9,20 +9,40 @@
 	
 	LS_TLWM* LS_TLWM::instance = NULL;	
 
-	const char* CONFIGFILE = "LightSpeed.Config.txt";
+	const char* CONFIGFILE = "LightSpeedServer.Config.txt";
 	void LS_TLWM::ReadConfig()
 	{
-		return;
+		// read config file
 		std::ifstream file;
 		file.open(CONFIGFILE);
+		// prepare buffers
 		int sessionid = 0;
 		const int ss = 200;
 		char skip[ss];
 		const int ds = 20;
 		char data[ds];
+		// skip comment
 		file.getline(skip,ss);
+		// read data
 		file.getline(data,ds);
+		// convert it (imbalance exchanges)
+		_imbexch = atoi(data) == 1;
+		// skip comment
+		file.getline(skip,ss);
+		// read data
+		file.getline(data,ds);
+		// convert it (verbose)
+		_noverb = atoi(data) == 0;
+
+		// close config file
 		file.close();
+	}
+
+	void LS_TLWM::v(const CString &message)
+	{
+		if (_noverb)
+			return;
+		D(message);
 	}
 
 	void LS_TLWM::D(const CString &message)
@@ -53,7 +73,9 @@
 		account->L_Attach(this);
 		accounts.push_back(account);
 
-		
+		std::vector<int> now;
+		TLTimeNow(now);
+		_date = now[TLdate];
 
 		depth = 0;
 
@@ -103,6 +125,7 @@
 		{
 			if (subs[i]!=NULL)
 			{
+				L_UnsubscribeFromTrades(subs[i]->L_Symbol(),this);
 				subs[i]->L_Detach(this);
 				L_DestroySummary(subs[i]);
 				subs[i] = NULL;
@@ -200,8 +223,9 @@
 			break;
 
 		
+		
+		}
 		return UNKNOWN_MESSAGE;
-	}
 	}
 
 
@@ -253,6 +277,10 @@
 	{
 		if (accounts.size()==0)
 			return INVALID_ACCOUNT;
+		// if order id is set and not-unique, reject order
+		if ((o.id!=0) && (!IdIsUnique(o.id)))
+			return DUPLICATE_ORDERID;
+
 		L_Summary* summary = preload(o.symbol);
 		L_Account* account = NULL;
 		for (uint i = 0; i<accounts.size(); i++)
@@ -263,9 +291,16 @@
 		if (account==NULL)
 			account = accounts[0];
 		
-			char side = o.side ? L_Side::BUY : L_Side::SELL;
-		long type = o.isStop() ? L_OrderType::STOP : ( o.isLimit() ? L_OrderType::LIMIT : L_OrderType::MARKET);
+		//convert the arguments
+		char side = o.side ? L_Side::BUY : L_Side::SELL;
+		long type = o.isStop() ? L_OrderType::STOP : 
+			( o.isLimit() ? L_OrderType::LIMIT : L_OrderType::MARKET);
 		double price = o.isStop() ? o.stop : o.price;
+
+		// prepare to receive the result
+		L_Order** orderSent = NULL;
+		L_Order** orderSent2 = NULL;
+		// send the order
 		uint error = 
 		account->L_SendOrderSync(
 				summary,
@@ -274,151 +309,16 @@
 				100,
 				price,
 				o.exchange,
-				L_TIF::DAY
+				L_TIF::DAY,
+				false,
+				abs(o.size),
+				0,
+				orderSent,
+				orderSent2
 				);
-		L_AddMessageToExtensionWnd(o.Serialize());
-		/*
-		const StockBase* Stock = preload(o.symbol);
-
-		Observable* m_account;
-		// if order id is set and not-unique, reject order
-		if ((o.id!=0) && (!IdIsUnique(o.id)))
-			return DUPLICATE_ORDERID;
-
-		// get account for this order
-		if (o.account=="")
-			m_account = B_GetCurrentAccount();
-		else 
-			m_account = B_GetAccount(o.account.GetBuffer());
-		// ensure we have an exchange
-		if (o.exchange=="")
-			o.exchange = o.symbol.GetLength()>3 ? "NSDQ" : "NYSE";
 		
-
-
-		//convert the arguments
-		Order* orderSent;
-		char side = (o.side) ? 'B' : 'S';
-		const Money pricem = Double2Money(o.price);
-		const Money stopm = Double2Money(o.stop);
-		const Money trailm = Double2Money(o.trail);
-		unsigned int mytif = TIFId(o.TIF);
-
-		if (Stock==NULL)
-			return UNKNOWN_SYMBOL;
-		if (!Stock->isLoaded())
-			return SYMBOL_NOT_LOADED;
-
-
-		uint size = abs(o.size);
-
-		// anvil has seperate call for trailing stop orders
-		if (!o.isTrail() && (o.isLimit() || o.isMarket()))
-		{
-
-		// send the order (next line is from SendOrderDlg.cpp)
-		error = B_SendOrder(Stock,
-				side,
-				o.exchange,
-				size,
-				OVM_VISIBLE, //visability mode
-				size, //visable size
-				pricem,//const Money& price,0 for Market
-				&stopm,//const Money* stopPrice,
-				NULL,//const Money* discrtetionaryPrice,
-				mytif,
-				_proactive,//bool proactive,
-				true,//bool principalOrAgency, //principal - true, agency - false
-				SUMO_ALG_UNKNOWN,//char superMontageAlgorithm,
-				OS_RESIZE,
-				//false,//bool delayShortTillUptick,
-				DE_DEFAULT, //destination exchange
-				&orderSent,
-				m_account,
-				0,
-				false,
-				101, o.comment);	
-
-		}
-		else if (o.isStop())
-		{
-			Money insideMarketQuote;
-			if (B_GetSafeInsidePrice(Stock,o.side,!o.side,false,insideMarketQuote))
-			{
-				Money stopPriceOffset;
-				if (o.side) stopPriceOffset = stopm - insideMarketQuote;
-				else stopPriceOffset = insideMarketQuote - stopm;
-				Observable* stopOrder = B_SendSmartStopOrder(Stock,
-					side,
-					size,
-					NULL,//const Money* priceOffset,//NULL for Stop Market
-					stopPriceOffset,
-					true, // price 2 decimal places
-					true,//bool ecnsOnlyBeforeAfterMarket,
-					false,//bool mmsBasedForNyse,
-					TIF_DAY,//unsigned int stopTimeInForce,
-					TIFId(o.TIF),//unsigned int timeInForceAfterStopReached,
-					"ISLD",
-					NULL,//const char* redirection,
-					false,//bool proactive,
-					true,//bool principalOrAgency, //principal - true, agency - false
-					SUMO_ALG_UNKNOWN,//char superMontageAlgorithm,
-					OS_RESIZE,
-		//            false,//bool delayShortTillUptick,
-					DE_DEFAULT,//unsigned int destinationExchange,
-					TT_PRICE,//StopTriggerType triggerType,
-					false, // is trailing
-					0,
-					o.comment,
-					NULL,//const char* regionalProactiveDestination,
-					STPT_ALL,
-					Money(0, 200),
-					false,
-					&orderSent,
-					m_account);
-				if(!stopOrder)
-					error = SO_INCORRECT_PRICE;
-			}
-			else
-				error = SO_INCORRECT_PRICE;
-
-		}
-		else if (o.isTrail())
-		{
-			Observable* stopOrder = B_SendSmartStopOrder(Stock,
-				side,
-				size,
-				NULL,//const Money* priceOffset,//NULL for Stop Market
-				trailm,//trail by this amount
-				true, // price 2 decimal places
-				true,//bool ecnsOnlyBeforeAfterMarket,
-				false,//bool mmsBasedForNyse,
-				TIF_DAY,//unsigned int stopTimeInForce,
-				TIFId(o.TIF),//unsigned int timeInForceAfterStopReached,
-				"ISLD", //post quote dest
-				NULL,//const char* redirection,
-				false,//bool proactive,
-				true,//bool principalOrAgency, //principal - true, agency - false
-				SUMO_ALG_UNKNOWN,//char superMontageAlgorithm,
-				OS_RESIZE,
-				DE_DEFAULT,//unsigned int destinationExchange,
-				TT_PRICE,//StopTriggerType triggerType,
-				true, // is trailing
-				0,
-				o.comment,
-				NULL,//const char* regionalProactiveDestination,
-				STPT_ALL,
-				Money(0, 200),
-				false,
-				&orderSent,
-				m_account);
-			if(!stopOrder)
-			{
-				error = SO_INCORRECT_PRICE;
-			}
-		}
 		// make sure order sent is valid order
-		if (orderSent==NULL)
+		if ((orderSent==NULL) && (orderSent2==NULL))
 		{
 			if (error==0) // if no error, return empty order
 				error = EMPTY_ORDER;
@@ -428,15 +328,16 @@
 			// save order if it was accepted
 			if (error==0)
 			{
-				if (saveOrder(orderSent,o.id,true))
+				if (saveOrder(*orderSent,o.id,true))
 					error = OK;
 				else 
 					error = UNKNOWN_ERROR;
 			}
 		}
-		*/
+		
 		// return result
 		return error;
+		
 	}
 
 
@@ -471,6 +372,24 @@
 		return 0;
 	}
 
+	bool LS_TLWM::saveOrderId(int64 tlid, long lsid)
+	{
+		for (uint i = 0; i<orderids.size(); i++)
+		{
+			if (orderids[i]==tlid)
+			{
+				if (lsids[i]==0)
+				{
+					lsids[i] = lsid;
+					return true;
+				}
+				else
+					return false;
+			}
+		}
+		return false;
+	}
+
 	bool LS_TLWM::saveOrder(L_Order* o, int64 id) { return saveOrder(o,id,false); }
 	bool LS_TLWM::saveOrder(L_Order* o,int64 id, bool allowduplicates)
 	{
@@ -496,6 +415,8 @@
 		ordercache.push_back(o);
 		// save the id
 		orderids.push_back(id); 
+		// save spot for lsid
+		lsids.push_back(0);
 		// we added order and it's id
 		return true; 
 	}
@@ -517,7 +438,7 @@
 			{
 				L_MsgOrderChange* m = (L_MsgOrderChange*)msg;
 				const L_Execution* x = m->L_Exec();
-				long id = m->L_OrderId();
+				long lsid = m->L_OrderId();
 				// test if this is an execution or an order
 				// no execution, must be an order
 				if (x==NULL)
@@ -529,16 +450,87 @@
 						{
 							TLOrder o;
 							o.symbol = CString(msg->L_Symbol());
-							o.id = id;
-							SrvGotOrder(o);
+							// ensure we have an account
+							if (accounts.size()>0)
+							{
+								// get order
+								L_Order* order = accounts[0]->L_FindOrderByOrderId(lsid);
+								// ensure it exists
+								if (order)
+								{
+									// udpate order information
+									CTime ct = CTime(order->L_CreateTime());
+									o.time = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
+									o.date = (ct.GetYear()*10000)+(ct.GetMonth()*100)+ct.GetDay();
+									o.exchange = CString(order->L_OriginalMarket());
+									o.price = order->L_AveragePrice();
+									o.side = order->L_TradeSide()=='B';
+									o.stop = order->L_SecondaryPrice();
+									o.size = (o.side ? 1 : -1) * abs(order->L_ActiveShares());
+									o.account = CString(accounts[0]->L_TraderId());
+									// try to save this order
+									bool isnew = saveOrder(order,0);
+									// if it fails, we already have it so get the id
+									// if it succeeds, we should be able to get the id anyways
+									int64 tlid = fetchOrderId(order);
+									o.id = tlid; 
+									// save the relationship
+									saveOrderId(tlid,lsid);
+									// notify 
+									SrvGotOrder(o);
+									// debug
+									if (!_noverb)
+									{
+										CString tmp;
+										tmp.Format("lsid: %i tlid: %lld ordack: %s",lsid,tlid,o.Serialize());
+										v(tmp);
+									}
+								}
+								else
+								{
+									CString tmp;
+									tmp.Format("%i order id not found.",lsid);
+									D(tmp);
+								}
+							}
+
 						}
 						break;
 					case L_OrderChange::Rejection:
 						break;
 					case L_OrderChange::Cancel:
 						{
-						// notify of cancel
-						SrvGotCancel(id);
+							// ensure we have accounts
+							if (accounts.size()>0)
+							{
+								bool found = false;
+								// get the order from id
+								for (uint i = 0; i<lsids.size(); i++)
+									if (lsids[i]==lsid)
+									{
+										int64 tlid = orderids[i];
+										SrvGotCancel(tlid);
+										found = true;
+										// debug
+										if (!_noverb)
+										{
+											CString tmp;
+											tmp.Format("lsid: %i tlid: %lld cancelack.",lsid,tlid);
+											v(tmp);
+										}
+										break;
+									}
+								// notify
+							    if (!found)
+								{
+									CString tmp;
+									tmp.Format("%i order id was not found to send cancel ack.",lsid);
+									D(tmp);
+								}
+
+							}
+
+						
 						}
 						break;
 
@@ -549,7 +541,7 @@
 				else// it's an execution
 				{
 					
-					CTime ct = CTime(x->L_ExecTime());
+					
 					
 					TLTrade f;
 					f.symbol = CString(x->L_Symbol());
@@ -557,6 +549,7 @@
 					f.xprice = x->L_AveragePrice();
 					f.side = x->L_Side()=='B';
 					f.xsize = abs(x->L_Shares()) * (f.side ? 1 : -1);
+					CTime ct = CTime(x->L_ExecTime());
 					f.xtime = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
 					f.xdate = (ct.GetYear()*10000)+(ct.GetMonth()*100)+ct.GetDay();
 
@@ -572,20 +565,9 @@
 		case L_MsgL1Update::id: // bid+ask
 			{
 				TLTick k;
-				/*
-				CString sym = CString(msg->L_Symbol());
-				L_Summary* summary = preload(sym);
-								k.bid = summary->L_Bid();
-				k.ask = summary->L_Ask();
-				k.bs = summary->L_BidSize();
-				k.os = summary->L_AskSize();
-				k.trade = summary->L_LastPrice();
-				k.size = summary->L_LastSize();
-				k.ex = summary->L_Exchange();
-				*/
-
 
 				L_MsgL1Update* m = (L_MsgL1Update*)msg;
+				
 				k.bid = m->L_Bid();
 				k.bs = m->L_BidSize();
 				k.ask = m->L_Ask();
@@ -607,13 +589,18 @@
 
 		case L_MsgTradeUpdate::id: // trade
 			{
-				TLTick k;
 				L_MsgTradeUpdate* m = (L_MsgTradeUpdate*)msg;
+				if (!m->L_Printable())
+					break;
+				TLTick k;
+				CTime ct = CTime(m->L_Time());
 				k.trade = m->L_Price();
-				k.size = m->L_Volume();
-				k.sym = CString(m->L_Symbol());
+				k.date = _date;
+				k.time = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
+				k.size = (int)m->L_Volume();
 				k.ex = CString(m->L_Market());
-				this->SrvGotTickAsync(k);
+				SrvGotTickAsync(k);
+
 			}
 			break;
 		case L_MsgOrderImbalance::id:
@@ -622,16 +609,24 @@
 				TLImbalance imb;
 				imb.Symbol = CString(m->L_Symbol());
 				CTime ct = CTime(m->L_Time());
+				if (_imbexch)
+				{
+					// get summary
+					L_Summary* sum = preload(imb.Symbol);
+					// update exchange
+					imb.Ex = CString(sum->L_Exchange());
+				}
+
 				imb.ThisTime = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
 
 				if (m->L_RegImbalance()=='1')
 				{
-					imb.ThisImbalance = m->L_BuyVolumeReg() - m->L_SellVolumeReg();
+					imb.ThisImbalance = (int)(m->L_BuyVolumeReg() - m->L_SellVolumeReg());
 				}
 				if (m->L_RegImbalance()=='0')
 				{
-					imb.ThisImbalance = m->L_BuyVolumeReg() - m->L_SellVolumeReg();
-					imb.InfoImbalance = m->L_BuyVolume() - m->L_SellVolume();
+					imb.ThisImbalance = (int)(m->L_BuyVolumeReg() - m->L_SellVolumeReg());
+					imb.InfoImbalance = (int)(m->L_BuyVolume() - m->L_SellVolume());
 				}
 				if ((imb.ThisImbalance==0) && (imb.InfoImbalance==0))
 					break;
@@ -642,190 +637,7 @@
 		}
 	}
 
-/*
-	void LS_TLWM::Process(const Message* message, Observable* from, const Message* additionalInfo)
-	{
-		switch(message->GetType())
-		{
-			case M_POOL_EXECUTION:
-			if(additionalInfo != NULL && additionalInfo->GetType() == M_AI_EXECUTION)
-			{
-				 MsgPoolExecution* msg = (MsgPoolExecution*)message;//to get the structure, just cast Message* to  MsgPoolExecution* (not used here)
 
-				//This is additional info structure prepared by Business.dll. 
-				//It contains updated objects Position, Order Execution (look in BusinessApi.h).
-				//You can access objects' fields, but it is not recommended to change them (The fields are protected and you should not play any tricks to modify the fields. It will cause unpredictable results)
-				AIMsgExecution* info = (AIMsgExecution*)additionalInfo;
-				Order* order = info->m_order;
-				const Execution* exec = info->m_execution;
-				if ((order==NULL) || (exec==NULL)) return; // don't process null orders
-				uint xid = info->m_execution->GetUniqueExecutionId();
-				if (sent(xid)) return; // don't notify twice on same execution
-				else sentids.push_back(xid);
-
-				int64 thisid = this->fetchOrderId(order);
-				CString ac = CString(B_GetAccountName(order->GetAccount()));
-
-				// build the serialized trade object
-				CTime ct(msg->x_Time);
-				int xd = (ct.GetYear()*10000)+(ct.GetMonth()*100)+ct.GetDay();
-				int xt = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
-				TradeLibFast::TLTrade fill;
-				fill.id = thisid;
-				fill.xtime = xt;
-				fill.xdate = xd;
-				fill.side = (order->GetSide()=='B');
-				fill.comment = CString(order->GetUserDescription());
-				fill.symbol = CString(msg->x_Symbol);
-				fill.xprice = (double)msg->x_ExecutionPrice/1024;
-				fill.xsize= msg->x_NumberOfShares;
-				fill.exchange = CString(DestExchangeName((long)msg->x_executionId));
-				fill.account = CString(B_GetAccountName(order->GetAccount()));
-				SrvGotFill(fill);
-
-			} // has additional info end
-			break;
-			case M_SMARTORDER_ADD: 
-			case M_POOL_ASSIGN_ORDER_ID://Original order sent has a unigue generated id. The server sends this message to notify you that the order was assigned a new id different from the original. Both ids are part of this notification structure. This message can come 1 or 2 times.
-			case M_POOL_UPDATE_ORDER:// Order status is modified
-			{
-				Order* order = NULL;
-				// see if it's a smart order
-				if (message->GetType()==M_SMARTORDER_ADD)
-				{
-					MsgOrderChange* info = (MsgOrderChange*)message;
-					if (info!=NULL)
-						order = info->m_order;
-				}
-				// otherwise it's a normal order
-				else 
-				{
-					// make sure normal order has data we need
-					if ((additionalInfo==NULL) || (additionalInfo->GetType()!= M_AI_ORDER))
-						return;
-					// get the data
-					AIMsgOrder* info = (AIMsgOrder*)additionalInfo;
-					if (info!=NULL)
-						order = info->m_order;
-				}
-
-				TLOrder o = ProcessOrder(order);
-				SrvGotOrder(o);
-				
-			}
-				break;
-			case M_ORDER_DELETED: // for regular cancels
-			case M_SMARTORDER_REMOVE: // for smart cancels
-				{
-					MsgOrderChange* info = (MsgOrderChange*)message;
-					if (info->m_order!=NULL)
-					{
-						Order* order = info->m_order;
-						int64 id = fetchOrderIdAndRemove(order);
-						if (id>0)
-							SrvGotCancel(id);
-
-					}
-
-				}
-				break;
-			case M_MS_NYSE_IMBALANCE_OPENING:
-				{
-					if (imbalance_clients.size()==0) return;
-					const StockMovement* sm = ((MsgStockMovement*)additionalInfo)->m_stock;
-					const StockBase* stk = (StockBase*)sm;
-					if (from==B_GetLevel1(stk))
-					{
-						TLImbalance imb;
-						if ((stk!=NULL) && stk->isLoaded()) 
-						{
-							imb.InfoImbalance = stk->GetNyseInformationalImbalance();
-							uint exid = (uint)stk->GetStockExchange();
-							imb.Ex = SymExchangeName(exid);
-						}
-						imb.Symbol = CString(sm->GetSymbol());
-						imb.ThisImbalance = sm->GetNyseImbalance();
-						imb.PrevImbalance = sm->GetNysePreviousImbalance();
-						// don't send empty imbalances
-						if ((imb.InfoImbalance==0) && (imb.ThisImbalance==0))
-							return;
-						imb.ThisTime = sm->GetNyseImbalanceTime();
-						imb.PrevTime = sm->GetNysePreviousImbalanceTime();
-						SrvGotImbAsync(imb);
-
-					}
-				}
-				break;
-			case M_MS_NYSE_IMBALANCE_CLOSING: 
-			//case M_MS_NYSE_IMBALANCE_NONE:
-				{
-					if (imbalance_clients.size()==0) return;
-					if (additionalInfo && (additionalInfo->GetType()==M_AI_STOCK_MOVEMENT))
-					{
-						const StockMovement* sm = ((MsgStockMovement*)additionalInfo)->m_stock;
-						const StockBase* stk = (StockBase*)sm;
-						TLImbalance imb;
-						if ((stk!=NULL) && stk->isLoaded()) 
-						{
-							imb.InfoImbalance = stk->GetNyseInformationalImbalance();
-							uint exid = (uint)stk->GetStockExchange();
-							imb.Ex = SymExchangeName(exid);
-						}
-						imb.Symbol = CString(sm->GetSymbol());
-						imb.ThisImbalance = sm->GetNyseImbalance();
-						imb.PrevImbalance = sm->GetNysePreviousImbalance();
-						// don't send empty imbalances
-						if ((imb.InfoImbalance==0) && (imb.ThisImbalance==0))
-							return;
-						imb.ThisTime = sm->GetNyseImbalanceTime();
-						imb.PrevTime = sm->GetNysePreviousImbalanceTime();
-						SrvGotImbAsync(imb);
-
-					}
-
-					break;
-				}
-			case M_NEW_MARKET_IMBALANCE:
-				{
-					if (imbalance_clients.size() == 0) return;
-					if (additionalInfo && (additionalInfo->GetType()==M_AI_STOCK_MOVEMENT))
-					{
-						const StockMovement* sm = ((MsgStockMovement*)additionalInfo)->m_stock;
-						const StockBase* stk = (StockBase*)sm;
-						TLImbalance imb;
-						imb.Symbol = CString(sm->GetSymbol());
-						if ((stk!=NULL) && stk->isLoaded()) 
-						{
-							imb.InfoImbalance = stk->GetNyseInformationalImbalance();
-							uint exid = (uint)stk->GetStockExchange();
-							imb.Ex = SymExchangeName(exid);
-						}
-
-						imb.ThisImbalance = sm->GetNasdaqImbalance();
-						imb.PrevImbalance = sm->GetNasdaqPreviousImbalance();
-						if (imb.hasImbalance() || imb.hadImbalance()) 
-						{
-							imb.Ex = CString("NASDAQ");
-							imb.ThisTime = sm->GetNasdaqImbalanceTime();
-							imb.PrevTime = sm->GetNasdaqPreviousImbalanceTime();
-							SrvGotImbAsync(imb);
-						}
-					}
-
-				}
-				break;
-			case MSGID_CONNECTION_LOST:
-				{
-					B_IsMarketSummaryPopulationDone();
-				}
-				break;
-			case MS_RESP_SYMBOL_SORTABLE_POPULATION_DONE:
-				{
-				}
-				break;
-		} // switchend
-	}
-	*/
 
 		UINT __cdecl DoReadImbThread(LPVOID param)
 	{
@@ -871,45 +683,7 @@
 		return OK;
 	}
 
-		/*
-	TLOrder LS_TLWM::ProcessOrder(Order* order)
-	{
-		TLOrder null;
-		// don't process null orders
-		if (order==NULL) 
-			return null; 
-
-		// send cancel for a dead order update
-		if (order->isDead()) 
-		{
-			//const MsgUpdateOrder* msg2 = (const MsgUpdateOrder*)message;
-			int64 id = fetchOrderIdAndRemove(order);
-			if (id>0)
-				SrvGotCancel(id);
-			return null;
-		}
-
-		// try to save this order
-		bool isnew = saveOrder(order,0);
-		// if it fails, we already have it so get the id
-		// if it succeeds, we should be able to get the id anyways
-		int64 id = fetchOrderId(order);
-
-		CTime ct = CTime::GetCurrentTime();
-		TLOrder o;
-		o.id = id;
-		o.price = order->isMarketOrder() ? 0: GetDouble(order->GetOrderPrice());
-		o.stop = GetDouble(order->GetStopPrice());
-		o.time = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
-		o.date = (ct.GetYear()*10000)+(ct.GetMonth()*100)+ct.GetDay();
-		o.size = order->GetSize();
-		o.side = order->GetSide()=='B';
-		o.comment = order->GetUserDescription();
-		o.TIF = TIFName(order->GetTimeInForce());
-		o.account = CString(B_GetAccountName(order->GetAccount()));
-		o.symbol = CString(order->GetSymbol());
-		return o;
-	}*/
+		
 
 
 	void LS_TLWM::SrvGotImbAsync(TLImbalance imb)
@@ -983,7 +757,7 @@
 		return f;
 	}
 
-	int LS_TLWM::CancelRequest(int64 tlsid)
+	int LS_TLWM::CancelRequest(int64 tlid)
 	{
 		if (accounts.size()==0)
 		{
@@ -997,13 +771,20 @@
 		{
 			
 			// make sure it's our order and order isn't NULL
-			if ((orderids[i]==tlsid) && (ordercache[i]!=NULL))
+			if ((orderids[i]==tlid) && (ordercache[i]!=NULL))
 			{
+				long lsid = lsids[i];
 					// try to cancel it
 					account->L_CancelOrder(ordercache[i]);
 					// mark it as found
-					bool found = true;
-
+					found = true;
+					// debug
+					if (!_noverb)
+					{
+						CString tmp;
+						tmp.Format("lsid: %i tlid: %lld cancelreq.",lsid,tlid);
+						v(tmp);
+					}
 				
 			}
 			
@@ -1011,7 +792,16 @@
 		account = NULL;
 		// return
 		if (!found) 
+		{
+				// debug
+				if (!_noverb)
+				{
+					CString tmp;
+					tmp.Format("tlid: %lld could not find ls order to cancel.",tlid);
+					v(tmp);
+				}
 			return ORDER_NOT_FOUND;
+		}
 		return OK;
 	}
 
@@ -1115,17 +905,14 @@
 			L_Summary * sec;
 			int symidx = FindSym(my[i]);
 			if (isIndex(my[i]))
-				sec = NULL; //new AVLIndex(my[i],symidx,this);
+				sec = NULL; 
 			else
 			{
 				
 				sec = L_CreateSummary(my[i]);
 				sec->L_Attach(this);
-
-				//AVLStock *stk = new AVLStock(my[i],this); // create new stock instance
-				//AVLStock *stk = new AVLStock(my[i],symidx,this,true,depth); // create new stock instance with added depth param
-				//sec = stk;
-				
+				// get trade data
+				L_SubscribeToTrades(my[i],this);
 			}
 			subs.push_back(sec);
 			subsym.push_back(my[i]);

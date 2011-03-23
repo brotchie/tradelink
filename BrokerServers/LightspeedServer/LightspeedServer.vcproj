@@ -183,7 +183,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy $(OutDir)\LightspeedServer.dll c:\progra~1\lightspeed\&#x0D;&#x0A;copy $(OutDir)\TradeLibFast.dll c:\progra~1\lightspeed\"
+				CommandLine="copy $(OutDir)\LightspeedServer.dll c:\progra~1\lightspeed\&#x0D;&#x0A;copy LightspeedServer.Config.txt c:\progra~1\lightspeed\&#x0D;&#x0A;copy $(OutDir)\TradeLibFast.dll c:\progra~1\lightspeed\&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
@@ -234,6 +234,10 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\LightspeedServer.Config.txt"
+			>
+		</File>
 		<File
 			RelativePath=".\LightspeedServer.cpp"
 			>
