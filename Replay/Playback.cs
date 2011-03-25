@@ -8,9 +8,9 @@ namespace Replay
 {
     public class Playback : BackgroundWorker
     {
-        private MultiSimImpl h = null;
+        private TradeLink.API.HistSim h = null;
 
-        public Playback(MultiSimImpl simulator) 
+        public Playback(TradeLink.API.HistSim simulator) 
         { 
             h = simulator;
             WorkerSupportsCancellation = true;

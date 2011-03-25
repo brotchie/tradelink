@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using TradeLink.API;
-using TradeLink.Common;
 using System.ComponentModel;
 
 namespace TradeLink.Common
@@ -52,10 +51,6 @@ namespace TradeLink.Common
         /// Gets next tick in the simulation
         /// </summary>
         public long NextTickTime { get { return _nextticktime; } }
-        /// <summary>
-        /// Gets broker used in the simulation
-        /// </summary>
-        public Broker SimBroker { get { return _broker; }  }
         
         /// <summary>
         /// Create a historical simulator using default tick folder and null filter
@@ -265,16 +260,17 @@ namespace TradeLink.Common
                 // for some reason background worker is slow exiting, recreate
                 if (Workers[i].IsBusy)
                 {
-                    v(Workers[i].workersec.HistSource.Symbol + " worker#" + i + " is busy, waiting till free...");
+                    v(Workers[i].Name+ " worker#" + i + " is busy, waiting till free...");
                     // retry
-                    while (Workers[i].isWorking)
+                    while (Workers[i].IsBusy)
                     {
                         System.Threading.Thread.Sleep(10);
                     }
+                    v(Workers[i].Name + " is no longer busy.");
                     System.Threading.Thread.Sleep(10);
                 }
                 Workers[i].RunWorkerAsync(readahead);
-                v(Workers[i].workersec.HistSource.Symbol + " worker#" + i + " is working.");
+                v(Workers[i].Name+ " worker#" + i + " now is working.");
 
             }
 
@@ -332,8 +328,6 @@ namespace TradeLink.Common
                 }
                 // update time
                 lasttime = k.datetime;
-                // process pending orders
-                _executions += SimBroker.Execute(k);
                 // notify tick
                 GotTick(k);
                 // count tick
@@ -375,8 +369,6 @@ namespace TradeLink.Common
                     break;
                 // get next tick
                 Tick k = Workers[cidx[nextidx]].NextTick();
-                // process pending orders
-                _executions += SimBroker.Execute(k);
                 // notify tick
                 GotTick(k);
                 // count tick
@@ -413,8 +405,6 @@ namespace TradeLink.Common
                     // or the worker is done reading tick stream
                     if (!Workers[i].isWorking)
                     {
-                        if (Workers[i].isWorkingChange)
-                            v(Workers[i].workersec.Name + " worker#" + i + " stopped working.");
                         break;
                     }
                     // if we're not done, wait for the I/O thread to catch up
@@ -448,6 +438,7 @@ namespace TradeLink.Common
         public bool hasTicks { get { lock (Ticks) { return (Ticks.Count > 0); } } }
         public Tick NextTick() { lock (Ticks) { return Ticks.Dequeue(); } } 
         public long NextTime() { return Ticks.Peek().datetime; }
+        public string Name { get { return workersec.Symbol + workersec.Date; } }
 
         public simworker(SecurityImpl sec)
         {

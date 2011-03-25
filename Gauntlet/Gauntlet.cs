@@ -14,7 +14,7 @@ namespace WinGauntlet
     {
 
 
-        MultiSimImpl h;
+        HistSim h;
         BackgroundWorker bw = new BackgroundWorker();
         BackgroundWorker getsymwork = new BackgroundWorker();
         static GauntArgs args = new GauntArgs();
@@ -132,33 +132,49 @@ namespace WinGauntlet
         string uniquen { get { return DateTime.Now.ToString(".yyyMMdd.HHmm"); } }
 
         string LogFile(string logtype) { return OUTFOLD+args.Response.FullName+(_unique.Checked ? uniquen:"")+ "."+logtype+".csv"; }
+        Broker SimBroker = new Broker();
 
         // runs the simulation in background
         void bw_DoWork(object sender, DoWorkEventArgs e)
         {
+            FillCount = 0;
             // get simulation arguments
             GauntArgs ga = (GauntArgs)e.Argument;
             // notify user
             debug("Run started: " + ga.Name);
             status("Started: " + ga.ResponseName);
             // prepare simulator
-            h = new MultiSimImpl(ga.Folder,ga.Filter);
+            bool portreal = _portfoliosim.Checked;
+            if (_portfoliosim.Checked)
+            {
+                debug("Using portfolio simulation. (realistic)");
+                h = new MultiSimImpl(ga.Folder, ga.Filter);
+            }
+            else
+            {
+                debug("Using sequential symbol simulation. (faster)");
+                h = new SingleSimImpl(ga.Folder, ga.Filter);
+            }
             h.GotDebug += new DebugDelegate(h_GotDebug);
-            h.CacheWait = 1000;
-            h.Initialize();
-            h.SimBroker.UseBidAskFills = _usebidask.Checked;
+            SimBroker.UseBidAskFills = _usebidask.Checked;
             h.GotTick += new TickDelegate(h_GotTick);
-            h.SimBroker.GotFill+=new FillDelegate(args.Response.GotFill);
-            h.SimBroker.GotOrder+=new OrderDelegate(args.Response.GotOrder);
-            h.SimBroker.GotOrderCancel += new OrderCancelDelegate(SimBroker_GotOrderCancel);
+            SimBroker.GotFill += new FillDelegate(SimBroker_GotFill);
+            SimBroker.GotOrder+=new OrderDelegate(args.Response.GotOrder);
+            SimBroker.GotOrderCancel += new OrderCancelDelegate(SimBroker_GotOrderCancel);
             // start simulation
             h.PlayTo(ga.PlayTo);
             // end simulation
             ga.Stopped = DateTime.Now;
             ga.TicksProcessed = h.TicksProcessed;
-            ga.Executions = h.FillCount;
+            ga.Executions = FillCount;
             // save result
             e.Result = ga;
+        }
+        int FillCount = 0;
+        void SimBroker_GotFill(Trade t)
+        {
+            FillCount++;
+            args.Response.GotFill(t);
         }
 
         void SimBroker_GotOrderCancel(string sym, bool side, long id)
@@ -174,7 +190,7 @@ namespace WinGauntlet
             GauntArgs gargs = (GauntArgs)e.Result;
             if (!e.Cancelled)
             {
-                List<Trade> list = h.SimBroker.GetTradeList();
+                List<Trade> list = SimBroker.GetTradeList();
                 tradeResults1.NewResultTrades(LogFile("Trades"),list);
                 if (gargs.Trades)
                 {
@@ -183,7 +199,7 @@ namespace WinGauntlet
                 }
                 if (gargs.Orders)
                 {
-                    List<Order> olist = h.SimBroker.GetOrderList();
+                    List<Order> olist = SimBroker.GetOrderList();
                     debug("writing "+olist.Count+" orders...");
                     StreamWriter sw = new StreamWriter(LogFile("Orders"), false);
                     string[] cols = Enum.GetNames(typeof(OrderField));
@@ -227,7 +243,10 @@ namespace WinGauntlet
         string nowtime = "0";
         void h_GotTick(Tick t)
         {
+            
             nowtime = t.time.ToString();
+            // execute open orders
+            SimBroker.Execute(t);
             if (args.Response == null) return;
             if (t.depth > _depth) return;
             count++;
@@ -471,7 +490,7 @@ namespace WinGauntlet
         void Response_SendOrder(Order o, int id)
         {
             if (h!=null)
-                h.SimBroker.SendOrderStatus(o);
+                SimBroker.SendOrderStatus(o);
         }
 
         void mybroker_GotOrderCancel(string sym, bool side, long id)
@@ -483,7 +502,7 @@ namespace WinGauntlet
         void Response_CancelOrderSource(long number, int id)
         {
             if (h!=null)
-                h.SimBroker.CancelOrder(number);
+                SimBroker.CancelOrder(number);
             
         }
 

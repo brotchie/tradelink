@@ -44,15 +44,16 @@ namespace Kadina
 
         BackgroundWorker bw = new BackgroundWorker();
         BackgroundWorker bw2 = new BackgroundWorker();
-        MultiSimImpl h = new MultiSimImpl();
+        HistSim h = new MultiSimImpl();
         ChartControl c = new ChartControl();
+        Broker SimBroker = new Broker();
 
         public kadinamain()
         {
             TrackEnabled = Util.TrackUsage();
             Program = PROGRAM;
             _dps = "N" + _dp;
-            h.SimBroker.UseBidAskFills = Properties.Settings.Default.UseBidAskFills;
+            SimBroker.UseBidAskFills = Properties.Settings.Default.UseBidAskFills;
             InitializeComponent();
             initgrids();
             debugControl1.NewCreateTicketEvent += new DebugDelegate(debugControl1_NewCreateTicketEvent);
@@ -141,9 +142,9 @@ namespace Kadina
 
         void h_GotTick(Tick t)
         {
-            // send to response
-            if (myres != null)
-                myres.GotTick(t);
+            // execute pending orders
+            SimBroker.Execute(t);
+
 
             if (showticks)
             {
@@ -208,6 +209,10 @@ namespace Kadina
                     }
                 }
             }
+
+            // send to response
+            if (myres != null)
+                myres.GotTick(t);
         }
 
         bool _chartlast = Properties.Settings.Default.ChartLast;
@@ -319,6 +324,7 @@ namespace Kadina
         {
             // clear all GUIs
             _msg = new StringBuilder(10000);
+            SimBroker.Reset();
             debugControl1.Clear();
             dt.Clear();
             ptab.Clear();
@@ -683,7 +689,7 @@ namespace Kadina
                 o.date = _date;
                 o.time = _time;
             }
-            h.SimBroker.SendOrderStatus(o);
+            SimBroker.SendOrderStatus(o);
         }
 
         void broker_GotOrderCancel(string sym, bool side, long id)
@@ -694,7 +700,7 @@ namespace Kadina
 
         void myres_CancelOrderSource(long number, int id)
         {
-            h.SimBroker.CancelOrder(number);
+            SimBroker.CancelOrder(number);
         }
 
         StringBuilder _msg = new StringBuilder(100000000);
@@ -768,14 +774,13 @@ namespace Kadina
          bool loadsim()
          {
              h = new MultiSimImpl(epffiles.ToArray());
-             h.SimBroker.GotOrder += new OrderDelegate(broker_GotOrder);
-             h.SimBroker.GotFill += new FillDelegate(broker_GotFill);
+             SimBroker.GotOrder += new OrderDelegate(broker_GotOrder);
+             SimBroker.GotFill += new FillDelegate(broker_GotFill);
              h.GotTick += new TickDelegate(h_GotTick);
-             h.SimBroker.UseBidAskFills = Properties.Settings.Default.UseBidAskFills;
-             h.SimBroker.GotOrderCancel += new OrderCancelDelegate(broker_GotOrderCancel);
+             SimBroker.UseBidAskFills = Properties.Settings.Default.UseBidAskFills;
+             SimBroker.GotOrderCancel += new OrderCancelDelegate(broker_GotOrderCancel);
              try
              {
-                 h.Initialize();
 
                  updatetitle();
                  status("Loaded tickdata: " + PrettyEPF());

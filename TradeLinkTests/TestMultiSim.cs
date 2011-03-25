@@ -149,6 +149,7 @@ namespace TestTradeLink
         int fillcount = 0;
         int desiredfills = 1000;
         MultiSimImpl h;
+        Broker SimBroker = new Broker();
         [Test]
         public void ExecutionPerformance()
         {
@@ -156,7 +157,7 @@ namespace TestTradeLink
             h = new MultiSimImpl(Environment.CurrentDirectory);
             h.Initialize();
             h.GotTick += new TradeLink.API.TickDelegate(execute_GotTick);
-            h.SimBroker.GotFill += new TradeLink.API.FillDelegate(SimBroker_GotFill);
+            SimBroker.GotFill += new TradeLink.API.FillDelegate(SimBroker_GotFill);
 
             tickcount = 0;
             lasttime = 0;
@@ -194,7 +195,7 @@ namespace TestTradeLink
             if (tickcount % 50 == 0)
             {
                 bool side = fillcount % 2 == 0;
-                h.SimBroker.SendOrderStatus(new MarketOrder(t.symbol, side, 100));
+                SimBroker.SendOrderStatus(new MarketOrder(t.symbol, side, 100));
             }
         }
 

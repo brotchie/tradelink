@@ -130,5 +130,17 @@ namespace WinGauntlet.Properties {
                 this["capitalprompt"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool PortfolioRealisticSim {
+            get {
+                return ((bool)(this["PortfolioRealisticSim"]));
+            }
+            set {
+                this["PortfolioRealisticSim"] = value;
+            }
+        }
     }
 }

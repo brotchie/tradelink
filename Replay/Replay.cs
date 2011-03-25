@@ -9,6 +9,7 @@ using TradeLink.Common;
 using System.IO;
 using TradeLink.API;
 using TradeLink.AppKit;
+using TradeLink.Common;
 
 namespace Replay
 {
@@ -17,12 +18,12 @@ namespace Replay
         TLServer tl;
             
         Playback _playback = null;
-        MultiSimImpl h = new MultiSimImpl();
+        HistSim h = new MultiSimImpl();
         string tickfolder = Util.TLTickDir;
         static Account HISTBOOK = new Account("_HISTBOOK");
         public const string PROGRAM = "Replay";
         public DebugWindow _dw = new DebugWindow();
-
+        Broker SimBroker = new Broker();
         public Replay()
         {
             
@@ -42,12 +43,11 @@ namespace Replay
             tl.newFeatureRequest+=new MessageArrayDelegate(GetFeatures);
             tl.newUnknownRequest += new UnknownMessageDelegate(tl_newUnknownRequest);
             h.GotTick += new TickDelegate(h_GotTick);
-            h.SimBroker.UseBidAskFills = Properties.Settings.Default.UseBidAskFills;
-            h.SimBroker.GotOrder += new OrderDelegate(SimBroker_GotOrder);
-            h.SimBroker.GotFill += new FillDelegate(SimBroker_GotFill);
-            h.SimBroker.GotOrderCancel += new OrderCancelDelegate(SimBroker_GotOrderCancel);
+            SimBroker.UseBidAskFills = Properties.Settings.Default.UseBidAskFills;
+            SimBroker.GotOrder += new OrderDelegate(SimBroker_GotOrder);
+            SimBroker.GotFill += new FillDelegate(SimBroker_GotFill);
+            SimBroker.GotOrderCancel += new OrderCancelDelegate(SimBroker_GotOrderCancel);
             h.GotDebug+=new DebugDelegate(_dw.GotDebug);
-            h.CacheWait = 500;
             // setup playback
             _playback = new Playback(h);
             _playback.RunWorkerCompleted += new RunWorkerCompletedEventHandler(_playback_RunWorkerCompleted);
@@ -130,14 +130,14 @@ namespace Replay
         Position[] tl_gotSrvPosList(string account)
         {
             if (h==null) return new PositionImpl[0];
-            List<Trade> tlist = h.SimBroker.GetTradeList(new Account(account));
+            List<Trade> tlist = SimBroker.GetTradeList(new Account(account));
             List<Position> plist = new List<Position>();
             List<string> slist = new List<string>();
             foreach (TradeImpl t in tlist)
                 if (!slist.Contains(t.symbol))
                     slist.Add(t.symbol);
             foreach (string sym in slist)
-                plist.Add(h.SimBroker.GetOpenPosition(sym));
+                plist.Add(SimBroker.GetOpenPosition(sym));
             return plist.ToArray();
         }
 
@@ -148,7 +148,7 @@ namespace Replay
             // prepare the account we're getting open pl for
             string acct = s=="" ? Broker.DEFAULTBOOK : s;
             // get trades from this account
-            List<Trade> fills = h.SimBroker.GetTradeList(new Account(acct));
+            List<Trade> fills = SimBroker.GetTradeList(new Account(acct));
             // setup storage for positions we'll create from trades
             Dictionary<string,PositionImpl> posdict = new Dictionary<string,PositionImpl>();
             // go through every trade and populate the position
@@ -171,11 +171,11 @@ namespace Replay
         decimal tl_gotSrvAcctClosedPLRequest(string s)
         {
             if (h == null) return 0;
-            string accts = string.Join(",",h.SimBroker.Accounts);
+            string accts = string.Join(",",SimBroker.Accounts);
             if (s == "")
-                return h.SimBroker.GetClosedPL(new Account(Broker.DEFAULTBOOK));
+                return SimBroker.GetClosedPL(new Account(Broker.DEFAULTBOOK));
             else if (accts.Contains(s))
-                return h.SimBroker.GetClosedPL(new Account(s));
+                return SimBroker.GetClosedPL(new Account(s));
             return 0;
         }
 
@@ -184,44 +184,44 @@ namespace Replay
         string tl_gotSrvAcctRequest()
         {
             if (h == null) return "";
-            return string.Join(",", h.SimBroker.Accounts);
+            return string.Join(",", SimBroker.Accounts);
         }
 
         void tl_OrderCancelRequest(long number)
         {
             if (h == null) return;
-            h.SimBroker.CancelOrder(number); // send cancel request to broker
+            SimBroker.CancelOrder(number); // send cancel request to broker
         }
 
 
         int tl_PositionSizeRequest(string s)
         {
-            if (!s.Contains(",") && (h.SimBroker != null))
-                return h.SimBroker.GetOpenPosition(s).Size;
-            else if (s.Contains(",") && (h.SimBroker != null))
+            if (!s.Contains(",") && (SimBroker != null))
+                return SimBroker.GetOpenPosition(s).Size;
+            else if (s.Contains(",") && (SimBroker != null))
             {
                 string[] r = s.Split(',');
                 string sym = r[0];
                 string acct = r[1];
-                foreach (string a in h.SimBroker.Accounts)
+                foreach (string a in SimBroker.Accounts)
                     if (acct == a)
-                        return h.SimBroker.GetOpenPosition(sym, new Account(acct)).Size;
+                        return SimBroker.GetOpenPosition(sym, new Account(acct)).Size;
             }
             return 0;
         }
 
         decimal tl_PositionPriceRequest(string s)
         {
-            if (!s.Contains(",") && (h.SimBroker != null))
-                return h.SimBroker.GetOpenPosition(s).AvgPrice;
-            else if (s.Contains(",") && (h.SimBroker!=null))
+            if (!s.Contains(",") && (SimBroker != null))
+                return SimBroker.GetOpenPosition(s).AvgPrice;
+            else if (s.Contains(",") && (SimBroker!=null))
             {
                 string[] r = s.Split(',');
                 string sym = r[0];
                 string acct = r[1];
-                foreach (string a in h.SimBroker.Accounts)
+                foreach (string a in SimBroker.Accounts)
                     if (acct == a)
-                        return h.SimBroker.GetOpenPosition(sym, new Account(acct)).AvgPrice;
+                        return SimBroker.GetOpenPosition(sym, new Account(acct)).AvgPrice;
             }
             return 0;
         }
@@ -240,8 +240,6 @@ namespace Replay
                     return;
                 }
                 tickfolder = fd.SelectedPath;
-                // set the user's tick folder
-                h.Folder = tickfolder;
             }
 
         }
@@ -283,7 +281,7 @@ namespace Replay
             // if we get an order cancel notify from the broker, pass along to our clients
             tl.newCancel(id);
             // send the updated book to our clients for same side as order
-            Tick book = OrderToTick(h.SimBroker.BestBidOrOffer(sym, side));
+            Tick book = OrderToTick(SimBroker.BestBidOrOffer(sym, side));
             tl.newTick(book);
         }
 
@@ -302,14 +300,14 @@ namespace Replay
                     o.date = lastdate;
                 }
                 // before we send the order, get top of book for same side
-                Order oldbbo = h.SimBroker.BestBidOrOffer(o.symbol,o.side);
+                Order oldbbo = SimBroker.BestBidOrOffer(o.symbol,o.side);
                 oldbbo.Account = "";
 
                 // then send the order
-                err = h.SimBroker.SendOrderStatus(o);
+                err = SimBroker.SendOrderStatus(o);
 
                 // get the new top of book
-                Order newbbo = h.SimBroker.BestBidOrOffer(o.symbol,o.side);
+                Order newbbo = SimBroker.BestBidOrOffer(o.symbol,o.side);
                 newbbo.Account = "";
 
                 // if it's changed, notify clients
@@ -370,6 +368,8 @@ namespace Replay
         int lastdate = 0;
         void h_GotTick(Tick t)
         {
+            // execute pending orders
+            SimBroker.Execute(t);
             // only process requested depth
             if (t.depth > tickdepth) return;
             if (tickdepth == 0)
@@ -400,15 +400,15 @@ namespace Replay
                 {   // it's a quote so we need to update the book
 
                     // first though get the BBO from hist book to detect improvements
-                    Order oldbid = h.SimBroker.BestBid(t.symbol);
-                    Order oldask = h.SimBroker.BestOffer(t.symbol);
+                    Order oldbid = SimBroker.BestBid(t.symbol);
+                    Order oldask = SimBroker.BestOffer(t.symbol);
 
                     // then update the historical book
                     PlaceHistoricalOrder(t);
 
                     // fetch the new book
-                    Order newbid = h.SimBroker.BestBid(t.symbol);
-                    Order newask = h.SimBroker.BestOffer(t.symbol);
+                    Order newbid = SimBroker.BestBid(t.symbol);
+                    Order newask = SimBroker.BestOffer(t.symbol);
 
                     // reset accounts so equality comparisons work properly in next step
                     oldbid.Account = "";
@@ -463,23 +463,23 @@ namespace Replay
             {
                 // if we already have a book for this side we can get rid of it
                 foreach (long oid in hasHistBook(t.symbol, false))
-                    h.SimBroker.CancelOrder(oid); 
+                    SimBroker.CancelOrder(oid); 
                 OrderImpl o = new SellLimit(t.symbol, t.AskSize, t.ask);
                 o.date = t.date;
                 o.time = t.time;
                 o.Exchange = t.oe;
-                h.SimBroker.SendOrderAccount(o,HISTBOOK);
+                SimBroker.SendOrderAccount(o,HISTBOOK);
             }
             if (t.hasBid)
             {
                 // if we already have a book for this side we can get rid of it
                 foreach (long oid in hasHistBook(t.symbol, true))
-                    h.SimBroker.CancelOrder(oid);
+                    SimBroker.CancelOrder(oid);
                 OrderImpl o = new BuyLimit(t.symbol, t.BidSize, t.bid);
                 o.date = t.date;
                 o.time = t.time;
                 o.Exchange = t.be;
-                h.SimBroker.SendOrderAccount(o, HISTBOOK);
+                SimBroker.SendOrderAccount(o, HISTBOOK);
             }
             
         }
@@ -489,7 +489,7 @@ namespace Replay
             // exits for a given market symbol and side
         {
             List<long> idxlist = new List<long>();
-            List<Order> olist = h.SimBroker.GetOrderList(HISTBOOK);
+            List<Order> olist = SimBroker.GetOrderList(HISTBOOK);
             for (int i = 0; i < olist.Count; i++)
                 if ((olist[i].symbol == sym) && (olist[i].side == side))
                     idxlist.Add(olist[i].id);
@@ -505,16 +505,24 @@ namespace Replay
             trackBar1.Enabled = true;
         }
 
-        private void monthCalendar1_DateSelected(object sender, DateRangeEventArgs e)
+        static TickFileFilter getfilterdate(int date)
         {
-            // create a new filter
+                        // create a new filter
             TickFileFilter tff = new TickFileFilter();
             // we dont' select any symbols, so just playback whatever we find on this day
             tff.isSymbolDateMatchUnion = true;
             // populate the filter from user's calendar
-            tff.DateFilter(Util.ToTLDate(monthCalendar1.SelectionEnd), DateMatchType.Day | DateMatchType.Month | DateMatchType.Year);
+            tff.DateFilter(date, DateMatchType.Day | DateMatchType.Month | DateMatchType.Year);
+            return tff;
+
+        }
+
+        TickFileFilter FileFilter = getfilterdate(Util.ToTLDate());
+
+        private void monthCalendar1_DateSelected(object sender, DateRangeEventArgs e)
+        {
             // set the filter on the simulator
-            h.FileFilter = tff;
+            FileFilter = getfilterdate(Util.ToTLDate(monthCalendar1.SelectionEnd));
         }
 
         private void _msg_Click(object sender, EventArgs e)
