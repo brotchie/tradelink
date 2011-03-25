@@ -47,10 +47,10 @@ namespace TestTradeLink
             s.VerboseDebugging = true;
             s.SendDebugEvent += new DebugDelegate(debug);
             s.newProviderName = Providers.TradeLink;
-            s.Start();
-
+            s.Start(5,200,true);
+            Assert.IsTrue(s.isStarted);
             // make sure we select our own loopback, if other servers are running
-            c = new TLClient_IP(TLClient_IP.GetEndpoints(IPUtil.TLDEFAULTTESTPORT,new string[] { System.Net.IPAddress.Loopback.ToString() }),0,"tlclient",0,0,debugc,true);
+            c = new TLClient_IP(TLClient_IP.GetEndpoints(s.Port,new string[] { System.Net.IPAddress.Loopback.ToString() }),0,"tlclient",0,0,debugc,true);
             c.VerboseDebugging = true;
 
             // create a second client to verify order and fill copying work

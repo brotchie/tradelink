@@ -158,20 +158,43 @@ namespace TradeLink.Common
         IAsyncResult _myresult = null;
         public virtual void Start()
         {
+            Start(3, 100, false);
+        }
+        public virtual void Start(int retries, int delayms, bool allowchangeport)
+        {
             try
             {
                 if (_started) return;
+                Stop();
                 debug("Starting server...");
+                int attempts = 0;
+                while (!_started && (attempts++ < retries))
+                {
+                    debug("Starting server at: " + _addr.ToString() + ":" + _port.ToString());
+                    IPEndPoint end = new IPEndPoint(_addr, _port);
+                    try
+                    {
 
-                debug("Starting server at: " + _addr.ToString() + ":" + _port.ToString());
-                IPEndPoint end = new IPEndPoint(_addr, _port);
-                _list = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                _list.Bind(end);
-                _list.Listen(MaxOustandingRequests);
-                _myresult = _list.BeginAccept(new AsyncCallback(ReadSocket), new socketinfo(_list));
-                debug("Server can handle pending requests: " + MaxOustandingRequests);
-                debug("Starting background threads to process requests and ticks.");
-                _started = true;
+                        _list = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                        _list.Bind(end);
+                        _list.Listen(MaxOustandingRequests);
+                        _myresult = _list.BeginAccept(new AsyncCallback(ReadSocket), new socketinfo(_list));
+                    }
+                    catch (SocketException ex)
+                    {
+                        Stop();
+                        v("start attempt #" + attempts + " failed: " + ex.Message + ex.StackTrace);
+                        Thread.Sleep(delayms);
+                        if (allowchangeport)
+                        {
+                            Random r = new Random();
+                            _port += r.Next(1, 50);
+                        }
+                    }
+                    debug("Server can handle pending requests: " + MaxOustandingRequests);
+                    debug("Starting background threads to process requests and ticks.");
+                    _started = _list.IsBound;
+                }
                 _at = new System.ComponentModel.BackgroundWorker();
                 _at.DoWork += new System.ComponentModel.DoWorkEventHandler(_at_DoWork);
                 _at.WorkerSupportsCancellation = true;
