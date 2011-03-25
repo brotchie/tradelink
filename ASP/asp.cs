@@ -1138,6 +1138,11 @@ namespace ASP
         void workingres_SendOrder(Order o, int id)
         {
             int rid = r2r(id);
+            if (rid < 0)
+            {
+                debug("Ignoring order from response with invalid id: " + id + " index not found. order: "+o.ToString());
+                return;
+            }
             if (!_reslist[rid].isValid)
             {
                 debug("Ignoring order from disabled response: " + _reslist[rid].Name + " order: " + o.ToString());
