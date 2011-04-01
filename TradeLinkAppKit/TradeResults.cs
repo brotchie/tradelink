@@ -217,14 +217,17 @@ namespace TradeLink.AppKit
             {
                 name = System.IO.Path.GetFileNameWithoutExtension(name);
                 if (!isUniqueName(name)) return;
+                List<TradeResult> newresult;
                 if (trades.Count == 0)
                 {
                     debug("No results found for: " + name);
-                    return;
+                    newresult = new List<TradeResult>();
                 }
+                else
+                    newresult = TradeResult.ResultsFromTradeList(trades);
                 tradefiles.Items.Add(name);
                 int idx = tradefiles.Items.Count - 1;
-                _resultlists.Add(TradeResult.ResultsFromTradeList(trades));
+                _resultlists.Add(newresult);
                 tradefiles.SelectedIndex = idx;
             }
         }
