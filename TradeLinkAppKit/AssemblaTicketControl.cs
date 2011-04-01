@@ -19,8 +19,8 @@ namespace TradeLink.AppKit
         }
 
         public void Update(string SPACE, string summary, string description) { Update(SPACE, summary, description, string.Empty, string.Empty); }
-        public void Update(string SPACE, string summary, string description, string user, string pass) { Update(SPACE, summary, null, description, user, pass); }
-        public void Update(string SPACE, string summary,  string data, string description, string username, string password)
+        public void Update(string SPACE, string summary, string description, string user, string pass) { Update(SPACE, summary, null, description, user, pass,string.Empty,string.Empty); }
+        public void Update(string SPACE, string summary,  string data, string description, string username, string password, string succeedurl, string failurl)
         {
             summ.Text = summary;
             space.Text = SPACE;
@@ -50,6 +50,8 @@ namespace TradeLink.AppKit
         public event VoidDelegate TicketSucceed;
         public event VoidDelegate TicketFailed;
         const string SSFILE = "ScreenShot.jpg";
+        public string FailUrl = string.Empty;
+        public string SucceedUrl = string.Empty;
         private void _create_Click(object sender, EventArgs e)
         {
             if (summ.Text.Length == 0)
@@ -57,6 +59,11 @@ namespace TradeLink.AppKit
                 status("missing subject.");
                 return;
             }
+            if (SucceedUrl==string.Empty)
+                SucceedUrl = AssemblaTicket.GetTicketUrl(space.Text);
+            if (FailUrl == string.Empty)
+                FailUrl = null;
+            
             int id = AssemblaTicket.Create(space.Text, user.Text, pass.Text, summ.Text,desc.Text, TicketStatus.New, Priority.Normal);
             if (id!=0)
             {
@@ -66,7 +73,8 @@ namespace TradeLink.AppKit
                 if (_attachdataasfile)
                     if (!AssemblaDocument.Create(space.Text, user.Text, pass.Text, path + DATAFILE, id))
                         status("data attach failed.");
-                System.Diagnostics.Process.Start(AssemblaTicket.GetTicketUrl(space.Text));
+                if (SucceedUrl!=null)
+                    System.Diagnostics.Process.Start(SucceedUrl);
                 if (TicketSucceed != null)
                     TicketSucceed();
 
@@ -76,6 +84,9 @@ namespace TradeLink.AppKit
                 status("login failed.");
                 if (TicketFailed != null)
                     TicketFailed();
+                if (FailUrl!=null)
+                    System.Diagnostics.Process.Start(FailUrl);
+
             }
 
         }
