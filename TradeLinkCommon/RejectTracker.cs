@@ -53,6 +53,18 @@ namespace TradeLink.Common
         }
 
         public event DebugDelegate SendDebugEvent;
+        public event LongDelegate SendCancelEvent;
+
+        void cancel(long id)
+        {
+            if (SendCancelEvent != null)
+            {
+                SendCancelEvent(id);
+                debug(id + " sent cancel.");
+            }
+            else
+                debug("send cancel events not defined on reject tracker.");
+        }
 
         void debug(string msg)
         {
@@ -106,6 +118,10 @@ namespace TradeLink.Common
             }
             
         }
+
+        bool _safetycancel = true;
+        public bool UseSafetyCancel { get { return _safetycancel; } set { _safetycancel = value; } }
+
         public bool isRejected(int idx)
         {
             if ((idx < 0) || (idx >= Count))
@@ -143,6 +159,9 @@ namespace TradeLink.Common
                 debug(id + " could not reject unknown id.");
                 return;
             }
+            // cancel just in case
+            if (UseSafetyCancel)
+                cancel(id);
             // mark as rejected
             rejected[idx] = true;
             // reject
