@@ -40,7 +40,7 @@ namespace TradeLinkTest
                 tls = new TradeLink.Common.TLServer_IP(Properties.Settings.Default.TLClientAddress, Properties.Settings.Default.TLClientPort);
             try
             {
-                GB = new GrayBox(tls, debug);
+            GB = new GrayBox(tls,this.lstStatusList,this.bt_Connect);
             }
             catch (Exception ex)
             {
@@ -57,8 +57,9 @@ namespace TradeLinkTest
            
 
              
-            
+            GB.Start();
 
+            this.txtPasword.Focus() ;
             
         }
 
@@ -87,18 +88,33 @@ namespace TradeLinkTest
                 return;
             }
 
+            if (GB.GetconnectionStatus() == false)
+            {
+                MessageBox.Show("Network connection failed. Please check.");
+                return;
+            }
                this.Cursor = Cursors.WaitCursor;
-               bool bConnected = GB.ConnectQuotesServer(txt_GBLoginName.Text, txtPasword.Text, "",  cboQuoteServer.Text, cboBookServer.Text);
+                string strBookServer = cboBookServer.Text;
+            if (strBookServer == "" || strBookServer == ",0" || strBookServer == ",32008")
+            {
+                strBookServer = "BOOKS1.HOLD.COM,32008";
+            }
+               bool bConnected = GB.ConnectQuotesServer(txt_GBLoginName.Text, txtPasword.Text, "",  cboQuoteServer.Text, strBookServer);
                this.Cursor = Cursors.Default;
 
            if (bConnected)
            {
-               bt_Connect.Enabled = false;
+               //bt_Connect.Enabled = false;
                txt_GBLoginName.Enabled = false;
                txtPasword.Enabled = false;
                cboQuoteServer.Enabled = false;
                cboBookServer.Enabled = false;
-           }
+               }
+               //else
+               //{
+               //    GB.Stop();
+               //    Close();
+               //}
            
         }
 
@@ -106,7 +122,7 @@ namespace TradeLinkTest
 
         private void btnClose_Click(object sender, EventArgs e)
         {
-            GB.DisconnectServer();
+            GB.Stop();
             Close();
         }
 
@@ -130,6 +146,30 @@ namespace TradeLinkTest
 
 
         }
+
+        private void PasswordKeyPressed(object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode == Keys.Enter)
+            {
+                bt_Connect_Click(sender, e);
+            }
+        }
+
+        private void PasswordKeyPressed(object sender, KeyPressEventArgs e)
+        {
+            if (e.ToString() == Keys.Enter.ToString())
+            {
+                bt_Connect_Click(sender, e);
+            }
+        }
+
+        protected void OnClosed(EventArgs e)
+        {
+            GB.Stop();
+            Close();
+        }
+
+
 
         
     }
