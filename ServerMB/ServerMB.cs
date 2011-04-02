@@ -1088,6 +1088,13 @@ namespace ServerMB
 
         public bool Start(int id, string user, string pw)
         {
+            if (m_ComMgr == null)
+            {
+                
+                debug("It does not appear you have MB Navigator installed.  Check Broker config guide on TradeLink project site.");
+                System.Diagnostics.Process.Start(@"http://code.google.com/p/tradelink/wiki/ComFactoryErrors");
+                return false;                
+            }
             m_ComMgr.DoLogin(id, user, pw, "");
             return true;
         }
