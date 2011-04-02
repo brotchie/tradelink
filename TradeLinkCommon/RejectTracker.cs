@@ -13,11 +13,12 @@ namespace TradeLink.Common
             _idt = idt;
             NewTxt += new TextIdxDelegate(RejectTracker_NewTxt);
         }
-
+        GenericTracker<bool> rejected = new GenericTracker<bool>();
         void RejectTracker_NewTxt(string txt, int idx)
         {
             ids.addindex(txt);
             times.addindex(txt);
+            rejected.addindex(txt);
         }
 
         long gettime { get { return System.DateTime.Now.Ticks; } }
@@ -78,6 +79,7 @@ namespace TradeLink.Common
             this[idx] = true;
         }
 
+        public void checkrejects() { checkrejects(gettime); }
         public void checkrejects(long ctime)
         {
             // compute allowed delay in nano-seconds that defines a reject
@@ -85,8 +87,11 @@ namespace TradeLink.Common
             // check every id
             for (int idx = 0; idx<this.Count; idx++)
             {
-                // ignore ids which have already been acked (or rejected)
+                // ignore ids which have already been acked 
                 if (this[idx])
+                    continue;
+                // ignore reject
+                if (rejected[idx])
                     continue;
                 // otherwise check for delay
                 if ((ctime - times[idx]) > delay)
@@ -101,6 +106,32 @@ namespace TradeLink.Common
             }
             
         }
+        public bool isRejected(int idx)
+        {
+            if ((idx < 0) || (idx >= Count))
+                return false;
+            return rejected[idx];
+        }
+        public bool isAccepted(int idx)
+        {
+            if ((idx < 0) || (idx >= Count))
+                return false;
+            return this[idx];
+        }
+        public bool isAccepted(long id)
+        {
+            int idx = getindex(id.ToString());
+            if ((idx < 0) || (idx >= Count))
+                return false;
+            return this[idx];
+        }
+        public bool isRejected(long id)
+        {
+            int idx = getindex(id.ToString());
+            if (idx < 0)
+                return false;
+            return rejected[idx];
+        }
 
         void reject(long id)
         {
@@ -112,8 +143,8 @@ namespace TradeLink.Common
                 debug(id + " could not reject unknown id.");
                 return;
             }
-            // mark as acked/rejected
-            this[idx] = true;
+            // mark as rejected
+            rejected[idx] = true;
             // reject
             if (SendRejectEvent != null)
                 SendRejectEvent(id);
