@@ -55,6 +55,8 @@ namespace TradeLink.Common
         public event DebugDelegate SendDebugEvent;
         public event LongDelegate SendCancelEvent;
 
+        
+
         void cancel(long id)
         {
             if (SendCancelEvent != null)
@@ -149,24 +151,39 @@ namespace TradeLink.Common
             return rejected[idx];
         }
 
-        void reject(long id)
+        public void reject(long id) { reject(id, true); }
+        public void reject(long id, bool simulatedreject)
         {
-            // get index
-            int idx = getindex(id.ToString());
-            // ignore unknown
-            if (idx < 0)
+            if (simulatedreject)
             {
-                debug(id + " could not reject unknown id.");
-                return;
+                // get index
+                int idx = getindex(id.ToString());
+                // ignore unknown
+                if (idx < 0)
+                {
+                    debug(id + " could not reject unknown id.");
+                    return;
+                }
+                // cancel just in case
+                if (UseSafetyCancel)
+                    cancel(id);
+
+                // mark as rejected
+                rejected[idx] = true;
             }
-            // cancel just in case
-            if (UseSafetyCancel)
-                cancel(id);
-            // mark as rejected
-            rejected[idx] = true;
             // reject
             if (SendRejectEvent != null)
                 SendRejectEvent(id);
+            else
+                debug("no reject event defined on reject tracker");
+        }
+
+        public event MessageDelegate GotMessageEvent;
+
+        public virtual void GotMessage(MessageTypes type, long source, long dest, long msgid, string request, ref string response)
+        {
+            if (GotMessageEvent!=null)
+                GotMessageEvent(type,source,dest,msgid,request,ref response);
         }
 
         public event OrderDelegate SendOrderEvent;
