@@ -84,6 +84,10 @@ namespace TradeLink.AppKit
         {
             Report(space, data, ex, (showtemplate ? templatequest() : string.Empty), user, pass, handlesuceed, pause,summary,string.Empty,string.Empty); 
         }
+        public static void Report(string space, string data, Exception ex, string highlight, string user, string pass, LoginSucceedDel handlesuceed, bool pause, string summary)
+        {
+            Report(space, data, ex, highlight, user, pass, handlesuceed, pause, summary, string.Empty, string.Empty);
+        }
         public static void Report(string space, string data, Exception ex, string highlight, string user, string pass, LoginSucceedDel handlesuceed, bool pause,string summary,string suceedurl, string failurl)
         {
             string header = Header(space, ex);

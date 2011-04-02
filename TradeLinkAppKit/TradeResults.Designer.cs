@@ -37,6 +37,7 @@
             // splitContainer1
             // 
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this.splitContainer1.Location = new System.Drawing.Point(0, 0);
             this.splitContainer1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.splitContainer1.Name = "splitContainer1";
@@ -45,8 +46,8 @@
             // splitContainer1.Panel1
             // 
             this.splitContainer1.Panel1.Controls.Add(this.tradefiles);
-            this.splitContainer1.Panel1MinSize = 50;
-            this.splitContainer1.Panel2MinSize = 50;
+            this.splitContainer1.Panel1MinSize = 0;
+            this.splitContainer1.Panel2MinSize = 0;
             this.splitContainer1.Size = new System.Drawing.Size(372, 310);
             this.splitContainer1.SplitterDistance = 137;
             this.splitContainer1.TabIndex = 1;
