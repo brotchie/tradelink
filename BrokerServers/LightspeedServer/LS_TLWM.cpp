@@ -149,6 +149,50 @@
 		return LightspeedDesktop;
 	}
 
+	TLOrder LS_TLWM::ProcessOrder(L_Order* order)
+	{
+		TLOrder o;
+		long lsid = order->L_ReferenceId();
+		// ensure it exists
+		if (order)
+		{
+			
+			// udpate order information
+			CTime ct = CTime(order->L_CreateTime());
+			o.symbol = CString(order->L_Symbol());
+			o.time = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
+			o.date = (ct.GetYear()*10000)+(ct.GetMonth()*100)+ct.GetDay();
+			o.exchange = CString(order->L_OriginalMarket());
+			o.price = order->L_AveragePrice();
+			o.side = order->L_TradeSide()=='B';
+			o.stop = order->L_SecondaryPrice();
+			o.size = (o.side ? 1 : -1) * abs(order->L_ActiveShares());
+			o.account = CString(accounts[0]->L_TraderId());
+			// try to save this order
+			bool isnew = saveOrder(order,0);
+			// if it fails, we already have it so get the id
+			// if it succeeds, we should be able to get the id anyways
+			int64 tlid = fetchOrderId(order);
+			o.id = tlid; 
+			// save the relationship
+			saveOrderId(tlid,lsid);
+			// debug
+			if (!_noverb)
+			{
+				CString tmp;
+				tmp.Format("lsid: %i tlid: %lld ordack: %s",lsid,tlid,o.Serialize());
+				v(tmp);
+			}
+		}
+		else
+		{
+			CString tmp;
+			tmp.Format("%i order id not found.",lsid);
+			D(tmp);
+		}
+		return o;
+	}
+
 	int LS_TLWM::UnknownMessage(int MessageType,CString msg)
 	{
 		switch (MessageType)
@@ -162,40 +206,38 @@
 					D(CString("Must send ORDERNOTIFY WITH: 'account+client' msg."));
 					break;
 				}
-				/*
-				Observable* m_account = B_GetAccount(r[0]);
-				if (m_account)
+				if (accounts.size()==0)
+					return INVALID_ACCOUNT;
+				
+				int count = 0;
+				
+				L_Account* acct = accounts[0];
+				
+
+				for (order_iterator pi = acct->active_orders_begin();pi != acct->active_orders_end(); ++pi)
 				{
-					// get all the orders available
-					void* iterator = B_CreateOrderIterator(OS_PENDINGLONG|OS_PENDINGSHORT, (1 << ST_LAST) - 1, m_account);
-					B_StartIteration(iterator);
-					Order* order;
-					while(order = B_GetNextOrder(iterator))
-					{
-						TLOrder o = ProcessOrder(order);
-						if (o.isValid())
-						{
-							TLSend(ORDERNOTIFY,o.Serialize(),r[1]);
-						}
-					}
-					B_DestroyIterator(iterator);
+					L_Order * ord = (*pi);
+					TradeLibFast::TLOrder o = ProcessOrder(ord);
+					// send valid orders back to client who requested them
+					if (o.isValid())
+						TLSend(ORDERNOTIFY,o.Serialize(),r[1]);
 				}
-				else
-				{
-					CString m;
-					m.Format("Invalid account: %s",r[0]);
-					D(m);
-				}*/
+				acct = NULL;
 			}
 			break;
 		case ISSHORTABLE :
 			{
-				/*
-				const StockBase* s = preload(msg);
-				if ((s==NULL)|| !s->isLoaded()) return SYMBOL_NOT_LOADED;
-				bool shortable = (s->GetStockAttributes() & STOCKATTR_UPC11830) == 0;
-				return shortable ? 1 : 0;
-				*/
+				
+				L_Summary* s = preload(msg);
+				if ((s==NULL)) 
+					return SYMBOL_NOT_LOADED;
+				int bcode = s->L_Borrowable();
+				if (bcode==-1)
+					return UNKNOWN_MESSAGE;
+				else if (bcode==0)
+					return 1;
+				else
+					return 0;
 			}
 			break;
 		case IMBALANCEREQUEST :
@@ -455,43 +497,11 @@
 							{
 								// get order
 								L_Order* order = accounts[0]->L_FindOrder(lsid);
-								// ensure it exists
-								if (order)
-								{
-									// udpate order information
-									CTime ct = CTime(order->L_CreateTime());
-									o.time = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
-									o.date = (ct.GetYear()*10000)+(ct.GetMonth()*100)+ct.GetDay();
-									o.exchange = CString(order->L_OriginalMarket());
-									o.price = order->L_AveragePrice();
-									o.side = order->L_TradeSide()=='B';
-									o.stop = order->L_SecondaryPrice();
-									o.size = (o.side ? 1 : -1) * abs(order->L_ActiveShares());
-									o.account = CString(accounts[0]->L_TraderId());
-									// try to save this order
-									bool isnew = saveOrder(order,0);
-									// if it fails, we already have it so get the id
-									// if it succeeds, we should be able to get the id anyways
-									int64 tlid = fetchOrderId(order);
-									o.id = tlid; 
-									// save the relationship
-									saveOrderId(tlid,lsid);
-									// notify 
+								// process it
+								o = ProcessOrder(order);
+								// notify
+								if (o.isValid())
 									SrvGotOrder(o);
-									// debug
-									if (!_noverb)
-									{
-										CString tmp;
-										tmp.Format("lsid: %i tlid: %lld ordack: %s",lsid,tlid,o.Serialize());
-										v(tmp);
-									}
-								}
-								else
-								{
-									CString tmp;
-									tmp.Format("%i order id not found.",lsid);
-									D(tmp);
-								}
 							}
 
 						}
@@ -574,6 +584,10 @@
 				k.os = m->L_AskSize();
 				k.sym = CString(m->L_Symbol());
 
+				uint h,min,s;
+				L_GetUSEasternTime(h,min,s);
+				k.time = (h*10000)+(min*100)+s;
+				k.date = _date;
 				this->SrvGotTickAsync(k);
 
 
@@ -594,6 +608,7 @@
 					break;
 				TLTick k;
 				CTime ct = CTime(m->L_Time());
+				k.sym = CString(m->L_Symbol());
 				k.trade = m->L_Price();
 				k.date = _date;
 				k.time = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
@@ -742,18 +757,14 @@
 		f.push_back(REGISTERSTOCK);
 		f.push_back(CLEARCLIENT);
 		f.push_back(CLEARSTOCKS);
+		f.push_back(ISSHORTABLE);
+		f.push_back(ORDERNOTIFYREQUEST);
 		f.push_back(FEATUREREQUEST);
 		f.push_back(FEATURERESPONSE);
 		f.push_back(TICKNOTIFY);
 		f.push_back(IMBALANCEREQUEST);
 		f.push_back(IMBALANCERESPONSE);
 
-/*		bool sim = B_IsAccountSimulation();
-		if (sim)
-			f.push_back(SIMTRADING);
-		else 
-			f.push_back(LIVETRADING);
-			*/
 		return f;
 	}
 
@@ -913,6 +924,9 @@
 				sec->L_Attach(this);
 				// get trade data
 				L_SubscribeToTrades(my[i],this);
+				CString m;
+				m.Format("added subscription for: %s",my[i]);
+				D(m);
 			}
 			subs.push_back(sec);
 			subsym.push_back(my[i]);
