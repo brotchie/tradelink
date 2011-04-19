@@ -147,6 +147,8 @@ namespace TradeLink.API
         /// get name of this client
         /// </summary>
         string Name { get; set; }
+
+        bool VerboseDebugging { get; set; }
     }
 
     /// <summary>

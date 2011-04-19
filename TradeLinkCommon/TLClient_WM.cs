@@ -80,6 +80,19 @@ namespace TradeLink.Common
             }
         }
 
+        bool _noverb = true;
+        /// <summary>
+        /// verbose debugging
+        /// </summary>
+        public bool VerboseDebugging { get { return !_noverb; } set { _noverb = !value; } }
+
+        void v(string msg)
+        {
+            if (_noverb)
+                return;
+            debug(msg);
+        }
+
  
         /// <summary>
         /// Gets or sets my handle of the parent application or form.
