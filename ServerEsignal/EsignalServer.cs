@@ -299,6 +299,9 @@ namespace ServerEsignal
                 k.bs = q.lBidSize;
                 k.os = q.lAskSize;
                 k.size = q.lLastSize;
+                DateTime now = esig.GetAppTime;
+                k.time = Util.ToTLTime(now);
+                k.date = Util.ToTLDate(now);
                 // send it
                 tl.newTick(k);
             }
