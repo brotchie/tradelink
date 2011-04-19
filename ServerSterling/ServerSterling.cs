@@ -864,7 +864,7 @@ namespace SterServer
                 int time;
                 if (int.TryParse(q.bstrUpdateTime, out time))
                 {
-                    Imbalance imb = new ImbalanceImpl(q.bstrSymbol, GetExPretty(q.bstrExch), q.nImbalance, time, 0, 0, q.nMktImbalance);
+                    Imbalance imb = new ImbalanceImpl(q.bstrSymbol, GetExPretty(q.bstrExch), q.nImbalance, time, 0, 0, 0);
                     tl.newImbalance(imb);
                 }
             }
@@ -882,7 +882,7 @@ namespace SterServer
                 int time;
                 if (int.TryParse(q.bstrUpdateTime, out time))
                 {
-                    Imbalance imb = new ImbalanceImpl(q.bstrSymbol, GetExPretty(q.bstrExch), q.nImbalance, time, 0, 0, q.nMktImbalance);
+                    Imbalance imb = new ImbalanceImpl(q.bstrSymbol, GetExPretty(q.bstrExch), 0, time, 0, 0, q.nImbalance);
                     tl.newImbalance(imb);
                 }
             }
