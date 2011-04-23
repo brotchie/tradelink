@@ -176,13 +176,24 @@ namespace TikConverter
                     debug("file does not exist: " + file);
                     continue;
                 }
-                // convert file
-                bool fg = ca.hassyms ? 
-                    convert(_conval,file,ds,ca.syms[i]) : 
-                    convert(_conval,file,ds);
+                bool status = false;
+                try
+                {
+                    // convert file
+                    status = ca.hassyms ?
+                        convert(_conval, file, ds, ca.syms[i]) :
+                        convert(_conval, file, ds);
+                }
+                catch (Exception ex)
+                {
+                    debug("Is your file correct formated?  Exception received processing: " + file + " err: " + ex.Message + ex.StackTrace);
+                    status = false;
+                }
+
                 // report progress
-                if (!fg) debug("error converting file: " + file);
-                g &= fg;
+                if (!status) 
+                    debug("error converting file: " + file);
+                g &= status;
             }
             e.Result = g;
 
