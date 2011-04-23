@@ -39,6 +39,8 @@ namespace SterServer
                     tls = new TradeLink.Common.TLServer_IP(Properties.Settings.Default.TLClientAddress, Properties.Settings.Default.TLClientPort);
 
                 tl = new ServerSterling(tls, Properties.Settings.Default.Sleep,Properties.Settings.Default.OrderSleep,debug);
+                tl.isPaperTradeUsingBidAsk = Properties.Settings.Default.PaperTradeUseBidAsk;
+                tl.isPaperTradeEnabled = Properties.Settings.Default.PaperTrade;
                 tl.UseXmlMode = Properties.Settings.Default.UseXMLQuotes;
                 tl.AutoCapAccounts = Properties.Settings.Default.AutoCapitilizeAccounts;
                 tl.CoverEnabled = Properties.Settings.Default.CoverEnabled;

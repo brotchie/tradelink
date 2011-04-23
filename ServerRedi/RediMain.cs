@@ -34,6 +34,8 @@ namespace ServerRedi
             TrackEnabled = Util.TrackUsage();
             Program = PROGRAM;
             InitializeComponent();
+            tl.isPaperTradeEnabled = Properties.Settings.Default.PaperTrade;
+            tl.isPaperTradeUsingBidAsk = Properties.Settings.Default.PaperTradeBidAsk;
             tl.VerboseDebugging = Properties.Settings.Default.VerboseDebugging;
             tl.SendDebug += new TradeLink.API.DebugDelegate(tl_SendDebug);
 

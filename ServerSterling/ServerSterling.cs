@@ -30,6 +30,12 @@ namespace SterServer
         int _fixorderdecimalplace = 2;
         public int FixOrderDecimalPlace { get { return _fixorderdecimalplace; } set { _fixorderdecimalplace = value; } }
 
+        bool _papertrade = false;
+        public bool isPaperTradeEnabled { get { return _papertrade; } set { _papertrade = value; } }
+        PapertradeTracker ptt = new PapertradeTracker();
+        bool _papertradebidask = false;
+        public bool isPaperTradeUsingBidAsk { get { return _papertradebidask; } set { _papertradebidask = value; } }
+
 
         PositionTracker pt = new PositionTracker();
         int _SLEEP = 50;
@@ -52,6 +58,7 @@ namespace SterServer
         public bool isConnected { get { return _connected; } }
         bool _verbosedebug = false;
         public bool VerboseDebugging { get { return _verbosedebug; } set { _verbosedebug = value; } }
+
         public bool Start()
         {
             try
@@ -69,6 +76,11 @@ namespace SterServer
                 _bw = new Thread(new ParameterizedThreadStart(background));
                 _runbg = true;
                 _bw.Start();
+                ptt.GotCancelEvent+=new LongDelegate(tl.newCancel);
+                ptt.GotFillEvent+=new FillDelegate(tl.newFill);
+                ptt.GotOrderEvent+=new OrderDelegate(tl.newOrder);
+                ptt.SendDebugEvent += new DebugDelegate(ptt_SendDebugEvent);
+                ptt.UseBidAskFills = isPaperTradeUsingBidAsk;
 
                 stiEvents.OnSTIShutdown += new _ISTIEventsEvents_OnSTIShutdownEventHandler(stiEvents_OnSTIShutdown);
                 stiEvents.SetOrderEventsAsStructs(true);
@@ -109,6 +121,8 @@ namespace SterServer
 
                 if(VerboseDebugging)
                     debug("Verbose Mode On.");
+                if (isPaperTradeEnabled)
+                    debug("Papertrading enabled.");
                 
             }
             catch (Exception ex)
@@ -120,6 +134,13 @@ namespace SterServer
             debug(PROGRAM + " started.");
             _connected = true;
             return _connected;
+        }
+
+        void ptt_SendDebugEvent(string msg)
+        {
+            if (!isPaperTradeEnabled)
+                return;
+            v("papertrade: " + msg);
         }
 
         void tl_SendDebugEvent(string message)
@@ -500,56 +521,63 @@ namespace SterServer
                         {
                             o.id = _idt.AssignId;
                         }
-                        o.price = Math.Round(o.price, FixOrderDecimalPlace);
-                        o.stopp = Math.Round(o.stopp, FixOrderDecimalPlace);
-                        order.LmtPrice = (double)o.price;
-                        order.StpPrice = (double)o.stopp;
-                        if (o.ex == string.Empty)
-                            o.ex = o.symbol.Length > 3 ? "NSDQ" : "NYSE";
-                        order.Destination = o.Exchange;
-                        order.Side = getside(o.symbol,o.side);
-                        order.Symbol = o.symbol;
-                        order.Quantity = o.UnsignedSize;
-                        string acct = Account != string.Empty ? Account : string.Empty;
-                        order.Account = o.Account != string.Empty ? o.Account : acct;
-                        order.Destination = o.Exchange != "" ? o.ex : "NYSE";
-                        bool close = o.TIFValid == TIFTypes.MOC;
-                        order.Tif = tif2tif(o.TIF);
-                        if (close)
+                        if (isPaperTradeEnabled)
                         {
-                            if (o.isMarket)
-                                order.PriceType = STIPriceTypes.ptSTIMktClo;
+                            ptt.sendorder(o);
+                        }
+                        else
+                        {
+                            o.price = Math.Round(o.price, FixOrderDecimalPlace);
+                            o.stopp = Math.Round(o.stopp, FixOrderDecimalPlace);
+                            order.LmtPrice = (double)o.price;
+                            order.StpPrice = (double)o.stopp;
+                            if (o.ex == string.Empty)
+                                o.ex = o.symbol.Length > 3 ? "NSDQ" : "NYSE";
+                            order.Destination = o.Exchange;
+                            order.Side = getside(o.symbol, o.side);
+                            order.Symbol = o.symbol;
+                            order.Quantity = o.UnsignedSize;
+                            string acct = Account != string.Empty ? Account : string.Empty;
+                            order.Account = o.Account != string.Empty ? o.Account : acct;
+                            order.Destination = o.Exchange != "" ? o.ex : "NYSE";
+                            bool close = o.TIFValid == TIFTypes.MOC;
+                            order.Tif = tif2tif(o.TIF);
+                            if (close)
+                            {
+                                if (o.isMarket)
+                                    order.PriceType = STIPriceTypes.ptSTIMktClo;
+                                else if (o.isLimit)
+                                    order.PriceType = STIPriceTypes.ptSTILmtClo;
+                                else
+                                    order.PriceType = STIPriceTypes.ptSTIClo;
+                            }
+                            else if (o.isMarket)
+                                order.PriceType = STIPriceTypes.ptSTIMkt;
+                            else if (o.isLimit && o.isStop)
+                                order.PriceType = STIPriceTypes.ptSTISvrStpLmt;
                             else if (o.isLimit)
-                                order.PriceType = STIPriceTypes.ptSTILmtClo;
-                            else
-                                order.PriceType = STIPriceTypes.ptSTIClo;
+                                order.PriceType = STIPriceTypes.ptSTILmt;
+                            else if (o.isStop)
+                                order.PriceType = STIPriceTypes.ptSTISvrStp;
+                            else if (o.isTrail)
+                                order.PriceType = STIPriceTypes.ptSTITrailStp;
+                            order.ClOrderID = o.id.ToString();
+                            int err = order.SubmitOrder();
+                            if (VerboseDebugging)
+                                debug("client order sent: " + order.ClOrderID);
+                            string tmp = "";
+                            if ((err == 0) && (!idacct.TryGetValue(o.id, out tmp)))
+                            {
+                                // save account/id relationship for canceling
+                                idacct.Add(o.id, order.Account);
+                                // wait briefly between orders
+                                Thread.Sleep(_ORDERSLEEP);
+                            }
+                            if (err < 0)
+                                debug("Error sending order: " + Util.PrettyError(tl.newProviderName, err) + o.ToString());
+                            if (err == -1)
+                                debug("Make sure you have set the account in sending program.");
                         }
-                        else if (o.isMarket)
-                            order.PriceType = STIPriceTypes.ptSTIMkt;
-                        else if (o.isLimit && o.isStop)
-                            order.PriceType = STIPriceTypes.ptSTISvrStpLmt;
-                        else if (o.isLimit)
-                            order.PriceType = STIPriceTypes.ptSTILmt;
-                        else if (o.isStop)
-                            order.PriceType = STIPriceTypes.ptSTISvrStp;
-                        else if (o.isTrail)
-                            order.PriceType = STIPriceTypes.ptSTITrailStp;
-                        order.ClOrderID = o.id.ToString();
-                        int err = order.SubmitOrder();
-                        if (VerboseDebugging)
-                            debug("client order sent: " + order.ClOrderID);
-                        string tmp = "";
-                        if ((err == 0) && (!idacct.TryGetValue(o.id, out tmp)))
-                        {
-                            // save account/id relationship for canceling
-                            idacct.Add(o.id, order.Account);
-                            // wait briefly between orders
-                            Thread.Sleep(_ORDERSLEEP);
-                        }
-                        if (err < 0)
-                            debug("Error sending order: " + Util.PrettyError(tl.newProviderName, err) + o.ToString());
-                        if (err == -1)
-                            debug("Make sure you have set the account in sending program.");
                     }
 
                     // new quotes
@@ -572,30 +600,37 @@ namespace SterServer
                     if (!_cancelq.isEmpty)
                     {
                         long number = _cancelq.Read();
-                        string acct = "";
-                        if (idacct.TryGetValue(number, out acct))
+                        if (isPaperTradeEnabled)
                         {
-                            // get unique cancel id
-                            long cancelid = _canceltracker.AssignId;
-                            // save cancel to order id relationship
-                            _cancel2order.Add(cancelid, number);
-                            bool isman;
-                            // see if it's a manual order
-                            if (!ismanorder.TryGetValue(number,out isman))
-                                isman = false;
-                            // send cancel
-                            if (isman) // manual orders use nOrderRercordId
-                                stiOrder.CancelOrder(acct, (int)number,null, cancelid.ToString());
-                            else
-                                stiOrder.CancelOrder(acct, 0, number.ToString(), cancelid.ToString());
-                            if (VerboseDebugging)
-                                debug("client cancel requested: " + number.ToString() + " " + cancelid.ToString());
+                            ptt.sendcancel(number);
                         }
                         else
-                            debug("No record of order id: " + number.ToString());
-                        // see if empty yet
-                        if (_cancelq.hasItems)
-                            Thread.Sleep(_CANCELWAIT);
+                        {
+                            string acct = "";
+                            if (idacct.TryGetValue(number, out acct))
+                            {
+                                // get unique cancel id
+                                long cancelid = _canceltracker.AssignId;
+                                // save cancel to order id relationship
+                                _cancel2order.Add(cancelid, number);
+                                bool isman;
+                                // see if it's a manual order
+                                if (!ismanorder.TryGetValue(number, out isman))
+                                    isman = false;
+                                // send cancel
+                                if (isman) // manual orders use nOrderRercordId
+                                    stiOrder.CancelOrder(acct, (int)number, null, cancelid.ToString());
+                                else
+                                    stiOrder.CancelOrder(acct, 0, number.ToString(), cancelid.ToString());
+                                if (VerboseDebugging)
+                                    debug("client cancel requested: " + number.ToString() + " " + cancelid.ToString());
+                            }
+                            else
+                                debug("No record of order id: " + number.ToString());
+                            // see if empty yet
+                            if (_cancelq.hasItems)
+                                Thread.Sleep(_CANCELWAIT);
+                        }
                     }
 
                     // messages
@@ -843,6 +878,10 @@ namespace SterServer
                 _lasttime = k.time;
                 k.trade = (decimal)q.fLastPrice;
                 k.size = q.nLastSize;
+                // execute orders if papertrade is enabled
+                if (isPaperTradeEnabled)
+                    ptt.newTick(k);
+                // notify clients of tick
                 if (!_imbalance || (_imbalance && k.isValid))
                     tl.newTick(k);
             }

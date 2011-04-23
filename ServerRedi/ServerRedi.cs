@@ -31,6 +31,15 @@ namespace ServerRedi
         Dictionary<string, long> OrderIdDict;
         PositionTracker pt = new PositionTracker();
         List<string> accts = new List<string>();
+
+        bool _papertrade = false;
+        public bool isPaperTradeEnabled { get { return _papertrade; } set { _papertrade = value; } }
+        PapertradeTracker ptt = new PapertradeTracker();
+        bool _papertradebidask = false;
+        public bool isPaperTradeUsingBidAsk { get { return _papertradebidask; } set { _papertradebidask = value; } }
+
+
+
         
         public ServerRedi(TLServer tls) : this(tls, 50) { }
         public ServerRedi(TLServer tls, int sleepvalue)
@@ -131,64 +140,82 @@ namespace ServerRedi
                 while (!_neworders.isEmpty)
                 {                  
                     Order o = _neworders.Read();
-                    RediLib.ORDER rediOrder = new RediLib.ORDERClass();
-
+                    v("received order: " + o.ToString());
                     if (o.Account == string.Empty)
                         o.Account = Account;
-                    // get any current position in symbol
-                    Position p = pt[o.symbol];
-                    // determine if a sell order should be a long exit or a short entry
-                    string side = !o.side && !p.isLong ? "Short" : (o.side ? "Buy" : "Sell");   
 
-                    rediOrder.Account = o.Account;
-                    rediOrder.UserID = _userid;
-                    rediOrder.Password = _pwd;
-                    
-                    rediOrder.TIF = o.TIF;
-                    rediOrder.Side = side;
-                    rediOrder.Symbol = o.symbol;
-                    if (o.ex == string.Empty)
-                        o.ex = o.symbol.Length > 3 ? "ARCA" : "NYSE";
-                    rediOrder.Exchange = o.ex;
-                    rediOrder.Quantity = o.UnsignedSize;
-                    rediOrder.Price = o.price.ToString();
-                    string priceType = o.isMarket ? "MKT" : (o.isLimit ? "Limit" : "MKT");
-                    rediOrder.PriceType = priceType;
-                    
-                    rediOrder.StopPrice = o.stopp;                    
-                    rediOrder.Memo = "none";
-                    rediOrder.Warning = false;                    
-                    object err = null;
-                    object transId = null;
-                    bool IsSuccessful = rediOrder.Submit2(ref transId, ref err);
-                    if (IsSuccessful)
+                    if (isPaperTradeEnabled)
                     {
-                        v("successfully sent order: " + o.ToString());
-                        object err1 = null;
-                        _messageCache.VBRediCache.AddWatch(1, o.symbol, "", ref err1);
-                        
-                        if (!(err1 == null))
-                            debug("FAILED open of Table! Table : Message  Error:" + err1.ToString()); 
-                        else
-                            v("successfully watching symbol: "+o.symbol);
-                        
+                        ptt.sendorder(o);
                     }
                     else
                     {
-                        v("error sending order: " + o.ToString());
-                        if(!(err == null))
-                            debug("order submission was not successful: " + err.ToString());
+                        RediLib.ORDER rediOrder = new RediLib.ORDERClass();
+
+
+                        // get any current position in symbol
+                        Position p = pt[o.symbol];
+                        // determine if a sell order should be a long exit or a short entry
+                        string side = !o.side && !p.isLong ? "Short" : (o.side ? "Buy" : "Sell");
+
+                        rediOrder.Account = o.Account;
+                        rediOrder.UserID = _userid;
+                        rediOrder.Password = _pwd;
+
+                        rediOrder.TIF = o.TIF;
+                        rediOrder.Side = side;
+                        rediOrder.Symbol = o.symbol;
+                        if (o.ex == string.Empty)
+                            o.ex = o.symbol.Length > 3 ? "ARCA" : "NYSE";
+                        rediOrder.Exchange = o.ex;
+                        rediOrder.Quantity = o.UnsignedSize;
+                        rediOrder.Price = o.price.ToString();
+                        string priceType = o.isMarket ? "MKT" : (o.isLimit ? "Limit" : "MKT");
+                        rediOrder.PriceType = priceType;
+
+                        rediOrder.StopPrice = o.stopp;
+                        rediOrder.Memo = "none";
+                        rediOrder.Warning = false;
+                        object err = null;
+                        object transId = null;
+                        bool IsSuccessful = rediOrder.Submit2(ref transId, ref err);
+                        if (IsSuccessful)
+                        {
+                            v("successfully sent order: " + o.ToString());
+                            object err1 = null;
+                            _messageCache.VBRediCache.AddWatch(1, o.symbol, "", ref err1);
+
+                            if (!(err1 == null))
+                                debug("FAILED open of Table! Table : Message  Error:" + err1.ToString());
+                            else
+                                v("successfully watching symbol: " + o.symbol);
+
+                        }
+                        else
+                        {
+                            v("error sending order: " + o.ToString());
+                            if (!(err == null))
+                                debug("order submission was not successful: " + err.ToString());
+                        }
                     }
                 }                
                 while (!_newcancel.isEmpty)
                 {
                     long id = _newcancel.Read();
-                    object err = null;                    
-                    _messageCache.VBRediCache.Cancel(id, ref err);
-                    if (err != null)
-                        v("error canceling id: " + id);
+                    v("received cancel request: " + id);
+                    if (isPaperTradeEnabled)
+                    {
+                        ptt.sendcancel(id);
+                    }
                     else
-                        v("cancel request sent for: " + id);
+                    {
+                        object err = null;
+                        _messageCache.VBRediCache.Cancel(id, ref err);
+                        if (err != null)
+                            v("error canceling id: " + id);
+                        else
+                            v("cancel request sent for: " + id);
+                    }
                 }
                 if (_newcancel.isEmpty && _neworders.isEmpty && _newsyms.isEmpty)
                     Thread.Sleep(_SLEEP);
@@ -661,6 +688,9 @@ namespace ServerRedi
                             }                            
                             k.date = Util.ToTLDate(DateTime.Now);
                             k.time = Util.DT2FT(DateTime.Now);
+                            // fill papertrade orders first
+                            if (isPaperTradeEnabled)
+                                ptt.newTick(k);
                             tl.newTick(k);
                         }
                         catch (Exception exc)
@@ -778,7 +808,14 @@ namespace ServerRedi
                 _pwd = pw;
                 Account = accnt;
                 OrderIdDict = new Dictionary<string, long>();
+                ptt.GotCancelEvent += new LongDelegate(tl.newCancel);
+                ptt.GotFillEvent += new FillDelegate(tl.newFill);
+                ptt.GotOrderEvent += new OrderDelegate(tl.newOrder);
+                ptt.SendDebugEvent += new DebugDelegate(ptt_SendDebugEvent);
+                ptt.UseBidAskFills = isPaperTradeUsingBidAsk;
                 _bw.Start();
+                if (isPaperTradeEnabled)
+                    debug("Papertrading enabled.");
             }
             catch (Exception ex)
             {
@@ -792,6 +829,13 @@ namespace ServerRedi
             debug("User: " + _cc.VBRediCache.UserID);
             _conn = true;
             return true;
+        }
+
+        void ptt_SendDebugEvent(string msg)
+        {
+            if (!isPaperTradeEnabled)
+                return;
+            v("papertrade: " + msg);
         }        
         public void Stop()
         {
