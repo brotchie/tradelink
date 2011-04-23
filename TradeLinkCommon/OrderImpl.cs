@@ -9,7 +9,7 @@ namespace TradeLink.Common
     [Serializable]
     public class OrderImpl : TradeImpl, Order
     {
-        public TIFTypes TIFValid { get { return (TIFTypes)Enum.Parse(typeof(TIFTypes), _tif, true); } set { _tif = value.ToString().Replace("TIFTypes",string.Empty).Replace(".",string.Empty); } }
+        public OrderInstructionType ValidInstruct { get { return (OrderInstructionType)Enum.Parse(typeof(OrderInstructionType), _tif, true); } set { _tif = value.ToString().Replace("OrderInstructionType", string.Empty).Replace(".", string.Empty); } }
         string _tif = "DAY";
         int  _date, _time,_size;
         decimal _price,_stopp,_trail;

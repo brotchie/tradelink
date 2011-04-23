@@ -529,8 +529,7 @@ namespace SterServer
                         {
                             o.price = Math.Round(o.price, FixOrderDecimalPlace);
                             o.stopp = Math.Round(o.stopp, FixOrderDecimalPlace);
-                            order.LmtPrice = (double)o.price;
-                            order.StpPrice = (double)o.stopp;
+
                             if (o.ex == string.Empty)
                                 o.ex = o.symbol.Length > 3 ? "NSDQ" : "NYSE";
                             order.Destination = o.Exchange;
@@ -540,8 +539,14 @@ namespace SterServer
                             string acct = Account != string.Empty ? Account : string.Empty;
                             order.Account = o.Account != string.Empty ? o.Account : acct;
                             order.Destination = o.Exchange != "" ? o.ex : "NYSE";
-                            bool close = o.TIFValid == TIFTypes.MOC;
+                            bool close = o.ValidInstruct == OrderInstructionType.MOC;
+                            bool pegged = (o.ValidInstruct >= OrderInstructionType.PEG2MID) && (o.ValidInstruct <= OrderInstructionType.PEG2BST);
                             order.Tif = tif2tif(o.TIF);
+                            if (!pegged)
+                            {
+                                order.LmtPrice = (double)o.price;
+                                order.StpPrice = (double)o.stopp;
+                            }
                             if (close)
                             {
                                 if (o.isMarket)
@@ -550,6 +555,19 @@ namespace SterServer
                                     order.PriceType = STIPriceTypes.ptSTILmtClo;
                                 else
                                     order.PriceType = STIPriceTypes.ptSTIClo;
+                            }
+                            else if (pegged)
+                            {
+                                order.PriceType = STIPriceTypes.ptSTIPegged;
+                                order.PegDiff = (double)o.price;
+                                if (o.ValidInstruct== OrderInstructionType.PEG2BST)
+                                    order.ExecInst = "T";
+                                else if (o.ValidInstruct== OrderInstructionType.PEG2MID)
+                                    order.ExecInst = "M";
+                                else if (o.ValidInstruct== OrderInstructionType.PEG2MKT)
+                                    order.ExecInst = "P";
+                                else if (o.ValidInstruct== OrderInstructionType.PEG2PRI)
+                                    order.ExecInst = "R";
                             }
                             else if (o.isMarket)
                                 order.PriceType = STIPriceTypes.ptSTIMkt;
@@ -693,17 +711,18 @@ namespace SterServer
 
         string tif2tif(string incoming)
         {
+            if (incoming == string.Empty)
+                return "D";
+
             if ((incoming == "OPG") || (incoming == "OPN"))
             {
                 return "O";
             }
-            if (incoming == "MOC")
+            else if (incoming == "MOC")
             {
                 return "D";
             }
-            if (incoming == string.Empty)
-                return "D";
-            return incoming;
+            return "D";
         }
 
         Dictionary<long, long> _cancel2order = new Dictionary<long, long>(MAXRECORD);
