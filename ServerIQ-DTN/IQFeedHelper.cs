@@ -568,7 +568,13 @@ namespace IQFeedBroker
                     if (actualData[0] == "F") return;
                         Tick tick = new TickImpl();
                         tick.date = Util.ToTLDate();
-                        tick.time = Util.DT2FT(DateTime.Parse(actualData[65]));
+                    DateTime now;
+                    if (DateTime.TryParse(actualData[65], out now))
+                    {
+                        tick.time = Util.DT2FT(now);
+                    }
+                    else
+                        tick.time = Util.ToTLTime();
                         int v = 0;
                         if (int.TryParse(actualData[64],out v))
                             tick.oe = getmarket(v);
