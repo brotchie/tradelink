@@ -14,6 +14,14 @@ namespace ServerEsignal
         BackgroundWorker bw = new BackgroundWorker();
         Hooks esig;
         bool _valid = false;
+
+        bool _papertrade = false;
+        public bool isPaperTradeEnabled { get { return _papertrade; } set { _papertrade = value; } }
+        PapertradeTracker ptt = new PapertradeTracker();
+        bool _papertradebidask = false;
+        public bool isPaperTradeUsingBidAsk { get { return _papertradebidask; } set { _papertradebidask = value; } }
+
+
         Basket _mb = new BasketImpl();
         public event DebugFullDelegate GotDebug;
         bool _go = true;
@@ -35,7 +43,35 @@ namespace ServerEsignal
             tl.newFeatureRequest += new MessageArrayDelegate(tl_newFeatureRequest);
             // handle unknown messages
             tl.newUnknownRequest += new UnknownMessageDelegate(EsignalServer_newUnknownRequest);
+            tl.newSendOrderRequest += new OrderDelegateStatus(tl_newSendOrderRequest);
+            tl.newOrderCancelRequest += new LongDelegate(tl_newOrderCancelRequest);
+
             tl.Start();
+        }
+
+        void tl_newOrderCancelRequest(long val)
+        {
+            ptt.sendcancel(val);
+        }
+
+        long tl_newSendOrderRequest(Order o)
+        {
+            if (isPaperTradeEnabled)
+            {
+                ptt.sendorder(o);
+            }
+            else
+            {
+                debug("paper trade disabled, ignoring order: "+o.ToString());
+            }
+            return 0;
+        }
+
+        void ptt_SendDebugEvent(string msg)
+        {
+            if (!isPaperTradeEnabled)
+                return;
+            verb(msg);
         }
 
         void tl_newRegisterSymbols(string client, string symbols)
@@ -182,6 +218,12 @@ namespace ServerEsignal
         {
             try
             {
+                // paper trading
+                ptt.GotCancelEvent += new LongDelegate(tl.newCancel);
+                ptt.GotFillEvent += new FillDelegate(tl.newFill);
+                ptt.GotOrderEvent += new OrderDelegate(tl.newOrder);
+                ptt.SendDebugEvent += new DebugDelegate(ptt_SendDebugEvent);
+                ptt.UseBidAskFills = isPaperTradeUsingBidAsk;
                 debug("attempting to start connection");
                 // connect to esignal
                 esig = new Hooks();
@@ -282,6 +324,18 @@ namespace ServerEsignal
             f.Add(MessageTypes.LIVEDATA);
             f.Add(MessageTypes.BARRESPONSE);
             f.Add(MessageTypes.BARREQUEST);
+            if (isPaperTradeEnabled)
+            {
+                f.Add(MessageTypes.SIMTRADING);
+                f.Add(MessageTypes.SENDORDER);
+                f.Add(MessageTypes.SENDORDERLIMIT);
+                f.Add(MessageTypes.SENDORDERMARKET);
+                f.Add(MessageTypes.SENDORDERSTOP);
+                f.Add(MessageTypes.ORDERNOTIFY);
+                f.Add(MessageTypes.ORDERCANCELREQUEST);
+                f.Add(MessageTypes.ORDERCANCELRESPONSE);
+                f.Add(MessageTypes.EXECUTENOTIFY);
+            }
             return f.ToArray();
         }
         void esig_OnQuoteChanged(string sSymbol)
@@ -302,8 +356,13 @@ namespace ServerEsignal
                 DateTime now = esig.GetAppTime;
                 k.time = Util.ToTLTime(now);
                 k.date = Util.ToTLDate(now);
+                if (isPaperTradeEnabled)
+                {
+                    ptt.newTick(k);
+                }
                 // send it
                 tl.newTick(k);
+
             }
             catch (Exception ex)
             {

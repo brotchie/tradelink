@@ -35,6 +35,8 @@ namespace ServerEsignal
             InitializeComponent();
             tl = new EsignalServer(tls);
             // set defaults
+            tl.isPaperTradeEnabled = Properties.Settings.Default.PaperTrade;
+            tl.isPaperTradeUsingBidAsk = Properties.Settings.Default.PaperTradeUseBidAsk;
             tl.AllowSendInvalidBars = Properties.Settings.Default.AllowSendOfInvalidBars;
             tl.DefaultBarsBack = Properties.Settings.Default.DefaultBarsBack;
             tl.VerboseDebugging = Properties.Settings.Default.VerboseDebugging;

@@ -44,6 +44,15 @@ namespace IQFeedBroker
         #endregion
         #region Constructors
         public string DtnPath = string.Empty;
+
+
+        bool _papertrade = false;
+        public bool isPaperTradeEnabled { get { return _papertrade; } set { _papertrade = value; } }
+        PapertradeTracker ptt = new PapertradeTracker();
+        bool _papertradebidask = false;
+        public bool isPaperTradeUsingBidAsk { get { return _papertradebidask; } set { _papertradebidask = value; } }
+
+
         public IQFeedHelper(TLServer tls)
         {
             _basket = new BasketImpl();
@@ -54,7 +63,22 @@ namespace IQFeedBroker
             tl.newRegisterSymbols += new SymbolRegisterDel(tl_newRegisterSymbols);
             tl.newFeatureRequest += new MessageArrayDelegate(IQFeedHelper_newFeatureRequest);
             tl.newUnknownRequest += new UnknownMessageDelegate(IQFeedHelper_newUnknownRequest);
+            tl.newSendOrderRequest += new OrderDelegateStatus(tl_newSendOrderRequest);
+            tl.newOrderCancelRequest+=new LongDelegate(ptt.sendcancel);
             _cb_hist = new AsyncCallback(OnReceiveHist);
+        }
+
+        long tl_newSendOrderRequest(Order o)
+        {
+            if (isPaperTradeEnabled)
+            {
+                ptt.sendorder(o);
+            }
+            else
+            {
+                debug("paper trade disabled, ignoring: " + o);
+            }
+            return 0;
         }
 
         void tl_newRegisterSymbols(string client, string symbols)
@@ -160,6 +184,18 @@ namespace IQFeedBroker
             f.Add(MessageTypes.BARRESPONSE);
             f.Add(MessageTypes.DAYHIGH);
             f.Add(MessageTypes.DAYLOW);
+            if (isPaperTradeEnabled)
+            {
+                f.Add(MessageTypes.SIMTRADING);
+                f.Add(MessageTypes.SENDORDER);
+                f.Add(MessageTypes.SENDORDERLIMIT);
+                f.Add(MessageTypes.SENDORDERMARKET);
+                f.Add(MessageTypes.SENDORDERSTOP);
+                f.Add(MessageTypes.ORDERNOTIFY);
+                f.Add(MessageTypes.ORDERCANCELREQUEST);
+                f.Add(MessageTypes.ORDERCANCELRESPONSE);
+                f.Add(MessageTypes.EXECUTENOTIFY);
+            }
             return f.ToArray();
         }
 
@@ -263,6 +299,12 @@ namespace IQFeedBroker
 
         public void Start(string username, string password, string data1, int data2)
         {
+            // paper trading
+            ptt.GotCancelEvent += new LongDelegate(tl.newCancel);
+            ptt.GotFillEvent += new FillDelegate(tl.newFill);
+            ptt.GotOrderEvent += new OrderDelegate(tl.newOrder);
+            ptt.SendDebugEvent += new DebugDelegate(ptt_SendDebugEvent);
+            ptt.UseBidAskFills = isPaperTradeUsingBidAsk;
             _registered = false;
             // get IQConnect Location from registry
             // IQFeed Installation directory is stored in the registry key
@@ -282,6 +324,13 @@ namespace IQFeedBroker
             _pswd = password;
             _prod = data1;
             _connect.RunWorkerAsync();
+        }
+
+        void ptt_SendDebugEvent(string msg)
+        {
+            if (!isPaperTradeEnabled)
+                return;
+            debug("papertrade: " + msg);
         }
         void Connect()
         {
@@ -604,7 +653,8 @@ namespace IQFeedBroker
                             _highs[idx] = d;
                         if (decimal.TryParse(actualData[9], out d))
                             _lows[idx] = d;
-                        
+                        if (isPaperTradeEnabled)
+                            tl.newTick(tick);
                         tl.newTick(tick);
                 }
                 catch (Exception ex)
