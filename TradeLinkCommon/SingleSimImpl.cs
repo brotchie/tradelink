@@ -220,8 +220,6 @@ namespace TradeLink.Common
                 // update last time
                 lasttime = next.datetime;
                 orderok &= lasttick || (t.datetime >= next.datetime) || (cidx!=next.symidx);
-                if (!orderok)
-                    D(t.ToString());
 
             }
             if (lasttick)
