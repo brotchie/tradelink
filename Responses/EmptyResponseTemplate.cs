@@ -36,7 +36,7 @@ namespace Responses
         public event DebugFullDelegate SendDebugEvent;
         public event OrderSourceDelegate SendOrderEvent;
         public event LongSourceDelegate SendCancelEvent;
-        public event StringParamDelegate SendIndicatorsEvent;
+        public event ResponseStringDel SendIndicatorsEvent;
         public event MessageDelegate SendMessageEvent;
         public event BasketDelegate SendBasketEvent;
         public event ChartLabelDelegate SendChartLabelEvent;

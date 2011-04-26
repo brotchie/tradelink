@@ -15,7 +15,7 @@ namespace TradeLink.API
         void GotMessage(MessageTypes type, long source, long dest, long msgid, string request,ref string response);
 
         // Response output
-        event StringParamDelegate SendIndicatorsEvent;
+        event ResponseStringDel SendIndicatorsEvent;
         event OrderSourceDelegate SendOrderEvent;
         event LongSourceDelegate SendCancelEvent;
         event DebugFullDelegate SendDebugEvent;

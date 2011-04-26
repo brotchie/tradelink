@@ -616,7 +616,7 @@ namespace Kadina
                 myres.SendDebugEvent += new DebugFullDelegate(myres_GotDebug);
                 myres.SendCancelEvent += new LongSourceDelegate(myres_CancelOrderSource);
                 myres.SendOrderEvent += new OrderSourceDelegate(myres_SendOrder);
-                myres.SendIndicatorsEvent += new StringParamDelegate(myres_SendIndicators);
+                myres.SendIndicatorsEvent += new ResponseStringDel(myres_SendIndicators);
                 myres.SendMessageEvent += new MessageDelegate(myres_SendMessage);
                 myres.SendBasketEvent += new BasketDelegate(myres_SendBasket);
                 myres.SendChartLabelEvent += new ChartLabelDelegate(myres_SendChartLabel);
@@ -669,7 +669,7 @@ namespace Kadina
         public const string PROGRAM = "Kadina";
         void updatetitle() { Text = PROGRAM + " - Study: " + resname + " " + PrettyEPF(); Invalidate(); }
 
-        void myres_SendIndicators(string param)
+        void myres_SendIndicators(int idx, string param)
         {
             if (myres == null) return;
             if (myres.Indicators.Length == 0)

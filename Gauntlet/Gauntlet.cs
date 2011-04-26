@@ -427,7 +427,7 @@ namespace WinGauntlet
             args.Response.ID = 0;
             args.Response.SendTicketEvent += new TicketDelegate(Response_SendTicketEvent);
             args.Response.SendMessageEvent += new MessageDelegate(Response_SendMessage);
-            args.Response.SendIndicatorsEvent += new StringParamDelegate(Response_SendIndicators);
+            args.Response.SendIndicatorsEvent += new ResponseStringDel(Response_SendIndicators);
             args.Response.SendDebugEvent += new DebugFullDelegate(Response_GotDebug);
             args.Response.SendCancelEvent += new LongSourceDelegate(Response_CancelOrderSource);
             args.Response.SendOrderEvent += new OrderSourceDelegate(Response_SendOrder);
@@ -473,7 +473,7 @@ namespace WinGauntlet
             }
         }
 
-        void Response_SendIndicators(string param)
+        void Response_SendIndicators(int id, string param)
         {
             if (!args.Indicators) return;
             // prepare indicator output

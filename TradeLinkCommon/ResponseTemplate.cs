@@ -86,17 +86,17 @@ namespace TradeLink.Common
         /// short form of sendindicator
         /// </summary>
         /// <param name="indicators"></param>
-        public virtual void I(string indicators) { SendIndicatorsEvent(indicators); }
+        public virtual void I(string indicators) { SendIndicatorsEvent(ID,indicators); }
         /// <summary>
         /// short form of sendindicator
         /// </summary>
         /// <param name="indicators"></param>
-        public virtual void I(object[] indicators) { string[] s = new string[indicators.Length]; for (int i = 0; i < indicators.Length; i++) s[i] = indicators[i].ToString(); SendIndicatorsEvent(string.Join(",", s)); }
+        public virtual void I(object[] indicators) { string[] s = new string[indicators.Length]; for (int i = 0; i < indicators.Length; i++) s[i] = indicators[i].ToString(); SendIndicatorsEvent(ID, string.Join(",", s)); }
         /// <summary>
         /// short form of sendindicator
         /// </summary>
         /// <param name="indicators"></param>
-        public virtual void I(string[] indicators) { SendIndicatorsEvent(string.Join(",", indicators)); }
+        public virtual void I(string[] indicators) { SendIndicatorsEvent(ID, string.Join(",", indicators)); }
         /// <summary>
         /// sends an order
         /// </summary>
@@ -111,17 +111,17 @@ namespace TradeLink.Common
         /// sends indicators as array of objects for later analysis
         /// </summary>
         /// <param name="indicators"></param>
-        public virtual void sendindicators(object[] indicators) { string[] s = new string[indicators.Length]; for (int i = 0; i < indicators.Length; i++) s[i] = indicators[i].ToString(); SendIndicatorsEvent(string.Join(",", s)); }
+        public virtual void sendindicators(object[] indicators) { string[] s = new string[indicators.Length]; for (int i = 0; i < indicators.Length; i++) s[i] = indicators[i].ToString(); SendIndicatorsEvent(ID, string.Join(",", s)); }
         /// <summary>
         /// send indicators as array of strings for later analysis
         /// </summary>
         /// <param name="indicators"></param>
-        public virtual void sendindicators(string[] indicators) { SendIndicatorsEvent(string.Join(",", indicators)); }
+        public virtual void sendindicators(string[] indicators) { SendIndicatorsEvent(ID, string.Join(",", indicators)); }
         /// <summary>
         /// sends indicators as a comma seperated string (for later analsis)
         /// </summary>
         /// <param name="indicators"></param>
-        public virtual void sendindicators(string indicators) { SendIndicatorsEvent(indicators); }
+        public virtual void sendindicators(string indicators) { SendIndicatorsEvent(ID, indicators); }
         /// <summary>
         /// requests ticks for a basket of securities
         /// </summary>
@@ -283,7 +283,7 @@ namespace TradeLink.Common
         public event DebugFullDelegate SendDebugEvent;
         public event OrderSourceDelegate SendOrderEvent;
         public event LongSourceDelegate SendCancelEvent;
-        public event StringParamDelegate SendIndicatorsEvent;
+        public event ResponseStringDel SendIndicatorsEvent;
         public event MessageDelegate SendMessageEvent;
         public event BasketDelegate SendBasketEvent;
         public event ChartLabelDelegate SendChartLabelEvent;

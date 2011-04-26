@@ -37,7 +37,7 @@ namespace TradeLink.Common
         public event DebugFullDelegate SendDebugEvent;
         public event OrderSourceDelegate SendOrderEvent;
         public event LongSourceDelegate SendCancelEvent;
-        public event StringParamDelegate SendIndicatorsEvent;
+        public event ResponseStringDel SendIndicatorsEvent;
         public event MessageDelegate SendMessageEvent;
         public event ChartLabelDelegate SendChartLabelEvent;
         public event TicketDelegate SendTicketEvent;

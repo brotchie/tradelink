@@ -134,18 +134,36 @@ namespace ASP
         }
 
         bool go = true;
-        Log _indlog;
+        List<Log> _indlog = new List<Log>();
         void si_DoWork(object sender, DoWorkEventArgs e)
         {
             while (go)
             {
                 if (_ao._saveinds.Checked)
                 {
-                    if (_indlog==null)
-                        _indlog = new Log(PROGRAM + ".inds.csv", true, true, Util.ProgramData(PROGRAM), true);
                     while (bufind.hasItems)
                     {
-                        _indlog.GotDebug(bufind.Read());
+                        inddata id = bufind.Read();
+                        if ((id.r>=_indlog.Count) || (id.r<0))
+                        {
+                            debug("No response id at: "+id.r+" to write indicator data: "+id.ind+", quitting indicator writing.");
+                            go = false;
+                            return;
+                        }
+                        if ((_reslist[id.r] == null) || !_reslist[id.r].isValid)
+                            continue;
+                        if (_indlog[id.r]== null)
+                        {
+                            string f = PROGRAM +"."+_reslist[id.r].FullName+"."+Util.ToTLDate()+ ".inds.csv";
+                            bool exists = File.Exists(Util.ProgramData(PROGRAM)+"\\"+f);
+                            // init log
+                            _indlog[id.r] = new Log(f, false, true, Util.ProgramData(PROGRAM), false);
+                            // write header
+                            if (!exists)
+                                _indlog[id.r].GotDebug(string.Join(",",_reslist[id.r].Indicators));
+
+                        }
+                        _indlog[id.r].GotDebug(id.ind);
                     }
                     System.Threading.Thread.Sleep(500);
                 }
@@ -579,6 +597,8 @@ namespace ASP
                 {
                     _reslist.Add(r);
                 }
+                // prepare log entry for it
+                _indlog.Add(null);
                 // save id to local relationship
                 _rid2local.Add(r.ID, idx);
                 // setup place for it's symbols
@@ -767,6 +787,9 @@ namespace ASP
                 _reslist[selbox] = new InvalidResponse();
                 // clear it's symbols
                 _rsym[selbox] = string.Empty;
+                // close it's indicators
+                if (_indlog[selbox] != null)
+                    _indlog[selbox].Stop();
                 // mark it's UI element for removal
                 remdidx.Add(dispidx);
                 // notify user
@@ -860,12 +883,15 @@ namespace ASP
             {
                 // stop saving indicators
                 go = false;
-                try
+                foreach (Log indlog in _indlog)
                 {
-                    if (_indlog != null)
-                        _indlog.Stop();
+                    try
+                    {
+                        if (indlog != null)
+                            indlog.Stop();
+                    }
+                    catch { continue; }
                 }
-                catch { }
                 // stop handling tickets
                 _rt.Stop();
                 // stop gui-safe broker-feed operations
@@ -997,7 +1023,7 @@ namespace ASP
             tmp.SendMessageEvent += new MessageDelegate(tmp_SendMessage);
             tmp.SendBasketEvent += new BasketDelegate(_workingres_SendBasket);
             tmp.SendChartLabelEvent += new ChartLabelDelegate(tmp_SendChartLabel);
-            tmp.SendIndicatorsEvent += new StringParamDelegate(tmp_SendIndicators);
+            tmp.SendIndicatorsEvent += new ResponseStringDel(tmp_SendIndicators);
             tmp.SendTicketEvent += new TicketDelegate(tmp_SendTicketEvent);
         }
 
@@ -1012,12 +1038,12 @@ namespace ASP
         }
 
         bool _inderror = false;
-        RingBuffer<string> bufind = new RingBuffer<string>(5000);
-        void tmp_SendIndicators(string param)
+        RingBuffer<inddata> bufind = new RingBuffer<inddata>(5000);
+        void tmp_SendIndicators(int idx, string param)
         {
             if (!_ao._saveinds.Checked)
                 return;
-            bufind.Write(param);
+            bufind.Write(new inddata(idx,param));
         }
 
         bool _charterror = false;
@@ -1399,5 +1425,13 @@ namespace ASP
 
 
                                          
+    }
+
+    internal struct inddata
+    {
+        
+        internal int r;
+        internal string ind;
+        internal inddata(int i, string s) { r = i; ind = s; }
     }
 }
