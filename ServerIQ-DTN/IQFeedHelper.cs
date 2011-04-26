@@ -531,15 +531,20 @@ namespace IQFeedBroker
                     string[] splitTickData = rawData.Split('\n');
                     Array.Reverse(splitTickData);
                     var sentTicks = new Dictionary<string, int>();
-                    Array.ForEach(splitTickData, str =>
+                    for (int i = 0; i<splitTickData.Length; i++)
                     {
+                        string str = splitTickData[i];
                         string[] actualData = str.Split(',');
                         int val;
+
                         if ((actualData.Length >= 15) && (!sentTicks.TryGetValue(actualData[1], out val)))
                         {
-                            FireTick(actualData);
+                            if ((actualData[0] == "Q"))
+                            {
+                                FireTick(actualData);
+                            }
                         }
-                    });
+                    }
                 }
                 catch (SocketException ex)
                 {
@@ -565,7 +570,9 @@ namespace IQFeedBroker
                 return;
                 try
                 {
-                    if (actualData[0] == "F") return;
+                    if (actualData[0] == "F") 
+                        return;
+
                         Tick tick = new TickImpl();
                         tick.date = Util.ToTLDate();
                     DateTime now;
