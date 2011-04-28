@@ -156,7 +156,7 @@ namespace ServerRedi
                         // get any current position in symbol
                         Position p = pt[o.symbol];
                         // determine if a sell order should be a long exit or a short entry
-                        string side = !o.side && !p.isLong ? "Short" : (o.side ? "Buy" : "Sell");
+                        string side = !o.side && !p.isLong ? "Sell Short" : (o.side ? "Buy" : "Sell");
 
                         rediOrder.Account = o.Account;
                         rediOrder.UserID = _userid;
