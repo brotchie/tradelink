@@ -223,10 +223,11 @@ namespace ASP
             {
                 // don't save ticks from replay since they're already saved
                 _ao.archivetickbox.Checked = (_bf.ProvidersAvailable.Length > 0) && !_bf.FeedClient.RequestFeatureList.Contains(MessageTypes.HISTORICALDATA);
-                // monitor quote feed
-                int poll = (int)((double)Properties.Settings.Default.brokertimeoutsec * 1000 / 2);
+                // monitor quote feed twice as frequently as the timeout interval
+                int timeout = (int)Properties.Settings.Default.brokertimeoutsec;
+                int poll = (int)(((double)timeout* 1000)/ 2);
                 debug(poll == 0 ? "connection timeout disabled." : "using connection timeout: " + poll);
-                _tlt = new TLTracker(poll, (int)Properties.Settings.Default.brokertimeoutsec, _bf.FeedClient, Providers.Unknown, true);
+                _tlt = new TLTracker(poll, timeout, _bf.FeedClient, Providers.Unknown, true);
                 _tlt.GotConnectFail += new VoidDelegate(_tlt_GotConnectFail);
                 _tlt.GotConnect += new VoidDelegate(_tlt_GotConnect);
                 _tlt.GotDebug += new DebugDelegate(_tlt_GotDebug);
