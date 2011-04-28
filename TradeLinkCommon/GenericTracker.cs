@@ -26,7 +26,7 @@ namespace TradeLink.Common
         /// <summary>
         /// reset all tracked values to their default value
         /// </summary>
-        public void Reset()
+        public virtual void Reset()
         {
             for (int i = 0; i < _tracked.Count; i++)
                 _tracked[i] = Default;
@@ -35,7 +35,7 @@ namespace TradeLink.Common
         /// reset given index to it's default value
         /// </summary>
         /// <param name="idx"></param>
-        public void Reset(int idx)
+        public virtual void Reset(int idx)
         {
             _tracked[idx] = Default;
         }
@@ -43,7 +43,7 @@ namespace TradeLink.Common
         /// reset given label to it's default value
         /// </summary>
         /// <param name="txt"></param>
-        public void Reset(string txt)
+        public virtual void Reset(string txt)
         {
             int idx = getindex(txt);
             _tracked[idx] = Default;
@@ -55,7 +55,7 @@ namespace TradeLink.Common
         /// </summary>
         public T Default { get { return _defval; } set { _defval = value; } }
 
-        public Type TrackedType
+        public virtual Type TrackedType
         {
             get 
         {
@@ -68,13 +68,13 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="txt"></param>
         /// <returns></returns>
-        public decimal ValueDecimal(string txt) { return Convert.ToDecimal(this[txt]); }
+        public virtual decimal ValueDecimal(string txt) { return Convert.ToDecimal(this[txt]); }
         /// <summary>
         /// attempts to convert tracked value to decimal given index
         /// </summary>
         /// <param name="idx"></param>
         /// <returns></returns>
-        public decimal ValueDecimal(int idx) { return Convert.ToDecimal(this[idx]); }
+        public virtual decimal ValueDecimal(int idx) { return Convert.ToDecimal(this[idx]); }
 
         /// <summary>
         /// gets value of given label
@@ -222,7 +222,7 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="txt"></param>
         /// <returns></returns>
-        public int addindex(string txt)
+        public virtual int addindex(string txt)
         {
             return addindex(txt, Default);
         }
@@ -232,7 +232,7 @@ namespace TradeLink.Common
         /// <param name="txtidx">label</param>
         /// <param name="initialval">value to associate with label</param>
         /// <returns></returns>
-        public int addindex(string txtidx, T val)
+        public virtual int addindex(string txtidx, T val)
         {
             int idx = UNKNOWN;
             if (!_txtidx.TryGetValue(txtidx, out idx))
@@ -254,7 +254,7 @@ namespace TradeLink.Common
         /// <summary>
         /// clears all tracked values and labels
         /// </summary>
-        public void Clear()
+        public virtual void Clear()
         {
             _tracked.Clear();
             _txtidx.Clear();
@@ -270,7 +270,7 @@ namespace TradeLink.Common
                 yield return _tracked[i];
         }
 
-        public T[] ToArray()
+        public virtual T[] ToArray()
         {
             return _tracked.ToArray();
         }
