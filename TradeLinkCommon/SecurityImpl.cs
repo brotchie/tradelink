@@ -115,7 +115,7 @@ namespace TradeLink.Common
         {
             List<string> p = new List<string>();
             p.Add(sec.Symbol);
-            if (sec.Type == SecurityType.OPT)
+            if (sec.Type == SecurityType.OPT || sec.Type==SecurityType.FUT || sec.Type==SecurityType.FOP || sec.Type==SecurityType.FUT)
             {
                 p.Add(sec.Date.ToString());
                 p.Add(sec.Details);
@@ -144,14 +144,20 @@ namespace TradeLink.Common
             SecurityImpl sec = new SecurityImpl();
             sec.Symbol = r[0];
             // look for option first
-            if (msg.Contains("OPT") || msg.Contains("PUT") || msg.Contains("CALL"))
+            if (msg.Contains("OPT") || msg.Contains("PUT") || msg.Contains("CALL") || msg.Contains("FOP") || msg.Contains("FUT"))
             {
-                sec.Type = SecurityType.OPT;
+                if (msg.Contains("OPT") || msg.Contains("PUT") || msg.Contains("CALL")) 
+                    sec.Type = SecurityType.OPT;
+                
+            	if(msg.Contains("FUT")) sec.Type = SecurityType.FUT;
+            	if(msg.Contains("FOP")) sec.Type = SecurityType.FOP;
+            	   
                 msg = msg.ToUpper();
                 sec.Details = msg.Contains("PUT") ? "PUT" : "CALL" ;
                 msg = msg.Replace("CALL", "");
                 msg = msg.Replace("PUT", "");
                 msg = msg.Replace("OPT", "");
+                msg=msg.Replace("FOP","");
                 r = msg.Split(' ');
                 sec.Symbol = r[0];
                 sec.Date = ExpirationDate(ref r);
