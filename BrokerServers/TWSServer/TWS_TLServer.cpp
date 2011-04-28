@@ -6,6 +6,14 @@
 #include "IBUtil.h"
 #include "TLBar.h"
 
+//ILDEBEGIN
+#include <iostream>
+//ILDEEND
+
+
+
+
+
 namespace TradeLibFast
 {
 	const char* CONFIGFILE = "TwsServer.Config.txt";
@@ -13,6 +21,9 @@ namespace TradeLibFast
 
 	TWS_TLServer::TWS_TLServer(void)
 	{
+		//BEGINILDE
+		CString clientname_ = "";
+		//ENDILDE
 		IGNOREERRORS = false;
 		_currency = CString("USD");
 		noverb = true;
@@ -170,6 +181,9 @@ namespace TradeLibFast
 		f.push_back(POSITIONREQUEST);
 		f.push_back(BARREQUEST);
 		f.push_back(BARRESPONSE);
+		//ILDEBEGIN
+		f.push_back(DOMREQUEST);
+		//ILDEEND
 		return f;
 	}
 	
@@ -770,6 +784,10 @@ namespace TradeLibFast
 
 	int TWS_TLServer::RegisterStocks(CString clientname)
 	{
+		//BEGINILDE
+		clientname_ = clientname;
+		//ENDILDE
+
 		// make sure base function is called
 		TLServer_WM::RegisterStocks(clientname);
 		// get client id so we can find his symbols
@@ -893,12 +911,14 @@ namespace TradeLibFast
 				k.ask = stockticks[tickerId].ask;
 				k.os = stockticks[tickerId].os;
 			}
+			
 			else return; // not relevant tick info
 			if (k.isValid() && needStock(k.sym))
 				this->SrvGotTick(k);
 		}
 	
 	}
+
 	void TWS_TLServer::tickSize( TickerId tickerId, TickType tickType, int size) 
 	{ 
 		if ((tickerId>=0)&&(tickerId<(TickerId)stockticks.size()) && needStock(stockticks[tickerId].sym))
@@ -934,8 +954,6 @@ namespace TradeLibFast
 			if (k.isValid() && needStock(k.sym))
 				this->SrvGotTick(k);
 		}
-
-
 	}
 
 	
@@ -978,15 +996,77 @@ namespace TradeLibFast
 	}
 
 
+	//ILDEBEGIN
+	void TWS_TLServer::updateMktDepth( TickerId id, int position, int operation, int side, double price, int size)
+	{
+		if ((id>=0)&&(id<(TickerId)stockticks.size()) && needStock(stockticks[id].sym))
+		{
+			time_t now;
+			time(&now);
+			CTime ct(now);
+			TLTick k;
+			k.date = (ct.GetYear()*10000) + (ct.GetMonth()*100) + ct.GetDay();
+			k.time = (ct.GetHour()*10000) + (ct.GetMinute()*100)+ct.GetSecond();
+			k.sym = stockticks[id].sym;
+			
+			if (side==1)
+			{
+				stockticks[id].bid = price;
+				k.bid = stockticks[id].bid;
+				k.bs = size;
+			}
+			else if (side==0)
+			{
+				stockticks[id].ask = price;
+				k.ask = stockticks[id].ask;
+				k.os = size;
+			}
+			else return; // not relevant tick info
+			
+			//set book depth
+			k.depth = position;
 
+			if (k.isValid() && needStock(k.sym))
+				this->SrvGotTick(k);
+		}
+	}
+	
+	//the argument "marketmaker" is ignored
 	void TWS_TLServer::updateMktDepthL2( TickerId id, int position, CString marketMaker, int operation, 
 			int side, double price, int size) 
 	{ 
-		// add DOM support here
+		if ((id>=0)&&(id<(TickerId)stockticks.size()) && needStock(stockticks[id].sym))
+		{
+			time_t now;
+			time(&now);
+			CTime ct(now);
+			TLTick k;
+			k.date = (ct.GetYear()*10000) + (ct.GetMonth()*100) + ct.GetDay();
+			k.time = (ct.GetHour()*10000) + (ct.GetMinute()*100)+ct.GetSecond();
+			k.sym = stockticks[id].sym;
+			
+			if (side==1)
+			{
+				stockticks[id].bid = price;
+				k.bid = stockticks[id].bid;
+				k.bs = size;
+			}
+			else if (side==0)
+			{
+				stockticks[id].ask = price;
+				k.ask = stockticks[id].ask;
+				k.os = size;
+			}
+			else return; // not relevant tick info
+			
+			//set book depth
+			k.depth = position;
+
+			if (k.isValid() && needStock(k.sym))
+				this->SrvGotTick(k);
+		}
 	}
-
-
-
+	//ILDEEND
 
 	void TWS_TLServer::tickOptionComputation( TickerId ddeId, TickType field, double impliedVol,
 		double delta, double modelPrice, double pvDividend) { }
@@ -1004,8 +1084,8 @@ namespace TradeLibFast
 	void TWS_TLServer::contractDetails( int reqId, const ContractDetails& contractDetails) {}
 	void TWS_TLServer::bondContractDetails( int reqId, const ContractDetails& contractDetails) {}
 	void TWS_TLServer::contractDetailsEnd( int reqId) {}
-	void TWS_TLServer::updateMktDepth( TickerId id, int position, int operation, int side, 
-			double price, int size) { }
+	//ILDECOMMENTvoid TWS_TLServer::updateMktDepth( TickerId id, int position, int operation, int side, 
+			//double price, int size) { }
 	void TWS_TLServer::updateNewsBulletin(int msgId, int msgType, const CString& newsMessage, const CString& originExch) { }
 	void TWS_TLServer::receiveFA(faDataType pFaDataType, const CString& cxml) { }
 	void TWS_TLServer::scannerParameters(const CString &xml) { }
@@ -1016,10 +1096,101 @@ namespace TradeLibFast
 	   long volume, double wap, int count) { }
 	void TWS_TLServer::currentTime(long time) {}
 	void TWS_TLServer::fundamentalData(TickerId reqId, const CString& data) {}
+
+	//ILDEBEGIN: 
+	//*We are requesting market depth for each registered stock
+	//*Cancel DOMRequest is not possible by the time being because interface not available in TLServer_WM.h
+	int TWS_TLServer::DOMRequest(int depth)
+	{ 
+		if(clientname_== "")
+		{
+			D("No ticket has been registered yet.");
+			return OK;
+		}
+		
+		// make sure base function is called
+		TLServer_WM::DOMRequest(depth);
+
+		// get client id so we can find his symbols
+		int cid = this->FindClient(clientname_); 
+
+		// make sure at least one TWS is running
+		if (!linktest())
+			return BROKERSERVER_NOT_FOUND;
+
+		// loop through every stock for this client
+		for (unsigned int i = 0; i<stocks[cid].size(); i++)
+		{
+			// if we already have a subscription to this stock, proceed to next one
+			if (hasTicker(stocks[cid][i])) 
+			{
+				// get symbol
+				TLSecurity sec = TLSecurity::Deserialize(stocks[cid][i]);
+				// keep copy of original symbol
+				CString lsym = CString(sec.sym);
+				sec.sym = tl2ibspace(sec.sym);
+
+				// otherwise, subscribe to this stock and save it to subscribed list of tickers
+				Contract contract;
+			
+				// if option, pass options parameters
+				if (sec.isCall() || sec.isPut())
+				{
+					contract.symbol = sec.sym;
+					contract.right = sec.details;
+					CString expire;
+					expire.Format("%i",sec.date);
+					contract.expiry = expire;
+					contract.strike = sec.strike;
+					if (!sec.hasDest())
+						contract.exchange = "SMART";
+				}
+				else // set local symbol to symbol
+				{
+					contract.localSymbol = sec.sym;
+				}
+
+				// if destination specified use it
+				if (sec.hasDest())
+					contract.exchange = sec.dest;
+				// if we have a destination but no type, try to guess type
+				if (!sec.hasType() && sec.hasDest())
+					sec.type = TypeFromExchange(contract.exchange);
+				// if we still don't have a type, use stock
+				if (!sec.hasType())
+					sec.type = STK;
+				// if we have a stock and it has no destination, use default
+				if ((sec.type==STK) && !sec.hasDest())
+					contract.exchange = "SMART";
+				if (sec.type==CASH)
+					contract.currency = truncateat(sec.sym,CString("."));
+				else
+					contract.currency = _currency;
+				contract.secType = TLSecurity::SecurityTypeName(sec.type);
+				
+				v(CString("attempting to add market depth"));
+								
+				TickerId tid = (TickerId)findStockticksTid(stocks[cid][i]);
+				if(tid == -1)
+					return SYMBOL_NOT_LOADED;
+
+				this->m_link[this->validlinkids[0]]->reqMktDepth(tid,contract,depth);
+				
+				v(CString("Added IB market depth subscription for ")+CString(sec.sym));
+			}
+		}
+		return 0;
+	}
+	
+	//This methid returns the tickerid for a given symbol or -1
+	int TWS_TLServer::findStockticksTid(CString symbol)
+	{
+		for (int i=0; i < stockticks.size(); i++) 
+		{
+			if(stockticks[i].sym.Compare(symbol) == 0)
+				return i;
+		}
+		return -1;
+	}
+	//ILDEEND
 }
-
-
-
-
-
-

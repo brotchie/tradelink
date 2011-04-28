@@ -30,7 +30,10 @@ namespace TradeLibFast
 		std::vector<int> GetFeatures();
 		int UnknownMessage(int MessageType, CString msg);
 		void Start(void);
-
+	    //ILDEBEGIN
+        int DOMRequest(int depth);
+		int TWS_TLServer::findStockticksTid(CString symbol);
+		//ILDEEND
 
 	private:
 		void getcontract(CString symbol, CString currency, CString localsymbol,CString exchange,Contract* contract);
@@ -125,6 +128,10 @@ namespace TradeLibFast
 		   long volume, double wap, int count);
 		void currentTime(long time);
 		void fundamentalData(TickerId reqId, const CString& data);
+
+		//BEGINILDE
+		CString clientname_;
+		//ENDILDE
 
 	public:
 		EClient* GetOrderSink(CString account);
