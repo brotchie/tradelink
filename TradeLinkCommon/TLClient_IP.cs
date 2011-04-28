@@ -5,6 +5,7 @@ using TradeLink.API;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using TradeLink.API;
 
 namespace TradeLink.Common
 {
@@ -172,18 +173,35 @@ namespace TradeLink.Common
                     _started = false;
                     break;
                 }
+                bool connected = server.Connected;
 
                 try
                 {
+
                     int ret = server.Receive(buffer, bufferoffset, buffer.Length - bufferoffset, SocketFlags.None);
                     if (ret > 0)
                     {
+#if DEBUG
+                        // notify
+                        v("client received bytes: " + ret+" raw data: "+HexToString(buffer,ret));
+#endif
                         // get messages from data
                         Message[] msgs = Message.gotmessages(ref buffer, ref bufferoffset);
                         // handle messages
                         for (int i = 0; i < msgs.Length; i++)
+                        {
+#if DEBUG
+                            v("client message#"+i+" type: "+msgs[i].Type+" content: "+msgs[i].Content);
+#endif
                             handle(msgs[i].Type, msgs[i].Content);
+                        }
+
                     }
+                    else if (ret == 0) // socket was shutdown
+                    {
+                        connected = issocketconnected(server);
+                    }
+                    
                 }
 
                 catch (SocketException ex)
@@ -197,7 +215,7 @@ namespace TradeLink.Common
                 }
                 
                 
-                if (_connect && ((server == null) || !server.Connected))
+                if (_connect && ((server == null) || !connected))
                 {
                     if ((p >= 0) && (p < serverip.Count))
                     {
@@ -211,6 +229,43 @@ namespace TradeLink.Common
                 }
             }
         }
+
+        bool issocketconnected(Socket client) { int err; return issocketconnected(client, out err); }
+        bool issocketconnected(Socket client, out int errorcode)
+        {
+            bool blockingState = client.Blocking;
+            errorcode = 0;
+            try
+            {
+                byte[] tmp = new byte[1];
+
+                client.Blocking = false;
+                client.Send(tmp, 0, 0);
+            }
+            catch (SocketException e)
+            {
+                // 10035 == WSAEWOULDBLOCK
+                if (e.NativeErrorCode.Equals(10035))
+                {
+                    v("connected but send blocked.");
+                    return true;
+                }
+                else
+                {
+
+                    errorcode = e.NativeErrorCode;
+                    v("disconnected, error: " + errorcode);
+                    return false;
+                }
+            }
+            finally
+            {
+                client.Blocking = blockingState;
+            }
+            return client.Connected;
+        }
+
+
 
         bool _started = false;
 
@@ -302,16 +357,7 @@ namespace TradeLink.Common
         public Providers[] ProvidersAvailable { get { return servers.ToArray(); } }
         public int ProviderSelected { get { return _curprovider; } }
 
-        public TLClient_IP(bool showwarning) : this(0, WMUtil.CLIENTWINDOW, showwarning) { }
-        public TLClient_IP(int ProviderIndex,string clientname) : this(ProviderIndex, clientname, true) { }
-        public TLClient_IP(string clientname, bool showwarningonmissing) : this(0,clientname, showwarningonmissing) { }
 
-        public TLClient_IP(int ProviderIndex, string clientname, bool showarmingonmissingserver)
-            : base()
-        {
-            gotFeatures += new MessageTypesMsgDelegate(TLClient_WM_gotFeatures);
-            this.Mode(ProviderIndex, showarmingonmissingserver);
-        }
 
         public static List<IPEndPoint> GetEndpoints(int port, params string[] servers)
         {
@@ -361,8 +407,8 @@ namespace TradeLink.Common
             this.port = port;
         }
 
-        const int DEFAULTWAIT = 100;
-        const int DEFAULTRETRIES = 3;
+        public const int DEFAULTWAIT = 100;
+        public const int DEFAULTRETRIES = 3;
 
         public TLClient_IP(string[] servers, int port,DebugDelegate deb)
             : this(GetEndpoints(port, servers), 0, "tlclient", DEFAULTRETRIES,DEFAULTWAIT,deb)
@@ -494,6 +540,10 @@ namespace TradeLink.Common
         {
             // encode
             byte[] data = Message.sendmessage(type, m);
+#if DEBUG
+            v("client sending message type: " + type + " contents: " + m);
+            v("client sending raw data size: " + data.Length + " data: " + HexToString(data, data.Length));
+#endif
             int len = 0;
             try
             {
@@ -524,6 +574,21 @@ namespace TradeLink.Common
             }
             return (long)MessageTypes.UNKNOWN_ERROR;
         }
+
+        public static string HexToString(byte[] buf, int len)
+        {
+            string Data1 = "";
+            string sData = "";
+            int i = 0;
+            while (i < len)
+            {
+                //Data1 = String.Format(”{0:X}”, buf[i++]); //no joy, doesn’t pad
+                Data1 = buf[i++].ToString("X").PadLeft(2, '0'); //same as “%02X” in C
+                sData += Data1;
+            }
+            return sData;
+        }
+
 
         bool retryconnect()
         {

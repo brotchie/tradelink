@@ -5,6 +5,7 @@ using TradeLink.API;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using TradeLink.API;
 
 namespace TradeLink.Common
 {
@@ -47,9 +48,9 @@ namespace TradeLink.Common
         Providers _pn = Providers.Unknown;
         public Providers newProviderName { get { return _pn; } set { _pn = value; } }
         IPAddress _addr;
-        //private TcpListener tcpLsn;
+
         List<Socket> _sock = new List<Socket>();
-        //private Dictionary<long, Thread> _threads = new Dictionary<long, Thread>();
+
 
         System.ComponentModel.BackgroundWorker _at = new System.ComponentModel.BackgroundWorker();
 
@@ -95,11 +96,26 @@ namespace TradeLink.Common
             
         }
 
+        public static string HexToString(byte[] buf, int len)
+        {
+            string Data1 = "";
+            string sData = "";
+            int i = 0;
+            while (i < len)
+            {
+                //Data1 = String.Format(”{0:X}”, buf[i++]); //no joy, doesn’t pad
+                Data1 = buf[i++].ToString("X").PadLeft(2, '0'); //same as “%02X” in C
+                sData += Data1;
+            }
+            return sData;
+        }
+
+
         void ReadData(IAsyncResult ir)
         {
             //get our state
             socketinfo csi = (socketinfo)ir.AsyncState;
-
+            bool connected = csi.sock.Connected;
             try
             {
                 SocketError se = SocketError.Success;
@@ -111,13 +127,17 @@ namespace TradeLink.Common
                     try
                     {
                         // get messages from data
+                        v("srv data received: socket_status: " + se.ToString() + " data size: "+csi.freebuffersize+" data: " + HexToString(csi.buffer, len));
                         Message[] msgs = Message.gotmessages(ref csi.buffer, ref csi.startidx);
+                        v("srv messages received: " + msgs.Length + " messages.  ");
                         // handle messages
                         for (int i = 0; i < msgs.Length; i++)
                         {
                             Message m = msgs[i];
+                            v("srv message# " + i + " size: " + m.ByteLength + " type: " + m.Type + " tag: " + m.Tag + " data: " + m.Content);
                             handle(m.Type, m.Content, csi.sock);
                         }
+                        v("srv handled " + msgs.Length + " messages.");
                     }
                     catch (Exception ex)
                     {
@@ -127,7 +147,9 @@ namespace TradeLink.Common
                 }
                 else
                 {
-                    // no data, implies a disconnect?
+                    // implies possible disconnect, verify
+                    connected = issocketconnected(csi.sock);
+
                 }
             }
             catch (SocketException ex)
@@ -138,19 +160,62 @@ namespace TradeLink.Common
             {
                 debug(ex.Message + ex.StackTrace);
             }
-
+            
             try
             {
                 // wait for more data to arrive
-                if (csi.sock.Connected)
+                if (connected)
+                {
+                    Thread.Sleep(100);
                     csi.sock.BeginReceive(csi.buffer, csi.startidx, csi.freebuffersize, SocketFlags.None, new AsyncCallback(ReadData), csi);
+                }
+                else
+                {
+                    csi.sock.Close();
+                }
             }
             catch (SocketException ex)
             {
                 // host likely disconnected
-                v(ex.SocketErrorCode + ex.Message + ex.StackTrace);
+                v("disconnected.  msg: "+ex.SocketErrorCode + ex.Message + ex.StackTrace);
+                csi.sock.Close();
             }
 
+        }
+
+        bool issocketconnected(Socket client) { int err; return issocketconnected(client, out err); }
+        bool issocketconnected(Socket client, out int errorcode)
+        {
+            bool blockingState = client.Blocking;
+            errorcode = 0;
+            try
+            {
+                byte[] tmp = new byte[1];
+
+                client.Blocking = false;
+                client.Send(tmp, 0, 0);
+            }
+            catch (SocketException e)
+            {
+                // 10035 == WSAEWOULDBLOCK
+                if (e.NativeErrorCode.Equals(10035))
+                {
+                    v("connected but send blocked.");
+                    return true;
+                }
+                else
+                {
+                    
+                    errorcode = e.NativeErrorCode;
+                    v("disconnected, error: "+errorcode);
+                    return false;
+                }
+            }
+            finally
+            {
+                client.Blocking = blockingState;
+            }
+            return client.Connected;
         }
 
 
@@ -195,10 +260,7 @@ namespace TradeLink.Common
                     debug("Starting background threads to process requests and ticks.");
                     _started = _list.IsBound;
                 }
-                _at = new System.ComponentModel.BackgroundWorker();
-                _at.DoWork += new System.ComponentModel.DoWorkEventHandler(_at_DoWork);
-                _at.WorkerSupportsCancellation = true;
-                _at.RunWorkerAsync();
+
                 debug("Server started.");
 
             }
@@ -210,6 +272,20 @@ namespace TradeLink.Common
             
             
         }
+
+        bool _startedthread = false;
+        void starttickthread()
+        {
+            if (_startedthread)
+                return;
+
+            _at = new System.ComponentModel.BackgroundWorker();
+            _at.DoWork += new System.ComponentModel.DoWorkEventHandler(_at_DoWork);
+            _at.WorkerSupportsCancellation = true;
+            _at.RunWorkerAsync();
+            _startedthread = true;
+        }
+
 
 
         long _lastheartbeat = 0;
@@ -232,7 +308,7 @@ namespace TradeLink.Common
                     if (count % 1000 == 0)
                         checkheartbeat();
                 }
-
+                
                 if (tickq.isEmpty)
                 {
                     Thread.Sleep(_wait);
@@ -274,6 +350,7 @@ namespace TradeLink.Common
         public virtual void Stop()
         {
             _started = false;
+            _startedthread = false;
             try
             {
                 for (int i = 0; i < _sock.Count; i++)
@@ -357,6 +434,7 @@ namespace TradeLink.Common
                 debug("Not valid ip address: " + ipaddr + ", using localhost.");
             _addr = IPUtil.isValidAddress(ipaddr) ? IPAddress.Parse(ipaddr) : IPAddress.Loopback;
             _port = port;
+            v("tlserver_ip wait: " + _wait);
             Start();
         }
 
@@ -395,7 +473,10 @@ namespace TradeLink.Common
         public void newTick(Tick tick)
         {
             if (_queueb4send)
+            {
+                starttickthread();
                 tickq.Write(tick);
+            }
             else
                 sendtick(tick);
 
@@ -419,6 +500,11 @@ namespace TradeLink.Common
             if (s.Connected)
             {
                 byte[] data = Message.sendmessage(type, msg);
+#if DEBUG
+                v("srv sending message type: " + type + " contents: " + msg);
+                v("srv sending raw data size: " + data.Length + " data: " + HexToString(data, data.Length));
+#endif
+
                 try
                 {
                     s.Send(data);
@@ -809,6 +895,8 @@ namespace TradeLink.Common
 
 
         }
+
+
 
 
 
