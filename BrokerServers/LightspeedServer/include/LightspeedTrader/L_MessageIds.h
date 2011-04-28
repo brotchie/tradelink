@@ -39,6 +39,7 @@ namespace L_Msg
 	const long OrderImbalance			= L_MessageRanges::equity_start + 104;
 	const long MarketStatus				= L_MessageRanges::equity_start + 101;
 	const long ECNList					= L_MessageRanges::equity_start + 107;
+	const long IndicationUpdate			= L_MessageRanges::equity_start + 127;
 
 	const long ChartSnapshot			= L_MessageRanges::chart_start + 2;
 	const long ChartUpdate				= L_MessageRanges::chart_start + 4;

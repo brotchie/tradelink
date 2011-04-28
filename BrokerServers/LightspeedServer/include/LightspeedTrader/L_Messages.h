@@ -42,7 +42,7 @@ public:
 		virtual double L_Price() const = 0;
 		virtual long L_Volume() const = 0;
 		virtual long L_ChangeIndicator() const = 0;
-		virtual time_t L_Time() const = 0;
+		virtual __time64_t L_Time() const = 0;
 		virtual char const *L_Market() const = 0;
 		virtual char L_SaleCondition() const = 0;
 	};
@@ -75,7 +75,8 @@ public:
 	virtual bool L_Printable() const = 0;
 	virtual char const *L_Market() const = 0;
 	virtual char L_SaleCondition() const = 0;
-	virtual time_t L_Time() const = 0;
+	virtual __time64_t L_Time() const = 0;
+	virtual long L_ChangeIndicator() const = 0;
 };
 
 class __declspec(novtable) L_MsgTradeCorrection : public L_Message
@@ -355,7 +356,7 @@ class __declspec(novtable) L_MsgStockHalted : public L_Message
 public:
 	enum { id = L_Msg::StockHalted };
 
-	virtual time_t L_Time() const = 0;
+	virtual __time64_t L_Time() const = 0;
 	virtual char const *L_Reason() const = 0;
 };
 
@@ -364,7 +365,7 @@ class __declspec(novtable) L_MsgStockResumed : public L_Message
 public:
 	enum { id = L_Msg::StockResumed };
 
-	virtual time_t L_Time() const = 0;
+	virtual __time64_t L_Time() const = 0;
 };
 
 class __declspec(novtable) L_MsgDirectQuotesLost : public L_Message
@@ -395,7 +396,7 @@ public:
 	virtual double L_FarPrice() const = 0;
 	virtual double L_ContinuousPrice() const = 0;
 	virtual double L_ClosingOnlyPrice() const = 0;
-	virtual time_t L_Time() const = 0;
+	virtual __time64_t L_Time() const = 0;
 };
 
 class __declspec(novtable) L_MsgChartSnapshot : public L_Message
@@ -415,7 +416,7 @@ public:
 	virtual double L_Low() const = 0;
 	virtual double L_Close() const = 0;
 	virtual long long L_Volume() const = 0;
-	virtual time_t L_Time() const = 0;
+	virtual __time64_t L_Time() const = 0;
 };
 
 class __declspec(novtable) L_MsgIndex : public L_Message
@@ -438,6 +439,15 @@ public:
 
 	virtual double L_Value() const = 0;
 	virtual double L_Change() const = 0;
+};
+
+class L_MsgIndicationUpdate : public L_Message
+{
+public:
+	enum { id = L_Msg::IndicationUpdate };
+	virtual double L_Bid() const = 0;
+	virtual double L_Ask() const = 0;
+	virtual long L_Time() const = 0;
 };
 
 //

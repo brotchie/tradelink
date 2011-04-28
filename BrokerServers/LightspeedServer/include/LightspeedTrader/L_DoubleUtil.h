@@ -8,34 +8,34 @@
 namespace LightspeedTrader
 {
 
-const double ls_epsilon = 0.00000001;
+double const ls_epsilon = 0.00000001;
 
-inline bool ls_neq(const double lhs, const double rhs)
+inline bool ls_neq(double lhs, double rhs)
 {
 	return (lhs < rhs - ls_epsilon) || (lhs > rhs + ls_epsilon);
 }
 
-inline bool ls_eq(const double lhs, const double rhs)
+inline bool ls_eq(double lhs, double rhs)
 {
 	return (lhs > rhs - ls_epsilon) && (lhs < rhs + ls_epsilon);
 }
 
-inline bool ls_gt(const double lhs, const double rhs)
+inline bool ls_gt(double lhs, double rhs)
 {
 	return lhs > rhs + ls_epsilon;
 }
 
-inline bool ls_geq(const double lhs, const double rhs)
+inline bool ls_geq(double lhs, double rhs)
 {
 	return lhs > rhs - ls_epsilon;
 }
 
-inline bool ls_lt(const double lhs, const double rhs)
+inline bool ls_lt(double lhs, double rhs)
 {
     return lhs < rhs - ls_epsilon;
 }
 
-inline bool ls_leq(const double lhs, const double rhs)
+inline bool ls_leq(double lhs, double rhs)
 {
 	return lhs < rhs + ls_epsilon;
 }

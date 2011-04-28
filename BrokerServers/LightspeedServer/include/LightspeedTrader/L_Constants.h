@@ -40,7 +40,9 @@ namespace L_Link
 		ExecutorLost		= 0,
 		ExecutorEstablished	= 1,
 		QuoteLost			= 2,
-		QuoteEstablished	= 3
+		QuoteEstablished	= 3,
+		MarketLost			= 4,
+		MarketEstablished	= 5
 	};
 }
 namespace L_Liquidity

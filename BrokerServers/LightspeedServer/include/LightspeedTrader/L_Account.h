@@ -65,42 +65,8 @@ public:
 		unsigned long visibleShares = 0,
 		double price2 = 0.0,
 		char const *market2 = 0,
-		long *correlationId = 0
-		) = 0;
-
-	virtual void L_SendOrder(
-		char const *symbol,
-		char const *exchange,
-		char const *primaryMarket,
-		double marginRequirement,
-		double bid,
-		double ask,
-		long type,
-		char side,
-		unsigned long shares,
-		double price,
-		char const *market,
-		long tif,
-		bool hidden = false,
-		unsigned long visibleShares = 0,
-		double price2 = 0.0,
-		char const *market2 = 0,
-		long *correlationId = 0
-		) = 0;
-
-	virtual long L_SendOrderSync(
-		L_Summary const *summary,
-		long type,
-		char side,
-		unsigned long shares,
-		double price,
-		char const *market,
-		long tif,
-		bool hidden = false,
-		unsigned long visibleShares = 0,
-		unsigned long *sharesSent = 0,
-		L_Order **order1 = 0,
-		L_Order **order2 = 0
+		long *correlationId = 0,
+		char const *info = 0
 		) = 0;
 
 	virtual void L_CancelOrder(

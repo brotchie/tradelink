@@ -79,6 +79,7 @@
 
 		depth = 0;
 
+		nextcorr = GetTickCount();
 		
 		_startimb = false;
 		_readimb = 0;
@@ -338,13 +339,19 @@
 		long type = o.isStop() ? L_OrderType::STOP : 
 			( o.isLimit() ? L_OrderType::LIMIT : L_OrderType::MARKET);
 		double price = o.isStop() ? o.stop : o.price;
+		// get correlation id
+		nextcorr++;
+		long* corid = &nextcorr;
+		// associate order id and correlation id
+		lscorrelationid.push_back(corid);
+		tlcorrelationid.push_back(o.id);
+
 
 		// prepare to receive the result
 		L_Order** orderSent = NULL;
 		L_Order** orderSent2 = NULL;
 		// send the order
-		uint error = 
-		account->L_SendOrderSync(
+			account->L_SendOrder(
 				summary,
 				type,
 				side,
@@ -354,31 +361,12 @@
 				L_TIF::DAY,
 				false,
 				abs(o.size),
-				0,
-				orderSent,
-				orderSent2
-				);
+				0,0,corid);
 		
-		// make sure order sent is valid order
-		if ((orderSent==NULL) && (orderSent2==NULL))
-		{
-			if (error==0) // if no error, return empty order
-				error = EMPTY_ORDER;
-		}
-		else // if order is good, save it
-		{
-			// save order if it was accepted
-			if (error==0)
-			{
-				if (saveOrder(*orderSent,o.id,true))
-					error = OK;
-				else 
-					error = UNKNOWN_ERROR;
-			}
-		}
+		
 		
 		// return result
-		return error;
+		return 0;
 		
 	}
 

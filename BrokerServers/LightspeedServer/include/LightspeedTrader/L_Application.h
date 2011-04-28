@@ -41,6 +41,9 @@ extern "C" void L_PreProcessMessageFilter(int code, LPMSG lpMsg);
 extern "C" void L_SubscribeToOrderImbalances(L_Observer *dest);
 extern "C" void L_UnsubscribeFromOrderImbalances(L_Observer *dest);
 
+extern "C" void L_SubscribeToIndications(L_Observer *dest);
+extern "C" void L_UnsubscribeFromIndications(L_Observer *dest);
+
 extern "C" void L_SubscribeToLevel1(char const *symbol, L_Observer* dest);
 extern "C" void L_UnsubscribeFromLevel1(char const *symbol, L_Observer* dest);
 
@@ -61,6 +64,7 @@ extern "C" void L_UnsubscribeFromMarketStatus(L_Observer *dest);
 
 extern "C" bool L_IsExecutorConnected();
 extern "C" bool L_IsQuoteConnected();
+extern "C" bool L_IsMarketConnected();
 
 extern "C" char L_MarketStatus();
 

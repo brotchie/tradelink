@@ -79,6 +79,19 @@ public:
 	virtual long L_LastSize() const = 0;
 	virtual long L_LastTime() const = 0;
 	virtual long L_UpdateTime() const = 0;
+	
+	virtual double L_Gap() const = 0;
+	virtual double L_GapPercent() const = 0;
+	virtual double L_GapBid() const = 0;
+	virtual double L_GapAsk() const = 0;
+	virtual double L_PrimaryGap() const = 0;
+	virtual double L_PrimaryGapPercent() const = 0;
+	virtual double L_PrimaryGapBid() const = 0;
+	virtual double L_PrimaryGapAsk() const = 0;
+
+	virtual double L_IndicationBid() const = 0;
+	virtual double L_IndicationAsk() const = 0;
+	virtual long L_IndicationTime() const = 0;
 };
 
 }
