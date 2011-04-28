@@ -658,7 +658,7 @@ namespace TradeLibFast
 			TLTimeNow(nowtime);
 			o.date = nowtime[TLdate];
 			o.time = nowtime[TLtime];
-			this->SrvGotOrder(o);
+			if (contract.secType!="BAG")	this->SrvGotOrder(o);
 
 	}
 
@@ -747,6 +747,12 @@ namespace TradeLibFast
 			m.Format("%s %s %s %f OPT",contract.symbol,contract.expiry,(contract.right==CString("C")) ? "CALL" : "PUT",contract.strike);
 			trade.symbol = m;
 		}
+		if (trade.security==CString("FOP"))
+		{
+			CString m;
+			m.Format("%s %s %s %f FOP",contract.symbol,contract.expiry,(contract.right==CString("C")) ? "CALL" : "PUT",contract.strike);
+			trade.symbol = m;
+		}
 		else
 		{
 			trade.localsymbol = contract.localSymbol;
@@ -762,7 +768,7 @@ namespace TradeLibFast
 		int sec = atoi(r2[2]);
 		trade.xdate = atoi(r[0]);
 		trade.xtime = (atoi(r2[0])*10000)+(atoi(r2[1])*100)+sec;
-		this->SrvGotFill(trade);
+		if (contract.secType!="BAG") this->SrvGotFill(trade);
 
 	}
 
@@ -805,14 +811,74 @@ namespace TradeLibFast
 			TLSecurity sec = TLSecurity::Deserialize(stocks[cid][i]);
 			// keep copy of original symbol
 			CString lsym = CString(sec.sym);
+D(lsym);
 			sec.sym = tl2ibspace(sec.sym);
 
 			// otherwise, subscribe to this stock and save it to subscribed list of tickers
 			Contract contract;
 			
 			// if option, pass options parameters
-			if (sec.isCall() || sec.isPut())
-			{
+			//if (sec.type!=0)
+			//{
+				
+	if (sec.sym=="CC") contract.multiplier= "10";
+else if (sec.sym=="DJ") contract.multiplier= "10";
+else if (sec.sym=="ES") contract.multiplier= "25";
+else if (sec.sym=="C") contract.multiplier= "50";
+else if (sec.sym=="KW") contract.multiplier= "50";
+else if (sec.sym=="MW") contract.multiplier= "50";
+else if (sec.sym=="O") contract.multiplier= "50";
+else if (sec.sym=="PL") contract.multiplier= "50";
+else if (sec.sym=="S") contract.multiplier= "50";
+else if (sec.sym=="SI") contract.multiplier= "50";
+else if (sec.sym=="W") contract.multiplier= "50";
+else if (sec.sym=="GC") contract.multiplier= "100";
+else if (sec.sym=="MV") contract.multiplier= "100";
+else if (sec.sym=="ND") contract.multiplier= "100";
+else if (sec.sym=="RR") contract.multiplier= "100";
+else if (sec.sym=="SM") contract.multiplier= "100";
+else if (sec.sym=="LB") contract.multiplier= "110";
+else if (sec.sym=="JO") contract.multiplier= "150";
+else if (sec.sym=="HG") contract.multiplier= "250";
+else if (sec.sym=="KV") contract.multiplier= "250";
+else if (sec.sym=="SP") contract.multiplier= "250";
+else if (sec.sym=="KC") contract.multiplier= "375";
+else if (sec.sym=="LC") contract.multiplier= "400";
+else if (sec.sym=="LH/LE") contract.multiplier= "400";
+else if (sec.sym=="PB") contract.multiplier= "400";
+else if (sec.sym=="HO") contract.multiplier= "420";
+else if (sec.sym=="HU") contract.multiplier= "420";
+else if (sec.sym=="RB") contract.multiplier= "420";
+else if (sec.sym=="CT") contract.multiplier= "500";
+else if (sec.sym=="FC") contract.multiplier= "500";
+else if (sec.sym=="RL") contract.multiplier= "500";
+else if (sec.sym=="YU") contract.multiplier= "500";
+else if (sec.sym=="BO") contract.multiplier= "600";
+else if (sec.sym=="BP") contract.multiplier= "625";
+else if (sec.sym=="AD") contract.multiplier= "1000";
+else if (sec.sym=="CD") contract.multiplier= "1000";
+else if (sec.sym=="CL") contract.multiplier= "1000";
+else if (sec.sym=="DX") contract.multiplier= "1000";
+else if (sec.sym=="FV") contract.multiplier= "1000";
+else if (sec.sym=="MB") contract.multiplier= "1000";
+else if (sec.sym=="TY") contract.multiplier= "1000";
+else if (sec.sym=="US") contract.multiplier= "1000";
+else if (sec.sym=="SB") contract.multiplier= "1120";
+else if (sec.sym=="EU") contract.multiplier= "1250";
+else if (sec.sym=="JY") contract.multiplier= "1250";
+else if (sec.sym=="SF") contract.multiplier= "1250";
+else if (sec.sym=="DA") contract.multiplier= "2000";
+else if (sec.sym=="TU") contract.multiplier= "2000";
+else if (sec.sym=="ED") contract.multiplier= "2500";
+else if (sec.sym=="NG") contract.multiplier= "10000";
+
+
+			else
+		contract.multiplier= "1";
+			
+		if (sec.type==1 )   //stock options
+				contract.multiplier= "100";
+				
 				contract.symbol = sec.sym;
 				contract.right = sec.details;
 				CString expire;
@@ -821,13 +887,7 @@ namespace TradeLibFast
 				contract.strike = sec.strike;
 				if (!sec.hasDest())
 					contract.exchange = "SMART";
-			}
-			else // set local symbol to symbol
-			{
-				contract.localSymbol = sec.sym;
-
-			}
-
+		
 			// if destination specified use it
 			if (sec.hasDest())
 				contract.exchange = sec.dest;
@@ -845,19 +905,25 @@ namespace TradeLibFast
 			else
 				contract.currency = _currency;
 			contract.secType = TLSecurity::SecurityTypeName(sec.type);
-			v(CString("attempting to add symbol"));
 			pcont(&contract);
+			CString j;
+			j.Format("adding this: %s %s %s %f %s",contract.symbol,contract.expiry,(contract.right==CString("C")) ? "CALL" : "PUT",contract.strike,contract.secType);
+			D(j);//CString("attempting to add symbol ")+CString(sec.sym));
+			
+			
 			this->m_link[this->validlinkids[0]]->reqMktData((TickerId)stockticks.size(),contract,"",false);
 			TLTick k; // create blank tick
 			k.sym = stocks[cid][i]; // store long symbol
 			stockticks.push_back(k);
-			v(CString("Added IB subscription for ")+CString(sec.sym));
-
+			D(CString("Added IB subscription for ")+CString(sec.sym));
 		}
 		return OK;
 
 	}
 
+	
+
+	
 	CString TWS_TLServer::truncateat(CString original,CString after)
 	{
 			CString cpy = CString(original);
@@ -971,14 +1037,23 @@ namespace TradeLibFast
 		double unrealizedPNL, double realizedPNL, const CString &accountName) 
 	{ 
 		TLPosition pos;
-		if (contract.secType!=CString("OPT"))
-			pos.Symbol = contract.localSymbol;
-		else
+		if (contract.secType==CString("OPT"))
 		{
 			CString m;
 			m.Format("%s %s %s %f OPT",contract.symbol,contract.expiry,(contract.right==CString("C")) ? "CALL" : "PUT",contract.strike);
 			pos.Symbol = m;
 		}
+		if (contract.secType==CString("FOP"))
+		{
+			CString m;
+			m.Format("%s %s %s %f FOP",contract.symbol,contract.expiry,(contract.right==CString("C")) ? "CALL" : "PUT",contract.strike);
+			pos.Symbol = m;
+		}
+		else
+			pos.Symbol = contract.localSymbol;
+	
+		
+		
 		pos.Size = position;
 		pos.AvgPrice = marketPrice;
 		pos.ClosedPL = realizedPNL;

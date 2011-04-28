@@ -54,8 +54,8 @@ namespace TradeLibFast
 		// symbol is a requirement for every type
 		sec.sym = rec[SecSym];
 		// check for option
-		bool isopt = (msg.Find(CString("PUT"))!=-1) || (msg.Find(CString("CALL"))!=-1);
-		if (isopt)
+		//bool isopt = (msg.Find(CString("PUT"))!=-1) || (msg.Find(CString("CALL"))!=-1);
+		if (rec.size()>1 && _tstoi(rec[1])!=0)
 		{
 			// sym, date, details, price, ex
 			sec.date = _tstoi(rec[1]);
@@ -65,7 +65,7 @@ namespace TradeLibFast
 			if (rec.size()>5)
 			{
 				sec.dest = rec[4];
-				sec.type = _tstoi(rec[5]);
+				sec.type = SecurityID(rec[5]);
 			}
 			else
 				sec.type = SecurityID(rec[4]);
@@ -151,4 +151,5 @@ namespace TradeLibFast
 		else if (TLSecurityName=="BAG") return BAG; //IB Supported combo type
 		return -1;
 	}
+	
 }

@@ -7,17 +7,17 @@ namespace TradeLibFast
     {
 		NIL = -1,
         STK = 0,
-        OPT,
-        FUT,
-        CFD,
-        FOR,
-        FOP,
-        WAR,
-        FOX,
-        IDX,
-        BND,
-		CASH,
-		BAG,  //IB Supported combo type
+        OPT=1,
+        FUT=2,
+        CFD=3,
+        FOR=4,
+        FOP=5,
+        WAR=6,
+        FOX=7,
+        IDX=8,
+        BND=9,
+		CASH=10,
+		BAG=11,  //IB Supported combo type
     };
 
 	enum TLSecurityField
