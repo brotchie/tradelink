@@ -76,6 +76,7 @@
 		std::vector<int> now;
 		TLTimeNow(now);
 		_date = now[TLdate];
+		_time = now[TLtime];
 
 		depth = 0;
 
@@ -572,9 +573,7 @@
 				k.os = m->L_AskSize();
 				k.sym = CString(m->L_Symbol());
 
-				uint h,min,s;
-				L_GetUSEasternTime(h,min,s);
-				k.time = (h*10000)+(min*100)+s;
+				k.time = _time;
 				k.date = _date;
 				this->SrvGotTickAsync(k);
 
@@ -600,6 +599,7 @@
 				k.trade = m->L_Price();
 				k.date = _date;
 				k.time = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
+				_time = k.time;
 				k.size = (int)m->L_Volume();
 				k.ex = CString(m->L_Market());
 				SrvGotTickAsync(k);

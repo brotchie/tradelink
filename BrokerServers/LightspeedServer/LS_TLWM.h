@@ -38,6 +38,7 @@ using namespace TradeLibFast;
 		void ReadConfig();
 		bool _imbexch;
 		long _date;
+		long _time;
 		TLOrder ProcessOrder(L_Order* order);
 		void SrvGotImbAsync(TLImbalance imb);
 		static LS_TLWM* instance;
