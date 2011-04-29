@@ -94,7 +94,7 @@ namespace Kadina
 
         void bw2_DoWork(object sender, DoWorkEventArgs e)
         {
-            Versions.UpgradeAlert();
+            Versions.UpgradeAlert(true);
         }
 
         void kadinamain_Resize(object sender, EventArgs e)
