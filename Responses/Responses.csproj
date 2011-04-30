@@ -80,8 +80,12 @@
     <Compile Include="BarRequestor.cs" />
     <Compile Include="BrokerFeatureList.cs" />
     <Compile Include="LessonBoxHello.cs" />
+    <Compile Include="LessonGenericTrackers.cs" />
     <Compile Include="LessonIndicators.cs" />
     <Compile Include="LessonParamPrompt.cs" />
+    <Compile Include="LessonRules.cs" />
+    <Compile Include="LessonTalib.cs" />
+    <Compile Include="LessonTrackerOverview.cs" />
     <Compile Include="LessonTradingRules.cs" />
     <Compile Include="LimitCancel.cs" />
     <Compile Include="MOCOrder_ResponseTest.cs" />
