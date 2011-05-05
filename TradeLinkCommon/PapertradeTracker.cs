@@ -102,8 +102,11 @@ namespace TradeLink.Common
             {
                 // get copy of current orders
                  orders = aq.ToArray();
+                 aq.Clear();
+
                 //get current cancels
                  cancels = can.ToArray();
+                 can.Clear();
             }
             // get ready for unfilled orders
             List<Order> unfilled = new List<Order>();
@@ -148,13 +151,10 @@ namespace TradeLink.Common
             }
             lock (aq)
             {
-                // clear queues
-                aq.Clear();
                 // add orders back
                 for (int i = 0; i < unfilled.Count; i++)
                     aq.Enqueue(unfilled[i]);
                 // add cancels back
-                can.Clear();
                 for (int i = 0; i < cancels.Length; i++)
                     if (cancels[i] != 0)
                         can.Enqueue(cancels[i]);
