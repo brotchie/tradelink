@@ -49,7 +49,7 @@
             // 
             this.create.Location = new System.Drawing.Point(347, 76);
             this.create.Name = "create";
-            this.create.Size = new System.Drawing.Size(63, 26);
+            this.create.Size = new System.Drawing.Size(63, 35);
             this.create.TabIndex = 7;
             this.create.Text = "send";
             this.toolTip1.SetToolTip(this.create, "login to assembla and create ticket");
@@ -111,7 +111,7 @@
             // 
             // desc
             // 
-            this.desc.Location = new System.Drawing.Point(10, 108);
+            this.desc.Location = new System.Drawing.Point(10, 117);
             this.desc.Multiline = true;
             this.desc.Name = "desc";
             this.desc.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
@@ -123,7 +123,7 @@
             // 
             this._ss.Location = new System.Drawing.Point(10, 76);
             this._ss.Name = "_ss";
-            this._ss.Size = new System.Drawing.Size(152, 26);
+            this._ss.Size = new System.Drawing.Size(152, 35);
             this._ss.TabIndex = 6;
             this._ss.Text = "take screenshot";
             this.toolTip1.SetToolTip(this._ss, "take screenshot now and attach.   make sure this tool is on same monitor that you" +
@@ -134,17 +134,17 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(6, 44);
+            this.label4.Location = new System.Drawing.Point(6, 47);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(140, 20);
+            this.label4.Size = new System.Drawing.Size(84, 20);
             this.label4.TabIndex = 9;
-            this.label4.Text = "Short Description: ";
+            this.label4.Text = "Summary: ";
             // 
             // summ
             // 
-            this.summ.Location = new System.Drawing.Point(152, 44);
+            this.summ.Location = new System.Drawing.Point(96, 44);
             this.summ.Name = "summ";
-            this.summ.Size = new System.Drawing.Size(258, 26);
+            this.summ.Size = new System.Drawing.Size(314, 26);
             this.summ.TabIndex = 4;
             // 
             // _stat
@@ -160,7 +160,7 @@
             // 
             this._screencast.Location = new System.Drawing.Point(169, 76);
             this._screencast.Name = "_screencast";
-            this._screencast.Size = new System.Drawing.Size(172, 26);
+            this._screencast.Size = new System.Drawing.Size(172, 35);
             this._screencast.TabIndex = 12;
             this._screencast.Text = "make screencast";
             this._screencast.UseVisualStyleBackColor = true;
@@ -184,7 +184,7 @@
             this.Controls.Add(this.space);
             this.Controls.Add(this.create);
             this.Name = "AssemblaTicketControl";
-            this.Size = new System.Drawing.Size(428, 295);
+            this.Size = new System.Drawing.Size(435, 315);
             this.Load += new System.EventHandler(this.AssemblaTicketControl_Load);
             this.SizeChanged += new System.EventHandler(this.AssemblaTicketControl_SizeChanged);
             this.ResumeLayout(false);
