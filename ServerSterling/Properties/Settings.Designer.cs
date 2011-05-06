@@ -202,5 +202,17 @@ namespace SterServer.Properties {
                 this["PaperTradeUseBidAsk"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool OversellSplit {
+            get {
+                return ((bool)(this["OversellSplit"]));
+            }
+            set {
+                this["OversellSplit"] = value;
+            }
+        }
     }
 }

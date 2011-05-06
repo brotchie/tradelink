@@ -99,6 +99,7 @@
     <Compile Include="IndicationHaltResumeImpl.cs" />
     <Compile Include="MarketOnCloseOrder.cs" />
     <Compile Include="OnceTracker.cs" />
+    <Compile Include="OversellTracker.cs" />
     <Compile Include="PresentlyTickingTracker.cs" />
     <Compile Include="DebugImpl.cs" />
     <Compile Include="Email.cs" />

@@ -25,6 +25,8 @@ namespace SterServer
         STIApp stiApp;
         TLServer tl;
 
+        OversellTracker ost;
+
         bool _ignoreoutoforderticks = true;
         public bool IgnoreOutOfOrderTicks { get { return _ignoreoutoforderticks; } set { _ignoreoutoforderticks = value; } }
         int _fixorderdecimalplace = 2;
@@ -58,12 +60,17 @@ namespace SterServer
         public bool isConnected { get { return _connected; } }
         bool _verbosedebug = false;
         public bool VerboseDebugging { get { return _verbosedebug; } set { _verbosedebug = value; } }
-
+        bool _ossplit = false;
+        public bool OversellSplit { get { return _ossplit; } set { _ossplit = value; } }
         public bool Start()
         {
             try
             {
                 if (_connected) return true;
+                ost = new OversellTracker(pt);
+                ost.Split = OversellSplit;
+                ost.SendOrderEvent += new OrderDelegate(ost_SendOrderEvent);
+                ost.SendDebugEvent += new DebugDelegate(ost_SendDebugEvent);
                 debug(Util.TLSIdentity());
                 debug("Attempting to start: " + PROGRAM);
                 // basic structures needed for operation
@@ -134,6 +141,16 @@ namespace SterServer
             debug(PROGRAM + " started.");
             _connected = true;
             return _connected;
+        }
+
+        void ost_SendDebugEvent(string msg)
+        {
+            debug(msg);
+        }
+
+        void ost_SendOrderEvent(Order o)
+        {
+            _orderq.Write(o);
         }
 
         void ptt_SendDebugEvent(string msg)
@@ -1015,7 +1032,7 @@ namespace SterServer
         {
 
             if (o.id == 0) o.id = _idt.AssignId;
-            _orderq.Write(o);
+            ost.sendorder(o);
             return (long)MessageTypes.OK;
         }
 

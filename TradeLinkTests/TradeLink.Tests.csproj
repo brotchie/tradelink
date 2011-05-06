@@ -108,6 +108,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TestOversell.cs" />
     <Compile Include="TestIndicationHaltResume.cs" />
     <Compile Include="TestMessageTracker.cs" />
     <Compile Include="TestMessage.cs" />
