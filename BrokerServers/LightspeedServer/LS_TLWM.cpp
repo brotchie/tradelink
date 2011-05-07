@@ -356,7 +356,7 @@
 				summary,
 				type,
 				side,
-				100,
+				abs(o.size),
 				price,
 				o.exchange,
 				L_TIF::DAY,
