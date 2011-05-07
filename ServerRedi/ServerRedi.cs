@@ -102,6 +102,57 @@ namespace ServerRedi
          */
         object vret;
         public string Account { get { return _accts.Count>0 ? _accts[0] : string.Empty; } set { if (!_accts.Contains(value)) _accts.Add(value); } }
+
+        string gettiftype(Order o)
+        {
+            string type = "Invalid";
+            switch (o.ValidInstruct)
+            {
+                case OrderInstructionType.DAY:
+                    type = "Day";
+                    break;
+                case OrderInstructionType.GTC:
+                    type = "Gtc";
+                    break;
+                case OrderInstructionType.OPG:
+                    type = "OPG";
+                    break;
+                case OrderInstructionType.MOC:
+                    type = "MOC";
+                    break;
+            }
+
+            if (type == "Invalid")
+                debug(o.symbol + " error unknown/invalid tif type for: " + o);
+
+            return type;
+        }
+
+        string getpricetype(Order o)
+        {
+            string type = "Invalid";
+            if (o.isStop && o.isLimit)
+                type = "Stop Limit";
+            else if (o.isStop)
+                type = "Stop";
+            else if (o.isLimit)
+                type = "Limit";
+            else if (o.isMarket)
+                type = "Market";
+
+            if (o.ValidInstruct != OrderInstructionType.Invalid)
+            {
+                if (o.ValidInstruct == OrderInstructionType.MOC)
+                    type = "Market Close";
+            }
+
+            if (type == "Invalid")
+                debug(o.symbol + " error unknown/invalid price type for: " + o);
+
+            return type;
+
+        }
+
         void doqueues(object obj)
         {
             while (_bwgo)
@@ -162,7 +213,7 @@ namespace ServerRedi
                         rediOrder.UserID = _userid;
                         rediOrder.Password = _pwd;
 
-                        rediOrder.TIF = o.TIF;
+                        rediOrder.TIF = gettiftype(o);
                         rediOrder.Side = side;
                         rediOrder.Symbol = o.symbol;
                         if (o.ex == string.Empty)
@@ -170,8 +221,7 @@ namespace ServerRedi
                         rediOrder.Exchange = o.ex;
                         rediOrder.Quantity = o.UnsignedSize;
                         rediOrder.Price = o.price.ToString();
-                        string priceType = o.isMarket ? "MKT" : (o.isLimit ? "Limit" : "MKT");
-                        rediOrder.PriceType = priceType;
+                        rediOrder.PriceType = getpricetype(o);
 
                         rediOrder.StopPrice = o.stopp;
                         rediOrder.Memo = "none";
@@ -324,7 +374,11 @@ namespace ServerRedi
                                     _messageCache.VBGetCell(row, "BRSEQ", ref cv, ref err);
                                     if (!(cv == null))
                                     {
-                                        long id = OrderIdDict[cv.ToString()];
+                                        long id = 0;
+                                        if (OrderIdDict.TryGetValue(cv.ToString(), out id))
+                                            f.id = id;
+                                        else
+                                            f.id = _idt.AssignId;
                                         f.id = id;
                                     }
                                     _messageCache.VBGetCell(row, "EXECPRICE", ref cv, ref err);
@@ -367,15 +421,20 @@ namespace ServerRedi
                                     f.xdate = (int)((now - f.xtime) / 1000000);
                                     Object objErr = null;
                                     _positionCache.VBRediCache.AddWatch(2, string.Empty, f.Account, ref objErr);
-                                    pt.Adjust(f);
-                                    tl.newFill(f);
-                                    v("fill ack received and sent: " + f.ToString());
+                                    if (f.isValid)
+                                    {
+                                        pt.Adjust(f);
+                                        tl.newFill(f);
+                                        v("fill ack received and sent: " + f.ToString());
+                                    }
+                                    else
+                                        debug("ignoring invalid fill: " + f.ToString());
                                 }
                             }                            
                         }
-                        catch (Exception exc)
+                        catch (Exception ex)
                         {
-                            debug(exc.Message);
+                            debug(ex.Message+ex.StackTrace);
                         }
                     }
                     break;
@@ -407,8 +466,12 @@ namespace ServerRedi
                                 }
                                 _messageCache.VBGetCell(row, "BRSEQ", ref cv, ref err);
                                 if (!(cv == null))
-                                {                                    
-                                    long id = OrderIdDict[cv.ToString()];                                    
+                                {
+                                    long id = 0;
+                                    if (OrderIdDict.TryGetValue(cv.ToString(), out id))
+                                        f.id = id;
+                                    else
+                                        f.id = _idt.AssignId;
                                     f.id = id;
                                 }
                                 _messageCache.VBGetCell(row, "EXECPRICE", ref cv, ref err);
@@ -445,8 +508,14 @@ namespace ServerRedi
                                 f.xdate = (int)((now - f.xtime) / 1000000);
                                 Object objErr = null;
                                 _positionCache.VBRediCache.AddWatch(2, string.Empty, f.Account, ref objErr);
-                                pt.Adjust(f);
-                                tl.newFill(f);
+                                if (f.isValid)
+                                {
+                                    pt.Adjust(f);
+                                    tl.newFill(f);
+                                    v("fill ack received and sent: " + f.ToString());
+                                }
+                                else
+                                    debug("ignoring invalid fill: " + f.ToString());
                             }
                             if (orderStatus == "Partial")
                             {
