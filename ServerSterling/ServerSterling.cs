@@ -576,7 +576,10 @@ namespace SterServer
                             else if (pegged)
                             {
                                 order.PriceType = STIPriceTypes.ptSTIPegged;
-                                order.PegDiff = (double)o.price;
+                                if (o.price<=0)
+                                    order.PegDiff = (double)o.price;
+                                else
+                                    order.LmtPrice = (double)o.price;
                                 if (o.ValidInstruct== OrderInstructionType.PEG2BST)
                                     order.ExecInst = "T";
                                 else if (o.ValidInstruct== OrderInstructionType.PEG2MID)
