@@ -327,9 +327,25 @@ int ServerGenesis::SendOrder(TradeLibFast::TLOrder o)
 		}
 		o.id = id;
 	}
+	// get genesis order id
+	DWORD goid = 0;
+	// ensure that our id is unique in the DWORD
+	if (o.id>4294967295)
+	{
+		goid = GetTickCount();
+		while (!IdIsUnique(goid))
+		{
+			if (goid<2) goid = 4000000000;
+			goid--;
+		}
+	}
+	else
+		goid = o.id;
 	// prepare to track order
 	// first... save our id
 	orderids.push_back(o.id);
+	// save genesis relationship to our id
+	gorderids.push_back(goid);
 	// with same index, store unknown sequence id we get on order ack
 	orderseq.push_back(0);
 	// with same index, store unknown trade id we get on fill
@@ -339,7 +355,7 @@ int ServerGenesis::SendOrder(TradeLibFast::TLOrder o)
 	int err = OK;
 	GTOrder go;
 	go = pStock->m_defOrder;
-	go.dwUserData = (DWORD)o.id;
+	go.dwUserData = goid;
 	if (o.isStop())
 	{
 		if(pStock->PlaceOrder(go, (o.side ? 'B' : 'S'), abs(o.size), o.price, METHOD_STOP, getTIF(o.TIF))==0)
@@ -387,6 +403,10 @@ int ServerGenesis::GetIDIndex(int64 id, int type)
 	case TICKET:
 		for (uint i = 0; i<orderseq.size(); i++)
 			if (orderticket[i]==id) return i;
+		break;
+	case GENESIS:
+		for (uint i = 0; i<gorderids.size(); i++)
+			if (gorderids[i]==id) return i;
 		break;
 	}
 	// not found

@@ -35,6 +35,7 @@ public :
 	std::vector<int64> orderids;
 	std::vector<long> orderseq;
 	std::vector<long> orderticket;
+	std::vector<DWORD> gorderids;
 	int GetIDIndex(int64 id, int type);
 
 private:
@@ -63,4 +64,5 @@ enum ORDERIDTYPE
 	ID,
 	SEQ,
 	TICKET,
+	GENESIS,
 };
