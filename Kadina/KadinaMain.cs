@@ -322,22 +322,30 @@ namespace Kadina
 
         void reset()
         {
-            // clear all GUIs
-            _msg = new StringBuilder(10000);
-            SimBroker.Reset();
-            debugControl1.Clear();
-            dt.Clear();
-            ptab.Clear();
-            poslist.Clear();
-            _tradelist.Clear();
-            ot.Clear();
-            ft.Clear();
-            _tabs.Refresh();
-            c = new ChartControl();
-            _tr.Clear();
-            if (it != null) { it.Clear(); it.Columns.Clear(); ig.Invalidate(); }
-            loadsim();
-            loadboxname(resname);
+            try
+            {
+                // clear all GUIs
+                _msg = new StringBuilder(10000);
+                SimBroker.Reset();
+                debugControl1.Clear();
+                dt.Clear();
+                ptab.Clear();
+                poslist.Clear();
+                _tradelist.Clear();
+                ot.Clear();
+                ft.Clear();
+                _tabs.Refresh();
+                c = new ChartControl();
+                _tr.Clear();
+                if (it != null) { it.Clear(); it.Columns.Clear(); ig.Invalidate(); }
+                loadsim();
+                loadboxname(resname);
+            }
+            catch (Exception ex)
+            {
+                status("An error occured, try again.");
+                debug("reset error: " + ex.Message + ex.StackTrace);
+            }
         }
 
         bool _missingindnameerrornotifyok = true;
