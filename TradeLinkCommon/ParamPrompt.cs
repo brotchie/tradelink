@@ -24,9 +24,12 @@ namespace TradeLink.Common
 			this.Text = DisplayParamsOfObject.Name + " Options";
             propertyGrid1.PropertySort = PropertySort.Categorized;
 			propertyGrid1.SelectedObject = (object)DisplayParamsOfObject;
+            DialogResult = DialogResult.Cancel;
             Invalidate();
 
 		}
+
+        static Response r;
         /// <summary>
         /// popup the parameters for selected response
         /// </summary>
@@ -40,16 +43,34 @@ namespace TradeLink.Common
         {
             if (skip) return;
             ParamPrompt p = new ParamPrompt(displayParamsAvail);
-
+            r = displayParamsAvail;
             p.Invalidate(true);
             if (pauseapp)
-                p.ShowDialog();
+            {
+                if (p.ShowDialog() == DialogResult.OK)
+                {
+                }
+                else
+                    displayParamsAvail.isValid = false;
+            }
             else
+            {
+                p.FormClosing += new FormClosingEventHandler(p_FormClosing);
                 p.Show();
+            }
             p.Invalidate(true);
         }
+
+        static void p_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            ParamPrompt p = (ParamPrompt)sender;
+            if (p.DialogResult != DialogResult.OK)
+                r.isValid = false;
+        }
+
 		void ApplybutClick(object sender, EventArgs e)
 		{
+            DialogResult = DialogResult.OK;
 			this.Close();
 		}
 
