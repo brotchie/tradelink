@@ -252,7 +252,7 @@ namespace ASP
             _bf.gotPosition += new PositionDelegate(tl_gotPosition);
             _bf.gotTick += new TickDelegate(quote_gotTick);
             _bf.gotUnknownMessage += new MessageDelegate(tl_gotUnknownMessage);
-
+            _bf.gotImbalance += new ImbalanceDelegate(tl_gotImbalance); // intercept imbalance messages
 
             // pass messages through
             _mtquote = new MessageTracker(_bf.FeedClient);
@@ -919,6 +919,21 @@ namespace ASP
 
         Results _rs = new Results();
        
+        void tl_gotImbalance(Imbalance imb)
+        {
+            /*("Got Imbalance: " + imb.Symbol
+                + "  THIS: " + imb.ThisImbalance
+                + "  PREV: " + imb.PrevImbalance
+                + "  INFO: " + imb.InfoImbalance
+                + "  valid: " + imb.isValid
+                + "  TIME:  " + imb.ThisTime);*/
+
+            // reserialize and pass as a message
+            string message = ImbalanceImpl.Serialize(imb);
+            foreach (Response resp in _reslist)
+                resp.GotMessage(MessageTypes.IMBALANCERESPONSE, 0, 0, 0, "", ref message);
+        }
+
         void tl_gotTick(Tick t)
         {
             // set time

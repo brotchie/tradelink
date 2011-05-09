@@ -439,7 +439,7 @@ namespace TradeLink.Common
                     quote.gotTick += new TickDelegate(quote_gotTick2);
                     quote.gotUnknownMessage += new MessageDelegate(quote_gotUnknownMessage2);
                 }
-
+                quote.gotImbalance += new ImbalanceDelegate(quote_gotImbalance);
             }
             if (setexec)
             {
@@ -676,6 +676,12 @@ namespace TradeLink.Common
         {
             _kbuf.Write(t);
             _reader.Interrupt();
+        }
+
+        void quote_gotImbalance(Imbalance imb)
+        {
+            if (gotImbalance != null)
+                gotImbalance(imb);
         }
 
         void debug(string msg)
