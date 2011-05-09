@@ -176,26 +176,35 @@ namespace TradeLink.Common
                     }
                 case MessageTypes.BARRESPONSE:
                     {
-                        // get bar
-                        Bar b = BarImpl.Deserialize(response);
-                        // quit if bar is invalid
-                        if (!b.isValid) 
-                            return true;
-                        // notify bar was received
-                        if (GotNewBar!=null)
-                            GotNewBar(b.Symbol,b.Interval);
-                        // update blt if desired
-                        if (BLT != null)
+                        try
                         {
-                            // get bar list
-                            BarList bl = BLT[b.Symbol,b.Interval];
-                            // get nearest intrday bar
-                            int preceed = BarListImpl.GetBarIndexPreceeding(bl, b.Bardate, b.Bartime);
-                            // increment by one to get new position
-                            int newpos = preceed + 1;
-                            // insert bar
-                            BLT[b.Symbol] = BarListImpl.InsertBar(bl, b, newpos);
-                            
+                            // get bar
+                            Bar b = BarImpl.Deserialize(response);
+                            // quit if bar is invalid
+                            if (!b.isValid)
+                                return true;
+                            // notify bar was received
+                            if (GotNewBar != null)
+                                GotNewBar(b.Symbol, b.Interval);
+                            // update blt if desired
+                            if (BLT != null)
+                            {
+                                // get bar list
+                                BarList bl = BLT[b.Symbol, b.Interval];
+                                // get nearest intrday bar
+                                int preceed = BarListImpl.GetBarIndexPreceeding(bl, b.Bardate, b.Bartime);
+                                // increment by one to get new position
+                                int newpos = preceed + 1;
+                                // insert bar
+                                BLT[b.Symbol] = BarListImpl.InsertBar(bl, b, newpos);
+
+                            }
+
+                        }
+                        catch (Exception ex)
+                        {
+                            debug("error receiving bardata: " + response + " err: " + ex.Message + ex.StackTrace);
+                            return false;
                         }
                         return true;
 
