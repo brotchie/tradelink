@@ -44,7 +44,7 @@ namespace TradeLink.Common
         /// </summary>
         public IdTracker Ids { get { return _ids; } set { _ids = value; } }
         public OffsetTracker(long initialid) : this(new IdTracker(initialid)) { }
-        public OffsetTracker(IdTracker tracker)
+        public OffsetTracker(IdTracker tracker) : base("OFFSET")
         {
             _ids = tracker;
         }
