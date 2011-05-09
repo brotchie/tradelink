@@ -72,6 +72,8 @@ namespace TradeLink.Common
                     debug(o.symbol + " splitting oversell/overcover to 2nd order: " + newo);
                 }
             }
+            else
+                sonow(o);
 
         }
 
