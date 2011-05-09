@@ -83,6 +83,25 @@ namespace TradeLink.Common
             } 
         }
 
+        /// <summary>
+        /// get position given positions symbol (assumes default account)
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <returns></returns>
+        public new Position this[int idx]
+        {
+            get
+            {
+                if (idx < 0)
+                    return new PositionImpl();
+                Position p = base[idx];
+                if (p == null)
+                    return new PositionImpl(getlabel(idx));
+                return p;
+            }
+        }
+        
+
 
         decimal _totalclosedpl = 0;
         /// <summary>
@@ -151,7 +170,7 @@ namespace TradeLink.Common
                 addindex(newpos.Symbol + newpos.Account, new PositionImpl(newpos));
             else
             {
-                this[idx] = new PositionImpl(newpos);
+                base[idx] = new PositionImpl(newpos);
                 _totalclosedpl += newpos.ClosedPL;
             }
             return 0;
