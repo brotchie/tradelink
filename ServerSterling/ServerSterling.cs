@@ -900,109 +900,108 @@ namespace SterServer
         object locker = new object();
         void doquote(ref structSTIQuoteUpdate q)
         {
-            lock (locker)
+
+            Tick k = new TickImpl(q.bstrSymbol);
+            k.bid = (decimal)q.fBidPrice;
+            k.ask = (decimal)q.fAskPrice;
+            k.bs = q.nBidSize / 100;
+            k.os = q.nAskSize / 100;
+            k.ex = GetExPretty(q.bstrExch);
+            k.be = GetExPretty(q.bstrBidExch);
+            k.oe = GetExPretty(q.bstrAskExch);
+            int now = Convert.ToInt32(q.bstrUpdateTime);
+            k.date = Util.ToTLDate(DateTime.Now);
+            //int sec = now % 100;
+            k.time = now;
+
+            // we don't want to simply return on out-of-order ticks because it'll prevent processing
+            // of the mdx messages further in this function.
+            if (!IgnoreOutOfOrderTicks || (k.time > _lasttime))
             {
-                Tick k = new TickImpl(q.bstrSymbol);
-                k.bid = (decimal)q.fBidPrice;
-                k.ask = (decimal)q.fAskPrice;
-                k.bs = q.nBidSize / 100;
-                k.os = q.nAskSize / 100;
-                k.ex = GetExPretty(q.bstrExch);
-                k.be = GetExPretty(q.bstrBidExch);
-                k.oe = GetExPretty(q.bstrAskExch);
-                int now = Convert.ToInt32(q.bstrUpdateTime);
-                k.date = Util.ToTLDate(DateTime.Now);
-                //int sec = now % 100;
-                k.time = now;
+                _lasttime = k.time;
+                k.trade = (decimal)q.fLastPrice;
+                k.size = q.nLastSize;
+                // execute orders if papertrade is enabled
+                if (isPaperTradeEnabled)
+                    ptt.newTick(k);
+                // notify clients of tick
+                if (!_imbalance || (_imbalance && k.isValid))
+                    tl.newTick(k);
+            }
 
-                // we don't want to simply return on out-of-order ticks because it'll prevent processing
-                // of the mdx messages further in this function.
-                if (!IgnoreOutOfOrderTicks || (k.time > _lasttime))
+            /////////////////////////
+            // MDX Processing
+            /////////////////////////
+            if (q.nMdxMsgType == 1)
+            {
+                if (VerboseDebugging)
+                    debug(q.bstrUpdateTime
+                    + "  Received Regulatory Imbalance for: " + q.bstrSymbol
+                    + "  ValidIntradayMarketImb: " + q.bValidIntradayMktImb
+                    + "  ValidMktImb: " + q.bValidMktImb
+                    + "  Imbalance: " + q.nImbalance
+                    + "  iMktImbalance: " + q.nIntradayMktImbalance
+                    + "  MktImbalance: " + q.nMktImbalance);
+
+                int time;
+                if (int.TryParse(q.bstrUpdateTime, out time))
                 {
-                    _lasttime = k.time;
-                    k.trade = (decimal)q.fLastPrice;
-                    k.size = q.nLastSize;
-                    // execute orders if papertrade is enabled
-                    if (isPaperTradeEnabled)
-                        ptt.newTick(k);
-                    // notify clients of tick
-                    if (!_imbalance || (_imbalance && k.isValid))
-                        tl.newTick(k);
-                }
-
-                /////////////////////////
-                // MDX Processing
-                /////////////////////////
-                if (q.nMdxMsgType == 1)
-                {
-                    if (VerboseDebugging)
-                        debug(q.bstrUpdateTime
-                        + "  Received Regulatory Imbalance for: " + q.bstrSymbol
-                        + "  ValidIntradayMarketImb: " + q.bValidIntradayMktImb
-                        + "  ValidMktImb: " + q.bValidMktImb
-                        + "  Imbalance: " + q.nImbalance
-                        + "  iMktImbalance: " + q.nIntradayMktImbalance
-                        + "  MktImbalance: " + q.nMktImbalance);
-
-                    int time;
-                    if (int.TryParse(q.bstrUpdateTime, out time))
-                    {
-                        Imbalance imb = new ImbalanceImpl(q.bstrSymbol, GetExPretty(q.bstrExch), q.nIntradayMktImbalance, time, 0, 0, 0);
-                        tl.newImbalance(imb);
-                    }
-                }
-                else if (q.nMdxMsgType == 2)
-                {
-                    if (VerboseDebugging)
-                        debug(q.bstrUpdateTime
-                        + "  Received Informational Imbalance for: " + q.bstrSymbol
-                        + "  ValidIntradayMarketImb: " + q.bValidIntradayMktImb
-                        + "  ValidMktImb: " + q.bValidMktImb
-                        + "  Imbalance: " + q.nImbalance
-                        + "  iMktImbalance: " + q.nIntradayMktImbalance
-                        + "  MktImbalance: " + q.nMktImbalance);
-
-                    int time;
-                    if (int.TryParse(q.bstrUpdateTime, out time))
-                    {
-                        Imbalance imb = new ImbalanceImpl(q.bstrSymbol, GetExPretty(q.bstrExch), 0, time, 0, 0, q.nIntradayMktImbalance);
-                        tl.newImbalance(imb);
-                    }
-                }
-                else if (q.nMdxMsgType == 3)
-                {
-                    if (VerboseDebugging)
-                        debug(q.bstrUpdateTime
-                        + "  Received Halt/Delay for: " + q.bstrSymbol
-                        + "  Status: " + q.bstrHaltResumeStatus
-                        + "  Reason: " + q.bstrHaltResumeReason);
-
-                    int time;
-                    if (int.TryParse(q.bstrUpdateTime, out time))
-                    {
-                        HaltResume h = new HaltResumeImpl(q.bstrSymbol, GetExPretty(q.bstrExch), time, q.bstrHaltResumeStatus, q.bstrHaltResumeReason);
-                        for (int clientNumber = 0; clientNumber < tl.NumClients; clientNumber++)
-                            tl.TLSend(HaltResumeImpl.Serialize(h), MessageTypes.HALTRESUME, clientNumber);
-                    }
-                }
-                else if (q.nMdxMsgType == 4)
-                {
-                    if (VerboseDebugging)
-                        debug(q.bstrUpdateTime
-                        + "  Received Indication for: " + q.bstrSymbol
-                        + "  ValidIndicators: " + q.bValidIndicators
-                        + "  IndicatorHigh: " + q.fIndicatorHigh
-                        + "  IndicatorLow: " + q.fIndicatorLow);
-
-                    int time;
-                    if (int.TryParse(q.bstrUpdateTime, out time))
-                    {
-                        Indication ind = new IndicationImpl(q.bstrSymbol, GetExPretty(q.bstrExch), time, q.bValidIndicators, (decimal)q.fIndicatorHigh, (decimal)q.fIndicatorLow);
-                        for (int clientNumber = 0; clientNumber < tl.NumClients; clientNumber++)
-                            tl.TLSend(IndicationImpl.Serialize(ind), MessageTypes.INDICATION, clientNumber);
-                    }
+                    Imbalance imb = new ImbalanceImpl(q.bstrSymbol, GetExPretty(q.bstrExch), q.nIntradayMktImbalance, time, 0, 0, 0);
+                    tl.newImbalance(imb);
                 }
             }
+            else if (q.nMdxMsgType == 2)
+            {
+                if (VerboseDebugging)
+                    debug(q.bstrUpdateTime
+                    + "  Received Informational Imbalance for: " + q.bstrSymbol
+                    + "  ValidIntradayMarketImb: " + q.bValidIntradayMktImb
+                    + "  ValidMktImb: " + q.bValidMktImb
+                    + "  Imbalance: " + q.nImbalance
+                    + "  iMktImbalance: " + q.nIntradayMktImbalance
+                    + "  MktImbalance: " + q.nMktImbalance);
+
+                int time;
+                if (int.TryParse(q.bstrUpdateTime, out time))
+                {
+                    Imbalance imb = new ImbalanceImpl(q.bstrSymbol, GetExPretty(q.bstrExch), 0, time, 0, 0, q.nIntradayMktImbalance);
+                    tl.newImbalance(imb);
+                }
+            }
+            else if (q.nMdxMsgType == 3)
+            {
+                if (VerboseDebugging)
+                    debug(q.bstrUpdateTime
+                    + "  Received Halt/Delay for: " + q.bstrSymbol
+                    + "  Status: " + q.bstrHaltResumeStatus
+                    + "  Reason: " + q.bstrHaltResumeReason);
+
+                int time;
+                if (int.TryParse(q.bstrUpdateTime, out time))
+                {
+                    HaltResume h = new HaltResumeImpl(q.bstrSymbol, GetExPretty(q.bstrExch), time, q.bstrHaltResumeStatus, q.bstrHaltResumeReason);
+                    for (int clientNumber = 0; clientNumber < tl.NumClients; clientNumber++)
+                        tl.TLSend(HaltResumeImpl.Serialize(h), MessageTypes.HALTRESUME, clientNumber);
+                }
+            }
+            else if (q.nMdxMsgType == 4)
+            {
+                if (VerboseDebugging)
+                    debug(q.bstrUpdateTime
+                    + "  Received Indication for: " + q.bstrSymbol
+                    + "  ValidIndicators: " + q.bValidIndicators
+                    + "  IndicatorHigh: " + q.fIndicatorHigh
+                    + "  IndicatorLow: " + q.fIndicatorLow);
+
+                int time;
+                if (int.TryParse(q.bstrUpdateTime, out time))
+                {
+                    Indication ind = new IndicationImpl(q.bstrSymbol, GetExPretty(q.bstrExch), time, q.bValidIndicators, (decimal)q.fIndicatorHigh, (decimal)q.fIndicatorLow);
+                    for (int clientNumber = 0; clientNumber < tl.NumClients; clientNumber++)
+                        tl.TLSend(IndicationImpl.Serialize(ind), MessageTypes.INDICATION, clientNumber);
+                }
+            }
+
         }
 
         void stiQuote_OnSTIQuoteUpdate(ref structSTIQuoteUpdate q)
