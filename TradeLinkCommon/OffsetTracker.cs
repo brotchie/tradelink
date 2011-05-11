@@ -507,16 +507,18 @@ namespace TradeLink.Common
         {
             // see if we have a custom offset
             int idx = getindex(sym);
-            OffsetInfo oi = base[idx];
+            OffsetInfo oi = null;
+            if (idx >= 0)
+                oi = base[idx];
             // if we don't have a custom but we're adding one, add from default
             if (AddCustom && (idx < 0))
             {
                 idx = addindex(sym, DefaultOffset);
             }
-            else if ((idx < 0) || (oi==null)) // otherwise use default
+            else if (oi==null) // otherwise use default
                 return DefaultOffset;
             // return custom
-            return base[idx];
+            return oi;
             
         }
 
