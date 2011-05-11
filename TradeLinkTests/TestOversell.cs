@@ -14,7 +14,7 @@ namespace TestTradeLink
         OversellTracker ost = new OversellTracker();
 
         [Test]
-        public void TestNormal()
+        public void TestNormalEntry()
         {
             lasto = new OrderImpl();
             oc = 0;
@@ -23,11 +23,32 @@ namespace TestTradeLink
             ost.SendDebugEvent += new DebugDelegate(rt.d);
             // take a position
             ost.GotPosition(new PositionImpl("TST"));
-            // over sell
+            // sell
             ost.sendorder(new SellMarket("TST", 500));
             // verify that was sent
             Assert.AreEqual(1, oc);
             Assert.AreEqual(-500, lasto.size);
+
+
+        }
+
+        [Test]
+        public void TestNormalExit()
+        {
+            lasto = new OrderImpl();
+            oc = 0;
+            ost = new OversellTracker();
+            ost.SendOrderEvent += new OrderDelegate(ost_SendOrderEvent);
+            ost.SendDebugEvent += new DebugDelegate(rt.d);
+            // take a position
+            ost.GotPosition(new PositionImpl("TST",100,500));
+            // sell
+            ost.sendorder(new SellMarket("TST", 500));
+            // verify that was sent
+            Assert.AreEqual(1, oc);
+            Assert.AreEqual(-500, lasto.size);
+
+
         }
 
         [Test]

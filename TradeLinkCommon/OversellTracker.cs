@@ -11,10 +11,12 @@ namespace TradeLink.Common
     {
         PositionTracker _pt;
         public string Name { get { return "OVERSELL"; } }
-        public OversellTracker() : this(new PositionTracker()) { }
-        public OversellTracker(PositionTracker pt)
+        public OversellTracker() : this(new PositionTracker(),new IdTracker()) { }
+        IdTracker _idt;
+        public OversellTracker(PositionTracker pt, IdTracker idt)
         {
             _pt = pt;
+            _idt = idt;
         }
 
         int osa = 0;
@@ -42,7 +44,7 @@ namespace TradeLink.Common
             // get existing size
             int size = _pt[o.symbol].Size;
             // check for overfill/overbuy
-            bool over = o.size * size < -1;
+            bool over = (o.size * size < -1) && (o.UnsignedSize>Math.Abs(size));
             // detect
             if (over)
             {
@@ -55,7 +57,7 @@ namespace TradeLink.Common
                 // count
                 osa++;
                 // notify
-                debug(o.symbol + " oversell detected: " + osize + ">" + size + " adjusted to: " + o.ToString());
+                debug(o.symbol + " oversell detected on pos: "+size+" order adjustment: " + osize + "->" + size + " " + o.ToString());
                 // see if we're splitting
                 if (Split)
                 {
@@ -66,6 +68,7 @@ namespace TradeLink.Common
                     // create order
                     Order newo = new OrderImpl(o);
                     newo.size = nsize;
+                    newo.id = _idt.AssignId;
                     // send
                     sonow(newo);
                     // notify

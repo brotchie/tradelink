@@ -67,7 +67,7 @@ namespace SterServer
             try
             {
                 if (_connected) return true;
-                ost = new OversellTracker(pt);
+                ost = new OversellTracker(pt,_idt);
                 ost.Split = OversellSplit;
                 ost.SendOrderEvent += new OrderDelegate(ost_SendOrderEvent);
                 ost.SendDebugEvent += new DebugDelegate(ost_SendDebugEvent);
@@ -84,7 +84,7 @@ namespace SterServer
                 _runbg = true;
                 _bw.Start();
                 ptt.GotCancelEvent+=new LongDelegate(tl.newCancel);
-                ptt.GotFillEvent+=new FillDelegate(tl.newFill);
+                ptt.GotFillEvent += new FillDelegate(tl.newFill);
                 ptt.GotOrderEvent+=new OrderDelegate(tl.newOrder);
                 ptt.SendDebugEvent += new DebugDelegate(ptt_SendDebugEvent);
                 ptt.UseBidAskFills = isPaperTradeUsingBidAsk;
@@ -142,6 +142,7 @@ namespace SterServer
             _connected = true;
             return _connected;
         }
+
 
         void ost_SendDebugEvent(string msg)
         {
