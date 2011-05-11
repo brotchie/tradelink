@@ -70,7 +70,8 @@ namespace TradeLink.Common
                     newo.size = nsize;
                     newo.id = _idt.AssignId;
                     // send
-                    sonow(newo);
+                    if (nsize!=0)
+                        sonow(newo);
                     // notify
                     debug(o.symbol + " splitting oversell/overcover to 2nd order: " + newo);
                 }
