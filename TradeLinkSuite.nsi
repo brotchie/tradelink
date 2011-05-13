@@ -116,7 +116,7 @@ Section "TradeLinkSuite"
   File "Install\VCRedistInstall.exe"
   File "Install\TickDataInstall.exe"
   File "Install\TickDataMigrate.exe"
-  File "ServerEsignal\bin\release\Interop.IESignal.dll"
+  File /nonfatal "ServerEsignal\bin\release\Interop.IESignal.dll"
   
   File "ServerGrayBox\bin\release\GbTLServer.exe"
   File "ServerGrayBox\bin\release\GBAPILibrary.dll"
