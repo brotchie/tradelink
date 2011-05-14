@@ -54,27 +54,36 @@ namespace Responses
         GenericTracker<bool> _wait = new GenericTracker<bool>();
         // track whether shutdown 
         GenericTracker<bool> _active = new GenericTracker<bool>();
+        // hold last ma
+        GenericTracker<decimal> _sma = new GenericTracker<decimal>();
 
         void _active_NewTxt(string txt, int idx)
         {
             // go ahead and notify any other trackers about this symbol
             _wait.addindex(txt, false);
+            _sma.addindex(txt, 0);
         }
 
         void blt_GotNewBar(string symbol, int interval)
         {
             // lets do our entries.  
+            
+            int idx = _active.getindex(symbol);
 
             // calculate the SMA using closign prices for so many bars back
             decimal SMA = Calc.Avg(Calc.EndSlice(blt[symbol].Close(),_barsback));
             // uncomment to use TA-lib indicators
-            //int v = 0;
-            //double[] result = new double[0];
-            //Core.Sma(0, blt[symbol].Close().Length - 1, Calc.Decimal2Double(blt[symbol].Close()), _barsback, out v, out v, result);
-            //SMA = (decimal)result[result.Length - 1];
+            //int num,si;
+            //double[] result = new double[blt[symbol].Count];
+            //Core.Sma(0, blt[symbol].Last,
+            //    Calc.Decimal2Double(blt[symbol].Close()), 
+            //    _barsback,out si, out num, result);
+            //Calc.TAPopulateGT(idx, num, ref result, _sma);
+            //decimal SMA = _sma[idx];
 
-            // ensure we're tracking waits for this symbol
-            _wait.addindex(symbol, false);
+            // wait until we have an SMA
+            if (SMA == 0)
+                return;
 
             //ensure we aren't waiting for previous order to fill
             if (!_wait[symbol])

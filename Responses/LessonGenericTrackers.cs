@@ -8,13 +8,13 @@ namespace Responses
 {
     public class LessonGenericTrackers : ResponseTemplate
     {
-        GenericTracker<bool> indicatorcross1 = new GenericTracker<bool>();
-        GenericTracker<bool> indicatorcross2 = new GenericTracker<bool>();
-        GenericTracker<bool> first1then2ok = new GenericTracker<bool>();
+        GenericTracker<bool> indicatorcross1 = new GenericTracker<bool>("indicatorcross1");
+        GenericTracker<bool> indicatorcross2 = new GenericTracker<bool>("indicatorcross2");
+        GenericTracker<bool> first1then2ok = new GenericTracker<bool>("first1then2");
 
-        GenericTracker<string> PRIMARY = new GenericTracker<string>();
-        GenericTracker<int> expectedsize = new GenericTracker<int>();
-        GenericTracker<bool> entryok = new GenericTracker<bool>();
+        GenericTracker<string> PRIMARY = new GenericTracker<string>("SYMBOL");
+        GenericTracker<int> expectedsize = new GenericTracker<int>("expect");
+        GenericTracker<bool> entryok = new GenericTracker<bool>("entryok");
 
         PositionTracker pt = new PositionTracker();
         BarListTracker blt = new BarListTracker(new BarInterval[] { BarInterval.FiveMin, BarInterval.Minute });
@@ -23,14 +23,21 @@ namespace Responses
         {
             blt.GotNewBar += new SymBarIntervalDelegate(GotNewBar);
             PRIMARY.NewTxt += new TextIdxDelegate(PRIMARY_NewTxt);
+            Indicators = gt.GetIndicatorNames(gens());
         }
 
+        GenericTrackerI[] gens()
+        {
+            return gt.geninds(PRIMARY, indicatorcross1, indicatorcross2, expectedsize, entryok, first1then2ok,pt);
+        }
 
 
         void GotNewBar(string symbol, int interval)
         {
             // get current barlist for this symbol+interval
             BarList bl = blt[symbol, interval];
+            // get index for symbol
+            int idx = PRIMARY.getindex(symbol);
             // check for first cross on first interval
             if (interval == (int)BarInterval.Minute)
                 // update the cross state
@@ -45,13 +52,14 @@ namespace Responses
             // send order if everything looks good
             if (first1then2ok[symbol] && indicatorcross2[symbol] && indicatorcross1[symbol])
                 sendorder(new BuyMarket(symbol, 100));
-
+            // notify of current tracker values
+            sendindicators(gt.GetIndicatorValues(idx, gens()));
         }
 
         public override void GotTick(Tick k)
         {
             // get index from symbol, add if it doesn't exist
-            int idx = PRIMARY.addindex(k.symbol);
+            int idx = PRIMARY.addindex(k.symbol,k.symbol);
             // build bars
             blt.newTick(k);
             // update whether entries are allowed
@@ -91,6 +99,7 @@ namespace Responses
             pt.addindex(txt);
             indicatorcross1.addindex(txt);
             indicatorcross2.addindex(txt);
+            first1then2ok.addindex(txt);
         }
 
 
