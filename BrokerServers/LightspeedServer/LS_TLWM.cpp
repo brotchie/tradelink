@@ -629,6 +629,8 @@
 					L_Summary* sum = L_CreateSummary(m->L_Symbol());
 					// update exchange
 					imb.Ex = CString(sum->L_Exchange());
+					// release summary 
+					L_DestroySummary(sum);
 				}
 
 				imb.ThisTime = (ct.GetHour()*10000)+(ct.GetMinute()*100)+ct.GetSecond();
