@@ -33,6 +33,7 @@ namespace TradeLink.AppKit
             dt.Columns.Add("Result");
             dg.RowHeadersVisible = false;
             dg.DataSource = dt;
+            dg.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dg.Parent = splitContainer1.Panel2;
             dg.Dock = DockStyle.Fill;
             dg.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
