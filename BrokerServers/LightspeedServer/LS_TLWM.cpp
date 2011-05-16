@@ -334,7 +334,18 @@
 		}
 		if (account==NULL)
 			account = accounts[0];
+
+		CString ex = o.exchange;
+		CString ex2 = NULL;
+		if (o.exchange.FindOneOf("+")!=-1)
+		{
+			std::vector<CString> exr;
+			gsplit(o.exchange,CString("+"),exr);
+			ex = exr[0];
+			ex2 = exr[1];
+		}
 		
+
 		//convert the arguments
 		char side = o.side ? L_Side::BUY : L_Side::SELL;
 		long type = o.isStop() ? L_OrderType::STOP : 
@@ -352,17 +363,17 @@
 		L_Order** orderSent = NULL;
 		L_Order** orderSent2 = NULL;
 		// send the order
-			account->L_SendOrder(
+		account->L_SendOrder(
 				summary,
 				type,
 				side,
 				abs(o.size),
 				price,
-				o.exchange,
+				ex,
 				L_TIF::DAY,
 				false,
 				abs(o.size),
-				0,0,corid);
+				0,ex2,corid);
 		
 		
 		
