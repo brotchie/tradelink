@@ -626,7 +626,7 @@
 				if (_imbexch)
 				{
 					// get summary
-					L_Summary* sum = preload(imb.Symbol);
+					L_Summary* sum = L_CreateSummary(m->L_Symbol());
 					// update exchange
 					imb.Ex = CString(sum->L_Exchange());
 				}
