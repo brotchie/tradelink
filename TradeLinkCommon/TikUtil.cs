@@ -117,11 +117,43 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="ticks"></param>
         public static bool TicksToFile(Tick[] ticks) { return TicksToFile(ticks, null); }
+        /// <summary>
+        /// create file from ticks
+        /// </summary>
+        /// <param name="ticks"></param>
+        /// <param name="debs"></param>
+        /// <returns></returns>
         public static bool TicksToFile(Tick[] ticks, DebugDelegate debs)
         {
             try
             {
                 TikWriter tw = new TikWriter();
+                foreach (Tick k in ticks)
+                    tw.newTick(k);
+                tw.Close();
+                if (debs != null)
+                    debs(tw.RealSymbol + " saved " + tw.Count + " ticks to: " + tw.Filepath);
+
+            }
+            catch (Exception ex)
+            {
+                if (debs != null)
+                    debs(ex.Message + ex.StackTrace);
+                return false;
+            }
+            return true;
+        }
+        /// <summary>
+        /// create file from ticks
+        /// </summary>
+        /// <param name="ticks"></param>
+        /// <param name="debs"></param>
+        /// <param name="tw"></param>
+        /// <returns></returns>
+        public static bool TicksToFile(Tick[] ticks, DebugDelegate debs, TikWriter tw)
+        {
+            try
+            {
                 foreach (Tick k in ticks)
                     tw.newTick(k);
                 tw.Close();
