@@ -308,14 +308,39 @@
 		return tw;
 	} 
 
-	/*
-	Money LS_TLWM::Double2Money(double val)
+	long LS_TLWM::gettype(TLOrder o)
 	{
-		int vw = (int)val;
-		int vfp = (int)((val-vw)*1000);
-		int vf = rndup(vfp);
-		return Money(vw,vf);
-	}*/
+		long type = o.isStop() ? L_OrderType::STOP : 
+			( o.isLimit() ? L_OrderType::LIMIT : L_OrderType::MARKET);
+
+		if ((o.TIF=="DAY")
+			|| (o.TIF=="IOC")
+			|| (o.TIF=="GTC")
+			|| (o.TIF==""))
+			return type;
+
+		if (o.TIF=="MOC")
+			return L_OrderType::MOC;
+		else if ((o.TIF=="LOO") || (o.TIF=="OPG"))
+			return L_OrderType::LOO;
+		else if (o.TIF=="LOC")
+			return L_OrderType::LOC;
+		else if (o.TIF=="MOO")
+			return L_OrderType::MOO;
+
+		return type;
+	}
+
+	long LS_TLWM::gettif(TLOrder o)
+	{
+		CString tifs = o.TIF;
+		if (tifs=="DAY")
+			return L_TIF::DAY;
+		else if (tifs=="IOC")
+			return L_TIF::IOC;
+
+		return L_TIF::DAY;
+	}
 
 	int LS_TLWM::SendOrder(TLOrder o) 
 	{
@@ -348,8 +373,7 @@
 
 		//convert the arguments
 		char side = o.side ? L_Side::BUY : L_Side::SELL;
-		long type = o.isStop() ? L_OrderType::STOP : 
-			( o.isLimit() ? L_OrderType::LIMIT : L_OrderType::MARKET);
+		
 		double price = o.isStop() ? o.stop : o.price;
 		// get correlation id
 		nextcorr++;
@@ -358,6 +382,9 @@
 		lscorrelationid.push_back(corid);
 		tlcorrelationid.push_back(o.id);
 
+		// get appropriate tif
+		long tif = gettif(o);
+		long type = gettype(o);
 
 		// prepare to receive the result
 		L_Order** orderSent = NULL;
@@ -370,7 +397,7 @@
 				abs(o.size),
 				price,
 				ex,
-				L_TIF::DAY,
+				tif,
 				false,
 				abs(o.size),
 				0,ex2,corid);
@@ -472,10 +499,66 @@
 		return false;
 	}
 
+	CString LS_TLWM::or2str(long res)
+	{
+		switch (res)
+		{
+		case L_OrderResult::ORDER_SENT_OK : return CString("ORDER_SENT_OK");
+		case L_OrderResult::SOES_ORDER_DISABLED: return CString("SOES_ORDER_DISABLED");
+		case L_OrderResult::MM_IN_EXCLUSION_LIST : return CString("MM_IN_EXCLUSION_LIST");
+		case L_OrderResult::ZERO_SHARES_ORDERED : return CString("ZERO_SHARES_ORDERED");
+		case L_OrderResult::EXECUTIONS_DISABLED : return CString("EXECUTIONS_DISABLED");
+		case L_OrderResult::BUYING_POWER_EXCEEDED : return CString("BUYING_POWER_EXCEEDED");
+		case L_OrderResult::SHORT_SELL_VIOLATION : return CString("SHORT_SELL_VIOLATION");
+		case L_OrderResult::STOCK_NOT_SHORTABLE : return CString("STOCK_NOT_SHORTABLE");
+		case L_OrderResult::EXECUTOR_NOT_CONNECTED : return CString("EXECUTOR_NOT_CONNECTED");
+		case L_OrderResult::MAXORDERSHARES_EXCEEDED : return CString("MAXORDERSHARES_EXCEEDED");
+		case L_OrderResult::WAIT_CONSTRAINT_VIOLATION : return CString("WAIT_CONSTRAINT_VIOLATION");
+		case L_OrderResult::STOCK_HALTED : return CString("STOCK_HALTED");
+		case L_OrderResult::MKXT_BOOK_OR_KILL : return CString("MKXT_BOOK_OR_KILL");
+		case L_OrderResult::SMALL_CAPS_NOT_SOESABLE : return CString("SMALL_CAPS_NOT_SOESABLE");
+		case L_OrderResult::OWN_CROSSING : return CString("OWN_CROSSING");
+		case L_OrderResult::CANNOT_TRADE_SYMBOL : return CString("CANNOT_TRADE_SYMBOL");
+		case L_OrderResult::MARKET_HALTED : return CString("MARKET_HALTED");
+		case L_OrderResult::FUTURES_MARGINABILITY_UNKNOWN : return CString("FUTURES_MARGINABILITY_UNKNOWN");
+		case L_OrderResult::TRADINGMONITOR_BLOCKED_ORDER : return CString("TRADINGMONITOR_BLOCKED_ORDER");
+		case L_OrderResult::DECLINED_AT_CONFIRM_BY_USER : return CString("DECLINED_AT_CONFIRM_BY_USER");
+		case L_OrderResult::ROUTING_BLOCKED_ORDER : return CString("ROUTING_BLOCKED_ORDER");
+		case L_OrderResult::OTHER_REJECTION : return CString("OTHER_REJECTION");
+		case L_OrderResult::EXECUTOR_NOT_LOGGED_IN : return CString("EXECUTOR_NOT_LOGGED_IN");
+		case L_OrderResult::UNINITIALIZED_SUMMARY : return CString("UNINITIALIZED_SUMMARY");
+		case L_OrderResult::INVALID_SUMMARY : return CString("INVALID_SUMMARY");
+		case L_OrderResult::INVALID_ORDER_TYPE : return CString("INVALID_ORDER_TYPE");
+		default :
+												 {
+													 CString m;
+													 m.Format("Unknown sendorder result: %l"+res);
+													 return m;
+													 break;
+												 }
+		}
+	}
+
 	void LS_TLWM::HandleMessage(L_Message const *msg)
 	{
 		switch (msg->L_Type())
 		{
+		case L_MsgOrderRequested::id:
+			{
+				L_MsgOrderRequested* m = (L_MsgOrderRequested*)msg;
+				long res = m->L_Result();
+				// check for error
+					long lscorid = m->L_CorrelationId();
+					CString err = or2str(res);
+					int64 tlid = 0;
+					for (uint i = 0; i<lscorrelationid.size(); i++)
+						if (*lscorrelationid[i]==lscorid)
+							tlid = tlcorrelationid[i];
+					CString ms;
+					ms.Format("orderreq id: %i tlid: %lld result: %s code: %i Symbol: %s",m->L_Order1ReferenceId(),tlid,err,res,m->L_Symbol());
+					D(ms);
+				break;
+			}
 		case L_MsgOrderChange::id: // orders?
 			{
 				L_MsgOrderChange* m = (L_MsgOrderChange*)msg;
@@ -507,7 +590,12 @@
 						}
 						break;
 					case L_OrderChange::Rejection:
+						{
+							CString m;
+							m.Format("lsid: %i rejected for %s",lsid,msg->L_Symbol());
+							D(m);
 						break;
+						}
 					case L_OrderChange::Cancel:
 						{
 							// ensure we have accounts

@@ -13,3 +13,4 @@ typedef long long int64;
 #include "TLImbalance.h"
 #include "Util.h"
 #include "TLPacket.h"
+#include "OrderInstructionTypes.h"

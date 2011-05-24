@@ -32,6 +32,7 @@ using namespace TradeLibFast;
 	virtual void HandleMessage(L_Message const *msg);
 
 	protected:
+		CString or2str(long res);
 		void v(const CString &msg);
 		bool _noverb;
 		bool saveOrderId(int64 tlid, long lsid);
@@ -47,6 +48,8 @@ using namespace TradeLibFast;
 		vector<L_Order*> ordercache;
 		vector<long> lsids;
 		L_Summary* preload(CString symbol);
+		long gettif(TLOrder o);
+		long gettype(TLOrder o);
 
 		int BrokerName(void);
 		int SendOrder(TLOrder order);

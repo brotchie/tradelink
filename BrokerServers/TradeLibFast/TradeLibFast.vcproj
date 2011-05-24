@@ -246,6 +246,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\OrderInstructionTypes.h"
+			>
+		</File>
+		<File
 			RelativePath=".\resource.h"
 			>
 		</File>
