@@ -2,3 +2,11 @@
 1
 // verbose debugging (0 = no, 1 = yes)
 1
+// maximum account size when sending api orders (0 to disable)
+0
+// maximum shares allowed sent through connector (0 to disable)
+0
+// resend orders rejected for summary not loaded (0 to disable)
+0
+// maximum % of total bp a position can take up (10 = 10%,0 to disable)
+10

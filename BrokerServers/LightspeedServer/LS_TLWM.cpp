@@ -33,7 +33,29 @@
 		file.getline(data,ds);
 		// convert it (verbose)
 		_noverb = atoi(data) == 0;
-
+		// skip comment
+		file.getline(skip,ss);
+		// read data
+		file.getline(data,ds);
+		_sendordermaxaccount = atoi(data);
+		_hasmaxaccount = _sendordermaxaccount!=0;
+		// skip comment
+		file.getline(skip,ss);
+		// read data
+		file.getline(data,ds);
+		_maxconnectorshares = atoi(data);
+		_hasmaxconnectorshares = _maxconnectorshares!=0;
+		// skip comment
+		file.getline(skip,ss);
+		// read data
+		file.getline(data,ds);
+		_resendsummarynotloaded = atoi(data)!=0;
+				// skip comment
+		file.getline(skip,ss);
+		// read data
+		file.getline(data,ds);
+		_maxaccountpospct = atoi(data)/(double)100;
+		_hasmaxaccountpospct = _maxaccountpospct !=0;
 		// close config file
 		file.close();
 	}
@@ -350,6 +372,7 @@
 		if ((o.id!=0) && (!IdIsUnique(o.id)))
 			return DUPLICATE_ORDERID;
 
+
 		L_Summary* summary = preload(o.symbol);
 		L_Account* account = NULL;
 		for (uint i = 0; i<accounts.size(); i++)
@@ -360,6 +383,41 @@
 		if (account==NULL)
 			account = accounts[0];
 
+
+		// do maximum size account check
+		if (_hasmaxaccountpospct)
+		{
+			double totalbp = account->L_BuyingPower();
+			L_Position* pos = account->L_FindPosition(o.symbol);
+			if (pos)
+			{
+				double poscost = pos->L_DollarValue();
+				double pospcttotal = totalbp==0 ? 1 : poscost/totalbp;
+				if (pospcttotal>_maxaccountpospct)
+				{
+					D(CString("rejecting for position size exceeded: "+o.Serialize()));
+					return REJECTEDACCOUNTSAFETY;
+				}
+			}
+		}
+		if (_hasmaxaccount)
+		{
+			double bpinuse = account->L_BuyingPowerInUse();
+			if (abs(bpinuse)>=_sendordermaxaccount)
+			{
+				D(CString("rejecting for account safety: "+o.Serialize()));
+				return REJECTEDACCOUNTSAFETY;
+			}
+		}
+		if (_hasmaxconnectorshares)
+		{
+			if (_curconnectorshares >= _maxconnectorshares)
+			{
+				D(CString("rejecting for max connector shares: "+o.Serialize()));
+				return REJECTEDACCOUNTSAFETY;
+			}
+		}
+
 		CString ex = o.exchange;
 		CString ex2 = NULL;
 		if (o.exchange.FindOneOf("+")!=-1)
@@ -368,6 +426,11 @@
 			gsplit(o.exchange,CString("+"),exr);
 			ex = exr[0];
 			ex2 = exr[1];
+		}
+		// check for loading
+		if (!_resendsummarynotloaded && (!summary || !summary->L_IsValid() || !summary->L_IsInit()))
+		{
+			return SYMBOL_NOT_LOADED;
 		}
 		
 
@@ -381,6 +444,8 @@
 		// associate order id and correlation id
 		lscorrelationid.push_back(corid);
 		tlcorrelationid.push_back(o.id);
+		// save order
+		tlorders.push_back(o);
 
 		// get appropriate tif
 		long tif = gettif(o);
@@ -401,8 +466,10 @@
 				false,
 				abs(o.size),
 				0,ex2,corid);
-		
-		
+
+
+
+
 		
 		// return result
 		return 0;
@@ -551,12 +618,40 @@
 					long lscorid = m->L_CorrelationId();
 					CString err = or2str(res);
 					int64 tlid = 0;
+					uint oidx = -1;
 					for (uint i = 0; i<lscorrelationid.size(); i++)
-						if (*lscorrelationid[i]==lscorid)
+					{
+						long comparlscor = *lscorrelationid[i];
+						if (comparlscor==lscorid)
+
+						{
+							oidx = i;
 							tlid = tlcorrelationid[i];
+						}
+					}
 					CString ms;
-					ms.Format("orderreq id: %i tlid: %lld result: %s code: %i Symbol: %s",m->L_Order1ReferenceId(),tlid,err,res,m->L_Symbol());
+					ms.Format("orderreq id: %i tlid: %lld result: %s code: %i Symbol: %s lscor: %i",m->L_Order1ReferenceId(),tlid,err,res,m->L_Symbol(),lscorid);
 					D(ms);
+					// if successful count shares
+					if (res==0)
+						_curconnectorshares += m->L_SharesSent();
+					else if (_resendsummarynotloaded && (res==L_OrderResult::UNINITIALIZED_SUMMARY))
+					{
+
+						// get order
+						if ((oidx!=-1))
+						{
+							// convert back to tradelink order
+							TLOrder ord = tlorders[oidx];
+							// resend it
+							SendOrder(ord);
+							// notify
+							D(CString("Resending order: "+ord.Serialize()));
+
+						}
+
+						
+					}
 				break;
 			}
 		case L_MsgOrderChange::id: // orders?
