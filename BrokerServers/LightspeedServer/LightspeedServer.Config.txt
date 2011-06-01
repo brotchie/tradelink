@@ -7,6 +7,6 @@
 // maximum shares allowed sent through connector (0 to disable)
 0
 // resend orders rejected for summary not loaded (0 to disable)
-0
+1
 // maximum % of total bp a position can take up (10 = 10%,0 to disable)
 10

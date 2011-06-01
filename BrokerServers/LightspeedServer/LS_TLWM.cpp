@@ -2,12 +2,47 @@
 #include "LS_TLWM.h"
 //#include "Util.h"
 
-
-
-
 	
 	
 	LS_TLWM* LS_TLWM::instance = NULL;	
+
+	UINT __cdecl DoOrderResend(LPVOID param)
+	{
+		// we need a queue object
+		LS_TLWM* tl = (LS_TLWM*)param;
+		// ensure it's present
+		if (tl==NULL)
+		{
+			return OK;
+		}
+
+		while (tl->_go)
+		{
+			if (tl->_resends!=0)
+			{
+						// process every valid order in queue
+						for (uint i = 0; i<tl->resend.size(); i++)
+						{
+							// get tradelink order
+							TLOrder ord = tl->resend[i];
+							// skip if invalid
+							if (!ord.isValid())
+								continue;
+							// mark as invalid
+							TLOrder blank;
+							tl->resend[i] = blank;
+							tl->_resends--;
+							// resend it
+							tl->SendOrder(ord);
+							// notify
+							tl->D(CString("Resending order: "+ord.Serialize()));
+							// wait briefly
+							Sleep(25);
+						}
+			}
+			Sleep(100);
+		}
+	}
 
 	const char* CONFIGFILE = "LightSpeedServer.Config.txt";
 	void LS_TLWM::ReadConfig()
@@ -50,6 +85,11 @@
 		// read data
 		file.getline(data,ds);
 		_resendsummarynotloaded = atoi(data)!=0;
+		if (_resendsummarynotloaded)
+		{
+			D(CString("Starting order resend manager."));
+			AfxBeginThread(DoOrderResend,this);
+		}
 				// skip comment
 		file.getline(skip,ss);
 		// read data
@@ -428,9 +468,14 @@
 			ex2 = exr[1];
 		}
 		// check for loading
-		if (!_resendsummarynotloaded && (!summary || !summary->L_IsValid() || !summary->L_IsInit()))
+		if (!summary || !summary->L_IsValid() || !summary->L_IsInit())
 		{
-			return SYMBOL_NOT_LOADED;
+			if (!_resendsummarynotloaded)
+				return SYMBOL_NOT_LOADED;
+			D(CString("Not loaded yet, Queing for resend: "+o.Serialize()));
+			resend.push_back(o);
+			_resends++;
+			return 0;
 		}
 		
 
@@ -638,17 +683,8 @@
 					else if (_resendsummarynotloaded && (res==L_OrderResult::UNINITIALIZED_SUMMARY))
 					{
 
-						// get order
-						if ((oidx!=-1))
-						{
-							// convert back to tradelink order
-							TLOrder ord = tlorders[oidx];
-							// resend it
-							SendOrder(ord);
-							// notify
-							D(CString("Resending order: "+ord.Serialize()));
+						
 
-						}
 
 						
 					}
@@ -836,6 +872,8 @@
 		}
 	}
 
+	
+
 
 
 		UINT __cdecl DoReadImbThread(LPVOID param)
@@ -851,7 +889,7 @@
 		// process until quick req
 		while (tl->_go)
 		{
-			// process ticks in queue
+			// process imbalances in queue
 			while (tl->_go && (tl->_readimb < tl->_imbcache.size()))
 			{
 				// if we're done reading, quit trying

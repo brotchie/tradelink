@@ -25,9 +25,12 @@ using namespace TradeLibFast;
 		volatile uint _readimb;
 		volatile bool _imbflip;
 		vector<TLImbalance> _imbcache;
+		volatile int _resends;
+		vector<TLOrder> resend;
 		volatile bool _startimb;
 		void SrvGotImbalance(TLImbalance imb);
 		void D(const CString &message);
+		int SendOrder(TLOrder order);
 		// L_Observer
 	virtual void HandleMessage(L_Message const *msg);
 
@@ -36,6 +39,7 @@ using namespace TradeLibFast;
 		void v(const CString &msg);
 		bool _noverb;
 		bool saveOrderId(int64 tlid, long lsid);
+		
 		void ReadConfig();
 		bool _imbexch;
 		long _date;
@@ -46,6 +50,7 @@ using namespace TradeLibFast;
 		vector <L_Summary*> subs;
 		vector<CString> subsym;
 		vector<L_Order*> ordercache;
+		
 		vector<long> lsids;
 		L_Summary* preload(CString symbol);
 		long gettif(TLOrder o);
@@ -60,7 +65,7 @@ using namespace TradeLibFast;
 		double _maxaccountpospct;
 
 		int BrokerName(void);
-		int SendOrder(TLOrder order);
+		
 		int UnknownMessage(int MessageType,CString msg);
 		int CancelRequest(int64 order);
 
