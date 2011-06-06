@@ -19,6 +19,9 @@ namespace TradeLink.Common
             _idt = idt;
         }
 
+        int minlotsize = 1;
+        public int MinLotSize { get { return minlotsize; } set { minlotsize = value; } }
+
         int osa = 0;
         public int OversellsAvoided { get { return osa; } }
 
@@ -51,7 +54,7 @@ namespace TradeLink.Common
                 // determine correct size
                 int oksize = _pt[o.symbol].FlatSize;
                 // adjust
-                o.size = oksize;
+                o.size = Calc.Norm2Min(oksize,MinLotSize);
                 // send 
                 sonow(o);
                 // count
@@ -62,7 +65,7 @@ namespace TradeLink.Common
                 if (Split)
                 {
                     // calculate new size
-                    int nsize = Math.Abs(uosize - Math.Abs(oksize));
+                    int nsize = Calc.Norm2Min(Math.Abs(uosize - Math.Abs(oksize)),MinLotSize);
                     // adjust side
                     nsize *= (o.side ? 1 : -1);
                     // create order
