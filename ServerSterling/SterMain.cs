@@ -115,6 +115,12 @@ namespace SterServer
             report(sender, e);
         }
 
+        private void verbosetoggle_Click(object sender, EventArgs e)
+        {
+            tl.VerboseDebugging = !tl.VerboseDebugging;
+            debug("verbose mode: "+ (tl.VerboseDebugging ? "ON" : "OFF"));
+        }
+
 
 
 

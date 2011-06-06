@@ -32,6 +32,7 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
+            this.verbosetoggle = new System.Windows.Forms.ToolStripButton();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -40,6 +41,7 @@
             this.toolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripButton1,
+            this.verbosetoggle,
             this.toolStripButton2});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
@@ -67,6 +69,16 @@
             this.toolStripButton2.Text = "Report bug";
             this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
             // 
+            // verbosetoggle
+            // 
+            this.verbosetoggle.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.verbosetoggle.Image = ((System.Drawing.Image)(resources.GetObject("verbosetoggle.Image")));
+            this.verbosetoggle.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.verbosetoggle.Name = "verbosetoggle";
+            this.verbosetoggle.Size = new System.Drawing.Size(81, 29);
+            this.verbosetoggle.Text = "Verbose";
+            this.verbosetoggle.Click += new System.EventHandler(this.verbosetoggle_Click);
+            // 
             // SterMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -89,6 +101,7 @@
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton toolStripButton1;
         private System.Windows.Forms.ToolStripButton toolStripButton2;
+        private System.Windows.Forms.ToolStripButton verbosetoggle;
 
     }
 }
