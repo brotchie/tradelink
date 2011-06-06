@@ -101,6 +101,7 @@
     <Compile Include="QuickQuote.cs" />
     <Compile Include="RandomSymbol.cs" />
     <Compile Include="RandomTicks.cs" />
+    <Compile Include="Screener.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="FetchBasket.resx">
