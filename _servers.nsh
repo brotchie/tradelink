@@ -26,6 +26,7 @@ SectionEnd
 
 
 Section "Lightspeed Connector"
+    CreateDirectory "$PROGRAMFILES\Lightspeed"
     File "/oname=$PROGRAMFILES\Lightspeed\LightspeedServer.Config.txt" "BrokerServers\Lightspeedserver\LightspeedServer.Config.txt"
 	File "/oname=$PROGRAMFILES\Lightspeed\LightspeedServer.dll" "BrokerServers\release\LightspeedServer.dll"
 	File "/oname=$PROGRAMFILES\Lightspeed\TradeLibFast.dll" "BrokerServers\release\TradeLibFast.dll"
