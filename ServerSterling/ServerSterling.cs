@@ -151,6 +151,28 @@ namespace SterServer
 
         void ost_SendOrderEvent(Order o)
         {
+            if (AutoSubscribeOrderSymbol)
+            {
+                bool needsub = true;
+                // see if we have this symbol
+                foreach (Security s in tl.AllClientBasket)
+                    if (s.Symbol == o.symbol)
+                    {
+                        needsub = false;
+                        break;
+                    }
+                if (needsub)
+                {
+                    // add symbol
+                    if (symquotes.Length > 0)
+                        symquotes += "," + o.symbol;
+                    else
+                        symquotes = o.symbol;
+                    // mark symbol as added
+                    _symsq.Write(true);
+                    
+                }
+            }
             _orderq.Write(o);
         }
 
@@ -520,6 +542,11 @@ namespace SterServer
 
         public bool AutosetUnsetId { get { return _autosetunsetid; } set { _autosetunsetid = value; } }
 
+        bool _autosubosym = true;
+        public bool AutoSubscribeOrderSymbol { get { return _autosubosym; } set { _autosubosym = value; } }
+
+        int _postsubscribewait = 100;
+        public int PostSymSubscribeWait { get { return _postsubscribewait; } set { _postsubscribewait = value; } }
 
         bool _runbg = false;
         void background(object param)
@@ -528,6 +555,18 @@ namespace SterServer
             {
                 try
                 {
+                    // new quotes
+                    if (!_symsq.isEmpty)
+                    {
+                        _symsq.Read();
+                        foreach (string sym in symquotes.Split(','))
+                        {
+                            stiQuote.RegisterQuote(sym, "*");
+                        }
+                        // wait moment for quotes to load
+                        Thread.Sleep(PostSymSubscribeWait);
+                    }
+
                     // orders
                     while (!_orderq.isEmpty)
                     {
@@ -619,15 +658,7 @@ namespace SterServer
                         }
                     }
 
-                    // new quotes
-                    if (!_symsq.isEmpty)
-                    {
-                        _symsq.Read();
-                        foreach (string sym in symquotes.Split(','))
-                        {
-                            stiQuote.RegisterQuote(sym, "*");
-                        }
-                    }
+                    
                     // old quotes
                     while (removesym.hasItems)
                     {

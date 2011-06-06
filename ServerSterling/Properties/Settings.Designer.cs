@@ -214,5 +214,29 @@ namespace SterServer.Properties {
                 this["OversellSplit"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int PostSymbolSubscribeWait {
+            get {
+                return ((int)(this["PostSymbolSubscribeWait"]));
+            }
+            set {
+                this["PostSymbolSubscribeWait"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AutosubscribeOrderSym {
+            get {
+                return ((bool)(this["AutosubscribeOrderSym"]));
+            }
+            set {
+                this["AutosubscribeOrderSym"] = value;
+            }
+        }
     }
 }
