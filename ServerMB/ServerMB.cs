@@ -50,6 +50,7 @@ namespace ServerMB
             if (!m_ComMgr.IsPreviousInstanceDetected("tradelink"))
             {
                 m_OrderClient.OnDemandMode = false;
+                v("order client on demand mode disabled as previous tradelink was running.");
             }
             m_Quotes = m_ComMgr.Quotes;
             m_Orders = m_OrderClient.OpenOrders;
@@ -90,11 +91,23 @@ namespace ServerMB
             //disable old ticks
             //DisableOldTicks = Convert.ToBoolean(ConfigurationSettings.AppSettings["DisableOldTicks"]);
             DisableOldTicks = true;
+            debug("all binding configured successfully.");
+        }
+
+        bool _noverb = true;
+        public bool VerboseDebugging { get { return !_noverb; } set { _noverb = !value; } }
+
+        void v(string msg)
+        {
+            if (_noverb)
+                return;
+            debug(msg);
         }
 
         void tl_newRegisterSymbols(string client, string symbols)
         {
             test();
+            v("received symbol request from: " + client + " for: " + symbols);
             string[] syms = tl.AllClientBasket.ToString().Split(',');
             m_Quotes.UnadviseAll(this);
             for (int i = 0; i < syms.Length; i++)
@@ -435,6 +448,7 @@ namespace ServerMB
         Position[] tl_newPosList(string account)
         {
             test();
+            v("received position list request for account: " + account);
             int num = m_OrderClient.Positions.Count;
             //TODO: enable some settings in app.config, i.e. VerboseDebugging as done in ServerSterling
             //debug(String.Format("tl_newPosList called for {0} positions:{1}", account, num));
@@ -771,7 +785,7 @@ namespace ServerMB
         {
             if (!m_ComMgr.IsConnected)
             {
-                debug("message rejected, must login first.");
+                debug("no connection: message rejected. must login first.");
                 return false;
             }
             if (tlAcct != null && tlAcct != "")
@@ -803,6 +817,7 @@ namespace ServerMB
         string tl_newAcctRequest()
         {
             test();
+            v("received account request.");
             int num = 0;
             if (m_OrderClient.Accounts != null)
                 num = m_OrderClient.Accounts.Count;
@@ -811,7 +826,9 @@ namespace ServerMB
                 accts[i] = m_OrderClient.Accounts[i].Account;
             //TODO:add this when verbose debugging is enabled
             //debug(String.Format("Accounts requested: {0}", string.Join(",", accts)));
-            return string.Join(",", accts);
+            string acctmsg = string.Join(",", accts);
+            v("sending accounts available as: " + acctmsg);
+            return acctmsg;
         }
 
         /// <summary>
@@ -972,6 +989,7 @@ namespace ServerMB
         long tl_newSendOrderRequest(Order o)
         {
             test(o);
+            v("received new order: " + o.ToString());
             string strType = "MBConst.VALUE_MARKET";
             int side = o.side ? MBConst.VALUE_BUY : MBConst.VALUE_SELL;
             int tif = MBConst.VALUE_GTC;
@@ -1088,6 +1106,7 @@ namespace ServerMB
 
         public bool Start(int id, string user, string pw)
         {
+            v("starting up MBTrading connector.");
             if (m_ComMgr == null)
             {
                 
@@ -1095,14 +1114,15 @@ namespace ServerMB
                 System.Diagnostics.Process.Start(@"http://code.google.com/p/tradelink/wiki/ComFactoryErrors");
                 return false;                
             }
-            m_ComMgr.DoLogin(id, user, pw, "");
-            return true;
+            v("MB navigator appears installed, attempting login...");
+            return m_ComMgr.DoLogin(id, user, pw, "");
         }
 
         MbtAccount getaccount(string name) { foreach (MbtAccount a in m_OrderClient.Accounts) if (a.Account == name) return a; return m_OrderClient.Accounts.DefaultAccount; }
 
         MessageTypes[] tl_newFeatureRequest()
         {
+            v("received feature request");
             List<MessageTypes> f = new List<MessageTypes>();
             f.Add(MessageTypes.EXECUTENOTIFY);
             f.Add(MessageTypes.ORDERCANCELRESPONSE);
@@ -1128,6 +1148,7 @@ namespace ServerMB
 
         public void Stop()
         {
+            v("stopping ServerMB connector.");
             m_Quotes.Disconnect();
             m_OrderClient.Disconnect();
         }
