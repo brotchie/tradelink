@@ -284,6 +284,10 @@ Section "ResponseExamples"
   
 SectionEnd
 
+Section "TA-Lib Excel Example and Plugins"
+  File /r "Install\talib_excel"
+SectionEnd
+
 Section "CSharpIde (Write Strategies)"
 
  File "Install\CsharpIdeInstall.exe"
