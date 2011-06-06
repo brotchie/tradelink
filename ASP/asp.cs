@@ -31,6 +31,8 @@ namespace ASP
         MessageTracker _mtquote;
         MessageTracker _mtconnect;
 
+        OversellTracker _ost;
+
         TicketTracker _rt = new TicketTracker();
 
         Dictionary<int, string> _resskinidx = new Dictionary<int, string>();
@@ -52,6 +54,8 @@ namespace ASP
         BackgroundWorker bw = new BackgroundWorker();
         BackgroundWorker cc = new BackgroundWorker();
         BackgroundWorker si = new BackgroundWorker();
+
+        bool _enableoversellprotect = Properties.Settings.Default.OversellProtection;
 
         public ASP()
         {
@@ -88,6 +92,10 @@ namespace ASP
             _ar.GotBadTick += new VoidDelegate(_ar_GotBadTick);
             _ar.GotTickOverrun += new VoidDelegate(_ar_GotTickOverrun);
             string[] servers = Properties.Settings.Default.ServerIpAddresses.Split(',');
+            _ost = new OversellTracker(_pt, _masteridt);
+            _ost.SendDebugEvent += new DebugDelegate(debug);
+            _ost.SendOrderEvent += new OrderDelegate(sendorder);
+            _ost.Split = false;
             _bf = new BrokerFeed(Properties.Settings.Default.prefquote, Properties.Settings.Default.prefexecute,_ao._providerfallback.Checked,false,PROGRAM,servers,Properties.Settings.Default.ServerPort);
             _bf.VerboseDebugging = Properties.Settings.Default.VerboseDebugging;
             _bf.SendDebugEvent+=new DebugDelegate(debug);
@@ -127,6 +135,8 @@ namespace ASP
             processcommands();
 
         }
+
+        
 
         void _ao_MktTimestampChange()
         {
@@ -1190,6 +1200,14 @@ namespace ASP
                 debug("Ignoring order from disabled response: " + _reslist[rid].Name + " order: " + o.ToString());
                 return;
             }
+            if (_enableoversellprotect)
+                _ost.sendorder(o);
+            else
+                sendorder(o);
+        }
+
+        void sendorder(Order o)
+        {
             // process order coming from a response
             if (_bf.BrokerClient== null)
             {
