@@ -10,7 +10,7 @@ namespace TradeLink.Research
     /// obtain a realtime quote from yahoo.
     /// (take caution not to overuse this.  yahoo will rate limit you.)
     /// </summary>
-    public class QuickQuote
+    public struct QuickQuote
     {
         /// <summary>
         /// base url for service
@@ -24,7 +24,16 @@ namespace TradeLink.Research
         public decimal high;
         public decimal low;
         public int vol;
+        public decimal eps;
+        public decimal marketcap;
+        public decimal afterhours;
+        public decimal changeper;
+        public decimal high52;
+        public decimal low52;
+        public decimal change;
+        public decimal pe;
         public string Company = "";
+        public string symbol { get { return Symbol; } }
 
         public bool isValid { get { return (Symbol != "") && (price != 0); } }
         /// <summary>
@@ -42,6 +51,7 @@ namespace TradeLink.Research
             string [] r = res.Split(',');
             qq.Symbol = r[(int)q.sym];
             qq.Company = r[(int)q.company];
+            decimal v;
             try 
             {
                 qq.time = DateTime.Parse(r[(int)q.time]);
@@ -51,6 +61,30 @@ namespace TradeLink.Research
                 qq.open = Convert.ToDecimal(r[(int)q.open]);
                 qq.low = Convert.ToDecimal(r[(int)q.low]);
                 qq.high = Convert.ToDecimal(r[(int)q.high]);
+                if (decimal.TryParse(r[(int)q.change].Replace("%", string.Empty), out v))
+                    qq.change = v;
+                if (decimal.TryParse(r[(int)q.changeper].Replace("%", string.Empty), out v))
+                    qq.changeper = v;
+                if (decimal.TryParse(r[(int)q.eps], out v))
+                    qq.eps = v;
+                if (decimal.TryParse(r[(int)q.pe], out v))
+                    qq.pe = v;
+                if (decimal.TryParse(r[(int)q.marketcap], out v))
+                    qq.marketcap = v;
+                if (decimal.TryParse(r[(int)q.afterhour], out v))
+                    qq.afterhours = v;
+                
+                // get 52week range
+                string [] range = r[(int)q.fiftytworange].Split(',');
+                // if we have two records, try to parse
+                if (range.Length == 2)
+                {
+                    
+                    if (decimal.TryParse(r[0], out v))
+                        qq.low52 = v;
+                    if (decimal.TryParse(r[1], out v))
+                        qq.high52 = v;
+                }
             }
             catch (Exception) {}
             return qq;

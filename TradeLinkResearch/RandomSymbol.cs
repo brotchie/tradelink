@@ -117,5 +117,34 @@ namespace TradeLink.Research
                 l.Add(GetSymbol(seed+i,symlength));
             return l.ToArray();
         }
+        /// <summary>
+        /// get random list of symbols of specified max length
+        /// </summary>
+        /// <param name="symlen"></param>
+        /// <param name="symcount"></param>
+        /// <returns></returns>
+        public static string[] GetSymbols(int symlen, int symcount)
+        {
+            return GetSymbols((int)DateTime.Now.Ticks, symlen, symcount);
+        }
+        /// <summary>
+        /// get random list of symbols
+        /// </summary>
+        /// <param name="symcount"></param>
+        /// <returns></returns>
+        public static string[] GetSymbols(int symcount)
+        {
+            return GetSymbols((int)DateTime.Now.Ticks, 4, symcount);
+        }
+        /// <summary>
+        /// get random symbol
+        /// </summary>
+        /// <returns></returns>
+        public static string GetSymbols()
+        {
+            return GetSymbols((int)DateTime.Now.Ticks, 4, 1)[0];
+        }
+
+
     }
 }
