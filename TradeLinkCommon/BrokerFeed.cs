@@ -777,7 +777,7 @@ namespace TradeLink.Common
         /// <summary>
         /// enable/disable extended debugging
         /// </summary>
-        public bool VerboseDebugging { get { return !_noverb; } set { _noverb = value; } }
+        public bool VerboseDebugging { get { return !_noverb; } set { _noverb = !value; } }
 
         void v(string msg)
         {
