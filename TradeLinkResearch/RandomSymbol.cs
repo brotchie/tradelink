@@ -127,15 +127,7 @@ namespace TradeLink.Research
         {
             return GetSymbols((int)DateTime.Now.Ticks, symlen, symcount);
         }
-        /// <summary>
-        /// get random list of symbols
-        /// </summary>
-        /// <param name="symcount"></param>
-        /// <returns></returns>
-        public static string[] GetSymbols(int symcount)
-        {
-            return GetSymbols((int)DateTime.Now.Ticks, 4, symcount);
-        }
+
         /// <summary>
         /// get random symbol
         /// </summary>

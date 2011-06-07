@@ -16,7 +16,7 @@ namespace TradeLink.Research
         /// base url for service
         /// </summary>
         const string baseurl = "http://download.finance.yahoo.com/d/quotes.csv?f=sl1d1t1c1ohgvj1pp2wern&s=";
-        public string Symbol = "";
+        public string Symbol;
         public decimal price;
         public DateTime date;
         public DateTime time;
@@ -32,10 +32,10 @@ namespace TradeLink.Research
         public decimal low52;
         public decimal change;
         public decimal pe;
-        public string Company = "";
+        public string Company;
         public string symbol { get { return Symbol; } }
 
-        public bool isValid { get { return (Symbol != "") && (price != 0); } }
+        public bool isValid { get { return (symbol!=null) && (Symbol != "") && (price != 0); } }
         /// <summary>
         /// fetch a quick quote from the yahoo service. returns a quick quote object.
         /// </summary>
