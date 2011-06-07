@@ -45,6 +45,7 @@ namespace Replay
             this._msg = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.verbtog = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.statusStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -178,7 +179,7 @@ namespace Replay
             // 
             // _msg
             // 
-            this._msg.Location = new System.Drawing.Point(292, 18);
+            this._msg.Location = new System.Drawing.Point(245, 18);
             this._msg.Name = "_msg";
             this._msg.Size = new System.Drawing.Size(41, 37);
             this._msg.TabIndex = 12;
@@ -198,12 +199,24 @@ namespace Replay
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // verbtog
+            // 
+            this.verbtog.Location = new System.Drawing.Point(292, 18);
+            this.verbtog.Name = "verbtog";
+            this.verbtog.Size = new System.Drawing.Size(41, 37);
+            this.verbtog.TabIndex = 14;
+            this.verbtog.Text = "V";
+            this.toolTip1.SetToolTip(this.verbtog, "Toggle verbose debugging");
+            this.verbtog.UseVisualStyleBackColor = true;
+            this.verbtog.Click += new System.EventHandler(this.verbtog_Click);
+            // 
             // Replay
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(495, 344);
+            this.Controls.Add(this.verbtog);
             this.Controls.Add(this.button1);
             this.Controls.Add(this._msg);
             this.Controls.Add(this.groupBox1);
@@ -243,6 +256,7 @@ namespace Replay
         private System.Windows.Forms.Button _msg;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button verbtog;
     }
 }
 

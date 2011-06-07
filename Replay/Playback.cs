@@ -10,6 +10,7 @@ namespace Replay
     {
         private TradeLink.API.HistSim h = null;
 
+        public Playback() : this(null) { }
         public Playback(TradeLink.API.HistSim simulator) 
         { 
             h = simulator;
@@ -19,6 +20,11 @@ namespace Replay
         int lastprogress = 0;
         protected override void OnDoWork(DoWorkEventArgs e)
         {
+            if (h == null)
+            {
+                
+                return;
+            }
             if (e.Cancel)
                 return;
             PlayBackArgs args = (PlayBackArgs)e.Argument;

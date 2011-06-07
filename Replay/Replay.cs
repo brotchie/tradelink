@@ -16,9 +16,9 @@ namespace Replay
     public partial class Replay : AppTracker
     {
         TLServer tl;
-            
-        Playback _playback = null;
-        HistSim h = new MultiSimImpl();
+
+        Playback _playback = new Playback();
+        HistSim h;
         string tickfolder = Util.TLTickDir;
         static Account HISTBOOK = new Account("_HISTBOOK");
         public const string PROGRAM = "Replay";
@@ -32,6 +32,7 @@ namespace Replay
                 tl = new TLServer_WM() ;
             else
                 tl = new TLServer_IP(Properties.Settings.Default.TLClientAddress, Properties.Settings.Default.TLClientPort);
+            tl.VerboseDebugging = Properties.Settings.Default.VerboseDebugging;
             TrackEnabled = Util.TrackUsage();
             Program = PROGRAM;
             InitializeComponent();
@@ -42,16 +43,12 @@ namespace Replay
             tl.newPosList += new PositionArrayDelegate(tl_gotSrvPosList);
             tl.newFeatureRequest+=new MessageArrayDelegate(GetFeatures);
             tl.newUnknownRequest += new UnknownMessageDelegate(tl_newUnknownRequest);
-            h.GotTick += new TickDelegate(h_GotTick);
+            tl.newRegisterSymbols += new SymbolRegisterDel(tl_newRegisterSymbols);
+            
             SimBroker.UseBidAskFills = Properties.Settings.Default.UseBidAskFills;
             SimBroker.GotOrder += new OrderDelegate(SimBroker_GotOrder);
             SimBroker.GotFill += new FillDelegate(SimBroker_GotFill);
             SimBroker.GotOrderCancel += new OrderCancelDelegate(SimBroker_GotOrderCancel);
-            h.GotDebug+=new DebugDelegate(_dw.GotDebug);
-            // setup playback
-            _playback = new Playback(h);
-            _playback.RunWorkerCompleted += new RunWorkerCompletedEventHandler(_playback_RunWorkerCompleted);
-            _playback.ProgressChanged += new ProgressChangedEventHandler(_playback_ProgressChanged);
 
 
             status(Util.TLSIdentity());
@@ -61,10 +58,31 @@ namespace Replay
             // (this is for determining top of book between historical sources and our own orders)
             HISTBOOK.Execute = false; // make sure our special book is never executed by simulator
             HISTBOOK.Notify = false; // don't notify 
+            FormClosing += new FormClosingEventHandler(Replay_FormClosing);
+        }
+
+        void Replay_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Properties.Settings.Default.Save();
+        }
+
+        void tl_newRegisterSymbols(string client, string symbols)
+        {
+            v("received from: " + client + " request for symbols: " + symbols);
+        }
+
+        bool _noverb = !Properties.Settings.Default.VerboseDebugging;
+
+        void v(string msg)
+        {
+            if (_noverb)
+                return;
+            debug(msg);
         }
 
         long tl_newUnknownRequest(MessageTypes t, string msg)
         {
+            v("message: " + t.ToString() + " data: " + msg);
             switch (t)
             {
                 case MessageTypes.DOMREQUEST:
@@ -99,6 +117,7 @@ namespace Replay
 
         MessageTypes[] GetFeatures()
         {
+            v("got feature request.");
             List<MessageTypes> f = new List<MessageTypes>();
             f.Add(MessageTypes.SIMTRADING);
             f.Add(MessageTypes.HISTORICALDATA);
@@ -138,6 +157,7 @@ namespace Replay
                     slist.Add(t.symbol);
             foreach (string sym in slist)
                 plist.Add(SimBroker.GetOpenPosition(sym));
+            v("received position list request and returned: " + plist.Count + " positions.");
             return plist.ToArray();
         }
 
@@ -165,6 +185,7 @@ namespace Replay
             foreach (Position p in posdict.Values)
                 if (!p.isFlat)
                     totalopenpl += Calc.OpenPL(last[p.Symbol], p);
+            v("received openpl request and returned: " + totalopenpl);
             return totalopenpl;
         }
 
@@ -172,6 +193,7 @@ namespace Replay
         {
             if (h == null) return 0;
             string accts = string.Join(",",SimBroker.Accounts);
+            v("received closed pl request for: "+s);
             if (s == "")
                 return SimBroker.GetClosedPL(new Account(Broker.DEFAULTBOOK));
             else if (accts.Contains(s))
@@ -184,12 +206,14 @@ namespace Replay
         string tl_gotSrvAcctRequest()
         {
             if (h == null) return "";
+            v("received account request");
             return string.Join(",", SimBroker.Accounts);
         }
 
         void tl_OrderCancelRequest(long number)
         {
             if (h == null) return;
+            v("received cancel order request for id: " + number);
             SimBroker.CancelOrder(number); // send cancel request to broker
         }
 
@@ -263,6 +287,18 @@ namespace Replay
                 status("simulation already in progress");
                 return;
             }
+
+            // setup simulation (portfolio realistic)
+            h = new MultiSimImpl(tickfolder,FileFilter);
+            // bind events
+            h.GotTick += new TickDelegate(h_GotTick);
+            h.GotDebug += new DebugDelegate(_dw.GotDebug);
+            // setup playback
+            _playback = new Playback(h);
+            _playback.RunWorkerCompleted += new RunWorkerCompletedEventHandler(_playback_RunWorkerCompleted);
+            _playback.ProgressChanged += new ProgressChangedEventHandler(_playback_ProgressChanged);
+
+
             // clear highs and lows
             highs = new Dictionary<string, decimal>();
             lows = new Dictionary<string, decimal>();
@@ -533,6 +569,15 @@ namespace Replay
         private void button1_Click(object sender, EventArgs e)
         {
             CrashReport.Report(PROGRAM, string.Empty, string.Empty, _dw.Content, null, null, false);
+        }
+
+        private void verbtog_Click(object sender, EventArgs e)
+        {
+            bool org = tl.VerboseDebugging;
+            tl.VerboseDebugging = !org;
+            _noverb = !_noverb;
+            Properties.Settings.Default.VerboseDebugging = !org;
+            debug("Verbose debugging: " + (tl.VerboseDebugging ? "ON" : "OFF"));
         }
 
 
