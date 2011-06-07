@@ -117,6 +117,9 @@ namespace WinGauntlet
                 args.Debugs = _debugs.Checked;
                 args.Filter = tickFileFilterControl1.GetFilter();
             }
+            // clear results
+            clearresults();
+            // set names and times
             args.Name = args.ResponseName+uniquen;
             args.Started = DateTime.Now;
 
@@ -180,6 +183,13 @@ namespace WinGauntlet
         void SimBroker_GotOrderCancel(string sym, bool side, long id)
         {
             args.Response.GotOrderCancel(id);
+        }
+
+        void clearresults()
+        {
+            FillCount = 0;
+            tradeResults1.Clear();
+            SimBroker.Reset();
         }
 
         // runs after simulation is complete
@@ -331,7 +341,7 @@ namespace WinGauntlet
             messages.Clear();
         }
 
-        string OUTFOLD = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\";
+        string OUTFOLD = Util.ProgramData(PROGRAM)+ "\\";
         void debug(string message) 
         {
             if (InvokeRequired)
@@ -709,13 +719,9 @@ namespace WinGauntlet
 
         private void _viewresults_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+            System.Diagnostics.Process.Start(Util.ProgramData(PROGRAM));
         }
 
-        private void button5_Click(object sender, EventArgs e)
-        {
-            System.Diagnostics.Process.Start(Util.TLProgramDir + "\\Tattle.exe");
-        }
 
         private void _docapcon_Click(object sender, EventArgs e)
         {
