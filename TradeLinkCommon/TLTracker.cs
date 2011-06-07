@@ -122,7 +122,6 @@ namespace TradeLink.Common
         /// </summary>
         public void Reconnect()
         {
-            TLClient_WM tl = (TLClient_WM)_tl;
 
             bool success = _tl.Mode(provindex(), false);
             // change in connect status (eg fail->success)
