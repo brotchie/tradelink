@@ -14,7 +14,7 @@ public struct TradeStation
     const int UP = 6;
     const int DOWN = 7;
     // here is where a line is converted
-    public static Tick parseline(string line, string sym, int defaultsize)
+    public static Tick parseline(string line, string sym)
     {
         // split line
         string[] r = line.Split(',');
@@ -32,10 +32,12 @@ public struct TradeStation
             k.time = iv * 100;
         // parse close as trade price
         if (decimal.TryParse(r[CLOSE], out dv))
-        {
             k.trade = dv;
-            k.size = defaultsize;
-        }
+        // parse volume (up and down); up = trade volume at prior ask; down = trade volume at prior bid
+        int volumeAtAsk = 0, volumeAtBid = 0;
+        if (int.TryParse(r[UP], out volumeAtAsk) && int.TryParse(r[DOWN], out volumeAtBid))
+            k.size = volumeAtAsk + volumeAtBid;
+
         // return tick
         return k;
     }
