@@ -654,7 +654,7 @@ namespace IQFeedBroker
                         if (decimal.TryParse(actualData[9], out d))
                             _lows[idx] = d;
                         if (isPaperTradeEnabled)
-                            tl.newTick(tick);
+                            ptt.newTick(tick);
                         tl.newTick(tick);
                 }
                 catch (Exception ex)
