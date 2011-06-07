@@ -326,7 +326,7 @@ namespace Kadina
             {
                 // clear all GUIs
                 _msg = new StringBuilder(10000);
-                SimBroker.Reset();
+                SimBroker = new Broker();
                 debugControl1.Clear();
                 dt.Clear();
                 ptab.Clear();
@@ -339,7 +339,9 @@ namespace Kadina
                 _tr.Clear();
                 if (it != null) { it.Clear(); it.Columns.Clear(); ig.Invalidate(); }
                 loadsim();
+                unbindresponseevents();
                 loadboxname(resname);
+                nowtime = "0";
             }
             catch (Exception ex)
             {
@@ -620,15 +622,8 @@ namespace Kadina
             if ((myres != null) && (myres.FullName == name))
             {
                 resname = name;
-                myres.SendTicketEvent += new TicketDelegate(myres_SendTicketEvent);
-                myres.SendDebugEvent += new DebugFullDelegate(myres_GotDebug);
-                myres.SendCancelEvent += new LongSourceDelegate(myres_CancelOrderSource);
-                myres.SendOrderEvent += new OrderSourceDelegate(myres_SendOrder);
-                myres.SendIndicatorsEvent += new ResponseStringDel(myres_SendIndicators);
-                myres.SendMessageEvent += new MessageDelegate(myres_SendMessage);
-                myres.SendBasketEvent += new BasketDelegate(myres_SendBasket);
-                myres.SendChartLabelEvent += new ChartLabelDelegate(myres_SendChartLabel);
                 status(resname + " is current response.");
+                bindresponseevents();
                 updatetitle();
                 igridinit();
                 myres.ID = 0;
@@ -646,6 +641,39 @@ namespace Kadina
             hasprereq();
 
         }
+
+        void bindresponseevents()
+        {
+            myres.SendTicketEvent += new TicketDelegate(myres_SendTicketEvent);
+            myres.SendDebugEvent += new DebugFullDelegate(myres_GotDebug);
+            myres.SendCancelEvent += new LongSourceDelegate(myres_CancelOrderSource);
+            myres.SendOrderEvent += new OrderSourceDelegate(myres_SendOrder);
+            myres.SendIndicatorsEvent += new ResponseStringDel(myres_SendIndicators);
+            myres.SendMessageEvent += new MessageDelegate(myres_SendMessage);
+            myres.SendBasketEvent += new BasketDelegate(myres_SendBasket);
+            myres.SendChartLabelEvent += new ChartLabelDelegate(myres_SendChartLabel);
+
+        }
+
+        void unbindresponseevents()
+        {
+            try
+            {
+                myres.SendTicketEvent -= new TicketDelegate(myres_SendTicketEvent);
+                myres.SendDebugEvent -= new DebugFullDelegate(myres_GotDebug);
+                myres.SendCancelEvent -= new LongSourceDelegate(myres_CancelOrderSource);
+                myres.SendOrderEvent -= new OrderSourceDelegate(myres_SendOrder);
+                myres.SendIndicatorsEvent -= new ResponseStringDel(myres_SendIndicators);
+                myres.SendMessageEvent -= new MessageDelegate(myres_SendMessage);
+                myres.SendBasketEvent -= new BasketDelegate(myres_SendBasket);
+                myres.SendChartLabelEvent -= new ChartLabelDelegate(myres_SendChartLabel);
+                myres = null;
+            }
+            catch { }
+
+        }
+
+
         bool _sendticketwarn = false;
         void myres_SendTicketEvent(string space, string user, string password, string summary, string description, Priority pri, TicketStatus stat)
         {
