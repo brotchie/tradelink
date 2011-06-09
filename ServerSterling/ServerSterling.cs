@@ -91,6 +91,7 @@ namespace SterServer
 
                 stiEvents.OnSTIShutdown += new _ISTIEventsEvents_OnSTIShutdownEventHandler(stiEvents_OnSTIShutdown);
                 stiEvents.SetOrderEventsAsStructs(true);
+                stiApp.SetModeXML(UseXmlMode);
 
                 stiEvents.OnSTIOrderUpdate += new _ISTIEventsEvents_OnSTIOrderUpdateEventHandler(stiEvents_OnSTIOrderUpdate);
                 stiEvents.OnSTIOrderUpdateXML += new _ISTIEventsEvents_OnSTIOrderUpdateXMLEventHandler(stiEvents_OnSTIOrderUpdateXML);
@@ -117,7 +118,7 @@ namespace SterServer
                 tl.newUnknownRequest += new UnknownMessageDelegate(tl_newUnknownRequest);
                 tl.newImbalanceRequest += new VoidDelegate(tl_newImbalanceRequest);
                 tl.SendDebugEvent += new DebugDelegate(tl_SendDebugEvent);
-                stiApp.SetModeXML(UseXmlMode);
+                
                 string trader = stiApp.GetTraderName().ToUpper();
                 debug("trader: " + trader);
                 if (!accts.Contains(trader))
