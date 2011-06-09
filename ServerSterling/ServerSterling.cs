@@ -915,7 +915,10 @@ namespace SterServer
             o.date = (int)((rem - o.time) / 10000);
             _onotified.Add(o.id);
             if (VerboseDebugging)
-                debug("order acknowledgement: " + o.ToString());
+            {
+                STIOrderStatus stat = (STIOrderStatus)structOrderUpdate.nOrderStatus;
+                debug("order acknowledgement: " + o.ToString()+" status: "+stat.ToString());
+            }
             tl.newOrder(o);
             
         }
