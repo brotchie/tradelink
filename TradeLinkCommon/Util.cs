@@ -532,6 +532,17 @@ namespace TradeLink.Common
             return "TradeLinkSuite-" + TLVersion();
         }
         /// <summary>
+        /// get long for current date + time
+        /// </summary>
+        /// <returns></returns>
+        public static long ToTLDateTime() { return (ToTLDate() * 100000000) + ToTLTime(); }
+        /// <summary>
+        /// get long for date + time
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <returns></returns>
+        public static long ToTLDateTime(DateTime dt) { return (ToTLDate(dt) * 100000000) + ToTLTime(dt); }
+        /// <summary>
         /// gets TradeLink date for today
         /// </summary>
         /// <returns></returns>

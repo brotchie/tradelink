@@ -170,7 +170,7 @@ namespace TradeLink.AppKit
                 PositionTracker pt = new PositionTracker(results.Count);
                 // setup new results
                 Results r = new Results();
-                r.ResultsDateTime = Util.ToTLDate() * 1000000 + Util.ToTLTime();
+                r.ResultsDateTime = Util.ToTLDateTime();
                 r.ComPerShare = CommissionPerContractShare;
                 r.RiskFreeRet = string.Format("{0:P2}", RiskFreeRate);
                 int consecWinners = 0;
