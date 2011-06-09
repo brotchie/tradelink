@@ -442,6 +442,8 @@ namespace TradeLink.Common
         /// <param name="t"></param>
         public void Adjust(Trade t)
         {
+            // get original size
+            int osize = _pt[t.symbol].Size;
             // update position
             _pt.Adjust(t);
             // see if it's our order
@@ -475,10 +477,14 @@ namespace TradeLink.Common
                 if (HitOffset != null)
                     HitOffset(t.symbol, t.id, t.xprice);
             }
-            // if we're flat, nothing to do
-            if (_pt[t.symbol].isFlat)
+            // if we're flat, nothing to do (or if we switched sides)
+            Position p = _pt[t.symbol];
+            if (p.isFlat || (osize*p.Size<-1))
             {
-                debug(t.symbol + " now flat.");
+                if (p.isFlat)
+                    debug(t.symbol + " now flat.");
+                else
+                    debug(t.symbol + " reversed: " + osize + " -> " + p.Size);
                 CancelAll(t.symbol);
                 // reset offset state but not configuration
                 SetOffset(t.symbol,new OffsetInfo(this[t.symbol]));
