@@ -313,6 +313,109 @@ namespace TradeLink.Common
         public static long ENDSIM = long.MaxValue;
         public static long STARTSIM = long.MinValue;
 
+
+
+        public static bool PlayHistoricalTicks(Response r, string symbol, int currentdate, int daysback, int expecteddays, DebugDelegate deb)
+        {
+            GenericTracker<string> symbols = new GenericTracker<string>();
+            symbols.addindex(symbol, symbol);
+            // calculate stop date
+            DateTime stop = Util.ToDateTime(currentdate, 0);
+            // calculate start date
+            DateTime start = stop.Subtract(new TimeSpan(daysback, 0, 0, 0));
+            // return results
+            return PlayHistoricalTicks(r, symbols, start, stop, expecteddays, deb);
+        }
+
+        public static bool PlayHistoricalTicks(Response r, GenericTracker<string> symbols, int currentdate, int daysback, int expecteddays, DebugDelegate deb)
+        {
+            // calculate stop date
+            DateTime stop = Util.ToDateTime(currentdate, 0);
+            // calculate start date
+            DateTime start = stop.Subtract(new TimeSpan(daysback, 0, 0, 0));
+            // return results
+            return PlayHistoricalTicks(r, symbols, start, stop, expecteddays, deb);
+        }
+        public static bool PlayHistoricalTicks(Response r, GenericTracker<string> symbols, DateTime start, DateTime endexclusive, int expecteddays, DebugDelegate deb)
+        {
+            bool skipexpected = expecteddays == 0;
+            // prepare to track actual days for each symbol
+            GenericTracker<int> actualdays = new GenericTracker<int>();
+            foreach (string sym in symbols)
+                actualdays.addindex(sym, 0);
+            // prepare to track all tickfiles
+            Dictionary<string, List<string>> files = new Dictionary<string, List<string>>();
+            // get all required tickfiles for each symbol on each date
+            DateTime now = new DateTime(start.Ticks);
+            int tfc = 0;
+            while (now < endexclusive)
+            {
+                // get the tick files
+                List<string> allfiles = TikUtil.GetFilesFromDate(Util.TLTickDir, Util.ToTLDate(now));
+                // go through them all and see if we find expected number
+                foreach (string fn in allfiles)
+                {
+                    // get security
+                    SecurityImpl sec = SecurityImpl.FromTIK(fn);
+                    // see if we want this symbol
+                    int idx = symbols.getindex(sec.HistSource.RealSymbol);
+                    if (idx < 0)
+                        idx = symbols.getindex(sec.Symbol);
+                    sec.HistSource.Close();
+                    // skip if we don't
+                    if (idx < 0)
+                        continue;
+                    string sym = symbols.getlabel(idx);
+                    // if we have it, count actual day
+                    actualdays[idx]++;
+                    // save file and symbol
+                    if (!files.ContainsKey(sym))
+                        files.Add(sym, new List<string>());
+                    files[sym].Add(fn);
+                    // count files
+                    tfc++;
+                }
+                // add one day
+                now = now.AddDays(1);
+            }
+            // notify
+            if (deb != null)
+            {
+                deb("found " + tfc + " tick files matching dates: " + Util.ToTLDate(start) + "->" + Util.ToTLDate(endexclusive) + " for: " + string.Join(",", symbols.ToArray()));
+            }
+            // playback when actual meets expected
+            bool allok = true;
+            foreach (string sym in symbols)
+            {
+                if (skipexpected || (actualdays[sym] >= expecteddays))
+                {
+                    // get tick files
+                    string[] tf = files[sym].ToArray();
+                    // notify
+                    if (deb != null)
+                    {
+                        deb(sym + " playing back " + tf.Length + " tick files.");
+                    }
+                    // playback
+                    HistSim h = new SingleSimImpl(tf);
+                    h.GotTick += new TickDelegate(r.GotTick);
+                    h.PlayTo(MultiSimImpl.ENDSIM);
+                    h.Stop();
+                    // notify
+                    if (deb != null)
+                    {
+                        deb(sym + " completed playback. ");
+                    }
+                }
+                else
+                    allok = false;
+            }
+
+
+            return allok;
+
+        }
+
     }
 
     
