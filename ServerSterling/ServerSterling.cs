@@ -54,6 +54,9 @@ namespace SterServer
             _SLEEP = 50;
             _ORDERSLEEP = sleepAfterOrder;
         }
+
+        int _minlotsize = 1;
+        public int MinLotSize { get { return _minlotsize; } set { _minlotsize = value; } }
         bool _xmlquotes = false;
         public bool UseXmlMode { get { return _xmlquotes; } set { _xmlquotes = value; debug("xml mode: " + (_xmlquotes ? "on" : "off")); } }
         bool _connected = false;
@@ -68,6 +71,7 @@ namespace SterServer
             {
                 if (_connected) return true;
                 ost = new OversellTracker(pt,_idt);
+                ost.MinLotSize = MinLotSize;
                 ost.Split = OversellSplit;
                 ost.SendOrderEvent += new OrderDelegate(ost_SendOrderEvent);
                 ost.SendDebugEvent += new DebugDelegate(ost_SendDebugEvent);
