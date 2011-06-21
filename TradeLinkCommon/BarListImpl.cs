@@ -476,14 +476,23 @@ namespace TradeLink.Common
         /// <param name="time"></param>
         /// <param name="bint"></param>
         /// <returns></returns>
-        public static int GetNearestIntraBar(BarList bl, int time, BarInterval bint)
+        public static int GetNearestIntraBar(BarList bl, int time, BarInterval bint) { return GetNearestIntraBar(bl, time, bint, null); }
+        public static int GetNearestIntraBar(BarList bl, int time, BarInterval bint,DebugDelegate debug)
         {
-            long barid = TimeIntervalData.getbarid(time, bl.RecentBar.Bardate, (int)bint);
-            BarListImpl bli = (BarListImpl)bl;
-            TimeIntervalData tid = (TimeIntervalData)bli._intdata[bli._intdataidx[(int)bint]];
-            for (int i = 0; i < tid.Count(); i++)
-                if (tid.ids[i] == barid)
-                    return i;
+            try
+            {
+                long barid = TimeIntervalData.getbarid(time, bl.RecentBar.Bardate, (int)bint);
+                BarListImpl bli = (BarListImpl)bl;
+                TimeIntervalData tid = (TimeIntervalData)bli._intdata[bli._intdataidx[(int)bint]];
+                for (int i = 0; i < tid.Count(); i++)
+                    if (tid.ids[i] == barid)
+                        return i;
+            }
+            catch (Exception ex)
+            {
+                if (debug != null)
+                    debug("error getting nearest bar from: " + bl.Symbol + " at: " + time + " for: " + bint + " error: " + ex.Message + ex.StackTrace);
+            }
             return -1;
         }
 
