@@ -224,7 +224,7 @@ namespace ServerRedi
                         rediOrder.PriceType = getpricetype(o);
 
                         rediOrder.StopPrice = o.stopp;
-                        rediOrder.Memo = "none";
+                        rediOrder.Memo = o.comment;
                         rediOrder.Warning = false;
                         object err = null;
                         object transId = null;
