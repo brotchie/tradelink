@@ -14,6 +14,13 @@ namespace TradeLink.AppKit
     /// </summary>
     public class Log
     {
+        string _logname = string.Empty;
+        public string Program { get { return _logname; } }
+        int _date = Util.ToTLDate();
+        /// <summary>
+        /// gets current date associated with log
+        /// </summary>
+        public int Date { get { return _date; } }
 
         StreamWriter _log = null;
         public bool isEnabled = true;
@@ -44,14 +51,48 @@ namespace TradeLink.AppKit
         public Log(string logname, bool dateinlogname,bool appendtolog,string path, bool timestamps)
         {
             _timestamps = timestamps;
-            fn = path+"\\"+logname+(dateinlogname ? "."+TradeLink.Common.Util.ToTLDate(DateTime.Now): "") + ".txt";
+            _dateinname = dateinlogname;
+            _path = path;
+            _append = appendtolog;
+            _logname = logname;
+            setfile();
+            
+        }
+
+        bool _dateinname = true;
+
+        void setfile()
+        {
+            fn = getfn(_path, _logname, _dateinname);
             try
             {
-                _log = new StreamWriter(fn,true);
+                try
+                {
+                    if (_log != null)
+                        _log.Close();
+                }
+                catch { }
+                _log = new StreamWriter(fn, _append);
                 _log.AutoFlush = true;
             }
             catch (Exception) { _log = null; }
         }
+
+        string _path = string.Empty;
+        bool _append = true;
+
+        string getfn(string path, string logname, bool dateinlogname)
+        {
+            string fn = string.Empty;
+            int inst = -1;
+            do
+            {
+                string inststring = inst < 0 ? string.Empty : "."+(inst++).ToString();
+                fn = path + "\\" + logname + (dateinlogname ? "." + _date : "") +  inststring+".txt";
+            } while (!TikUtil.IsFileWritetable(fn));
+            return fn;
+        }
+
         public event DebugFullDelegate SendDebug;
         /// <summary>
         /// log something
@@ -61,7 +102,8 @@ namespace TradeLink.AppKit
         {
             if (SendDebug != null)
                 SendDebug(msg);
-            if (!isEnabled) return;
+            if (!isEnabled) 
+                return;
             try
             {
                 if (_log != null)
@@ -69,7 +111,16 @@ namespace TradeLink.AppKit
                     StringBuilder sb = new StringBuilder();
                     if (_timestamps)
                     {
-                        sb.Append(DateTime.Now.ToString("HHmmss"));
+                        DateTime now = DateTime.Now;
+                        // see if date changed
+                        int newdate = Util.ToTLDate(now);
+                        // if date has changed, start new file
+                        if (newdate != _date)
+                        {
+                            _date = newdate;
+                            setfile();
+                        }
+                        sb.Append(now.ToString("HHmmss"));
                         sb.Append(": ");
                     }
                     sb.Append(msg.Msg);
