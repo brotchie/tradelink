@@ -368,12 +368,30 @@ namespace TradeLink.Common
                     break;
                 case MessageTypes.EXECUTENOTIFY:
                     // date,time,symbol,side,size,price,comment
-                    Trade tr = TradeImpl.Deserialize(msg);
-                    if (gotFill != null) gotFill(tr);
+                    try
+                    {
+                        Trade tr = TradeImpl.Deserialize(msg);
+                        if (gotFill != null) gotFill(tr);
+                    }
+                    catch (Exception ex)
+                    {
+                        debug("error deserializing fill: " + msg);
+                        debug("error: " + ex.Message + ex.StackTrace);
+                        debug("broker: " + BrokerName);
+                    }
                     break;
                 case MessageTypes.ORDERNOTIFY:
-                    Order o = OrderImpl.Deserialize(msg);
-                    if (gotOrder != null) gotOrder(o);
+                    try
+                    {
+                        Order o = OrderImpl.Deserialize(msg);
+                        if (gotOrder != null) gotOrder(o);
+                    }
+                    catch (Exception ex)
+                    {
+                        debug("error deserializing order: " + msg);
+                        debug("error: " + ex.Message + ex.StackTrace);
+                        debug("broker: " + BrokerName);
+                    }
                     break;
                 case MessageTypes.POSITIONRESPONSE:
                     try
