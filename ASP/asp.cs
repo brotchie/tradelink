@@ -223,6 +223,15 @@ namespace ASP
                 debug("a problem has occured.  ASP must be run in interactive mode.");
                 return;
             }
+            
+            // hook up events
+            _bf.gotFill += new FillDelegate(tl_gotFill);
+            _bf.gotOrder += new OrderDelegate(tl_gotOrder);
+            _bf.gotOrderCancel += new LongDelegate(tl_gotOrderCancel);
+            _bf.gotPosition += new PositionDelegate(tl_gotPosition);
+            _bf.gotTick += new TickDelegate(quote_gotTick);
+            _bf.gotUnknownMessage += new MessageDelegate(tl_gotUnknownMessage);
+            _bf.gotImbalance += new ImbalanceDelegate(tl_gotImbalance); // intercept imbalance messages
             // try to connect to preferr providers
             _bf.Reset();
             // update ASP gui with available providers
@@ -255,14 +264,6 @@ namespace ASP
                 _ao._execsel.Text = _bf.BrokerName.ToString() + " " + _bf.BrokerClient.ProviderSelected;
 
             }
-            // hook up events
-            _bf.gotFill += new FillDelegate(tl_gotFill);
-            _bf.gotOrder += new OrderDelegate(tl_gotOrder);
-            _bf.gotOrderCancel += new LongDelegate(tl_gotOrderCancel);
-            _bf.gotPosition += new PositionDelegate(tl_gotPosition);
-            _bf.gotTick += new TickDelegate(quote_gotTick);
-            _bf.gotUnknownMessage += new MessageDelegate(tl_gotUnknownMessage);
-            _bf.gotImbalance += new ImbalanceDelegate(tl_gotImbalance); // intercept imbalance messages
 
             // pass messages through
             _mtquote = new MessageTracker(_bf.FeedClient);
