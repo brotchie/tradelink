@@ -828,7 +828,7 @@ namespace TradeLink.Common
         /// <param name="rulename"></param>
         /// <param name="booltrackers"></param>
         /// <returns></returns>
-        public static bool rulepasses(int idx, string rulename, params GenericTrackerI[] booltrackers) { return rulepasses(idx, rulename, null, false, booltrackers); }
+        public new static bool rulepasses(int idx, string rulename, params GenericTrackerI[] booltrackers) { return rulepasses(idx, rulename, true, null, false, booltrackers); }
         /// <summary>
         /// test a rule made up of trackers
         /// </summary>
@@ -837,7 +837,17 @@ namespace TradeLink.Common
         /// <param name="debug"></param>
         /// <param name="booltrackers"></param>
         /// <returns></returns>
-        public static bool rulepasses(int idx, string rulename, DebugDelegate debug, params GenericTrackerI[] booltrackers) { return rulepasses(idx, rulename, debug, false, booltrackers); }
+        public new static bool rulepasses(int idx, string rulename, DebugDelegate debug, params GenericTrackerI[] booltrackers) { return rulepasses(idx, rulename, true, debug, false, booltrackers); }
+        /// <summary>
+        /// test a rule made up of trackers
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <param name="rulename"></param>
+        /// <param name="debug"></param>
+        /// <param name="debugfails"></param>
+        /// <param name="booltrackers"></param>
+        /// <returns></returns>
+        public new static bool rulepasses(int idx, string rulename, DebugDelegate debug, bool debugfails, params GenericTrackerI[] booltrackers) { return rulepasses(idx, rulename, true, debug, false, booltrackers); }
         /// <summary>
         /// test a rule made up of trackers... optionally display the passes or failures.
         /// </summary>
@@ -847,7 +857,7 @@ namespace TradeLink.Common
         /// <param name="debugfails"></param>
         /// <param name="booltrackers"></param>
         /// <returns></returns>
-        public static bool rulepasses(int idx, string rulename, DebugDelegate debug, bool debugfails, params GenericTrackerI[] booltrackers)
+        public new static bool rulepasses(int idx, string rulename, bool fastmode, DebugDelegate debug, bool debugfails, params GenericTrackerI[] booltrackers)
         {
             List<GenericTrackerI> passes = new List<GenericTrackerI>(booltrackers.Length);
             List<GenericTrackerI> fails = new List<GenericTrackerI>(booltrackers.Length);
@@ -863,11 +873,17 @@ namespace TradeLink.Common
                     continue;
                 // test for pass
                 bool pass = gt.ValueDecimal(idx) == 1;
+                ok &= pass;
                 if (pass)
                     passes.Add(gt);
                 else if (debugfails)
+                {
                     fails.Add(gt);
-                ok &= pass;
+                    if (fastmode)
+                        break;
+                }
+                else if (fastmode)
+                    break;
             }
             // display if need be
             if ((debug != null) && (booltrackers.Length > 0))
@@ -880,7 +896,6 @@ namespace TradeLink.Common
             }
             return ok;
         }
-
 
 
         public static string get(string url) { return get(url, true, 3); }
