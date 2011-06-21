@@ -277,6 +277,7 @@ namespace Quotopia
         const string AVGPRICE = "AvgPrice";
         const string POSSIZE = "PosSize";
         const string CLOSEDPL = "ClosedPL";
+        const string DATE = "Date";
         const string TIME = "Time";
         void QuoteGridSetup()
         {
@@ -296,6 +297,7 @@ namespace Quotopia
             qt.Columns.Add("Exch");
             qt.Columns.Add("BidEx");
             qt.Columns.Add("AskEx");
+            qt.Columns.Add(DATE);
             qt.Columns.Add(TIME);
             //bid-ask spread
             qt.Columns.Add("BASpreadBPS");
@@ -715,14 +717,10 @@ namespace Quotopia
                     }
                     try
                     {
+                        qt.Rows[r][DATE] = t.date;
                         qt.Rows[r][TIME] = t.time;
                     }
                     catch { }
-
-
-
-
-
                 }
             }
         }
