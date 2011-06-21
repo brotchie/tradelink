@@ -790,12 +790,16 @@ namespace TradeLink.Common
         {
             if (!IPUtil.hasValidAddress(_servers))
             {
-                return new TLClient_WM(false);
+                TLClient tmp = new TLClient_WM(false);
+                tmp.VerboseDebugging = VerboseDebugging;
+                tmp.SendDebugEvent+=new DebugDelegate(debug);
+                return tmp;
             }
             else
             {
                 TLClient_IP tmp = new TLClient_IP(_servers, _port);
                 tmp.VerboseDebugging = VerboseDebugging;
+                tmp.SendDebugEvent+=new DebugDelegate(debug);
                 return tmp;
             }
         }

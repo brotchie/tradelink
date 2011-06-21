@@ -677,6 +677,7 @@ namespace TradeLink.Common
             if (nice)
             {
                 _connect = false;
+                Stop();
                 TLSend(MessageTypes.CLEARCLIENT, Name);
                 if (GotDisconnectEvent != null)
                     GotDisconnectEvent(Util.ToTLTime());
