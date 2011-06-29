@@ -25,7 +25,7 @@ namespace ServerBlackwood
             else
                 tl = new TLServer_IP(Properties.Settings.Default.TLClientAddress, Properties.Settings.Default.TLClientPort);
             _con = new ServerBlackwood(tl);
-
+            _con.VerbuseDebugging = Properties.Settings.Default.VerboseDebugging;
             
             TrackEnabled = Util.TrackUsage();
             Program = PROGRAM;

@@ -52,6 +52,16 @@ namespace ServerBlackwood
             
         }
 
+        bool _noverb = true;
+        public bool VerbuseDebugging { get { return !_noverb; } set { _noverb = !value; tl.VerboseDebugging = VerbuseDebugging; } }
+
+        void v(string msg)
+        {
+            if (_noverb)
+                return;
+            debug(msg);
+        }
+
         void tl_newRegisterSymbols(string client, string symbols)
         {
             Basket b = BasketImpl.FromString(symbols);
@@ -66,6 +76,7 @@ namespace ServerBlackwood
                 stk.OnLevel1Update += new BWStock.Level1UpdateHandler(stk_OnLevel1Update);
                 _stocks.Add(stk);
                 _symstk.Add(s.Symbol);
+                v("added level1 subscription for: " + s.Symbol);
             }
             // get existing list
             Basket list = tl.AllClientBasket;
@@ -92,6 +103,7 @@ namespace ServerBlackwood
             {
                 Position p = new PositionImpl(s.Symbol, (decimal)s.Price, s.Size, (decimal)s.ClosedPNL);
                 pt.Adjust(p);
+                v(p.Symbol + " found position: " + p.ToString());
             }
             return pt.ToArray();
         }
@@ -101,6 +113,7 @@ namespace ServerBlackwood
 
         void ServerBlackwood_newImbalanceRequest()
         {
+            v("received imbalance request.");
             m_Session.RequestNYSEImbalances();
         }
         bool isunique(Order o)
@@ -112,8 +125,12 @@ namespace ServerBlackwood
         IdTracker _id = new IdTracker();
         long ServerBlackwood_newSendOrderRequest(Order o)
         {
+            v(o.symbol + " received sendorder request for: " + o.ToString());
             if ((o.id != 0) && !isunique(o))
+            {
+                v(o.symbol + " dropping duplicate order: " + o.ToString());
                 return (long)MessageTypes.DUPLICATE_ORDERID;
+            }
             if (o.id == 0)
                 o.id = _id.AssignId;
             int orderCID = (int)o.id;
@@ -146,22 +163,32 @@ namespace ServerBlackwood
             // send the order
             bwOrder.Send();
             _bwOrdIds.Add(o.id, 0);
+            v(o.symbol + " sent order: " + o.ToString());
             return (long)MessageTypes.OK;
         }
         void ServerBlackwood_newOrderCancelRequest(long tlID)
         {
+            v("cancel request received for: " + tlID);
             int bwID = 0;
+            bool match = false;
             if (_bwOrdIds.TryGetValue(tlID, out bwID))
             { 
                 foreach (BWOrder o in m_Session.GetOpenOrders())
                 {
                     if (o.OrderID == (int)bwID)
+                    {
+                        match = true;
                         o.Cancel();
+                        v("found blackwood order: " + o.OrderID + " for tlid: " + tlID + " and requested cancel.");
+                    }
                 }
             }
+            if (!match)
+                v("could not cancel order: " + tlID + " as no matching blackwood order was found.");
         }
         MessageTypes[] ServerBlackwood_newFeatureRequest()
         {
+            v("received feature request.");
             List<MessageTypes> f = new List<MessageTypes>();
             f.Add(MessageTypes.LIVEDATA);
             f.Add(MessageTypes.LIVETRADING);
@@ -202,12 +229,15 @@ namespace ServerBlackwood
             switch (t)
             {
                 case MessageTypes.DOMREQUEST:
+                    
                     _depth = Convert.ToInt32(msg);
+                    v("received DOM request for depth: " + _depth);
                     ret = MessageTypes.OK;
                     break;
                 case MessageTypes.ISSHORTABLE:
                     return (long)(m_Session.GetStock(msg).IsHardToBorrow() ? 0 : 1);
                 case MessageTypes.BARREQUEST:
+                    v("received bar request: " + msg);
                     string[] r = msg.Split(',');
                     DBARTYPE barType = getBarTypeFromBW(r[(int)BarRequestField.BarInt]);
                     int tlDateS = int.Parse(r[(int)BarRequestField.StartDate]);
@@ -301,10 +331,12 @@ namespace ServerBlackwood
         string _acct = string.Empty;
         void m_Session_OnAccountMessage(object sender, BWAccount accountMsg)
         {
+            
             string str = m_Session.Account;
             string[] strArr = str.Split('~');
             _acct = strArr[0];
             _cpl = accountMsg.ClosedProfit;
+            
         }
         void m_Session_OnExecutionMessage(object sender, BWExecution executionMsg)
         {
@@ -319,6 +351,7 @@ namespace ServerBlackwood
                     t.id = ordID.Key;
                     t.ex = executionMsg.MarketMaker; 
                     tl.newFill(t);
+                    v(t.symbol + " sent fill notification for: " + t.ToString());
                 }
         }
         void m_Session_OnNYSEImbalanceMessage(object sender, BWNYSEImbalance imbalanceMsg)
@@ -341,9 +374,11 @@ namespace ServerBlackwood
             //string ac = positionMsg.UserID.ToString();
             Position p = new PositionImpl(sym, price, size, cpl, _acct);
             pt.NewPosition(p);
+            v(p.Symbol + " new position information: " + p.ToString());
         }
         public bool Start(string user, string pw, string ipaddress, int data2)
         {
+            v("got start request on blackwood connector.");
             System.Net.IPAddress bwIP = System.Net.IPAddress.Parse(ipaddress);
             
             // register for notification of a disconnection from the client portal
@@ -370,6 +405,7 @@ namespace ServerBlackwood
         {
             try
             {
+                v("got stop request on blackwood connector.");
                 m_Session.DisconnectFromOrders();
                 m_Session.DisconnectFromHistoricData();
                 m_Session.DisconnectFromMarketData();
@@ -403,6 +439,7 @@ namespace ServerBlackwood
             }
             else
             {
+                v(histMsg.Symbol + " received bar history data containing " + histMsg.bars.Length + " bars.");
                 if (histMsg.bars != null && histMsg.bars.Length > 0)
                 {
                     string sym = histMsg.Symbol;
@@ -529,19 +566,21 @@ namespace ServerBlackwood
         {
             BWOrder bwo = (BWOrder)sender;
             long id = (long)bwo.CustomID;
+            Order o = new OrderImpl(bwo.Symbol, (int)bwo.Size);
+            o.id = (long)bwo.CustomID;
+            o.side = (bwo.OrderSide == ORDER_SIDE.SIDE_BUY) || (bwo.OrderSide == ORDER_SIDE.SIDE_COVER);
+            o.price = (decimal)bwo.LimitPrice;
+            o.stopp = (decimal)bwo.StopPrice;
+            o.Account = bwo.UserID.ToString();
+            o.ex = bwo.Venue.ToString();
         
             switch (BWOrderStatus)
             {
                 case BWOrderStatus.ACCEPTED:
                     {
-                        Order o = new OrderImpl(bwo.Symbol, (int)bwo.Size);
-                        o.id = (long)bwo.CustomID;
-                        o.side = (bwo.OrderSide == ORDER_SIDE.SIDE_BUY) || (bwo.OrderSide == ORDER_SIDE.SIDE_COVER);
-                        o.price = (decimal)bwo.LimitPrice;
-                        o.stopp = (decimal)bwo.StopPrice;
-                        o.Account = bwo.UserID.ToString();
-                        o.ex = bwo.Venue.ToString();
+ 
                         tl.newOrder(o);
+                        v(o.symbol + " sent order acknowledgement for: " + o.ToString());
                         if (_bwOrdIds.ContainsKey(o.id))
                             {
                                 _bwOrdIds[o.id] = bwo.OrderID;
@@ -550,7 +589,9 @@ namespace ServerBlackwood
                     break;
                 case BWOrderStatus.CANCELED:
                     {
-                        tl.newCancel(id); 
+                        
+                        tl.newCancel(id);
+                        v("sent cancel notification for order: " + id);
                         
                     }
                     break;
