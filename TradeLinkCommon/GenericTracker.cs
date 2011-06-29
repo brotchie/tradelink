@@ -257,6 +257,7 @@ namespace TradeLink.Common
         public virtual void Clear()
         {
             _tracked.Clear();
+            _txt.Clear();
             _txtidx.Clear();
         }
 
