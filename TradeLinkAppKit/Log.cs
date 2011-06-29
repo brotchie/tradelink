@@ -87,8 +87,9 @@ namespace TradeLink.AppKit
             int inst = -1;
             do
             {
-                string inststring = inst < 0 ? string.Empty : "."+(inst++).ToString();
-                fn = path + "\\" + logname + (dateinlogname ? "." + _date : "") +  inststring+".txt";
+                inst++;
+                string inststring = inst < 0 ? string.Empty : "." + inst.ToString(); 
+                fn = path + "\\" + logname + (dateinlogname ? "." + _date : "") + inststring + ".txt";
             } while (!TikUtil.IsFileWritetable(fn));
             return fn;
         }
