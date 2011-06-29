@@ -580,11 +580,21 @@ namespace Quotopia
             if (!bardict.ContainsKey(sec.FullName))
                 bardict.Add(sec.FullName, new BarListImpl(sym));
             status("Added " + sym);
-            if (!mb.ToString().Contains(sym))
+            if (!hassym(sym))
                 mb.Add(sym);
             symindex();
             return true;
         }
+
+        bool hassym(string sym)
+        {
+            foreach (Security s in mb)
+                if ((s.FullName == sym) || (s.Symbol == sym))
+                    return true;
+            return false;
+        }
+
+        
 
         
         Dictionary<string, int[]> symidx = new Dictionary<string, int[]>();

@@ -189,6 +189,7 @@ namespace TDServer
         {
             List<MessageTypes> f = new List<MessageTypes>();
             f.Add(MessageTypes.SENDORDER);
+            f.Add(MessageTypes.EXECUTENOTIFY);
             f.Add(MessageTypes.ACCOUNTREQUEST);
             f.Add(MessageTypes.ACCOUNTRESPONSE);
             f.Add(MessageTypes.ORDERCANCELREQUEST);
