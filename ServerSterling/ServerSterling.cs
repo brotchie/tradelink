@@ -27,6 +27,8 @@ namespace SterServer
 
         OversellTracker ost;
 
+        REGSHO_ShortTracker sho = new REGSHO_ShortTracker();
+
         bool _ignoreoutoforderticks = true;
         public bool IgnoreOutOfOrderTicks { get { return _ignoreoutoforderticks; } set { _ignoreoutoforderticks = value; } }
         int _fixorderdecimalplace = 2;
@@ -75,6 +77,8 @@ namespace SterServer
                 ost.Split = OversellSplit;
                 ost.SendOrderEvent += new OrderDelegate(ost_SendOrderEvent);
                 ost.SendDebugEvent += new DebugDelegate(ost_SendDebugEvent);
+                sho.SendDebugEvent+=new DebugDelegate(v);
+                sho.DefaultAccount = Account;
                 debug(Util.TLSIdentity());
                 debug("Attempting to start: " + PROGRAM);
                 // basic structures needed for operation
@@ -595,7 +599,7 @@ namespace SterServer
                             if (o.ex == string.Empty)
                                 o.ex = o.symbol.Length > 3 ? "NSDQ" : "NYSE";
                             order.Destination = o.Exchange;
-                            order.Side = getside(o.symbol, o.side);
+                            order.Side = getside(o);
                             order.Symbol = o.symbol;
                             order.Quantity = o.UnsignedSize;
                             string acct = Account != string.Empty ? Account : string.Empty;
@@ -729,7 +733,7 @@ namespace SterServer
                                     order.PegDiff = (double)o.pegdiff;
                                     order.PriceType = STIPriceTypes.ptSTIPegged;
                                     bool side = o.size > 0;
-                                    order.Side = getside(o.symbol, side);
+                                    order.Side = getside(order.Symbol, side);
                                     order.Quantity = Math.Abs(o.size);
                                     order.Destination = o.ex;
                                     order.ClOrderID = o.id.ToString();
@@ -786,6 +790,9 @@ namespace SterServer
 
         IdTracker _canceltracker = new IdTracker(false, 0, DateTime.Now.Ticks);
 
+        bool _regshoshort = false;
+        public bool RegSHOShorts { get { return _regshoshort; } set { _regshoshort = value; } }
+
         string getside(string symbol, bool side)
         {
             // use by and sell as default
@@ -798,6 +805,31 @@ namespace SterServer
                 // if short and buying, mark as cover
                 else if (pt[symbol].isShort && side)
                     r = "C";
+            }
+            return r;
+        }
+        string getside(Order o)
+        {
+            bool side = o.side;
+            string symbol = o.symbol;
+            // use by and sell as default
+            string r = side ? "B" : "S";
+            if (CoverEnabled)
+            {
+                // if we're flat or short and selling, mark as a short
+                if ((pt[symbol].isFlat || pt[symbol].isShort) && !side)
+                    r = "T";
+                // if short and buying, mark as cover
+                else if (pt[symbol].isShort && side)
+                    r = "C";
+            }
+            if (RegSHOShorts)
+            {
+                if (sho.isOrderShort(o))
+                {
+                    v(o.symbol + " marking order as regsho short: " + o);
+                    r = "T";
+                }
             }
             return r;
         }
@@ -833,6 +865,8 @@ namespace SterServer
             f.xdate = (int)((now - f.xtime) / 1000000);
             f.ex = t.bstrDestination;
             pt.Adjust(f);
+            if (RegSHOShorts)
+                sho.GotFill(f);
             tl.newFill(f);
             if (VerboseDebugging)
                 debug("new trade sent: " + f.ToString() + " " + f.id);
@@ -923,6 +957,8 @@ namespace SterServer
                 STIOrderStatus stat = (STIOrderStatus)structOrderUpdate.nOrderStatus;
                 debug("order acknowledgement: " + o.ToString()+" status: "+stat.ToString());
             }
+            if (RegSHOShorts)
+                sho.GotOrder(o);
             tl.newOrder(o);
             
         }
@@ -1099,6 +1135,8 @@ namespace SterServer
             Position p = new PositionImpl(sym, price, size, cpl, ac);
             // track it
             pt.NewPosition(p);
+            if (RegSHOShorts)
+                sho.GotPosition(p);
             // track account
             if (!accts.Contains(ac))
                 accts.Add(ac);

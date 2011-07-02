@@ -190,7 +190,7 @@ namespace TradeLink.Common
         }
 
         public event DebugDelegate SendDebugEvent;
-        void debug(string msg)
+        protected void debug(string msg)
         {
             if (SendDebugEvent != null)
                 SendDebugEvent(msg);

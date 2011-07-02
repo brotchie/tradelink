@@ -250,5 +250,17 @@ namespace SterServer.Properties {
                 this["MinLotSize"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool RegSHOShorts {
+            get {
+                return ((bool)(this["RegSHOShorts"]));
+            }
+            set {
+                this["RegSHOShorts"] = value;
+            }
+        }
     }
 }
