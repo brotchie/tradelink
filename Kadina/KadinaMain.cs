@@ -810,6 +810,7 @@ namespace Kadina
          bool loadsim()
          {
              h = new MultiSimImpl(epffiles.ToArray());
+             SimBroker = new Broker();
              SimBroker.GotOrder += new OrderDelegate(broker_GotOrder);
              SimBroker.GotFill += new FillDelegate(broker_GotFill);
              h.GotTick += new TickDelegate(h_GotTick);
