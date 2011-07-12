@@ -264,7 +264,7 @@ namespace TestTradeLink
         public void FromGoogle()
         {
             // get a year chart
-            BarList bl = BarListImpl.DayFromGoogle("MHS");
+            BarList bl = BarListImpl.DayFromGoogle("IBM");
             // make sure it's there
             Assert.IsTrue(bl.isValid);
             // verify we have at least a year of bar data
