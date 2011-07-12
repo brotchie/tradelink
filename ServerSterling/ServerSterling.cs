@@ -79,6 +79,7 @@ namespace SterServer
                 ost.SendDebugEvent += new DebugDelegate(ost_SendDebugEvent);
                 sho.SendDebugEvent+=new DebugDelegate(v);
                 sho.DefaultAccount = Account;
+                
                 debug(Util.TLSIdentity());
                 debug("Attempting to start: " + PROGRAM);
                 // basic structures needed for operation
@@ -135,10 +136,12 @@ namespace SterServer
                     debug("accounts: " + string.Join(",", Accounts));
                 }
 
-                if(VerboseDebugging)
-                    debug("Verbose Mode On.");
-                if (isPaperTradeEnabled)
-                    debug("Papertrading enabled.");
+                debug("VerboseDebugging: " + (VerboseDebugging ? "ON" : "disabled."));
+                debug("PaperTrade: " + (isPaperTradeEnabled ? "ON" : "disabled."));
+                debug("OversellSplit: " + (OversellSplit ? "ON" : "disabled."));
+                debug("CoverEnabled: " + (CoverEnabled? "ON" : "disabled."));
+                debug("RegSHOShorts: " + (RegSHOShorts ? "ON" : "disabled."));
+                
                 
             }
             catch (Exception ex)
@@ -183,6 +186,7 @@ namespace SterServer
                 }
             }
             _orderq.Write(o);
+            _receivedorder = true;
         }
 
         void ptt_SendDebugEvent(string msg)
@@ -830,6 +834,8 @@ namespace SterServer
                     v(o.symbol + " marking order as regsho short: " + o);
                     r = "T";
                 }
+                else
+                    v(o.symbol + " not a regsho short order: " + o);
             }
             return r;
         }
@@ -1119,6 +1125,10 @@ namespace SterServer
             return (long)MessageTypes.OK;
         }
 
+        bool _posupdatelimit = true;
+        public bool LimitPositionUpdates { get { return _posupdatelimit; } set { _posupdatelimit = value; } }
+        bool _receivedorder = false;
+
         void dopositionupdate(ref structSTIPositionUpdate structPositionUpdate)
         {
             // symbol
@@ -1134,14 +1144,21 @@ namespace SterServer
             // build position
             Position p = new PositionImpl(sym, price, size, cpl, ac);
             // track it
-            pt.NewPosition(p);
+            bool adjust = false;
+            if (_posupdatelimit && _receivedorder)
+                ;
+            else
+            {
+                pt.NewPosition(p);
+                adjust = true;
+            }
             if (RegSHOShorts)
                 sho.GotPosition(p);
             // track account
             if (!accts.Contains(ac))
                 accts.Add(ac);
             if (VerboseDebugging)
-                debug("new position recv: " + p.ToString());
+                debug("new position recv: " + p.ToString()+" info: "+pt[p.Symbol,ac]);
         }
 
         List<string> accts = new List<string>();

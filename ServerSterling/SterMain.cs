@@ -42,7 +42,11 @@ namespace SterServer
                 tl.MinLotSize = Properties.Settings.Default.MinLotSize;
                 tl.PostSymSubscribeWait = Properties.Settings.Default.PostSymbolSubscribeWait;
                 tl.AutoSubscribeOrderSymbol = Properties.Settings.Default.AutosubscribeOrderSym;
-                tl.OversellSplit = Properties.Settings.Default.OversellSplit;
+                //tl.OversellSplit = Properties.Settings.Default.OversellSplit;
+                tl.OversellSplit = true;
+                //tl.RegSHOShorts = Properties.Settings.Default.RegSHOShorts;
+                tl.RegSHOShorts = true;
+                tl.LimitPositionUpdates = Properties.Settings.Default.PositionUpdateLimit;
                 tl.isPaperTradeUsingBidAsk = Properties.Settings.Default.PaperTradeUseBidAsk;
                 tl.isPaperTradeEnabled = Properties.Settings.Default.PaperTrade;
                 tl.UseXmlMode = Properties.Settings.Default.UseXMLQuotes;
