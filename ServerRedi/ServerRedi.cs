@@ -381,21 +381,61 @@ namespace ServerRedi
                                             f.id = _idt.AssignId;
                                         f.id = id;
                                     }
-                                    _messageCache.VBGetCell(row, "EXECPRICE", ref cv, ref err);
-                                    if (!(cv == null))
-                                    {
-                                        f.xprice = decimal.Parse(cv.ToString());
-                                    }
                                     _messageCache.VBGetCell(row, "EXECQUANTITY", ref cv, ref err);
                                     if (!(cv == null))
                                     {
                                         f.xsize = int.Parse(cv.ToString());
                                     }
+                                    _messageCache.VBGetCell(row, "EXECPRICE", ref cv, ref err);
+                                    if (!(cv == null))
+                                    {
+                                        f.xprice = decimal.Parse(cv.ToString());
+                                    }
+                                    else
+                                    {
+                                        v(f.symbol + " error getting EXECPRICE, err: " + err+" retrying...");
+                                        _messageCache.VBGetCell(row, "EXECPRICE", ref cv, ref err);
+                                        if (cv != null)
+                                        {
+                                            f.xprice = decimal.Parse(cv.ToString());
+                                        }
+                                        else
+                                        {
+                                            v(f.symbol + " error getting EXECPRICE, err: " + err + " retrying new method...");
+                                            _messageCache.VBGetCell(row, "EXECVALUE", ref cv, ref err);
+                                            bool ok = false;
+                                            decimal val = 0;
+                                            int usize = Math.Abs(f.xsize);
+                                            if (cv != null)
+                                            {
+                                                
+                                                if (decimal.TryParse(cv.ToString(), out val))
+                                                {
+                                                    
+                                                    if ((val != 0) && (usize != 0))
+                                                    {
+                                                        ok = true;
+                                                        f.xprice = val / usize;
+                                                    }
+                                                    else
+                                                    {
+
+                                                    }
+                                                }
+                                            }
+                                            if (!ok)
+                                                v(f.symbol + " error inferring EXECPRICE, usize: " + usize + " execval: " + val);
+
+                                        }
+                                    }
+
+
                                     _messageCache.VBGetCell(row, "EXCHANGE", ref cv, ref err);
                                     if (!(cv == null))
                                     {
                                         f.ex = cv.ToString();
                                     }
+                                    else
                                     _messageCache.VBGetCell(row, "SIDE", ref cv, ref err);
                                     if (!(cv == null))
                                     {
@@ -414,11 +454,8 @@ namespace ServerRedi
                                         else
                                             v("invalid fill side: " + cv.ToString());
                                     }
-                                    long now = Util.ToTLDate(DateTime.Now);
-                                    int xsec = (int)(now % 100);
-                                    long rem = (now - xsec) / 100;
-                                    f.xtime = ((int)(rem % 10000)) * 100 + xsec;
-                                    f.xdate = (int)((now - f.xtime) / 1000000);
+                                    f.xtime = Util.ToTLDate();
+                                    f.xdate = Util.ToTLTime();
                                     Object objErr = null;
                                     _positionCache.VBRediCache.AddWatch(2, string.Empty, f.Account, ref objErr);
                                     if (f.isValid)
