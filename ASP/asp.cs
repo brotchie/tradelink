@@ -95,7 +95,7 @@ namespace ASP
             _ost = new OversellTracker(_pt, _masteridt);
             _ost.SendDebugEvent += new DebugDelegate(debug);
             _ost.SendOrderEvent += new OrderDelegate(sendorder);
-            _ost.Split = false;
+            _ost.Split = Properties.Settings.Default.OversellSplit;
             _bf = new BrokerFeed(Properties.Settings.Default.prefquote, Properties.Settings.Default.prefexecute,_ao._providerfallback.Checked,false,PROGRAM,servers,Properties.Settings.Default.ServerPort);
             _bf.VerboseDebugging = Properties.Settings.Default.VerboseDebugging;
             _bf.SendDebugEvent+=new DebugDelegate(debug);
