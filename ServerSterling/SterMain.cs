@@ -70,7 +70,7 @@ namespace SterServer
         void setaccount(object sender, EventArgs e)
         {
             string acct = Microsoft.VisualBasic.Interaction.InputBox("Provide default account name: ", "Default Sterling Account", Properties.Settings.Default.defaultaccount, 0, 0);
-            Properties.Settings.Default.defaultaccount = string.Join(",",tl.Accounts);
+            Properties.Settings.Default.defaultaccount = acct;
             tl.Accounts = acct.Split(',');
         }
 
