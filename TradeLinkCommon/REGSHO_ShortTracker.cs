@@ -42,28 +42,28 @@ namespace TradeLink.Common
                 return false;
             }
             // get symbol position
-            Position p = pt[ord.symbol];
+            Position p = pt[ord.symbol,ord.Account];
             // if we're flat return side
             if (p.isFlat)
             {
                 
-                debug(ord.symbol + (ord.side ? " flat+buy order can't be short: ":" flat+sell is a short: ") + ord);
+                debug(ord.symbol + (ord.side ? " flat+buy order can't be short: ":" flat+sell is a short: ") + ord+" pos: "+p);
                 return !ord.side;
             }
             // if same side return side
             if (p.isLong && ord.side)
             {
-                debug(ord.symbol + " flat+buy order can't be short: " + ord);
+                debug(ord.symbol + " flat+buy order can't be short: " + ord + " pos: " + p);
                 return false;
             }
             else if (p.isShort && !ord.side)
             {
-                debug(ord.symbol + " short+sell always short: " + ord);
+                debug(ord.symbol + " short+sell always short: " + ord + " pos: " + p);
                 return true;
             }
             else if (p.isShort && ord.side)
             {
-                debug(ord.symbol + " short+buy order can't be short: " + ord);
+                debug(ord.symbol + " short+buy order can't be short: " + ord + " pos: " + p);
                 return false;
             }
             // get all pending orders for symbol
@@ -80,7 +80,7 @@ namespace TradeLink.Common
             // see if size will completely exit position
             if (exitsize >= p.UnsignedSize)
             {
-                debug(ord.symbol + " pending sell size: " + exitsize + " for long: " + p + " exceeds position size from orders: " + string.Join(",", ids.ToArray()));
+                debug(ord.symbol + " marking short as pending sell size: " + exitsize + " for long: " + p + " > pos: "+p +" from orders: " + string.Join(",", ids.ToArray()));
                 return true;
             }
 

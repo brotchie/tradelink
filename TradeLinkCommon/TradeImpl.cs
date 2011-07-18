@@ -85,7 +85,7 @@ namespace TradeLink.Common
         public string ToString(char delimiter,bool includeid)
         {
             int usize = Math.Abs(xsize);
-            string[] trade = new string[] { xdate.ToString(), xtime.ToString(), symbol, (side ? "BUY" : "SELL"), usize.ToString(), xprice.ToString("F2"), comment };
+            string[] trade = new string[] { xdate.ToString(), xtime.ToString(), symbol, (side ? "BUY" : "SELL"), usize.ToString(), xprice.ToString("F2"), Account };
             if (!includeid)
                 return string.Join(delimiter.ToString(), trade);
             return string.Join(delimiter.ToString(), trade) + delimiter + id;
@@ -98,7 +98,7 @@ namespace TradeLink.Common
             t.xdate = Convert.ToInt32(r[0]);
             t.xtime = Convert.ToInt32(r[1]);
             t.symbol = r[2];
-            t.comment = r[6];
+            t.Account = r[6];
             t.xprice = Convert.ToDecimal(r[5]);
             t.side = r[3]=="BUY";
             t.xsize = Convert.ToInt32(r[4]);

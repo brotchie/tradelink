@@ -190,7 +190,7 @@ namespace TradeLink.Common
 
         public override string ToString()
         {
-            return Symbol+" "+Size+"@"+AvgPrice.ToString("F2");
+            return Symbol+" "+Size+"@"+AvgPrice.ToString("F2")+" ["+Account+"]";
         }
         public Trade ToTrade()
         {
