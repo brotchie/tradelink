@@ -774,6 +774,8 @@
 					
 					TLTrade f;
 					f.symbol = CString(x->L_Symbol());
+					L_Account* acct = accounts[0];
+					f.account = CString(acct->L_TraderId());
 					f.id = x->L_OrderId();
 					f.xprice = x->L_AveragePrice();
 					f.side = x->L_Side()=='B';
