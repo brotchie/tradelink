@@ -19,6 +19,7 @@ namespace SterServer
         // basic structures needed for operation
         STIEvents stiEvents;
         STIOrderMaint stiOrder;
+        STIAcctMaint stiMaint;
         STIPosition stiPos;
         STIQuote stiQuote;
         STIBook stiBook;
@@ -89,6 +90,7 @@ namespace SterServer
                 stiQuote = new STIQuote();
                 stiBook = new STIBook();
                 stiApp = new STIApp();
+                stiMaint = new STIAcctMaint();
                 _bw = new Thread(new ParameterizedThreadStart(background));
                 _runbg = true;
                 _bw.Start();
@@ -115,7 +117,19 @@ namespace SterServer
                 stiEvents.OnSTIOrderReject += new _ISTIEventsEvents_OnSTIOrderRejectEventHandler(stiEvents_OnSTIOrderReject);
                 stiQuote.OnSTIQuoteUpdateXML += new _ISTIQuoteEvents_OnSTIQuoteUpdateXMLEventHandler(stiQuote_OnSTIQuoteUpdateXML);
                 stiQuote.OnSTIQuoteSnapXML += new _ISTIQuoteEvents_OnSTIQuoteSnapXMLEventHandler(stiQuote_OnSTIQuoteSnapXML);
+                stiMaint.OnSTIAcctUpdate += new _ISTIAcctMaintEvents_OnSTIAcctUpdateEventHandler(stiMaint_OnSTIAcctUpdate);
+                stiMaint.OnSTIAcctUpdateXML += new _ISTIAcctMaintEvents_OnSTIAcctUpdateXMLEventHandler(stiMaint_OnSTIAcctUpdateXML);
+                Array acctlist = new string[0];
+                stiMaint.GetAccountList(ref acctlist);
+                if (acctlist.Length > 0)
+                {
+                    foreach (string au in acctlist)
+                        Accounts = new string[] { au};
+
+
+                }
                 stiPos.GetCurrentPositions();
+                
 
                 tl.newAcctRequest += new StringDelegate(tl_newAcctRequest);
                 tl.newProviderName = Providers.Sterling;
@@ -153,6 +167,33 @@ namespace SterServer
             debug(PROGRAM + " started.");
             _connected = true;
             return _connected;
+        }
+
+        void stiMaint_OnSTIAcctUpdateXML(ref string bstrAcct)
+        {
+            try
+            {
+                XmlSerializer xs = new XmlSerializer(typeof(SterlingLib.structSTIAcctUpdate));
+                structSTIAcctUpdate q = (structSTIAcctUpdate)xs.Deserialize(new System.IO.StringReader(bstrAcct));
+                doacctupdate(ref q);
+            }
+            catch (Exception ex)
+            {
+                debug("Error receiving account: " + bstrAcct + " err: " + ex.Message + ex.StackTrace);
+            }
+            
+        }
+
+        void stiMaint_OnSTIAcctUpdate(ref structSTIAcctUpdate structAcctUpdate)
+        {
+            if (_xmlquotes)
+                return;
+            doacctupdate(ref structAcctUpdate);
+        }
+
+        void doacctupdate(ref structSTIAcctUpdate au)
+        {
+            Accounts = new string[] { au.bstrAcct };
         }
 
 
@@ -804,11 +845,15 @@ namespace SterServer
             if (CoverEnabled)
             {
                 // if we're flat or short and selling, mark as a short
-                if ((pt[symbol].isFlat || pt[symbol].isShort) && !side)
+                if ((pt[symbol, Account].isFlat || pt[symbol, Account].isShort) && !side)
+                {
                     r = "T";
+                }
                 // if short and buying, mark as cover
-                else if (pt[symbol].isShort && side)
+                else if (pt[symbol, Account].isShort && side)
+                {
                     r = "C";
+                }
             }
             return r;
         }
@@ -821,11 +866,17 @@ namespace SterServer
             if (CoverEnabled)
             {
                 // if we're flat or short and selling, mark as a short
-                if ((pt[symbol].isFlat || pt[symbol].isShort) && !side)
+                if ((pt[symbol,o.Account].isFlat || pt[symbol, o.Account].isShort) && !side)
+                {
+                    v(o.symbol + " marking order as short: " + o.ToString()+ " pos: "+pt[symbol,o.Account]);
                     r = "T";
+                }
                 // if short and buying, mark as cover
-                else if (pt[symbol].isShort && side)
+                else if (pt[symbol,o.Account].isShort && side)
+                {
+                    v(o.symbol + " marking order as cover: " + o.ToString() + " pos: " + pt[symbol, o.Account]);
                     r = "C";
+                }
             }
             if (RegSHOShorts)
             {
@@ -875,7 +926,7 @@ namespace SterServer
                 sho.GotFill(f);
             tl.newFill(f);
             if (VerboseDebugging)
-                debug("new trade sent: " + f.ToString() + " " + f.id);
+                debug("new trade sent: " + f.ToString() +" pos: "+pt[f.symbol,f.Account]);
         }
 
         void stiEvents_OnSTITradeUpdate(ref structSTITradeUpdate t)
@@ -1158,7 +1209,7 @@ namespace SterServer
             if (!accts.Contains(ac))
                 accts.Add(ac);
             if (VerboseDebugging)
-                debug("new position recv: " + p.ToString()+" info: "+pt[p.Symbol,ac]);
+                debug("new position recv: " + p.ToString()+" info: "+pt[p.Symbol,ac]+" acct: "+ac);
         }
 
         List<string> accts = new List<string>();
