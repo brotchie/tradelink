@@ -33,6 +33,8 @@ namespace IQFeedBroker
             InitializeComponent();
             this.FormClosing += IQFeedFrm_FormClosing;
             _helper = new IQFeedHelper(tls);
+            _helper.IgnoreAfterTimeWithBefore = Properties.Settings.Default.IgnoreAfterTimeWithBefore;
+            _helper.IfBeforeTimeUseIgnoreAfter = Properties.Settings.Default.IfBeforeTimeUseIgnoreAfter;
             _helper.isPaperTradeEnabled = Properties.Settings.Default.PaperTrade;
             _helper.isPaperTradeUsingBidAsk = Properties.Settings.Default.PaperTradeUsesBidAsk;
             _helper.DtnPath = Properties.Settings.Default.DtnPath;

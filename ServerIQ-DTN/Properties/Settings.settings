@@ -41,5 +41,11 @@
     <Setting Name="PaperTradeUsesBidAsk" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="IgnoreAfterTimeWithBefore" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">150000</Value>
+    </Setting>
+    <Setting Name="IfBeforeTimeUseIgnoreAfter" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">100000</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

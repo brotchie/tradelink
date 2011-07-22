@@ -45,6 +45,12 @@ namespace IQFeedBroker
         #region Constructors
         public string DtnPath = string.Empty;
 
+        int _ignoreaftertime = 250000;
+        public int IgnoreAfterTimeWithBefore { get { return _ignoreaftertime; } set { _ignoreaftertime = value; } }
+
+        int _ignoreafterifbeforetime = 0;
+        public int IfBeforeTimeUseIgnoreAfter { get { return _ignoreafterifbeforetime; } set { _ignoreafterifbeforetime = value; } }
+
 
         bool _papertrade = false;
         public bool isPaperTradeEnabled { get { return _papertrade; } set { _papertrade = value; } }
@@ -323,6 +329,7 @@ namespace IQFeedBroker
             _user = username;
             _pswd = password;
             _prod = data1;
+            usebeforeafterignoretime = IfBeforeTimeUseIgnoreAfter != 0;
             _connect.RunWorkerAsync();
         }
 
@@ -610,7 +617,11 @@ namespace IQFeedBroker
             {
                 debug(result.AsyncState.ToString());
             }
+        
         }
+
+        bool usebeforeafterignoretime = false;
+
         GenericTracker<decimal> _highs = new GenericTracker<decimal>();
         GenericTracker<decimal> _lows = new GenericTracker<decimal>();
         private void FireTick(string[] actualData)
@@ -625,12 +636,22 @@ namespace IQFeedBroker
                         Tick tick = new TickImpl();
                         tick.date = Util.ToTLDate();
                     DateTime now;
+                    int local = Util.ToTLTime();
                     if (DateTime.TryParse(actualData[65], out now))
                     {
                         tick.time = Util.DT2FT(now);
                     }
                     else
-                        tick.time = Util.ToTLTime();
+                        tick.time = local;
+                    // see if user has tick ignoring enabled
+                    if (usebeforeafterignoretime)
+                    {
+                        // see if tick should be ignored
+                        if ((local < IfBeforeTimeUseIgnoreAfter)
+                            && (tick.time > IgnoreAfterTimeWithBefore))
+                            return;
+                    }
+
                         int v = 0;
                         if (int.TryParse(actualData[64],out v))
                             tick.oe = getmarket(v);
