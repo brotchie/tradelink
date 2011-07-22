@@ -592,6 +592,9 @@ namespace SterServer
             } 
         }
 
+        bool _useserverstops = true;
+        public bool UseServerStops { get { return _useserverstops; } set { _useserverstops = value; } }
+
         bool _autosetunsetid = true;
 
         public bool AutosetUnsetId { get { return _autosetunsetid; } set { _autosetunsetid = value; } }
@@ -686,11 +689,21 @@ namespace SterServer
                             else if (o.isMarket)
                                 order.PriceType = STIPriceTypes.ptSTIMkt;
                             else if (o.isLimit && o.isStop)
-                                order.PriceType = STIPriceTypes.ptSTISvrStpLmt;
+                            {
+                                if (UseServerStops)
+                                    order.PriceType = STIPriceTypes.ptSTISvrStpLmt;
+                                else
+                                    order.PriceType = STIPriceTypes.ptSTILmtStp;
+                            }
                             else if (o.isLimit)
                                 order.PriceType = STIPriceTypes.ptSTILmt;
                             else if (o.isStop)
-                                order.PriceType = STIPriceTypes.ptSTISvrStp;
+                            {
+                                if (UseServerStops)
+                                    order.PriceType = STIPriceTypes.ptSTISvrStp;
+                                else 
+                                    order.Tif = "STP";
+                            }
                             else if (o.isTrail)
                                 order.PriceType = STIPriceTypes.ptSTITrailStp;
                             order.ClOrderID = o.id.ToString();

@@ -274,5 +274,17 @@ namespace SterServer.Properties {
                 this["PositionUpdateLimit"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool UseServerStops {
+            get {
+                return ((bool)(this["UseServerStops"]));
+            }
+            set {
+                this["UseServerStops"] = value;
+            }
+        }
     }
 }
