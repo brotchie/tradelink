@@ -387,7 +387,7 @@ namespace ServerRedi
                                         f.xsize = int.Parse(cv.ToString());
                                     }
                                     _messageCache.VBGetCell(row, "EXECPRICE", ref cv, ref err);
-                                    if (!(cv == null))
+                                    if (cv != null)
                                     {
                                         f.xprice = decimal.Parse(cv.ToString());
                                     }
@@ -436,18 +436,15 @@ namespace ServerRedi
                                         f.ex = cv.ToString();
                                     }
                                     else
-                                    _messageCache.VBGetCell(row, "SIDE", ref cv, ref err);
+                                    _messageCache.VBGetCell(row, "EXECSIDE", ref cv, ref err);
                                     if (!(cv == null))
                                     {
-                                        if (cv.ToString() == "BUY")
+                                        if (cv.ToString().Contains("BUY"))
                                         {
                                             f.side = true;
                                         }
-                                        else if (cv.ToString() == "SELL")
-                                        {
-                                            f.side = false;
-                                        }
-                                        else if (cv.ToString().Contains("SHORT"))
+                                        else if (cv.ToString().Contains("SELL") 
+                                            || cv.ToString().Contains("SHORT"))
                                         {
                                             f.side = false;
                                         }
@@ -740,14 +737,13 @@ namespace ServerRedi
             object cv = new object();
             decimal dv = 0;
             int iv = 0;
-            v("action: " + action.ToString());
             switch (action)
             {
                 case 1: //CN_SUBMIT
                     {
                         try
                         {
-                            v("for submit row: " + row.ToString());
+                            v("for submit row: " + row.ToString() + " action: " + action.ToString());
                             int i = row != 0 ? row - 1 : row;
                             Tick k = new TickImpl();
                             _cc.VBGetCell(i, "SYMBOL", ref cv, ref err);
@@ -813,11 +809,13 @@ namespace ServerRedi
                     {
                         try
                         {
-                            v("for update row: " + row.ToString());
+                            if (TickDebugVerbose)
+                                v("for update row: " + row.ToString() + " action: " + action.ToString());
                             int i = row;                            
                             Tick k = new TickImpl();
                             _cc.VBGetCell(i, "SYMBOL", ref cv, ref err);
-                            v("getcellerr: " + err.ToString());                            
+                            if (TickDebugVerbose)
+                                v("getcellerr: " + err.ToString());                            
                             if (!(cv == null))
                             {
                                 k.symbol = cv.ToString();
@@ -879,6 +877,10 @@ namespace ServerRedi
                      */
             }
         }
+
+        bool _tickdebugverb = false;
+        public bool TickDebugVerbose { get { return _tickdebugverb; } set { _tickdebugverb = value; } }
+
         public event DebugDelegate SendDebug;
         void debug(string msg)
         {

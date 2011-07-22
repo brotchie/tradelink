@@ -34,6 +34,8 @@ namespace ServerRedi
             TrackEnabled = Util.TrackUsage();
             Program = PROGRAM;
             InitializeComponent();
+            tl.TickDebugVerbose = Properties.Settings.Default.TickDebuggingVerbose;
+
             tl.isPaperTradeEnabled = Properties.Settings.Default.PaperTrade;
             tl.isPaperTradeUsingBidAsk = Properties.Settings.Default.PaperTradeBidAsk;
             tl.VerboseDebugging = Properties.Settings.Default.VerboseDebugging;
