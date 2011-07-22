@@ -155,6 +155,7 @@ namespace SterServer
                 debug("OversellSplit: " + (OversellSplit ? "ON" : "disabled."));
                 debug("CoverEnabled: " + (CoverEnabled? "ON" : "disabled."));
                 debug("RegSHOShorts: " + (RegSHOShorts ? "ON" : "disabled."));
+                debug("ServerStops: " + (UseServerStops ? "ON" : "disabled."));
                 
                 
             }
@@ -701,8 +702,10 @@ namespace SterServer
                             {
                                 if (UseServerStops)
                                     order.PriceType = STIPriceTypes.ptSTISvrStp;
-                                else 
-                                    order.Tif = "STP";
+                                else
+                                {
+                                    order.PriceType = STIPriceTypes.ptSTISvrStp;
+                                }
                             }
                             else if (o.isTrail)
                                 order.PriceType = STIPriceTypes.ptSTITrailStp;
