@@ -848,7 +848,7 @@ namespace TradeLink.Common
         /// <param name="debugfails"></param>
         /// <param name="booltrackers"></param>
         /// <returns></returns>
-        public new static bool rulepasses(int idx, string rulename, DebugDelegate debug, bool debugfails, params GenericTrackerI[] booltrackers) { return rulepasses(idx, rulename, true, debug, false, booltrackers); }
+        public new static bool rulepasses(int idx, string rulename, DebugDelegate debug, bool debugfails, params GenericTrackerI[] booltrackers) { return rulepasses(idx, rulename, true, debug, debugfails, booltrackers); }
         /// <summary>
         /// test a rule made up of trackers... optionally display the passes or failures.
         /// </summary>
