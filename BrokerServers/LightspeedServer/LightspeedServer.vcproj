@@ -191,36 +191,6 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
-			<File
-				RelativePath=".\GrayBoxSample.h"
-				>
-			</File>
-			<File
-				RelativePath=".\LS_TLWM.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MainDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Resource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\stdafx.h"
-				>
-			</File>
-			<File
-				RelativePath="..\TradeLibFast\Util.h"
-				>
-			</File>
-		</Filter>
-		<Filter
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
@@ -234,6 +204,10 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\GrayBoxSample.h"
+			>
+		</File>
 		<File
 			RelativePath=".\LightspeedServer.Config.txt"
 			>
@@ -251,11 +225,23 @@
 			>
 		</File>
 		<File
+			RelativePath=".\LS_TLWM.h"
+			>
+		</File>
+		<File
 			RelativePath=".\MainDlg.cpp"
 			>
 		</File>
 		<File
+			RelativePath=".\MainDlg.h"
+			>
+		</File>
+		<File
 			RelativePath=".\ReadMe.txt"
+			>
+		</File>
+		<File
+			RelativePath=".\Resource.h"
 			>
 		</File>
 		<File
@@ -279,7 +265,15 @@
 			</FileConfiguration>
 		</File>
 		<File
+			RelativePath=".\stdafx.h"
+			>
+		</File>
+		<File
 			RelativePath="..\TradeLibFast\Util.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\TradeLibFast\Util.h"
 			>
 		</File>
 	</Files>

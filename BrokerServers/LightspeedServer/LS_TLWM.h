@@ -38,7 +38,7 @@ using namespace TradeLibFast;
 		CString or2str(long res);
 		void v(const CString &msg);
 		bool _noverb;
-		bool saveOrderId(int64 tlid, long lsid);
+		
 		
 		void ReadConfig();
 		bool _imbexch;
@@ -49,9 +49,9 @@ using namespace TradeLibFast;
 		static LS_TLWM* instance;
 		vector <L_Summary*> subs;
 		vector<CString> subsym;
-		vector<L_Order*> ordercache;
 		
-		vector<long> lsids;
+		
+		
 		L_Summary* preload(CString symbol);
 		long gettif(TLOrder o);
 		long gettype(TLOrder o);
@@ -73,17 +73,18 @@ using namespace TradeLibFast;
 		bool imbreq;
 		vector<int> imbalance_clients;
 		vector<L_Account*> accounts;
-		vector<int64> orderids;
-		vector<long*> lscorrelationid;
+		vector<long> lscorrelationid;
 		vector<int64> tlcorrelationid;
+		vector<long> lsorderid1;
+		vector<long> lsorderid2;
 		vector<TLOrder> tlorders;
-		long nextcorr;
+		
 		int64 fetchOrderIdAndRemove(L_Order* order);
 		int64 fetchOrderId(L_Order * order);
 		bool IdIsUnique(int64 id);
 		bool saveOrder(L_Order* o,int64 id, bool overwriteexistingid);
 		bool saveOrder(L_Order* o,int64 id);
-		unsigned int AnvilId(int64 TLOrderId);
+		int64 matchlsid2tlid(long somelsid);
 
 
 		void RemoveUnused();
