@@ -202,5 +202,29 @@ namespace IQFeedBroker.Properties {
                 this["IfBeforeTimeUseIgnoreAfter"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ReportLatency {
+            get {
+                return ((bool)(this["ReportLatency"]));
+            }
+            set {
+                this["ReportLatency"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SaveRawFeed {
+            get {
+                return ((bool)(this["SaveRawFeed"]));
+            }
+            set {
+                this["SaveRawFeed"] = value;
+            }
+        }
     }
 }

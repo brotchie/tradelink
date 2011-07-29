@@ -43,7 +43,8 @@ namespace IQFeedBroker
             _helper.MktCodes = parsemkts(Properties.Resources.marketcenters);
             _helper.SendDebug += new DebugDelegate(_helper_SendDebug);
             _helper.Connected += new IQFeedHelper.booldel(_helper_Connected);
-
+            _helper.SaveRawData = Properties.Settings.Default.SaveRawFeed;
+            _helper.ReportLatency = Properties.Settings.Default.ReportLatency;
 
         }
 

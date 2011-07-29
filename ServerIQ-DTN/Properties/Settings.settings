@@ -47,5 +47,11 @@
     <Setting Name="IfBeforeTimeUseIgnoreAfter" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">100000</Value>
     </Setting>
+    <Setting Name="ReportLatency" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="SaveRawFeed" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

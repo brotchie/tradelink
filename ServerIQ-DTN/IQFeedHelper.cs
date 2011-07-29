@@ -79,6 +79,7 @@ namespace IQFeedBroker
             tl.newSendOrderRequest += new OrderDelegateStatus(tl_newSendOrderRequest);
             tl.newOrderCancelRequest+=new LongDelegate(ptt.sendcancel);
             _cb_hist = new AsyncCallback(OnReceiveHist);
+            saveraw.WorkerSupportsCancellation = true;
             saveraw.DoWork += new DoWorkEventHandler(saveraw_DoWork);
         }
 
@@ -105,6 +106,8 @@ namespace IQFeedBroker
                 {
                     while (rawdatabuf.hasItems)
                     {
+                        if (e.Cancel)
+                            break;
                         rawfile.Write(rawdatabuf.Read());
                     }
                     System.Threading.Thread.Sleep(100);
