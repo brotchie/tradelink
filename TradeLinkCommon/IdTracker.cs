@@ -7,8 +7,98 @@ namespace TradeLink.Common
     /// <summary>
     /// used to obtain valid ids for orders, responses, etc
     /// </summary>
-    public class IdTracker
+    public class IdTracker : IConvertible
     {
+        public static implicit operator long(IdTracker idt)
+        {
+            return idt.AssignId;
+        }
+
+        public decimal ToDecimal(IFormatProvider provider)
+        {
+            throw new InvalidCastException();
+        }
+
+        byte IConvertible.ToByte(IFormatProvider provider)
+        {
+            throw new InvalidCastException();
+        }
+
+        char IConvertible.ToChar(IFormatProvider provider)
+        {
+            throw new InvalidCastException();
+        }
+
+        DateTime IConvertible.ToDateTime(IFormatProvider provider)
+        {
+            throw new InvalidCastException();
+        }
+
+        double IConvertible.ToDouble(IFormatProvider provider)
+        {
+            throw new InvalidCastException();
+        }
+
+        short IConvertible.ToInt16(IFormatProvider provider)
+        {
+            throw new InvalidCastException();
+        }
+
+        int IConvertible.ToInt32(IFormatProvider provider)
+        {
+            throw new InvalidCastException();
+        }
+
+        long IConvertible.ToInt64(IFormatProvider provider)
+        {
+            return AssignId;
+        }
+
+        public TypeCode GetTypeCode()
+        {
+            return TypeCode.Object;
+        }
+
+        sbyte IConvertible.ToSByte(IFormatProvider provider)
+        {
+            throw new InvalidCastException();
+        }
+
+        float IConvertible.ToSingle(IFormatProvider provider)
+        {
+            throw new InvalidCastException();
+        }
+
+        bool IConvertible.ToBoolean(IFormatProvider provider)
+        {
+            throw new InvalidCastException();
+        }
+
+        string IConvertible.ToString(IFormatProvider provider)
+        {
+            return ToString();
+        }
+
+        object IConvertible.ToType(Type conversionType, IFormatProvider provider)
+        {
+            return Convert.ChangeType(_first, conversionType);
+        }
+
+        ushort IConvertible.ToUInt16(IFormatProvider provider)
+        {
+            throw new InvalidCastException();
+        }
+
+        uint IConvertible.ToUInt32(IFormatProvider provider)
+        {
+            throw new InvalidCastException();
+        }
+
+        ulong IConvertible.ToUInt64(IFormatProvider provider)
+        {
+            throw new InvalidCastException();
+        }
+
         const long DEFAULTOWNER = 0;
         const long MAXOWNER = 512;
         // calculate mask length
