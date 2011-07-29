@@ -58,6 +58,13 @@ namespace IQFeedBroker
         bool _papertradebidask = false;
         public bool isPaperTradeUsingBidAsk { get { return _papertradebidask; } set { _papertradebidask = value; } }
 
+        bool _saverawdata = false;
+        public bool SaveRawData { get { return _saverawdata; } set { _saverawdata = value; } }
+
+        BackgroundWorker saveraw = new BackgroundWorker();
+
+        bool _reportlatency = false;
+        public bool ReportLatency { get { return _reportlatency; } set { _reportlatency = value; } }
 
         public IQFeedHelper(TLServer tls)
         {
@@ -72,6 +79,44 @@ namespace IQFeedBroker
             tl.newSendOrderRequest += new OrderDelegateStatus(tl_newSendOrderRequest);
             tl.newOrderCancelRequest+=new LongDelegate(ptt.sendcancel);
             _cb_hist = new AsyncCallback(OnReceiveHist);
+            saveraw.DoWork += new DoWorkEventHandler(saveraw_DoWork);
+        }
+
+        RingBuffer<string> rawdatabuf = new RingBuffer<string>(1000000);
+        System.IO.StreamWriter rawfile;
+
+        void saveraw_DoWork(object sender, DoWorkEventArgs e)
+        {
+            string rawfn= Util.ProgramData(IQFeedFrm.PROGRAM) + "\\Iqfeedraw." + Util.ToTLDate() + ".txt";
+            bool fileok = false;
+            try
+            {
+                rawfile = new System.IO.StreamWriter(rawfn, true);
+                rawfile.AutoFlush = true;
+            }
+            catch (Exception ex)
+            {
+                debug("Raw saving failed from error writing to raw file: " + rawfn + " err: " + ex.Message + ex.StackTrace);
+                fileok = true;
+            }
+            if (fileok)
+            {
+                while (_go)
+                {
+                    while (rawdatabuf.hasItems)
+                    {
+                        rawfile.Write(rawdatabuf.Read());
+                    }
+                    System.Threading.Thread.Sleep(100);
+                }
+            }
+            debug("Ended raw file write: " + rawfn);
+            try
+            {
+                if (rawfile!=null)
+                    rawfile.Close();
+            }
+            catch { }
         }
 
         long tl_newSendOrderRequest(Order o)
@@ -215,6 +260,24 @@ namespace IQFeedBroker
         #region IQFeedHelper Members
         public void Stop()
         {
+            // stop threads
+            _go = false;
+            if (SaveRawData)
+            {
+                try
+                {
+                    saveraw.CancelAsync();
+                }
+                catch { }
+                if (rawfile != null)
+                {
+                    try
+                    {
+                        rawfile.Close();
+                    }
+                    catch { }
+                }
+            }
             Array.ForEach(System.Diagnostics.Process.GetProcessesByName(IQ_FEED), iqProcess => iqProcess.Kill());
             debug("QUITTING****************************");
         }
@@ -303,6 +366,8 @@ namespace IQFeedBroker
         return string.Empty;
     }
 
+    bool _go = true;
+
         public void Start(string username, string password, string data1, int data2)
         {
             // paper trading
@@ -330,7 +395,13 @@ namespace IQFeedBroker
             _pswd = password;
             _prod = data1;
             usebeforeafterignoretime = IfBeforeTimeUseIgnoreAfter != 0;
+            _go = true;
             _connect.RunWorkerAsync();
+            if (SaveRawData)
+            {
+                debug("Starting thread to save raw data.");
+                saveraw.RunWorkerAsync();
+            }
         }
 
         void ptt_SendDebugEvent(string msg)
@@ -584,6 +655,8 @@ namespace IQFeedBroker
                     int bytesReceived = 0;
                     bytesReceived = m_sockIQConnect.EndReceive(result);
                     string rawData = Encoding.ASCII.GetString(m_szLevel1SocketBuffer, 0, bytesReceived);
+                    if (SaveRawData)
+                        rawdatabuf.Write(rawData);
                     string[] splitTickData = rawData.Split('\n');
                     Array.Reverse(splitTickData);
                     var sentTicks = new Dictionary<string, int>();
@@ -593,7 +666,7 @@ namespace IQFeedBroker
                         string[] actualData = str.Split(',');
                         int val;
 
-                        if ((actualData.Length >= 15) && (!sentTicks.TryGetValue(actualData[1], out val)))
+                        if ((actualData.Length >= 15))
                         {
                             if ((actualData[0] == "Q"))
                             {
@@ -622,9 +695,13 @@ namespace IQFeedBroker
 
         bool usebeforeafterignoretime = false;
 
+        long lastticktime = 0;
+        double latencyavg = 0;
+        int tickssincelastlatencyreport = 0;
+
         GenericTracker<decimal> _highs = new GenericTracker<decimal>();
         GenericTracker<decimal> _lows = new GenericTracker<decimal>();
-        private void FireTick(string[] actualData)
+        public void FireTick(string[] actualData)
         {
             if (actualData.Length < 66)
                 return;
@@ -640,6 +717,20 @@ namespace IQFeedBroker
                     if (DateTime.TryParse(actualData[65], out now))
                     {
                         tick.time = Util.DT2FT(now);
+                        if (ReportLatency)
+                        {
+                            lastticktime = now.Ticks;
+                            long latency = DateTime.Now.Ticks - lastticktime;
+                            latencyavg = (latency + latencyavg) / 2;
+                            tickssincelastlatencyreport++;
+                            if (tickssincelastlatencyreport > 100000)
+                            {
+                                double latencyms = latencyavg * 10000;
+                                debug("latency avg since last (ms): " + latencyms.ToString("N1"));
+                                tickssincelastlatencyreport = 0;
+                                latencyavg = 0;
+                            }
+                        }
                     }
                     else
                         tick.time = local;
