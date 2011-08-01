@@ -59,12 +59,19 @@ namespace IQFeedBroker
         public bool isPaperTradeUsingBidAsk { get { return _papertradebidask; } set { _papertradebidask = value; } }
 
         bool _saverawdata = false;
-        public bool SaveRawData { get { return _saverawdata; } set { _saverawdata = value; } }
+        public bool SaveRawData { get { return true; } 
+            set { 
+                //_saverawdata = value; 
+            } }
 
         BackgroundWorker saveraw = new BackgroundWorker();
 
         bool _reportlatency = false;
-        public bool ReportLatency { get { return _reportlatency; } set { _reportlatency = value; } }
+        public bool ReportLatency { get { return true; } 
+            set 
+            { 
+                //_reportlatency = value; 
+            } }
 
         public IQFeedHelper(TLServer tls)
         {
@@ -94,11 +101,13 @@ namespace IQFeedBroker
             {
                 rawfile = new System.IO.StreamWriter(rawfn, true);
                 rawfile.AutoFlush = true;
+                debug("started rawfeed archive at: " + rawfn);
+                fileok = true;
             }
             catch (Exception ex)
             {
                 debug("Raw saving failed from error writing to raw file: " + rawfn + " err: " + ex.Message + ex.StackTrace);
-                fileok = true;
+                
             }
             if (fileok)
             {
@@ -106,9 +115,11 @@ namespace IQFeedBroker
                 {
                     while (rawdatabuf.hasItems)
                     {
-                        if (e.Cancel)
+                        if (e.Cancel || !_go)
                             break;
-                        rawfile.Write(rawdatabuf.Read());
+                        string data = rawdatabuf.Read();
+                        if (data!=string.Empty)
+                            rawfile.Write(data);
                     }
                     System.Threading.Thread.Sleep(100);
                 }
@@ -700,6 +711,7 @@ namespace IQFeedBroker
 
         long lastticktime = 0;
         double latencyavg = 0;
+        double peaklatency = 0;
         int tickssincelastlatencyreport = 0;
 
         GenericTracker<decimal> _highs = new GenericTracker<decimal>();
@@ -722,14 +734,23 @@ namespace IQFeedBroker
                         tick.time = Util.DT2FT(now);
                         if (ReportLatency)
                         {
+                            Int64 latency = 0;
+                            if (lastticktime!=0)
+                                latency = DateTime.Now.Ticks - lastticktime;
                             lastticktime = now.Ticks;
-                            long latency = DateTime.Now.Ticks - lastticktime;
+                            
                             latencyavg = (latency + latencyavg) / 2;
                             tickssincelastlatencyreport++;
-                            if (tickssincelastlatencyreport > 100000)
+                            // test for peak
+                            if (latency > peaklatency)
+                                peaklatency = latency;
+                            // test for report
+                            if (tickssincelastlatencyreport > 500000)
                             {
-                                double latencyms = latencyavg * 10000;
-                                debug("latency avg since last (ms): " + latencyms.ToString("N1"));
+                                // convert to ms
+                                double latencyms = latencyavg / 10000;
+                                double peakms = peaklatency / 10000;
+                                debug(string.Format("latency (ms) avg {0:N1} peak: {0:N1}",latencyms,peaklatency));
                                 tickssincelastlatencyreport = 0;
                                 latencyavg = 0;
                             }
