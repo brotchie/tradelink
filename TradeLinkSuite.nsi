@@ -79,6 +79,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\NxCore64.lnk" "$INSTDIR\ServerNxCore64.exe" "" "$INSTDIR\ServerNxCore64.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\RealTick.lnk" "$INSTDIR\RealTickConnector.exe" "" "$INSTDIR\RealTickConnector.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\DAS.lnk" "$INSTDIR\ServerDAS.exe" "" "$INSTDIR\ServerDAS.exe" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink Connectors\Rithmic.lnk" "$INSTDIR\ServerRithmic.exe" "" "$INSTDIR\ServerRithmic.exe" 0  
   
   
   ; install these files
@@ -87,6 +88,10 @@ Section "TradeLinkSuite"
   File "Replay\bin\release\Replay.exe"
   File "ServerSterling\bin\release\SterServer.exe"
   File "ServerSterling\bin\release\Interop.SterlingLib.dll"
+  
+  File "ServerRithmic\bin\release\ServerRithmic.exe"
+  File "ServerRithmic\bin\release\ServerRithmic.exe.config"
+  File "ServerRithmic\bin\release\rapi.dll"
 
   
   File "Responses\TA-Lib-Core.dll"
