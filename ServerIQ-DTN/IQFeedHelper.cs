@@ -413,8 +413,13 @@ namespace IQFeedBroker
             _connect.RunWorkerAsync();
             if (SaveRawData)
             {
-                debug("Starting thread to save raw data.");
-                saveraw.RunWorkerAsync();
+                if (saveraw.IsBusy)
+                    debug("raw data save thread was already running.");
+                else
+                {
+                    debug("Starting thread to save raw data.");
+                    saveraw.RunWorkerAsync();
+                }
             }
         }
 
