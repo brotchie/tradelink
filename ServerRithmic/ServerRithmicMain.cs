@@ -18,16 +18,33 @@ namespace ServerRithmic
         Log _log = new Log(PROGRAM);
         DebugWindow dw = new DebugWindow();
 
+        ServerRithmic sr;
+
         public ServerRithmicMain()
         {
             InitializeComponent();
             dw.Parent = this;
             FormClosing += new FormClosingEventHandler(ServerRithmicMain_FormClosing);
+
+            TradeLink.API.TLServer tls;
+            if (Properties.Settings.Default.TLClientAddress == string.Empty)
+            {
+                tls = new TradeLink.Common.TLServer_WM();
+            }
+            else
+                tls = new TradeLink.Common.TLServer_IP(Properties.Settings.Default.TLClientAddress, Properties.Settings.Default.TLClientPort);
+            sr = new ServerRithmic(tls, debug);
+
+            if ((user.Text!=string.Empty) && (pass.Text!=string.Empty))
+                go();
         }
 
         void ServerRithmicMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             _log.Stop();
+            if (sr != null)
+                sr.Stop();
+            Properties.Settings.Default.Save();
         }
 
         void debug(string msg)
@@ -41,6 +58,19 @@ namespace ServerRithmic
         private void button2_Click(object sender, EventArgs e)
         {
             dw.Toggle();
+        }
+
+        void go()
+        {
+            if (sr.Start(user.Text, pass.Text))
+                BackColor = Color.Green;
+            else
+                BackColor = Color.Red;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            go();
         }
     }
 }

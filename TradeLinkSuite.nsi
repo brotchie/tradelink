@@ -92,6 +92,8 @@ Section "TradeLinkSuite"
   File "ServerRithmic\bin\release\ServerRithmic.exe"
   File "ServerRithmic\bin\release\ServerRithmic.exe.config"
   File "ServerRithmic\bin\release\rapi.dll"
+  File "ServerRithmic\bin\release\RithmicCertificate.pk12"
+  
 
   
   File "Responses\TA-Lib-Core.dll"
