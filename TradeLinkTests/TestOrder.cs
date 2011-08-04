@@ -8,7 +8,7 @@ using TradeLink.API;
 namespace TestTradeLink
 {
     [TestFixture]
-    public class TestOrder
+    public class TestOrder : AssertionHelper
     {
         public TestOrder() { }
 
@@ -20,6 +20,32 @@ namespace TestTradeLink
             OrderImpl o = new OrderImpl();
             Assert.That(!o.isValid);
             Assert.That(!o.isFilled);
+        }
+
+        [Test]
+        public void FillBidAskPartial()
+        {
+
+            PapertradeTracker ptt = new PapertradeTracker();
+            PositionTracker pt = new PositionTracker();
+
+
+            ptt.UseBidAskFills = true;
+            ptt.GotFillEvent += new FillDelegate(pt.GotFill);
+
+            foreach (bool side in new bool[] { true, false })
+            {
+                pt.Clear();
+                Order o = new MarketOrder("IBM", side, 1000);
+                int size = o.size;
+                o.id = 1;
+                ptt.sendorder(o);
+                Tick k = TickImpl.NewQuote("IBM", 100, 101, 400, 400, "", "");
+                ptt.newTick(k); // partial fill
+                ptt.newTick(k); // partial fill
+                ptt.newTick(k); // partial fill, completed
+                Expect(pt["IBM"].Size, Is.EqualTo(size));
+            }
         }
 
         [Test]
