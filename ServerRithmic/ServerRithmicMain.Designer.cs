@@ -34,41 +34,43 @@
             this.button3 = new System.Windows.Forms.Button();
             this.pass = new System.Windows.Forms.TextBox();
             this.user = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(77, 115);
+            this.button1.Location = new System.Drawing.Point(30, 116);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.Size = new System.Drawing.Size(53, 34);
             this.button1.TabIndex = 0;
-            this.button1.Text = "button1";
+            this.button1.Text = "go";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(77, 145);
+            this.button2.Location = new System.Drawing.Point(106, 116);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.Size = new System.Drawing.Size(75, 34);
             this.button2.TabIndex = 1;
-            this.button2.Text = "button2";
+            this.button2.Text = "info";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(77, 175);
+            this.button3.Image = ((System.Drawing.Image)(resources.GetObject("button3.Image")));
+            this.button3.Location = new System.Drawing.Point(187, 116);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(75, 23);
+            this.button3.Size = new System.Drawing.Size(49, 34);
             this.button3.TabIndex = 2;
-            this.button3.Text = "button3";
             this.button3.UseVisualStyleBackColor = true;
             // 
             // pass
             // 
             this.pass.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::ServerRithmic.Properties.Settings.Default, "pw", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.pass.Location = new System.Drawing.Point(77, 62);
+            this.pass.Location = new System.Drawing.Point(136, 62);
             this.pass.Name = "pass";
             this.pass.PasswordChar = '*';
             this.pass.Size = new System.Drawing.Size(100, 26);
@@ -79,17 +81,37 @@
             // user
             // 
             this.user.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::ServerRithmic.Properties.Settings.Default, "user", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.user.Location = new System.Drawing.Point(77, 30);
+            this.user.Location = new System.Drawing.Point(136, 30);
             this.user.Name = "user";
             this.user.Size = new System.Drawing.Size(100, 26);
             this.user.TabIndex = 3;
             this.user.Text = global::ServerRithmic.Properties.Settings.Default.user;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(30, 30);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(87, 20);
+            this.label1.TabIndex = 5;
+            this.label1.Text = "Username:";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(30, 62);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(82, 20);
+            this.label2.TabIndex = 6;
+            this.label2.Text = "Password:";
+            // 
             // ServerRithmicMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(278, 236);
+            this.ClientSize = new System.Drawing.Size(327, 236);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.pass);
             this.Controls.Add(this.user);
             this.Controls.Add(this.button3);
@@ -110,6 +132,8 @@
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.TextBox user;
         private System.Windows.Forms.TextBox pass;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
     }
 }
 

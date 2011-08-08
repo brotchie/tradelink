@@ -259,17 +259,22 @@ namespace ServerRithmic
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
 
                if (oInfo.AlertType == AlertType.LoginComplete &&
      oInfo.ConnectionId == ConnectionId.MarketData)
                {
                    PRI_bLoggedIntoMd = true;
                }
-               if (oInfo.AlertType == AlertType.LoginComplete &&
+               else if (oInfo.AlertType == AlertType.LoginComplete &&
                    oInfo.ConnectionId == ConnectionId.TradingSystem)
                {
                    PRI_bLoggedIntoTs = true;
+               }
+
+               else if (oInfo.AlertType == AlertType.LoginFailed)
+               {
+                   debug("Login failed, reason: " + oInfo.Message + " result code: " + oInfo.RpCode);
                }
 
                }
@@ -280,14 +285,14 @@ namespace ServerRithmic
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           public override void BestAskQuote(AskInfo oInfo)
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
 
                Tick k = TickImpl.NewBid(oInfo.Symbol, (decimal)oInfo.Price, oInfo.Size);
                k.be = oInfo.Exchange;
@@ -300,7 +305,7 @@ namespace ServerRithmic
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
 
                Tick k = TickImpl.NewAsk(oInfo.Symbol, (decimal)oInfo.Price, oInfo.Size);
                k.be = oInfo.Exchange;
@@ -435,7 +440,7 @@ namespace ServerRithmic
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           public override void TimeBarReplay(TimeBarReplayInfo oInfo)
@@ -455,7 +460,7 @@ namespace ServerRithmic
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
                sb.AppendFormat("\n");
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           public override void PasswordChange(PasswordChangeInfo oInfo)
@@ -468,7 +473,7 @@ namespace ServerRithmic
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
                sb.AppendFormat("\n");
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           public override void ExecutionReplay(ExecutionReplayInfo oInfo)
@@ -476,7 +481,7 @@ namespace ServerRithmic
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
                sb.AppendFormat("\n");
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           public override void LineUpdate(LineInfo oInfo)
@@ -486,14 +491,14 @@ namespace ServerRithmic
                oInfo.Dump(sb);
                sb.AppendFormat("\n");
 
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
           public override void OpenOrderReplay(OrderReplayInfo oInfo)
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
                sb.AppendFormat("\n");
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           public override void OrderReplay(OrderReplayInfo oInfo)
@@ -501,7 +506,7 @@ namespace ServerRithmic
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
                sb.AppendFormat("\n");
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
            public override void PnlReplay(PnlReplayInfo oInfo)
@@ -511,7 +516,7 @@ namespace ServerRithmic
                oInfo.Dump(sb);
                sb.AppendFormat("\n");
 
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           public override void PnlUpdate(PnlInfo oInfo)
@@ -521,7 +526,7 @@ namespace ServerRithmic
                oInfo.Dump(sb);
                sb.AppendFormat("\n");
 
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           public override void SodUpdate(SodReport oReport)
@@ -531,7 +536,7 @@ namespace ServerRithmic
                oReport.Dump(sb);
                sb.AppendFormat("\n");
 
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -671,7 +676,8 @@ namespace ServerRithmic
             catch { }
         }
 
-        void debug(string msg)
+        protected void debug(StringBuilder sb) { debug(sb.ToString()); }
+        protected void debug(string msg)
         {
             if (debs != null)
                 debs(msg);
@@ -688,7 +694,7 @@ namespace ServerRithmic
             {
                 StringBuilder sb = new StringBuilder();
                 oInfo.Dump(sb);
-                Console.Out.Write(sb);
+                sr.debug(sb);
             }
         }
 

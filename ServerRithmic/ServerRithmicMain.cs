@@ -23,7 +23,6 @@ namespace ServerRithmic
         public ServerRithmicMain()
         {
             InitializeComponent();
-            dw.Parent = this;
             FormClosing += new FormClosingEventHandler(ServerRithmicMain_FormClosing);
 
             TradeLink.API.TLServer tls;
