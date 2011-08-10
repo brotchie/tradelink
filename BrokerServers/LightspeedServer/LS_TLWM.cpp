@@ -791,7 +791,8 @@
 					f.symbol = CString(x->L_Symbol());
 					L_Account* acct = accounts[0];
 					f.account = CString(acct->L_TraderId());
-					int64 tlid = matchlsid2tlid(x->L_OrderId());
+					long lsid = x->L_OrderId();
+					int64 tlid = matchlsid2tlid(lsid);
 					f.id = tlid;
 					f.xprice = x->L_AveragePrice();
 					f.side = x->L_Side()=='B';
@@ -801,6 +802,12 @@
 					f.xdate = (ct.GetYear()*10000)+(ct.GetMonth()*100)+ct.GetDay();
 
 					SrvGotFill(f);
+					if (!_noverb)
+					{
+						CString tmp;
+						tmp.Format("%s new fill tlid: %lld lsid: %i",f.symbol,tlid,lsid);
+						v(tmp);
+					}
 					return;
 			}
 			}
