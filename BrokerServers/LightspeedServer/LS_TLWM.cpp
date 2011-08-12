@@ -35,7 +35,9 @@
 							// resend it
 							tl->SendOrder(ord);
 							// notify
-							tl->D(CString("Resending order: "+ord.Serialize()));
+							CString tmp;
+							tmp.Format("%s Resending order: %s",ord.symbol,ord.Serialize());
+							tl->D(tmp);
 							// wait briefly
 							Sleep(25);
 						}
@@ -440,7 +442,9 @@
 				double pospcttotal = totalbp==0 ? 1 : poscost/totalbp;
 				if (pospcttotal>_maxaccountpospct)
 				{
-					D(CString("rejecting for position size exceeded: "+o.Serialize()));
+					CString tmp;
+					tmp.Format("%s rejecting for position size exceeded: %s",o.symbol,o.Serialize());
+					D(tmp);
 					return REJECTEDACCOUNTSAFETY;
 				}
 			}
@@ -450,7 +454,9 @@
 			double bpinuse = account->L_BuyingPowerInUse();
 			if (abs(bpinuse)>=_sendordermaxaccount)
 			{
-				D(CString("rejecting for account safety: "+o.Serialize()));
+				CString tmp;
+				tmp.Format("%s rejecting for account BP safety:  %s",o.symbol,o.Serialize());
+				D(tmp);
 				return REJECTEDACCOUNTSAFETY;
 			}
 		}
@@ -458,7 +464,9 @@
 		{
 			if (_curconnectorshares >= _maxconnectorshares)
 			{
-				D(CString("rejecting for max connector shares: "+o.Serialize()));
+				CString tmp;
+				tmp.Format("%s rejecting for max api/connector shares:  %s",o.symbol,o.Serialize());
+				D(tmp);
 				return REJECTEDACCOUNTSAFETY;
 			}
 		}
@@ -479,7 +487,9 @@
 		{
 			if (!_resendsummarynotloaded)
 				return SYMBOL_NOT_LOADED;
-			D(CString("Not loaded yet, Queing for resend: "+o.Serialize()));
+			CString tmp;
+			tmp.Format("%s Not loaded yet, Queing for resend:  %s",o.symbol,o.Serialize());
+			D(tmp);
 			resend.push_back(o);
 			_resends++;
 			return 0;
