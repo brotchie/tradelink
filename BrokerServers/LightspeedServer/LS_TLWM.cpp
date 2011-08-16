@@ -510,6 +510,7 @@
 		// associate blank ids for orders
 		lsorderid1.push_back(0);
 		lsorderid2.push_back(0);
+		lsorderidfinal.push_back(0);
 		// save order
 		tlorders.push_back(o);
 
@@ -569,9 +570,27 @@
 	}
 
 	
+	int64 LS_TLWM::finalid2tlid(long final)
+	{
+		for (uint i = 0; i<lsorderidfinal.size(); i++)
+		{
+			if (lsorderidfinal[i]==final)
+				return tlcorrelationid[i];
+		}
+		return 0;
+
+	}
+
+	void LS_TLWM::tlid2final(int64 tlid, long finalid)
+	{
+		for (uint i = 0; i<tlcorrelationid.size(); i++)
+		{
+			if (tlcorrelationid[i]==tlid)
+				lsorderidfinal[i] = finalid;
+		}
+	}
 	
-	bool LS_TLWM::saveOrder(L_Order* o, int64 id) { return saveOrder(o,id,false); }
-	bool LS_TLWM::saveOrder(L_Order* o,int64 id, bool allowduplicates)
+	bool LS_TLWM::saveOrder(L_Order* o,int64 id)
 	{
 		// fail if invalid order
 		if (o==NULL) 
@@ -580,9 +599,19 @@
 		long lsid = o->L_ReferenceId();
 		// see if we know this order
 		int64 tlid = matchlsid2tlid(lsid);
-		// already have this order
+		// we have the order, but see if we have the orders final id
 		if (tlid!=0)
+		{
+			int64 tlid_final = finalid2tlid(o->L_OrderId());
+			// see if we have it already
+			if (tlid_final!=0)
+				return false; // if so we're done
+			// otherwise save it
+			tlid2final(tlid,o->L_OrderId());
+			// now we're done
 			return false;
+		}
+
 		if (id==0) // if id is zero, we auto-assign the id
 		{
 			vector<int> now;
@@ -598,6 +627,7 @@
 		// save spot for lsid
 		lsorderid1.push_back(lsid);
 		lsorderid2.push_back(lsid);
+		lsorderidfinal.push_back(o->L_OrderId());
 		tlcorrelationid.push_back(tlid);
 		// we added order and it's id
 		return true; 
@@ -659,6 +689,8 @@
 			if (lsorderid1[i]==somelsid)
 				return tlcorrelationid[i];
 			else if (lsorderid2[i]==somelsid)
+				return tlcorrelationid[i];
+			if (lsorderidfinal[i]==somelsid)
 				return tlcorrelationid[i];
 
 		}
@@ -739,7 +771,7 @@
 								o = ProcessOrder(order);
 
 								CString tmp;
-								tmp.Format("%s order ack lsid: %i tlid: %lld",o.symbol,lsid,o.id);
+								tmp.Format("%s order ack lsid: %i tlid: %lld lsfinal: %i",o.symbol,lsid,o.id,order->L_OrderId());
 								v(tmp);
 
 								// notify
@@ -752,7 +784,7 @@
 					case L_OrderChange::Rejection:
 						{
 							CString tmp;
-							tmp.Format("lsid: %i rejected for %s",lsid,msg->L_Symbol());
+							tmp.Format("%s lsid: %i rejected lsfinal: %i",msg->L_Symbol(),lsid,m->L_OrderId());
 							D(tmp);
 						break;
 						}
@@ -771,7 +803,7 @@
 									if (!_noverb)
 										{
 											CString tmp;
-											tmp.Format("lsid: %i tlid: %lld cancelack.",lsid,tlid);
+											tmp.Format("lsid: %i tlid: %lld lsfinal: %i cancelack.",lsid,tlid,m->L_OrderId());
 											v(tmp);
 										}
 								}
@@ -815,7 +847,7 @@
 					if (!_noverb)
 					{
 						CString tmp;
-						tmp.Format("%s new fill tlid: %lld lsid: %i",f.symbol,tlid,lsid);
+						tmp.Format("%s new fill tlid: %lld lsfinalid: %i",f.symbol,tlid,lsid);
 						v(tmp);
 					}
 					return;

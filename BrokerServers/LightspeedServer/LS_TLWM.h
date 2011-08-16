@@ -77,12 +77,15 @@ using namespace TradeLibFast;
 		vector<int64> tlcorrelationid;
 		vector<long> lsorderid1;
 		vector<long> lsorderid2;
+		vector<long> lsorderidfinal;
 		vector<TLOrder> tlorders;
+
+		int64 finalid2tlid(long final);
+		void tlid2final(int64 tlid, long finalid);
 		
 		int64 fetchOrderIdAndRemove(L_Order* order);
 		int64 fetchOrderId(L_Order * order);
 		bool IdIsUnique(int64 id);
-		bool saveOrder(L_Order* o,int64 id, bool overwriteexistingid);
 		bool saveOrder(L_Order* o,int64 id);
 		int64 matchlsid2tlid(long somelsid);
 
