@@ -758,6 +758,7 @@
 					// check type of order
 					switch (m->L_Category())
 					{
+					case L_OrderChange::Receive:
 					case L_OrderChange::Create:
 						{
 							TLOrder o;
@@ -781,6 +782,7 @@
 
 						}
 						break;
+
 					case L_OrderChange::Rejection:
 						{
 							CString tmp;
@@ -1145,7 +1147,7 @@
 		L_Account* acct = accounts[0];
 		
 
-		for (position_iterator pi = acct->positions_end();pi != acct->positions_end(); ++pi)
+		for (position_iterator pi = acct->positions_begin();pi != acct->positions_end(); ++pi)
 		{
 			L_Position* pos = (*pi);
 			TradeLibFast::TLPosition p;
