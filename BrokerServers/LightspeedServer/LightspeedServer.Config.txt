@@ -2,11 +2,13 @@
 0
 // verbose debugging (0 = no, 1 = yes)
 1
-// maximum account size when sending api orders (0 to disable)
+// maximum buying power in use when sending api orders (0 to disable)
 0
-// maximum shares allowed sent through connector (0 to disable)
+// maximum cumulative shares allowed sent through connector since start (0 to disable)
 0
 // resend orders rejected for summary not loaded (0 to disable)
 1
-// maximum % of total bp a position can take up (10 = 10%,0 to disable)
+// maximum % of total buying power (BP) a position can take up (10 = 10%,0 to disable)
 10
+// maximum open position size allowed before sending order for symbol (0 to diable)
+0

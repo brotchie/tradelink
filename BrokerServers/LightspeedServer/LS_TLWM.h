@@ -63,6 +63,8 @@ using namespace TradeLibFast;
 		bool _resendsummarynotloaded;
 		bool _hasmaxaccountpospct;
 		double _maxaccountpospct;
+		bool _hasmaxpositionsize;
+		int _maxpositionsize;
 
 		int BrokerName(void);
 		

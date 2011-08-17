@@ -104,6 +104,13 @@
 		file.getline(data,ds);
 		_maxaccountpospct = atoi(data)/(double)100;
 		_hasmaxaccountpospct = _maxaccountpospct !=0;
+
+		// skip comment
+		file.getline(skip,ss);
+		// read data
+		file.getline(data,ds);
+		_maxpositionsize = atoi(data);
+		_hasmaxpositionsize = _maxpositionsize!=0;
 		// close config file
 		file.close();
 	}
@@ -468,6 +475,22 @@
 				tmp.Format("%s rejecting for max api/connector shares:  %s",o.symbol,o.Serialize());
 				D(tmp);
 				return REJECTEDACCOUNTSAFETY;
+			}
+		}
+		if (_hasmaxpositionsize)
+		{
+			L_Position* pos = account->L_FindPosition(o.symbol);
+			// only run check if we have a position
+			if (pos)
+			{
+				long size = pos->L_Shares();
+				if (abs(size)>_maxpositionsize)
+				{
+					CString tmp;
+					tmp.Format("%s rejecting for max position size:  %s",o.symbol,o.Serialize());
+					D(tmp);
+					return REJECTEDACCOUNTSAFETY;
+				}
 			}
 		}
 
