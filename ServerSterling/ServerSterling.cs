@@ -117,8 +117,7 @@ namespace SterServer
                 stiEvents.OnSTIOrderReject += new _ISTIEventsEvents_OnSTIOrderRejectEventHandler(stiEvents_OnSTIOrderReject);
                 stiQuote.OnSTIQuoteUpdateXML += new _ISTIQuoteEvents_OnSTIQuoteUpdateXMLEventHandler(stiQuote_OnSTIQuoteUpdateXML);
                 stiQuote.OnSTIQuoteSnapXML += new _ISTIQuoteEvents_OnSTIQuoteSnapXMLEventHandler(stiQuote_OnSTIQuoteSnapXML);
-                stiMaint.OnSTIAcctUpdate += new _ISTIAcctMaintEvents_OnSTIAcctUpdateEventHandler(stiMaint_OnSTIAcctUpdate);
-                stiMaint.OnSTIAcctUpdateXML += new _ISTIAcctMaintEvents_OnSTIAcctUpdateXMLEventHandler(stiMaint_OnSTIAcctUpdateXML);
+
                 Array acctlist = new string[0];
                 stiMaint.GetAccountList(ref acctlist);
                 if (acctlist.Length > 0)
@@ -170,32 +169,6 @@ namespace SterServer
             return _connected;
         }
 
-        void stiMaint_OnSTIAcctUpdateXML(ref string bstrAcct)
-        {
-            try
-            {
-                XmlSerializer xs = new XmlSerializer(typeof(SterlingLib.structSTIAcctUpdate));
-                structSTIAcctUpdate q = (structSTIAcctUpdate)xs.Deserialize(new System.IO.StringReader(bstrAcct));
-                doacctupdate(ref q);
-            }
-            catch (Exception ex)
-            {
-                debug("Error receiving account: " + bstrAcct + " err: " + ex.Message + ex.StackTrace);
-            }
-            
-        }
-
-        void stiMaint_OnSTIAcctUpdate(ref structSTIAcctUpdate structAcctUpdate)
-        {
-            if (_xmlquotes)
-                return;
-            doacctupdate(ref structAcctUpdate);
-        }
-
-        void doacctupdate(ref structSTIAcctUpdate au)
-        {
-            Accounts = new string[] { au.bstrAcct };
-        }
 
 
         void ost_SendDebugEvent(string msg)
