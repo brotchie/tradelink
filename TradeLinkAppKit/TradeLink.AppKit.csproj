@@ -68,6 +68,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>.\Ionic.Zip.dll</HintPath>
     </Reference>
+    <Reference Include="LibCurlNet, Version=1.3.0.0, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Install\LibCurlNet.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -206,6 +210,7 @@
     <Compile Include="PopupWindow.designer.cs">
       <DependentUpon>PopupWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="qc.cs" />
     <Compile Include="Results.cs" />
     <Compile Include="RunTracker.cs" />
     <Compile Include="SafeBindingSource.cs">
@@ -321,6 +326,14 @@
       <Project>{A0FE06A2-F31B-49DE-8901-917B5D593E43}</Project>
       <Name>TradeLink.Common</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="libcurl.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="LibCurlShim.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
