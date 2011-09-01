@@ -630,10 +630,21 @@ namespace Quotopia
         }
         int[] GetSymbolRows(string sym)
         {
-            int[] res = new int[] { };
-            symidx.TryGetValue(sym,out res);
-            if (res == null) return new int[0];
-            return res;
+            int[] res = new int[0];
+            if (symidx.TryGetValue(sym, out res))
+                return res;
+            List<int> rows = new List<int>();
+            for (int i = 0; i < qt.Rows.Count; i++)
+            {
+                if (qt.Rows[i].RowState == DataRowState.Deleted) 
+                    continue;
+                Security sec = SecurityImpl.Parse(qt.Rows[i]["Symbol"].ToString());
+                Security csec = SecurityImpl.Parse(sym);
+                if (sec.Symbol == csec.Symbol)
+                    rows.Add(i);
+            }
+            
+            return rows.ToArray();
         }
         HighTracker _ht = new HighTracker();
         LowTracker _lt = new LowTracker();

@@ -922,12 +922,13 @@ else if (sec.sym=="NG") contract.multiplier= "10000";
 		if (sec.type==1 )   //stock options
 				contract.multiplier= "100";
 				
-				contract.symbol = sec.sym;
+		contract.localSymbol = sec.sym;
 				contract.right = sec.details;
 				CString expire;
 				expire.Format("%i",sec.date);
 				contract.expiry = expire;
 				contract.strike = sec.strike;
+				
 				if (!sec.hasDest())
 					contract.exchange = "SMART";
 		
@@ -950,7 +951,11 @@ else if (sec.sym=="NG") contract.multiplier= "10000";
 			contract.secType = TLSecurity::SecurityTypeName(sec.type);
 			pcont(&contract);
 			CString j;
-			j.Format("adding this: %s %s %s %f %s",contract.symbol,contract.expiry,(contract.right==CString("C")) ? "CALL" : "PUT",contract.strike,contract.secType);
+			CString extra("");
+			if (sec.type==OPT)
+				extra.Format("%s %s %f",contract.expiry,(contract.right==CString("C")) ? "CALL" : "PUT",contract.strike);
+			
+			j.Format("adding this: %s %s %s %s %s",contract.symbol,contract.localSymbol,contract.secType,contract.exchange,extra);
 			D(j);//CString("attempting to add symbol ")+CString(sec.sym));
 			
 			
@@ -1266,6 +1271,7 @@ else if (sec.sym=="NG") contract.multiplier= "10000";
 				else // set local symbol to symbol
 				{
 					contract.localSymbol = sec.sym;
+					contract.symbol = sec.sym;
 				}
 
 				// if destination specified use it
