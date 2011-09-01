@@ -10,7 +10,7 @@ using System.IO;
 using SeasideResearch.LibCurlNet;
 using TradeLink.AppKit;
 
-namespace TradeLink.AppKit
+namespace testticket
 {
     /// <summary>
     /// create and modify assembla tickets
@@ -85,7 +85,7 @@ namespace TradeLink.AppKit
             string rs = string.Empty;
             try 
             {
-                qc.gopost(url,user,password, data.ToString(),SendDebug, out rs);
+                testticket.qc.gopost(url,user,password, data.ToString(),SendDebug, out rs);
                 
 
                 XmlDocument xd = new XmlDocument();
@@ -387,15 +387,11 @@ namespace TradeLink.AppKit
             try
             {
                 string url = AssemblaTicket.GetTicketsUrl(space);
-                HttpWebRequest hr = WebRequest.Create(url) as HttpWebRequest;
-                hr.Credentials = new System.Net.NetworkCredential(user, pw);
-                hr.PreAuthenticate = true;
-                hr.Method = "GET";
-                hr.ContentType = "application/xml";
-                HttpWebResponse wr = (HttpWebResponse)hr.GetResponse();
-                StreamReader sr = new StreamReader(wr.GetResponseStream());
 
-                string result = sr.ReadToEnd();
+                string result;
+                if (!qc.goget(url, user, pw, string.Empty, SendDebug, out result))
+                    return docs;
+
 
                 XmlDocument xd = new XmlDocument();
                 xd.LoadXml(result);

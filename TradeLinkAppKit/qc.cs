@@ -5,7 +5,7 @@ using System.Text;
 
 namespace TradeLink.AppKit
 {
-    internal class qc
+    class qc
     {
 
         public static bool goget(string url, string user, string password, string data, TradeLink.API.DebugDelegate deb, out string result)
@@ -14,7 +14,7 @@ namespace TradeLink.AppKit
             Curl.GlobalInit((int)CURLinitFlag.CURL_GLOBAL_ALL);
 
             Easy easy = new Easy();
-            rresult = null;
+            rresult = new StringBuilder();
             hasresult = false;
 
             Easy.WriteFunction wf = new Easy.WriteFunction(OnWritePostData);
@@ -24,7 +24,7 @@ namespace TradeLink.AppKit
 
             // simple post - with a string
             Slist sl = new Slist();
-            sl.Append("Content-Type:application/xml");
+            //sl.Append("Content-Type:application/xml");
             sl.Append("Accept: application/xml");
             easy.SetOpt(CURLoption.CURLOPT_HTTPHEADER, sl);
             easy.SetOpt(CURLoption.CURLOPT_SSL_VERIFYPEER, false);
@@ -60,7 +60,7 @@ namespace TradeLink.AppKit
 
 
             Curl.GlobalCleanup();
-            result = rresult;
+            result = rresult.ToString();
 
 
 
@@ -73,7 +73,7 @@ namespace TradeLink.AppKit
             Curl.GlobalInit((int)CURLinitFlag.CURL_GLOBAL_ALL);
 
             Easy easy = new Easy();
-            rresult = null;
+            rresult = new StringBuilder();
             hasresult = false;
 
             Easy.WriteFunction wf = new Easy.WriteFunction(OnWritePostData);
@@ -119,7 +119,7 @@ namespace TradeLink.AppKit
 
 
             Curl.GlobalCleanup();
-            result = rresult;
+            result = rresult.ToString();
 
 
 
@@ -133,7 +133,7 @@ namespace TradeLink.AppKit
             Curl.GlobalInit((int)CURLinitFlag.CURL_GLOBAL_ALL);
 
             Easy easy = new Easy();
-            rresult = null;
+            rresult = new StringBuilder();
             hasresult = false;
 
             Easy.WriteFunction wf = new Easy.WriteFunction(OnWritePostData);
@@ -181,7 +181,7 @@ namespace TradeLink.AppKit
 
 
             Curl.GlobalCleanup();
-            result = rresult;
+            result = rresult.ToString();
 
 
 
@@ -198,13 +198,17 @@ namespace TradeLink.AppKit
             }
         }
 
-        static string rresult = null;
+        static StringBuilder rresult = new StringBuilder();
         static bool hasresult = false;
         public static Int32 OnWritePostData(Byte[] buf, Int32 size, Int32 nmemb,
         Object extraData)
         {
-            rresult = System.Text.Encoding.UTF8.GetString(buf);
-            hasresult = true;
+            string newdata = System.Text.Encoding.UTF8.GetString(buf);
+            if (newdata != null)
+            {
+                rresult.Append(newdata);
+                hasresult = true;
+            }
             return size * nmemb;
         }
 
