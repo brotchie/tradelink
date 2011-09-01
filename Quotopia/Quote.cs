@@ -415,7 +415,10 @@ namespace Quotopia
 
         void rightremove(object sender, EventArgs e)
         {
-            string sym = GetVisibleSecurity(CurrentRow).Symbol;
+            Security sec = GetVisibleSecurity(CurrentRow);
+            if (!sec.isValid)
+                return;
+            string sym = sec.Symbol;
             if (MessageBox.Show("Are you sure you want to remove "+sym+"?","Confirm remove",MessageBoxButtons.YesNo)== DialogResult.Yes)
             {
                 // remove symbol from basket
@@ -435,6 +438,8 @@ namespace Quotopia
         void rightchart(object sender, EventArgs e)
         {
             Security sec = GetVisibleSecurity(CurrentRow);
+            if (!sec.isValid)
+                return;
             string sym = sec.Symbol;
             BarList bl;
             if (!bardict.TryGetValue(sec.FullName,out bl))
