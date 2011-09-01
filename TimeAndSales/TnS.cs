@@ -159,6 +159,8 @@ namespace TimeSales
             {
                 _dt.Clear();
                 s = SecurityImpl.FromTIK(file);
+                if (s.Type == SecurityType.CASH)
+                    _dp = 5;
                 total = s.ApproxTicks;
                 symbol = s.Symbol;
                 date = s.Date;
