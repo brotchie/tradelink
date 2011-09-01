@@ -761,7 +761,7 @@ histperiod=daily&startdate=" + startdate + "&enddate=" + enddate + "&output=csv&
             for (int j = chart.Last; (j >= chart.First); j--)
             {
                 if (chart.Date()[j] > date) continue;
-                if (chart.Time()[j] < time)
+                if (chart.Time()[j] < time || date > chart.Date()[j])
                 {
                     return j;
                 }
