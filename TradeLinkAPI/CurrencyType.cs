@@ -4,7 +4,7 @@ namespace TradeLink.API
     public enum CurrencyType
     {
         USD,
-        AUK,
+        AUD,
         CAD,
         CHF,
         EUR,
