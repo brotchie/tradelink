@@ -311,9 +311,10 @@ namespace Quotopia
             qg.ColumnHeadersVisible = true;
             qg.Capture = true;
             qg.ContextMenuStrip = new ContextMenuStrip();
+            qg.ContextMenuStrip.Items.Add("Add Symbol", null, new EventHandler(rightadd));
+            qg.ContextMenuStrip.Items.Add("Remove", null, new EventHandler(rightremove));
             qg.ContextMenuStrip.Items.Add("Chart", null, new EventHandler(rightchart));
             qg.ContextMenuStrip.Items.Add("Ticket", null, new EventHandler(rightticket));
-            qg.ContextMenuStrip.Items.Add("Remove", null,new EventHandler(rightremove));
             qg.ContextMenuStrip.Items.Add("Import Basket", null,new EventHandler(importbasketbut_Click));
             qg.ContextMenuStrip.Items.Add("Export Basket", null, new EventHandler(exportbasket));
             qg.ContextMenuStrip.Items.Add("Report Bug", null, new EventHandler(report));
@@ -404,6 +405,12 @@ namespace Quotopia
             }
             else
                 debug("order: "+sendOrder.ToString());
+        }
+
+        void rightadd(object sender, EventArgs e)
+        {
+            string syms = TextPrompt.Prompt("Symbols to add", "Enter symbols seperated by commas: ");
+            addbasket(BasketImpl.FromString(syms));
         }
 
         void rightremove(object sender, EventArgs e)
