@@ -8,9 +8,9 @@ using TradeLink.API;
 using TradeLink.Common;
 using System.IO;
 using SeasideResearch.LibCurlNet;
-using TradeLink.AppKit;
 
-namespace testticket
+
+namespace TradeLink.AppKit
 {
     /// <summary>
     /// create and modify assembla tickets
@@ -85,7 +85,7 @@ namespace testticket
             string rs = string.Empty;
             try 
             {
-                testticket.qc.gopost(url,user,password, data.ToString(),SendDebug, out rs);
+                qc.gopost(url,user,password, data.ToString(),SendDebug, out rs);
                 
 
                 XmlDocument xd = new XmlDocument();
