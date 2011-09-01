@@ -45,6 +45,7 @@ namespace TradeLibFast
 		CString ib2tlspace(CString ibsym);
 		void v(CString msg);
 		bool noverb;
+		bool fillnotifyfullsymbol;
 		bool linktest();
 		vector<TLPosition> poslist;
 		bool havepos(TLPosition p);
@@ -69,6 +70,7 @@ namespace TradeLibFast
 		int getMlinkId(OrderId id);
 		std::vector<int> validlinkids; // gets the m_links ids that are logged in
 		bool IGNOREERRORS;
+		int getsymbolindex(CString sym);
 		// for storing subscribed symbols and their tickerid
 		bool hasTicker(CString symbol);
 		// following used because tick updates only include size or price that changed (not both)

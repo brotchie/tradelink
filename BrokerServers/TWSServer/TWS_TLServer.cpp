@@ -96,6 +96,14 @@ namespace TradeLibFast
 		else
 			D("Using all bar data available.");
 
+		file.getline(skip,ss);
+		file.getline(data,ds);
+		fillnotifyfullsymbol = atoi(data)==1;
+		if (fillnotifyfullsymbol)
+			D("Using full quoted symbol on fill notification.");
+		else
+			D("Using only executed symbol on fill notification.");
+
 
 		file.close();
 		if (!noverb)
@@ -327,7 +335,7 @@ namespace TradeLibFast
 
 	int64 TWS_TLServer::saveOrder(OrderId ibid, CString acct)
 	{
-		int tlid = IB2TLID(ibid);
+		int64 tlid = IB2TLID(ibid);
 		// don't save if it's already been saved
 		if (tlid!=0)
 			return tlid;
@@ -753,6 +761,21 @@ namespace TradeLibFast
 			m.Format("%s %s %s %f FOP",contract.symbol,contract.expiry,(contract.right==CString("C")) ? "CALL" : "PUT",contract.strike);
 			trade.symbol = m;
 		}
+		else if (fillnotifyfullsymbol)
+		{
+			int idx = getsymbolindex(contract.localSymbol);
+			if (idx<0)
+			{
+				trade.localsymbol = contract.localSymbol;
+				trade.symbol = contract.localSymbol;
+			}
+			else
+			{
+				trade.symbol = stockticks[idx].sym;
+				trade.localsymbol = stockticks[idx].sym;
+			}
+
+		}
 		else
 		{
 			trade.localsymbol = contract.localSymbol;
@@ -770,6 +793,26 @@ namespace TradeLibFast
 		trade.xtime = (atoi(r2[0])*10000)+(atoi(r2[1])*100)+sec;
 		if (contract.secType!="BAG") this->SrvGotFill(trade);
 
+	}
+
+	int TWS_TLServer::getsymbolindex(CString symbol)
+	{
+		TLSecurity sec = TLSecurity::Deserialize(symbol);
+		CString ssym = sec.sym;
+		for (uint i = 0; i<stockticks.size(); i++)
+		{
+			CString clsym = stockticks[i].sym;
+			if (clsym==symbol)
+				return i;
+			TLSecurity csec = TLSecurity::Deserialize(clsym);
+			CString cssym = csec.sym;
+			if (cssym==symbol)
+				return i;
+			if (cssym==ssym)
+				return i;
+		}
+
+		return -1;
 	}
 
 
@@ -1260,7 +1303,7 @@ else if (sec.sym=="NG") contract.multiplier= "10000";
 	//This methid returns the tickerid for a given symbol or -1
 	int TWS_TLServer::findStockticksTid(CString symbol)
 	{
-		for (int i=0; i < stockticks.size(); i++) 
+		for (uint i=0; i < stockticks.size(); i++) 
 		{
 			if(stockticks[i].sym.Compare(symbol) == 0)
 				return i;

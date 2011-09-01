@@ -12,3 +12,5 @@ USD
 MIDPOINT
 // historical bars include regular trading hours (1 = true, 0 = false)
 0
+// on fill notification, send same symbol that was subscribed (eg include quote exchange and contract type)
+1
