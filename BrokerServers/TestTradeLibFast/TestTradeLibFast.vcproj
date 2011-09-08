@@ -130,7 +130,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\TradeLibFast"
+				AdditionalIncludeDirectories="..\TradeLibFast;.\cfix\include\"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_AFXEXT"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
@@ -152,9 +152,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="TradeLibFast.lib"
+				AdditionalDependencies="TradeLibFast.lib cfix.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;..\$(Configurationname)&quot;"
+				AdditionalLibraryDirectories="&quot;..\$(Configurationname)&quot;;.\cfix\lib\"
 				ModuleDefinitionFile="$(ProjectName).def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -186,7 +186,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="auto-run unit tests"
-				CommandLine="$(ProjectDir)\runtests.cmd $(OutDir) &quot;$(OutDir)\$(ProjectName).dll&quot;"
+				CommandLine="$(ProjectDir)\runtests.cmd $(OutDir) &quot;$(OutDir)\$(ProjectName).dll&quot; $(ProjectDir)"
 			/>
 		</Configuration>
 	</Configurations>

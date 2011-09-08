@@ -1,0 +1,5 @@
+App,Date,Time,CPU
+(null),2009-05-27,20:58:48,0.00MHz
+Function,Invocations,Total,Execution,T/I,E/I
+TradeLibFast::TLServer_WM::SrvGotTick,10001,     0.000,     0.000,     0.000,     0.000
+Total,10001,     0.000,     0.000
