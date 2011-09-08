@@ -24,6 +24,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ServerGenesis", "ServerGene
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LightspeedServer", "LightspeedServer\LightspeedServer.vcproj", "{9BEDFC5D-E316-43A2-985A-00B576B1C80F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{70D6F9FC-3067-4527-8858-D931623554CF} = {70D6F9FC-3067-4527-8858-D931623554CF}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

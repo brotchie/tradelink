@@ -187,7 +187,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Copying TWS config file..."
-				CommandLine="copy TwsServer.Config.txt $(TargetDir)"
+				CommandLine="copy TwsServer.Config.txt &quot;$(TargetDir)&quot;"
 			/>
 		</Configuration>
 	</Configurations>

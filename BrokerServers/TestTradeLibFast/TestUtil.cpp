@@ -28,7 +28,7 @@ static void __stdcall gsplittest()
 	unsigned long stop = GetTickCount();
 	// elapsed
 	int elapms = stop - start;
-	int rate = (MAXGSPLITS/elapms)*1000;
+	int rate = elapms== 0 ? 0 : (MAXGSPLITS/elapms)*1000;
 	CFIX_LOG(L"Gsplit elapsed time(ms): %i",elapms);
 	CFIX_LOG(L"Gsplits perf (splits/sec: %i",rate);
 	CFIX_ASSERT(elapms<50);

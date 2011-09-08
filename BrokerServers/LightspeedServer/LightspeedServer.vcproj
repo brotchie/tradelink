@@ -150,7 +150,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="LightspeedTrader.lib TradeLibFast.lib"
+				AdditionalDependencies="LightspeedTrader.lib &quot;$(OUTDIR)\TradeLibFast.lib&quot;"
+				OutputFile="&quot;$(OutDir)\$(ProjectName).dll&quot;"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;..\$(Configurationname)&quot;;&quot;$(OutDir)&quot;;&quot;$(SolutionDir)..\..\..\lib&quot;"
 				ModuleDefinitionFile=".\LightspeedServer.def"
@@ -183,7 +184,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy $(OutDir)\LightspeedServer.dll c:\progra~1\lightspeed\&#x0D;&#x0A;copy LightspeedServer.Config.txt c:\progra~1\lightspeed\&#x0D;&#x0A;copy $(OutDir)\TradeLibFast.dll c:\progra~1\lightspeed\&#x0D;&#x0A;"
+				CommandLine="copy &quot;$(OutDir)\LightspeedServer.dll&quot; &quot;c:\progra~1\lightspeed\&#x0D;&#x0A;copy LightspeedServer.Config.txt c:\progra~1\lightspeed\&#x0D;&#x0A;copy &quot;$(OutDir)\TradeLibFast.dll&quot; c:\progra~1\lightspeed\&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>

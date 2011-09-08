@@ -165,7 +165,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(OUTDIR)\TradeLibFast.lib $(OUTDIR)\GTAPI.LIB"
+				AdditionalDependencies="&quot;$(OUTDIR)\TradeLibFast.lib&quot; &quot;$(OUTDIR)\GTAPI.LIB&quot;"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="$(ConfigurationName)"

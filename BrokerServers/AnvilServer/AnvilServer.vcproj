@@ -86,7 +86,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="Business.lib Observer.lib Version.lib TradeLibFast.lib"
-				OutputFile="$(OutDir)\$(ProjectName).dll"
+				OutputFile="&quot;$(OutDir)\$(ProjectName).dll&quot;"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="&quot;..\$(Configurationname)&quot;;&quot;$(OutDir)&quot;"
@@ -123,7 +123,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="copy anvil config file"
-				CommandLine="copy AnvilServer.Config.txt $(TargetDir)"
+				CommandLine="copy AnvilServer.Config.txt &quot;$(TargetDir)&quot;"
 			/>
 		</Configuration>
 		<Configuration
