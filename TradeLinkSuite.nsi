@@ -185,7 +185,7 @@ Section "TradeLinkSuite"
     ; don't overwrite config files files
   SetOverWrite off
   File "ServerFIX\bin\release\ServerFIX.exe.config"
-  File "ServerNxCore\bin\release\ServerNxCore32.exe.config"
+  File "ServerNxCore\bin\x86\release\ServerNxCore32.exe.config"
   File "ServerNxCore64\bin\x64\release\ServerNxCore64.exe.config"
   File "ServerRedi\bin\release\ServerRedi.exe.config"
 	File "ServerDAS\bin\release\ServerDAS.exe.config"
