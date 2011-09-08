@@ -1,4 +1,4 @@
-﻿namespace TradeLinkTest
+﻿namespace GbTLServer
 {
     partial class GBTradeLink
     {

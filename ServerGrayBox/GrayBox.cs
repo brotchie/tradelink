@@ -53,9 +53,9 @@ public delegate void SetCallBack(string msg);
 
 
 
-namespace TradeLinkTest
+namespace GbTLServer
 {
-    class GrayBox
+    public class GrayBox
     {
         //Thread related
         Thread m_bgThread;

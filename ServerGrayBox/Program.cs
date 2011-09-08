@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.IO;
 using System.Globalization;
 
-namespace TradeLinkTest
+namespace GbTLServer
 {
     static class Program
     {

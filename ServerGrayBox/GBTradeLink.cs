@@ -10,11 +10,11 @@ using TradeLink.API;
 using TradeLink.Common;
 using TradeLink.AppKit;
 
- 
 
 
 
-namespace TradeLinkTest
+
+namespace GbTLServer
 {
     public partial class GBTradeLink : AppTracker
     {
