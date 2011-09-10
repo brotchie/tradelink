@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using TradeLink.API;
 
+
 namespace TradeLink.Common
 {
-
+    public delegate void OCOGroupDel(OCOGroup group);
 
     public class OCOTracker : GenericTracker<OCOGroup>
     {
         IdTracker _idt;
         public OCOTracker() : this(new IdTracker()) { }
         public OCOTracker(IdTracker idt) : this("OcoTracker", 100, idt) { }
-        public OCOTracker(string name, int estsymbols, IdTracker idt)
-            : base(estsymbols, name)
+        public OCOTracker(string name, int estsymbols, IdTracker idt) : base (estsymbols,name)
         {
             _idt = idt;
         }
@@ -39,7 +39,7 @@ namespace TradeLink.Common
                 {
                     return OCOGroup.EmptyGroup();
                 }
-                return this[idx];
+                return base[idx];
             }
         }
 
@@ -58,7 +58,7 @@ namespace TradeLink.Common
         public bool isGroupMember(long id)
         {
             int idx = -1;
-            return oid2symidx.TryGetValue(id, out idx);
+            return oid2symidx.TryGetValue(id,out idx);
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace TradeLink.Common
         {
             int idx = -1;
             int symidx = getindex(sym);
-            return oid2symidx.TryGetValue(id, out idx) && (symidx == idx);
+            return oid2symidx.TryGetValue(id, out idx) && (symidx==idx);
         }
 
         /// <summary>
@@ -88,10 +88,10 @@ namespace TradeLink.Common
 
         void cancel(long id)
         {
-            if ((SendCancelEvent != null) && (id != 0))
+            if ((SendCancelEvent != null) && (id!=0))
                 SendCancelEvent(id);
-            else if (id != 0)
-                debug("Can't cancel " + id + " because no SendCancelEvent defined!");
+            else if (id!=0)
+                debug("Can't cancel "+id+" because no SendCancelEvent defined!");
         }
         /// <summary>
         /// pass fills to oco tracker
@@ -114,6 +114,17 @@ namespace TradeLink.Common
                 v("ocogroup: " + getindex(grp.SymbolOwner) + " attempting to cancel any open orders.");
                 cancelgrp(grp, f.id);
             }
+            else
+                v("ocogroup: " + grp.ToString() + " not valid, no cancels to send.");
+        }
+
+        /// <summary>
+        /// cancel a group by index
+        /// </summary>
+        /// <param name="idx"></param>
+        public void CancelGroup(int idx)
+        {
+            CancelGroup(this[idx]);
         }
 
         /// <summary>
@@ -122,14 +133,14 @@ namespace TradeLink.Common
         /// <param name="grp"></param>
         public void CancelGroup(OCOGroup grp)
         {
-
+            
             cancelgrp(grp, 0);
         }
         void cancelgrp(OCOGroup grp, long ex)
         {
             if (!grp.isValid)
             {
-                v("Invalid oco group: " + grp.ToString());
+                v(grp.SymbolOwner+" no oco being used. ["+grp.ToString()+"]");
                 return;
             }
             int idx = getindex(grp.SymbolOwner);
@@ -142,11 +153,11 @@ namespace TradeLink.Common
                     v("group: " + idx + " canceling orderid: " + grp[i]);
                     cancel(grp[i]);
                 }
-            if (ok && (SendOCOGroupCancelEvent != null))
+            if (ok && (SendOCOGroupCancelEvent!=null))
             {
                 SendOCOGroupCancelEvent(grp);
             }
-
+            
         }
 
         void debug(string msg)
@@ -215,22 +226,30 @@ namespace TradeLink.Common
             {
                 debug("Send request for: " + grp.ToString());
                 // see if we already had group
-                bool exists = (getindex(grp.SymbolOwner) >= 0);
+                int idx = getindex(grp.SymbolOwner);
+                bool exists = (idx >= 0);
                 if (exists)
                 {
-                    debug("Already had group for: " + grp.SymbolOwner);
-
-                    if (CancelOcoOnUpdate)
+                    if (this[idx].isValid)
                     {
-                        CancelGroup(grp);
+                        debug("Already had group for: " + grp.SymbolOwner);
+
+                        if (CancelOcoOnUpdate)
+                        {
+                            CancelGroup(grp);
+                        }
                     }
+                }
+                else
+                {
+                    // ensure we have group
+                    idx = addindex(grp.SymbolOwner, grp);
+                    // save group
+                    this[grp.SymbolOwner] = grp;
                 }
 
 
-                // ensure we have group
-                int idx = addindex(grp.SymbolOwner, grp);
-                // save group
-                this[grp.SymbolOwner] = grp;
+
                 // send orders
                 for (int i = 0; i < grp.orders.Length; i++)
                 {
@@ -247,7 +266,7 @@ namespace TradeLink.Common
                 if (exists && (SendOCOGroupUpdateEvent != null))
                     SendOCOGroupUpdateEvent(grp);
                 debug("finished sending oco group: " + idx);
-
+                
             }
             else
                 debug("Can't send group as no SendOrderEvent present.");
@@ -262,8 +281,6 @@ namespace TradeLink.Common
         public bool VerboseDebugging { get { return !_noverb; } set { _noverb = !value; } }
     }
 
-
-    public delegate void OCOGroupDel(OCOGroup group);
     /// <summary>
     /// represents a group of OCO orders
     /// </summary>
@@ -307,7 +324,7 @@ namespace TradeLink.Common
             return grp;
 
         }
-
+            
         /// <summary>
         /// create an oco group
         /// </summary>
@@ -333,5 +350,4 @@ namespace TradeLink.Common
             return s;
         }
     }
-
 }
