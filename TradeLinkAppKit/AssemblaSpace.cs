@@ -24,7 +24,7 @@ namespace TradeLink.AppKit
         /// whether space is valid
         /// </summary>
         public bool isValid { get { return (_sn != null) && (_sn != string.Empty); } }
-
+        public static event TradeLink.API.DebugDelegate SendDebug;
         /// <summary>
         /// get list of spaces for an account
         /// </summary>
@@ -34,38 +34,38 @@ namespace TradeLink.AppKit
         public static List<AssemblaSpace> GetSpaces(string user, string password)
         {
             string url = @"http://www.assembla.com/spaces/my_spaces";
-            HttpWebRequest hr = WebRequest.Create(url) as HttpWebRequest;
-            hr.Credentials = new System.Net.NetworkCredential(user, password);
-            hr.PreAuthenticate = true;
-            hr.Method = "GET";
-            hr.ContentType = "application/xml";
-            HttpWebResponse wr = (HttpWebResponse)hr.GetResponse();
-            StreamReader sr = new StreamReader(wr.GetResponseStream());
-
-            string result = sr.ReadToEnd();
-
-            XmlDocument xd = new XmlDocument();
-            xd.LoadXml(result);
             List<AssemblaSpace> docs = new List<AssemblaSpace>();
-            XmlNodeList xnl = xd.GetElementsByTagName("space");
-            foreach (XmlNode xn in xnl)
+            string result = string.Empty;
+            if (qc.goget(url, user, password, string.Empty, SendDebug, out result))
             {
-                AssemblaSpace doc = new AssemblaSpace();
-
-                foreach (XmlNode dc in xn.ChildNodes)
+                XmlDocument xd = new XmlDocument();
+                xd.LoadXml(result);
+                
+                XmlNodeList xnl = xd.GetElementsByTagName("space");
+                foreach (XmlNode xn in xnl)
                 {
-                    string m = dc.InnerText;
-                    if (dc.Name == "name")
-                        doc.Space= m;
-                    else if (dc.Name == "is-commercial")
-                        doc.isCommercial = Convert.ToBoolean(m);
-                    else if (dc.Name == "description")
-                        doc.Desc = m;
+                    AssemblaSpace doc = new AssemblaSpace();
+
+                    foreach (XmlNode dc in xn.ChildNodes)
+                    {
+                        string m = dc.InnerText;
+                        if (dc.Name == "name")
+                            doc.Space = m;
+                        else if (dc.Name == "is-commercial")
+                            doc.isCommercial = Convert.ToBoolean(m);
+                        else if (dc.Name == "description")
+                            doc.Desc = m;
+                    }
+                    if (doc.isValid)
+                        docs.Add(doc);
                 }
-                if (doc.isValid)
-                    docs.Add(doc);
+
+
             }
+
             return docs;
+
+
 
         }
 

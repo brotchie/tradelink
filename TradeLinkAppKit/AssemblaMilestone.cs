@@ -50,7 +50,7 @@ namespace TradeLink.AppKit
         {
             return "http://www.assembla.com/spaces/" + space + "/milestones/";
         }
-
+        public static event TradeLink.API.DebugDelegate SendDebug;
         /// <summary>
         /// delete a milestone given a valid milestone instance
         /// </summary>
@@ -63,13 +63,8 @@ namespace TradeLink.AppKit
         {
             string space = milestone.Space;
             string url = GetMilestonesUrl(space)+"//"+milestone.Id;
-            HttpWebRequest hr = WebRequest.Create(url) as HttpWebRequest;
-            hr.Credentials = new System.Net.NetworkCredential(user, password);
-            hr.PreAuthenticate = true;
-            hr.Method = "GET";
-            hr.ContentType = "application/xml";
-            HttpWebResponse wr = (HttpWebResponse)hr.GetResponse();
-            return wr.StatusCode == HttpStatusCode.OK;
+            string result = string.Empty;
+            return qc.goget(url, user, password, string.Empty, SendDebug, out result);
 
         }
 
@@ -83,15 +78,10 @@ namespace TradeLink.AppKit
         public static List<AssemblaMilestone> GetMilestones(string space, string user, string password)
         {
             string url = GetMilestonesUrl(space);
-            HttpWebRequest hr = WebRequest.Create(url) as HttpWebRequest;
-            hr.Credentials = new System.Net.NetworkCredential(user, password);
-            hr.PreAuthenticate = true;
-            hr.Method = "GET";
-            hr.ContentType = "application/xml";
-            HttpWebResponse wr = (HttpWebResponse)hr.GetResponse();
-            StreamReader sr = new StreamReader(wr.GetResponseStream());
+            string result = string.Empty;
+            bool ok = qc.goget(url, user, password, string.Empty, SendDebug, out result);
             
-            string result = sr.ReadToEnd();
+            
 
             return getms(space,result);
 
@@ -152,11 +142,7 @@ namespace TradeLink.AppKit
         public static AssemblaMilestone Create(string space, string user, string password, string name, string description, TradeLink.API.DebugDelegate deb)
         {
             string url = GetMilestonesUrl(space);
-            HttpWebRequest hr = WebRequest.Create(url) as HttpWebRequest;
-            hr.Credentials = new System.Net.NetworkCredential(user, password);
-            hr.PreAuthenticate = true;
-            hr.Method = "POST";
-            hr.ContentType = "application/xml";
+
             StringBuilder data = new StringBuilder();
             data.AppendLine("<milestone>");
             data.AppendLine("<title>" + name + "</title>");
@@ -164,33 +150,12 @@ namespace TradeLink.AppKit
             data.AppendLine(description);
             data.AppendLine("</description>");
             data.AppendLine("</milestone>");
-            // encode
-            byte[] bytes = UTF8Encoding.UTF8.GetBytes(data.ToString());
-            hr.ContentLength = bytes.Length;
-            // prepare id
-            int id = 0;
-            try
+
+            string result = string.Empty;
+            if (qc.gopost(url, user, password, data.ToString(), SendDebug, out result))
             {
-                // write it
-                System.IO.Stream post = hr.GetRequestStream();
-                post.Write(bytes, 0, bytes.Length);
-                // get response
-                System.IO.StreamReader response = new System.IO.StreamReader(hr.GetResponse().GetResponseStream());
-                // get string version
-                string rs = response.ReadToEnd();
-                List<AssemblaMilestone> ms = getms(space, rs);
-                if (ms.Count == 0)
-                    return new AssemblaMilestone();
+                List<AssemblaMilestone> ms = getms(space, result);
                 return ms[0];
-                
-                
-            }
-            catch (Exception ex)
-            {
-                if (deb != null)
-                {
-                    deb("Error creating milestone: " + ex.Message + ex.StackTrace);
-                }
             }
             return new AssemblaMilestone();
         }
