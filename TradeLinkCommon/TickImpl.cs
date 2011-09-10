@@ -184,7 +184,7 @@ namespace TradeLink.Common
         {
             if (!this.hasTick) return "";
             if (this.isTrade) return symbol+" "+this.size + "@" + this.trade + " " + this.ex;
-            else return symbol+" "+this.bid + "x" + this.ask + " (" + this.bs + "x" + this.os + ") " + this.be + "," + this.oe;
+            else return symbol+" "+this.bid + "x" + this.ask + " (" + this.bs + "x" + this.os + ") " + this.be + "x" + this.oe;
         }
 
         public static string Serialize(Tick t)
