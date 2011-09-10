@@ -860,32 +860,51 @@ namespace TradeLink.Common
         /// <returns></returns>
         public new static bool rulepasses(int idx, string rulename, bool fastmode, DebugDelegate debug, bool debugfails, params GenericTrackerI[] booltrackers)
         {
+            if (idx < 0)
+            {
+                if (debug != null)
+                    debug("??? failed rule: " + rulename + " reason: invalid index -1");
+                return false;
+            }
+            bool ok = true;
+            
+            string errcode = string.Empty;
             List<GenericTrackerI> passes = new List<GenericTrackerI>(booltrackers.Length);
             List<GenericTrackerI> fails = new List<GenericTrackerI>(booltrackers.Length);
-
-            debugfails &= (debug != null);
-            bool ok = true;
-            for (int i = 0; i < booltrackers.Length; i++)
+            try
             {
-                // get tracker
-                GenericTrackerI gt = booltrackers[i];
-                // skip non bool types
-                if (gt.TrackedType != typeof(bool))
-                    continue;
-                // test for pass
-                bool pass = gt.ValueDecimal(idx) == 1;
-                ok &= pass;
-                if (pass)
-                    passes.Add(gt);
-                else if (debugfails)
+
+
+                debugfails &= (debug != null);
+                
+                for (int i = 0; i < booltrackers.Length; i++)
                 {
-                    fails.Add(gt);
-                    if (fastmode)
+                    // get tracker
+                    GenericTrackerI gt = booltrackers[i];
+                    // skip non bool types
+                    if (gt.TrackedType != typeof(bool))
+                        continue;
+                    // test for pass
+                    bool pass = gt.ValueDecimal(idx) == 1;
+                    ok &= pass;
+                    if (pass)
+                        passes.Add(gt);
+                    else if (debugfails)
+                    {
+                        fails.Add(gt);
+                        if (fastmode)
+                            break;
+                    }
+                    else if (fastmode)
                         break;
                 }
-                else if (fastmode)
-                    break;
             }
+            catch (Exception ex)
+            {
+                ok = false;
+                errcode = ex.Message + ex.StackTrace;
+            }
+            
             // display if need be
             if ((debug != null) && (booltrackers.Length > 0))
             {
@@ -893,7 +912,7 @@ namespace TradeLink.Common
                 if (ok)
                     debug(sym + " passed rule: " + rulename + " reason: " + GenericTracker.GetIndicatorPairs(idx, passes.ToArray()));
                 else if (debugfails)
-                    debug(sym + " failed rule: " + rulename + " reason: " + GenericTracker.GetIndicatorPairs(idx, fails.ToArray()));
+                    debug(sym + " failed rule: " + rulename + " reason: " + errcode+ " "+GenericTracker.GetIndicatorPairs(idx, fails.ToArray()));
             }
             return ok;
         }
