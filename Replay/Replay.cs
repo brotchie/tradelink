@@ -5,7 +5,6 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using TradeLink.Common;
 using System.IO;
 using TradeLink.API;
 using TradeLink.AppKit;
