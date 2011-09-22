@@ -212,7 +212,8 @@ namespace TimeSales
         {
             
             line++;
-            string time = t.time.ToString();
+            DateTime d = Util.FT2DT(t.time);
+            string time = d.ToString("HH:mm:ss");
             string trade = "";
             string bid = "";
             string ask = "";
