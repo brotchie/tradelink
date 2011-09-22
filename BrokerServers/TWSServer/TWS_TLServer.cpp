@@ -658,6 +658,22 @@ namespace TradeLibFast
 			o.security = contract.secType;
 			o.currency = contract.currency;
 			o.localsymbol = contract.localSymbol;
+			if (fillnotifyfullsymbol)
+			{
+				int idx = getsymbolindex(contract.localSymbol);
+				if (idx<0)
+				{
+					o.localsymbol = contract.localSymbol;
+					o.symbol = contract.localSymbol;
+				}
+				else
+				{
+					o.symbol = stockticks[idx].sym;
+					o.localsymbol = stockticks[idx].sym;
+				}
+
+			}
+
 			o.TIF = order.tif;
 			std::vector<int> nowtime;
 			CString no;
@@ -666,7 +682,8 @@ namespace TradeLibFast
 			TLTimeNow(nowtime);
 			o.date = nowtime[TLdate];
 			o.time = nowtime[TLtime];
-			if (contract.secType!="BAG")	this->SrvGotOrder(o);
+			if (contract.secType!="BAG")	
+				this->SrvGotOrder(o);
 
 	}
 
@@ -791,7 +808,8 @@ namespace TradeLibFast
 		int sec = atoi(r2[2]);
 		trade.xdate = atoi(r[0]);
 		trade.xtime = (atoi(r2[0])*10000)+(atoi(r2[1])*100)+sec;
-		if (contract.secType!="BAG") this->SrvGotFill(trade);
+		if (contract.secType!="BAG") 
+			this->SrvGotFill(trade);
 
 	}
 
@@ -1104,6 +1122,19 @@ namespace TradeLibFast
 		}
 		else
 			pos.Symbol = contract.localSymbol;
+		if (fillnotifyfullsymbol)
+		{
+			int idx = getsymbolindex(contract.localSymbol);
+			if (idx<0)
+			{
+				pos.Symbol = contract.localSymbol;
+			}
+			else
+			{
+				pos.Symbol = stockticks[idx].sym;
+			}
+
+		}
 	
 		
 		
