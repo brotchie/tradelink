@@ -75,7 +75,7 @@ namespace TradeLink.AppKit
 
         void changecomm(object s, EventArgs e)
         {
-            string input = Microsoft.VisualBasic.Interaction.InputBox("Per Contract Comission: ", "Update Comission", _comm.ToString("F3"), 0, 0);
+            string input = Microsoft.VisualBasic.Interaction.InputBox("Per Contract Comission: ", "Update Comission", _comm.ToString("F6"), 0, 0);
             decimal c = 0;
             if (decimal.TryParse(input, out c))
             {
@@ -325,14 +325,14 @@ namespace TradeLink.AppKit
             foreach (FieldInfo fi in fis)
             {
                 string format = null;
-                if (fi.GetType() == typeof(Decimal)) format = "N2";
+                if (fi.FieldType == typeof(Decimal)) format = "{0:N2}";
                 dt.Rows.Add(fi.Name, (format != null) ? string.Format(format, fi.GetValue(r)) : fi.GetValue(r).ToString());
             }
             PropertyInfo[] pis = t.GetProperties();
             foreach (PropertyInfo pi in pis)
             {
                 string format = null;
-                if (pi.GetType() == typeof(Decimal)) format = "N2";
+                if (pi.PropertyType == typeof(Decimal)) format = "{0:N2}";
                 dt.Rows.Add(pi.Name, (format != null) ? string.Format(format, pi.GetValue(r, null)) : pi.GetValue(r, null).ToString());
             }
             foreach (string ps in r.PerSymbolStats)

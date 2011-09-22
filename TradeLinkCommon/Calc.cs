@@ -1608,7 +1608,6 @@ namespace TradeLink.Common
             return aret;
         }
 
-
         /// <summary>
         /// calculate maximum drawdown from a PL stream for a given security/portfolio as a dollar value
         /// </summary>
@@ -1616,19 +1615,25 @@ namespace TradeLink.Common
         /// <returns></returns>
         public static decimal MaxDDVal(decimal[] ret)
         {
-            decimal peak = decimal.MinValue;
-            decimal low = 0;
-            foreach (decimal pl in ret)
+            int maxi = 0;
+            int prevmaxi = 0;
+            int prevmini = 0;
+            for (int i = 0; i < ret.Length; i++)
             {
-                if (pl > peak)
-                    peak = pl;
-                if (pl < low)
-                    low = pl;
+                if (ret[i] >= ret[maxi])
+                    maxi = i;
+                else
+                {
+                    if ((ret[maxi] - ret[i]) > (ret[prevmaxi] - ret[prevmini]))
+                    {
+                        prevmaxi = maxi;
+                        prevmini = i;
+                    }
+                }
             }
-            decimal maxddv = low == 0 ? 0 : -1 * (peak - low);
-            return maxddv;
-
+            return (ret[prevmini] - ret[prevmaxi]);
         }
+
         /// <summary>
         /// maximum drawdown as a percentage
         /// </summary>

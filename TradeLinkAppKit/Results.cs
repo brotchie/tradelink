@@ -277,7 +277,7 @@ namespace TradeLink.AppKit
                     r.MoneyInUse = Math.Round(Calc.Max(_MIU.ToArray()), 2);
                     r.MaxPL = Math.Round(Calc.Max(_return.ToArray()), 2);
                     r.MinPL = Math.Round(Calc.Min(_return.ToArray()), 2);
-                    r.MaxDD = string.Format("{0:P1}", Calc.MaxDDPct(fills));
+                    r.MaxDD = string.Format("{0:P2}", Calc.MaxDDPct(fills));
                     r.SymbolCount = pt.Count;
                     r.DaysTraded = days.Count;
                     r.GrossPerDay = Math.Round(r.GrossPL / days.Count, 2);
@@ -308,7 +308,7 @@ namespace TradeLink.AppKit
                 catch (Exception ex)
                 {
                     if (d != null)
-                        d("sharp error: " + ex.Message);
+                        d("sharpe error: " + ex.Message);
                 }
 
                 try
@@ -438,14 +438,14 @@ namespace TradeLink.AppKit
             foreach (FieldInfo fi in fis)
             {
                 string format = null;
-                if (fi.GetType() == typeof(Decimal)) format = "N2";
+                if (fi.FieldType == typeof(Decimal)) format = "{0:N2}";
                 sb.AppendLine(fi.Name + delim + (format != null ? string.Format(format, fi.GetValue(this)) : fi.GetValue(this).ToString()));
             }
             PropertyInfo[] pis = t.GetProperties();
             foreach (PropertyInfo pi in pis)
             {
                 string format = null;
-                if (pi.GetType() == typeof(Decimal)) format = "N2";
+                if (pi.PropertyType == typeof(Decimal)) format = "{0:N2}";
                 sb.AppendLine(pi.Name + delim + (format != null ? string.Format(format, pi.GetValue(this, null)) : pi.GetValue(this, null).ToString()));
             }
             foreach (string ps in PerSymbolStats)
