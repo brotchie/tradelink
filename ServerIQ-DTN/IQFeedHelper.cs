@@ -719,6 +719,10 @@ namespace IQFeedBroker
         double peaklatency = 0;
         int tickssincelastlatencyreport = 0;
 
+        int lasttickordertime = 0;
+        bool ignoreoutoforder = false;
+        public bool IgnoreOutOfOrderTick { get { return ignoreoutoforder; } set { ignoreoutoforder = value; } }
+
         GenericTracker<decimal> _highs = new GenericTracker<decimal>();
         GenericTracker<decimal> _lows = new GenericTracker<decimal>();
         public void FireTick(string[] actualData)
@@ -737,6 +741,7 @@ namespace IQFeedBroker
                     if (DateTime.TryParse(actualData[65], out now))
                     {
                         tick.time = Util.DT2FT(now);
+                        
                         if (ReportLatency)
                         {
                             Int64 latency = 0;
@@ -763,13 +768,18 @@ namespace IQFeedBroker
                     }
                     else
                         tick.time = local;
-                    // see if user has tick ignoring enabled
+                    // see if user has tick ignoring enabled 
+                    //(this is because in early AM iqfeed will frequently send ticks with yesterday time stamps
                     if (usebeforeafterignoretime)
                     {
                         // see if tick should be ignored
                         if ((local < IfBeforeTimeUseIgnoreAfter)
                             && (tick.time > IgnoreAfterTimeWithBefore))
                             return;
+                            // allow ignoring for ignoring other ticks that are out of order
+                        else if (ignoreoutoforder && (tick.time < lasttickordertime))
+                            return;
+                        lasttickordertime = tick.time;
                     }
 
                         int v = 0;

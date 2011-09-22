@@ -226,5 +226,17 @@ namespace IQFeedBroker.Properties {
                 this["SaveRawFeed"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool IgnoreOutofOrderTicks {
+            get {
+                return ((bool)(this["IgnoreOutofOrderTicks"]));
+            }
+            set {
+                this["IgnoreOutofOrderTicks"] = value;
+            }
+        }
     }
 }
