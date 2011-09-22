@@ -663,6 +663,9 @@ namespace TradeLibFast
 			o.localsymbol = contract.localSymbol;
 			o.TIF = order.tif;
 			std::vector<int> nowtime;
+			CString no;
+			no.Format("%s received order ack: %s",o.symbol,o.Serialize());
+			D(no);
 			TLTimeNow(nowtime);
 			o.date = nowtime[TLdate];
 			o.time = nowtime[TLtime];
@@ -831,6 +834,69 @@ namespace TradeLibFast
 		return false;
 	}
 
+	CString TWS_TLServer::getmultiplier(TLSecurity sec)
+	{
+		CString multiplier = CString("1");
+		if (sec.sym=="CC") multiplier= "10";
+		else if (sec.sym=="DJ") multiplier= "10";
+		else if (sec.sym=="ES") multiplier= "25";
+		else if (sec.sym=="C") multiplier= "50";
+		else if (sec.sym=="KW") multiplier= "50";
+		else if (sec.sym=="MW") multiplier= "50";
+		else if (sec.sym=="O") multiplier= "50";
+		else if (sec.sym=="PL") multiplier= "50";
+		else if (sec.sym=="S") multiplier= "50";
+		else if (sec.sym=="SI") multiplier= "50";
+		else if (sec.sym=="W") multiplier= "50";
+		else if (sec.sym=="GC") multiplier= "100";
+		else if (sec.sym=="MV") multiplier= "100";
+		else if (sec.sym=="ND") multiplier= "100";
+		else if (sec.sym=="RR") multiplier= "100";
+		else if (sec.sym=="SM") multiplier= "100";
+		else if (sec.sym=="LB") multiplier= "110";
+		else if (sec.sym=="JO") multiplier= "150";
+		else if (sec.sym=="HG") multiplier= "250";
+		else if (sec.sym=="KV") multiplier= "250";
+		else if (sec.sym=="SP") multiplier= "250";
+		else if (sec.sym=="KC") multiplier= "375";
+		else if (sec.sym=="LC") multiplier= "400";
+		else if (sec.sym=="LH/LE") multiplier= "400";
+		else if (sec.sym=="PB") multiplier= "400";
+		else if (sec.sym=="HO") multiplier= "420";
+		else if (sec.sym=="HU") multiplier= "420";
+		else if (sec.sym=="RB") multiplier= "420";
+		else if (sec.sym=="CT") multiplier= "500";
+		else if (sec.sym=="FC") multiplier= "500";
+		else if (sec.sym=="RL") multiplier= "500";
+		else if (sec.sym=="YU") multiplier= "500";
+		else if (sec.sym=="BO") multiplier= "600";
+		else if (sec.sym=="BP") multiplier= "625";
+		else if (sec.sym=="AD") multiplier= "1000";
+		else if (sec.sym=="CD") multiplier= "1000";
+		else if (sec.sym=="CL") multiplier= "1000";
+		else if (sec.sym=="DX") multiplier= "1000";
+		else if (sec.sym=="FV") multiplier= "1000";
+		else if (sec.sym=="MB") multiplier= "1000";
+		else if (sec.sym=="TY") multiplier= "1000";
+		else if (sec.sym=="US") multiplier= "1000";
+		else if (sec.sym=="SB") multiplier= "1120";
+		else if (sec.sym=="EU") multiplier= "1250";
+		else if (sec.sym=="JY") multiplier= "1250";
+		else if (sec.sym=="SF") multiplier= "1250";
+		else if (sec.sym=="DA") multiplier= "2000";
+		else if (sec.sym=="TU") multiplier= "2000";
+		else if (sec.sym=="ED") multiplier= "2500";
+		else if (sec.sym=="NG") multiplier= "10000";
+
+
+			else
+		multiplier= "1";
+			
+		if (sec.type==1 )   //stock options
+				multiplier= "100";
+		return multiplier;
+	}
+
 	int TWS_TLServer::RegisterStocks(CString clientname)
 	{
 		//BEGINILDE
@@ -854,83 +920,24 @@ namespace TradeLibFast
 			TLSecurity sec = TLSecurity::Deserialize(stocks[cid][i]);
 			// keep copy of original symbol
 			CString lsym = CString(sec.sym);
-D(lsym);
+			// accomodate that ib allows spaces in symbols (tl:_ -> ib: )
 			sec.sym = tl2ibspace(sec.sym);
 
 			// otherwise, subscribe to this stock and save it to subscribed list of tickers
 			Contract contract;
 			
-			// if option, pass options parameters
-			//if (sec.type!=0)
-			//{
+			contract.multiplier = getmultiplier(sec);	
+	
 				
-	if (sec.sym=="CC") contract.multiplier= "10";
-else if (sec.sym=="DJ") contract.multiplier= "10";
-else if (sec.sym=="ES") contract.multiplier= "25";
-else if (sec.sym=="C") contract.multiplier= "50";
-else if (sec.sym=="KW") contract.multiplier= "50";
-else if (sec.sym=="MW") contract.multiplier= "50";
-else if (sec.sym=="O") contract.multiplier= "50";
-else if (sec.sym=="PL") contract.multiplier= "50";
-else if (sec.sym=="S") contract.multiplier= "50";
-else if (sec.sym=="SI") contract.multiplier= "50";
-else if (sec.sym=="W") contract.multiplier= "50";
-else if (sec.sym=="GC") contract.multiplier= "100";
-else if (sec.sym=="MV") contract.multiplier= "100";
-else if (sec.sym=="ND") contract.multiplier= "100";
-else if (sec.sym=="RR") contract.multiplier= "100";
-else if (sec.sym=="SM") contract.multiplier= "100";
-else if (sec.sym=="LB") contract.multiplier= "110";
-else if (sec.sym=="JO") contract.multiplier= "150";
-else if (sec.sym=="HG") contract.multiplier= "250";
-else if (sec.sym=="KV") contract.multiplier= "250";
-else if (sec.sym=="SP") contract.multiplier= "250";
-else if (sec.sym=="KC") contract.multiplier= "375";
-else if (sec.sym=="LC") contract.multiplier= "400";
-else if (sec.sym=="LH/LE") contract.multiplier= "400";
-else if (sec.sym=="PB") contract.multiplier= "400";
-else if (sec.sym=="HO") contract.multiplier= "420";
-else if (sec.sym=="HU") contract.multiplier= "420";
-else if (sec.sym=="RB") contract.multiplier= "420";
-else if (sec.sym=="CT") contract.multiplier= "500";
-else if (sec.sym=="FC") contract.multiplier= "500";
-else if (sec.sym=="RL") contract.multiplier= "500";
-else if (sec.sym=="YU") contract.multiplier= "500";
-else if (sec.sym=="BO") contract.multiplier= "600";
-else if (sec.sym=="BP") contract.multiplier= "625";
-else if (sec.sym=="AD") contract.multiplier= "1000";
-else if (sec.sym=="CD") contract.multiplier= "1000";
-else if (sec.sym=="CL") contract.multiplier= "1000";
-else if (sec.sym=="DX") contract.multiplier= "1000";
-else if (sec.sym=="FV") contract.multiplier= "1000";
-else if (sec.sym=="MB") contract.multiplier= "1000";
-else if (sec.sym=="TY") contract.multiplier= "1000";
-else if (sec.sym=="US") contract.multiplier= "1000";
-else if (sec.sym=="SB") contract.multiplier= "1120";
-else if (sec.sym=="EU") contract.multiplier= "1250";
-else if (sec.sym=="JY") contract.multiplier= "1250";
-else if (sec.sym=="SF") contract.multiplier= "1250";
-else if (sec.sym=="DA") contract.multiplier= "2000";
-else if (sec.sym=="TU") contract.multiplier= "2000";
-else if (sec.sym=="ED") contract.multiplier= "2500";
-else if (sec.sym=="NG") contract.multiplier= "10000";
-
-
-			else
-		contract.multiplier= "1";
-			
-		if (sec.type==1 )   //stock options
-				contract.multiplier= "100";
+			contract.localSymbol = sec.sym;
+			contract.right = sec.details;
+			CString expire;
+			expire.Format("%i",sec.date);
+			contract.expiry = expire;
+			contract.strike = sec.strike;
 				
-		contract.localSymbol = sec.sym;
-				contract.right = sec.details;
-				CString expire;
-				expire.Format("%i",sec.date);
-				contract.expiry = expire;
-				contract.strike = sec.strike;
-				
-				if (!sec.hasDest())
-					contract.exchange = "SMART";
+			if (!sec.hasDest())
+				contract.exchange = "SMART";
 		
 			// if destination specified use it
 			if (sec.hasDest())

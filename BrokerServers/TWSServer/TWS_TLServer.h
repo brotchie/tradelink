@@ -36,6 +36,8 @@ namespace TradeLibFast
 		//ILDEEND
 
 	private:
+
+		CString getmultiplier(TLSecurity sec);
 		void getcontract(CString symbol, CString currency, CString localsymbol,CString exchange,Contract* contract);
 		CString truncateat(CString original,CString after);
 		CString truncatebefore(CString original,CString before);
