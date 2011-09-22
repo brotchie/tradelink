@@ -108,7 +108,7 @@ namespace Quotopia
             }
             Basket nb = BasketImpl.FromFile(f);
             addbasket(nb);
-            updatebasket();
+            
             Refresh();
         }
 
@@ -142,7 +142,7 @@ namespace Quotopia
 
                     // if we have a quote provid
                     if (mb.Count > 0)
-                        updatebasket();
+                        subscribe();
                 }
             }
             catch { }
@@ -465,6 +465,17 @@ namespace Quotopia
         
         }
 
+        bool subscribe()
+        {
+            try
+            {
+                _bf.Subscribe(mb);
+                return true;
+            }
+            catch (TLServerNotFound) { debug("no broker or feed server running."); }
+            return false;
+        }
+
         string newsymbol = "";
         void qg_KeyUp(object sender, KeyEventArgs e)
         {
@@ -479,11 +490,7 @@ namespace Quotopia
                     if (addsymbol(newsymbol))
                     {
                         newsymbol = "";
-                        try
-                        {
-                            _bf.Subscribe(mb);
-                        }
-                        catch (TLServerNotFound) { debug("no broker or feed server running."); }
+                        subscribe();
                     }
                 }
                 else
@@ -576,7 +583,8 @@ namespace Quotopia
 
         Dictionary<string, BarList> bardict = new Dictionary<string, BarList>();
 
-        bool addsymbol(string sym)
+        bool addsymbol(string sym) { return addsymbol(sym, true); }
+        bool addsymbol(string sym, bool dosubscribe)
         {
             Security sec = SecurityImpl.Parse(sym);
             try
@@ -595,6 +603,8 @@ namespace Quotopia
             if (!hassym(sym))
                 mb.Add(sym);
             symindex();
+            if (dosubscribe)
+                return subscribe();
             return true;
         }
 
@@ -891,22 +901,17 @@ namespace Quotopia
                 status("Imported " + count + " instruments.");
             }
             else return;
-            updatebasket();
+            
             Invalidate(true);
         }
 
-        void updatebasket()
-        {
-            if (_bf.ProvidersAvailable.Length > 0)
-                _bf.Subscribe(mb);
-            else
-                status("no server running to obtain quotes from.");
-        }
+
 
         void addbasket(Basket b)
         {
             foreach (Security s in b)
-                addsymbol(s.FullName);
+                addsymbol(s.FullName,false);
+            subscribe();
         }
 
         private void saveSettingsbut_Click(object sender, EventArgs e)

@@ -227,7 +227,7 @@ namespace TradeLibFast
 				// get contract
 				Contract contract;
 				TLSecurity sec = TLSecurity::Deserialize(br.Symbol);
-				getcontract(br.Symbol,_currency,sec.sym,sec.dest,&contract);
+				getcontract(br.Symbol,_currency,sec.dest,&contract);
 				// get request duration
 				std::vector<int> st;
 				std::vector<int> et;
@@ -398,13 +398,12 @@ namespace TradeLibFast
 		v(m);
 	}
 
-	void TWS_TLServer::getcontract(CString symbol, CString currency, CString localsymbol,CString exchange,Contract* contract)
+	void TWS_TLServer::getcontract(CString symbol, CString currency, CString exchange,Contract* contract)
 	{
 		TLSecurity tmpsec = TLSecurity::Deserialize(symbol);
-		contract->symbol = symbol;
 		if (symbol.FindOneOf(" ")!=-1)
 		{
-			contract->symbol = tmpsec.sym;
+			contract->localSymbol = tmpsec.sym;
 			// options stuff
 			if (tmpsec.isCall()|| tmpsec.isPut())
 			{
@@ -415,8 +414,6 @@ namespace TradeLibFast
 				contract->right = tmpsec.details;
 				//contract->currency = _currency;			
 			}
-			else 
-				contract->localSymbol = localsymbol!="" ? localsymbol : tmpsec.sym;
 			if (tmpsec.hasDest())
 				contract->exchange = tmpsec.dest;
 			if (tmpsec.hasType())
@@ -426,7 +423,7 @@ namespace TradeLibFast
 		}
 		else 
 		{
-			contract->localSymbol = localsymbol!="" ? localsymbol : symbol;
+			contract->localSymbol = tmpsec.sym;
 			contract->exchange = exchange;
 			contract->secType = tmpsec.SecurityTypeName(tmpsec.type);
 
@@ -434,7 +431,7 @@ namespace TradeLibFast
 		if (tmpsec.type==CASH)
 		{
 			// remove base currency from symbol
-			CString cpy = CString(localsymbol);
+			CString cpy = CString(tmpsec.sym);
 			int pidx = cpy.Find(CString("."));
 			if (pidx!=-1)
 			{
@@ -442,7 +439,7 @@ namespace TradeLibFast
 				cpy.Delete(pidx,cpy.GetLength()-pidx);
 			}
 			contract->symbol = cpy;
-			contract->currency = truncateat(localsymbol,CString("."));
+			contract->currency = truncateat(tmpsec.sym,CString("."));
 		}
 		else
 			contract->currency = currency;
@@ -488,7 +485,7 @@ namespace TradeLibFast
 		
 		
 		Contract* contract(new Contract);
-		getcontract(o.symbol,o.currency,o.localsymbol,o.exchange,contract);
+		getcontract(o.symbol,o.currency,o.exchange,contract);
 		pcont(contract);
 		pord(order);		
 
@@ -915,7 +912,8 @@ namespace TradeLibFast
 		for (unsigned int i = 0; i<stocks[cid].size(); i++)
 		{
 			// if we already have a subscription to this stock, proceed to next one
-			if (hasTicker(stocks[cid][i])) continue;
+			if (hasTicker(stocks[cid][i])) 
+				continue;
 			// get symbol
 			TLSecurity sec = TLSecurity::Deserialize(stocks[cid][i]);
 			// keep copy of original symbol

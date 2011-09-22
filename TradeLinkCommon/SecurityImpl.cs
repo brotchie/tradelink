@@ -115,13 +115,14 @@ namespace TradeLink.Common
         {
             List<string> p = new List<string>();
             p.Add(sec.Symbol);
-            if (sec.Type == SecurityType.OPT || sec.Type==SecurityType.FUT || sec.Type==SecurityType.FOP || sec.Type==SecurityType.FUT)
+            if (sec.Type == SecurityType.OPT ||sec.Type==SecurityType.FOP )
             {
                 p.Add(sec.Date.ToString());
                 p.Add(sec.Details);
                 p.Add(sec.Strike.ToString("F4"));
             }
-            if (sec.hasDest) p.Add(sec.DestEx);
+            if (sec.hasDest) 
+                p.Add(sec.DestEx);
             if ((sec.Type!= SecurityType.NIL) && (sec.Type!= SecurityType.STK))
                 p.Add(sec.Type.ToString());
             return string.Join(" ", p.ToArray());
