@@ -16,6 +16,61 @@ namespace TestTradeLink
         const string sym = "TST";
 
         [Test]
+        public void DoubleBasicWithFlat()
+        {
+            long id = 1;
+            sho = new REGSHO_ShortTracker();
+            sho.SendDebugEvent += new DebugDelegate(sho_SendDebugEvent);
+            sho.VerboseDebugging = true;
+            Order o = new OrderImpl();
+
+            // take a position
+            sho.GotPosition(new PositionImpl(sym, 89.7m, 100));
+
+            // accept two exits
+            o = new SellStop(sym, 100, 89.65m, id++);
+            long stop1 = o.id;
+            Assert.IsFalse(sho.isOrderShort(o), "entry1: first sell was incorrectly short");
+            sho.GotOrder(o);
+            o = new SellLimit(sym, 100, 89.75m, id++);
+            long profit1 = o.id;
+            Assert.IsTrue(sho.isOrderShort(o), "entry1: second sell was incorrectly sell");
+            sho.GotOrder(o);
+
+
+            // flat
+            o = new SellStop(sym, 100, 89.65m, stop1);
+            o.Fill(TickImpl.NewTrade(sym,89.62m,100));
+            sho.GotFill((Trade)o);
+            sho.GotCancel(profit1);
+
+            // do again
+            // take a position
+            o = new BuyMarket(sym,100);
+            o.id = id++;
+            o.Fill(TickImpl.NewTrade(sym, 89.64m, 100));
+            sho.GotFill((Trade)o);
+
+            // accept two exits
+            o = new SellStop(sym, 100, 89.65m, id++);
+            Assert.IsFalse(sho.isOrderShort(o), "entry2: first sell was incorrectly short");
+            sho.GotOrder(o);
+            o = new SellLimit(sym, 100, 89.75m, id++);
+            Assert.IsTrue(sho.isOrderShort(o), "entry2: second sell was incorrectly NOT short");
+            sho.GotOrder(o);
+
+
+
+        }
+
+        int shodebug = 0;
+        void sho_SendDebugEvent(string msg)
+        {
+            shodebug++ ;
+            rt.d(shodebug + " " + msg);
+        }
+
+        [Test]
         public void Basic()
         {
             long id = 1;
@@ -40,6 +95,7 @@ namespace TestTradeLink
 
 
         }
+
 
         const string ACCT = "ACCT";
 

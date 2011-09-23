@@ -202,11 +202,12 @@ namespace TradeLink.Common
                 debug(o.symbol + " can't track order with blank id!: " + o.ToString());
                 return;
             }
-            int idx = sent.getindex(o.symbol);
+            int idx = sent.getindex(o.id.ToString());
             if (idx < 0)
             {
-                orders.addindex(o.id.ToString(), o);
+                idx = orders.addindex(o.id.ToString(), o);
             }
+            v(o.symbol + " order ack: " + o);
         }
 
         public virtual void GotCancel(long id)
@@ -219,6 +220,15 @@ namespace TradeLink.Common
                 return;
             }
             canceled[idx] = true;
+            if (_noverb) ;
+            else
+            {
+                string symbol = "?";
+                foreach (Order o in this)
+                    if (o.id == id)
+                        symbol = o.symbol;
+                v(symbol + " canceled id: " + id);
+            }
         }
 
         public virtual void GotFill(Trade f)
@@ -235,6 +245,24 @@ namespace TradeLink.Common
                 return;
             }
             filled[idx] += f.xsize;
+            v(f.symbol + " filled size: " + filled[idx] + " after: " + f.ToString());
+        }
+
+        bool _noverb = true;
+        public bool VerboseDebugging
+        {
+            get { return !_noverb; }
+            set
+            {
+                _noverb = !value;
+            }
+        }
+
+        void v(string msg)
+        {
+            if (_noverb)
+                return;
+            debug(msg);
         }
     }
 }

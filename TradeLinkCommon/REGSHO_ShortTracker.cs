@@ -8,19 +8,33 @@ namespace TradeLink.Common
     {
         string _acct = string.Empty;
 
-        public REGSHO_ShortTracker() : base()
+        public REGSHO_ShortTracker() : this(new PositionTracker()) { }
+        public REGSHO_ShortTracker(PositionTracker PT) : base()
         {
+            pt = PT;
             pt.DefaultAccount = DefaultAccount;
+
+        }
+
+        void REGSHO_ShortTracker_SendDebugEvent(string msg)
+        {
+            if (_noverb)
+                return;
+            debug(msg);
         }
 
         public string DefaultAccount { get { return _acct; } set { _acct = value; pt.DefaultAccount = _acct; debug("REGSHO Short, default account: " + _acct); } }
 
         PositionTracker pt = new PositionTracker();
 
+        public PositionTracker Positions { get { return pt; } set { pt = value; } }
+
         public virtual void GotPosition(Position p)
         {
             pt.Adjust(p);
         }
+
+
 
         public override void GotFill(Trade f)
         {
@@ -67,7 +81,7 @@ namespace TradeLink.Common
                 return false;
             }
             // get all pending orders for symbol
-            int exitsize = 0;
+            int exitsize = ord.UnsignedSize;
             List<string> ids = new List<string>();
             foreach (Order o in this)
                 if (!isPending(o.id))
@@ -76,15 +90,36 @@ namespace TradeLink.Common
                 {
                     ids.Add(o.id.ToString());
                     exitsize += o.UnsignedSize;
+                    debug("pend: " + o);
                 }
-            // see if size will completely exit position
-            if (exitsize >= p.UnsignedSize)
+            // see if size will more than exit position
+            if (exitsize > p.UnsignedSize)
             {
-                debug(ord.symbol + " marking short as pending sell size: " + exitsize + " for long: " + p + " > pos: "+p +" from orders: " + string.Join(",", ids.ToArray()));
+                debug(ord.symbol + " marking short. reason: pending sell size: " + exitsize + " > position: " + p + " from orders: " + string.Join(",", ids.ToArray()));
                 return true;
             }
 
+            debug(ord.symbol + " exit size: " + exitsize + " marked sell. reason: not reversing position: " + p + " from orders: " + string.Join(",", ids.ToArray()));
+
             return false;
+        }
+
+        bool _noverb = true;
+        public bool VerboseDebugging
+        {
+            get { return !_noverb; }
+            set
+            {
+                _noverb = !value;
+                base.VerboseDebugging = value;
+            }
+        }
+
+        void v(string msg)
+        {
+            if (_noverb)
+                return;
+            debug(msg);
         }
     }
 }
