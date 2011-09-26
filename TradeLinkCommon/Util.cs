@@ -1279,6 +1279,12 @@ namespace TradeLink.Common
         For_Internal_Use_Only2 = -30,
         Sell_to_Open_Position_Not_Enabled_for_Options = -31,
         Allow_Close_and_Cancel_Only = -32,
+        Trader_not_enabled_for_security_locating = -33,
+        Order_not_able_to_be_replaced_ReplaceOrder_only = -34,
+        Trader_not_enabled_for_Buy_to_Cover = -35,
+        Invalid_maturity_date = -36,
+        Only_one_cancel_or_replace_allowed_per_order_per_second = -37,
+        Account_maximum_position_value_for_this_symbol_exceeded = -38,
         Symbol_Violates_Account_MinMax_PriceSettings = -39,
         Quote_Unavailable_Order_dollar_limit = -40,
         Quote_Unavailable_Maximum_Position_Cost = -41,
@@ -1288,6 +1294,7 @@ namespace TradeLink.Common
         Market_order_would_remove_liquidity_frontend_setting = -45,
         Not_enabled_for_server_stop_orders = -46,
         Not_enabled_for_trail_stop_orders = -47,
+        Order_would_exceed_the_Max_Open_orders_per_side_on_this_symbol_= -48
     }
 
 
