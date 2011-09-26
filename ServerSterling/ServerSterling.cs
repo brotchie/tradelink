@@ -677,7 +677,7 @@ namespace SterServer
                                     order.PriceType = STIPriceTypes.ptSTISvrStp;
                                 else
                                 {
-                                    order.PriceType = STIPriceTypes.ptSTISvrStp;
+                                    order.PriceType = STIPriceTypes.ptSTILmtStp;
                                 }
                             }
                             else if (o.isTrail)
