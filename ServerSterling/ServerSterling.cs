@@ -944,6 +944,7 @@ namespace SterServer
 
         void doorderupdate(ref structSTIOrderUpdate structOrderUpdate)
         {
+            STIOrderStatus stat = (STIOrderStatus)structOrderUpdate.nOrderStatus;
             Order o = new OrderImpl();
             o.symbol = structOrderUpdate.bstrSymbol;
             long id = 0;
@@ -965,7 +966,7 @@ namespace SterServer
                 }
             }
             // if this is a cancel notification, pass along
-            if (structOrderUpdate.nOrderStatus == (int)STIOrderStatus.osSTICanceled)
+            if (stat == STIOrderStatus.osSTICanceled)
             {
                 // if it's a cancel, we'll have cancel id rather than order id
                 // get new id
@@ -977,11 +978,23 @@ namespace SterServer
                         debug("cancel received for: " + orderid);
                 }
                 else
+                {
                     debug("manual cancel sent with id: " + id);
+                }
+                return;
+            }
+            else if (stat == STIOrderStatus.osSTIPendingCancel)
+            {
+                v("pending cancel received from server for: " + id);
                 return;
             }
             // don't notify for same order more than once
-            if (_onotified.Contains(id)) return;
+            if (_onotified.Contains(id))
+            {
+                string clid = structOrderUpdate.bstrClOrderId == null ? string.Empty : structOrderUpdate.bstrClOrderId;
+                v("order information.  clid:" + clid + " status: " + stat.ToString() + " nrecid: " + structOrderUpdate.nOrderRecordId+" other: "+Util.DumpObjectProperties(structOrderUpdate));
+                return;
+            }
             if (structOrderUpdate.bstrLogMessage.Contains("REJ"))
                 debug(id+" "+structOrderUpdate.bstrLogMessage);
             o.id = id;
@@ -998,11 +1011,7 @@ namespace SterServer
             o.time = ((int)(rem % 10000)) * 100 + xsec;
             o.date = (int)((rem - o.time) / 10000);
             _onotified.Add(o.id);
-            if (VerboseDebugging)
-            {
-                STIOrderStatus stat = (STIOrderStatus)structOrderUpdate.nOrderStatus;
-                debug("order acknowledgement: " + o.ToString()+" status: "+stat.ToString());
-            }
+            v("order acknowledgement: " + o.ToString()+" status: "+stat.ToString()+" id: "+id+" nrecid: "+structOrderUpdate.nOrderRecordId);
             if (RegSHOShorts)
                 sho.GotOrder(o);
             tl.newOrder(o);
