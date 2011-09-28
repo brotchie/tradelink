@@ -39,6 +39,37 @@ namespace TradeLink.Common
                 SendDebugEvent(msg);
         }
 
+        Dictionary<long, long> _orgid2splitid = new Dictionary<long, long>();
+
+        public event LongDelegate SendCancelEvent;
+
+        void cancel(long id)
+        {
+            if (SendCancelEvent != null)
+                SendCancelEvent(id);
+            else
+                debug("Can't cancel: " + id + " as no SendCancelEvent handler is defined!");
+        }
+
+        /// <summary>
+        /// ensure that if splits are enabled, cancels for the original order also are copied to the split
+        /// </summary>
+        /// <param name="id"></param>
+        public void sendcancel(long id)
+        {
+            long cancelsplit = 0;
+            cancel(id);
+            if (_orgid2splitid.TryGetValue(id, out cancelsplit))
+            {
+                debug("cancel received on original order: " + id + ", copying cancel to split: " + cancelsplit);
+                cancel(cancelsplit);
+            }
+        }
+
+        /// <summary>
+        /// track and correct oversells (either by splitting into two orders, or dropping oversell)
+        /// </summary>
+        /// <param name="o"></param>
         public void sendorder(Order o)
         {
             // get original size
@@ -72,6 +103,10 @@ namespace TradeLink.Common
                     Order newo = new OrderImpl(o);
                     newo.size = nsize;
                     newo.id = _idt.AssignId;
+                    if (_orgid2splitid.ContainsKey(o.id))
+                        _orgid2splitid[o.id] = newo.id;
+                    else
+                        _orgid2splitid.Add(o.id, newo.id);
                     // send
                     if (nsize!=0)
                         sonow(newo);

@@ -52,6 +52,44 @@ namespace TestTradeLink
         }
 
         [Test]
+        public void SplitCancelCopy()
+        {
+            lasto = new OrderImpl();
+            oc = 0;
+            cancels.Clear();
+            ost = new OversellTracker();
+            ost.SendOrderEvent += new OrderDelegate(ost_SendOrderEvent);
+            ost.SendDebugEvent += new DebugDelegate(rt.d);
+            ost.SendCancelEvent += new LongDelegate(ost_SendCancelEvent);
+
+            ost.Split = true;
+            // take a position
+            ost.GotPosition(new PositionImpl("TST", 100, 300));
+            // over sell
+            Order o = new SellMarket("TST", 500);
+            o.id = 5;
+            ost.sendorder(o);
+            // verify that only flat was sent
+            Assert.AreEqual(2, oc);
+            Assert.AreEqual(-200, lasto.size);
+            // make sure we've not canceled
+            Assert.AreEqual(0, cancels.Count);
+            // cancel original order
+            ost.sendcancel(5);
+            // ensure two cancels sent
+            Assert.AreEqual(2, cancels.Count);
+            // ensure different cancels
+            Assert.AreEqual(5, cancels[0]);
+            Assert.AreNotEqual(5, cancels[1]);
+        }
+
+        List<long> cancels = new List<long>();
+        void ost_SendCancelEvent(long val)
+        {
+            cancels.Add(val);
+        }
+
+        [Test]
         public void TestOverSellDrop()
         {
             lasto = new OrderImpl();
@@ -102,7 +140,7 @@ namespace TestTradeLink
             ost.GotPosition(new PositionImpl("TST", 100, 300));
             // over sell
             ost.sendorder(new SellMarket("TST", 500));
-            // verify that only flat was sent
+            // verify that flat and adjustment were sent
             Assert.AreEqual(2, oc);
             Assert.AreEqual(-200, lasto.size);
 
@@ -122,7 +160,7 @@ namespace TestTradeLink
             ost.GotPosition(new PositionImpl("TST", 100, -300));
             // over sell
             ost.sendorder(new BuyMarket("TST", 500));
-            // verify that only flat was sent
+            // verify that flat and adjustment were sent
             Assert.AreEqual(2, oc);
             Assert.AreEqual(200, lasto.size);
 
