@@ -78,6 +78,7 @@ namespace SterServer
                 ost.Split = OversellSplit;
                 ost.SendOrderEvent += new OrderDelegate(ost_SendOrderEvent);
                 ost.SendDebugEvent += new DebugDelegate(ost_SendDebugEvent);
+                ost.SendCancelEvent += new LongDelegate(ost_SendCancelEvent);
                 sho.SendDebugEvent+=new DebugDelegate(v);
                 sho.DefaultAccount = Account;
                 
@@ -168,6 +169,11 @@ namespace SterServer
             debug(PROGRAM + " started.");
             _connected = true;
             return _connected;
+        }
+
+        void ost_SendCancelEvent(long val)
+        {
+            _cancelq.Write(val);
         }
 
 
@@ -901,7 +907,7 @@ namespace SterServer
 
         void tl_OrderCancelRequest(long number)
         {
-            _cancelq.Write(number);
+            ost.sendcancel(number);
         }
 
         void dofillupdate(ref structSTITradeUpdate t)
