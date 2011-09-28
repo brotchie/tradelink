@@ -57,6 +57,7 @@ namespace SterServer
                 tl.FixOrderDecimalPlace = Properties.Settings.Default.FixOrderDecimalPlaces;
                 tl.IgnoreOutOfOrderTicks = Properties.Settings.Default.IgnoreOutOfOrderTicks;
                 tl.AutosetUnsetId = Properties.Settings.Default.AutoSeUnsetId;
+                tl.SendCancelOnReject = Properties.Settings.Default.SendCancelOnRejects;
                 tl.Start();
             }
             catch (Exception ex)

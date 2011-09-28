@@ -286,5 +286,17 @@ namespace SterServer.Properties {
                 this["UseServerStops"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool SendCancelOnRejects {
+            get {
+                return ((bool)(this["SendCancelOnRejects"]));
+            }
+            set {
+                this["SendCancelOnRejects"] = value;
+            }
+        }
     }
 }

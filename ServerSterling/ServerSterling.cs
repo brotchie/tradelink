@@ -155,6 +155,7 @@ namespace SterServer
                 debug("CoverEnabled: " + (CoverEnabled? "ON" : "disabled."));
                 debug("RegSHOShorts: " + (RegSHOShorts ? "ON" : "disabled."));
                 debug("ServerStops: " + (UseServerStops ? "ON" : "disabled."));
+                debug("SendCancelOnRejects: "+(SendCancelOnReject ? "ON" : "disabled."));
                 
                 
             }
@@ -338,9 +339,21 @@ namespace SterServer
             doupdatereject(ref structOrderReject);
         }
 
+        bool _cancelonrej = false;
+        public bool SendCancelOnReject { get { return _cancelonrej; } set { _cancelonrej = value; } }
+
         void doupdatereject(ref structSTIOrderReject structOrderReject)
         {
             debug("reject: " + structOrderReject.bstrClOrderId + " reason: " + structOrderReject.nRejectReason + " " + sterrejectpretty(structOrderReject.nRejectReason) + " additional info: " + structOrderReject.bstrText);
+            if (SendCancelOnReject)
+            {
+                long cancelid = 0;
+                if (long.TryParse(structOrderReject.bstrClOrderId, out cancelid))
+                {
+                    v("sending cancel ack for rejected id: " + cancelid);
+                    tl.newCancel(cancelid);
+                }
+            }
         }
 
         void doupdatereject(STIOrderRejectMsg oSTIOrderRejectMsg)
