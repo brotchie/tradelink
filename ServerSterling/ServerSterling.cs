@@ -998,7 +998,7 @@ namespace SterServer
                 }
                 else
                 {
-                    debug("manual cancel sent with id: " + id);
+                    debug("exchange_or_user cancel sent with id: " + id);
                 }
                 return;
             }
