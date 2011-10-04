@@ -742,7 +742,7 @@ namespace SterServer
                             if (idacct.TryGetValue(number, out acct))
                             {
                                 // get unique cancel id
-                                long cancelid = _canceltracker.AssignId;
+                                long cancelid = _idt.AssignId;
                                 // save cancel to order id relationship
                                 _cancel2order.Add(cancelid, number);
                                 bool isman;
@@ -841,7 +841,7 @@ namespace SterServer
 
         Dictionary<long, long> _cancel2order = new Dictionary<long, long>(MAXRECORD);
 
-        IdTracker _canceltracker = new IdTracker(false, 0, DateTime.Now.Ticks);
+        
 
         bool _regshoshort = false;
         public bool RegSHOShorts { get { return _regshoshort; } set { _regshoshort = value; } }
