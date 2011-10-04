@@ -95,11 +95,11 @@ namespace TradeLink.Common
             // see if size will more than exit position
             if (exitsize > p.UnsignedSize)
             {
-                debug(ord.symbol + " marking short. reason: pending sell size: " + exitsize + " > position: " + p + " from orders: " + string.Join(",", ids.ToArray()));
+                debug(ord.symbol + " marking short. reason: pending sell size: " + exitsize + " > position: " + p + "after order: " + ord + " from orders: " + string.Join(",", ids.ToArray()));
                 return true;
             }
 
-            debug(ord.symbol + " exit size: " + exitsize + " marked sell. reason: not reversing position: " + p + " from orders: " + string.Join(",", ids.ToArray()));
+            debug(ord.symbol + " exit size: " + exitsize + " marked sell. reason: not reversing position: " + p + "after order: " + ord + " from orders: " + string.Join(",", ids.ToArray()));
 
             return false;
         }
