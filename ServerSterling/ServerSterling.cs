@@ -365,6 +365,15 @@ namespace SterServer
         void doupdatereject(STIOrderRejectMsg oSTIOrderRejectMsg)
         {
             debug("reject: " + oSTIOrderRejectMsg.ClOrderID + " reason: " + oSTIOrderRejectMsg.RejectReason.ToString());
+            if (SendCancelOnReject)
+            {
+                long cancelid = 0;
+                if (long.TryParse(oSTIOrderRejectMsg.ClOrderID, out cancelid))
+                {
+                    v("sending cancel ack for rejected id: " + cancelid);
+                    tl.newCancel(cancelid);
+                }
+            }
         }
 
         void stiEvents_OnSTIOrderRejectMsg(STIOrderRejectMsg oSTIOrderRejectMsg)
@@ -996,15 +1005,26 @@ namespace SterServer
                     if (VerboseDebugging)
                         debug("cancel received for: " + orderid);
                 }
+                else if (sterid2tlid.ContainsKey(structOrderUpdate.nOrderRecordId))
+                {
+                    tl.newCancel(sterid2tlid[structOrderUpdate.nOrderRecordId]);
+                    if (VerboseDebugging)
+                        debug("cancel received for: " + orderid);
+
+                }
                 else
                 {
-                    debug("exchange_or_user cancel sent with id: " + id);
+                    debug("exchange_or_user cancel sent with unknown id: " + id);
+                    string clid = structOrderUpdate.bstrClOrderId == null ? string.Empty : structOrderUpdate.bstrClOrderId;
+                    v("order information.  clid:" + clid + " status: " + stat.ToString() + " nrecid: " + structOrderUpdate.nOrderRecordId + " other: " + Util.DumpObjectProperties(structOrderUpdate));
+
                 }
                 return;
             }
             else if (stat == STIOrderStatus.osSTIPendingCancel)
             {
-                v("pending cancel received from server for: " + id);
+                string clid = structOrderUpdate.bstrClOrderId == null ? string.Empty : structOrderUpdate.bstrClOrderId;
+                v("order information.  clid:" + clid + " status: " + stat.ToString() + " nrecid: " + structOrderUpdate.nOrderRecordId + " other: " + Util.DumpObjectProperties(structOrderUpdate));
                 return;
             }
             // don't notify for same order more than once
@@ -1031,10 +1051,44 @@ namespace SterServer
             o.date = (int)((rem - o.time) / 10000);
             _onotified.Add(o.id);
             v("order acknowledgement: " + o.ToString()+" status: "+stat.ToString()+" id: "+id+" nrecid: "+structOrderUpdate.nOrderRecordId);
+            updateidmap(structOrderUpdate.nOrderRecordId, o.id);
             if (RegSHOShorts)
                 sho.GotOrder(o);
             tl.newOrder(o);
             
+        }
+
+        Dictionary<int, long> sterid2tlid = new Dictionary<int, long>();
+        Dictionary<long, int> tl2sterid = new Dictionary<long, int>();
+
+        void updateidmap(int sterid, long tlid)
+        {
+            long id;
+            int nrec;
+            // do sterling map first
+            if (sterid2tlid.TryGetValue(sterid, out id))
+            {
+                if (id != tlid)
+                {
+                    debug("unexpected id change, sterid: " + sterid + " tlid: " + id + " newtlid: " + tlid);
+                    sterid2tlid[sterid] = tlid;
+                }
+            }
+            else // new id
+            {
+                sterid2tlid.Add(sterid, tlid);
+                tl2sterid.Add(tlid, sterid);
+            }
+
+            // then check tl map (generally not necessary)
+            if (tl2sterid.TryGetValue(tlid, out nrec))
+            {
+                if (nrec != sterid)
+                {
+                    debug("unexpected id change, tlid: " + tlid + " sterid: " + nrec+ " newsterid: " + sterid);
+                    tl2sterid[tlid] = sterid;
+                }
+            }
         }
 
 
