@@ -15,6 +15,8 @@ namespace TestTradeLink
 
         const string sym = "TST";
 
+       
+
         [Test]
         public void DoubleBasicWithFlat()
         {
@@ -93,6 +95,38 @@ namespace TestTradeLink
             o = new SellStop(sym, 300, 99);
             Assert.IsTrue(sho.isOrderShort(o));
 
+
+        }
+
+        [Test]
+        public void BasicStopAndLimit()
+        {
+            long id = 1;
+            sho = new REGSHO_ShortTracker();
+            sho.SendDebugEvent += new DebugDelegate(rt.d);
+            sho.VerboseDebugging = true;
+            Order o = new OrderImpl();
+
+            // take a position
+            o = new BuyLimit(sym, 100, 21.18m, id++);
+            o.Account = ACCT;
+            Assert.IsFalse(sho.isOrderShort(o), "entry buy never a short.");
+            sho.GotOrder(o);
+            Assert.IsTrue(o.Fill(TickImpl.NewTrade(sym,21.14m,100)),"unable to fill order");
+            Trade t = (Trade)o;
+            Assert.IsTrue(t.isValid && t.isFilled, "not a valid trade");
+            sho.GotFill(t);
+            
+
+            // accept two exits
+            o = new SellStop(sym, 100, 21.09m, id++);
+            o.Account = ACCT;
+            Assert.IsFalse(sho.isOrderShort(o),"first exit was wrongly a short");
+            sho.GotOrder(o);
+            o = new SellLimit(sym, 100, 21.19m, id++);
+            o.Account = ACCT;
+            Assert.IsTrue(sho.isOrderShort(o), "second exit was wrongly a sell");
+            sho.GotOrder(o);
 
         }
 

@@ -32,6 +32,7 @@ namespace TradeLink.Common
         public virtual void GotPosition(Position p)
         {
             pt.Adjust(p);
+            v(p.Symbol+ " position: " + p);
         }
 
 
@@ -40,6 +41,7 @@ namespace TradeLink.Common
         {
             pt.Adjust(f);
             base.GotFill(f);
+            v(f.symbol + " position: " + pt[f.symbol, f.Account] + " after fill: " + f);
         }
         /// <summary>
         /// returns true if order is a true short

@@ -722,6 +722,12 @@ namespace SterServer
                                 // wait briefly between orders
                                 Thread.Sleep(_ORDERSLEEP);
                             }
+                            // if order was sent and we're following short regulations, start tracking this order
+                            if ((err == 0) && RegSHOShorts)
+                            {
+                                // keep track that we sent the order
+                                sho.GotOrder(o);
+                            }
                             if (err < 0)
                                 debug("Error sending order: " + Util.PrettyError(tl.newProviderName, err) + o.ToString());
                             if (err == -1)
@@ -897,6 +903,7 @@ namespace SterServer
             }
             if (RegSHOShorts)
             {
+                // see if order needs short marking (versus sell)
                 if (sho.isOrderShort(o))
                 {
                     v(o.symbol + " marking order as regsho short: " + o);
@@ -904,6 +911,7 @@ namespace SterServer
                 }
                 else
                     v(o.symbol + " not a regsho short order: " + o);
+
             }
             return r;
         }
