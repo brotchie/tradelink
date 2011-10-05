@@ -987,18 +987,27 @@ namespace SterServer
             // see if the order id is unknown
             if (!long.TryParse(structOrderUpdate.bstrClOrderId, out id))
             {
-                // use the norderrecordid as our order id
-                id = (long)structOrderUpdate.nOrderRecordId;
-
-                // ensure this is not a secondary notification of same order
-                string tmp;
-                if (!idacct.TryGetValue(id, out tmp))
+                // see if we know the sterling id (sometimes sterling doesn't send full client id)
+                if (sterid2tlid.ContainsKey(structOrderUpdate.nOrderRecordId))
                 {
+                    id = sterid2tlid[structOrderUpdate.nOrderRecordId];
 
-                    // save the id
-                    debug("manual order: " + id + " " + structOrderUpdate.bstrAccount);
-                    idacct.Add(id, structOrderUpdate.bstrAccount);
-                    ismanorder.Add(id, true);
+                }
+                else
+                {
+                    // use the norderrecordid as our order id
+                    id = (long)structOrderUpdate.nOrderRecordId;
+
+                    // ensure this is not a secondary notification of same order
+                    string tmp;
+                    if (!idacct.TryGetValue(id, out tmp))
+                    {
+
+                        // save the id
+                        debug("manual order: " + id + " " + structOrderUpdate.bstrAccount);
+                        idacct.Add(id, structOrderUpdate.bstrAccount);
+                        ismanorder.Add(id, true);
+                    }
                 }
             }
             // if this is a cancel notification, pass along
