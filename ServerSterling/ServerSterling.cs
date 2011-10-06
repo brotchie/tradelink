@@ -78,9 +78,10 @@ namespace SterServer
                 ost.Split = OversellSplit;
                 ost.SendOrderEvent += new OrderDelegate(ost_SendOrderEvent);
                 ost.SendDebugEvent += new DebugDelegate(ost_SendDebugEvent);
-                ost.SendCancelEvent += new LongDelegate(ost_SendCancelEvent);
+                ost.SendCancelEvent += new LongDelegate(reqcancel);
                 sho.SendDebugEvent+=new DebugDelegate(v);
                 sho.DefaultAccount = Account;
+                sho.VerboseDebugging = VerboseDebugging;
                 
                 debug(Util.TLSIdentity());
                 debug("Attempting to start: " + PROGRAM);
@@ -95,7 +96,7 @@ namespace SterServer
                 _bw = new Thread(new ParameterizedThreadStart(background));
                 _runbg = true;
                 _bw.Start();
-                ptt.GotCancelEvent+=new LongDelegate(tl.newCancel);
+                ptt.GotCancelEvent+=new LongDelegate(newcancel);
                 ptt.GotFillEvent += new FillDelegate(tl.newFill);
                 ptt.GotOrderEvent+=new OrderDelegate(tl.newOrder);
                 ptt.SendDebugEvent += new DebugDelegate(ptt_SendDebugEvent);
@@ -171,10 +172,11 @@ namespace SterServer
             return _connected;
         }
 
-        void ost_SendCancelEvent(long val)
+        void reqcancel(long id)
         {
-            _cancelq.Write(val);
+            _cancelq.Write(id);
         }
+
 
 
 
@@ -357,7 +359,7 @@ namespace SterServer
                 if (long.TryParse(structOrderReject.bstrClOrderId, out cancelid))
                 {
                     v("sending cancel ack for rejected id: " + cancelid);
-                    tl.newCancel(cancelid);
+                    newcancel(cancelid);
                 }
             }
         }
@@ -371,7 +373,7 @@ namespace SterServer
                 if (long.TryParse(oSTIOrderRejectMsg.ClOrderID, out cancelid))
                 {
                     v("sending cancel ack for rejected id: " + cancelid);
-                    tl.newCancel(cancelid);
+                    newcancel(cancelid);
                 }
             }
         }
@@ -978,6 +980,16 @@ namespace SterServer
 
         Dictionary<long, bool> ismanorder = new Dictionary<long, bool>();
 
+        void newcancel(long id)
+        {
+            if (VerboseDebugging)
+                debug("cancel received for: " + id);
+            if (RegSHOShorts)
+                sho.GotCancel(id);
+            tl.newCancel(id);
+
+        }
+
         void doorderupdate(ref structSTIOrderUpdate structOrderUpdate)
         {
             STIOrderStatus stat = (STIOrderStatus)structOrderUpdate.nOrderStatus;
@@ -1018,16 +1030,12 @@ namespace SterServer
                 long orderid = 0;
                 if (_cancel2order.TryGetValue(id, out orderid))
                 {
-                    tl.newCancel(orderid);
-                    if (VerboseDebugging)
-                        debug("cancel received for: " + orderid);
+                    newcancel(orderid);
+
                 }
                 else if (sterid2tlid.ContainsKey(structOrderUpdate.nOrderRecordId))
                 {
-                    tl.newCancel(sterid2tlid[structOrderUpdate.nOrderRecordId]);
-                    if (VerboseDebugging)
-                        debug("cancel received for: " + orderid);
-
+                    newcancel(orderid);
                 }
                 else
                 {

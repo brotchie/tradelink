@@ -92,7 +92,7 @@ namespace TradeLink.Common
                 {
                     ids.Add(o.id.ToString());
                     exitsize += o.UnsignedSize;
-                    debug("pend: " + o);
+                    v("regsho pend: " + o);
                 }
             // see if size will more than exit position
             if (exitsize > p.UnsignedSize)
