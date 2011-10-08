@@ -244,7 +244,7 @@ namespace TradeLink.Common
                 debug("unknown fillid: " + f.id);
                 return;
             }
-            filled[idx] += f.xsize;
+            filled[idx] += Math.Abs(f.xsize);
             v(f.symbol + " filled size: " + filled[idx] + " after: " + f.ToString());
         }
 

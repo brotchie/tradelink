@@ -102,6 +102,7 @@ namespace SterServer
         {
             try
             {
+                
                 Properties.Settings.Default.Save();
                 tl.Stop();
                 _log.Stop();
@@ -125,6 +126,7 @@ namespace SterServer
         private void verbosetoggle_Click(object sender, EventArgs e)
         {
             tl.VerboseDebugging = !tl.VerboseDebugging;
+            Properties.Settings.Default.VerboseDebugging = tl.VerboseDebugging;
             debug("verbose mode: "+ (tl.VerboseDebugging ? "ON" : "OFF"));
         }
 
