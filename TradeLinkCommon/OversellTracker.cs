@@ -19,6 +19,16 @@ namespace TradeLink.Common
             _idt = idt;
         }
 
+        bool _verbosedebug = false;
+        public bool VerboseDebugging { get { return _verbosedebug; } set { _verbosedebug = value; } }
+
+        protected virtual void v(string msg)
+        {
+            if (!_verbosedebug)
+                return;
+            debug(msg);
+        }
+
         int minlotsize = 1;
         public int MinLotSize { get { return minlotsize; } set { minlotsize = value; } }
 
@@ -57,13 +67,25 @@ namespace TradeLink.Common
         /// <param name="id"></param>
         public void sendcancel(long id)
         {
-            long cancelsplit = 0;
-            cancel(id);
-            if (_orgid2splitid.TryGetValue(id, out cancelsplit))
+            try
             {
-                debug("cancel received on original order: " + id + ", copying cancel to split: " + cancelsplit);
-                cancel(cancelsplit);
+                long cancelsplit = 0;
+                // cancel original
+                cancel(id);
+                // cancel split if it exists
+                if (_orgid2splitid.TryGetValue(id, out cancelsplit))
+                {
+                    debug("cancel received on original order: " + id + ", copying cancel to split: " + cancelsplit);
+                    cancel(cancelsplit);
+                }
+                else
+                    v("cancel did not match split order, passing along cancel: " + id);
             }
+            catch (Exception ex)
+            {
+                debug("error encountered processing cancel: " + id + " err: " + ex.Message + ex.StackTrace);
+            }
+
         }
 
         /// <summary>
@@ -111,7 +133,7 @@ namespace TradeLink.Common
                     if (nsize!=0)
                         sonow(newo);
                     // notify
-                    debug(o.symbol + " splitting oversell/overcover to 2nd order: " + newo);
+                    debug(o.symbol + " splitting oversell/overcover: "+o.ToString()+" to 2nd order: " + newo);
                 }
             }
             else

@@ -81,6 +81,30 @@ namespace TestTradeLink
             // ensure different cancels
             Assert.AreEqual(5, cancels[0]);
             Assert.AreNotEqual(5, cancels[1]);
+
+            // do it again
+
+            // take a position
+            ost.GotPosition(new PositionImpl("TST", 100, 300));
+
+            // over sell
+            o = new SellMarket("TST", 500);
+            o.id = 10;
+            ost.sendorder(o);
+            // verify that only flat was sent
+            Assert.AreEqual(4, oc);
+            Assert.AreEqual(-200, lasto.size);
+            // make sure we've not canceled
+            Assert.AreEqual(2, cancels.Count);
+            // cancel original order
+            ost.sendcancel(10);
+            // ensure two cancels sent
+            Assert.AreEqual(4, cancels.Count);
+            // ensure different cancels
+            Assert.AreEqual(10, cancels[2]);
+            Assert.AreNotEqual(10, cancels[3]);
+
+
         }
 
         List<long> cancels = new List<long>();

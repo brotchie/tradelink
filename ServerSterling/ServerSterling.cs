@@ -79,6 +79,7 @@ namespace SterServer
                 ost.SendOrderEvent += new OrderDelegate(ost_SendOrderEvent);
                 ost.SendDebugEvent += new DebugDelegate(ost_SendDebugEvent);
                 ost.SendCancelEvent += new LongDelegate(reqcancel);
+                ost.VerboseDebugging = VerboseDebugging;
                 sho.SendDebugEvent+=new DebugDelegate(v);
                 sho.DefaultAccount = Account;
                 sho.VerboseDebugging = VerboseDebugging;
@@ -174,6 +175,7 @@ namespace SterServer
 
         void reqcancel(long id)
         {
+            v("marking id: " + id + " for cancelation.");
             _cancelq.Write(id);
         }
 
@@ -926,6 +928,7 @@ namespace SterServer
 
         void tl_OrderCancelRequest(long number)
         {
+            v("processing incoming cancel id: " + number);
             ost.sendcancel(number);
         }
 
@@ -1035,7 +1038,7 @@ namespace SterServer
                 }
                 else if (sterid2tlid.ContainsKey(structOrderUpdate.nOrderRecordId))
                 {
-                    newcancel(orderid);
+                    newcancel(sterid2tlid[structOrderUpdate.nOrderRecordId]);
                 }
                 else
                 {
