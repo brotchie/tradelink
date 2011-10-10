@@ -17,5 +17,14 @@
     <Setting Name="TLClientPort" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
+    <Setting Name="sAdmCnnctPt" Type="System.String" Scope="User">
+      <Value Profile="(Default)">dd_admin_sslc</Value>
+    </Setting>
+    <Setting Name="sTsCnnctPt" Type="System.String" Scope="User">
+      <Value Profile="(Default)">login_agent_uatc</Value>
+    </Setting>
+    <Setting Name="sMdCnnctPt" Type="System.String" Scope="User">
+      <Value Profile="(Default)">login_agent_sim_uatc</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -31,14 +31,15 @@ namespace ServerRithmic
             PRI_bOrderComplete = false;
         }
 
-        int admport = 65001;
-        int marketdataport = 65002;
-        int tradeport = 65003;
+        public string AdmPt = "dd_admin_sslc";
+        public string MarketDataPt = "login_agent_sim_uatc";
+        public string TsConnectPt = "login_agent_uatc";
 
         void setupparams()
         {
             oAdmCallbacks = new admcallback(this);
-            oParams.AdmCnnctPt = admport.ToString();
+            oParams.AdmCnnctPt = AdmPt;
+            
             oParams.AppName = "TradeLinkRithmicConnector";
             oParams.AppVersion = "1.0.0.0";
             oParams.AdmCallbacks = oAdmCallbacks;
@@ -64,8 +65,8 @@ namespace ServerRithmic
                 oEngine.login(this,
                     user,
                     pw,
-                    marketdataport.ToString(),
-                    tradeport.ToString(),
+                    MarketDataPt,
+                    TsConnectPt,
                     string.Empty,
                     string.Empty);
 

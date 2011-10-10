@@ -82,5 +82,41 @@ namespace ServerRithmic.Properties {
                 this["TLClientPort"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("dd_admin_sslc")]
+        public string sAdmCnnctPt {
+            get {
+                return ((string)(this["sAdmCnnctPt"]));
+            }
+            set {
+                this["sAdmCnnctPt"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("login_agent_uatc")]
+        public string sTsCnnctPt {
+            get {
+                return ((string)(this["sTsCnnctPt"]));
+            }
+            set {
+                this["sTsCnnctPt"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("login_agent_sim_uatc")]
+        public string sMdCnnctPt {
+            get {
+                return ((string)(this["sMdCnnctPt"]));
+            }
+            set {
+                this["sMdCnnctPt"] = value;
+            }
+        }
     }
 }
