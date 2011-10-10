@@ -33,6 +33,9 @@ namespace ServerRithmic
             else
                 tls = new TradeLink.Common.TLServer_IP(Properties.Settings.Default.TLClientAddress, Properties.Settings.Default.TLClientPort);
             sr = new ServerRithmic(tls, debug);
+            sr.AdmPt = Properties.Settings.Default.sAdmCnnctPt;
+            sr.TsConnectPt = Properties.Settings.Default.sTsCnnctPt;
+            sr.MarketDataPt = Properties.Settings.Default.sMdCnnctPt;
 
             if ((user.Text!=string.Empty) && (pass.Text!=string.Empty))
                 go();
