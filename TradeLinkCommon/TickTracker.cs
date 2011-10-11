@@ -324,7 +324,8 @@ namespace TradeLink.Common
         /// <param name="idx"></param>
         public void newTick(Tick k, int idx)
         {
-            if (idx < 0) return;
+            if (idx < 0) 
+                return;
             // update date/time
             time[idx] = k.time;
             date[idx] = k.date;
@@ -355,7 +356,11 @@ namespace TradeLink.Common
         /// <returns></returns>
         public bool newTick(Tick k)
         {
-            int idx = addindex(k.symbol);
+            // get index
+            int idx = getindex(k.symbol);
+            // add if unknown
+            if (idx < 0)
+                idx = addindex(k.symbol);
             // update date/time
             time[idx] = k.time;
             date[idx] = k.date;
