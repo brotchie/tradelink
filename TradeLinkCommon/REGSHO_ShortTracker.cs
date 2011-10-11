@@ -87,7 +87,10 @@ namespace TradeLink.Common
             List<string> ids = new List<string>();
             foreach (Order o in this)
                 if (!isPending(o.id))
+                {
+                    v("regsho notpend: " + o);
                     continue;
+                }
                 else if (o.side != p.isLong)
                 {
                     ids.Add(o.id.ToString());

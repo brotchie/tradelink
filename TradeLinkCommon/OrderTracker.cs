@@ -52,7 +52,9 @@ namespace TradeLink.Common
         public event TextIdxDelegate NewTxt;
         void orders_NewTxt(string txt, int idx)
         {
-            sent.addindex(txt, orders[idx].size);
+            int sentsize = (orders[idx].side? 1 : -1) * Math.Abs(orders[idx].size);
+            v(txt + " sentsize: " + sentsize + " after: " + orders[idx].ToString());
+            sent.addindex(txt, sentsize);
             filled.addindex(txt, 0);
             canceled.addindex(txt, false);
             if (NewTxt != null)
@@ -79,7 +81,7 @@ namespace TradeLink.Common
                 return false;
             if (canceled[idx])
                 return false;
-            return sent[idx] != filled[idx];
+            return Math.Abs(sent[idx]) != Math.Abs(filled[idx]);
         }
 
         /// <summary>
@@ -160,7 +162,7 @@ namespace TradeLink.Common
                 if ((idx<0) || (idx>filled.Count)) return 0;
                 if (canceled[idx])
                     return 0;
-                return sent[idx]-filled[idx];
+                return Math.Abs(sent[idx])-Math.Abs(filled[idx]);
             }
         }
 
@@ -186,7 +188,7 @@ namespace TradeLink.Common
         public bool isTracked(long id)
         {
             int idx = sent.getindex(id.ToString());
-            return id != GenericTracker.UNKNOWN;
+            return idx != GenericTracker.UNKNOWN;
         }
 
         public event DebugDelegate SendDebugEvent;
@@ -244,7 +246,7 @@ namespace TradeLink.Common
                 debug("unknown fillid: " + f.id);
                 return;
             }
-            filled[idx] += Math.Abs(f.xsize);
+            filled[idx] += (f.side ? 1 : -1) *Math.Abs(f.xsize);
             v(f.symbol + " filled size: " + filled[idx] + " after: " + f.ToString());
         }
 
