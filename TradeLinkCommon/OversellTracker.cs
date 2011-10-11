@@ -79,7 +79,7 @@ namespace TradeLink.Common
                     cancel(cancelsplit);
                 }
                 else
-                    v("cancel did not match split order, passing along cancel: " + id);
+                    v("cancel did not match split order, passed along cancel: " + id);
             }
             catch (Exception ex)
             {
