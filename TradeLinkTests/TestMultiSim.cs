@@ -189,6 +189,7 @@ namespace TestTradeLink
 
         void execute_GotTick(TradeLink.API.Tick t)
         {
+            SimBroker.Execute(t);
             tickcount++;
             // generate fills periodically
             if (fillcount >= desiredfills) return;
