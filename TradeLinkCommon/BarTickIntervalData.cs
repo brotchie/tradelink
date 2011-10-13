@@ -116,7 +116,8 @@ namespace TradeLink.Common
             ticks[l]++;
             // don't set volume for index
             if (k.size > 0)
-                vols[l] += k.size;            // notify barlist
+                vols[l] += k.size;            
+            // notify barlist
             if (_isRecentNew)
                 NewBar(k.symbol, intervallength);
         }
@@ -153,7 +154,9 @@ namespace TradeLink.Common
             // don't set volume for index
             if (size>0)
                 vols[l] += size;
-
+            // notify barlist
+            if (_isRecentNew)
+                NewBar(k.symbol, intervallength);
 
         }
 
