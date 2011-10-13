@@ -40,7 +40,7 @@ namespace TradeLink.API
         /// <param name="time"></param>
         /// <param name="date"></param>
         /// <param name="size"></param>
-        void newPoint(decimal p, int time, int date, int size);
+        void newPoint(string symbol, decimal p, int time, int date, int size);
         /// <summary>
         /// get a bar from list using it's index.  
         /// index = 0 is oldest bar.  index = Last is newest bar.

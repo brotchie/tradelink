@@ -444,11 +444,11 @@ namespace TradeLink.Common
                 _intdata[i].newTick(k);
         }
 
-        public void newPoint(decimal p, int time, int date, int size)
+        public void newPoint(string symbol, decimal p, int time, int date, int size)
         {
             // add tick to every requested bar interval
             for (int i = 0; i < _intdata.Length; i++)
-                _intdata[i].newPoint(p,time,date,size);
+                _intdata[i].newPoint(symbol,p,time,date,size);
         }
 
         /// <summary>
@@ -725,9 +725,9 @@ histperiod=daily&startdate=" + startdate + "&enddate=" + enddate + "&output=csv&
             else
             {
                 if (t.hasAsk && !_usebid)
-                    _fromepf.newPoint(t.ask, t.time, t.date, t.AskSize);
+                    _fromepf.newPoint(t.symbol,t.ask, t.time, t.date, t.AskSize);
                 else if (t.hasBid && _usebid)
-                    _fromepf.newPoint(t.bid, t.time, t.date, t.BidSize);
+                    _fromepf.newPoint(t.symbol, t.bid, t.time, t.date, t.BidSize);
             }
         }
         /// <summary>

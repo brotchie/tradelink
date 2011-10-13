@@ -121,7 +121,7 @@ namespace TradeLink.Common
             if (_isRecentNew)
                 NewBar(k.symbol, intervallength);
         }
-        public void newPoint(decimal p, int time, int date, int size)
+        public void newPoint(string symbol, decimal p, int time, int date, int size)
         {
 
             // get the barcount
@@ -155,7 +155,7 @@ namespace TradeLink.Common
                 vols[Last()] += size;
             // notify barlist
             if (_isRecentNew)
-                NewBar(k.symbol, intervallength);
+                NewBar(symbol, intervallength);
 
         }
 

@@ -51,7 +51,7 @@ namespace TestTradeLink
             foreach (TickImpl k in ticklist)
             {
                 /// add tick to bar
-                bl.newPoint(k.trade,k.time,k.date,k.size);
+                bl.newPoint(k.symbol,k.trade,k.time,k.date,k.size);
             }
 
             // verify we had expected number of bars
@@ -92,7 +92,7 @@ namespace TestTradeLink
             foreach (TickImpl k in SampleData())
             {
                 // add tick to bar
-                bl.newPoint(k.trade,k.time,k.date,k.size);
+                bl.newPoint(k.symbol,k.trade,k.time,k.date,k.size);
                 // count if it's a new bar
                 if (bl.RecentBar.isNew)
                     newbars++;
@@ -184,7 +184,7 @@ namespace TestTradeLink
             foreach (Tick k in tape)
             {
                 // add ticks
-                bl.newPoint(k.trade,k.time,k.date,k.size);
+                bl.newPoint(k.symbol,k.trade,k.time,k.date,k.size);
             }
             // make sure we have at least 1 bars
             Assert.IsTrue(bl.Has(1));

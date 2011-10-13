@@ -173,7 +173,7 @@ namespace TradeLink.Common
                 bl.GotNewBar += new SymBarIntervalDelegate(bl_GotNewBar);
                 _bdict.Add(symbol, bl);
             }
-            bl.newPoint(p, time, date, size);
+            bl.newPoint(symbol,p, time, date, size);
         }
 
         /// <summary>

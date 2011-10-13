@@ -121,7 +121,7 @@ namespace TradeLink.Common
             if (_isRecentNew)
                 NewBar(k.symbol, intervallength);
         }
-        public void newPoint(decimal p, int time, int date, int size)
+        public void newPoint(string symbol, decimal p, int time, int date, int size)
         {
             // if we have no bars or we'll exceed our interval length w/this tick
             if ((curr_barid == -1) || (ticks[curr_barid] == intervallength))
@@ -156,7 +156,7 @@ namespace TradeLink.Common
                 vols[l] += size;
             // notify barlist
             if (_isRecentNew)
-                NewBar(k.symbol, intervallength);
+                NewBar(symbol, intervallength);
 
         }
 
