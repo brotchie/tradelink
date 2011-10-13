@@ -21,7 +21,7 @@ namespace ServerRithmic
         {
             debs = dd;
             tl = tls;
-
+            
             // set defaults
             PRI_bLoggedIntoMd = false;
             PRI_bGotPriceIncrInfo = false;
@@ -71,7 +71,7 @@ namespace ServerRithmic
                     string.Empty);
 
                 // tradelink stuff
-
+                tl.newProviderName = Providers.Rithmic;
                 tl.newAcctRequest += new StringDelegate(tl_newAcctRequest);
                 tl.newFeatureRequest += new MessageArrayDelegate(tl_newFeatureRequest);
                 tl.newOrderCancelRequest += new LongDelegate(tl_newOrderCancelRequest);

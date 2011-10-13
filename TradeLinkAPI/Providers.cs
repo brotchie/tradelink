@@ -39,5 +39,8 @@ namespace TradeLink.API
         Avatar,
         LightspeedColo,
         DAS,
+        Rithmic,
+        GenericFix,
+        Takion,
     }
 }
