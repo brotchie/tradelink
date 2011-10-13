@@ -19,7 +19,10 @@ namespace TradeLink.Common
 
         public void newTick(Tick k)
         {
-            _curidx = addindex(k.symbol);
+            int idx = getindex(k.symbol);
+            if (idx < 0)
+                idx = addindex(k.symbol);
+            _curidx = idx;
         }
     }
 }
