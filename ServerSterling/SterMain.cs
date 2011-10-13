@@ -58,6 +58,7 @@ namespace SterServer
                 tl.IgnoreOutOfOrderTicks = Properties.Settings.Default.IgnoreOutOfOrderTicks;
                 tl.AutosetUnsetId = Properties.Settings.Default.AutoSeUnsetId;
                 tl.SendCancelOnReject = Properties.Settings.Default.SendCancelOnRejects;
+                tl.SendCancelOnError = Properties.Settings.Default.SendCancelOnError;
                 tl.Start();
             }
             catch (Exception ex)

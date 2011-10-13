@@ -159,6 +159,7 @@ namespace SterServer
                 debug("RegSHOShorts: " + (RegSHOShorts ? "ON" : "disabled."));
                 debug("ServerStops: " + (UseServerStops ? "ON" : "disabled."));
                 debug("SendCancelOnRejects: "+(SendCancelOnReject ? "ON" : "disabled."));
+                debug("SendCancelOnError: " + (SendCancelOnError? "ON" : "disabled."));
                 
                 
             }
@@ -351,6 +352,9 @@ namespace SterServer
 
         bool _cancelonrej = false;
         public bool SendCancelOnReject { get { return _cancelonrej; } set { _cancelonrej = value; } }
+
+        bool _cancelonerr = false;
+        public bool SendCancelOnError { get { return _cancelonerr; } set { _cancelonerr = value; } }
 
         void doupdatereject(ref structSTIOrderReject structOrderReject)
         {
@@ -733,9 +737,17 @@ namespace SterServer
                                 sho.GotOrder(o);
                             }
                             if (err < 0)
+                            {
                                 debug("Error sending order: " + Util.PrettyError(tl.newProviderName, err) + o.ToString());
-                            if (err == -1)
-                                debug("Make sure you have set the account in sending program.");
+                                if (err == -1)
+                                    debug("Make sure you have set the account in sending program.");
+                                if (SendCancelOnError)
+                                {
+                                    v("sending cancel ack for error on order id: " + o.id);
+                                    newcancel(o.id);
+                                }
+
+                            }
                         }
                     }
 
