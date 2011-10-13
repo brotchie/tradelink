@@ -77,9 +77,9 @@ namespace TradeLink.AppKit
                 chartControl1.redraw();
         }
 
-        public void newPoint(decimal p, int time, int date, int size)
+        public void newPoint(string symbol,decimal p, int time, int date, int size)
         {
-            chartControl1.newPoint(p, time, date, size);
+            chartControl1.newPoint(symbol,p, time, date, size);
             if (Visible)
                 chartControl1.redraw();
 

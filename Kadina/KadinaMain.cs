@@ -196,16 +196,16 @@ namespace Kadina
                     if (_chartlast)
                     {
                         if (t.isTrade)
-                            c.newPoint(t.trade, t.time, t.date, t.size);
+                            c.newPoint(t.symbol,t.trade, t.time, t.date, t.size);
                     }
                     else if (_chartbid)
                     {
                         if (t.hasBid)
-                            c.newPoint(t.bid, t.time, t.date, t.BidSize);
+                            c.newPoint(t.symbol, t.bid, t.time, t.date, t.BidSize);
                     }
                     else if (t.hasAsk)
                     {
-                        c.newPoint(t.ask, t.time, t.date, t.AskSize);
+                        c.newPoint(t.symbol, t.ask, t.time, t.date, t.AskSize);
                     }
                 }
             }

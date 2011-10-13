@@ -65,15 +65,15 @@ namespace TradeLink.AppKit
         /// <param name="time"></param>
         /// <param name="date"></param>
         /// <param name="size"></param>
-        public void newPoint(decimal p, int time, int date, int size)
+        public void newPoint(string symbol, decimal p, int time, int date, int size)
         {
             if (bl == null)
             {
-                Symbol = string.Empty;
+                Symbol = symbol;
                 highesth = SMALLVAL;
-                bl = new BarListImpl(string.Empty);
+                bl = new BarListImpl(symbol);
             }
-            bl.newPoint(p, time, date, size);
+            bl.newPoint(symbol,p, time, date, size);
             if (p!=0)
             {
                 if (p > highesth)

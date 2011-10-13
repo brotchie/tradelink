@@ -828,7 +828,7 @@ namespace Quotopia
                         Tick k = _kt[t.symbol];
                         decimal p = usebidonfx ? k.bid : k.ask;
                         int s = usebidonfx ? k.bs : k.os;
-                        bardict[t.symbol].newPoint(p, k.time, k.date, s);
+                        bardict[t.symbol].newPoint(t.symbol,p, k.time, k.date, s);
                     }
                     else
                         bardict[t.symbol].newTick(t);
