@@ -720,6 +720,7 @@ namespace IQFeedBroker
         int tickssincelastlatencyreport = 0;
 
         int lasttickordertime = 0;
+        int lasttickdate = 0;
         bool ignoreoutoforder = false;
         public bool IgnoreOutOfOrderTick { get { return ignoreoutoforder; } set { ignoreoutoforder = value; } }
 
@@ -772,6 +773,13 @@ namespace IQFeedBroker
                     //(this is because in early AM iqfeed will frequently send ticks with yesterday time stamps
                     if (usebeforeafterignoretime)
                     {
+                        // ensure that ordering works across multiple days
+                        if (lasttickdate != tick.date)
+                        {
+                            lasttickordertime = 0;
+                            lasttickdate = tick.date;
+                        }
+
                         // see if tick should be ignored
                         if ((local < IfBeforeTimeUseIgnoreAfter)
                             && (tick.time > IgnoreAfterTimeWithBefore))
