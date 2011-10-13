@@ -99,8 +99,9 @@ namespace TradeLink.Common
             int uosize = o.UnsignedSize;
             // get existing size
             int size = _pt[o.symbol].Size;
+            int upsize = _pt[o.symbol].UnsignedSize;
             // check for overfill/overbuy
-            bool over = (o.size * size < -1) && (o.UnsignedSize>Math.Abs(size));
+            bool over = (o.size * size < -1) && (o.UnsignedSize > Math.Abs(size)) && (upsize >= MinLotSize);
             // detect
             if (over)
             {

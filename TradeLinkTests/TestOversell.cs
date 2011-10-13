@@ -14,6 +14,28 @@ namespace TestTradeLink
         OversellTracker ost = new OversellTracker();
 
         [Test]
+        public void SplitWithPartialFillRoundMinsize100()
+        {
+            lasto = new OrderImpl();
+            oc = 0;
+            ost = new OversellTracker();
+            ost.SendOrderEvent += new OrderDelegate(ost_SendOrderEvent);
+            ost.SendDebugEvent += new DebugDelegate(rt.d);
+            ost.MinLotSize = 100;
+
+            ost.Split = true;
+            // take a position
+            ost.GotPosition(new PositionImpl("TST", 100, 58));
+            // over sell
+            Order o = new SellMarket("TST", 100);
+            o.id = 1;
+            ost.sendorder(o);
+            // verify that flat and adjustment were sent
+            Assert.AreEqual(1, oc);
+            Assert.AreEqual(-100, lasto.size);
+        }
+
+        [Test]
         public void TestNormalEntry()
         {
             lasto = new OrderImpl();
