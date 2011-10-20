@@ -154,7 +154,7 @@ namespace TradeLink.Common
         public static int Norm2Min(decimal size, int MINSIZE) { return Norm2Min(size, MINSIZE, true); }
         public static int Norm2Min(decimal size, int MINSIZE, bool roundup)
         {
-            int sign = (int)(size / Math.Abs(size));
+            int sign = size >= 0 ? 1 : -1;
             int mult = (int)Math.Floor(size / MINSIZE);
             if (roundup)
             {
