@@ -37,6 +37,10 @@ namespace TradeLink.Common
             _date = copy.Date;
             _details = copy.Details;
         }
+
+        public bool isCall { get { return Details.ToUpper().Contains("CALL"); } }
+        public bool isPut { get { return Details.ToUpper().Contains("PUT"); } }
+
         /// <summary>
         /// create new security
         /// </summary>
@@ -63,6 +67,10 @@ namespace TradeLink.Common
         /// symbol associated with security
         /// </summary>
         public virtual string Symbol { get { return _sym; } set { _sym = value; } }
+        /// <summary>
+        /// symbol with underscores represented as spaces
+        /// </summary>
+        public virtual string Symbol_Spaces { get { return _sym.Replace("_", " "); } }
         /// <summary>
         /// name (symbol) of security
         /// </summary>
@@ -93,11 +101,11 @@ namespace TradeLink.Common
         /// details of security (eg PUT/CALL for options)
         /// </summary>
         public string Details { get { return _details; } set { _details = value; } }
-        double _strike = 0;
+        decimal _strike = 0;
         /// <summary>
         /// strike price for options
         /// </summary>
-        public double Strike { get { return _strike; } set { _strike = value; } }
+        public decimal Strike { get { return _strike; } set { _strike = value; } }
         /// <summary>
         /// printable string
         /// </summary>
@@ -117,9 +125,12 @@ namespace TradeLink.Common
             p.Add(sec.Symbol);
             if (sec.Type == SecurityType.OPT ||sec.Type==SecurityType.FOP )
             {
-                p.Add(sec.Date.ToString());
-                p.Add(sec.Details);
-                p.Add(sec.Strike.ToString("F4"));
+                if (sec.Date!=0)
+                    p.Add(sec.Date.ToString());
+                if (sec.Details!=string.Empty)
+                    p.Add(sec.Details);
+                if (sec.Strike!=0)
+                    p.Add(sec.Strike.ToString("F4"));
             }
             if (sec.hasDest) 
                 p.Add(sec.DestEx);
@@ -154,7 +165,7 @@ namespace TradeLink.Common
             	if(msg.Contains("FOP")) sec.Type = SecurityType.FOP;
             	   
                 msg = msg.ToUpper();
-                sec.Details = msg.Contains("PUT") ? "PUT" : "CALL" ;
+                sec.Details = msg.Contains("PUT") ? "PUT" : (msg.Contains("CALL") ? "CALL" : string.Empty);
                 msg = msg.Replace("CALL", "");
                 msg = msg.Replace("PUT", "");
                 msg = msg.Replace("OPT", "");
@@ -197,6 +208,98 @@ namespace TradeLink.Common
             return sec;
         }
 
+        static DebugDelegate debs = null;
+        static void debug(string msg)
+        {
+            if (debs != null)
+                debs(msg);
+        }
+
+        public static string ToOSISymbol(Security sec) { return ToOSISymbol(sec, true,true); } 
+        public static string ToOSISymbol(Security sec, bool usetradelinkspaces, bool spacebetweenunderlying)
+        {
+
+            string sym = (usetradelinkspaces ? sec.Symbol_Spaces : sec.Symbol);
+            if (spacebetweenunderlying)
+                sym += " ";
+
+            string expire = Util.ToDateTime(sec.Date, 0).ToString("yyMMdd");
+            string pc = sec.isCall ? "C" : "P";
+            string strike = ((int)sec.Strike * 1000).ToString("F0");
+            return sym + expire + pc + strike;
+        }
+
+        /// <summary>
+        /// infer option security information from OSI string
+        /// http://biz.yahoo.com/opt/symbol.html
+        /// </summary>
+        /// <param name="osi"></param>
+        /// <param name="sec"></param>
+        /// <returns></returns>
+        public static bool ParseOptionOSI(string osi, ref Security sec) { return ParseOptionOSI(osi, ref sec, null); }
+        public static bool ParseOptionOSI(string osi, ref Security sec, DebugDelegate deb)
+        {
+            debs = deb;
+            osi = osi.ToUpper();
+            // Root symbol + Expiration Year(yy)+ Expiration Month(mm)+ Expiration Day(dd) + Call/Put Indicator (C or P) + Strike 
+            // eg yahoo 2010 4/16 expiration call at $20.00 is YHOO100416C00020000
+
+            // get everything but the underlying
+            string ebu = Util.rxm(osi,@"[0-9]+.*");
+            // see if the symbol is present and grab if so
+            if (ebu != osi)
+            {
+                int ebustart = osi.IndexOf(ebu);
+                if (ebustart != 0)
+                {
+                    sec.Symbol = osi.Substring(0, ebustart ).TrimStart(' ').TrimEnd(' ');
+                }
+            }
+            else
+                debug("No symbol provided in osi: " + osi);
+            // get call/put
+            int cpidx = ebu.IndexOf("C");
+            if (cpidx < 0)
+            {
+                cpidx = ebu.IndexOf("P");
+                if (cpidx < 0)
+                {
+                    debug("no call/put identifier found in: " + osi);
+                    return false;
+                }
+                else
+                    sec.Details = "PUT";
+            }
+            else
+                sec.Details = "CALL";
+            // get expiration
+            string expires = ebu.Substring(0, cpidx );
+            System.Globalization.CultureInfo provider = System.Globalization.CultureInfo.InvariantCulture;
+            DateTime expiredt;
+            if (DateTime.TryParseExact(expires, "yyMMdd", provider, System.Globalization.DateTimeStyles.None, out expiredt))
+            {
+                sec.Date = Util.ToTLDate(expiredt);
+            }
+            else
+            {
+                debug("unable to parse expiration from: " + expires + " in osi: " + osi);
+                return false;
+            }
+            // get strike
+            string strikes = ebu.Substring(cpidx + 1, ebu.Length - cpidx - 1);
+            decimal v;
+            if (decimal.TryParse(strikes, out v))
+                sec.Strike = v/1000;
+            else
+            {
+                debug("unable to get strike from: " + strikes + " in osi: " + osi);
+                return false;
+            }
+
+            return true;
+
+        }
+
         public static bool SecurityExpiration(string longdate, out int date)
         {
             DateTime dt;
@@ -235,13 +338,13 @@ namespace TradeLink.Common
             return 0;
         }
 
-        static double StrikePrice(ref  string[]  tests)
+        static decimal StrikePrice(ref  string[]  tests)
         {
-            double p = 0;
+            decimal p = 0;
             for (int i = 0; i< tests.Length; i++)
             {
                 string test = tests[i];
-                if (double.TryParse(test, out p))
+                if (decimal.TryParse(test, out p))
                 {
                     tests[i] = string.Empty;
                     return p;

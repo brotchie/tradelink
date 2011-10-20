@@ -14,6 +14,11 @@ namespace TradeLink.API
         /// symbol name
         /// </summary>
         string Symbol { get; set; }
+
+        /// <summary>
+        /// symbol with underscores represented as spaces
+        /// </summary>
+        string Symbol_Spaces { get; }
         /// <summary>
         /// entire representation of security
         /// </summary>
@@ -47,9 +52,17 @@ namespace TradeLink.API
         /// </summary>
         string Details { get; set; }
         /// <summary>
+        /// whether security is a call
+        /// </summary>
+        bool isCall { get; }
+        /// <summary>
+        /// whether security is put
+        /// </summary>
+        bool isPut { get; }
+        /// <summary>
         /// strike price of options securities
         /// </summary>
-        double Strike { get; set; }
+        decimal Strike { get; set; }
     }
 
     public class InvalidSecurity : Exception { }

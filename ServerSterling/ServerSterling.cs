@@ -615,6 +615,53 @@ namespace SterServer
         int _postsubscribewait = 100;
         public int PostSymSubscribeWait { get { return _postsubscribewait; } set { _postsubscribewait = value; } }
 
+        bool _usesubscribedsym = true;
+        public bool UseSubscribedSymbolForNotify { get { return _usesubscribedsym; } set { _usesubscribedsym = value; } }
+
+        string[] syms { get { return symquotes.Split(','); } }
+        Dictionary<string, int> ssym2longsymidx = new Dictionary<string, int>();
+
+        string getfullsymbolname(string ssym)
+        {
+            int idx = getlongsymbolidx(ssym);
+            if ((idx >= 0) && (idx < syms.Length))
+            {
+                return syms[idx];
+            }
+            return ssym;
+        }
+
+        int getlongsymbolidx(string ssym)
+        {
+            int idx;
+            if (ssym2longsymidx.TryGetValue(ssym, out idx))
+                return idx;
+            return -1;
+
+        }
+
+        bool hasssymbol(string ssym)
+        {
+            return getlongsymbolidx(ssym) != -1;
+        }
+
+        string getinstrument(Security sec)
+        {
+            
+            switch (sec.Type)
+            {
+                case SecurityType.OPT:
+                    return "O";
+                case SecurityType.FUT:
+                    return "F";
+                case SecurityType.CASH:
+                case SecurityType.FOX:
+                    return "X";
+                default:
+                    return "E";
+            }
+        }
+
         bool _runbg = false;
         void background(object param)
         {
@@ -626,9 +673,28 @@ namespace SterServer
                     if (!_symsq.isEmpty)
                     {
                         _symsq.Read();
-                        foreach (string sym in symquotes.Split(','))
+                        // clear index
+                        ssym2longsymidx.Clear();
+                        for (int i = 0; i<syms.Length; i++)
                         {
-                            stiQuote.RegisterQuote(sym, "*");
+                            string sym = syms[i];
+                            // get security
+                            Security sec = SecurityImpl.Parse(sym);
+                            if (sec.hasDest)
+                                stiQuote.RegisterQuote(sec.Symbol_Spaces,sec.DestEx);
+                            else if (sec.Type== SecurityType.OPT)
+                                stiQuote.RegisterQuote(sec.Symbol_Spaces, "O");
+                            else
+                                stiQuote.RegisterQuote(sec.Symbol_Spaces, "*");
+                            // save relationship
+                            if (!ssym2longsymidx.ContainsKey(sec.Symbol_Spaces))
+                                ssym2longsymidx.Add(sec.Symbol_Spaces, i);
+                            else
+                            {
+                                v(sec.Symbol_Spaces + " replacing index: " + ssym2longsymidx[sec.Symbol_Spaces] + " with: " + i);
+                                ssym2longsymidx[sec.Symbol_Spaces] = i;
+                            }
+
                         }
                         // wait moment for quotes to load
                         Thread.Sleep(PostSymSubscribeWait);
@@ -658,7 +724,9 @@ namespace SterServer
                                 o.ex = o.symbol.Length > 3 ? "NSDQ" : "NYSE";
                             order.Destination = o.Exchange;
                             order.Side = getside(o);
-                            order.Symbol = o.symbol;
+                            Security sec = SecurityImpl.Parse(o.symbol);
+                            order.Instrument = getinstrument(sec);
+                            order.Symbol = sec.Symbol_Spaces;
                             order.Quantity = o.UnsignedSize;
                             string acct = Account != string.Empty ? Account : string.Empty;
                             order.Account = o.Account != string.Empty ? o.Account : acct;
@@ -718,6 +786,32 @@ namespace SterServer
                             }
                             else if (o.isTrail)
                                 order.PriceType = STIPriceTypes.ptSTITrailStp;
+                            // sterling options need some information provided twice
+                            if (sec.Type == SecurityType.OPT)
+                            {
+                                if (SecurityImpl.ParseOptionOSI(sec.Symbol_Spaces, ref sec, v))
+                                {
+                                    order.Maturity = sec.Date.ToString();
+                                    order.PutCall = sec.isCall ? "C" : "P";
+                                    order.StrikePrice = (double)sec.Strike;
+                                    order.Underlying = sec.Symbol;
+                                    string symbol = order.Symbol;
+                                    // if we're flat or going with our side, it's an open
+                                    if (pt[symbol, o.Account].isFlat || (pt[symbol, o.Account].isLong == o.side))
+                                    {
+                                        v(o.symbol + " marking option order as open: " + o.ToString() + " from pos: " + pt[symbol, o.Account]);
+                                        order.OpenClose = "O";
+                                    }
+                                    // if going against our side, it's a close
+                                    else if (!pt[symbol, o.Account].isFlat && (pt[symbol, o.Account].isLong == o.side))
+                                    {
+                                        v(o.symbol + " marking option order as close: " + o.ToString() + " from pos: " + pt[symbol, o.Account]);
+                                        order.OpenClose = "C";
+                                    }
+                                }
+                                else
+                                    debug("error parsing option osi: " + o.symbol + " on order: " + o.ToString());
+                            }
                             order.ClOrderID = o.id.ToString();
                             int err = order.SubmitOrder();
                             if (VerboseDebugging)
@@ -947,7 +1041,22 @@ namespace SterServer
         void dofillupdate(ref structSTITradeUpdate t)
         {
             Trade f = new TradeImpl();
-            f.symbol = t.bstrSymbol;
+            string ssym = t.bstrSymbol;
+            if (UseSubscribedSymbolForNotify)
+            {
+                int idx = getlongsymbolidx(ssym);
+                // check for error
+                if ((idx < 0) || (idx >= syms.Length))
+                {
+                    debug(ssym + " fill ack error identifying symbol idx: " + idx + " symbols: " + string.Join(",", syms));
+                    f.symbol = ssym;
+                }
+                else
+                    f.symbol = syms[idx];
+            }
+            else
+                f.symbol = ssym;
+            
             f.Account = t.bstrAccount;
             long id = 0;
             if (long.TryParse(t.bstrClOrderId, out id))
@@ -1009,7 +1118,21 @@ namespace SterServer
         {
             STIOrderStatus stat = (STIOrderStatus)structOrderUpdate.nOrderStatus;
             Order o = new OrderImpl();
-            o.symbol = structOrderUpdate.bstrSymbol;
+            string ssym = structOrderUpdate.bstrSymbol;
+            if (UseSubscribedSymbolForNotify)
+            {
+                int idx = getlongsymbolidx(ssym);
+                // check for error
+                if ((idx < 0) || (idx>=syms.Length))
+                {
+                    debug(ssym + " order ack error identifying symbol idx: " + idx + " symbols: " + string.Join(",", syms));
+                    o.symbol = ssym;
+                }
+                else
+                    o.symbol = syms[idx];
+            }
+            else
+                o.symbol = ssym;
             long id = 0;
             // see if the order id is unknown
             if (!long.TryParse(structOrderUpdate.bstrClOrderId, out id))
@@ -1135,6 +1258,7 @@ namespace SterServer
 
         Position[] tl_gotSrvPosList(string account)
         {
+            // otherwise return positions as sterling sees them
             return pt.ToArray();
         }
 
@@ -1143,8 +1267,9 @@ namespace SterServer
         object locker = new object();
         void doquote(ref structSTIQuoteUpdate q)
         {
-
-            Tick k = new TickImpl(q.bstrSymbol);
+            string ssym = q.bstrSymbol;
+            string sym = getfullsymbolname(ssym);
+            Tick k = new TickImpl(sym);
             k.bid = (decimal)q.fBidPrice;
             k.ask = (decimal)q.fAskPrice;
             k.bs = q.nBidSize / 100;
@@ -1294,7 +1419,23 @@ namespace SterServer
         void dopositionupdate(ref structSTIPositionUpdate structPositionUpdate)
         {
             // symbol
-            string sym = structPositionUpdate.bstrSym;
+            string ssym = structPositionUpdate.bstrSym;
+            string sym = ssym;
+            if (UseSubscribedSymbolForNotify)
+            {
+                sym = getfullsymbolname(ssym);
+            }
+            if (!UseSubscribedSymbolForNotify || (sym == ssym))
+            {
+                // only do for non-equities
+                if (structPositionUpdate.bstrInstrument == "O")
+                    sym = ssym + " "+SecurityType.OPT;
+                else if (structPositionUpdate.bstrInstrument == "X")
+                    sym = ssym + " " + SecurityType.CASH;
+                else if (structPositionUpdate.bstrInstrument == "F")
+                    sym = ssym + " " + SecurityType.FUT;
+            }
+
             // size
             int size = (structPositionUpdate.nSharesBot - structPositionUpdate.nSharesSld) + structPositionUpdate.nOpeningPosition;
             // price
