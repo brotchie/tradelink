@@ -39,8 +39,16 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
+
+          public event TradeLink.API.DebugDelegate SendDebugEvent;
+          void debug(StringBuilder sb) { debug(sb.ToString()); }
+          void debug(string msg)
+          {
+              if (SendDebugEvent != null)
+                  SendDebugEvent(msg);
+          }
           }
 
      /*   ================================================================   */
@@ -99,7 +107,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
 
                if (oInfo.AlertType == AlertType.LoginComplete &&
                    oInfo.ConnectionId == ConnectionId.MarketData)
@@ -119,7 +127,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -128,7 +136,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -137,7 +145,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -146,7 +154,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -155,7 +163,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -164,7 +172,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -173,7 +181,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -182,7 +190,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -191,7 +199,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -200,7 +208,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -209,7 +217,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -218,7 +226,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -227,7 +235,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -236,7 +244,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -245,7 +253,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -254,7 +262,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -263,7 +271,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -272,7 +280,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -281,7 +289,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -290,7 +298,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -299,7 +307,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -308,7 +316,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -317,7 +325,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -326,7 +334,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -335,7 +343,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   ----------------------------------------------------------------   */
@@ -344,7 +352,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -353,7 +361,7 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -362,17 +370,24 @@ namespace SampleOrderNamespace
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
-               Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   ----------------------------------------------------------------   */
 
+          public event TradeLink.API.DebugDelegate SendDebugEvent;
+          void debug(StringBuilder sb) { debug(sb.ToString()); }
+          void debug(string msg)
+          {
+              if (SendDebugEvent != null)
+                  SendDebugEvent(msg);
+          }
           public override void AccountList(AccountListInfo oInfo)
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
                sb.AppendFormat("\n");
-               System.Console.Out.Write(sb);
+               debug(sb);
 
                PRI_bGotAccounts = true;
                if (oInfo.Accounts.Count > 0)
@@ -390,7 +405,7 @@ namespace SampleOrderNamespace
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
                sb.AppendFormat("\n");
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -400,7 +415,7 @@ namespace SampleOrderNamespace
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
                sb.AppendFormat("\n");
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -410,7 +425,7 @@ namespace SampleOrderNamespace
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
                sb.AppendFormat("\n");
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -422,7 +437,7 @@ namespace SampleOrderNamespace
                oInfo.Dump(sb);
                sb.AppendFormat("\n");
 
-               System.Console.Out.Write(sb);
+               debug(sb);
 
                if (!string.IsNullOrEmpty(oInfo.CompletionReason))
                     {
@@ -437,7 +452,7 @@ namespace SampleOrderNamespace
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
                sb.AppendFormat("\n");
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -447,7 +462,7 @@ namespace SampleOrderNamespace
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
                sb.AppendFormat("\n");
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -459,7 +474,7 @@ namespace SampleOrderNamespace
                oInfo.Dump(sb);
                sb.AppendFormat("\n");
 
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -471,7 +486,7 @@ namespace SampleOrderNamespace
                oInfo.Dump(sb);
                sb.AppendFormat("\n");
 
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -483,7 +498,7 @@ namespace SampleOrderNamespace
                oReport.Dump(sb);
                sb.AppendFormat("\n");
 
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   ----------------------------------------------------------------   */
@@ -495,7 +510,7 @@ namespace SampleOrderNamespace
                oReport.Dump(sb);
                sb.AppendFormat("\n");
 
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -507,7 +522,7 @@ namespace SampleOrderNamespace
                oReport.Dump(sb);
                sb.AppendFormat("\n");
 
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -519,7 +534,7 @@ namespace SampleOrderNamespace
                oReport.Dump(sb);
                sb.AppendFormat("\n");
 
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -531,7 +546,7 @@ namespace SampleOrderNamespace
                oReport.Dump(sb);
                sb.AppendFormat("\n");
 
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -543,7 +558,7 @@ namespace SampleOrderNamespace
                oReport.Dump(sb);
                sb.AppendFormat("\n");
 
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -555,7 +570,7 @@ namespace SampleOrderNamespace
                oReport.Dump(sb);
                sb.AppendFormat("\n");
 
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -567,7 +582,7 @@ namespace SampleOrderNamespace
                oReport.Dump(sb);
                sb.AppendFormat("\n");
 
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -579,7 +594,7 @@ namespace SampleOrderNamespace
                oReport.Dump(sb);
                sb.AppendFormat("\n");
 
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -591,7 +606,7 @@ namespace SampleOrderNamespace
                oReport.Dump(sb);
                sb.AppendFormat("\n");
 
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -603,7 +618,7 @@ namespace SampleOrderNamespace
                oReport.Dump(sb);
                sb.AppendFormat("\n");
 
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -615,7 +630,7 @@ namespace SampleOrderNamespace
                oReport.Dump(sb);
                sb.AppendFormat("\n");
 
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -627,7 +642,7 @@ namespace SampleOrderNamespace
                oReport.Dump(sb);
                sb.AppendFormat("\n");
 
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */
@@ -639,7 +654,7 @@ namespace SampleOrderNamespace
                oReport.Dump(sb);
                sb.AppendFormat("\n");
 
-               System.Console.Out.Write(sb);
+               debug(sb);
                }
 
           /*   -----------------------------------------------------------   */

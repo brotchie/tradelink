@@ -212,6 +212,11 @@ namespace ServerRithmic
 
         string tl_newAcctRequest()
         {
+            if ((Account == null) || (Account.AccountId == null))
+            {
+                debug("Account not defined, responding with blank account.");
+                return string.Empty;
+            }
             return Account.AccountId;
         }
 
@@ -456,13 +461,27 @@ namespace ServerRithmic
 
           /*   -----------------------------------------------------------   */
 
+        
+          
+
           public override void AccountList(AccountListInfo oInfo)
                {
                StringBuilder sb = new StringBuilder();
                oInfo.Dump(sb);
                sb.AppendFormat("\n");
                debug(sb);
+              PRI_bGotAccounts = true;
+              if (oInfo.Accounts.Count > 0)
+                    {
+                    PRI_oAccount = new AccountInfo(oInfo.Accounts[0].FcmId,
+                                                   oInfo.Accounts[0].IbId,
+                                                   oInfo.Accounts[0].AccountId);
+                    }
+               
                }
+
+          
+          
 
           public override void PasswordChange(PasswordChangeInfo oInfo)
                {
