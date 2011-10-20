@@ -59,7 +59,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink\Time and Sales.lnk" "$INSTDIR\TimeSales.exe" "" "$INSTDIR\TimeSales.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Uninstall TradeLink.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\TikConverter.lnk" "$INSTDIR\TikConverter.exe" "" "$INSTDIR\TikConverter.exe" 0
-  CreateShortCut "$SMPROGRAMS\TradeLink\TickData.lnk" "$LOCALAPPDATA\TradeLinkTicks\" "" "$LOCALAPPDATA\TradeLinkTicks" 0
+  CreateShortCut "$SMPROGRAMS\TradeLink\TickData.lnk" "$LOCALAPPDATA\TradeLinkTicks\" "" "" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Logs.lnk" "$LOCALAPPDATA\" "" "$LOCALAPPDATA\" 0
   CreateShortCut "$SMPROGRAMS\TradeLink\Kadina.lnk" "$INSTDIR\Kadina.EXE" "" "$INSTDIR\Kadina.EXE" 0 
   CreateShortCut "$SMPROGRAMS\TradeLink\Record.lnk" "$INSTDIR\Record.EXE" "" "$INSTDIR\Record.EXE" 0  
