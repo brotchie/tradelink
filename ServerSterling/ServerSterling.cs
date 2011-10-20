@@ -160,6 +160,7 @@ namespace SterServer
                 debug("ServerStops: " + (UseServerStops ? "ON" : "disabled."));
                 debug("SendCancelOnRejects: "+(SendCancelOnReject ? "ON" : "disabled."));
                 debug("SendCancelOnError: " + (SendCancelOnError? "ON" : "disabled."));
+                debug("UseSubscribedSymbolForNotify: " + (UseSubscribedSymbolForNotify? "ON" : "disabled."));
                 
                 
             }

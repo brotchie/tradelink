@@ -59,6 +59,7 @@ namespace SterServer
                 tl.AutosetUnsetId = Properties.Settings.Default.AutoSeUnsetId;
                 tl.SendCancelOnReject = Properties.Settings.Default.SendCancelOnRejects;
                 tl.SendCancelOnError = Properties.Settings.Default.SendCancelOnError;
+                tl.UseSubscribedSymbolForNotify = Properties.Settings.Default.UseSubscribedSymbolForNotify;
                 tl.Start();
             }
             catch (Exception ex)

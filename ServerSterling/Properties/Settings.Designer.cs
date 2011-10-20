@@ -310,5 +310,17 @@ namespace SterServer.Properties {
                 this["SendCancelOnError"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool UseSubscribedSymbolForNotify {
+            get {
+                return ((bool)(this["UseSubscribedSymbolForNotify"]));
+            }
+            set {
+                this["UseSubscribedSymbolForNotify"] = value;
+            }
+        }
     }
 }
