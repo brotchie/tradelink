@@ -59,18 +59,18 @@ namespace IQFeedBroker
         public bool isPaperTradeUsingBidAsk { get { return _papertradebidask; } set { _papertradebidask = value; } }
 
         bool _saverawdata = false;
-        public bool SaveRawData { get { return true; } 
+        public bool SaveRawData { get { return _saverawdata; } 
             set { 
-                //_saverawdata = value; 
+                _saverawdata = value; 
             } }
 
         BackgroundWorker saveraw = new BackgroundWorker();
 
         bool _reportlatency = false;
-        public bool ReportLatency { get { return true; } 
+        public bool ReportLatency { get { return _reportlatency; } 
             set 
             { 
-                //_reportlatency = value; 
+                _reportlatency = value; 
             } }
 
         public IQFeedHelper(TLServer tls)
