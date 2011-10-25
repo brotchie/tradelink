@@ -154,7 +154,12 @@ namespace ServerRithmic
             {
                 // subscribe what we don't have
                 if (!syms.Contains(sym))
-                    oEngine.subscribe(string.Empty,sym,flags,null);
+                {
+                    // get the security
+                    Security sec = SecurityImpl.Parse(sym);
+                    string ex = sec.hasDest ? sec.DestEx : "NYSE";
+                    oEngine.subscribe(ex, sec.Symbol, flags, null);
+                }
             }
 
             // remove old
@@ -300,7 +305,7 @@ namespace ServerRithmic
                oInfo.Dump(sb);
                debug(sb);
 
-               Tick k = TickImpl.NewBid(oInfo.Symbol, (decimal)oInfo.Price, oInfo.Size);
+               Tick k = TickImpl.NewAsk(oInfo.Symbol, (decimal)oInfo.Price, oInfo.Size);
                k.be = oInfo.Exchange;
                k.date = Util.ToTLDate();
                k.time = Util.ToTLTime();
@@ -313,7 +318,7 @@ namespace ServerRithmic
                oInfo.Dump(sb);
                debug(sb);
 
-               Tick k = TickImpl.NewAsk(oInfo.Symbol, (decimal)oInfo.Price, oInfo.Size);
+               Tick k = TickImpl.NewBid(oInfo.Symbol, (decimal)oInfo.Price, oInfo.Size);
                k.be = oInfo.Exchange;
                k.date = Util.ToTLDate();
                k.time = Util.ToTLTime();
