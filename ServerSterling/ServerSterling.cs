@@ -700,6 +700,13 @@ namespace SterServer
                         Thread.Sleep(PostSymSubscribeWait);
                     }
 
+                    // prepare cancels
+                    List<long> reqcancels = new List<long>();
+                    while (_cancelq.hasItems)
+                    {
+                        reqcancels.Add(_cancelq.Read());
+                    }
+
                     // orders
                     while (!_orderq.isEmpty)
                     {
@@ -710,6 +717,11 @@ namespace SterServer
                         if ((o.id == 0) && AutosetUnsetId)
                         {
                             o.id = _idt.AssignId;
+                        }
+                        if (reqcancels.Contains(o.id))
+                        {
+                            v(o.symbol + " not sending order: " + o.ToString() + " as this order was requested to be canceled.");
+                            continue;
                         }
                         if (isPaperTradeEnabled)
                         {
@@ -854,9 +866,9 @@ namespace SterServer
                     }
 
                     // cancels
-                    if (!_cancelq.isEmpty)
+                    for (int i = 0; i<reqcancels.Count; i++)
                     {
-                        long number = _cancelq.Read();
+                        long number = reqcancels[i];
                         if (isPaperTradeEnabled)
                         {
                             ptt.sendcancel(number);
@@ -885,7 +897,7 @@ namespace SterServer
                             else
                                 debug("No record of order id: " + number.ToString());
                             // see if empty yet
-                            if (_cancelq.hasItems)
+                            if (i!=reqcancels.Count-1)
                                 Thread.Sleep(_CANCELWAIT);
                         }
                     }
