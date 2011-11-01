@@ -681,20 +681,19 @@ namespace SterServer
                             string sym = syms[i];
                             // get security
                             Security sec = SecurityImpl.Parse(sym);
+                            // save relationship
+                            if (!ssym2longsymidx.ContainsKey(sec.Symbol_Spaces))
+                                ssym2longsymidx.Add(sec.Symbol_Spaces, i);
+                            // don't re-register same symbol
+                            else
+                                continue;
                             if (sec.hasDest)
                                 stiQuote.RegisterQuote(sec.Symbol_Spaces,sec.DestEx);
                             else if (sec.Type== SecurityType.OPT)
                                 stiQuote.RegisterQuote(sec.Symbol_Spaces, "O");
                             else
                                 stiQuote.RegisterQuote(sec.Symbol_Spaces, "*");
-                            // save relationship
-                            if (!ssym2longsymidx.ContainsKey(sec.Symbol_Spaces))
-                                ssym2longsymidx.Add(sec.Symbol_Spaces, i);
-                            else
-                            {
-                                v(sec.Symbol_Spaces + " replacing index: " + ssym2longsymidx[sec.Symbol_Spaces] + " with: " + i);
-                                ssym2longsymidx[sec.Symbol_Spaces] = i;
-                            }
+
 
                         }
                         // wait moment for quotes to load
