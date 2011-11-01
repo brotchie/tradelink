@@ -127,13 +127,13 @@ namespace ServerRithmic
             }
         }
 
+        Basket org = new BasketImpl();
 
         void tl_newRegisterSymbols(string client, string symbols)
         {
             if (VerboseDebugging)
                 debug("client subscribe request received: " + symbols);
-            // get original basket
-            Basket org = BasketImpl.FromString(symbols);
+
             Basket rem = new BasketImpl();
 
             // if we had something before, check if something was removed
@@ -149,11 +149,13 @@ namespace ServerRithmic
             List<string> syms = new List<string>();
             syms.AddRange(tl.AllClientBasket.ToSymArray());
 
+            List<string> orgs = new List<string>(org.ToSymArray());
+
             // add current
-            foreach (string sym in org.ToSymArray())
+            foreach (string sym in tl.AllClientBasket.ToSymArray())
             {
                 // subscribe what we don't have
-                if (!syms.Contains(sym))
+                if (!orgs.Contains(sym))
                 {
                     // get the security
                     Security sec = SecurityImpl.Parse(sym);
