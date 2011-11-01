@@ -699,8 +699,21 @@ namespace ServerRithmic
             try
             {
                 oEngine.logout();
+                
             }
-            catch { }
+            catch (Exception ex)
+            {
+                debug("error logging out: " + ex.Message + ex.StackTrace);
+            }
+
+            try
+            {
+                oEngine.shutdown();
+            }
+            catch (Exception ex)
+            {
+                debug("error shutting down: " + ex.Message + ex.StackTrace);
+            }
         }
 
         protected void debug(StringBuilder sb) { debug(sb.ToString()); }
