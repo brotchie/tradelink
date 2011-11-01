@@ -248,9 +248,13 @@ namespace TradeLink.AppKit
         }
         decimal getPrice(int Y) 
         {
-            if (bl == null) return 0;
+            if (bl == null) 
+                return 0;
+            if (pixperdollar == 0)
+                return 0;
             decimal p = (((decimal)(Y-hborder)/pixperdollar)-highesth)*-1;
-            if ((p > highesth) || (p < lowestl)) return 0;
+            if ((p > highesth) || (p < lowestl)) 
+                return 0;
             return p;
         }
 
