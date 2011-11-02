@@ -5,7 +5,7 @@
 // Copyright © 2001-2011 Lightspeed Financial, Inc. All rights reserved.
 
 #define LS_API_VERSION_1 0
-#define LS_API_VERSION_2 8
+#define LS_API_VERSION_2 7
 #define LS_API_VERSION_3 0
 #define LS_API_VERSION_4 0
 

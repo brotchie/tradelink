@@ -24,11 +24,9 @@ extern "C" void L_AddMessageToAppWnd(char const *message);
 extern "C" void L_AddMessageToExtensionWnd(char const *message, COLORREF color = RGB(255, 255, 255));
 
 extern "C" L_Summary *L_CreateSummary(char const *symbol);
-extern "C" L_Summary *L_TryCreateSummary(char const *symbol);
 extern "C" void L_DestroySummary(L_Summary *sum);
 
 extern "C" L_FullQuote *L_CreateFullQuote(char const *symbol);
-extern "C" L_FullQuote *L_TryCreateFullQuote(char const *symbol);
 extern "C" void L_DestroyFullQuote(L_FullQuote *fullQuote);
 
 extern "C" char const *L_GetFocusedSymbol();
@@ -63,13 +61,6 @@ extern "C" void L_UnsubscribeFromECN(char const *ecn, char const *symbol, L_Obse
 
 extern "C" void L_SubscribeToMarketStatus(L_Observer *dest);
 extern "C" void L_UnsubscribeFromMarketStatus(L_Observer *dest);
-
-extern "C" long L_SummaryCount(char const *symbol);
-extern "C" long L_L1SubscriptionCount(char const *symbol);
-extern "C" long L_FullQuoteCount(char const *symbol);
-extern "C" long L_TradesSubscriptionCount(char const *symbol);
-extern "C" long L_L2SubscriptionCount(char const *symbol);
-extern "C" long L_ECNSubscriptionCount(char const *ecn, char const *symbol);
 
 extern "C" bool L_IsExecutorConnected();
 extern "C" bool L_IsQuoteConnected();
