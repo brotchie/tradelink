@@ -267,128 +267,131 @@ namespace TradeLink.AppKit
         public string Title { get { if (bl == null) return Symbol; return Symbol + " " + Enum.GetName(typeof(BarInterval), bl.DefaultInterval).ToString(); } }
         void Chart_Paint(object sender, PaintEventArgs e)
         {
-            // get form
-            ChartControl f = (ChartControl)sender;
-            // get graphics
-            g = e.Graphics;
-            // get window
-            r = ClientRectangle;
-            // get title
-            Text = Title;
-            // check for data
-            if ((bl == null) || (bl.Intervals.Length==0) || (bl.Count == 0))
+            lock (bl)
             {
-                g.DrawString("Unknown symbol, or no data.", new Font(FontFamily.GenericSerif, 14, FontStyle.Bold), Brushes.Red, new PointF(r.Width / 3, r.Height / 2));
-                return;
-            }
-            border = (int)(g.MeasureString(bl.High()[0].ToString(), f.Font).Width);
-            // setup to draw
-
-            Pen p = new Pen(fgcol);
-            g.Clear(f.BackColor);
-            // get number of pixels available for each bar, based on screensize and barcount
-            pixperbar = (((decimal)r.Width - (decimal)border - ((decimal)border/3)) / (decimal)barc);
-            // pixels for each time stamp
-            const int pixperbarlabel = 60;
-            // number of labels we have room to draw
-            int numbarlabels = (int)((double)(r.Width - border - ((double)border / 3)) / pixperbarlabel);
-            // draw a label every so many bars (assume every bar to star)
-            int labeleveryX = 1;
-            // if there's more bars than space
-            if (barc>numbarlabels)
-                labeleveryX = (int)Math.Round(((double)barc / numbarlabels));
-            // get dollar range for chart
-            decimal range = (highesth - lowestl);
-            // get pixels available for each dollar of movement
-            pixperdollar = range == 0 ? 0 : (((decimal)r.Height - (decimal)hborder * 2) / range);
-
-
-            // x-axis
-            g.DrawLine(new Pen(fgcol),(int)(border/3), r.Height-hborder, r.Width - border, r.Height - hborder);
-            // y-axis
-            g.DrawLine(new Pen(fgcol), r.Width - border, r.Y + hborder, r.Width-border, r.Height - hborder);
-
-            const int minxlabelwidth = 30;
-
-            int lastlabelcoord = -500;
-
-            for (int i = 0; i < barc; i++)
-            {
-                // get bar color
-                Color bcolor = (bl.Close()[i] > bl.Open()[i]) ? Color.Green : Color.Red;
-                p = new Pen(bcolor);
-                try
+                // get form
+                ChartControl f = (ChartControl)sender;
+                // get graphics
+                g = e.Graphics;
+                // get window
+                r = ClientRectangle;
+                // get title
+                Text = Title;
+                // check for data
+                if ((bl == null) || (bl.Intervals.Length == 0) || (bl.Count == 0))
                 {
-                    // draw high/low bar
-                    g.DrawLine(p, getX(i), getY(bl.Low()[i]), getX(i), getY(bl.High()[i]));
-                    // draw open bar
-                    g.DrawLine(p, getX(i), getY(bl.Open()[i]), getX(i) - (int)(pixperbar / 3), getY(bl.Open()[i]));
-                    // draw close bar
-                    g.DrawLine(p, getX(i), getY(bl.Close()[i]), getX(i) + (int)(pixperbar / 3), getY(bl.Close()[i]));
-                    // draw time labels (time @30min and date@noon)
-
-                    // if interval is intra-day
-                    if (bl.DefaultInterval != BarInterval.Day)
-                    {
-                        // every 6 bars draw the bartime
-                        if ((i % labeleveryX) == 0) g.DrawString((bl.Time()[i]/100).ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (f.Font.GetHeight() * 3));
-                        // if it's noon, draw the date
-                        if (bl.Time()[i]== 120000) g.DrawString(bl.Date()[i].ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (float)(f.Font.GetHeight() * 1.5));
-                    }
-                    else // otherwise it's daily data
-                    {
-                        // get date
-                        int[] date = Calc.Date(bl.Date()[i]);
-                        int[] lastbardate = date;
-                        // get previous bar date if we have one
-                        if ((i - 1) > 0) lastbardate = Calc.Date(bl.Date()[i]);
-                        // if we have room since last time we drew the year
-                        if ((getX(lastlabelcoord) + minxlabelwidth) <= getX(i))
-                        {
-                            // get coordinate for present days label
-                            lastlabelcoord = i;
-                            // draw day
-                            g.DrawString(date[2].ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (f.Font.GetHeight() * 3));
-                        }
-                        // if it's first bar or a new month
-                        if ((i == 0) || (lastbardate[1] != date[1]))
-                        {
-                            // get the month
-                            string ds = date[1].ToString();
-                            // if it sfirst bar or the year has changed, add year to month
-                            if ((i == 0) || (lastbardate[0] != date[0])) ds += '/' + date[0].ToString();
-                            // draw the month
-                            g.DrawString(ds, f.Font, new SolidBrush(fgcol), getX(i), r.Height - (float)(f.Font.GetHeight() * 1.5));
-                        }
-                    }
+                    g.DrawString("Unknown symbol, or no data.", new Font(FontFamily.GenericSerif, 14, FontStyle.Bold), Brushes.Red, new PointF(r.Width / 3, r.Height / 2));
+                    return;
                 }
-                catch (OverflowException) { }
-            }
+                border = (int)(g.MeasureString(bl.High()[0].ToString(), f.Font).Width);
+                // setup to draw
 
-            // DRAW YLABELS
-            // max number of even intervaled ylabels possible on yaxis
-            int numlabels = (int)((r.Height - hborder) / (f.Font.GetHeight()*1.5));
-            // nearest price units giving "pretty" even intervaled ylabels
-            decimal priceunits = NearestPrettyPriceUnits(highesth - lowestl, numlabels);
-            // starting price point from low end of range, including lowest low in barlist
-            decimal lowstart = lowestl - ((lowestl * 100) % (priceunits * 100)) / 100;
-            // original "non-pretty" price units calc
-            //decimal priceunits = (highesth-lowestl)/numlabels;
-            Pen priceline = new Pen(Color.BlueViolet);
-            priceline.DashStyle = System.Drawing.Drawing2D.DashStyle.Dot;
+                Pen p = new Pen(fgcol);
+                g.Clear(f.BackColor);
+                // get number of pixels available for each bar, based on screensize and barcount
+                pixperbar = (((decimal)r.Width - (decimal)border - ((decimal)border / 3)) / (decimal)barc);
+                // pixels for each time stamp
+                const int pixperbarlabel = 60;
+                // number of labels we have room to draw
+                int numbarlabels = (int)((double)(r.Width - border - ((double)border / 3)) / pixperbarlabel);
+                // draw a label every so many bars (assume every bar to star)
+                int labeleveryX = 1;
+                // if there's more bars than space
+                if (barc > numbarlabels)
+                    labeleveryX = (int)Math.Round(((double)barc / numbarlabels));
+                // get dollar range for chart
+                decimal range = (highesth - lowestl);
+                // get pixels available for each dollar of movement
+                pixperdollar = range == 0 ? 0 : (((decimal)r.Height - (decimal)hborder * 2) / range);
 
-            for (decimal i = 0;i<=numlabels; i++) 
-            {
-                decimal price = lowstart+(i*priceunits);
-                g.DrawString(price.ToString("C"),f.Font,new SolidBrush(fgcol), r.Width-border,getY(price)-f.Font.GetHeight());
-                g.DrawLine(priceline, border/3, getY(price), r.Width - border, getY(price));
-            }
-            if (DisplayInterval && (bl!=null))
-            {
-                g.DrawString(bl.DefaultInterval.ToString(), f.Font, new SolidBrush(fgcol), 3, 3);
-            }
 
-            DrawLabels();
+                // x-axis
+                g.DrawLine(new Pen(fgcol), (int)(border / 3), r.Height - hborder, r.Width - border, r.Height - hborder);
+                // y-axis
+                g.DrawLine(new Pen(fgcol), r.Width - border, r.Y + hborder, r.Width - border, r.Height - hborder);
+
+                const int minxlabelwidth = 30;
+
+                int lastlabelcoord = -500;
+
+                for (int i = 0; i < barc; i++)
+                {
+                    // get bar color
+                    Color bcolor = (bl.Close()[i] > bl.Open()[i]) ? Color.Green : Color.Red;
+                    p = new Pen(bcolor);
+                    try
+                    {
+                        // draw high/low bar
+                        g.DrawLine(p, getX(i), getY(bl.Low()[i]), getX(i), getY(bl.High()[i]));
+                        // draw open bar
+                        g.DrawLine(p, getX(i), getY(bl.Open()[i]), getX(i) - (int)(pixperbar / 3), getY(bl.Open()[i]));
+                        // draw close bar
+                        g.DrawLine(p, getX(i), getY(bl.Close()[i]), getX(i) + (int)(pixperbar / 3), getY(bl.Close()[i]));
+                        // draw time labels (time @30min and date@noon)
+
+                        // if interval is intra-day
+                        if (bl.DefaultInterval != BarInterval.Day)
+                        {
+                            // every 6 bars draw the bartime
+                            if ((i % labeleveryX) == 0) g.DrawString((bl.Time()[i] / 100).ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (f.Font.GetHeight() * 3));
+                            // if it's noon, draw the date
+                            if (bl.Time()[i] == 120000) g.DrawString(bl.Date()[i].ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (float)(f.Font.GetHeight() * 1.5));
+                        }
+                        else // otherwise it's daily data
+                        {
+                            // get date
+                            int[] date = Calc.Date(bl.Date()[i]);
+                            int[] lastbardate = date;
+                            // get previous bar date if we have one
+                            if ((i - 1) > 0) lastbardate = Calc.Date(bl.Date()[i]);
+                            // if we have room since last time we drew the year
+                            if ((getX(lastlabelcoord) + minxlabelwidth) <= getX(i))
+                            {
+                                // get coordinate for present days label
+                                lastlabelcoord = i;
+                                // draw day
+                                g.DrawString(date[2].ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (f.Font.GetHeight() * 3));
+                            }
+                            // if it's first bar or a new month
+                            if ((i == 0) || (lastbardate[1] != date[1]))
+                            {
+                                // get the month
+                                string ds = date[1].ToString();
+                                // if it sfirst bar or the year has changed, add year to month
+                                if ((i == 0) || (lastbardate[0] != date[0])) ds += '/' + date[0].ToString();
+                                // draw the month
+                                g.DrawString(ds, f.Font, new SolidBrush(fgcol), getX(i), r.Height - (float)(f.Font.GetHeight() * 1.5));
+                            }
+                        }
+                    }
+                    catch (OverflowException) { }
+                }
+
+                // DRAW YLABELS
+                // max number of even intervaled ylabels possible on yaxis
+                int numlabels = (int)((r.Height - hborder) / (f.Font.GetHeight() * 1.5));
+                // nearest price units giving "pretty" even intervaled ylabels
+                decimal priceunits = NearestPrettyPriceUnits(highesth - lowestl, numlabels);
+                // starting price point from low end of range, including lowest low in barlist
+                decimal lowstart = lowestl - ((lowestl * 100) % (priceunits * 100)) / 100;
+                // original "non-pretty" price units calc
+                //decimal priceunits = (highesth-lowestl)/numlabels;
+                Pen priceline = new Pen(Color.BlueViolet);
+                priceline.DashStyle = System.Drawing.Drawing2D.DashStyle.Dot;
+
+                for (decimal i = 0; i <= numlabels; i++)
+                {
+                    decimal price = lowstart + (i * priceunits);
+                    g.DrawString(price.ToString("C"), f.Font, new SolidBrush(fgcol), r.Width - border, getY(price) - f.Font.GetHeight());
+                    g.DrawLine(priceline, border / 3, getY(price), r.Width - border, getY(price));
+                }
+                if (DisplayInterval && (bl != null))
+                {
+                    g.DrawString(bl.DefaultInterval.ToString(), f.Font, new SolidBrush(fgcol), 3, 3);
+                }
+
+                DrawLabels();
+            }
         }
 
         /// <summary>
