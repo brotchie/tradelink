@@ -291,8 +291,8 @@ Section "ResponseExamples"
   File /r /x *.user /x *.xml /x *.dll /x *.pdf /x *.csv /x *.txt /x *.Cache /x .svn /x obj /x bin Responses
   File /r Responses\TA*.*
   CreateShortCut "$SMPROGRAMS\TradeLink\ResponseExamples.lnk" "$INSTDIR\Responses\Responses.csproj" "" "$INSTDIR\Responses\Responses.csproj" 0
-  CopyFiles /silent $INSTDIR\*.dll $INSTDIR\Responses\bin\debug
-  CopyFiles /silent $INSTDIR\*.dll $INSTDIR\Responses\bin\release
+  CopyFiles /silent $INSTDIR\TradeLink*.dll $INSTDIR\Responses\bin\debug
+  CopyFiles /silent $INSTDIR\TradeLink*.dll $INSTDIR\Responses\bin\release
   
 SectionEnd
 
