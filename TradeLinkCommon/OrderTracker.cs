@@ -54,6 +54,7 @@ namespace TradeLink.Common
         {
             int sentsize = (orders[idx].side? 1 : -1) * Math.Abs(orders[idx].size);
             v(txt + " sentsize: " + sentsize + " after: " + orders[idx].ToString());
+            unknownsent.addindex(txt, false);
             sent.addindex(txt, sentsize);
             filled.addindex(txt, 0);
             canceled.addindex(txt, false);
@@ -64,6 +65,8 @@ namespace TradeLink.Common
         }
 
 
+
+        GenericTracker<bool> unknownsent = new GenericTracker<bool>();
         GenericTracker<int> sent = new GenericTracker<int>();
         GenericTracker<int> filled = new GenericTracker<int>();
         GenericTracker<bool> canceled = new GenericTracker<bool>();
@@ -218,7 +221,10 @@ namespace TradeLink.Common
             int idx = sent.getindex(id.ToString());
             if (idx<0)
             {
-                debug("unknown cancelid: "+id);
+                debug("no existing order found with cancel id: "+id);
+                idx = orders.addindex(id.ToString(), new OrderImpl());
+                unknownsent[idx] = true;
+                canceled[idx] = true;
                 return;
             }
             canceled[idx] = true;
@@ -233,6 +239,9 @@ namespace TradeLink.Common
             }
         }
 
+        bool _fixsentonunknown = false;
+        public bool FixSentSizeOnUnknown { get { return _fixsentonunknown; } set { _fixsentonunknown = value; } }
+
         public virtual void GotFill(Trade f)
         {
             if (f.id == 0)
@@ -243,10 +252,13 @@ namespace TradeLink.Common
             int idx = sent.getindex(f.id.ToString());
             if (idx < 0)
             {
-                debug("unknown fillid: " + f.id);
-                return;
+                debug("no existing order found with fillid: " + f.id);
+                idx = orders.addindex(f.id.ToString(), new OrderImpl());
+                unknownsent[idx] = true;
             }
             filled[idx] += (f.side ? 1 : -1) *Math.Abs(f.xsize);
+            if (FixSentSizeOnUnknown && unknownsent[idx])
+                sent[idx] = filled[idx];
             v(f.symbol + " filled size: " + filled[idx] + " after: " + f.ToString());
         }
 
