@@ -282,13 +282,31 @@ namespace TradeLink.Common
         public void Disconnect()
         {
             v("disconnecting from all providers.");
-            if (quote!=null)
-                quote.Disconnect();
+            if (quote != null)
+            {
+                try
+                {
+                    quote.Disconnect();
+                }
+                catch (TLServerNotFound) { }
+            }
             if (execute != null)
-                execute.Disconnect();
+            {
+                try
+                {
+                    execute.Disconnect();
+                }
+                catch (TLServerNotFound) { }
+            }
             for (int i = 0; i < _pcon.Count; i++)
                 if (_pcon[i] != null)
-                    _pcon[i].Disconnect();
+                {
+                    try
+                    {
+                        _pcon[i].Disconnect();
+                    }
+                    catch (TLServerNotFound) { }
+                }
         }
 
         public int HeartBeat()
@@ -374,6 +392,8 @@ namespace TradeLink.Common
                 debug("At least one valid IpAddress found, attempting IP transport.");
             else
                 debug("No ip addresses specified, attempting Windows IPC.");
+            // disconnect any existing providers
+            Disconnect();
 
             TLClient tl = getsearchclient();
             
