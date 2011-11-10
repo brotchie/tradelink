@@ -267,6 +267,8 @@ namespace TradeLink.AppKit
         public string Title { get { if (bl == null) return Symbol; return Symbol + " " + Enum.GetName(typeof(BarInterval), bl.DefaultInterval).ToString(); } }
         void Chart_Paint(object sender, PaintEventArgs e)
         {
+            if (bl == null)
+                return;
             lock (bl)
             {
                 // get form
