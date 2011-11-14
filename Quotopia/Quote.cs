@@ -273,7 +273,7 @@ namespace Quotopia
         }
 
         Timer statfade = new Timer();
-        Multimedia.Timer ticker = new Multimedia.Timer();
+        
         DataGridView qg = new DataGridView();
         DataTable qt = new DataTable();
         const string SYMBOL = "Symbol";
