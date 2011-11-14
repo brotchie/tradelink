@@ -17,7 +17,8 @@ namespace Quotopia
     public delegate void OrderStatusDel(string sym, int error);
     public partial class Quote : AppTracker
     {
-
+        OrderTracker ord = new OrderTracker();
+        IdTracker idt = new IdTracker();
         public int GetDate { get { DateTime d = DateTime.Now; int i = (d.Year * 10000) + (d.Month * 100) + d.Day; return i; } }
         public int GetTime { get { DateTime d = DateTime.Now; int i = (d.Hour * 100) + (d.Minute); return i; } }
         public event TickDelegate spillTick;
@@ -77,6 +78,8 @@ namespace Quotopia
                 _bf.gotTick += new TickDelegate(tl_gotTickasync);
                 _ar.GotTick += new TickDelegate(tl_gotTick);
             }
+            ord.VerboseDebugging = true;
+            ord.SendDebugEvent+=new DebugDelegate(debug);
             _bf.gotFill += new FillDelegate(tl_gotFill);
             _bf.gotOrder += new OrderDelegate(tl_gotOrder);
             _bf.gotOrderCancel += new LongDelegate(tl_gotOrderCancel);
@@ -216,7 +219,8 @@ namespace Quotopia
 
         void tl_gotOrderCancel(long number)
         {
-            debug("cancelack: " + number);
+            ord.GotCancel(number);
+            
             if (ordergrid.InvokeRequired)
                 ordergrid.Invoke(new LongDelegate(tl_gotOrderCancel), new object[] { number });
             else
@@ -239,7 +243,8 @@ namespace Quotopia
 
         void tl_gotOrder(Order o)
         {
-            debug("orderack: " + o.ToString());
+            ord.GotOrder(o);
+            
             if (orderidx(o.id)==-1) // if we don't have this order, add it
                 ordergrid.Rows.Add(new object[] { o.id, o.symbol, (o.side ? "BUY" : "SELL"), o.UnsignedSize, (o.price == 0 ? "Market" : o.price.ToString(_dispdecpointformat)), (o.stopp == 0 ? "" : o.stopp.ToString(_dispdecpointformat)), o.Account });
         }
@@ -396,6 +401,8 @@ namespace Quotopia
                 sendOrder.Account = accountname.Text;
             if (exchdest.Text != "")
                 sendOrder.Exchange = exchdest.Text;
+            if (sendOrder.id == 0)
+                sendOrder.id = idt.AssignId;
             int res = _bf.SendOrder(sendOrder);
             if (res != 0)
             {
@@ -771,7 +778,7 @@ namespace Quotopia
 
         void tl_gotFill(Trade t)
         {
-            debug("fill: " + t.ToString());
+            ord.GotFill(t);
             if (InvokeRequired)
                 Invoke(new FillDelegate(tl_gotFill), new object[] { t });
             else
