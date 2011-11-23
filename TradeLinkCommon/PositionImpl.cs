@@ -213,7 +213,7 @@ namespace TradeLink.Common
 
         public static string Serialize(Position p)
         {
-            string[] r = new string[] { p.Symbol, p.AvgPrice.ToString("N2",System.Globalization.CultureInfo.InvariantCulture), p.Size.ToString(), p.ClosedPL.ToString("N2",System.Globalization.CultureInfo.InvariantCulture), p.Account };
+            string[] r = new string[] { p.Symbol, p.AvgPrice.ToString("F2", System.Globalization.CultureInfo.InvariantCulture), p.Size.ToString("F0", System.Globalization.CultureInfo.InvariantCulture), p.ClosedPL.ToString("F2", System.Globalization.CultureInfo.InvariantCulture), p.Account };
             return string.Join(",", r);
         }
 
