@@ -16,6 +16,8 @@ namespace TradeLink.AppKit
     /// </summary>
     public partial class Ticket : Form
     {
+        bool _assumenoordermod = true;
+        public bool AssumeNewOrder { get { return _assumenoordermod; } set { _assumenoordermod = value; } }
         Order work = new OrderImpl();
         /// <summary>
         /// gets the current value of the working order for the ticket
@@ -136,6 +138,8 @@ namespace TradeLink.AppKit
                 work.price = limit;
                 work.stopp = stop;
             }
+            if (AssumeNewOrder)
+                work.id = 0;
             if (SendOrder!=null) SendOrder(work);
         }
 
