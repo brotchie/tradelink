@@ -50,6 +50,7 @@ namespace TradeLibFast
 		bool fillnotifyfullsymbol;
 		bool linktest();
 		vector<TLPosition> poslist;
+		int getposidx(TLPosition pos);
 		bool havepos(TLPosition p);
 		int PositionResponse(CString account, CString client);
 		// here's a vector of pointers to our socket connections to IB

@@ -1093,14 +1093,18 @@ namespace TradeLibFast
 		}
 	}
 
-	
+	int TWS_TLServer::getposidx(TLPosition pos)
+	{
+		for (int i = 0; i<(int)poslist.size(); i++)
+			if ((poslist[i].Symbol==pos.Symbol) && (poslist[i].Account == pos.Account))
+				return i;
+		return -1;
+	}
 
 	bool TWS_TLServer::havepos(TLPosition pos)
 	{
-		for (int i = 0; i<(int)poslist.size(); i++)
-			if ((poslist[i].Symbol==pos.Symbol))
-				return true;
-		return false;
+		int idx = getposidx(pos);
+		return idx!=-1;
 	}
 
 	void TWS_TLServer::updatePortfolio( const Contract& contract, int position,
@@ -1142,8 +1146,13 @@ namespace TradeLibFast
 		pos.AvgPrice = marketPrice;
 		pos.ClosedPL = realizedPNL;
 		pos.Account = accountName;
-		if (!havepos(pos))
+		int idx = getposidx(pos);
+		if (idx<0)
 			poslist.push_back(pos);
+		else
+			poslist[idx] = pos;
+
+
 
 	}
 
