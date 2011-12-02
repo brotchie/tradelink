@@ -383,7 +383,12 @@ namespace TradeLibFast
 			line.Format("%i %s",now[TLtime],message);
 			debugbuffer.Append(line);
 			if (LOGENABLED)
+			{
+				// write it
 				log<<line<<endl;
+				// ensure log is written now
+				log.flush();
+			}
 			__raise this->GotDebug(line);
 		}
 	}

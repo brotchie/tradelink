@@ -1,8 +1,0 @@
-; TradeLibFast.def : Declares the module parameters for the DLL.
-
-LIBRARY      "TradeLibFast"
-
-EXPORTS
-    ; Explicit exports can go here
-    TLSENDORDER		@1
-    TLSENDCANCEL	@2

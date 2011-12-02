@@ -38,7 +38,7 @@ using namespace TradeLibFast;
 		CString or2str(long res);
 		void v(const CString &msg);
 		bool _noverb;
-		
+		int64 GetUniqueId(int64 existing);
 		
 		void ReadConfig();
 		bool _imbexch;
@@ -82,13 +82,12 @@ using namespace TradeLibFast;
 		vector<long> lsorderidfinal;
 		vector<TLOrder> tlorders;
 
-		int64 finalid2tlid(long final);
-		void tlid2final(int64 tlid, long finalid);
+		
 		
 		int64 fetchOrderIdAndRemove(L_Order* order);
 		int64 fetchOrderId(L_Order * order);
 		bool IdIsUnique(int64 id);
-		bool saveOrder(L_Order* o,int64 id);
+
 		int64 matchlsid2tlid(long somelsid);
 
 

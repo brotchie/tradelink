@@ -240,27 +240,9 @@
 			o.stop = order->L_SecondaryPrice();
 			o.size = (o.side ? 1 : -1) * abs(order->L_ActiveShares());
 			o.account = CString(accounts[0]->L_TraderId());
-			// try to save this order
-			bool isnew = saveOrder(order,0);
-			// if it fails, we already have it so get the id
-			// if it succeeds, we should be able to get the id anyways
+			// grab the id
 			int64 tlid = fetchOrderId(order);
 			o.id = tlid; 
-			if (!_noverb)
-			{
-				if (isnew)
-				{
-					CString tmp;
-					tmp.Format("%s new order tlid: %lld lsid: %i ord: %s",o.symbol,o.id,lsid,o.Serialize());
-					v(tmp);
-				}
-				else
-				{
-					CString tmp;
-					tmp.Format("%s processed order tlid: %lld lsid: %i ord: %s",o.symbol,tlid,lsid,o.Serialize());
-					v(tmp);
-				}
-			}
 		}
 		else
 		{
@@ -494,8 +476,17 @@
 			}
 		}
 
+		// ensure we have an order id
+		if (o.id==0)
+		{
+			
+			o.id = GetUniqueId(0);
+			CString tmp;
+			tmp.Format("%s no tlid on api order, assigned: %lld to: %s",o.symbol,o.id,o.Serialize());
+			v(tmp);
+		}
 
-
+		// support lightspeed "special" double destinations
 		CString ex = o.exchange;
 		CString ex2 = NULL;
 		if (o.exchange.FindOneOf("+")!=-1)
@@ -505,6 +496,8 @@
 			ex = exr[0];
 			ex2 = exr[1];
 		}
+
+
 		// check for loading
 		if (!summary || !summary->L_IsValid() || !summary->L_IsInit())
 		{
@@ -537,12 +530,7 @@
 		// save order
 		tlorders.push_back(o);
 
-		if (!_noverb)
-		{
-			CString tmp;
-			tmp.Format("%s received api order tlid: %lld lscorid: %i ord: %s",o.symbol,o.id,corid,o.Serialize());
-			v(tmp);
-		}
+
 
 		// get appropriate tif
 		long tif = gettif(o);
@@ -569,7 +557,12 @@
 
 		lscorrelationid[coridx] = corid;
 		
-
+		if (!_noverb)
+		{
+			CString tmp;
+			tmp.Format("%s received api order tlid: %lld lscorid: %i ord: %s",o.symbol,o.id,corid,o.Serialize());
+			v(tmp);
+		}
 
 		
 		// return result
@@ -588,73 +581,39 @@
 	
 	int64 LS_TLWM::fetchOrderId(L_Order* order)
 	{
+		// is our order id final yet?
+		if ((order->L_OrderId()!=0) && 
+			(order->L_OrderId()!=order->L_ReferenceId()))
+		{
+			int64 tlid = matchlsid2tlid(order->L_OrderId());
+
+
+		}
 		int64 tlid = matchlsid2tlid(order->L_ReferenceId());
 		return tlid;
 	}
 
 	
-	int64 LS_TLWM::finalid2tlid(long final)
-	{
-		for (uint i = 0; i<lsorderidfinal.size(); i++)
-		{
-			if (lsorderidfinal[i]==final)
-				return tlcorrelationid[i];
-		}
-		return 0;
 
-	}
 
-	void LS_TLWM::tlid2final(int64 tlid, long finalid)
+
+	int64 LS_TLWM::GetUniqueId(int64 existing)
 	{
-		for (uint i = 0; i<tlcorrelationid.size(); i++)
+		if (existing!=0)
+			return existing;
+		
+		vector<int> now;
+		int64 id = GetTickCount();
+		while (!IdIsUnique(id))
 		{
-			if (tlcorrelationid[i]==tlid)
-				lsorderidfinal[i] = finalid;
+			if (id<2) id = 4000000000;
+			id--;
 		}
+		return id;
+
 	}
 	
-	bool LS_TLWM::saveOrder(L_Order* o,int64 id)
-	{
-		// fail if invalid order
-		if (o==NULL) 
-			return false;
-		// get lightspeed id
-		long lsid = o->L_ReferenceId();
-		// see if we know this order
-		int64 tlid = matchlsid2tlid(lsid);
-		// we have the order, but see if we have the orders final id
-		if (tlid!=0)
-		{
-			int64 tlid_final = finalid2tlid(o->L_OrderId());
-			// see if we have it already
-			if (tlid_final!=0)
-				return false; // if so we're done
-			// otherwise save it
-			tlid2final(tlid,o->L_OrderId());
-			// now we're done
-			return false;
-		}
-
-		if (id==0) // if id is zero, we auto-assign the id
-		{
-			vector<int> now;
-			id = GetTickCount();
-			while (!IdIsUnique(id))
-			{
-				if (id<2) id = 4000000000;
-				id--;
-			}
-		}
-		// this is our new tl id
-		tlid = id;
-		// save spot for lsid
-		lsorderid1.push_back(lsid);
-		lsorderid2.push_back(lsid);
-		lsorderidfinal.push_back(o->L_OrderId());
-		tlcorrelationid.push_back(tlid);
-		// we added order and it's id
-		return true; 
-	}
+	
 	
 
 	vector<uint> sentids;
@@ -709,12 +668,13 @@
 	{
 		for (uint i = 0; i<lsorderid1.size(); i++)
 		{
+			if (lsorderidfinal[i]==somelsid)
+				return tlcorrelationid[i];
 			if (lsorderid1[i]==somelsid)
 				return tlcorrelationid[i];
 			else if (lsorderid2[i]==somelsid)
 				return tlcorrelationid[i];
-			if (lsorderidfinal[i]==somelsid)
-				return tlcorrelationid[i];
+
 
 		}
 		return 0;
@@ -769,7 +729,7 @@
 					}
 				break;
 			}
-		case L_MsgOrderChange::id: // orders?
+		case L_MsgOrderChange::id: // orders
 			{
 				L_MsgOrderChange* m = (L_MsgOrderChange*)msg;
 				const L_Execution* x = m->L_Exec();
@@ -782,26 +742,84 @@
 					switch (m->L_Category())
 					{
 					case L_OrderChange::Receive:
+						{
+							// ensure that we have a final id
+							if ((m->L_OrderId()!=0) &&
+								(m->L_ReferenceId()!=m->L_OrderId()))
+							{
+								long f_lsid = m->L_OrderId();
+								//get our match
+								int64 tlid = matchlsid2tlid(f_lsid);
+								// if we don't have an id (eg manual orders), get a unique one 
+								if (tlid==0)
+								{
+									tlid = GetUniqueId(0);
+									CString tmp;
+									tmp.Format("%s assigned %lld to manual order finalid: %i",msg->L_Symbol(),tlid,f_lsid);
+									v(tmp);
+								}
+								// ensure we have an id
+								if (tlid!=0)
+								{
+									// save the id
+									lsorderid1.push_back(0);
+									lsorderid2.push_back(0);
+									lscorrelationid.push_back(0);
+									lsorderidfinal.push_back(f_lsid);
+									tlcorrelationid.push_back(tlid);
+									TLOrder o;
+									o.symbol = CString(msg->L_Symbol());
+									CString tmp;
+									tmp.Format("%s order ack lsid: %i tlid: %lld lsfinal: %i",o.symbol,lsid,tlid,f_lsid);
+									v(tmp);
+	
+									// ensure we have an account
+									if (accounts.size()>0)
+									{
+										
+										// get order
+										L_Order* order = accounts[0]->L_FindOrderByOrderId(f_lsid);
+										//L_Order* order = accounts[0]->L_FindOrder(lsid);
+										// process it
+										o = ProcessOrder(order);
+
+
+										// notify
+										if (o.isValid())
+											SrvGotOrder(o);
+									}
+								}
+								
+
+							}
+						}
 					case L_OrderChange::Create:
 						{
-							TLOrder o;
-							o.symbol = CString(msg->L_Symbol());
-							// ensure we have an account
-							if (accounts.size()>0)
+							// ensure we have a reference id
+							if (lsid!=0)
 							{
-								// get order
-								L_Order* order = accounts[0]->L_FindOrder(lsid);
-								// process it
-								o = ProcessOrder(order);
+								// get our matching id
+								int64 tlid = matchlsid2tlid(lsid);
+								// see if we matched something (api orders only)
+								if (tlid!=0)
+								{
+									// we need to save reference id and process order, but not notify for it
+									// save the id
+									lsorderid1.push_back(lsid);
+									lsorderid2.push_back(lsid);
+									lscorrelationid.push_back(0);
+									lsorderidfinal.push_back(0);
+									tlcorrelationid.push_back(tlid);
+									CString tmp;
+									tmp.Format("%s ls order create lsid: %i tlid: %lld lsfinal: n/a",m->L_Symbol(),lsid,tlid);
+									v(tmp);
 
-								CString tmp;
-								tmp.Format("%s order ack lsid: %i tlid: %lld lsfinal: %i",o.symbol,lsid,o.id,order->L_OrderId());
-								v(tmp);
+								}
 
-								// notify
-								if (o.isValid())
-									SrvGotOrder(o);
 							}
+							
+
+
 
 						}
 						break;
