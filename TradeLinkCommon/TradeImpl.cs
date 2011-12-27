@@ -111,7 +111,7 @@ namespace TradeLink.Common
         public static string Serialize(Trade t)
         {
             const char d = ',';
-            return t.xdate.ToString() + d + t.xtime.ToString() + d + d + t.symbol + d + t.side.ToString() + d + t.xsize.ToString() + d + t.xprice.ToString(System.Globalization.CultureInfo.InvariantCulture) + d + t.comment + d + t.Account + d + t.Security.ToString() + d + t.Currency.ToString() + d + t.LocalSymbol + d + t.id.ToString() + d + t.ex; ;
+            return t.xdate.ToString(System.Globalization.CultureInfo.InvariantCulture) + d + t.xtime.ToString(System.Globalization.CultureInfo.InvariantCulture) + d + d + t.symbol + d + t.side.ToString() + d + t.xsize.ToString(System.Globalization.CultureInfo.InvariantCulture) + d + t.xprice.ToString(System.Globalization.CultureInfo.InvariantCulture) + d + t.comment + d + t.Account + d + t.Security.ToString() + d + t.Currency.ToString() + d + t.LocalSymbol + d + t.id.ToString(System.Globalization.CultureInfo.InvariantCulture) + d + t.ex; ;
         }
         /// <summary>
         /// Deserialize string to Trade
@@ -123,17 +123,17 @@ namespace TradeLink.Common
             string[] rec = message.Split(',');
             if (rec.Length < 14) throw new InvalidTrade();
             bool side = Convert.ToBoolean(rec[(int)TradeField.Side]);
-            int size = Convert.ToInt32(rec[(int)TradeField.Size]);
+            int size = Convert.ToInt32(rec[(int)TradeField.Size], System.Globalization.CultureInfo.InvariantCulture);
             size = Math.Abs(size) * (side ? 1 : -1);
             decimal xprice = Convert.ToDecimal(rec[(int)TradeField.Price],System.Globalization.CultureInfo.InvariantCulture);
             string sym = rec[(int)TradeField.Symbol];
             t = new TradeImpl(sym, xprice, size);
-            t.xdate = Convert.ToInt32(rec[(int)TradeField.xDate]);
-            t.xtime = Convert.ToInt32(rec[(int)TradeField.xTime]);
+            t.xdate = Convert.ToInt32(rec[(int)TradeField.xDate], System.Globalization.CultureInfo.InvariantCulture);
+            t.xtime = Convert.ToInt32(rec[(int)TradeField.xTime], System.Globalization.CultureInfo.InvariantCulture);
             t.comment = rec[(int)TradeField.Comment];
             t.Account = rec[(int)TradeField.Account];
             t.LocalSymbol = rec[(int)TradeField.LocalSymbol];
-            t.id = Convert.ToInt64(rec[(int)TradeField.ID]);
+            t.id = Convert.ToInt64(rec[(int)TradeField.ID], System.Globalization.CultureInfo.InvariantCulture);
             t.ex = rec[(int)TradeField.Exch];
             t.Currency = (CurrencyType)Enum.Parse(typeof(CurrencyType), rec[(int)TradeField.Currency]);
             t.Security = (SecurityType)Enum.Parse(typeof(SecurityType), rec[(int)TradeField.Security]);
