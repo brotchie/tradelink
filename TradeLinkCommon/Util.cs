@@ -913,7 +913,8 @@ namespace TradeLink.Common
         /// <param name="o"></param>
         /// <param name="deb"></param>
         /// <returns></returns>
-        public static string DumpObjectProperties(Object o,DebugDelegate deb)
+        public static string DumpObjectProperties(Object o, DebugDelegate deb) { return DumpObjectProperties(o, true, deb); }
+        public static string DumpObjectProperties(Object o,bool stripheader, DebugDelegate deb)
         {
             try
             {
@@ -922,7 +923,8 @@ namespace TradeLink.Common
                 System.IO.StringWriter sw = new System.IO.StringWriter();
                 xs.Serialize(sw, o);
                 sw.Close();
-                return sw.ToString();
+                string xml = sw.ToString();
+                return stripheader ? stripxmlhead(xml) : xml;
             }
             catch (Exception ex)
             {
@@ -936,6 +938,13 @@ namespace TradeLink.Common
                     deb("Error dumping: "+o.ToString()+" "+ex.Message + ex.StackTrace+inner);
             }
             return string.Empty;
+        }
+
+        static string stripxmlhead(string xml)
+        {
+            xml = xml.Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", string.Empty);
+            xml = xml.Replace(" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"", string.Empty);
+            return xml;
         }
         /// <summary>
         /// 
