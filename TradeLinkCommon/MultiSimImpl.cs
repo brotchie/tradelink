@@ -140,9 +140,17 @@ namespace TradeLink.Common
             // now we have our list, initialize instruments from files
             for (int i = 0; i<_tickfiles.Length; i++)
             {
-                SecurityImpl s = getsec(i);
-                if ((s!=null) && s.isValid && s.HistSource.isValid)
-                    Workers.Add(new simworker(s));
+                try
+                {
+                    SecurityImpl s = getsec(i);
+                    if ((s != null) && s.isValid && s.HistSource.isValid)
+                        Workers.Add(new simworker(s));
+                }
+                catch (Exception ex)
+                {
+                    D("Unable to initialize: " + _tickfiles[i] + " error: " + ex.Message + ex.StackTrace);
+                    continue;
+                }
             }
             // setup our initial index
             idx = genidx(Workers.Count);
