@@ -123,7 +123,7 @@ namespace Responses
 
             // this way we can debug our indicators during development
             // indicators are sent in the same order as they are named above
-            sendindicators(new string[] { time.ToString(),SMA.ToString("N2")});
+            sendindicators(new string[] { time.ToString(), SMA.ToString("F2", System.Globalization.CultureInfo.InvariantCulture) });
 
             // draw the MA as a line
             sendchartlabel(SMA, time);
