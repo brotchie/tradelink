@@ -320,7 +320,8 @@ namespace Kadina
             status("Playing next " + pt.ToString().Replace(PLAYTO, string.Empty) + "...");
         }
 
-        void reset()
+        void reset() { reset(true); }
+        void reset(bool reloadcurrentstudy)
         {
             try
             {
@@ -344,9 +345,17 @@ namespace Kadina
                     ig.Invalidate();
                     SafeBindingSource.refreshgrid(ig, ibs,true);
                 }
-                loadsim();
                 unbindresponseevents();
-                loadboxname(resname);
+                if (reloadcurrentstudy)
+                {
+                    loadsim();
+                    loadboxname(resname);
+                }
+                else
+                {
+                    epffiles.Clear();
+                    
+                }
                 nowtime = "0";
             }
             catch (Exception ex)
@@ -614,6 +623,8 @@ namespace Kadina
 
         void loadboxname(string name)
         {
+            if ((resname!=string.Empty) && (name!=resname))
+                reset(false);
             try
             {
                 myres = ResponseLoader.FromDLL(name, responsedll);
@@ -778,6 +789,7 @@ namespace Kadina
         }
          private bool loadfile(string path)
          {
+
             string f = path;
             bool success = false;
             if (isResponse(f))
@@ -1009,11 +1021,12 @@ namespace Kadina
         {
             OpenFileDialog of = new OpenFileDialog();
             of.Filter = "Responses Libraries|*.dll|AllFiles|*.*";
-            of.Multiselect = true;
+            
             if (of.ShowDialog() == DialogResult.OK)
             {
-                foreach (string f in of.FileNames)
-                    loadfile(f);
+
+
+                loadfile(of.FileName);
             }
         }
 
