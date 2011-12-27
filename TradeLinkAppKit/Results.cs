@@ -190,7 +190,9 @@ namespace TradeLink.AppKit
                     if (!days.Contains(tr.Source.xdate))
                         days.Add(tr.Source.xdate);
                     int usizebefore = pt[tr.Source.symbol].UnsignedSize;
-                    pt.Adjust(tr.Source);
+                    decimal pospl = pt.Adjust(tr.Source);
+                    bool isroundturn = (usizebefore != 0) && (pt[tr.Source.symbol].UnsignedSize == 0);
+
                     bool isclosing = pt[tr.Source.symbol].UnsignedSize<usizebefore;
                     // calculate MIU and store on array
                     decimal miu = Calc.Sum(Calc.MoneyInUse(pt));
@@ -209,6 +211,16 @@ namespace TradeLink.AppKit
                         if (pctret < 0)
                             negret.Add(pl);
                     }
+                    if (isroundturn)
+                    {
+                        r.RoundTurns++;
+                        if (pospl >= 0)
+                            r.RoundWinners++;
+                        else if (pospl < 0)
+                            r.RoundLosers++;
+
+                    }
+                    
 
                     if (!r.Symbols.Contains(tr.Source.symbol))
                         r.Symbols += tr.Source.symbol + ",";
@@ -394,6 +406,9 @@ namespace TradeLink.AppKit
         public decimal MaxOpenWin = 0;
         public decimal MaxOpenLoss = 0;
         public int SharesTraded = 0;
+        public int RoundTurns = 0;
+        public int RoundWinners = 0;
+        public int RoundLosers = 0;
         public int HundredLots { get { return (int)Math.Round((double)SharesTraded / 100, 0); } }
         public int Trades = 0;
         public int SymbolCount = 0;

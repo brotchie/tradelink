@@ -105,6 +105,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TestResults.cs" />
     <Compile Include="TestTickTracker.cs" />
     <Compile Include="TestOrderTracker.cs" />
     <Compile Include="TestREGSHOTracker.cs" />
@@ -170,6 +171,10 @@
     <ProjectReference Include="..\TradeLinkAPI\TradeLink.API.csproj">
       <Project>{1B99C9ED-7AF1-4D48-AC9D-A97CF30E1A82}</Project>
       <Name>TradeLink.API</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TradeLinkAppKit\TradeLink.AppKit.csproj">
+      <Project>{4581ADEF-B013-4EA9-90C5-D585637008CA}</Project>
+      <Name>TradeLink.AppKit</Name>
     </ProjectReference>
     <ProjectReference Include="..\TradeLinkCommon\TradeLink.Common.csproj">
       <Project>{A0FE06A2-F31B-49DE-8901-917B5D593E43}</Project>
@@ -254,6 +259,6 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>CALL "$(ProjectDir)runtests.cmd" $(ConfigurationName) "$(TargetPath)"</PostBuildEvent>
+    <PostBuildEvent>rem CALL "$(ProjectDir)runtests.cmd" $(ConfigurationName) "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
 </Project>
