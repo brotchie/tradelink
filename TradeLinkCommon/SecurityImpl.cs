@@ -375,11 +375,9 @@ namespace TradeLink.Common
         static int SecurityID(string type)
         {
             int id = -1;
-            try
-            {
-                id = (int)(SecurityType)Enum.Parse(typeof(SecurityType), type);
-            }
-            catch (Exception) { }
+            SecurityType st = SecurityType.NIL;
+            if (Enum.TryParse<SecurityType>(type, out st))
+                id = (int)st;
             return id;
         }
         int _date = 0;
