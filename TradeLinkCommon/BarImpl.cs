@@ -151,7 +151,7 @@ namespace TradeLink.Common
             DateTime d = new DateTime();
             try
             {
-                d = DateTime.Parse(r[0]);
+                d = DateTime.Parse(r[0], System.Globalization.CultureInfo.InvariantCulture);
             }
             catch (System.FormatException) { return null; }
             int date = (d.Year*10000)+(d.Month*100)+d.Day;
@@ -159,7 +159,7 @@ namespace TradeLink.Common
             decimal high = Convert.ToDecimal(r[2], System.Globalization.CultureInfo.InvariantCulture);
             decimal low = Convert.ToDecimal(r[3], System.Globalization.CultureInfo.InvariantCulture);
             decimal close = Convert.ToDecimal(r[4], System.Globalization.CultureInfo.InvariantCulture);
-            long vol = Convert.ToInt64(r[5]);
+            long vol = Convert.ToInt64(r[5], System.Globalization.CultureInfo.InvariantCulture);
             return new BarImpl(open,high,low,close,vol,date,0,symbol,interval);
         }
 
