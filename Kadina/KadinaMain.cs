@@ -337,7 +337,13 @@ namespace Kadina
                 _tabs.Refresh();
                 c = new ChartControl();
                 _tr.Clear();
-                if (it != null) { it.Clear(); it.Columns.Clear(); ig.Invalidate(); }
+                if (it != null) 
+                { 
+                    it.Clear(); 
+                    it.Columns.Clear(); 
+                    ig.Invalidate();
+                    SafeBindingSource.refreshgrid(ig, ibs,true);
+                }
                 loadsim();
                 unbindresponseevents();
                 loadboxname(resname);
