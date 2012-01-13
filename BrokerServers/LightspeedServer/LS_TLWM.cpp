@@ -520,7 +520,7 @@
 		long corid = 0;
 
 		// associate order id and correlation id
-		uint coridx = lscorrelationid.size();
+		uint coridx = (uint)lscorrelationid.size();
 		lscorrelationid.push_back(corid);
 		tlcorrelationid.push_back(o.id);
 		// associate blank ids for orders
@@ -870,14 +870,20 @@
 				else// it's an execution
 				{
 					
-					
-					
+					bool havefinalid = (m->L_OrderId()!=0) &&(m->L_ReferenceId()!=m->L_OrderId());
+					long f_lsid = m->L_OrderId();
+					if (!havefinalid)
+					{
+						CString tmp;
+						tmp.Format("%s fill ack, original order missing final id.  order: %i",x->L_Symbol(),m->L_OrderId());
+						D(tmp);
+					}
+					L_Order* order = accounts[0]->L_FindOrderByOrderId(f_lsid);
+					int64 tlid = fetchOrderId(order);
 					TLTrade f;
 					f.symbol = CString(x->L_Symbol());
 					L_Account* acct = accounts[0];
 					f.account = CString(acct->L_TraderId());
-					long lsid = x->L_OrderId();
-					int64 tlid = matchlsid2tlid(lsid);
 					f.id = tlid;
 					f.xprice = x->L_AveragePrice();
 					f.side = x->L_Side()=='B';
