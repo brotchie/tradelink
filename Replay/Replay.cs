@@ -35,6 +35,7 @@ namespace Replay
             TrackEnabled = Util.TrackUsage();
             Program = PROGRAM;
             InitializeComponent();
+            Text += " " + Util.TLVersion();
             tl.newProviderName = Providers.TradeLink;
             tl.newSendOrderRequest += new OrderDelegateStatus(tl_gotSrvFillRequest);
             tl.newOrderCancelRequest += new LongDelegate(tl_OrderCancelRequest);

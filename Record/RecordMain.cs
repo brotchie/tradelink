@@ -27,6 +27,7 @@ namespace Record
             TrackEnabled = Util.TrackUsage();
             Program = PROGRAM;
             InitializeComponent();
+            Text += " " + Util.TLVersion();
             string ipaddr = Properties.Settings.Default.ServerIpAddresses;
             string[] servers = ipaddr.Split(',');
             if (ipaddr==string.Empty)

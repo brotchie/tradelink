@@ -34,7 +34,7 @@ namespace Quotopia
             TrackEnabled = Util.TrackUsage();
             Program = PROGRAM;
             InitializeComponent();
-
+            Text += " " + Util.TLVersion();
             if ((Location.X == 0) && (Location.Y == 0))
             {
                 Quotopia.Properties.Settings.Default.location = new Point(300, 300);

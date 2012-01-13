@@ -23,6 +23,7 @@ namespace TikConverter
             TrackEnabled = Util.TrackUsage();
             Program = PROGRAM;
             InitializeComponent();
+            Text += " " + Util.TLVersion();
             _cqgparseoptionsgroupbox.Visible = false;
             _con.Items.AddRange(Enum.GetNames(typeof(Converter)));
             bw.WorkerReportsProgress = true;

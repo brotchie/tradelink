@@ -30,6 +30,7 @@ namespace WinGauntlet
             TrackEnabled = Util.TrackUsage();
             Program = PROGRAM;
             InitializeComponent();
+            Text += " " + Util.TLVersion();
             debug(Util.TLSIdentity());
             args.GotDebug += new DebugDelegate(args_GotDebug);
             args.ParseArgs(Environment.GetCommandLineArgs());

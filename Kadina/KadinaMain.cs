@@ -52,10 +52,12 @@ namespace Kadina
         public kadinamain()
         {
             TrackEnabled = Util.TrackUsage();
+            
             Program = PROGRAM;
             _dps = "N" + _dp;
             SimBroker.UseBidAskFills = Properties.Settings.Default.UseBidAskFills;
             InitializeComponent();
+            Text += " " + Util.TLVersion();
             initgrids();
             debugControl1.NewCreateTicketEvent += new DebugDelegate(debugControl1_NewCreateTicketEvent);
             sizetabs();
@@ -728,7 +730,7 @@ namespace Kadina
             debug("SendMessage and custom messages not supported in kadina.");
         }
         public const string PROGRAM = "Kadina";
-        void updatetitle() { Text = PROGRAM + " - Study: " + resname + " " + PrettyEPF(); Invalidate(); }
+        void updatetitle() { Text = PROGRAM + " "+Util.TLVersion() + " - Study: " + resname + " " + PrettyEPF(); Invalidate(); }
 
         void myres_SendIndicators(int idx, string param)
         {

@@ -435,7 +435,7 @@ namespace TradeLink.Common
         /// get build for installed tradelink
         /// </summary>
         /// <returns></returns>
-        public static int TLBuild() { return BuildFromRegistry(PROGRAM); }
+        public static int TLBuild() { return ProgramBuild(PROGRAM); }
         /// <summary>
         /// gets build for specific installed program.
         /// returns 0 if not installed or error.
@@ -519,9 +519,12 @@ namespace TradeLink.Common
         /// <returns></returns>
         public static string TLVersion()
         {
-            const string major = "0.1.";
-            string build = TLBuild().ToString();
-            return major + build;
+            int build = TLBuild();
+            int maj = (int)((double)build / 1000);
+            int min = (int)(((double)build-maj*1000)/100);
+            int fix = build-(maj*1000 + min*100);
+            string nicebuild = maj+"."+min+"."+fix;
+            return nicebuild;
         }
         /// <summary>
         /// Gets a string representing the identity of this suite.

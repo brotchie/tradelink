@@ -25,6 +25,7 @@ namespace TimeSales
             TrackEnabled = Util.TrackUsage();
             Program = PROGRAM;
             InitializeComponent();
+            Text += " " + Util.TLVersion();
             initgrid();
 
             _dpf = "N" + _dp;

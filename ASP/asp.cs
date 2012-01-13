@@ -64,6 +64,7 @@ namespace ASP
             // read designer options for gui
             InitializeComponent();
             // show status
+            Text += " " + Util.TLVersion();
             status(Util.TLSIdentity());
             debug(Util.TLSIdentity());
             // count instances of program
