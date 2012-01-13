@@ -22,6 +22,7 @@ namespace Kadina
         PlayTo pt = PlayTo.Hour;
         int _dp = Properties.Settings.Default.DecimalPlaces;
         string _dps = "N2";
+        Log log = new Log(PROGRAM);
 
         ResponseList _rl = new ResponseList();
 
@@ -295,7 +296,14 @@ namespace Kadina
         {
             saverecentlibs();
             saverecentfiles();
-            Kadina.Properties.Settings.Default.Save();
+            try
+            {
+                Kadina.Properties.Settings.Default.Save();
+            } catch (Exception ex)
+            {
+                debug("error saving properties on exit: " + ex.Message + ex.StackTrace);
+            }
+            log.Stop();
         }
         const string PLAYTO = "Play +";
         
@@ -885,6 +893,7 @@ namespace Kadina
         void debug(string msg)
         {
             debugControl1.GotDebug(msg);
+            log.GotDebug(msg);
         }
 
         private void kadinamain_DragEnter(object sender, DragEventArgs e)
