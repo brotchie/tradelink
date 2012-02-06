@@ -353,7 +353,7 @@ Function .onInit
   ; plugins dir should be automatically removed after installer runs
   InitPluginsDir
   File /oname=$PLUGINSDIR\splash.bmp "Install\tradelinklogo.bmp"
-  splash::show 1000 $PLUGINSDIR\splash
+  splash::show 3000 $PLUGINSDIR\splash
 
   		 
   Pop $0 ; $0 has '1' if the user closed the splash screen early,
