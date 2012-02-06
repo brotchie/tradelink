@@ -158,12 +158,6 @@ Section "TradeLinkSuite"
 
   File "TikConverter\bin\release\TikConverter.exe"
   
-  File "ServerFIX\bin\release\ServerFIX.exe"
-
-  File "ServerFIX\bin\release\SessionSettings.txt"
-  File "ServerFIX\bin\release\quickfix_net.dll"
-  File "ServerFIX\bin\release\quickfix_net_messages.dll"
-  File "ServerFIX\bin\release\quickfix_net_test.dll"
   
     ; may fail if you don't have 3rd party vendor software installed
   File /nonfatal "ServerEsignal\bin\release\ServerEsignal.exe"
@@ -184,7 +178,7 @@ Section "TradeLinkSuite"
   
     ; don't overwrite config files files
   SetOverWrite off
-  File "ServerFIX\bin\release\ServerFIX.exe.config"
+  
   File "ServerNxCore\bin\x86\release\ServerNxCore32.exe.config"
   File "ServerNxCore64\bin\x64\release\ServerNxCore64.exe.config"
   File "ServerRedi\bin\release\ServerRedi.exe.config"
