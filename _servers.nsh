@@ -18,8 +18,9 @@ Section "TradeLink c++"
     DetailPrint "Checking for VCRedistributable..."
   ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "InstalledVcRedist"
   StrCmp $0 "Yes" finishvcredist
-  ExecWait "vcredist_x86.20110514.exe"
-  DetailPrint "VCRedistributable installed."
+  DetailPrint "Installing vcredistributable..."
+  ExecWait '"vcredist_x86.20110514.exe" /q:a /c:\"VCREDI~3.EXE /q:a /c:\"\"msiexec /i vcredist.msi /qn\"\" \"' $0
+  DetailPrint "VCRedistributable installed.  Result:$0"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "InstalledVcRedist" "Yes"
 
   
