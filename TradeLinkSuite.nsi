@@ -76,7 +76,7 @@ Section "TradeLinkSuite"
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\REDI.lnk" "$INSTDIR\ServerRedi.exe" "" "$INSTDIR\ServerRedi.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\IQFeed.lnk" "$INSTDIR\IQFeedBroker.exe" "" "$INSTDIR\IQFeedBroker.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\NxCore32.lnk" "$INSTDIR\ServerNxCore32.exe" "" "$INSTDIR\ServerNxCore32.exe" 0  
-  CreateShortCut "$SMPROGRAMS\TradeLink Connectors\NxCore64.lnk" "$INSTDIR\ServerNxCore64.exe" "" "$INSTDIR\ServerNxCore64.exe" 0  
+  CreateShortCut "$SMPROGRAMS\TradeLink Connectors\NxCore64.lnk" "$INSTDIR\ServerNxCore64.exe" "" "$INSTDIR\tradelinkinstaller.ico" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\RealTick.lnk" "$INSTDIR\RealTickConnector.exe" "" "$INSTDIR\RealTickConnector.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\DAS.lnk" "$INSTDIR\ServerDAS.exe" "" "$INSTDIR\ServerDAS.exe" 0  
   CreateShortCut "$SMPROGRAMS\TradeLink Connectors\Rithmic.lnk" "$INSTDIR\ServerRithmic.exe" "" "$INSTDIR\ServerRithmic.exe" 0  
@@ -93,7 +93,7 @@ Section "TradeLinkSuite"
   File "ServerRithmic\bin\release\ServerRithmic.exe.config"
   File "ServerRithmic\bin\release\rapi.dll"
   File "ServerRithmic\bin\release\RithmicCertificate.pk12"
-  
+  File "Install\tradelinkinstaller.ico"
 
   
   File "Responses\TA-Lib-Core.dll"
@@ -231,24 +231,8 @@ Section "TradeLinkSuite"
   ; skip tickdata and vcredistuble installs if running in silent mode
   StrCmp $SILENT "YES" finishinstall
 
+  
 
-tickdata:  
-  DetailPrint "Checking for TickData..."
-  ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "InstalledTickData"
-  StrCmp $0 "Yes" vcredistinstall
-  ExecWait "TickDataInstall.exe"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "InstalledTickData" "Yes"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "TickDataPath" "$LOCALAPPDATA\TradeLinkTicks"
-  DetailPrint "TickData was installed."
-  
-  
- vcredistinstall:
-  DetailPrint "Checking for VCRedistributable..."
-  ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "InstalledVcRedist"
-  StrCmp $0 "Yes" finishinstall
-  ExecWait "VCRedistInstall.exe"
-  DetailPrint "VCRedistributable was installed."
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "InstalledVcRedist" "Yes"
   
 finishinstall:  
   ; Write the uninstall keys for Windows
@@ -281,6 +265,29 @@ SectionEnd
 
 ; Uninstaller
 
+Section "TikData Samples"
+
+  
+  DetailPrint "Checking for TickData..."
+  ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "InstalledTickData"
+  StrCmp $0 "Yes" finishtickdata
+
+  
+  
+  ; change to tick data folder
+  SetOutPath "$LOCALAPPDATA\TradeLinkTicks"
+  File "TikData\*.TIK"
+  
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "InstalledTickData" "Yes"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "TickDataPath" "$LOCALAPPDATA\TradeLinkTicks"
+  ; change back to tradelink folder
+  SetOutPath $INSTDIR
+  
+  finishtickdata:
+ DetailPrint "TickData was installed."
+
+SectionEnd
+
 Section "ResponseExamples"
   File /r /x *.user /x *.xml /x *.dll /x *.pdf /x *.csv /x *.txt /x *.Cache /x .svn /x obj /x bin Responses
   File /r Responses\TA*.*
@@ -294,21 +301,7 @@ Section "TA-Lib Excel Example and Plugins"
   File /r "Install\talib_excel"
 SectionEnd
 
-Section "CSharpIde (Write Strategies)"
 
- File "Install\CsharpIdeInstall.exe"
-   
- vcredistinstall:
-  DetailPrint "Checking for CSharpIDE..."
-  ReadRegStr $0 HKLM SOFTWARE\TradeLinkSuite "InstalledCSharpIDE"
-  StrCmp $0 "Yes" finishinstall
-  ExecWait "CsharpIdeInstall.exe"
-  DetailPrint "CSharpIDE was installed."
-  WriteRegStr HKLM SOFTWARE\TradeLinkSuite "InstalledCSharpIDE" "Yes"
-  
-finishinstall:  
-
-SectionEnd
 
 Section "Anonymous Suite Usage Tracking"
 

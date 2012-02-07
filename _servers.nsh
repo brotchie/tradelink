@@ -13,9 +13,18 @@ Section "TradeLink c++"
   
   ; files included in install
   File "BrokerServers\release\TradeLibFast.dll"
+  File "Install\vcredist_x86.20110514.exe"
+  
+    DetailPrint "Checking for VCRedistributable..."
+  ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "InstalledVcRedist"
+  StrCmp $0 "Yes" finishvcredist
+  ExecWait "vcredist_x86.20110514.exe"
+  DetailPrint "VCRedistributable installed."
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "InstalledVcRedist" "Yes"
 
   
-finishinstall:  
+finishvcredist:  
+	DetailPrint "VCRedistributable was installed."
   
   ; write path for TradeLibFast.dll
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\App Paths\TradeLibFast.dll" "Path" "$INSTDIR\"
