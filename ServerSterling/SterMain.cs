@@ -60,6 +60,9 @@ namespace SterServer
                 tl.SendCancelOnReject = Properties.Settings.Default.SendCancelOnRejects;
                 tl.SendCancelOnError = Properties.Settings.Default.SendCancelOnError;
                 tl.UseSubscribedSymbolForNotify = Properties.Settings.Default.UseSubscribedSymbolForNotify;
+                tl.UseSterlingTickBuffer = Properties.Settings.Default.SterlingTickBuffering;
+                
+                tl.EnableImbalancesAndHalts = Properties.Settings.Default.EnableImbalancesAndHalts;
                 tl.Start();
             }
             catch (Exception ex)

@@ -322,5 +322,41 @@ namespace SterServer.Properties {
                 this["UseSubscribedSymbolForNotify"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SterlingTickBuffering {
+            get {
+                return ((bool)(this["SterlingTickBuffering"]));
+            }
+            set {
+                this["SterlingTickBuffering"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100000")]
+        public int SterlingTickBufferSize {
+            get {
+                return ((int)(this["SterlingTickBufferSize"]));
+            }
+            set {
+                this["SterlingTickBufferSize"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool EnableImbalancesAndHalts {
+            get {
+                return ((bool)(this["EnableImbalancesAndHalts"]));
+            }
+            set {
+                this["EnableImbalancesAndHalts"] = value;
+            }
+        }
     }
 }
