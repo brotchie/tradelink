@@ -745,7 +745,7 @@ namespace SterServer
                             order.Destination = o.Exchange != "" ? o.ex : "NYSE";
                             bool close = o.ValidInstruct == OrderInstructionType.MOC;
                             bool pegged = (o.ValidInstruct >= OrderInstructionType.PEG2MID) && (o.ValidInstruct <= OrderInstructionType.PEG2BST);
-                            order.Tif = tif2tif(o.TIF);
+                            order.Tif = tif2tif(o);
                             if (!pegged)
                             {
                                 order.LmtPrice = (double)o.price;
@@ -960,12 +960,15 @@ namespace SterServer
             }
         }
 
-        string tif2tif(string incoming)
+        string tif2tif(Order o)
         {
+            string incoming = o.TIF;
+            var oi = o.ValidInstruct;
             if (incoming == string.Empty)
                 return "D";
 
-            if ((incoming == "OPG") || (incoming == "OPN"))
+
+            if ((incoming == "OPG") || (incoming == "OPN") || (oi== OrderInstructionType.OPG))
             {
                 return "O";
             }
@@ -973,6 +976,15 @@ namespace SterServer
             {
                 return "D";
             }
+            else if (oi == OrderInstructionType.IOC)
+            {
+                return "I";
+            }
+            else if (oi == OrderInstructionType.GTC)
+            {
+                return "G";
+            }
+
             return "D";
         }
 
