@@ -101,8 +101,48 @@ namespace TradeLink.API
         INTRADAYLOW,
         INDICATION,
         HALTRESUME,
+        CUSTOM41,
+        CUSTOM42,
+        CUSTOM43,
+        CUSTOM44,
+        CUSTOM45,
+        CUSTOM56,
+        CUSTOM47,
+        CUSTOM48,
+        CUSTOM49,
+        CUSTOM50,
+        CUSTOM51,
+        CUSTOM52,
+        CUSTOM53,
+        CUSTOM54,
+        CUSTOM55,
+        CUSTOM56,
+        CUSTOM57,
+        CUSTOM58,
+        CUSTOM59,
+        CUSTOM60,
+        CUSTOM61,
+        CUSTOM62,
+        CUSTOM63,
+        CUSTOM64,
+        CUSTOM65,
+        CUSTOM66,
+        CUSTOM67,
+        CUSTOM68,
+        CUSTOM69,
+        CUSTOM70,
+        CUSTOM71,
+        CUSTOM72,
+        CUSTOM73,
+        CUSTOM74,
+        CUSTOM75,
+        CUSTOM76,
+        CUSTOM77,
+        CUSTOM78,
+        CUSTOM79,
+        CUSTOM80,
         // END CUSTOM MESSAGES
-        // START TRADELINK MESSAGES
+        // START TRADELINK STANDARD MESSAGES
         // requests
         SENDORDER = 5000,
         BROKERNAME,
@@ -150,8 +190,14 @@ namespace TradeLink.API
         BARRESPONSE,
         ORDERSTATUSRESPONSE,
         HEARTBEATRESPONSE,
+
+        // END TRADELINK STANDARD MESSAGES
+        // START SPECIAL-CASE TRADELINK MESSAGES
+        RESPONSESTART = 7000,
+        RESPONSESHUTDOWN,
+
         
-        // END TRADELINK MESSAGES - DO NOT REMOVE OR RENAME MESSAGES (ONLY ADD/INSERT)
+        // DO NOT REMOVE OR RENAME MESSAGES (ONLY ADD/INSERT)
         // IF CHANGED, MUST COPY THIS ENUM TO BROKERSERVERS\TRADELIBFAST\TRADELINK.H
 
     }
