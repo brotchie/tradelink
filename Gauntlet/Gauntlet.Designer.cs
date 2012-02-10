@@ -43,6 +43,7 @@ namespace WinGauntlet
             this.reslist = new System.Windows.Forms.ListBox();
             this.tickFileFilterControl1 = new TradeLink.AppKit.TickFileFilterControl();
             this.optionpage = new System.Windows.Forms.TabPage();
+            this._portfoliosim = new System.Windows.Forms.CheckBox();
             this._docapcon = new System.Windows.Forms.Button();
             this._capitalprompt = new System.Windows.Forms.CheckBox();
             this._usebidask = new System.Windows.Forms.CheckBox();
@@ -65,7 +66,7 @@ namespace WinGauntlet
             this._resulttab = new System.Windows.Forms.TabPage();
             this.tradeResults1 = new TradeLink.AppKit.TradeResults();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this._portfoliosim = new System.Windows.Forms.CheckBox();
+            this.button5 = new System.Windows.Forms.Button();
             this.tabs.SuspendLayout();
             this.studypage.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -76,10 +77,9 @@ namespace WinGauntlet
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(306, 101);
-            this.button1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.button1.Location = new System.Drawing.Point(204, 66);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(32, 28);
+            this.button1.Size = new System.Drawing.Size(21, 18);
             this.button1.TabIndex = 0;
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
@@ -92,14 +92,14 @@ namespace WinGauntlet
             this.tabs.Controls.Add(this._resulttab);
             this.tabs.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabs.Location = new System.Drawing.Point(0, 0);
-            this.tabs.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tabs.Name = "tabs";
             this.tabs.SelectedIndex = 0;
-            this.tabs.Size = new System.Drawing.Size(629, 542);
+            this.tabs.Size = new System.Drawing.Size(419, 352);
             this.tabs.TabIndex = 1;
             // 
             // studypage
             // 
+            this.studypage.Controls.Add(this.button5);
             this.studypage.Controls.Add(this._viewresults);
             this.studypage.Controls.Add(this._twithelp);
             this.studypage.Controls.Add(this.statusStrip1);
@@ -107,20 +107,20 @@ namespace WinGauntlet
             this.studypage.Controls.Add(this.queuebut);
             this.studypage.Controls.Add(this.reslist);
             this.studypage.Controls.Add(this.tickFileFilterControl1);
-            this.studypage.Location = new System.Drawing.Point(4, 29);
-            this.studypage.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.studypage.Location = new System.Drawing.Point(4, 22);
             this.studypage.Name = "studypage";
-            this.studypage.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.studypage.Size = new System.Drawing.Size(621, 509);
+            this.studypage.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.studypage.Size = new System.Drawing.Size(411, 326);
             this.studypage.TabIndex = 0;
             this.studypage.Text = "Studies";
             this.studypage.UseVisualStyleBackColor = true;
             // 
             // _viewresults
             // 
-            this._viewresults.Location = new System.Drawing.Point(421, 421);
+            this._viewresults.Location = new System.Drawing.Point(281, 274);
+            this._viewresults.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this._viewresults.Name = "_viewresults";
-            this._viewresults.Size = new System.Drawing.Size(191, 31);
+            this._viewresults.Size = new System.Drawing.Size(127, 20);
             this._viewresults.TabIndex = 20;
             this._viewresults.Text = "Raw Results Folder";
             this.toolTip1.SetToolTip(this._viewresults, "View Results Folder");
@@ -130,9 +130,10 @@ namespace WinGauntlet
             // _twithelp
             // 
             this._twithelp.Image = ((System.Drawing.Image)(resources.GetObject("_twithelp.Image")));
-            this._twithelp.Location = new System.Drawing.Point(9, 421);
+            this._twithelp.Location = new System.Drawing.Point(6, 274);
+            this._twithelp.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this._twithelp.Name = "_twithelp";
-            this._twithelp.Size = new System.Drawing.Size(31, 31);
+            this._twithelp.Size = new System.Drawing.Size(21, 20);
             this._twithelp.TabIndex = 19;
             this.toolTip1.SetToolTip(this._twithelp, "open bug report");
             this._twithelp.UseVisualStyleBackColor = true;
@@ -143,10 +144,9 @@ namespace WinGauntlet
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ProgressBar1,
             this.lastmessage});
-            this.statusStrip1.Location = new System.Drawing.Point(4, 468);
+            this.statusStrip1.Location = new System.Drawing.Point(3, 298);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 21, 0);
-            this.statusStrip1.Size = new System.Drawing.Size(613, 36);
+            this.statusStrip1.Size = new System.Drawing.Size(405, 25);
             this.statusStrip1.TabIndex = 8;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -154,30 +154,28 @@ namespace WinGauntlet
             // 
             this.ProgressBar1.Enabled = false;
             this.ProgressBar1.Name = "ProgressBar1";
-            this.ProgressBar1.Size = new System.Drawing.Size(150, 30);
+            this.ProgressBar1.Size = new System.Drawing.Size(100, 19);
             // 
             // lastmessage
             // 
             this.lastmessage.Name = "lastmessage";
-            this.lastmessage.Size = new System.Drawing.Size(129, 31);
+            this.lastmessage.Size = new System.Drawing.Size(80, 20);
             this.lastmessage.Text = "No active runs.";
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(102, 302);
-            this.label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label7.Location = new System.Drawing.Point(68, 196);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(90, 20);
+            this.label7.Size = new System.Drawing.Size(60, 13);
             this.label7.TabIndex = 7;
             this.label7.Text = "Responses";
             // 
             // queuebut
             // 
-            this.queuebut.Location = new System.Drawing.Point(106, 421);
-            this.queuebut.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.queuebut.Location = new System.Drawing.Point(71, 274);
             this.queuebut.Name = "queuebut";
-            this.queuebut.Size = new System.Drawing.Size(308, 31);
+            this.queuebut.Size = new System.Drawing.Size(205, 20);
             this.queuebut.TabIndex = 4;
             this.queuebut.Text = "Run the Gauntlet";
             this.toolTip1.SetToolTip(this.queuebut, "start the backtesting run");
@@ -188,21 +186,20 @@ namespace WinGauntlet
             // 
             this.reslist.ColumnWidth = 300;
             this.reslist.FormattingEnabled = true;
-            this.reslist.ItemHeight = 20;
-            this.reslist.Location = new System.Drawing.Point(106, 327);
-            this.reslist.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.reslist.Location = new System.Drawing.Point(71, 213);
             this.reslist.MultiColumn = true;
             this.reslist.Name = "reslist";
-            this.reslist.Size = new System.Drawing.Size(506, 84);
+            this.reslist.Size = new System.Drawing.Size(339, 56);
             this.reslist.TabIndex = 2;
             this.toolTip1.SetToolTip(this.reslist, "select response to trade");
             this.reslist.SelectedIndexChanged += new System.EventHandler(this.boxlist_SelectedIndexChanged);
             // 
             // tickFileFilterControl1
             // 
-            this.tickFileFilterControl1.Location = new System.Drawing.Point(9, 9);
+            this.tickFileFilterControl1.Location = new System.Drawing.Point(6, 6);
+            this.tickFileFilterControl1.Margin = new System.Windows.Forms.Padding(1, 1, 1, 1);
             this.tickFileFilterControl1.Name = "tickFileFilterControl1";
-            this.tickFileFilterControl1.Size = new System.Drawing.Size(607, 298);
+            this.tickFileFilterControl1.Size = new System.Drawing.Size(405, 194);
             this.tickFileFilterControl1.TabIndex = 18;
             // 
             // optionpage
@@ -226,20 +223,34 @@ namespace WinGauntlet
             this.optionpage.Controls.Add(this._debugs);
             this.optionpage.Controls.Add(this.label1);
             this.optionpage.Controls.Add(this.button1);
-            this.optionpage.Location = new System.Drawing.Point(4, 29);
-            this.optionpage.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.optionpage.Location = new System.Drawing.Point(4, 22);
             this.optionpage.Name = "optionpage";
-            this.optionpage.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.optionpage.Size = new System.Drawing.Size(621, 509);
+            this.optionpage.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.optionpage.Size = new System.Drawing.Size(411, 326);
             this.optionpage.TabIndex = 1;
             this.optionpage.Text = "Options";
             this.optionpage.UseVisualStyleBackColor = true;
             // 
+            // _portfoliosim
+            // 
+            this._portfoliosim.AutoSize = true;
+            this._portfoliosim.Checked = global::WinGauntlet.Properties.Settings.Default.PortfolioRealisticSim;
+            this._portfoliosim.CheckState = System.Windows.Forms.CheckState.Checked;
+            this._portfoliosim.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "PortfolioRealisticSim", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this._portfoliosim.Location = new System.Drawing.Point(28, 208);
+            this._portfoliosim.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this._portfoliosim.Name = "_portfoliosim";
+            this._portfoliosim.Size = new System.Drawing.Size(161, 17);
+            this._portfoliosim.TabIndex = 32;
+            this._portfoliosim.Text = "Portfolio-realistic Sim (slower)";
+            this._portfoliosim.UseVisualStyleBackColor = true;
+            // 
             // _docapcon
             // 
-            this._docapcon.Location = new System.Drawing.Point(264, 9);
+            this._docapcon.Location = new System.Drawing.Point(176, 6);
+            this._docapcon.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this._docapcon.Name = "_docapcon";
-            this._docapcon.Size = new System.Drawing.Size(234, 35);
+            this._docapcon.Size = new System.Drawing.Size(156, 23);
             this._docapcon.TabIndex = 31;
             this._docapcon.Text = "make capital connection";
             this._docapcon.UseVisualStyleBackColor = true;
@@ -251,9 +262,10 @@ namespace WinGauntlet
             this._capitalprompt.Checked = global::WinGauntlet.Properties.Settings.Default.capitalprompt;
             this._capitalprompt.CheckState = System.Windows.Forms.CheckState.Checked;
             this._capitalprompt.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "capitalprompt", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this._capitalprompt.Location = new System.Drawing.Point(42, 290);
+            this._capitalprompt.Location = new System.Drawing.Point(28, 188);
+            this._capitalprompt.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this._capitalprompt.Name = "_capitalprompt";
-            this._capitalprompt.Size = new System.Drawing.Size(205, 24);
+            this._capitalprompt.Size = new System.Drawing.Size(146, 17);
             this._capitalprompt.TabIndex = 30;
             this._capitalprompt.Text = "Allow capital connections";
             this._capitalprompt.UseVisualStyleBackColor = true;
@@ -263,21 +275,23 @@ namespace WinGauntlet
             this._usebidask.AutoSize = true;
             this._usebidask.Checked = global::WinGauntlet.Properties.Settings.Default.UseBidAskFills;
             this._usebidask.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "UseBidAskFills", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this._usebidask.Location = new System.Drawing.Point(306, 290);
+            this._usebidask.Location = new System.Drawing.Point(204, 188);
+            this._usebidask.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this._usebidask.Name = "_usebidask";
-            this._usebidask.Size = new System.Drawing.Size(146, 24);
+            this._usebidask.Size = new System.Drawing.Size(106, 17);
             this._usebidask.TabIndex = 29;
             this._usebidask.Text = "Use Bid/Ask Fills";
             this.toolTip1.SetToolTip(this._usebidask, "Use Bid/Ask to fill orders, otherwise last trade is used.  This should generally " +
-                    "be enabled for for-ex");
+        "be enabled for for-ex");
             this._usebidask.UseVisualStyleBackColor = true;
             // 
             // _indicatcsv
             // 
             this._indicatcsv.AutoSize = true;
-            this._indicatcsv.Location = new System.Drawing.Point(306, 223);
+            this._indicatcsv.Location = new System.Drawing.Point(204, 145);
+            this._indicatcsv.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this._indicatcsv.Name = "_indicatcsv";
-            this._indicatcsv.Size = new System.Drawing.Size(135, 24);
+            this._indicatcsv.Size = new System.Drawing.Size(96, 17);
             this._indicatcsv.TabIndex = 28;
             this._indicatcsv.Text = "Indicators CSV";
             this.toolTip1.SetToolTip(this._indicatcsv, "save indicators to log for analysis");
@@ -286,9 +300,10 @@ namespace WinGauntlet
             // _debugfile
             // 
             this._debugfile.AutoSize = true;
-            this._debugfile.Location = new System.Drawing.Point(306, 189);
+            this._debugfile.Location = new System.Drawing.Point(204, 123);
+            this._debugfile.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this._debugfile.Name = "_debugfile";
-            this._debugfile.Size = new System.Drawing.Size(166, 24);
+            this._debugfile.Size = new System.Drawing.Size(118, 17);
             this._debugfile.TabIndex = 27;
             this._debugfile.Text = "Messages in log file";
             this.toolTip1.SetToolTip(this._debugfile, "Saves messages to a text file for review");
@@ -300,10 +315,10 @@ namespace WinGauntlet
             this._unique.Checked = global::WinGauntlet.Properties.Settings.Default.csvnamesunique;
             this._unique.CheckState = System.Windows.Forms.CheckState.Checked;
             this._unique.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "csvnamesunique", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this._unique.Location = new System.Drawing.Point(306, 154);
-            this._unique.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this._unique.Location = new System.Drawing.Point(204, 100);
+            this._unique.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this._unique.Name = "_unique";
-            this._unique.Size = new System.Drawing.Size(151, 24);
+            this._unique.Size = new System.Drawing.Size(107, 17);
             this._unique.TabIndex = 26;
             this._unique.Text = "Unique filenames";
             this.toolTip1.SetToolTip(this._unique, "ensure filenames never duplicate");
@@ -314,10 +329,9 @@ namespace WinGauntlet
             this.ordersincsv.AutoSize = true;
             this.ordersincsv.Checked = global::WinGauntlet.Properties.Settings.Default.ordersincsv;
             this.ordersincsv.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "ordersincsv", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.ordersincsv.Location = new System.Drawing.Point(306, 257);
-            this.ordersincsv.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.ordersincsv.Location = new System.Drawing.Point(204, 167);
             this.ordersincsv.Name = "ordersincsv";
-            this.ordersincsv.Size = new System.Drawing.Size(129, 24);
+            this.ordersincsv.Size = new System.Drawing.Size(92, 17);
             this.ordersincsv.TabIndex = 22;
             this.ordersincsv.Text = "Orders in CSV";
             this.toolTip1.SetToolTip(this.ordersincsv, "save orders to excel or R-compatible file");
@@ -325,10 +339,9 @@ namespace WinGauntlet
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(81, 9);
-            this.button4.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.button4.Location = new System.Drawing.Point(54, 6);
             this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(76, 35);
+            this.button4.Size = new System.Drawing.Size(51, 23);
             this.button4.TabIndex = 20;
             this.button4.Text = "Discard";
             this.toolTip1.SetToolTip(this.button4, "discard changes made since last save");
@@ -337,10 +350,9 @@ namespace WinGauntlet
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(166, 9);
-            this.button3.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.button3.Location = new System.Drawing.Point(111, 6);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(91, 35);
+            this.button3.Size = new System.Drawing.Size(61, 23);
             this.button3.TabIndex = 19;
             this.button3.Text = "Defaults";
             this.toolTip1.SetToolTip(this.button3, "return to gauntlet default values");
@@ -353,10 +365,9 @@ namespace WinGauntlet
             this.messagewrite.Checked = global::WinGauntlet.Properties.Settings.Default.writeonmessages;
             this.messagewrite.CheckState = System.Windows.Forms.CheckState.Checked;
             this.messagewrite.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "writeonmessages", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.messagewrite.Location = new System.Drawing.Point(42, 257);
-            this.messagewrite.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.messagewrite.Location = new System.Drawing.Point(28, 167);
             this.messagewrite.Name = "messagewrite";
-            this.messagewrite.Size = new System.Drawing.Size(203, 24);
+            this.messagewrite.Size = new System.Drawing.Size(142, 17);
             this.messagewrite.TabIndex = 18;
             this.messagewrite.Text = "Disable Message Editing";
             this.toolTip1.SetToolTip(this.messagewrite, "disable modifying or making notes in messages window");
@@ -368,10 +379,9 @@ namespace WinGauntlet
             this.clearmessages.Checked = global::WinGauntlet.Properties.Settings.Default.clearmessages;
             this.clearmessages.CheckState = System.Windows.Forms.CheckState.Checked;
             this.clearmessages.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "clearmessages", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.clearmessages.Location = new System.Drawing.Point(42, 223);
-            this.clearmessages.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.clearmessages.Location = new System.Drawing.Point(28, 145);
             this.clearmessages.Name = "clearmessages";
-            this.clearmessages.Size = new System.Drawing.Size(198, 24);
+            this.clearmessages.Size = new System.Drawing.Size(139, 17);
             this.clearmessages.TabIndex = 17;
             this.clearmessages.Text = "Clear Messages on Run";
             this.toolTip1.SetToolTip(this.clearmessages, "clear messages window for each run");
@@ -383,11 +393,10 @@ namespace WinGauntlet
             this.saveonexit.Checked = global::WinGauntlet.Properties.Settings.Default.saveonexit;
             this.saveonexit.CheckState = System.Windows.Forms.CheckState.Checked;
             this.saveonexit.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "saveonexit", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.saveonexit.Location = new System.Drawing.Point(42, 154);
-            this.saveonexit.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.saveonexit.Location = new System.Drawing.Point(28, 100);
             this.saveonexit.Name = "saveonexit";
             this.saveonexit.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.saveonexit.Size = new System.Drawing.Size(116, 24);
+            this.saveonexit.Size = new System.Drawing.Size(86, 17);
             this.saveonexit.TabIndex = 14;
             this.saveonexit.Text = "Save on Exit";
             this.toolTip1.SetToolTip(this.saveonexit, "save gauntlet options on exit");
@@ -395,10 +404,9 @@ namespace WinGauntlet
             // 
             // savesettings
             // 
-            this.savesettings.Location = new System.Drawing.Point(9, 9);
-            this.savesettings.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.savesettings.Location = new System.Drawing.Point(6, 6);
             this.savesettings.Name = "savesettings";
-            this.savesettings.Size = new System.Drawing.Size(63, 35);
+            this.savesettings.Size = new System.Drawing.Size(42, 23);
             this.savesettings.TabIndex = 13;
             this.savesettings.Text = "Save";
             this.toolTip1.SetToolTip(this.savesettings, "save these options");
@@ -408,20 +416,18 @@ namespace WinGauntlet
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(77, 106);
-            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label2.Location = new System.Drawing.Point(51, 69);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(165, 20);
+            this.label2.Size = new System.Drawing.Size(111, 13);
             this.label2.TabIndex = 4;
             this.label2.Text = "Select Response DLL";
             this.toolTip1.SetToolTip(this.label2, "select response library used to populate response list on Studies tab");
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(42, 103);
-            this.button2.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.button2.Location = new System.Drawing.Point(28, 67);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(30, 26);
+            this.button2.Size = new System.Drawing.Size(20, 17);
             this.button2.TabIndex = 3;
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
@@ -431,11 +437,10 @@ namespace WinGauntlet
             this._debugs.AutoSize = true;
             this._debugs.Checked = true;
             this._debugs.CheckState = System.Windows.Forms.CheckState.Checked;
-            this._debugs.Location = new System.Drawing.Point(42, 189);
-            this._debugs.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this._debugs.Location = new System.Drawing.Point(28, 123);
             this._debugs.Name = "_debugs";
             this._debugs.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this._debugs.Size = new System.Drawing.Size(183, 24);
+            this._debugs.Size = new System.Drawing.Size(129, 17);
             this._debugs.TabIndex = 2;
             this._debugs.Text = "Response Debugging";
             this.toolTip1.SetToolTip(this._debugs, "show your responses SendDebug messages in messages window");
@@ -444,10 +449,9 @@ namespace WinGauntlet
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(346, 106);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label1.Location = new System.Drawing.Point(231, 69);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(135, 20);
+            this.label1.Size = new System.Drawing.Size(93, 13);
             this.label1.TabIndex = 1;
             this.label1.Text = "Select Tick Folder";
             this.toolTip1.SetToolTip(this.label1, "select folder that is scanned for historical data");
@@ -455,10 +459,9 @@ namespace WinGauntlet
             // messagepage
             // 
             this.messagepage.Controls.Add(this.messages);
-            this.messagepage.Location = new System.Drawing.Point(4, 29);
-            this.messagepage.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.messagepage.Location = new System.Drawing.Point(4, 22);
             this.messagepage.Name = "messagepage";
-            this.messagepage.Size = new System.Drawing.Size(621, 509);
+            this.messagepage.Size = new System.Drawing.Size(411, 326);
             this.messagepage.TabIndex = 4;
             this.messagepage.Text = "Messages";
             this.messagepage.UseVisualStyleBackColor = true;
@@ -469,20 +472,20 @@ namespace WinGauntlet
             this.messages.DataBindings.Add(new System.Windows.Forms.Binding("ReadOnly", global::WinGauntlet.Properties.Settings.Default, "writeonmessages", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.messages.Dock = System.Windows.Forms.DockStyle.Fill;
             this.messages.Location = new System.Drawing.Point(0, 0);
-            this.messages.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.messages.Name = "messages";
             this.messages.ReadOnly = global::WinGauntlet.Properties.Settings.Default.writeonmessages;
-            this.messages.Size = new System.Drawing.Size(621, 509);
+            this.messages.Size = new System.Drawing.Size(415, 332);
             this.messages.TabIndex = 0;
             this.messages.Text = "";
             // 
             // _resulttab
             // 
             this._resulttab.Controls.Add(this.tradeResults1);
-            this._resulttab.Location = new System.Drawing.Point(4, 29);
+            this._resulttab.Location = new System.Drawing.Point(4, 22);
+            this._resulttab.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this._resulttab.Name = "_resulttab";
-            this._resulttab.Padding = new System.Windows.Forms.Padding(3);
-            this._resulttab.Size = new System.Drawing.Size(621, 509);
+            this._resulttab.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this._resulttab.Size = new System.Drawing.Size(411, 326);
             this._resulttab.TabIndex = 5;
             this._resulttab.Text = "Results";
             this._resulttab.UseVisualStyleBackColor = true;
@@ -492,33 +495,30 @@ namespace WinGauntlet
             this.tradeResults1.AutoWatch = false;
             this.tradeResults1.BackColor = System.Drawing.Color.White;
             this.tradeResults1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tradeResults1.Location = new System.Drawing.Point(3, 3);
+            this.tradeResults1.Location = new System.Drawing.Point(2, 2);
+            this.tradeResults1.Margin = new System.Windows.Forms.Padding(1, 1, 1, 1);
             this.tradeResults1.Name = "tradeResults1";
             this.tradeResults1.Path = "C:\\Users\\jfranta\\Documents";
-            this.tradeResults1.Size = new System.Drawing.Size(615, 503);
+            this.tradeResults1.Size = new System.Drawing.Size(410, 327);
             this.tradeResults1.TabIndex = 0;
             // 
-            // _portfoliosim
+            // button5
             // 
-            this._portfoliosim.AutoSize = true;
-            this._portfoliosim.Checked = global::WinGauntlet.Properties.Settings.Default.PortfolioRealisticSim;
-            this._portfoliosim.CheckState = System.Windows.Forms.CheckState.Checked;
-            this._portfoliosim.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::WinGauntlet.Properties.Settings.Default, "PortfolioRealisticSim", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this._portfoliosim.Location = new System.Drawing.Point(42, 320);
-            this._portfoliosim.Name = "_portfoliosim";
-            this._portfoliosim.Size = new System.Drawing.Size(234, 24);
-            this._portfoliosim.TabIndex = 32;
-            this._portfoliosim.Text = "Portfolio-realistic Sim (slower)";
-            this._portfoliosim.UseVisualStyleBackColor = true;
+            this.button5.Location = new System.Drawing.Point(8, 212);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(57, 23);
+            this.button5.TabIndex = 21;
+            this.button5.Text = "Library";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button2_Click);
             // 
             // Gauntlet
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(629, 542);
+            this.ClientSize = new System.Drawing.Size(419, 352);
             this.Controls.Add(this.tabs);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "Gauntlet";
             this.Text = "Gauntlet";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Gauntlet_FormClosing);
@@ -573,6 +573,7 @@ namespace WinGauntlet
         private System.Windows.Forms.CheckBox _capitalprompt;
         private System.Windows.Forms.Button _docapcon;
         private System.Windows.Forms.CheckBox _portfoliosim;
+        private System.Windows.Forms.Button button5;
     }
 }
 
