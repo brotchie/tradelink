@@ -69,8 +69,7 @@ namespace TradeLink.Common
 
         private void init(string realsymbol, int date, string path)
         {
-            // if file exists, assume it has a header
-            _hasheader = File.Exists(_file);
+
 
             // store important stuff
             _realsymbol = realsymbol;
@@ -78,6 +77,9 @@ namespace TradeLink.Common
             _date = date;
             // get filename from path and symbol
             _file = SafeFilename(_realsymbol, _path, _date);
+
+            // if file exists, assume it has a header
+            _hasheader = File.Exists(_file);
 
             if (!_hasheader)
                 Header(this, realsymbol);
