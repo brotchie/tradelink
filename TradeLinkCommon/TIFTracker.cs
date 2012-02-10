@@ -6,7 +6,7 @@ using TradeLink.API;
 namespace TradeLink.Common
 {
     /// <summary>
-    /// enforce time limits for orders
+    /// enforce time limits for orders (in seconds)
     /// </summary>
     public class TIFTracker : GenericTracker<long>, GotTickIndicator, GenericTrackerLong, SendOrderIndicator, SendCancelIndicator, GotCancelIndicator, GotFillIndicator
     {
@@ -59,10 +59,11 @@ namespace TradeLink.Common
                 int tif = _tifs[i];
                 if (tif == 0)
                     continue;
-                int diff = Util.FTDIFF(_senttime[i], _lasttime);
+                int senttime = _senttime[i];
+                int diff = Util.FTDIFF(senttime, _lasttime);
                 if (diff >= tif)
                 {
-                    debug("Tif expired for: " + _id[i]);
+                    debug("Tif expired for: " + _id[i]+" at time: "+_lasttime+" from: "+_senttime+" secs: "+diff);
                     if (SendCancelEvent != null)
                         SendCancelEvent(_id[i]);
                     else
@@ -80,7 +81,7 @@ namespace TradeLink.Common
             // mark as canceled
             _tifs[idx] = 0;
             // get symbol
-            debug(sym[idx] + " cancel received for: " + id);
+            debug(sym[idx] + " cancel received for tif(sec) order: " + id);
         }
 
         public void GotFill(Trade fill)
