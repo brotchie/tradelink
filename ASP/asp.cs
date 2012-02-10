@@ -625,6 +625,13 @@ namespace ASP
                 // send it current positions
                 foreach (Position p in _pt)
                     _reslist[idx].GotPosition(p);
+                // send it a startup message
+                try
+                {
+                    string tmp = string.Empty;
+                    _reslist[idx].GotMessage(MessageTypes.RESPONSESTART, r.ID, r.ID, 0, r.FullName, ref tmp);
+                }
+                catch { }
                 // update everything
                 IndexBaskets();
                 // show we added response
@@ -793,8 +800,17 @@ namespace ASP
                 int selbox = getrindx(dispidx);
                 // get name
                 string name = _reslist[selbox].FullName;
-                // remove id to local association
+                // send it a shutdown notification
+                string tmp = string.Empty;
+                // get response id
                 int responseID = _reslist[selbox].ID;
+                // notify it of shutdown
+                try
+                {
+                    _reslist[selbox].GotMessage(MessageTypes.RESPONSESHUTDOWN, responseID, responseID, 0, _reslist[selbox].FullName, ref tmp);
+                }
+                catch { }
+                // remove id to local association
                 _rid2local.Remove(responseID);
                 // remove the response
                 _reslist[selbox] = new InvalidResponse();
