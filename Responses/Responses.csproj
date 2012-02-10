@@ -139,6 +139,7 @@
       <DependentUpon>Quotelet.cs</DependentUpon>
     </Compile>
     <Compile Include="SMAResponse.cs" />
+    <Compile Include="TIF_Response.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="BigTradeUI.resx">
