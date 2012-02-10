@@ -371,7 +371,22 @@ namespace ASP
             // send unknown messages to valid responses
             for (int idx= 0; idx<_reslist.Count; idx++)
                 if (!isBadResponse(idx))
-                    _reslist[idx].GotMessage(type, source, dest, id, request, ref response);
+                {
+                    if (handleresponseexception)
+                    {
+                        try
+                        {
+                            _reslist[idx].GotMessage(type, source, dest, id, request, ref response);
+                        }
+                        catch (Exception ex)
+                        {
+                            notifyresponseexception(idx, _lasttime, "message: "+type+" "+request, ex);
+                        }
+
+                    }
+                    else
+                        _reslist[idx].GotMessage(type, source, dest, id, request, ref response);
+                }
         }
 
 
@@ -624,7 +639,22 @@ namespace ASP
                 _reslist[idx].Reset();
                 // send it current positions
                 foreach (Position p in _pt)
-                    _reslist[idx].GotPosition(p);
+                {
+                    if (handleresponseexception)
+                    {
+                        try
+                        {
+                            _reslist[idx].GotPosition(p);
+                        }
+                        catch (Exception ex)
+                        {
+                            notifyresponseexception(idx, _lasttime, p.ToString(), ex);
+                        }
+                       
+                    }
+                    else
+                        _reslist[idx].GotPosition(p);
+                }
                 // send it a startup message
                 try
                 {
@@ -877,7 +907,21 @@ namespace ASP
             // send order cancel notification to every valid box
             for (int idx = 0; idx<_reslist.Count; idx++)
                 if (!isBadResponse(idx))
-                    _reslist[idx].GotOrderCancel(number);
+                {
+                    if (handleresponseexception)
+                    {
+                        try
+                        {
+                            _reslist[idx].GotOrderCancel(number);
+                        }
+                        catch (Exception ex)
+                        {
+                            notifyresponseexception(idx, _lasttime, "cancel: "+number, ex);
+                        }
+                    }
+                    else
+                        _reslist[idx].GotOrderCancel(number);
+                }
         }
 
         void tl_gotOrder(Order o)
@@ -886,7 +930,21 @@ namespace ASP
             // send order notification to any valid responses
             for (int i = 0; i<_reslist.Count; i++)
                 if (!isBadResponse(i))
-                    _reslist[i].GotOrder(o);
+                {
+                    if (handleresponseexception)
+                    {
+                        try
+                        {
+                            _reslist[i].GotOrder(o);
+                        }
+                        catch (Exception ex)
+                        {
+                            notifyresponseexception(i, o.time, o.ToString(), ex);
+                        }
+                    }
+                    else
+                        _reslist[i].GotOrder(o);
+                }
         }
 
         void ASP_FormClosing(object sender, FormClosingEventArgs e)
@@ -958,12 +1016,41 @@ namespace ASP
 
             // reserialize and pass as a message
             string message = ImbalanceImpl.Serialize(imb);
-            foreach (Response resp in _reslist)
-                resp.GotMessage(MessageTypes.IMBALANCERESPONSE, 0, 0, 0, "", ref message);
+            for (int i = 0; i < _reslist.Count; i++)
+            {
+                if (handleresponseexception)
+                {
+                    try {
+                        _reslist[i].GotMessage(MessageTypes.IMBALANCERESPONSE,0,0,0,"",ref message);
+                    }
+                    catch (Exception ex)
+                    {
+                        notifyresponseexception(i, imb.ThisTime, "imbalance: "+imb.ToString(), ex);
+                    }
+                }
+                else
+                    _reslist[i].GotMessage(MessageTypes.IMBALANCERESPONSE, 0, 0, 0, "", ref message);
+            }
         }
+
+        bool handleresponseexception = Properties.Settings.Default.HandleResponseExceptions;
+        bool disableresponseonexception = Properties.Settings.Default.DisableResponseOnException;
+        void notifyresponseexception(int idx, int time, string ondata, Exception ex)
+        {
+            string ridn = _reslist[idx].ID + " " + _reslist[idx].FullName + " at: " + time + " on: " + ondata;
+            debug(ridn + " had a user code error: " + ex.Message + ex.StackTrace + ".  Purchase a support contract at http://www.pracplay.com or ask community at http://community.tradelink.org if you need help resolving your error.");
+            if (disableresponseonexception)
+            {
+                _reslist[idx].isValid = false;
+                debug(ridn + " was marked invalid because of user code error.");
+            }
+        }
+
+        int _lasttime = 0;
 
         void tl_gotTick(Tick t)
         {
+            _lasttime = t.time;
             // set time
             _dw.ExternalTimeStamp = t.time;
             // see if we are tracking this symbol
@@ -977,7 +1064,27 @@ namespace ASP
 
             // send tick to any valid requesting responses
             foreach (int idx in idxs)
+            {
+                if (handleresponseexception)
+                {
+                    // skip disabled responses
+                    if ((_reslist[idx]==null)  || !_reslist[idx].isValid)
+                        continue;
+                    // try to execute
+                    try
+                    {
+                        _reslist[idx].GotTick(t);
+                    }
+                    catch (Exception ex)
+                    {
+                        notifyresponseexception(idx, t.time, t.ToString(), ex);
+                    }
+                }
+                else
+                {
                     _reslist[idx].GotTick(t);
+                }
+            }
             // watch for timeout
             _tlt.newTick(t);
         }
@@ -993,7 +1100,26 @@ namespace ASP
             
             // send trade notification to any valid requesting responses
             for (int i = 0; i < _reslist.Count; i++)
+            {
+                if (handleresponseexception)
+                {
+                    if ((_reslist[i] == null) || !_reslist[i].isValid)
+                        continue;
+                    else
+                    {
+                        try
+                        {
+                            _reslist[i].GotFill(t);
+                        }
+                        catch (Exception ex)
+                        {
+                            notifyresponseexception(i, t.xtime, t.ToString(), ex);
+                        }
+                    }
+                }
+                else
                     _reslist[i].GotFill(t);
+            }
             // check for capital connection request
             if (docapcon && _ao._capconprompt.Checked)
             {
