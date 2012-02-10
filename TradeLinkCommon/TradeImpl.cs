@@ -95,13 +95,13 @@ namespace TradeLink.Common
         {
             string[] r = tradestring.Split(delimiter);
             Trade t = new TradeImpl();
-            t.xdate = Convert.ToInt32(r[0]);
-            t.xtime = Convert.ToInt32(r[1]);
+            t.xdate = Convert.ToInt32(r[0], System.Globalization.CultureInfo.InvariantCulture);
+            t.xtime = Convert.ToInt32(r[1], System.Globalization.CultureInfo.InvariantCulture);
             t.symbol = r[2];
             t.Account = r[6];
-            t.xprice = Convert.ToDecimal(r[5]);
+            t.xprice = Convert.ToDecimal(r[5], System.Globalization.CultureInfo.InvariantCulture);
             t.side = r[3]=="BUY";
-            t.xsize = Convert.ToInt32(r[4]);
+            t.xsize = Convert.ToInt32(r[4], System.Globalization.CultureInfo.InvariantCulture);
             return t;
         }
         /// <summary>
