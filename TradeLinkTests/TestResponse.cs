@@ -82,7 +82,7 @@ namespace TestTradeLink
         public void AlwaysEnter()
         {
             Always b = new Always();
-            b.SendDebugEvent += new DebugFullDelegate(b_SendDebug);
+            b.SendDebugEvent += new DebugDelegate(b_SendDebug);
             b.SendOrderEvent += new OrderSourceDelegate(b_SendOrder);
             sbcount = 0;
             debugs = 0;
@@ -109,7 +109,7 @@ namespace TestTradeLink
             Assert.AreEqual(4, debugs);
         }
 
-        void b_SendDebug(Debug debug)
+        void b_SendDebug(string msg)
         {
             debugs++;
         }
@@ -127,7 +127,7 @@ namespace TestTradeLink
         {
             // subscribe to news service that will count everytime a debug is sent
             Always b = new Always(); // send debugs from reponse to our news service
-            b.SendDebugEvent += new DebugFullDelegate(b_SendDebug);
+            b.SendDebugEvent += new DebugDelegate(b_SendDebug);
             b.SendOrderEvent += new OrderSourceDelegate(b_SendOrder);
             int good = 0;
             debugs = 0;

@@ -1188,7 +1188,7 @@ namespace ASP
         {
             // handle all the outgoing events from the response
             tmp.SendOrderEvent += new OrderSourceDelegate(workingres_SendOrder);
-            tmp.SendDebugEvent += new DebugFullDelegate(workingres_GotDebug);
+            tmp.SendDebugEvent += new DebugDelegate(workingres_GotDebug);
             tmp.SendCancelEvent += new LongSourceDelegate(workingres_CancelOrderSource);
             tmp.SendMessageEvent += new MessageDelegate(tmp_SendMessage);
             tmp.SendBasketEvent += new BasketDelegate(_workingres_SendBasket);
@@ -1411,10 +1411,10 @@ namespace ASP
             _bf.CancelOrder((long)number);
         }
 
-        void workingres_GotDebug(Debug d)
+        void workingres_GotDebug(string msg)
         {
             // display to screen
-            debug(d.Msg);
+            debug(msg);
         }
 
         private void status(string msg)

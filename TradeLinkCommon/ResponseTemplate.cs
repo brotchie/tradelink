@@ -71,7 +71,7 @@ namespace TradeLink.Common
         /// short form of senddebug
         /// </summary>
         /// <param name="msg"></param>
-        public virtual void D(string msg) { SendDebugEvent(DebugImpl.Create(msg)); }
+        public virtual void D(string msg) { SendDebugEvent(msg); }
         /// <summary>
         /// short form of sendorder
         /// </summary>
@@ -197,7 +197,7 @@ namespace TradeLink.Common
         /// sends a debug message about what your response is doing at the moment.
         /// </summary>
         /// <param name="msg"></param>
-        public virtual void senddebug(string msg) { if (SendDebugEvent!=null) SendDebugEvent(DebugImpl.Create(msg)); }
+        public virtual void senddebug(string msg) { if (SendDebugEvent!=null) SendDebugEvent(msg); }
         /// <summary>
         /// clears the chart
         /// </summary>
@@ -280,7 +280,7 @@ namespace TradeLink.Common
         /// Full name of this response set by programs (includes namespace)
         /// </summary>
         public string FullName { get { return _full; } set { _full = value; } }
-        public event DebugFullDelegate SendDebugEvent;
+        public event DebugDelegate SendDebugEvent;
         public event OrderSourceDelegate SendOrderEvent;
         public event LongSourceDelegate SendCancelEvent;
         public event ResponseStringDel SendIndicatorsEvent;

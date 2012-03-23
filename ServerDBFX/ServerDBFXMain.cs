@@ -27,11 +27,11 @@ namespace ServerDBFX
             TrackEnabled = Util.TrackUsage();
             Program = PROGRAM;
             InitializeComponent();
-            _dbfx.SendDebug += new TradeLink.API.DebugFullDelegate(_dbfx_SendDebug);
+            _dbfx.SendDebug += new TradeLink.API.DebugDelegate(_dbfx_SendDebug);
             FormClosing += new FormClosingEventHandler(ServerDBFXMain_FormClosing);
         }
 
-        void _dbfx_SendDebug(TradeLink.API.Debug debug)
+        void _dbfx_SendDebug(string debug)
         {
             _dw.GotDebug(debug);
             _log.GotDebug(debug);

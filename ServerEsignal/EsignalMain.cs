@@ -45,7 +45,7 @@ namespace ServerEsignal
             tl.WaitBetweenEvents = Properties.Settings.Default.WaitBetweenEvents;
             tl.BarRequestsGetAllData = Properties.Settings.Default.BarRequestsuseAllData;
             // send debug messages to log file
-            tl.GotDebug += new DebugFullDelegate(debug);
+            tl.GotDebug += new DebugDelegate(debug);
             debug("Started " + PROGRAM + Util.TLVersion());
             // attempt to connect to esignal
             _ok_Click(null, null);

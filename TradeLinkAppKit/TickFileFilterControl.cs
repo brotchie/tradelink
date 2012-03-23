@@ -20,7 +20,7 @@ namespace TradeLink.AppKit
         /// <summary>
         /// sends debug messages from control
         /// </summary>
-        public event DebugFullDelegate SendDebug;
+        public event DebugDelegate SendDebug;
         /// <summary>
         /// sent whenever user changes filter
         /// </summary>
@@ -308,16 +308,19 @@ namespace TradeLink.AppKit
             if (FilterUpdate != null) 
                 FilterUpdate(sender, new EventArgs()); 
         }
+
+        public event DebugDelegate SendStatusEvent;
+
         void status(string msg)
         {
-            if (SendDebug != null)
-                SendDebug(DebugImpl.Create(msg, DebugLevel.Status));
+            if (SendStatusEvent!= null)
+                SendStatusEvent(msg);
         }
 
         void debug(string msg)
         {
             if (SendDebug != null)
-                SendDebug(DebugImpl.Create(msg, DebugLevel.Debug));
+                SendDebug(msg);
 
         }
 

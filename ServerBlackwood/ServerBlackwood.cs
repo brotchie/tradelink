@@ -20,7 +20,7 @@ namespace ServerBlackwood
         
        
         // tradelink members
-        public event DebugFullDelegate SendDebug;
+        public event DebugDelegate SendDebug;
         private bool _valid = false;
         public bool isValid { get { return _valid; } }
         PositionTracker pt = new PositionTracker();
@@ -606,7 +606,7 @@ namespace ServerBlackwood
         void debug(string msg)
         {
             if (SendDebug != null)
-                SendDebug(DebugImpl.Create(msg));
+                SendDebug(msg);
         }
      }
 }

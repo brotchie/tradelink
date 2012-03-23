@@ -23,7 +23,7 @@ namespace ServerEsignal
 
 
         Basket _mb = new BasketImpl();
-        public event DebugFullDelegate GotDebug;
+        public event DebugDelegate GotDebug;
         bool _go = true;
         public bool isValid { get { return _valid; } }
         bool _barrequestsgetalldata = true;
@@ -172,7 +172,7 @@ namespace ServerEsignal
                 catch (Exception ex)
                 {
                     if (GotDebug != null)
-                        GotDebug(DebugImpl.Create(ex.Message + ex.StackTrace, DebugLevel.Debug));
+                        GotDebug(ex.Message + ex.StackTrace);
                 }
                 if (e.Cancel || !_go)
                     break;
@@ -312,7 +312,7 @@ namespace ServerEsignal
         void debug(string msg)
         {
             if (GotDebug != null)
-                GotDebug(DebugImpl.Create(msg));
+                GotDebug(msg);
         }
         string _tmpregister = string.Empty;
         MessageTypes[] tl_newFeatureRequest()
@@ -367,7 +367,7 @@ namespace ServerEsignal
             catch (Exception ex)
             {
                 if (GotDebug != null)
-                    GotDebug(DebugImpl.Create(ex.Message + ex.StackTrace, DebugLevel.Debug));
+                    GotDebug(ex.Message + ex.StackTrace);
             }
         }
         /// <summary>
@@ -392,7 +392,7 @@ namespace ServerEsignal
             catch (Exception ex)
             {
                 if (GotDebug != null)
-                    GotDebug(DebugImpl.Create(ex.Message + ex.StackTrace, DebugLevel.Debug));
+                    GotDebug(ex.Message + ex.StackTrace);
             }
             // garbage collect esignal object
             esig = null;

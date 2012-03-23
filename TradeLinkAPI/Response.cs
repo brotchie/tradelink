@@ -18,7 +18,7 @@ namespace TradeLink.API
         event ResponseStringDel SendIndicatorsEvent;
         event OrderSourceDelegate SendOrderEvent;
         event LongSourceDelegate SendCancelEvent;
-        event DebugFullDelegate SendDebugEvent;
+        event DebugDelegate SendDebugEvent;
         event MessageDelegate SendMessageEvent;
         event BasketDelegate SendBasketEvent;
         event ChartLabelDelegate SendChartLabelEvent;

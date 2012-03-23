@@ -94,12 +94,12 @@ namespace TradeLink.AppKit
             return fn;
         }
 
-        public event DebugFullDelegate SendDebug;
+        public event DebugDelegate SendDebug;
         /// <summary>
         /// log something
         /// </summary>
         /// <param name="msg"></param>
-        public void GotDebug(Debug msg) 
+        public void GotDebug(string msg) 
         {
             if (SendDebug != null)
                 SendDebug(msg);
@@ -124,21 +124,15 @@ namespace TradeLink.AppKit
                         sb.Append(now.ToString("HHmmss"));
                         sb.Append(": ");
                     }
-                    sb.Append(msg.Msg);
+                    sb.Append(msg);
                     _log.WriteLine(sb.ToString());
                     _content.Append(sb.ToString());
                 }
             }
             catch { }
         }
-        /// <summary>
-        /// log something
-        /// </summary>
-        /// <param name="msg"></param>
-        public void GotDebug(string msg)
-        {
-            GotDebug(DebugImpl.Create(msg));
-        }
+
+
         /// <summary>
         /// close the log
         /// </summary>

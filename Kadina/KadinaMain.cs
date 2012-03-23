@@ -672,7 +672,7 @@ namespace Kadina
         void bindresponseevents()
         {
             myres.SendTicketEvent += new TicketDelegate(myres_SendTicketEvent);
-            myres.SendDebugEvent += new DebugFullDelegate(myres_GotDebug);
+            myres.SendDebugEvent += new DebugDelegate(myres_GotDebug);
             myres.SendCancelEvent += new LongSourceDelegate(myres_CancelOrderSource);
             myres.SendOrderEvent += new OrderSourceDelegate(myres_SendOrder);
             myres.SendIndicatorsEvent += new ResponseStringDel(myres_SendIndicators);
@@ -687,7 +687,7 @@ namespace Kadina
             try
             {
                 myres.SendTicketEvent -= new TicketDelegate(myres_SendTicketEvent);
-                myres.SendDebugEvent -= new DebugFullDelegate(myres_GotDebug);
+                myres.SendDebugEvent -= new DebugDelegate(myres_GotDebug);
                 myres.SendCancelEvent -= new LongSourceDelegate(myres_CancelOrderSource);
                 myres.SendOrderEvent -= new OrderSourceDelegate(myres_SendOrder);
                 myres.SendIndicatorsEvent -= new ResponseStringDel(myres_SendIndicators);
@@ -767,9 +767,9 @@ namespace Kadina
         }
 
         StringBuilder _msg = new StringBuilder(100000000);
-        void myres_GotDebug(Debug msg)
+        void myres_GotDebug(string msg)
         {
-            _msg.AppendFormat("{0}: {1}{2}",nowtime,msg.Msg,Environment.NewLine);
+            _msg.AppendFormat("{0}: {1}{2}",nowtime,msg,Environment.NewLine);
         }
 
 

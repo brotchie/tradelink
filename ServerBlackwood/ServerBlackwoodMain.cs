@@ -31,7 +31,7 @@ namespace ServerBlackwood
             Program = PROGRAM;
             InitializeComponent();
             _con.BWConnectedEvent += new BWConnectedEventHandler(_con_BWConnectedEvent);
-            _con.SendDebug += new DebugFullDelegate(_dw.GotDebug);
+            _con.SendDebug += new DebugDelegate(_dw.GotDebug);
 
             StatusHandler = new DisplayStatusHandler(DisplayStatus);
 

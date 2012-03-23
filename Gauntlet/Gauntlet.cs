@@ -439,7 +439,7 @@ namespace WinGauntlet
             args.Response.SendTicketEvent += new TicketDelegate(Response_SendTicketEvent);
             args.Response.SendMessageEvent += new MessageDelegate(Response_SendMessage);
             args.Response.SendIndicatorsEvent += new ResponseStringDel(Response_SendIndicators);
-            args.Response.SendDebugEvent += new DebugFullDelegate(Response_GotDebug);
+            args.Response.SendDebugEvent += new DebugDelegate(Response_GotDebug);
             args.Response.SendCancelEvent += new LongSourceDelegate(Response_CancelOrderSource);
             args.Response.SendOrderEvent += new OrderSourceDelegate(Response_SendOrder);
             args.Response.SendBasketEvent += new BasketDelegate(Response_SendBasket);
@@ -519,10 +519,10 @@ namespace WinGauntlet
 
         System.Text.StringBuilder _sb = new System.Text.StringBuilder(10000000);
 
-        void Response_GotDebug(Debug msg)
+        void Response_GotDebug(string msg)
         {
            // _sb.AppendLine(msg.Msg);
-            _sb.AppendFormat("{0}: {1}{2}", nowtime, msg.Msg, Environment.NewLine);
+            _sb.AppendFormat("{0}: {1}{2}", nowtime, msg, Environment.NewLine);
             
         }
 

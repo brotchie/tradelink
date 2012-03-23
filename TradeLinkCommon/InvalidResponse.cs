@@ -34,7 +34,7 @@ namespace TradeLink.Common
         public string Name { get { return _name; } set { _name = value; } }
         public string FullName { get { return _fn; } set { _fn = value; } }
         public event BasketDelegate SendBasketEvent;
-        public event DebugFullDelegate SendDebugEvent;
+        public event DebugDelegate SendDebugEvent;
         public event OrderSourceDelegate SendOrderEvent;
         public event LongSourceDelegate SendCancelEvent;
         public event ResponseStringDel SendIndicatorsEvent;

@@ -34,8 +34,8 @@ namespace TradeLink.Common
         }
         bool _trailbydefault = true;
 
-        public event DebugFullDelegate SendDebug;
-        void D(string msg) { if (SendDebug != null) SendDebug(DebugImpl.Create(msg)); }
+        public event DebugDelegate SendDebug;
+        void D(string msg) { if (SendDebug != null) SendDebug(msg); }
         /// <summary>
         /// gets or sets the trail amount for a given symbol
         /// </summary>

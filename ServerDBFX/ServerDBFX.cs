@@ -13,7 +13,7 @@ namespace ServerDBFX
         FXCore.CoreAut core = new FXCore.CoreAut();
         // this will receive events from dbfx
         FXCore.TradeDeskEventsSinkClass sink;
-        public event DebugFullDelegate SendDebug;
+        public event DebugDelegate SendDebug;
         int _sub = 0;
         public ServerDBFX(TLServer tls)
         {
@@ -82,7 +82,7 @@ namespace ServerDBFX
             //D(psOrderId.ToString());
             return (long)MessageTypes.OK;
         }
-        void D(string msg) { if (SendDebug != null) SendDebug(DebugImpl.Create(msg)); }
+        void D(string msg) { if (SendDebug != null) SendDebug(msg); }
         void ServerDBFX_newOrderCancelRequest(long number)
         {
             string dbfxid = string.Empty;
@@ -103,7 +103,7 @@ namespace ServerDBFX
             catch (Exception ex) 
             {
                 if (SendDebug != null)
-                    SendDebug(DebugImpl.Create(ex.Message+ex.StackTrace));
+                    SendDebug(ex.Message+ex.StackTrace);
                 return false;
             }
             
