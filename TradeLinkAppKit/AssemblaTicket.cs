@@ -164,7 +164,7 @@ namespace TradeLink.AppKit
         private string _un = string.Empty;
         public string Username { get { return _un; } set { _un = value; } }
         internal string _pw = string.Empty;
-        public string Password { set { _pw = value; } }
+        public string Password { set { _pw = value; } get { return _pw; } }
 
         string _sum = string.Empty;
         public string Summary { get { return _sum; } set { _sum = value; } }
