@@ -9,7 +9,7 @@ using TradeLink.Common;
 
 namespace TestTradeLink
 {
-    [TestFixture]
+    [TestFixture, Explicit]
     public class TestTradeLink_IP
     {
         // max time (sec) for all ip tests
