@@ -740,7 +740,8 @@ namespace SterServer
                         }
                         if (reqcancels.Contains(o.id))
                         {
-                            v(o.symbol + " not sending order: " + o.ToString() + " as this order was requested to be canceled.");
+                            v(o.symbol + " not sending order: " + o.ToString() + " as this order was requested to be canceled.  Sent simulated cancel for: "+o.id);
+                            newcancel(o.id);
                             continue;
                         }
                         if (isPaperTradeEnabled)
