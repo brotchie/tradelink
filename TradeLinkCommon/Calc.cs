@@ -57,10 +57,148 @@ namespace TradeLink.Common
         {
             return PosSize * (LastTrade - AvgPrice);
         }
+        /// <summary>
+        /// get open pl for position given the last trade
+        /// </summary>
+        /// <param name="LastTrade"></param>
+        /// <param name="Pos"></param>
+        /// <returns></returns>
         public static decimal OpenPL(decimal LastTrade, Position Pos)
         {
             return OpenPL(LastTrade, Pos.AvgPrice, Pos.Size);
         }
+        /// <summary>
+        /// prepare an array for us with ta lib
+        /// </summary>
+        /// <param name="ih"></param>
+        /// <returns></returns>
+        public static double[] taprep(decimal[] ih)
+        {
+            double[] v;
+            int end;
+            if (taprep(ih, out end, out v))
+                return v;
+            return new double[end];
+        }
+        /// <summary>
+        /// prepare an array for us with ta lib
+        /// </summary>
+        /// <param name="ih"></param>
+        /// <param name="includerecent"></param>
+        /// <returns></returns>
+        public static double[] taprep(decimal[] ih, bool includerecent)
+        {
+            double[] v;
+            int end;
+            if (taprep(ih, includerecent,out end, out v))
+                return v;
+            return new double[end];
+        }
+
+        
+        
+        /// <summary>
+        /// prepare an array for us with ta lib
+        /// </summary>
+        /// <param name="ih"></param>
+        /// <param name="end"></param>
+        /// <param name="h"></param>
+        /// <returns></returns>
+        public static bool taprep(decimal[] ih, out int end, out double[] h)
+        {
+            return taprep(ih, false, out end, out h);
+        }
+        /// <summary>
+        /// prepare an array for us with ta lib
+        /// </summary>
+        /// <param name="ih"></param>
+        /// <param name="includerecent"></param>
+        /// <param name="end"></param>
+        /// <param name="h"></param>
+        /// <returns></returns>
+        public static bool taprep(decimal[] ih, bool includerecent, out int end, out double[] h)
+        {
+            int len = includerecent ? ih.Length : ih.Length - 1;
+            end = len - 1;
+            var tlh = new decimal[len];
+            if (includerecent)
+            {
+                tlh = ih;
+            }
+            else
+            {
+                Array.Copy(ih, tlh, len);
+            }
+
+            h = Calc.Decimal2Double(tlh);
+            return true;
+        }
+        /// <summary>
+        /// prepare an array for us with ta lib
+        /// </summary>
+        /// <param name="ih"></param>
+        /// <returns></returns>
+        public static double[] taprep(long[] ih)
+        {
+            double[] v;
+            int end;
+            if (taprep(ih, out end, out v))
+                return v;
+            return new double[end];
+        }
+        /// <summary>
+        /// prepare an array for us with ta lib
+        /// </summary>
+        /// <param name="ih"></param>
+        /// <param name="includerecent"></param>
+        /// <returns></returns>
+        public static double[] taprep(long[] ih, bool includerecent)
+        {
+            double[] v;
+            int end;
+            if (taprep(ih, includerecent,out end, out v))
+                return v;
+            return new double[end];
+        }
+        /// <summary>
+        /// prepare an array for us with ta lib
+        /// </summary>
+        /// <param name="ih"></param>
+        /// <param name="end"></param>
+        /// <param name="h"></param>
+        /// <returns></returns>
+        public static bool taprep(long[] ih, out int end, out double[] h)
+        {
+            return taprep(ih, false, out end, out h);
+        }
+        /// <summary>
+        /// prepare an array for us with ta lib
+        /// </summary>
+        /// <param name="ih"></param>
+        /// <param name="includerecent"></param>
+        /// <param name="end"></param>
+        /// <param name="h"></param>
+        /// <returns></returns>
+        public static bool taprep(long[] ih, bool includerecent, out int end, out double[] h)
+        {
+            int len = includerecent ? ih.Length : ih.Length - 1;
+            end = len - 1;
+            var tlh = new long[len];
+            if (includerecent)
+            {
+                tlh = ih;
+            }
+            else
+            {
+                Array.Copy(ih, tlh, len);
+            }
+            h = new double[len];
+            for (int i = 0; i < len; i++)
+                h[i] = (double)ih[i];
+            return true;
+        }
+
+
         /// <summary>
         /// <summary>
         /// populate generic tracker with most recent TA-lib result
