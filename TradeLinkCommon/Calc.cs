@@ -830,6 +830,292 @@ namespace TradeLink.Common
         }
 
         /// <summary>
+        /// sum last elements of array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="barsback"></param>
+        /// <returns></returns>
+        public static double Sum(double[] array, int barsback) { return Sum(array, array.Length - barsback, barsback); }
+        /// <summary>
+        /// sum part of an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="startindex"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
+        public static double Sum(double[] array, int startindex, int length)
+        {
+            double sum = 0;
+            for (int i = startindex; i < startindex + length; i++)
+                sum += array[i];
+            return sum;
+        }
+        /// <summary>
+        /// gets sum of entire array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static double Sum(double[] array) { return Sum(array, 0, array.Length); }
+        /// <summary>
+        /// gets sum of squares for end of an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="barsback"></param>
+        /// <returns></returns>
+        public static double SumSquares(double[] array, int barsback) { return SumSquares(array, array.Length - barsback, barsback); }
+        /// <summary>
+        /// get sums of squares for part of an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="startindex"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
+        public static double SumSquares(double[] array, int startindex, int length)
+        {
+            double sum = 0;
+            for (int i = startindex; i < startindex + length; i++)
+                sum += array[i] * array[i];
+            return sum;
+        }
+
+        /// <summary>
+        /// gets sum of squares for entire array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static double SumSquares(double[] array) { return SumSquares(array, 0, array.Length); }
+
+
+
+
+
+
+
+
+        /// <summary>
+        /// gets mean of an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static double Avg(double[] array) { return Avg(array, true); }
+        /// <summary>
+        /// gets mean of an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="returnzeroIfempty"></param>
+        /// <returns></returns>
+        public static double Avg(double[] array, bool returnzeroIfempty) { return array.Length == 0 ? 0 : Sum(array) / array.Length; }
+
+
+
+
+
+
+        /// <summary>
+        /// adds two arrays
+        /// </summary>
+        /// <param name="array1"></param>
+        /// <param name="array2"></param>
+        /// <returns></returns>
+        public static double[] Add(double[] array1, double[] array2)
+        {
+            // normalize sizes of arrays
+            bool a2bigger = array1.Length < array2.Length;
+            int max = a2bigger ? array2.Length : array1.Length;
+            long[] s1 = double2long(array1, max);
+            long[] s2 = double2long(array2, max);
+            // calculate values
+            for (int i = 0; i < s1.Length; i++)
+                s2[i] += s1[i];
+            return long2double(s2);
+        }
+
+        
+        static long[] double2long(double[] a) { return double2long(a, a.Length); }
+        static long[] double2long(double[] a, int length)
+        {
+            long[] r = new long[length];
+            for (int i = 0; i < length; i++)
+                r[i] = (long)(a[i] * D2L_MULT);
+            return r;
+        }
+
+        static double[] long2double(long[] a) { return long2double(a, a.Length); }
+        static double[] long2double(long[] a, int length)
+        {
+            double[] r = new double[length];
+            for (int i = 0; i < length; i++)
+                r[i] = ((double)a[i] / D2L_MULT);
+            return r;
+        }
+
+        static double[] long2doublep(long[] a)
+        {
+            double[] r = new double[a.Length];
+            long m = D2L_MULT * (long)D2L_MULT;
+            for (int i = 0; i < a.Length; i++)
+                r[i] = ((double)a[i] / m);
+            return r;
+        }
+
+
+
+
+        /// <summary>
+        /// subtracts 2nd array from first array
+        /// </summary>
+        /// <param name="array1"></param>
+        /// <param name="array2"></param>
+        /// <returns></returns>
+        public static double[] Subtract(double[] array1, double[] array2)
+        {
+            // normalize sizes of arrays
+            bool a2bigger = array1.Length < array2.Length;
+            int max = a2bigger ? array2.Length : array1.Length;
+            long[] s1 = double2long(array1, max);
+            long[] s2 = double2long(array2, max);
+            // calculate values
+            for (int i = 0; i < s1.Length; i++)
+                s1[i] -= s2[i];
+            return long2double(s1);
+        }
+
+
+        public static double[] Subtract(double[] array, double val)
+        {
+            double[] r = new double[array.Length];
+            for (int i = 0; i < array.Length; i++)
+                r[i] = array[i] - val;
+            return r;
+        }
+
+
+
+
+        /// <summary>
+        /// multiplies two arrays
+        /// </summary>
+        /// <param name="array1"></param>
+        /// <param name="array2"></param>
+        /// <returns></returns>
+        public static double[] Product(double[] array1, double[] array2)
+        {
+            // normalize sizes of arrays
+            bool a2bigger = array1.Length < array2.Length;
+            int max = a2bigger ? array2.Length : array1.Length;
+            long[] s1 = double2long(array1, max);
+            long[] s2 = double2long(array2, max);
+            // calculate values
+            for (int i = 0; i < s1.Length; i++)
+                s2[i] *= s1[i];
+            return long2doublep(s2);
+        }
+
+        /// <summary>
+        /// divides first array by second array.  
+        /// </summary>
+        /// <param name="array1"></param>
+        /// <param name="array2"></param>
+        /// <returns></returns>
+        public static double[] Divide2Double(int[] array1, int[] array2) { return Divide2Double(array1, array2, true); }
+        public static double[] Divide2Double(int[] array1, int[] array2, bool zeroIfundefined)
+        {
+            // normalize sizes of arrays
+            bool a2bigger = array1.Length < array2.Length;
+            int max = a2bigger ? array2.Length : array1.Length;
+            int[] s1 = new int[max];
+            int[] s2 = new int[max];
+            double[] r = new double[max];
+            Buffer.BlockCopy(array1, 0, s1, 0, array1.Length * 4);
+            Buffer.BlockCopy(array2, 0, s2, 0, array2.Length * 4);
+            // calculate values
+            for (int i = 0; i < s1.Length; i++)
+                if (zeroIfundefined)
+                    r[i] = s2[i] != 0 ? (double)s1[i] / s2[i] : 0;
+                else
+                    r[i] = (double)s1[i] / s2[i];
+            return r;
+        }
+
+        /// <summary>
+        /// divides first array by second array.  
+        /// </summary>
+        /// <param name="array1"></param>
+        /// <param name="array2"></param>
+        /// <returns></returns>
+        public static double[] Divide2Double(long[] array1, long[] array2) { return Divide2Double(array1, array2, true); }
+        public static double[] Divide2Double(long[] array1, long[] array2, bool zeroIfundefined)
+        {
+            // normalize sizes of arrays
+            bool a2bigger = array1.Length < array2.Length;
+            int max = a2bigger ? array2.Length : array1.Length;
+            long[] s1 = new long[max];
+            long[] s2 = new long[max];
+            double[] r = new double[max];
+            Buffer.BlockCopy(array1, 0, s1, 0, array1.Length * 4);
+            Buffer.BlockCopy(array2, 0, s2, 0, array2.Length * 4);
+            // calculate values
+            for (int i = 0; i < s1.Length; i++)
+                if (zeroIfundefined)
+                    r[i] = s2[i] != 0 ? (double)s1[i] / s2[i] : 0;
+                else
+                    r[i] = (double)s1[i] / s2[i];
+            return r;
+        }
+
+        /// <summary>
+        /// divides first array by second array.  
+        /// </summary>
+        /// <param name="array1"></param>
+        /// <param name="array2"></param>
+        /// <returns></returns>
+        public static double[] Divide(double[] array1, double[] array2) { return Divide(array1, array2, true); }
+        public static double[] Divide(double[] array1, double[] array2, bool zeroIfundefined)
+        {
+            // normalize sizes of arrays
+            bool a2bigger = array1.Length < array2.Length;
+            int max = a2bigger ? array2.Length : array1.Length;
+            long[] s1 = double2long(array1, max);
+            long[] s2 = double2long(array2, max);
+            double[] r = new double[max];
+            // calculate values
+            for (int i = 0; i < s1.Length; i++)
+            {
+                if (zeroIfundefined)
+                    r[i] = s2[i] != 0 ? (double)s1[i] / s2[i] : 0;
+                else
+                    r[i] = (double)s1[i] / s2[i];
+            }
+            return r;
+        }
+        /// <summary>
+        /// adds a constant to an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public static double[] Add(int[] array, double val)
+        {
+            double[] r = new double[array.Length];
+            for (int i = 0; i < array.Length; i++)
+                r[i] = array[i] + val;
+            return r;
+        }
+        /// <summary>
+        /// adds a constant to an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public static double[] Add(long[] array, double val)
+        {
+            double[] r = new double[array.Length];
+            for (int i = 0; i < array.Length; i++)
+                r[i] = array[i] + val;
+            return r;
+        }
+
+        /// <summary>
         /// divides first array by second array.  
         /// </summary>
         /// <param name="array1"></param>
@@ -990,6 +1276,41 @@ namespace TradeLink.Common
             return r;
         }
 
+        public static double[] Add(double[] array, double val)
+        {
+            double[] r = new double[array.Length];
+            for (int i = 0; i < array.Length; i++)
+                r[i] = array[i] + val;
+            return r;
+        }
+
+        /// <summary>
+        /// subtracts constant from an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public static double[] Subtract(int[] array, double val)
+        {
+            double[] r = new double[array.Length];
+            for (int i = 0; i < array.Length; i++)
+                r[i] = array[i] - val;
+            return r;
+        }
+        /// <summary>
+        /// subtracts constant from an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public static double[] Subtract(long[] array, double val)
+        {
+            double[] r = new double[array.Length];
+            for (int i = 0; i < array.Length; i++)
+                r[i] = array[i] - val;
+            return r;
+        }
+
         /// <summary>
         /// subtracts constant from an array
         /// </summary>
@@ -1027,6 +1348,48 @@ namespace TradeLink.Common
             decimal[] r = new decimal[array.Length];
             for (int i = 0; i < array.Length; i++)
                 r[i] = array[i] - val;
+            return r;
+        }
+
+        /// <summary>
+        /// takes product of constant and an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public static double[] Product(int[] array, double val)
+        {
+            double[] r = new double[array.Length];
+            for (int i = 0; i < array.Length; i++)
+                r[i] = array[i] * val;
+            return r;
+        }
+
+        /// <summary>
+        /// takes product of constant and an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public static double[] Product(double[] array, double val)
+        {
+            double[] r = new double[array.Length];
+            for (int i = 0; i < array.Length; i++)
+                r[i] = array[i] * val;
+            return r;
+        }
+
+        /// <summary>
+        /// takes product of constant and an array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public static double[] Product(long[] array, double val)
+        {
+            double[] r = new double[array.Length];
+            for (int i = 0; i < array.Length; i++)
+                r[i] = array[i] * val;
             return r;
         }
 
@@ -1098,6 +1461,27 @@ namespace TradeLink.Common
                 r[i] = array[i] * val;
             return r;
         }
+
+        public static double StdDevSam(double[] array)
+        {
+            double avg = Avg(array);
+            double[] var = Subtract(array, avg);
+            double[] varsq = Product(var, var);
+            double sumvar = Sum(varsq);
+            double stdev = (double)Math.Pow((double)sumvar / (array.Length - 1), .5);
+            return stdev;
+        }
+
+
+        public static double[] Divide(double[] array, double val)
+        {
+            double[] r = new double[array.Length];
+            for (int i = 0; i < array.Length; i++)
+                r[i] = (double)array[i] / val;
+            return r;
+        }
+
+
         /// <summary>
         /// divides array by a constant
         /// </summary>
@@ -1193,6 +1577,46 @@ namespace TradeLink.Common
             decimal sumvar = Sum(varsq);
             decimal stdev = (decimal)Math.Pow((double)sumvar / (array.Length-1),.5);
             return stdev;
+        }
+
+        /// <summary>
+        /// Takes slice of last N elements of an array
+        /// </summary>
+        /// <param name="inputarray"></param>
+        /// <param name="lastNumElements"></param>
+        /// <returns></returns>
+        public static double[] EndSlice(double[] inputarray, int lastNumElements)
+        {
+            int end = inputarray.Length >= lastNumElements ? inputarray.Length - lastNumElements : 0;
+            double[] output = new double[inputarray.Length - end];
+            int count = output.Length - 1;
+            for (int i = inputarray.Length - 1; i >= end; i--)
+                output[count--] = inputarray[i];
+            return output;
+        }
+
+        /// <summary>
+        /// takes slice of first N elements of array
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public static double[] Slice(double[] input, int count) { return Slice(input, 0, count); }
+        /// <summary>
+        /// takes slice of any N elements of array
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="start"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public static double[] Slice(double[] input, int start, int count)
+        {
+            int len = count < input.Length ? count : input.Length;
+            double[] o = new double[len];
+            if (start > input.Length) return o;
+            for (int i = start; i < start + len; i++)
+                o[i - start] = input[i];
+            return o;
         }
 
         /// <summary>
@@ -1305,6 +1729,72 @@ namespace TradeLink.Common
             return new int[] { year, month, day };
         }
         public static int[] Date(Bar bar) { return Date(bar.Bardate); }
+
+        public static double HH(double[] array) { return Max(array); }
+
+
+        public static double Min(double[] array)
+        {
+            double low = double.MaxValue;
+            for (int i = 0; i < array.Length; i++)
+                if (array[i] < low) low = array[i];
+            return low;
+        }
+
+        public static double SharpeRatio(double ratereturn, double stdevRate, double riskFreeRate)
+        {
+            return (ratereturn - riskFreeRate) / stdevRate;
+        }
+
+        public static double SortinoRatio(double ratereturn, double stdevRateDownside, double riskFreeRate)
+        {
+            return (ratereturn - riskFreeRate) / stdevRateDownside;
+        }
+
+        /// <summary>
+        /// calculate a percentage return based upon a given amount of money used and the absolute return for this money, for each respective securtiy in a portfolio.
+        /// </summary>
+        /// <param name="MoneyInUse"></param>
+        /// <param name="AbsoluteReturn"></param>
+        /// <returns></returns>
+        public static double[] RateOfReturn(double[] MoneyInUse, double[] AbsoluteReturn)
+        {
+            if (MoneyInUse.Length != AbsoluteReturn.Length)
+                throw new Exception("Money in use and Absolute return must have 1:1 security correspondence");
+            double[] ror = new double[MoneyInUse.Length];
+            for (int i = 0; i < MoneyInUse.Length; i++)
+                ror[i] = AbsoluteReturn[i] / MoneyInUse[i];
+            return ror;
+        }
+
+        public static double[] MoneyInUse2Double(PositionTracker pt)
+        {
+            double[] miu = new double[pt.Count];
+            for (int i = 0; i < pt.Count; i++)
+                miu[i] += (double)pt[i].AvgPrice * pt[i].UnsignedSize;
+            return miu;
+        }
+
+
+        /// <summary>
+        /// gets maximum in an array (will return MaxValue if array has no elements)
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static double Max(double[] array)
+        {
+            double max = double.MinValue;
+            for (int i = 0; i < array.Length; i++)
+                if (array[i] > max) max = array[i];
+            return max;
+        }
+
+        /// <summary>
+        /// lowest low of array
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static double LL(double[] array) { return Min(array); }
         /// <summary>
         /// Returns the highest-high of the barlist, for so many bars back.
         /// </summary>
@@ -1851,6 +2341,33 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="prices"></param>
         /// <returns></returns>
+        public static string parray(double[] prices) { return parray(prices, 0); }
+        /// <summary>
+        /// print an array
+        /// </summary>
+        /// <param name="prices"></param>
+        /// <param name="back"></param>
+        /// <returns></returns>
+        public static string parray(double[] prices, int back)
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            int start = prices.Length - back;
+            if (start < 0)
+                start = 0;
+            for (int i = start; i < prices.Length; i++)
+            {
+                double c = prices[i];
+                if (c != 0)
+                    sb.Append(c.ToString("N2") + " ");
+            }
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// print an array
+        /// </summary>
+        /// <param name="prices"></param>
+        /// <returns></returns>
         public static string parray(decimal[] prices) { return parray(prices, 0); }
         /// <summary>
         /// print an array
@@ -1893,6 +2410,15 @@ namespace TradeLink.Common
             }
             return sb.ToString();
         }
+
+        public static double[] fillarray(double val, int len)
+        {
+            double[] a = new double[len];
+            for (int i = 0; i < len; i++)
+                a[i] = val;
+            return a;
+        }
+
         /// <summary>
         /// fill an array with a value
         /// </summary>
