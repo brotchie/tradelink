@@ -470,7 +470,7 @@ namespace Kadina
             fg.Show();
 
             // indicator tab
-            igridinit();
+
 
             // tick tab
             dt.Columns.Add("Time", "".GetType());
@@ -539,11 +539,12 @@ namespace Kadina
 
         TradeResults _tr = new TradeResults();
 
+
         void igridinit()
         {
 
             // don't process invalid responses
-            if ((myres == null) || (myres.Indicators.Length == 0))
+            if ((myres == null) || (myres.Indicators==null) || (myres.Indicators.Length == 0))
                 return;
             // clear existing indicators
             it.Clear();
@@ -652,11 +653,12 @@ namespace Kadina
                 status(resname + " is current response.");
                 bindresponseevents();
                 updatetitle();
-                igridinit();
+                
                 myres.ID = 0;
                 try
                 {
                     myres.Reset();
+                    igridinit();
                 }
                 catch (Exception ex)
                 {

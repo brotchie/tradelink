@@ -91,18 +91,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>.\TA-Lib-Core.dll</HintPath>
     </Reference>
-    <Reference Include="TradeLinkAPI">
-      <HintPath>..\..\..\..\..\Program Files\TradeLink\TradeLinkAPI.dll</HintPath>
-    </Reference>
-    <Reference Include="TradeLinkAppKit">
-      <HintPath>..\..\..\..\..\Program Files\TradeLink\TradeLinkAppKit.dll</HintPath>
-    </Reference>
-    <Reference Include="TradeLinkCommon">
-      <HintPath>..\..\..\..\..\Program Files\TradeLink\TradeLinkCommon.dll</HintPath>
-    </Reference>
-    <Reference Include="TradeLinkResearch">
-      <HintPath>..\..\..\..\..\Program Files\TradeLink\TradeLinkResearch.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BarRequestor.cs" />
@@ -173,6 +161,24 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TradeLinkAPI\TradeLink.API.csproj">
+      <Project>{1B99C9ED-7AF1-4D48-AC9D-A97CF30E1A82}</Project>
+      <Name>TradeLink.API</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TradeLinkAppKit\TradeLink.AppKit.csproj">
+      <Project>{4581ADEF-B013-4EA9-90C5-D585637008CA}</Project>
+      <Name>TradeLink.AppKit</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TradeLinkCommon\TradeLink.Common.csproj">
+      <Project>{A0FE06A2-F31B-49DE-8901-917B5D593E43}</Project>
+      <Name>TradeLink.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TradeLinkResearch\TradeLink.Research.csproj">
+      <Project>{BBDF2EFE-BFE6-4880-977B-4724C3A67D76}</Project>
+      <Name>TradeLink.Research</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

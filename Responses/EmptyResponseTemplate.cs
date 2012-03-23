@@ -33,7 +33,7 @@ namespace Responses
         public string[] Indicators { get { return new string[0]; } set { } }
         public string Name { get { return ""; } set { } }
         public string FullName { get { return ""; } set { } }
-        public event DebugFullDelegate SendDebugEvent;
+        public event DebugDelegate SendDebugEvent;
         public event OrderSourceDelegate SendOrderEvent;
         public event LongSourceDelegate SendCancelEvent;
         public event ResponseStringDel SendIndicatorsEvent;
