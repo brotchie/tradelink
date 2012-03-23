@@ -193,7 +193,7 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="idx"></param>
         /// <returns></returns>
-        public bool HasBid(int idx) { return bid[idx] != 0; }
+        public bool HasBid(int idx) { if (idx < 0) return false; return bid[idx] != 0; }
         /// <summary>
         /// whether we have a bid
         /// </summary>
@@ -205,19 +205,19 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="idx"></param>
         /// <returns></returns>
-        public bool HasAsk(string sym) { return ask[sym] != 0; }
+        public bool HasAsk(string sym) {  return ask[sym] != 0; }
         /// <summary>
         /// whether we have a ask
         /// </summary>
         /// <param name="idx"></param>
         /// <returns></returns>
-        public bool HasAsk(int idx) { return ask[idx] != 0; }
+        public bool HasAsk(int idx) { if (idx < 0) return false; return ask[idx] != 0; }
         /// <summary>
         /// whether we have a last price
         /// </summary>
         /// <param name="idx"></param>
         /// <returns></returns>
-        public bool HasLast(int idx) { return last[idx] != 0; }
+        public bool HasLast(int idx) { if (idx < 0) return false; return last[idx] != 0; }
         /// <summary>
         /// whether we have a last price
         /// </summary>
@@ -235,7 +235,7 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="sym"></param>
         /// <returns></returns>
-        public bool HasAll(int idx) { return HasBid(idx) && HasAsk(idx) && HasLast(idx); }
+        public bool HasAll(int idx) { if (idx < 0) return false; return HasBid(idx) && HasAsk(idx) && HasLast(idx); }
         /// <summary>
         /// whether we have a bid/ask
         /// </summary>
@@ -247,7 +247,7 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="sym"></param>
         /// <returns></returns>
-        public bool HasQuote(int idx) { return HasBid(idx) && HasAsk(idx); }
+        public bool HasQuote(int idx) { if (idx < 0) return false; return HasBid(idx) && HasAsk(idx); }
         /// <summary>
         /// get a tick in tick format
         /// </summary>
