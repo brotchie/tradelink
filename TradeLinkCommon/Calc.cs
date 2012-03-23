@@ -1225,12 +1225,15 @@ namespace TradeLink.Common
         /// <param name="start"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public static long[] Slice(long[] a, int start, int count)
+        public static long[] Slice(long[] input, int start, int count)
         {
-            long[] f = new long[count];
-            for (int i = start; (i < (start + count)) && (i < a.Length); i++)
-                f[i] = a[i];
-            return f;
+            int len = count < input.Length ? count : input.Length;
+            long[] o = new long[len];
+            if (start > input.Length)
+                return o;
+            for (int i = start; i < start + len; i++)
+                o[i - start] = input[i];
+            return o;
         }
 
         /// <summary>
