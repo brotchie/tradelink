@@ -996,7 +996,33 @@ histperiod=daily&startdate=" + startdate + "&enddate=" + enddate + "&output=csv&
             return final.ToArray();
         }
 
+        bool _dir = false;
+        public bool DoubleIncludesRecent { get { return _dir; } set { _dir = value; } }
 
+        public double[] OpenDouble()
+        {
+            return Calc.taprep(Open(),_dir);
+        }
+
+        public double[] CloseDouble()
+        {
+            return Calc.taprep(Close(), _dir);
+        }
+
+        public double[] HighDouble()
+        {
+            return Calc.taprep(High(), _dir);
+        }
+
+        public double[] LowDouble()
+        {
+            return Calc.taprep(Low(), _dir);
+        }
+
+        public double[] VolDouble()
+        {
+            return Calc.taprep(Vol(), _dir);
+        }
     }
 
 

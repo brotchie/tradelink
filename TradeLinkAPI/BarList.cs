@@ -114,6 +114,37 @@ namespace TradeLink.API
         /// </summary>
         /// <returns></returns>
         decimal[] Low();
+
+
+        /// <summary>
+        /// gets array of opening prices for all bars in list, ordered by their index.
+        /// </summary>
+        /// <returns></returns>
+        double[] OpenDouble();
+        /// <summary>
+        /// gets array of closing prices for all bars in list, ordered by their index.
+        /// </summary>
+        /// <returns></returns>
+        double[] CloseDouble();
+        /// <summary>
+        /// gets array of high prices for all bars in list, ordered by their index.
+        /// </summary>
+        /// <returns></returns>
+        double[] HighDouble();
+        /// <summary>
+        /// gets array of low prices for all bars in list, ordered by their index.
+        /// </summary>
+        /// <returns></returns>
+        double[] LowDouble();
+        /// <summary>
+        /// gets array of volumes for all bars in list, ordered by their index.
+        /// </summary>
+        /// <returns></returns>
+        double[] VolDouble();
+
+        bool DoubleIncludesRecent { get; set; }
+
+
         /// <summary>
         /// gets array of dates for all bars in list, ordered by their index.
         /// </summary>
