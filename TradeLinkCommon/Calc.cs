@@ -197,7 +197,19 @@ namespace TradeLink.Common
                 h[i] = (double)ih[i];
             return true;
         }
-
+        /// <summary>
+        /// populate generic tracker with most recent TA-lib result
+        /// </summary>
+        /// <param name="sym"></param>
+        /// <param name="nb"></param>
+        /// <param name="res"></param>
+        /// <param name="gt"></param>
+        /// <returns></returns>
+        public static bool TAPopulateGT(string sym, int nb, ref double[] res, GenericTracker<decimal> gt)
+        {
+            int idx = gt.getindex(sym);
+            return TAPopulateGT(idx, nb, 2, ref res, gt);
+        }
 
         /// <summary>
         /// <summary>
