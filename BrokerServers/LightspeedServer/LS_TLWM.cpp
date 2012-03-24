@@ -352,6 +352,9 @@
 		sec->L_Attach(this);
 		subs.push_back(sec);
 		subsym.push_back(symbol);
+		CString m;
+		m.Format("Preload (no full trades): %s",symbol);
+		D(m);
 		return sec;
 	}
 
@@ -504,7 +507,7 @@
 			if (!_resendsummarynotloaded)
 				return SYMBOL_NOT_LOADED;
 			CString tmp;
-			tmp.Format("%s Not loaded yet, Queing for resend:  %s",o.symbol,o.Serialize());
+			tmp.Format("%s Not loaded yet, Queuing for resend:  %s",o.symbol,o.Serialize());
 			D(tmp);
 			resend.push_back(o);
 			_resends++;
@@ -593,10 +596,6 @@
 		return tlid;
 	}
 
-	
-
-
-
 	int64 LS_TLWM::GetUniqueId(int64 existing)
 	{
 		if (existing!=0)
@@ -672,7 +671,7 @@
 				return tlcorrelationid[i];
 			if (lsorderid1[i]==somelsid)
 				return tlcorrelationid[i];
-			else if (lsorderid2[i]==somelsid)
+			if (lsorderid2[i]==somelsid)
 				return tlcorrelationid[i];
 
 
@@ -721,11 +720,7 @@
 						_curconnectorshares += m->L_SharesSent();
 					else if (_resendsummarynotloaded && (res==L_OrderResult::UNINITIALIZED_SUMMARY))
 					{
-
-						
-
-
-						
+						D("Summary not loaded. We shouldn't reach here.");					
 					}
 				break;
 			}
@@ -792,6 +787,7 @@
 								
 
 							}
+							
 						}
 					case L_OrderChange::Create:
 						{
@@ -906,12 +902,11 @@
 
 			//SetDlgItemInt(IDC_PENDINGORDERS, account->L_PendingOrdersCount());
 			break;
-		case L_MsgL1::id:
-		case L_MsgL1Update::id: // bid+ask
+		case L_MsgL1::id: // initial snapshot
 			{
 				TLTick k;
 
-				L_MsgL1Update* m = (L_MsgL1Update*)msg;
+				L_MsgL1* m = (L_MsgL1*)msg;
 				
 				k.bid = m->L_Bid();
 				k.bs = m->L_BidSize();
@@ -921,10 +916,28 @@
 
 				k.time = _time;
 				k.date = _date;
+				CString tmp;
+				tmp.Format("%s: L_MsgL1",msg->L_Symbol());
+				D(tmp);
 				this->SrvGotTickAsync(k);
 
+			}
+			break;
+		case L_MsgL1Update::id: // bid+ask
+			{
+				TLTick k;
 
+				L_MsgL1Update* m = (L_MsgL1Update*)msg;
 
+				k.bid = m->L_Bid();
+				k.bs = m->L_BidSize();
+				k.ask = m->L_Ask();
+				k.os = m->L_AskSize();
+				k.sym = CString(m->L_Symbol());
+
+				k.time = _time;
+				k.date = _date;
+				this->SrvGotTickAsync(k);
 			}
 			break;
 		case L_MsgL2Update::id:
