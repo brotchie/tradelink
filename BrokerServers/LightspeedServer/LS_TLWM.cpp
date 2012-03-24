@@ -823,9 +823,8 @@
 					case L_OrderChange::Rejection:
 						{
 							CString tmp;
-							tmp.Format("%s lsid: %i rejected lsfinal: %i",msg->L_Symbol(),lsid,m->L_OrderId());
+							tmp.Format("%s lsid: %i rejected lsfinal: %i.  will attempt sending cancel.",msg->L_Symbol(),lsid,m->L_OrderId());
 							D(tmp);
-						break;
 						}
 					case L_OrderChange::Cancel:
 						{
