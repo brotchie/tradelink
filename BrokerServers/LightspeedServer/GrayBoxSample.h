@@ -19,9 +19,6 @@ class CGrayBoxSampleApp : public CWinApp
 public:
 	CGrayBoxSampleApp();
 
-	void StartExtension();
-	void StopExtension();
-
 // Overrides
 public:
 	virtual BOOL InitInstance();

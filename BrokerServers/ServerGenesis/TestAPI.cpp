@@ -54,6 +54,8 @@ BOOL CTestAPIApp::InitInstance()
 	if(GTSession::Initialize(GTAPI_VERSION) != 0)
 		return FALSE;
 
+		InstallFaultHandler();
+
 	// Standard initialization
 	// If you are not using these features and wish to reduce the size
 	//  of your final executable, you should remove from the following
@@ -87,6 +89,6 @@ BOOL CTestAPIApp::InitInstance()
 int CTestAPIApp::ExitInstance() 
 {
 	GTSession::Uninitialize();
-	
+		RevertFaultHandler();
 	return CWinApp::ExitInstance();
 }

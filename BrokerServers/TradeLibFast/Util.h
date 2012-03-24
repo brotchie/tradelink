@@ -11,6 +11,10 @@ char* cleansvnrev(const char * dirtyrev);
 CString SerializeIntVec(std::vector<int> input);
 CString UniqueWindowName(CString rootname);
 
+void InstallFaultHandler();
+void RevertFaultHandler();
+
+
 enum TLTimeField
 {
 	TLdate,

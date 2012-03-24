@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include "GrayBoxSample.h"
-#include "MainDlg.h"
+
 #include "LS_TLWM.h"
 
 
@@ -12,40 +12,7 @@
 #endif
 
 std::string version;
-void CGrayBoxSampleApp::StartExtension()
-{
 	
-}
-void CGrayBoxSampleApp::StopExtension()
-{
-	
-	
-}
-
-/*
-void CGrayBoxSampleApp::StartExtension()
-{
-	
-	MainDlg *pDlg = new MainDlg;
-	if (pDlg->Create(IDD_MAINDLG, CWnd::FromHandle(L_GetMainWnd())))
-	{
-		m_pMainWnd = pDlg;
-	}
-	else
-	{
-		delete pDlg;
-	}
-}
-void CGrayBoxSampleApp::StopExtension()
-{
-	
-	if (m_pMainWnd != 0)
-	{
-		m_pMainWnd->DestroyWindow();
-		m_pMainWnd = 0;
-	}
-}*/
-
 
 //
 //TODO: If this DLL is dynamically linked against the MFC DLLs,
@@ -94,6 +61,8 @@ CGrayBoxSampleApp theApp;
 
 LSEXPORT void LSInitInstance()
 {
+	InstallFaultHandler();
+
 	LS_TLWM* frame = LS_TLWM::GetInstance();
 
 
@@ -105,7 +74,7 @@ LSEXPORT void LSInitInstance()
 			
 	frame->Start();
 	CString tmp;
-	tmp.Format("TradeLink LightspeedConnector %s",frame->Version());
+	tmp.Format("TradeLink LightspeedConnector %s-%s",frame->Version(), "p2");
 	frame->D(tmp);
 }
 LSEXPORT void LSExitInstance()
@@ -117,6 +86,8 @@ LSEXPORT void LSExitInstance()
     }
 	delete frame;
 	frame = NULL;
+
+	RevertFaultHandler();
 }
 LSEXPORT BOOL LSPreTranslateMessage(MSG *pMsg)
 {
