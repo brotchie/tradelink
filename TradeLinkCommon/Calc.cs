@@ -211,7 +211,7 @@ namespace TradeLink.Common
             return TAPopulateGT(idx, nb, 2, ref res, gt);
         }
 
-        /// <summary>
+        
         /// <summary>
         /// populate generic tracker with most recent TA-lib result
         /// </summary>
@@ -237,6 +237,31 @@ namespace TradeLink.Common
         {
             if (nb <= 0) return false;
             gt[idx] = Math.Round(Convert.ToDecimal(res[nb - 1]), dplaces);
+            return true;
+
+        }
+        /// <summary>
+        /// populate a gt with a talib integer result
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <param name="nb"></param>
+        /// <param name="res"></param>
+        /// <param name="gt"></param>
+        /// <returns></returns>
+        public static bool TAPopulateGT(int idx, int nb, ref int[] res, GenericTracker<int> gt) { return TAPopulateGT(idx, nb, 0, ref res, gt); }
+        /// <summary>
+        /// populate a gt with a talib integer result
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <param name="nb"></param>
+        /// <param name="dplaces"></param>
+        /// <param name="res"></param>
+        /// <param name="gt"></param>
+        /// <returns></returns>
+        public static bool TAPopulateGT(int idx, int nb, int dplaces, ref int[] res, GenericTracker<int> gt)
+        {
+            if (nb <= 0) return false;
+            gt[idx] = res[nb - 1];
             return true;
 
         }
