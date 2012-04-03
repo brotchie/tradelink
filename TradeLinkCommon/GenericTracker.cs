@@ -142,29 +142,48 @@ namespace TradeLink.Common
         /// creates a tracker with given name
         /// </summary>
         /// <param name="name"></param>
-        public GenericTracker(string name) : this(0, name) { }
+        public GenericTracker(string name) : this(0, name, default(T)) { }
+        /// <summary>
+        /// creates tracker with given name and default value
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="defaultvaladd"></param>
+        public GenericTracker(string name, T defaultvaladd) : this(0, name, defaultvaladd) { }
+
+        
 
         /// <summary>
         /// creates a tracker
         /// </summary>
-        public GenericTracker() : this(0,string.Empty) { }
+        public GenericTracker() : this(0, string.Empty, default(T)) { }
 
         /// <summary>
         /// creates tracker with approximate # of initial items
         /// </summary>
         /// <param name="EstCount"></param>
-        public GenericTracker(int EstCount) : this(EstCount, string.Empty) { }
+        public GenericTracker(int EstCount) : this(EstCount, string.Empty,default(T)) { }
         /// <summary>
         /// create a tracker with an approximate # of initial items and name
         /// </summary>
         /// <param name="EstCount"></param>
-        public GenericTracker(int EstCount,string name)
+        public GenericTracker(int EstCount,string name, T defaultaddval)
         {
             _name = name;
             _estcount = EstCount;
-            _tracked = new List<T>(EstCount);
-            _txtidx = new Dictionary<string, int>(EstCount);
-            _txt = new List<string>(EstCount);
+            if (EstCount != 0)
+            {
+                _tracked = new List<T>(EstCount);
+                _txtidx = new Dictionary<string, int>(EstCount);
+                _txt = new List<string>(EstCount);
+            }
+            else
+            {
+                _tracked = new List<T>();
+                _txtidx = new Dictionary<string, int>();
+                _txt = new List<string>();
+
+            }
+            _defval = defaultaddval;
         }
 
         /// <summary>

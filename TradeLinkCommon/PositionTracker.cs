@@ -20,7 +20,7 @@ namespace TradeLink.Common
         /// create tracker with approximate # of positions
         /// </summary>
         /// <param name="estimatedPositions"></param>
-        public PositionTracker(int estimatedPositions) : base(estimatedPositions,"POSITION") 
+        public PositionTracker(int estimatedPositions) : base(estimatedPositions,"POSITION",new PositionImpl()) 
         {
             NewTxt += new TextIdxDelegate(PositionTracker_NewTxt);
         }

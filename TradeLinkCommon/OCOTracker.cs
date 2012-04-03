@@ -11,8 +11,8 @@ namespace TradeLink.Common
     {
         IdTracker _idt;
         public OCOTracker() : this(new IdTracker()) { }
-        public OCOTracker(IdTracker idt) : this("OcoTracker", 100, idt) { }
-        public OCOTracker(string name, int estsymbols, IdTracker idt) : base (estsymbols,name)
+        public OCOTracker(IdTracker idt) : this("OcoTracker", idt) { }
+        public OCOTracker(string name, IdTracker idt) : base (name,OCOGroup.EmptyGroup())
         {
             _idt = idt;
         }

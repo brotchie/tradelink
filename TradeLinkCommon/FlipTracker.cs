@@ -45,11 +45,11 @@ namespace TradeLink.Common
         /// <param name="name"></param>
         /// <param name="estlabels"></param>
         public FlipTracker(string name, int estlabels)
-            : base(estlabels, name)
+            : base(name)
         {
-            vcount = new GenericTracker<int>(estlabels, name);
-            prev = new GenericTracker<bool>(estlabels, name);
-            cur = new GenericTracker<bool>(estlabels, name);
+            vcount = new GenericTracker<int>(name);
+            prev = new GenericTracker<bool>(name);
+            cur = new GenericTracker<bool>(name);
             NewTxt += new TextIdxDelegate(FlipTracker_NewTxt);
         }
         void debug(string msg)

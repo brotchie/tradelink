@@ -127,7 +127,7 @@ namespace TradeLink.Research
             // get raw list
             string[][] raw = fetchrawlist(url,deb);
             debug("beginning screen indexing of "+raw.GetLength(0)+" screens.");
-            GenericTracker<Screener> ss = new GenericTracker<Screener>(raw.GetLength(0), "SCREENS");
+            GenericTracker<Screener> ss = new GenericTracker<Screener>(raw.GetLength(0), "SCREENS", new Screener());
             foreach (string[] r in raw)
             {
                 Screener s = getscreen(r);

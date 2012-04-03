@@ -20,12 +20,12 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="estSymbols"></param>
         /// <param name="name"></param>
-        public HighTracker(int estSymbols,string name) : base(estSymbols,name)
+        public HighTracker(int estSymbols,string name) : base(name)
         {
         }
 
-        public HighTracker(int estSymbols) : base(estSymbols, "HIGH") { }
-        public HighTracker(string name) : base(100, name) { }
+        public HighTracker(int estSymbols) : base("HIGH") { }
+        public HighTracker(string name) : base(100, name,0) { }
         public HighTracker() : this(100, "HIGH") { }
 
         /// <summary>
@@ -159,7 +159,7 @@ namespace TradeLink.Common
         /// tracks highs and lows
         /// </summary>
         public LowTracker(int estSymbols, string name)
-            : base(estSymbols, name)
+            : base(name,decimal.MaxValue)
         {
         }
 
