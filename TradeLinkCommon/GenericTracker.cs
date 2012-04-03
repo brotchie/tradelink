@@ -841,6 +841,39 @@ namespace TradeLink.Common
             return display.ToArray();
         }
 
+        public new static bool rulepass_assign(string sym, GenericTracker<bool> assignto, params GenericTrackerI[] booltrackers) { return rulepass_assign(sym, assignto, true, null, false, booltrackers); }
+        public new static bool rulepass_assign(string sym, GenericTracker<bool> assignto, DebugDelegate debug, params GenericTrackerI[] booltrackers) { return rulepass_assign(sym, assignto, true, debug, false, booltrackers); }
+        
+        public new static bool rulepass_assign(string sym, GenericTracker<bool> assignto, DebugDelegate debug, bool debugfails, params GenericTrackerI[] booltrackers) { return rulepass_assign(sym, assignto, true, debug, debugfails, booltrackers); }
+        public new static bool rulepass_assign(string sym, GenericTracker<bool> assignto, bool fastmode, DebugDelegate debug, bool debugfails, params GenericTrackerI[] booltrackers)
+        {
+            int idx = assignto.getindex(sym);
+            return rulepass_assign(idx, assignto, fastmode, debug, debugfails, booltrackers);
+
+        }
+
+        public new static bool rulepass_assign(int idx, GenericTracker<bool> assignto, params GenericTrackerI[] booltrackers) { return rulepass_assign(idx, assignto, true, null, false, booltrackers); }
+        public new static bool rulepass_assign(int idx, GenericTracker<bool> assignto, DebugDelegate debug, params GenericTrackerI[] booltrackers) { return rulepass_assign(idx, assignto, true, debug, false, booltrackers); }
+        public new static bool rulepass_assign(int idx, GenericTracker<bool> assignto, DebugDelegate debug, bool debugfails, params GenericTrackerI[] booltrackers) { return rulepass_assign(idx, assignto, true, debug, debugfails, booltrackers); }
+        public new static bool rulepass_assign(int idx, GenericTracker<bool> assignto, bool fastmode, DebugDelegate debug, bool debugfails, params GenericTrackerI[] booltrackers)
+        {
+            bool pass = rulepasses(idx,assignto.Name,fastmode,debug,debugfails,booltrackers);;
+            assignto[idx] = pass;
+            return pass;
+        }
+
+        public new static bool rulepasses(string sym, string rulename, params GenericTrackerI[] booltrackers) { return rulepasses(sym, rulename, true, null, false, booltrackers); }
+        public new static bool rulepasses(string sym, string rulename, DebugDelegate debug, params GenericTrackerI[] booltrackers) { return rulepasses(sym, rulename, true, debug, false, booltrackers); }
+        public new static bool rulepasses(string sym, string rulename, DebugDelegate debug, bool debugfails,params GenericTrackerI[] booltrackers) { return rulepasses(sym, rulename, true, debug, debugfails, booltrackers); }
+        public new static bool rulepasses(string sym, string rulename, bool fastmode, DebugDelegate debug, params GenericTrackerI[] booltrackers) { return rulepasses(sym, rulename, fastmode, debug, false, booltrackers); }
+        public new static bool rulepasses(string sym, string rulename, bool fastmode, DebugDelegate debug, bool debugfails, params GenericTrackerI[] booltrackers)
+        {
+            if (booltrackers.Length==0)
+                return false;
+            int idx = booltrackers[0].getindex(sym);
+            return rulepasses(idx, rulename, fastmode, debug, debugfails, booltrackers);
+        }
+
         /// <summary>
         /// test a rule made up of trackers
         /// </summary>

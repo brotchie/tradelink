@@ -240,6 +240,8 @@ namespace TradeLink.Common
             return true;
 
         }
+
+        public static bool TAPopulateGT(string sym, int nb, ref int[] res, GenericTracker<int> gt) { int idx = gt.getindex(sym);  return TAPopulateGT(idx, nb, 0, ref res, gt); }
         /// <summary>
         /// populate a gt with a talib integer result
         /// </summary>
