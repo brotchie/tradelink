@@ -48,6 +48,7 @@ namespace WinGauntlet
             if (args.isUnattended)
             {
                 ordersincsv.Checked = true;
+                if (args.HideWindow) { this.ShowInTaskbar = false; this.WindowState = FormWindowState.Minimized; }
                 //ShowWindow(System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle, SW_MINIMIZE);
                 bindresponseevents();
                 queuebut_Click(null, null);
@@ -222,6 +223,8 @@ namespace WinGauntlet
                 string msg = "Done.  Ticks: " + gargs.TicksProcessed + " Speed:" + gargs.TicksSecond.ToString("N0") + " t/s  Fills: " + gargs.Executions.ToString();
                 debug(msg);
                 status(msg);
+
+                if(gargs.isUnattended) _capitalprompt.Checked = args.CapitalConnections;
                 if (CapitalRequestConfim.ConfirmSubmitCapitalRequest(tradeResults1.CurrentResults, _capitalprompt.Checked, debug))
                     status("sent capital connection request.");
             }
@@ -565,10 +568,14 @@ namespace WinGauntlet
             bool _indicators = false;
             bool _trades = true;
             bool _orders = false;
+            bool _capitalConnections = false;
+            bool _hideWindow = false;
             public bool Orders { get { return _orders; } set { _orders = value; } }
             public bool Trades { get { return _trades; } set { _trades = value; } }
             public bool Indicators { get { return _indicators; } set { _indicators = value; } }
             public bool Debugs { get { return _debugs; } set { _debugs = value; } }
+            public bool CapitalConnections { get { return _capitalConnections; } set { _capitalConnections = value; } }
+            public bool HideWindow { get { return _hideWindow; } set { _hideWindow = value; } }
             string _dllname = !File.Exists(WinGauntlet.Properties.Settings.Default.boxdll) ? "Responses.dll" : WinGauntlet.Properties.Settings.Default.boxdll;
             string _resp = "";
             Response _response;
@@ -630,7 +637,7 @@ namespace WinGauntlet
                     Console.WriteLine("");
                     Console.WriteLine("GAUNTLET USAGE: ");
                     Console.WriteLine("gauntlet.exe [Response.dll] [ResponseName] [FLAGS] [TickPath] [TickFileFilterPath]");
-                    Console.WriteLine("Flags: control output produced.  (O)rders (T)rades (I)ndicators (D)ebugs");
+                    Console.WriteLine("Flags: control output produced.  (O)rders (T)rades (I)ndicators (D)ebugs (C)apitalConnection (H)ideWindow");
                     Console.WriteLine(@"eg: gauntlet 'c:\users\administrator\my documents\MyStrategies.dll' ");
                     Console.WriteLine("\t\tMyStrategies.MyStrategy OTIF 'c:\\tradelink\\tickdata\\' ");
                     Console.WriteLine("\t\t'c:\\users\\administrator\\my documents\\filefilter.txt'");
@@ -641,13 +648,16 @@ namespace WinGauntlet
                     _background = true;
                 
             }
-            string Flags { get { return (Orders ? "O" : "") + (Debugs ? "D" : "") + (Indicators ? "I" : "") + (Trades ? "T" : ""); } }
+            string Flags { get { return (Orders ? "O" : "") + (Debugs ? "D" : "") + (Indicators ? "I" : "") + (Trades ? "T" : "") + (CapitalConnections ? "C" : "") + (HideWindow ? "H" : ""); } }
             void SetFlags(string flags)
             {
                 _orders = flags.Contains("O");
                 _debugs = flags.Contains("F");
                 _trades = flags.Contains("T");
                 _indicators = flags.Contains("I");
+                _capitalConnections = flags.Contains("C");
+                _hideWindow = flags.Contains("H");
+
                 D("set flags: "+Flags);
             }
             bool SetFolder(string folder)
