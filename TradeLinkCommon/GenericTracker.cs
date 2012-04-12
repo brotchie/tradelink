@@ -969,6 +969,85 @@ namespace TradeLink.Common
             return ok;
         }
 
+        /// <summary>
+        /// gets index for a symbol in a list of generics, adding default value in every generic if symbol is not indexed
+        /// </summary>
+        /// <param name="sym"></param>
+        /// <param name="gts"></param>
+        /// <returns></returns>
+        public static int addindex(string sym, params GenericTrackerI[] gts)
+        {
+            if (gts.Length == 0)
+                return -1;
+            int idx = gts[0].getindex(sym);
+            if (idx >= 0)
+                return idx;
+            foreach (var gti in gts)
+                idx = gti.addindex(sym);
+            return idx;
+        }
+        /// <summary>
+        /// index a list of generic trackers using a list of symbols as labels
+        /// </summary>
+        /// <param name="syms"></param>
+        /// <param name="gts"></param>
+        public static void index(string[] syms, params GenericTrackerI[] gts) { index(syms, true,gts); }
+        /// <summary>
+        /// index a list of generic trackers using a list of symbols as labels
+        /// </summary>
+        /// <param name="syms"></param>
+        /// <param name="skipifindexed"></param>
+        /// <param name="gts"></param>
+        public static void index(string[] syms, bool skipifindexed, params GenericTrackerI[] gts)
+        {
+            if (gts.Length == 0)
+                return;
+            if (skipifindexed && (gts[0].Count > 0))
+                return;
+            foreach (string sym in syms)
+                foreach (var gti in gts)
+                    gti.addindex(sym);
+        }
+
+        /// <summary>
+        /// gets labels/symbols identified in first generictracker in a list of generics
+        /// </summary>
+        /// <param name="gts"></param>
+        /// <returns></returns>
+        public static string[] getsymbollist(params GenericTrackerI[] gts)
+        {
+            if (gts.Length == 0)
+                return new string[0];
+            var gt = gts[0];
+            List<string> syms = new List<string>(gt.Count);
+            for (int i = 0; i < gt.Count; i++)
+                syms.Add(gt.getlabel(i));
+            return syms.ToArray();
+        }
+        /// <summary>
+        /// gets ranking (on order 1-N) for a given value in given generic tracker range
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="val"></param>
+        /// <param name="ind"></param>
+        /// <param name="reverse"></param>
+        /// <returns></returns>
+        public static int rank<T>(T val, GenericTracker<T> ind, bool reverse) where T : IComparable
+        {
+            // get values
+            T[] vals = ind.ToArray();
+            // sort them
+            Array.Sort(vals);
+            // see where our rank is
+            int rank = -1;
+            for (int i = 0; i < vals.Length; i++)
+                if (vals[i].CompareTo(val) > 0)
+                    rank = i;
+            // one indexed
+            rank++;
+            // check if we want reverse rank
+            return reverse ? vals.Length - rank : rank;
+        }
 
         public static string get(string url) { return get(url, true, 3); }
         public static string get(string url, bool removenewlines, int retries)
