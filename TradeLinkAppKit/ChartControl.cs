@@ -174,18 +174,27 @@ namespace TradeLink.AppKit
                 {
                     int x = e.X;
                     int y = e.Y;
+
                     ChartControl f = this;
                     g = CreateGraphics();
-                    float size = g.MeasureString(highesth.ToString(), f.Font).Width + g.MeasureString("255000 ", f.Font).Width;
-                    g.FillRectangle(new SolidBrush(f.BackColor), r.Width - size, r.Height - f.Font.Height, size, f.Font.Height);
+                    //100 is an estimate of the text length for the open/high/low/close
+                    float size = g.MeasureString(highesth.ToString(), f.Font).Width + g.MeasureString("255000 ", f.Font).Width + 10000;
+
+                    //Box location
+                    float boxX = 50;
+                    int boxY = 0;
+
+                    //Clean current box
+                    g.FillRectangle(new SolidBrush(f.BackColor), boxX, boxY, size, f.Font.Height);
                     _curbar = getBar(x);
                     _curprice = getPrice(y);
                     size = g.MeasureString(highesth.ToString(), f.Font).Width + g.MeasureString("255000 ", f.Font).Width;
                     int time = (_curbar<0)||(_curbar>bl.Last) ? 0 : (bl.DefaultInterval== BarInterval.Day ? bl[_curbar].Bardate :  (int)((double)bl[_curbar].Bartime/100));
                     string times = time == 0 ? string.Empty : time.ToString();
                     string price = _curprice == 0 ? string.Empty : _curprice.ToString("F2");
-                    g.DrawString(time + " " + price, f.Font, new SolidBrush(fgcol), r.Width - size, r.Height - f.Font.Height);
+                    string OHLC = string.Format(" Open:{0} High:{1} Low:{2} Close:{3}", bl[_curbar].Open.ToString("0.######"), bl[_curbar].High.ToString("0.######"), bl[_curbar].Low.ToString("0.######"), bl[_curbar].Close.ToString("0.######"));
 
+                    g.DrawString("Time:" + time + " Price:" + price + OHLC, f.Font, new SolidBrush(fgcol), boxX, boxY);
                 }
             }
             catch { }
