@@ -1132,10 +1132,13 @@ namespace ASP
 
         void tl_gotPosition(Position pos)
         {
-            // keep track of position
-            _pt.Adjust(pos);
-            // keep track of results
-            _rs.GotPosition(pos);
+            if (pos.isValid)
+            {
+                // keep track of position
+                _pt.Adjust(pos);
+                // keep track of results
+                _rs.GotPosition(pos);
+            }
         }
 
         void debug(string message)

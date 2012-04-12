@@ -56,6 +56,8 @@ namespace TradeLink.AppKit
         /// <param name="p"></param>
         public void GotPosition(Position p)
         {
+            if (p.isFlat)
+                return;
             fills.Add(p.ToTrade());
         }
 
