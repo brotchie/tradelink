@@ -504,7 +504,7 @@ namespace IQFeedBroker
         {
             RegistryKey rk = Registry.CurrentUser.OpenSubKey(IQ_FEED_REGISTRY_LOCATION + "\\Startup");
             int p = 0;
-            if (!int.TryParse(rk.GetValue("LookupPort").ToString(), out p))
+            if (!int.TryParse(rk.GetValue("LookupPort").ToString(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out p))
             {
                 return 0;
             }
@@ -571,7 +571,7 @@ namespace IQFeedBroker
                         continue;
                     // get request id
                     long rid = 0;
-                    if (!long.TryParse(r[0], out rid))
+                    if (!long.TryParse(r[0], System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out rid))
                         continue;
                     BarRequest br;
                     if (!reqid2req.TryGetValue(rid, out br))
@@ -581,11 +581,11 @@ namespace IQFeedBroker
                     try
                     {
                         DateTime dt = DateTime.Parse(r[1]);
-                        decimal h = Convert.ToDecimal(r[2]);
-                        decimal l = Convert.ToDecimal(r[3]);
-                        decimal o = Convert.ToDecimal(r[4]);
-                        decimal c = Convert.ToDecimal(r[5]);
-                        long v = Convert.ToInt64(r[7]);
+                        decimal h = Convert.ToDecimal(r[2], System.Globalization.CultureInfo.InvariantCulture);
+                        decimal l = Convert.ToDecimal(r[3], System.Globalization.CultureInfo.InvariantCulture);
+                        decimal o = Convert.ToDecimal(r[4], System.Globalization.CultureInfo.InvariantCulture);
+                        decimal c = Convert.ToDecimal(r[5], System.Globalization.CultureInfo.InvariantCulture);
+                        long v = Convert.ToInt64(r[7], System.Globalization.CultureInfo.InvariantCulture);
                         // build bar
                         b = new BarImpl(o, h, l, c, v, Util.ToTLDate(dt), Util.ToTLTime(dt), br.Symbol, br.Interval);
                     }
@@ -739,7 +739,7 @@ namespace IQFeedBroker
                         tick.date = Util.ToTLDate();
                     DateTime now;
                     int local = Util.ToTLTime();
-                    if (DateTime.TryParse(actualData[65], out now))
+                    if (DateTime.TryParse(actualData[65],out now))
                     {
                         tick.time = Util.DT2FT(now);
                         
@@ -791,26 +791,26 @@ namespace IQFeedBroker
                     }
 
                         int v = 0;
-                        if (int.TryParse(actualData[64],out v))
+                        if (int.TryParse(actualData[64], System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out v))
                             tick.oe = getmarket(v);
-                        if (int.TryParse(actualData[63],out v))
+                        if (int.TryParse(actualData[63], System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out v))
                             tick.be = getmarket(v);
-                        if (int.TryParse(actualData[62], out v))
+                        if (int.TryParse(actualData[62], System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out v))
                             tick.ex = getmarket(v);
                         tick.symbol = actualData[1];
-                        tick.bid = Convert.ToDecimal(actualData[10]);
-                        tick.ask = Convert.ToDecimal(actualData[11]);
-                        tick.trade = Convert.ToDecimal(actualData[3]);
-                        tick.size = Convert.ToInt32(actualData[7]);
-                        tick.BidSize = Convert.ToInt32(actualData[12]);
-                        tick.AskSize= Convert.ToInt32(actualData[13]);
+                        tick.bid = Convert.ToDecimal(actualData[10], System.Globalization.CultureInfo.InvariantCulture);
+                        tick.ask = Convert.ToDecimal(actualData[11], System.Globalization.CultureInfo.InvariantCulture);
+                        tick.trade = Convert.ToDecimal(actualData[3], System.Globalization.CultureInfo.InvariantCulture);
+                        tick.size = Convert.ToInt32(actualData[7], System.Globalization.CultureInfo.InvariantCulture);
+                        tick.BidSize = Convert.ToInt32(actualData[12], System.Globalization.CultureInfo.InvariantCulture);
+                        tick.AskSize = Convert.ToInt32(actualData[13], System.Globalization.CultureInfo.InvariantCulture);
                         // get symbol index for custom data requests
                         int idx = _highs.getindex(tick.symbol);
                         // update custom data (tryparse is faster than convert)
                         decimal d = 0;
-                        if (decimal.TryParse(actualData[8], out d))
+                        if (decimal.TryParse(actualData[8], System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out d))
                             _highs[idx] = d;
-                        if (decimal.TryParse(actualData[9], out d))
+                        if (decimal.TryParse(actualData[9], System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out d))
                             _lows[idx] = d;
                         if (isPaperTradeEnabled)
                             ptt.newTick(tick);
