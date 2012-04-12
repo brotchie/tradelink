@@ -1273,6 +1273,8 @@ namespace ASP
 
         void newsyms(string[] syms,int idx)
         {
+            // trim any useless characters
+            syms = BasketImpl.TrimSymbols(syms);
             // save contents
             string basket = string.Join(",", syms);
             // make sure there's a response there

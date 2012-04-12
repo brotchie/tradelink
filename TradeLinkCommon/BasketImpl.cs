@@ -39,6 +39,22 @@ namespace TradeLink.Common
             }
             return rem;
         }
+
+        public static string[] TrimSymbols(string[] syms)
+        {
+            List<string> trimmed = new List<string>();
+            for (int i = 0; i < syms.Length; i++)
+            {
+                syms[i] = syms[i].TrimStart(' ', ',');
+                syms[i] = syms[i].TrimEnd(' ', ',');
+                // ensure we still have a symbol
+                if (string.IsNullOrWhiteSpace(syms[i]))
+                    continue;
+                trimmed.Add(syms[i]);
+            }
+            return trimmed.ToArray();
+        }
+
         /// <summary>
         /// Create a basket of securities
         /// </summary>

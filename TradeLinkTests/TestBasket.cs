@@ -13,6 +13,22 @@ namespace TestTradeLink
         }
 
         [Test]
+        public void SymbolTrimming()
+        {
+            string[] t1 = new string[] { " IBM", "NYMEX FUT NYMEX ", ",WAG", "LVS,", " ,FRX,","" };
+
+            var r = BasketImpl.TrimSymbols(t1);
+            int i = 0;
+            Assert.AreEqual(5, r.Length,string.Join(".",r));
+            Assert.AreEqual("IBM", r[i++]);
+            Assert.AreEqual("NYMEX FUT NYMEX", r[i++]);
+            Assert.AreEqual("WAG", r[i++]);
+            Assert.AreEqual("LVS", r[i++]);
+            Assert.AreEqual("FRX", r[i++]);
+            //Assert.AreEqual(string.Empty, r[i++]);
+        }
+
+        [Test]
         public void BasketBasics()
         {
             BasketImpl mb = new BasketImpl();
