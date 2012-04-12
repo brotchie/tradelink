@@ -1049,6 +1049,96 @@ namespace TradeLink.Common
             return reverse ? vals.Length - rank : rank;
         }
 
+        /// <summary>
+        /// autopopulate a list of generics from a csv file (assuming primary column: SYMBOL)
+        /// </summary>
+        /// <param name="csvfile"></param>
+        /// <param name="gts"></param>
+        /// <returns></returns>
+        public static bool CSV2GTS(string csvfile, params GenericTrackerI[] gts) { return CSV2GTS(csvfile, "SYMBOL", null, gts); }
+        /// <summary>
+        /// autopopulate a list of generics from a csv file (assuming primary column: SYMBOL)
+        /// </summary>
+        /// <param name="csvfile"></param>
+        /// <param name="d"></param>
+        /// <param name="gts"></param>
+        /// <returns></returns>
+        public static bool CSV2GTS(string csvfile, DebugDelegate d, params GenericTrackerI[] gts) { return CSV2GTS(csvfile, "SYMBOL", d, gts); }
+        /// <summary>
+        /// autopopulate a list of generics from a csv file
+        ///  * csv needs a header file
+        ///  * csv must have a primary column (typically titled SYMBOL)
+        ///  * generics should be listed in same order as csv columns
+        ///  * provide name of the primary column if it's something other than SYMBOL
+        /// </summary>
+        /// <param name="csvfile"></param>
+        /// <param name="primarygtname"></param>
+        /// <param name="d"></param>
+        /// <param name="gts"></param>
+        /// <returns></returns>
+        public static bool CSV2GTS(string csvfile, string primarygtname, DebugDelegate d, params GenericTrackerI[] gts)
+        {
+            bool ok = true;
+            int symcol = 0;
+            for (int i = 0; i < gts.Length; i++)
+            {
+                GenericTrackerI gt = gts[i];
+                if (gt.Name == primarygtname)
+                {
+                    symcol = i;
+                    GenericTracker<string> pri = (GenericTracker<string>)gt;
+                    ok &= GenericTracker.CSVInitGeneric<string>(csvfile, true, ref pri, i, string.Empty, ',', d);
+                }
+                else
+                {
+                    if (gt.TrackedType == typeof(decimal))
+                    {
+                        GenericTracker<decimal> tmp = (GenericTracker<decimal>)gt;
+                        ok &= GenericTracker.CSVCOL2Generic<decimal>(csvfile, true, ref tmp, symcol, i, ',', d);
+
+                    }
+                    else if (gt.TrackedType == typeof(int))
+                    {
+                        GenericTracker<int> tmp = (GenericTracker<int>)gt;
+                        ok &= GenericTracker.CSVCOL2Generic<int>(csvfile, true, ref tmp, symcol, i, ',', d);
+                    }
+                    else if (gt.TrackedType == typeof(bool))
+                    {
+                        GenericTracker<bool> tmp = (GenericTracker<bool>)gt;
+                        ok &= GenericTracker.CSVCOL2Generic<bool>(csvfile, true, ref tmp, symcol, i, ',', d);
+                    }
+                    else if (gt.TrackedType == typeof(string))
+                    {
+                        GenericTracker<string> tmp = (GenericTracker<string>)gt;
+                        ok &= GenericTracker.CSVCOL2Generic<string>(csvfile, true, ref tmp, symcol, i, ',', d);
+                    }
+                    else
+                    {
+                        if (d != null)
+                        {
+                            d("unknown type " + gt.TrackedType.ToString() + " on tracker: " + gt.Name);
+
+                        }
+                        ok = false;
+                    }
+
+                }
+                if (ok && (d != null))
+                {
+                    d("successfully read csv column: " + gt.Name);
+
+                }
+            }
+            if (d != null)
+            {
+                if (ok)
+                    d("successfully imported from csv: " + csvfile + " to: " + string.Join(",", gt.GetIndicatorNames(gts)));
+                else
+                    d("errors importing from csv: " + csvfile);
+            }
+            return ok;
+        }
+
         public static string get(string url) { return get(url, true, 3); }
         public static string get(string url, bool removenewlines, int retries)
         {
