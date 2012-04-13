@@ -117,7 +117,17 @@ namespace TradeLink.AppKit
             redraw();
         }
         string sym = string.Empty;
-        public string Symbol { get { return sym; } set { sym = value; Text = Title; } }
+        public string Symbol { get { return sym; } set { sym = value; settitle(Title); } }
+
+        void settitle(string tit)
+        {
+            if (InvokeRequired)
+                Invoke(new DebugDelegate(settitle), new object[] { tit });
+            else
+            {
+                Text = tit;
+            }
+        }
         Graphics g = null;
         string mlabel = null;
         decimal highesth = 0;
@@ -201,6 +211,14 @@ namespace TradeLink.AppKit
             base.OnMouseMove(e);
         }
 
+        int CurrentChartMouseTime
+        {
+            get
+            {
+                return (_curbar < 0) || (_curbar > bl.Last) ? 0 : (bl.DefaultInterval == BarInterval.Day ? bl[_curbar].Bardate : (int)((double)bl[_curbar].Bartime / 100));
+            }
+        }
+
         public event DebugDelegate SendDebug;
         internal void debug(string msg)
         {
@@ -208,21 +226,31 @@ namespace TradeLink.AppKit
                 SendDebug(msg);
         }
 
-        void ChartControl_MouseDoubleClick(object sender, MouseEventArgs e)
+        public bool TakeScreenShot() { return TakeScreenShot(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\" + Symbol + bl.Date()[bl.Last] + ".png"); }
+        public bool TakeScreenShot(string fn)
         {
-            string fn = string.Empty;
             try
             {
-                fn = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\" + Symbol + bl.Date()[bl.Last]+ ".png";
+                
                 ScreenCapture sc = new ScreenCapture();
                 sc.CaptureWindowToFile(Handle, fn, System.Drawing.Imaging.ImageFormat.Png);
+                return true;
             }
             catch (Exception ex)
             {
                 debug("Error writing: " + fn);
                 debug(ex.Message + ex.StackTrace);
             }
+            return false;
+        }
 
+        public event Int32Delegate SendChartDoubleClick;
+
+        void ChartControl_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (SendChartDoubleClick != null)
+                SendChartDoubleClick(CurrentChartMouseTime);
+            debug("User double-clicked at time: " + CurrentChartMouseTime);
 
         }
 
