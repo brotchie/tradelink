@@ -841,6 +841,33 @@ namespace TradeLink.Common
             return display.ToArray();
         }
 
+        static Dictionary<string, System.Drawing.Color> _lab2col = new Dictionary<string, System.Drawing.Color>();
+        /// <summary>
+        /// resets the color labels already assigned
+        /// (could result in duplicates if used in middle of runs)
+        /// </summary>
+        public static void clearcolorlabels() { _lab2col.Clear(); }
+
+        /// <summary>
+        /// gets a unique color
+        /// </summary>
+        /// <returns></returns>
+        public static System.Drawing.Color getcolorlabel() { return getcolorlabel(_lab2col.Count.ToString()); }
+        /// <summary>
+        /// gets a unique color for a given label
+        /// </summary>
+        /// <param name="label"></param>
+        /// <returns></returns>
+        public static System.Drawing.Color getcolorlabel(string label)
+        {
+            System.Drawing.Color c;
+            if (_lab2col.TryGetValue(label, out c))
+                return c;
+            c = System.Drawing.ColorTranslator.FromOle(_lab2col.Count);
+            _lab2col.Add(label, c);
+            return c;
+        }
+
         public new static bool rulepass_assign(string sym, GenericTracker<bool> assignto, params GenericTrackerI[] booltrackers) { return rulepass_assign(sym, assignto, true, null, false, booltrackers); }
         public new static bool rulepass_assign(string sym, GenericTracker<bool> assignto, DebugDelegate debug, params GenericTrackerI[] booltrackers) { return rulepass_assign(sym, assignto, true, debug, false, booltrackers); }
         
