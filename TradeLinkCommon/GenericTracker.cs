@@ -54,12 +54,16 @@ namespace TradeLink.Common
         /// gets default value for a given type
         /// </summary>
         public T Default { get { return _defval; } set { _defval = value; } }
-
+        /// <summary>
+        /// gets type of whatever is being tracked
+        /// </summary>
         public virtual Type TrackedType
         {
             get 
         {
             T val = default(T);
+            if (val == null)
+                return null;
             return val.GetType();
         } 
         }
