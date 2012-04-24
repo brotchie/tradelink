@@ -12,12 +12,13 @@ namespace TradeLink.Common
         MultiSimImpl _h;
         public MultiSimImpl Engine { get { return _h; } }
         public TradeLink.API.Response response { get { return _r; } }
-        Broker SimBroker = new Broker();
+        public Broker SimBroker = new Broker();
         public GauntletEngine(TradeLink.API.Response r, TickFileFilter tff)
         {
             _r = r;
             _r.SendOrderEvent += new OrderSourceDelegate(_r_SendOrder);
             _r.SendCancelEvent += new LongSourceDelegate(_r_SendCancel);
+            _r.SendDebugEvent += new DebugDelegate(_r_SendDebugEvent);
             _tff = tff;
             _h = new MultiSimImpl(_tff);
             _h.GotTick += new TickDelegate(_h_GotTick);
@@ -55,6 +56,9 @@ namespace TradeLink.Common
             _r.GotTick(t);
         }
 
-
+        void _r_SendDebugEvent(string msg)
+        {
+            
+        }
     }
 }
