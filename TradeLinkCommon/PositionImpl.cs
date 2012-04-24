@@ -147,6 +147,7 @@ namespace TradeLink.Common
         }
         public decimal ClosedPL { get { return _closedpl; } }
         public string Symbol { get { return _sym; } }
+        public string symbol { get { return _sym; } }
         public decimal Price { get { return _price; } }
         public decimal AvgPrice { get { return _price; } }
         public int Size { get { return _size; } }

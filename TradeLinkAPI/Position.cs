@@ -8,6 +8,7 @@ namespace TradeLink.API
     public interface Position
     {
         string Symbol { get; }
+        string symbol { get; }
         decimal AvgPrice { get; }
         int Size { get; }
         int UnsignedSize { get; }
