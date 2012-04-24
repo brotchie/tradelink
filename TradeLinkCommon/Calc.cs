@@ -1939,7 +1939,7 @@ namespace TradeLink.Common
         /// <returns></returns>
         public static int Max(int[] array)
         {
-            int max = int.MaxValue;
+            int max = int.MinValue;
             for (int i = 0; i < array.Length; i++)
                 if (array[i] > max) max = array[i];
             return max;
@@ -1952,7 +1952,7 @@ namespace TradeLink.Common
         /// <returns></returns>
         public static long Max(long[] array)
         {
-            long max = long.MaxValue;
+            long max = long.MinValue;
             for (int i = 0; i < array.Length; i++)
                 if (array[i] > max) max = array[i];
             return max;
