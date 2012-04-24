@@ -100,8 +100,14 @@ namespace TradeLink.Common
                 return p;
             }
         }
-        
 
+        public override Type TrackedType
+        {
+            get
+            {
+                return typeof(Position);
+            }
+        }
 
         decimal _totalclosedpl = 0;
         /// <summary>
