@@ -158,6 +158,8 @@ Section "TradeLinkSuite"
 
   File "TikConverter\bin\release\TikConverter.exe"
   
+  ; this installer not present by default
+  File /nonfatal "Install\Install-Glean.exe"
   
     ; may fail if you don't have 3rd party vendor software installed
   File /nonfatal "ServerEsignal\bin\release\ServerEsignal.exe"
@@ -247,6 +249,9 @@ finishinstall:
   ; register tik extension
   ${registerExtension} "$INSTDIR\TimeSales.exe" ".tik" "TradeLink TickData"
   
+  ; install glean if present
+  ExecWait "Install-Glean.exe /S"
+  
   ; don't open browser on silent
   StrCmp $SILENT "YES" final
   ExecShell "open" "http://www.pracplay.com/landings/afterinstallingtradelink"
@@ -321,6 +326,9 @@ Section "Uninstall"
   DeleteRegKey HKLM SOFTWARE\TradeLinkSuite
   ; unregister tickdata
   ${unregisterExtension} ".tik" "TradeLink TickData"
+  
+  ; uninstall glean
+  ExecWait "$PROGRAMFILES\Glean\uninstall.exe /S"
 
   ; Remove files and uninstaller
   Delete $INSTDIR\TradeLinkSuite.nsi
