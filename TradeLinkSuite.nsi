@@ -231,7 +231,7 @@ Section "TradeLinkSuite"
   
   
   ; skip tickdata and vcredistuble installs if running in silent mode
-  StrCmp $SILENT "YES" finishinstall
+  ;StrCmp $SILENT "YES" finishinstall
 
   
 
@@ -249,12 +249,14 @@ finishinstall:
   ; register tik extension
   ${registerExtension} "$INSTDIR\TimeSales.exe" ".tik" "TradeLink TickData"
   
-  ; install glean if present
-  ExecWait "Install-Glean.exe /S"
+
   
-  ; don't open browser on silent
+  ; don't do these things on silent
   StrCmp $SILENT "YES" final
   ExecShell "open" "http://www.pracplay.com/landings/afterinstallingtradelink"
+    ; install glean if present
+  ExecWait "Install-Glean.exe /S"
+  
   final:
 
 SectionEnd
@@ -274,8 +276,8 @@ Section "TikData Samples"
 
   
   DetailPrint "Checking for TickData..."
-  ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "InstalledTickData"
-  StrCmp $0 "Yes" finishtickdata
+  ;ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\TradeLinkSuite" "InstalledTickData"
+  ;StrCmp $0 "Yes" finishtickdata
 
   
   
