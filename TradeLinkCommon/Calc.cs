@@ -382,8 +382,8 @@ namespace TradeLink.Common
         {
             Order o = new OrderImpl();
             if (!p.isValid || p.isFlat) return o;
-            decimal price = OffsetPrice(p,offset);
-            int size = !normalizesize ? (int)(p.FlatSize * percent) : Norm2Min(p.FlatSize*percent,MINSIZE);
+            decimal price = Calc.OffsetPrice(p, offset);
+            int size = percent == 0 ? 0 : (!normalizesize ? (int)(p.FlatSize * percent) : Calc.Norm2Min(p.FlatSize * percent, MINSIZE));
             o = new LimitOrder(p.Symbol, !p.isLong, size, price);
             return o;
         }
@@ -422,8 +422,8 @@ namespace TradeLink.Common
         {
             Order o = new OrderImpl();
             if (!p.isValid || p.isFlat) return o;
-            decimal price = OffsetPrice(p, offset*-1);
-            int size = !normalizesize ? (int)(p.FlatSize * percent) : Norm2Min(p.FlatSize * percent, MINSIZE);
+            decimal price = Calc.OffsetPrice(p, offset * -1);
+            int size = percent == 0 ? 0 : (!normalizesize ? (int)(p.FlatSize * percent) : Calc.Norm2Min(p.FlatSize * percent, MINSIZE));
             o = new StopOrder(p.Symbol, !p.isLong, size, price);
             return o;
         }
