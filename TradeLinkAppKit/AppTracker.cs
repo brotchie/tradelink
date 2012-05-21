@@ -124,6 +124,8 @@ namespace TradeLink.AppKit
         /// </summary>
         public int UnprocessedItemCount { get { return _untrackedqueue.Count; } }
 
+        bool hastrackurl { get { return TrackUrl != string.Empty; } }
+
         void _bw_DoWork(object sender, DoWorkEventArgs e)
         {
             WebClient wc = new WebClient();
@@ -131,8 +133,8 @@ namespace TradeLink.AppKit
             {
                 if (e.Cancel) break;
                 
-                if (TrackUrl == string.Empty) continue;
-                while (!_untrackedqueue.isEmpty && TrackEnabled)
+                
+                while (!_untrackedqueue.isEmpty && TrackEnabled && hastrackurl)
                 {
                     if (e.Cancel) break;
                     // get item
