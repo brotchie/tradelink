@@ -215,6 +215,91 @@ namespace TestTradeLink
             Assert.AreEqual(0, bl.Count);
         }
 
+        [Test]
+        public void InsertBar_NoexistingBars()
+        {
+            string sym = "FTI";
+            int d = 20070926;
+            // historical bar filename
+            string filename = sym+d+TikConst.DOT_EXT;
+            
+            // test for the parameter's prescence
+            Assert.IsNotEmpty(filename,"forgot to assign insert bar filename");
+
+            // unit test case 1 no existing bars aka (empty or brand-new insertion)
+            BarList org = new BarListImpl(BarInterval.FiveMin,sym);
+            Assert.IsTrue(org.isValid, "your original barlist is not valid 1");
+            int orgcount = org.Count;
+            Assert.AreEqual(0,orgcount);
+            // make up a bar here  (eg at 755 in FTI there are no ticks so this should add a new bar in most scenarios)
+            Bar insert = new BarImpl(30,30,30,30,10000,d,75500,sym,(int)BarInterval.FiveMin);
+            Assert.IsTrue(insert.isValid,"your bar to insert is not valid 1");
+            BarList inserted = BarListImpl.InsertBar(org,insert,org.Count);
+            Assert.AreEqual(inserted.Count,orgcount+1);
+            Bar actualinsert = inserted.RecentBar;
+            Assert.IsTrue(actualinsert.isValid);
+            Assert.AreEqual(insert.Close,actualinsert.Close);
+            Assert.AreEqual(insert.Open,actualinsert.Open);
+            Assert.AreEqual(insert.High,actualinsert.High);
+            Assert.AreEqual(insert.Low,actualinsert.Low);
+            Assert.AreEqual(insert.Symbol,actualinsert.Symbol);
+        }
+
+        [Test, Explicit]
+        public void InsertBar_HistoricalBarsPresent()
+        {
+
+            string sym = "FTI";
+            int d = 20070926;
+            // historical bar filename
+            string filename = sym + d + TikConst.DOT_EXT;
+
+            // unit test case 2 existing bars with front insertion (aka historical bar insert)
+
+            var org = BarListImpl.FromTIK(filename);
+            Assert.IsTrue(org.isValid, "your original bar is not valid 2");
+            var orgcount = org.Count;
+            Assert.Greater(orgcount,0);
+            // create bar to insert
+            var insert = new BarImpl(30, 30, 30, 30, 10000, d, 75500, sym, (int)BarInterval.FiveMin);
+            Assert.IsTrue(insert.isValid, "your bar to insert is not valid 2");
+            var inserted = BarListImpl.InsertBar(org,insert,0);
+            Assert.AreEqual(inserted.Count,orgcount+1);
+            var actualinsert = inserted[0];
+            Assert.IsTrue(actualinsert.isValid);
+            Assert.AreEqual(insert.Close,actualinsert.Close);
+            Assert.AreEqual(insert.Open,actualinsert.Open);
+            Assert.AreEqual(insert.High,actualinsert.High);
+            Assert.AreEqual(insert.Low,actualinsert.Low);
+            Assert.AreEqual(insert.Symbol,actualinsert.Symbol);
+        }
+
+        [Test,Explicit]
+        public void InsertBar_HistoricalPlusNewBarsPresent()
+        {
+            string sym = "FTI";
+            int d = 20070926;
+            // historical bar filename
+            string filename = sym + d + TikConst.DOT_EXT;
+            // case 3 - middle insertion aka (some historical and some new bars already present)
+            var org = BarListImpl.FromTIK(filename);
+            Assert.IsTrue(org.isValid, "your original bar is not valid 3");
+            var orgcount = org.Count;
+            Assert.Greater(orgcount,0);
+            // create bar to insert
+            var insert = new BarImpl(30, 30, 30, 30, 10000, d, 75500, sym, (int)BarInterval.FiveMin);
+            Assert.IsTrue(insert.isValid, "your bar to insert is not valid 3");
+            int insertpos = BarListImpl.GetBarIndexPreceeding(org,insert.Bardate);
+            var inserted = BarListImpl.InsertBar(org, insert, insertpos);
+            Assert.AreEqual(inserted.Count,orgcount+1);
+            var actualinsert = inserted[insertpos];
+            Assert.IsTrue(actualinsert.isValid);
+            Assert.AreEqual(insert.Close,actualinsert.Close);
+            Assert.AreEqual(insert.Open,actualinsert.Open);
+            Assert.AreEqual(insert.High,actualinsert.High);
+            Assert.AreEqual(insert.Low,actualinsert.Low);
+            Assert.AreEqual(insert.Symbol,actualinsert.Symbol);
+        }
 
         [Test]
         public void NewBarEvent()
