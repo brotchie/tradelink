@@ -354,6 +354,7 @@ namespace TradeLink.AppKit
                     const int minxlabelwidth = 30;
 
                     int lastlabelcoord = -500;
+                    int[] lastbardate = new int[3];
 
                     for (int i = 0; i < barc; i++)
                     {
@@ -382,10 +383,8 @@ namespace TradeLink.AppKit
                             {
                                 // get date
                                 int[] date = Calc.Date(bl.Date()[i]);
-                                int[] lastbardate = date;
-                                // get previous bar date if we have one
-                                if ((i - 1) > 0) lastbardate = Calc.Date(bl.Date()[i]);
-                                // if we have room since last time we drew the year
+
+                                // if we have room since last time we drew 
                                 if ((getX(lastlabelcoord) + minxlabelwidth) <= getX(i))
                                 {
                                     // get coordinate for present days label
@@ -399,10 +398,14 @@ namespace TradeLink.AppKit
                                     // get the month
                                     string ds = date[1].ToString();
                                     // if it sfirst bar or the year has changed, add year to month
-                                    if ((i == 0) || (lastbardate[0] != date[0])) ds += '/' + date[0].ToString();
+                                    if ((i == 0) || (lastbardate[0] != date[0])) 
+                                        ds += '/' + date[0].ToString();
                                     // draw the month
-                                    g.DrawString(ds, f.Font, new SolidBrush(fgcol), getX(i), r.Height - (float)(f.Font.GetHeight() * 1.5));
+                                    Font monf = new System.Drawing.Font(f.Font.FontFamily,f.Font.Size-1, FontStyle.Regular);
+                                    g.DrawString(ds, monf, new SolidBrush(fgcol), getX(i), r.Height - (float)(monf.GetHeight() * 1.5));
                                 }
+                                //save last date
+                                lastbardate = date;
                             }
                         }
                         catch (OverflowException) { }
