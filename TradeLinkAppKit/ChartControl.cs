@@ -250,6 +250,8 @@ namespace TradeLink.AppKit
         {
             if (SendChartDoubleClick != null)
                 SendChartDoubleClick(CurrentChartMouseTime);
+            else
+                TakeScreenShot();
             debug("User double-clicked at time: " + CurrentChartMouseTime);
 
         }
@@ -561,10 +563,15 @@ namespace TradeLink.AppKit
 
         private void Chart_MouseClick(object sender, MouseEventArgs e)
         {
+            if ((e == null) || (e.Button==null))
+                return;
             if (e.Button == MouseButtons.Left)
             {
-                if (mlabel == null) return;
-                DrawChartLabel(getPrice(e.Y), bl.Time()[getBar(e.X)],mlabel,ManualColor);
+                int barnum = getBar(e.X);
+                decimal price =getPrice(e.Y); 
+                if ((mlabel == null) || (bl==null) || (barnum<0) || (barnum>=bl.Count))
+                    return;
+                DrawChartLabel(price, bl.Time()[barnum],mlabel,ManualColor);
             }
             else if (e.Button == MouseButtons.Middle) 
             {
