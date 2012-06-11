@@ -146,14 +146,12 @@ namespace TradeLink.AppKit
             // 
             // ChartControl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
             this.ContextMenuStrip = this.chartContextMenu;
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "ChartControl";
-            this.Size = new System.Drawing.Size(830, 603);
-            this.toolTip1.SetToolTip(this, "right click to annotate.   double click to screenshot.  ");
+            this.Size = new System.Drawing.Size(553, 392);
             this.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Chart_MouseClick);
             this.Resize += new System.EventHandler(this.Chart_Resize);
             this.chartContextMenu.ResumeLayout(false);
