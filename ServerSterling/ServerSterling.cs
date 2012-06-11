@@ -128,9 +128,9 @@ namespace SterServer
                 stiMaint.GetAccountList(ref acctlist);
                 if (acctlist.Length > 0)
                 {
-                    foreach (string au in acctlist)
-                        Accounts = new string[] { au};
-
+                    string[] tmp = new string[acctlist.Length];
+                    acctlist.CopyTo(tmp, 0);
+                    Accounts = tmp;
 
                 }
                 stiPos.GetCurrentPositions();
