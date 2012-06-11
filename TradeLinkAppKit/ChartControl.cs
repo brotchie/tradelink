@@ -223,7 +223,11 @@ namespace TradeLink.AppKit
         internal void debug(string msg)
         {
             if (SendDebug != null)
+            {
+                if ((bl != null) && (bl.Symbol != string.Empty))
+                    msg = bl.Symbol + " " + msg;
                 SendDebug(msg);
+            }
         }
 
         public bool TakeScreenShot() { return TakeScreenShot(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\" + Symbol + bl.Date()[bl.Last] + ".png"); }

@@ -916,6 +916,159 @@ histperiod=daily&startdate=" + startdate + "&enddate=" + enddate + "&output=csv&
         }
 
 
+
+        public static bool TryCache_Chart = true;
+        public static int DelayMs_Chart = 0;
+        public static int MaxCacheDays_Chart = 1;
+
+        public const string CHARTDBDEFAULTNAME = "ChartDB";
+        static string GetChartDb() { return GetChartDb(TradeLink.Common.Util.ProgramData(CHARTDBDEFAULTNAME)); }
+        static string GetChartDb(string path)
+        {
+            string db = path;
+            if (!System.IO.Directory.Exists(db))
+            {
+                try
+                {
+                    System.IO.Directory.CreateDirectory(db);
+                }
+                catch { }
+            }
+            return db;
+        }
+
+        public static BarList GetChart(string sym, bool trycache, int delayms, DebugDelegate deb) { return GetChart(sym, TradeLink.Common.Util.ToTLDate(), MaxCacheDays_Chart, trycache, delayms, deb); }
+        public static BarList GetChart(string sym, DebugDelegate deb) { return GetChart(sym, TradeLink.Common.Util.ToTLDate(), MaxCacheDays_Chart, TryCache_Chart, DelayMs_Chart, deb); }
+        public static BarList GetChart(string sym) { return GetChart(sym, TradeLink.Common.Util.ToTLDate(), MaxCacheDays_Chart, TryCache_Chart, DelayMs_Chart, null); }
+        public static BarList GetChart(string sym, int maxcacheagedays, bool trycache) { return GetChart(sym, Util.ToTLDate(), maxcacheagedays, trycache, DelayMs_Chart, null); }
+        public static BarList GetChart(string sym, int maxcacheagedays) { return GetChart(sym, Util.ToTLDate(), maxcacheagedays, TryCache_Chart, DelayMs_Chart, null); }
+
+        public static BarList GetChart(string sym, int maxcacheagedays, bool trycache, int delayms, DebugDelegate deb) { return GetChart(sym, Util.ToTLDate(), maxcacheagedays, trycache, delayms, deb); }
+        public static BarList GetChart(string sym, int maxcacheagedays, DebugDelegate deb) { return GetChart(sym, Util.ToTLDate(), maxcacheagedays, TryCache_Chart, DelayMs_Chart, deb); }
+        public static BarList GetChart(string sym, int date, int maxcacheagedays, DebugDelegate deb) { return GetChart(sym, date, maxcacheagedays, TryCache_Chart, DelayMs_Chart, deb); }
+        public static BarList GetChart(string sym, int date, int maxcacheagedays, bool trycache, int delayms, DebugDelegate deb)
+        {
+            debs = deb;
+            // expect 
+            string chart = GetDBLoc(CHARTDBDEFAULTNAME, sym, maxcacheagedays, Util.ToDateTime(date, Util.ToTLTime()), TikConst.DOT_EXT);
+            string task = CHARTDBDEFAULTNAME + sym;
+            // see if it exists
+            if (trycache && System.IO.File.Exists(chart))
+            {
+                try
+                {
+                    var bl = TradeLink.Common.BarListImpl.FromTIK(chart);
+                    bl.DefaultInterval = BarInterval.Day;
+                    debug(sym + " chart existed for: " + date + " bars: " + bl.Count);
+                    return bl;
+                }
+                catch (Exception ex)
+                {
+                    debug(sym + " error reading cached chart, will re-download.   (loc: " + chart + " err: " + ex.Message + ex.StackTrace);
+                }
+            }
+            else if (TaskStatus.hasMaxFails(task))
+            {
+                debug(sym + " hit max failures with no success, skipping...");
+                return new BarListImpl(BarInterval.Day, sym);
+            }
+            else
+                debug(sym + " chart not found for " + date + ", downloading...");
+            // grab it
+            var newbl = TradeLink.Common.BarListImpl.DayFromGoogle(sym);
+            if (ChartSave(newbl, Path.GetDirectoryName(chart), date))
+            {
+                if (delayms != 0)
+                    Util.sleep(delayms);
+                debug(sym + " saved chart for " + date + " with bars: " + newbl.Count + " to: " + chart);
+                TaskStatus.CountSuccess(task);
+            }
+            else
+            {
+                debug(sym + " error saving chart for " + date + " and bars: " + newbl.Count + " to: " + chart);
+                TaskStatus.CountFail(task);
+            }
+            return newbl;
+        }
+
+        public static bool ChartSave(BarList bl, string path, int date)
+        {
+            try
+            {
+                Directory.CreateDirectory(path);
+            }
+            catch { return false; }
+            try
+            {
+                if (date == 0)
+                    date = bl.RecentBar.Bardate;
+                string fn = TikWriter.SafeFilename(bl.Symbol, path, date);
+                if (System.IO.File.Exists(fn))
+                {
+                    try { System.IO.File.Delete(fn); }
+                    catch { return false; }
+                }
+                TikWriter tw = new TikWriter(path, bl.Symbol, date);
+                foreach (Bar b in bl)
+                {
+                    Tick[] ticks = BarImpl.ToTick(b);
+                    foreach (Tick k in ticks)
+                        tw.newTick(k);
+                }
+                tw.Close();
+                return true;
+            }
+            catch { }
+            return false;
+        }
+
+
+        static string GetDbLocBase(string path)
+        {
+            string db = path;
+            if (!System.IO.Directory.Exists(db))
+            {
+                try
+                {
+                    System.IO.Directory.CreateDirectory(db);
+                }
+                catch { }
+            }
+            return db;
+        }
+
+        static string BuildDBLoc(string path, string sym, int date, string fileext)
+        {
+            return path + "\\" + sym + date + fileext;
+        }
+
+        public static string GetDBLoc(string program, string sym, int maxcacheage_days) { return GetDBLoc(program, sym, maxcacheage_days, DateTime.Now, ".xml"); }
+        public static string GetDBLoc(string program, string sym, int maxcacheage_days, DateTime currentdate) { return GetDBLoc(program, sym, maxcacheage_days, currentdate, ".xml"); }
+        public static string GetDBLoc(string program, string sym, int maxcacheage_days, DateTime currentdate, string fileext)
+        {
+            // get our db location
+            string baseloc = GetDbLocBase(Util.ProgramData(program));
+            // prepare present day
+            int pday = Util.ToTLDate(currentdate);
+            int dbday = pday;
+            // search for an existing date
+            int cacheage_days = 0;
+            string loc = string.Empty;
+            bool found = false;
+            do
+            {
+                currentdate = currentdate.Subtract(new TimeSpan(cacheage_days, 0, 0, 0));
+                loc = BuildDBLoc(baseloc, sym, Util.ToTLDate(currentdate), fileext);
+                found = System.IO.File.Exists(loc);
+
+            } while (!found && (cacheage_days++ < maxcacheage_days));
+            if (!found)
+                return BuildDBLoc(baseloc, sym, pday, fileext);
+            return loc;
+
+        }
+
+
         /// <summary>
         /// load previous days bar data from tick files located in tradelink tick folder
         /// </summary>
@@ -1022,6 +1175,14 @@ histperiod=daily&startdate=" + startdate + "&enddate=" + enddate + "&output=csv&
         public double[] VolDouble()
         {
             return Calc.taprep(Vol(), _dir);
+        }
+
+
+        static DebugDelegate debs = null;
+        static void debug(string msg)
+        {
+            if (debs != null)
+                debs(msg);
         }
     }
 

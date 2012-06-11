@@ -14,8 +14,10 @@ namespace Chartographer
     public partial class ChartMain : AppTracker
     {
         public event BarListDelegate newChartData;
-        Dictionary<string, BarList> blbox = new Dictionary<string, BarList>();
+        
         public const string PROGRAM = "Chartographer";
+
+        Log log = new Log(PROGRAM);
 
         public ChartMain()
         {
@@ -34,6 +36,19 @@ namespace Chartographer
             this.Move += new EventHandler(Form1_Move);
             Chartographer.Properties.Settings.Default.PropertyChanged += new PropertyChangedEventHandler(Default_PropertyChanged);
             Text = "Chart " + Util.TLVersion();
+            FormClosing += new FormClosingEventHandler(ChartMain_FormClosing);
+        }
+
+        void debug(string msg)
+        {
+            log.GotDebug(msg);
+            dw.GotDebug(msg);
+        }
+
+        void ChartMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            log.Stop();
+            Properties.Settings.Default.Save();
         }
 
         void Default_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -71,24 +86,36 @@ namespace Chartographer
 
         private void button1_Click(object sender, EventArgs e)
         {
-            chartsymbolbox.Text = chartsymbolbox.Text.ToUpper();
-            downloaddata(chartsymbolbox.Text);
+            string sym = chartsymbolbox.Text.ToUpper();
+            chartsymbolbox.Text = sym;
+            usecachenow = usecachebut.Checked;
+            useblack = blackbackground.Checked;
+            usesticky = stickychartsbox.Checked;
+            usemax = maxchartbox.Checked;
+            newchartsyms.Write(sym);
+            RunHelper.run(downloaddata, null, debug, "chartographer background fetcher");
         }
 
-        private void downloaddata(string symbol)
+        RingBuffer<string> newchartsyms = new RingBuffer<string>(20);
+        bool usecachenow = Properties.Settings.Default.usecache;
+        bool usemax = Properties.Settings.Default.maxcharts;
+        bool usesticky = Properties.Settings.Default.stickychartson;
+        bool useblack = Properties.Settings.Default.blackchartbg;
+
+        private void downloaddata()
         {
-            downloaddata(symbol, true);
+            while (newchartsyms.hasItems)
+            {
+                string sym = newchartsyms.Read();
+                var chart = BarListImpl.GetChart(sym, usecachenow, 200, debug);
+                newChart(chart);
+            }
+            
         }
 
-        private void downloaddata(string sym, bool newChart)
-        {
-            bool r = BarListImpl.DayFromGoogleAsync(sym, new BarListDelegate(gotchart));
-        }
 
-        void gotchart(BarList bl)
-        {
-            newChart(bl);
-        }
+
+
 
         private void stickychartsbox_CheckedChanged(object sender, EventArgs e)
         {
@@ -127,24 +154,31 @@ namespace Chartographer
 
         void newChart(BarList bl)
         {
-            if (!blbox.ContainsKey(bl.Symbol))
-                blbox.Add(bl.Symbol, bl);
-            else blbox[bl.Symbol] = bl;
-
-            Chart c = new Chart(bl, false);
-            c.Symbol = bl.Symbol;
-            try
+            if (InvokeRequired)
+                Invoke(new BarListDelegate(newChart), new object[] { bl });
+            else
             {
-                c.StartPosition = FormStartPosition.Manual;
-                c.Location = Chartographer.Properties.Settings.Default.chartstart;
+
+                Chart c = new Chart(bl, false);
+                c.Symbol = bl.Symbol;
+                c.chartControl1.SendDebug += new DebugDelegate(debug);
+
+
+                try
+                {
+                    c.StartPosition = FormStartPosition.Manual;
+                    c.Location = Chartographer.Properties.Settings.Default.chartstart;
+                }
+                catch (NullReferenceException) { }
+                newChartData += new BarListDelegate(c.NewBarList);
+                c.Move += new EventHandler(c_Move);
+                c.Icon = Chartographer.Properties.Resources.chart;
+                if (usemax)
+                    c.WindowState = FormWindowState.Maximized;
+                if (useblack)
+                    c.chartControl1.BackColor = Color.Black;
+                c.Show();
             }
-            catch (NullReferenceException) { }
-            newChartData += new BarListDelegate(c.NewBarList);
-            c.Move += new EventHandler(c_Move);
-            c.Icon = Chartographer.Properties.Resources.chart;
-            if (maxchartbox.Checked) c.WindowState = FormWindowState.Maximized;
-            if (blackbackground.Checked) c.chartControl1.BackColor = Color.Black;
-            c.Show();
         }
 
         private void chartsymbolbox_Click(object sender, EventArgs e)
@@ -161,6 +195,13 @@ namespace Chartographer
         {
             if (e.KeyCode == Keys.Enter)
                 button1_Click(null, null);
+        }
+
+        DebugWindow dw = new DebugWindow();
+
+        private void msgbut_Click(object sender, EventArgs e)
+        {
+            dw.Toggle();
         }
     }
 }

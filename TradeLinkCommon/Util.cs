@@ -29,6 +29,16 @@ namespace TradeLink.Common
         static string KEY_VERSION = "Version";
         static string KEY_TRACKUSAGE = "TrackUsage";
 
+        /// <summary>
+        /// sleep current thread a few milliseconds
+        /// </summary>
+        /// <param name="ms"></param>
+        public static void sleep(int ms)
+        {
+            if (ms != 0)
+                System.Threading.Thread.Sleep(ms);
+        }
+
 
         /// <summary>
         /// determines whether user has consented to application tracking for given program

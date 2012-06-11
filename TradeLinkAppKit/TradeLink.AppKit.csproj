@@ -210,6 +210,7 @@
     </Compile>
     <Compile Include="qc.cs" />
     <Compile Include="Results.cs" />
+    <Compile Include="RunHelper.cs" />
     <Compile Include="RunTracker.cs" />
     <Compile Include="SafeBindingSource.cs">
       <SubType>Component</SubType>

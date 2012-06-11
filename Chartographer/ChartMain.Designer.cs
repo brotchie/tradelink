@@ -31,12 +31,14 @@ namespace Chartographer
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ChartMain));
             this.chartsymbolbox = new System.Windows.Forms.TextBox();
-            this.blackbackground = new System.Windows.Forms.CheckBox();
-            this.stickychartsbox = new System.Windows.Forms.CheckBox();
-            this.maxchartbox = new System.Windows.Forms.CheckBox();
             this.button2 = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.button1 = new System.Windows.Forms.Button();
+            this.usecachebut = new System.Windows.Forms.CheckBox();
+            this.blackbackground = new System.Windows.Forms.CheckBox();
+            this.stickychartsbox = new System.Windows.Forms.CheckBox();
+            this.maxchartbox = new System.Windows.Forms.CheckBox();
+            this.msgbut = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // chartsymbolbox
@@ -44,14 +46,52 @@ namespace Chartographer
             this.chartsymbolbox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
             this.chartsymbolbox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.RecentlyUsedList;
             this.chartsymbolbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chartsymbolbox.Location = new System.Drawing.Point(9, 8);
+            this.chartsymbolbox.Location = new System.Drawing.Point(9, 6);
             this.chartsymbolbox.Name = "chartsymbolbox";
-            this.chartsymbolbox.Size = new System.Drawing.Size(51, 22);
+            this.chartsymbolbox.Size = new System.Drawing.Size(72, 22);
             this.chartsymbolbox.TabIndex = 0;
             this.chartsymbolbox.Text = "GOOG";
             this.toolTip1.SetToolTip(this.chartsymbolbox, "load yearly chart for desired symbol from internet (free)");
             this.chartsymbolbox.Click += new System.EventHandler(this.chartsymbolbox_Click);
             this.chartsymbolbox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.chartsymbolbox_KeyUp);
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(139, 6);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(51, 22);
+            this.button2.TabIndex = 6;
+            this.button2.Text = "intra";
+            this.toolTip1.SetToolTip(this.button2, "load intraday chart from tick file");
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(86, 6);
+            this.button1.Margin = new System.Windows.Forms.Padding(2);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(48, 22);
+            this.button1.TabIndex = 7;
+            this.button1.Text = "daily";
+            this.toolTip1.SetToolTip(this.button1, "load daily chart for desired symbol using internet data (free)");
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click_1);
+            // 
+            // usecachebut
+            // 
+            this.usecachebut.Appearance = System.Windows.Forms.Appearance.Button;
+            this.usecachebut.AutoSize = true;
+            this.usecachebut.Checked = global::Chartographer.Properties.Settings.Default.usecache;
+            this.usecachebut.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.usecachebut.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::Chartographer.Properties.Settings.Default, "usecache", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            this.usecachebut.Location = new System.Drawing.Point(165, 34);
+            this.usecachebut.Name = "usecachebut";
+            this.usecachebut.Size = new System.Drawing.Size(64, 23);
+            this.usecachebut.TabIndex = 8;
+            this.usecachebut.Text = "usecache";
+            this.toolTip1.SetToolTip(this.usecachebut, "maximize new charts");
+            this.usecachebut.UseVisualStyleBackColor = true;
             // 
             // blackbackground
             // 
@@ -74,7 +114,7 @@ namespace Chartographer
             this.stickychartsbox.AutoSize = true;
             this.stickychartsbox.Checked = global::Chartographer.Properties.Settings.Default.stickychartson;
             this.stickychartsbox.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::Chartographer.Properties.Settings.Default, "stickychartson", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            this.stickychartsbox.Location = new System.Drawing.Point(63, 34);
+            this.stickychartsbox.Location = new System.Drawing.Point(58, 34);
             this.stickychartsbox.Name = "stickychartsbox";
             this.stickychartsbox.Size = new System.Drawing.Size(44, 23);
             this.stickychartsbox.TabIndex = 4;
@@ -98,28 +138,15 @@ namespace Chartographer
             this.maxchartbox.UseVisualStyleBackColor = true;
             this.maxchartbox.CheckedChanged += new System.EventHandler(this.maxchartbox_CheckedChanged);
             // 
-            // button2
+            // msgbut
             // 
-            this.button2.Location = new System.Drawing.Point(111, 8);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(48, 22);
-            this.button2.TabIndex = 6;
-            this.button2.Text = "intra";
-            this.toolTip1.SetToolTip(this.button2, "load intraday chart from tick file");
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(63, 8);
-            this.button1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(44, 22);
-            this.button1.TabIndex = 7;
-            this.button1.Text = "go";
-            this.toolTip1.SetToolTip(this.button1, "load daily chart for desired symbol using internet data (free)");
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click_1);
+            this.msgbut.Location = new System.Drawing.Point(208, 5);
+            this.msgbut.Name = "msgbut";
+            this.msgbut.Size = new System.Drawing.Size(21, 23);
+            this.msgbut.TabIndex = 9;
+            this.msgbut.Text = "!";
+            this.msgbut.UseVisualStyleBackColor = true;
+            this.msgbut.Click += new System.EventHandler(this.msgbut_Click);
             // 
             // ChartMain
             // 
@@ -127,7 +154,9 @@ namespace Chartographer
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.ClientSize = new System.Drawing.Size(173, 69);
+            this.ClientSize = new System.Drawing.Size(244, 72);
+            this.Controls.Add(this.msgbut);
+            this.Controls.Add(this.usecachebut);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.blackbackground);
@@ -138,7 +167,7 @@ namespace Chartographer
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "ChartMain";
-            this.Text = "Chart";
+            this.Text = "Chartographer";
             this.TopMost = true;
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.ChartMain_DragDrop);
             this.DragEnter += new System.Windows.Forms.DragEventHandler(this.ChartMain_DragEnter);
@@ -156,6 +185,8 @@ namespace Chartographer
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.CheckBox usecachebut;
+        private System.Windows.Forms.Button msgbut;
     }
 }
 
