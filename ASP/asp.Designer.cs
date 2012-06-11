@@ -45,7 +45,6 @@ namespace ASP
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this._twithelp = new System.Windows.Forms.Button();
             this._opttog = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
             this._togglemsgs = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this._newrespbox.SuspendLayout();
@@ -55,10 +54,9 @@ namespace ASP
             // 
             this._availresponses.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._availresponses.FormattingEnabled = true;
-            this._availresponses.Location = new System.Drawing.Point(108, 29);
-            this._availresponses.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this._availresponses.Location = new System.Drawing.Point(72, 19);
             this._availresponses.Name = "_availresponses";
-            this._availresponses.Size = new System.Drawing.Size(333, 28);
+            this._availresponses.Size = new System.Drawing.Size(223, 21);
             this._availresponses.TabIndex = 1;
             this.toolTip1.SetToolTip(this._availresponses, "List of responses available in current response library");
             this._availresponses.SelectedIndexChanged += new System.EventHandler(this.Boxes_SelectedIndexChanged);
@@ -67,12 +65,10 @@ namespace ASP
             // 
             this._resnames.FormattingEnabled = true;
             this._resnames.HorizontalScrollbar = true;
-            this._resnames.ItemHeight = 20;
-            this._resnames.Location = new System.Drawing.Point(13, 134);
-            this._resnames.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this._resnames.Location = new System.Drawing.Point(9, 87);
             this._resnames.Name = "_resnames";
             this._resnames.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this._resnames.Size = new System.Drawing.Size(455, 144);
+            this._resnames.Size = new System.Drawing.Size(305, 95);
             this._resnames.TabIndex = 4;
             this._resnames.TabStop = false;
             this.toolTip1.SetToolTip(this._resnames, "Active Responses");
@@ -82,10 +78,9 @@ namespace ASP
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1,
             this.toolStripStatusLabel2});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 347);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 218);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 21, 0);
-            this.statusStrip1.Size = new System.Drawing.Size(488, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(325, 22);
             this.statusStrip1.TabIndex = 8;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -107,9 +102,11 @@ namespace ASP
             this._newrespbox.Controls.Add(this._saveskins);
             this._newrespbox.Controls.Add(this._remskin);
             this._newrespbox.Controls.Add(this._availresponses);
-            this._newrespbox.Location = new System.Drawing.Point(14, 12);
+            this._newrespbox.Location = new System.Drawing.Point(9, 8);
+            this._newrespbox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this._newrespbox.Name = "_newrespbox";
-            this._newrespbox.Size = new System.Drawing.Size(454, 114);
+            this._newrespbox.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this._newrespbox.Size = new System.Drawing.Size(303, 74);
             this._newrespbox.TabIndex = 16;
             this._newrespbox.TabStop = false;
             this._newrespbox.Text = "Start new Response";
@@ -117,9 +114,10 @@ namespace ASP
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 32);
+            this.label2.Location = new System.Drawing.Point(4, 21);
+            this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(90, 20);
+            this.label2.Size = new System.Drawing.Size(61, 13);
             this.label2.TabIndex = 24;
             this.label2.Text = "Response: ";
             // 
@@ -127,26 +125,29 @@ namespace ASP
             // 
             this._skins.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._skins.FormattingEnabled = true;
-            this._skins.Location = new System.Drawing.Point(108, 64);
+            this._skins.Location = new System.Drawing.Point(72, 42);
+            this._skins.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this._skins.Name = "_skins";
-            this._skins.Size = new System.Drawing.Size(261, 28);
+            this._skins.Size = new System.Drawing.Size(175, 21);
             this._skins.TabIndex = 20;
             this.toolTip1.SetToolTip(this._skins, "Skins you have saved");
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(46, 67);
+            this.label1.Location = new System.Drawing.Point(31, 44);
+            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(56, 20);
+            this.label1.Size = new System.Drawing.Size(39, 13);
             this.label1.TabIndex = 23;
             this.label1.Text = "Skins: ";
             // 
             // _saveskins
             // 
-            this._saveskins.Location = new System.Drawing.Point(410, 64);
+            this._saveskins.Location = new System.Drawing.Point(273, 42);
+            this._saveskins.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this._saveskins.Name = "_saveskins";
-            this._saveskins.Size = new System.Drawing.Size(31, 29);
+            this._saveskins.Size = new System.Drawing.Size(21, 19);
             this._saveskins.TabIndex = 22;
             this._saveskins.Text = "S";
             this.toolTip1.SetToolTip(this._saveskins, "save current settings from running skins");
@@ -154,9 +155,10 @@ namespace ASP
             // 
             // _remskin
             // 
-            this._remskin.Location = new System.Drawing.Point(375, 64);
+            this._remskin.Location = new System.Drawing.Point(250, 42);
+            this._remskin.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this._remskin.Name = "_remskin";
-            this._remskin.Size = new System.Drawing.Size(29, 29);
+            this._remskin.Size = new System.Drawing.Size(19, 19);
             this._remskin.TabIndex = 21;
             this._remskin.Text = "-";
             this.toolTip1.SetToolTip(this._remskin, "delete current skin");
@@ -164,9 +166,10 @@ namespace ASP
             // 
             // _librarysel
             // 
-            this._librarysel.Location = new System.Drawing.Point(131, 286);
+            this._librarysel.Location = new System.Drawing.Point(87, 186);
+            this._librarysel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this._librarysel.Name = "_librarysel";
-            this._librarysel.Size = new System.Drawing.Size(80, 34);
+            this._librarysel.Size = new System.Drawing.Size(53, 22);
             this._librarysel.TabIndex = 21;
             this._librarysel.Text = "Library";
             this.toolTip1.SetToolTip(this._librarysel, "Change library where responses are obtained");
@@ -176,9 +179,10 @@ namespace ASP
             // _twithelp
             // 
             this._twithelp.Image = ((System.Drawing.Image)(resources.GetObject("_twithelp.Image")));
-            this._twithelp.Location = new System.Drawing.Point(437, 286);
+            this._twithelp.Location = new System.Drawing.Point(291, 186);
+            this._twithelp.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this._twithelp.Name = "_twithelp";
-            this._twithelp.Size = new System.Drawing.Size(31, 34);
+            this._twithelp.Size = new System.Drawing.Size(21, 22);
             this._twithelp.TabIndex = 20;
             this.toolTip1.SetToolTip(this._twithelp, "submit bug report");
             this._twithelp.UseVisualStyleBackColor = true;
@@ -186,31 +190,22 @@ namespace ASP
             // 
             // _opttog
             // 
-            this._opttog.Location = new System.Drawing.Point(51, 286);
+            this._opttog.Location = new System.Drawing.Point(34, 186);
+            this._opttog.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this._opttog.Name = "_opttog";
-            this._opttog.Size = new System.Drawing.Size(34, 34);
+            this._opttog.Size = new System.Drawing.Size(23, 22);
             this._opttog.TabIndex = 21;
             this._opttog.Text = "?";
             this.toolTip1.SetToolTip(this._opttog, "change ASP options");
             this._opttog.UseVisualStyleBackColor = true;
             this._opttog.Click += new System.EventHandler(this._opttog_Click);
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(91, 286);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(34, 34);
-            this.button1.TabIndex = 22;
-            this.button1.Text = "$";
-            this.toolTip1.SetToolTip(this.button1, "request capital connection");
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
             // _togglemsgs
             // 
-            this._togglemsgs.Location = new System.Drawing.Point(13, 286);
+            this._togglemsgs.Location = new System.Drawing.Point(9, 186);
+            this._togglemsgs.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this._togglemsgs.Name = "_togglemsgs";
-            this._togglemsgs.Size = new System.Drawing.Size(32, 34);
+            this._togglemsgs.Size = new System.Drawing.Size(21, 22);
             this._togglemsgs.TabIndex = 19;
             this._togglemsgs.Text = "!";
             this._togglemsgs.UseVisualStyleBackColor = true;
@@ -218,10 +213,9 @@ namespace ASP
             // 
             // ASP
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(488, 369);
-            this.Controls.Add(this.button1);
+            this.ClientSize = new System.Drawing.Size(325, 240);
             this.Controls.Add(this._opttog);
             this.Controls.Add(this._twithelp);
             this.Controls.Add(this._librarysel);
@@ -230,7 +224,6 @@ namespace ASP
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this._resnames);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "ASP";
             this.Text = "ASP";
             this.statusStrip1.ResumeLayout(false);
@@ -259,7 +252,6 @@ namespace ASP
         public System.Windows.Forms.Button _remskin;
         public System.Windows.Forms.ComboBox _skins;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label label2;
     }
 }

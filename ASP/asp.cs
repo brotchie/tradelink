@@ -51,8 +51,10 @@ namespace ASP
         int _ASPINSTANCE = 0;
         int _INITIALRESPONSEID = 0;
         int _NEXTRESPONSEID = 0;
+
+        // do startup tasks in the background
         BackgroundWorker bw = new BackgroundWorker();
-        BackgroundWorker cc = new BackgroundWorker();
+        // write indicators to file in background (if enabled in asp options)
         BackgroundWorker si = new BackgroundWorker();
 
         bool _enableoversellprotect = Properties.Settings.Default.OversellProtection;
@@ -123,8 +125,6 @@ namespace ASP
             this.FormClosing += new FormClosingEventHandler(ASP_FormClosing);
             bw.DoWork += new DoWorkEventHandler(bw_DoWork);
             bw.RunWorkerAsync();
-            // handle capital connections on seperate thread
-            cc.DoWork += new DoWorkEventHandler(cc_DoWork);
             // write indicator output
             si.DoWork += new DoWorkEventHandler(si_DoWork);
             si.RunWorkerAsync();
@@ -183,15 +183,7 @@ namespace ASP
             }
         }
 
-        void cc_DoWork(object sender, DoWorkEventArgs e)
-        {
-            if (!_ao._capconprompt.Checked)
-            {
-                return;
-            }
-            if (CapitalRequestConfim.ConfirmSubmitCapitalRequest(_rs, false, debug))
-                status("Sent capital connection request.");
-        }
+
 
         void _dw_NewCreateTicketEvent(string msg)
         {
@@ -1120,15 +1112,10 @@ namespace ASP
                 else
                     _reslist[i].GotFill(t);
             }
-            // check for capital connection request
-            if (docapcon && _ao._capconprompt.Checked)
-            {
-                docapcon = false;
-                docc();
-            }
+
         }
 
-        bool docapcon = Properties.Settings.Default.capitalconnections;
+
 
         void tl_gotPosition(Position pos)
         {
@@ -1592,18 +1579,6 @@ namespace ASP
             }
         }
 
-        void docc()
-        {
-            if (!cc.IsBusy)
-                cc.RunWorkerAsync();
-            else
-                debug("Already running capital connection request.");
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            docc();
-        }
 
 
 
