@@ -17,13 +17,14 @@ namespace ServerDAS
     {
         
          private bool LOGGEDIN;
-
+       // AmeritradeBrokerAPI api = new AmeritradeBrokerAPI();
         const string APIVER = "1";
         TLServer tl = new TLServer_WM();
         public const string PROGRAM = "ServerDAS BETA";
         Log _log = new Log(PROGRAM);
         bool ok { get { 
             return true; 
+            //api.LoggedIn; 
         } }
         Dictionary<long, long> idmap = new Dictionary<long, long>();
 
@@ -61,18 +62,19 @@ namespace ServerDAS
             tl.newProviderName = Providers.DAS;
             tl.newFeatureRequest += new MessageArrayDelegate(tl_newFeatureRequest);
             tl.newSendOrderRequest += new OrderDelegateStatus(tl_gotSrvFillRequest);
-            tl.newAcctRequest += new StringDelegate(tl_newAcctRequest);
+            //tl.newAcctRequest += new StringDelegate(tl_gotSrvAcctRequest);
             tl.newOrderCancelRequest += new LongDelegate(tl_newOrderCancelRequest);
             tl.newUnknownRequest += new UnknownMessageDelegate(tl_newUnknownRequest);
             tl.newRegisterSymbols +=new SymbolRegisterDel(tl_newRegisterSymbols);
             tl.newPosList += new PositionArrayDelegate(tl_newPosList);
 
-
-        }
-
-        string tl_newAcctRequest()
-        {
-            return string.Empty;
+            //api.OnStatusChange += new Axtdaactx.ITDAAPICommEvents_OnStatusChangeEventHandler(api_OnStatusChange);
+            ////api.OnL1Quote +=  rs_LevelOneStreaming = new AmeritradeBrokerAPI.RequestState();
+            ////api.rs_LevelOneStreaming.TickWithArgs += new AmeritradeBrokerAPI.EventHandlerWithArgs(rs_LevelOneStreaming_TickWithArgs);
+            ////api.rs_ActivesStreaming = new AmeritradeBrokerAPI.RequestState();
+            ////api.rs_ActivesStreaming.TickWithArgs += new AmeritradeBrokerAPI.EventHandlerWithArgs(rs_ActivesStreaming_TickWithArgs);
+            //api.OnL1Quote += new Axtdaactx.ITDAAPICommEvents_OnL1QuoteEventHandler(api_LevelOneStreaming);
+            //doLogin();
         }
 
         void tl_newRegisterSymbols(string client, string symbols)
@@ -80,12 +82,27 @@ namespace ServerDAS
             
             debug("got symbol request: " + client + " for: " + symbols);
             Basket mb = tl.AllClientBasket;
-            socketQuoteServer.WLSTRemoveWatchListonL1();
+            try
+            {
+                socketQuoteServer.WLSTRemoveWatchListonL1();
+            }
+            catch (Exception ex)
+            {
+                debug("DAS exception on removing watch list for symbols: " + symbols+ " err: " + ex.Message + ex.StackTrace);
+            }
            
-
+            //Close_Connections(false);
             foreach (Security s in mb)
             {
-                socketQuoteServer.WLSTAddWatch(s.Symbol);
+                try
+                {
+                    socketQuoteServer.WLSTAddWatch(s.Symbol);
+                    socketQuoteServer.WLSTAddWatch(s.Symbol, 2);
+                }
+                catch (Exception ex)
+                {
+                    debug("DAS exception on registering symbols: " + s.Symbol + " err: " + ex.Message + ex.StackTrace);
+                }
           
             }
             
@@ -94,9 +111,33 @@ namespace ServerDAS
 
         Position[] tl_newPosList(string account)
         {
-            
+            /*
+            AmeritradeBrokerAPI.ATradeArgument brokerAcctPosArgs = new AmeritradeBrokerAPI.ATradeArgument();
+            brokerAcctPosArgs.oPositions = new List<AmeritradeBrokerAPI.Positions>();
+            //api.TD_getAcctBalancesAndPositions(_user.Text, _pass.Text, AmeritradeBrokerAPI.SOURCEID, APIVER, ref brokerAcctPosArgs.oCashBalances, ref brokerAcctPosArgs.oPositions);
+            Position[] plist = new Position[brokerAcctPosArgs.oPositions.Count];
             int count = 0;
-            List<itemPosition> litem =  socketOrderServer.sitemPosition.Finditems(accid);
+            foreach (AmeritradeBrokerAPI.Positions oPosition in brokerAcctPosArgs.oPositions)
+            {
+                decimal price = 0;
+                decimal.TryParse(oPosition.AveragePric, out price);
+                int size = 0;
+                int.TryParse(oPosition.Quantity, out size);
+                Position p = new PositionImpl(oPosition.StockSymbol, price, size);
+                plist[count++] = p;
+            }
+            return plist;
+             */
+            int count = 0;
+            List<itemPosition> litem = new List<itemPosition>();
+            try
+            {
+                litem = socketOrderServer.sitemPosition.Finditems(accid);
+            }
+            catch (Exception ex)
+            {
+                debug("DAS connector error on requesting positions: " + ex.Message + ex.StackTrace);
+            }
             if (litem.Count == 0) return null;
             Position[] plist = new Position[litem.Count];
             foreach (itemPosition itemp in litem)
@@ -113,7 +154,11 @@ namespace ServerDAS
 
         long tl_newUnknownRequest(MessageTypes t, string msg)
         {
-
+            //switch (t)
+            //{
+            //  case MessageTypes.ISSHORTABLE:
+            //       return api.TD_IsShortable(msg) ? 1 : 0;
+            //}
             return (long)MessageTypes.FEATURE_NOT_IMPLEMENTED;
         }
 
@@ -141,8 +186,15 @@ namespace ServerDAS
 
                 if (porder.mlvsqty > 0)
                 {
-                    iManager im = new iManager(socketOrderServer);
-                    im.Send_CancelOrder(porder, 0);
+                    try
+                    {
+                        iManager im = new iManager(socketOrderServer);
+                        im.Send_CancelOrder(porder, 0);
+                    }
+                    catch (Exception ex)
+                    {
+                        debug("DAS error canceling order: " +number+" err: "+ ex.Message + ex.StackTrace);
+                    }
 
                     tl.newCancel(number);
                     
@@ -162,16 +214,14 @@ namespace ServerDAS
         MessageTypes[] tl_newFeatureRequest()
         {
             List<MessageTypes> f = new List<MessageTypes>();
-            f.Add(MessageTypes.ORDERNOTIFY);
             f.Add(MessageTypes.SENDORDER);
             f.Add(MessageTypes.EXECUTENOTIFY);
             f.Add(MessageTypes.ORDERCANCELREQUEST);
             f.Add(MessageTypes.ORDERCANCELRESPONSE);
             f.Add(MessageTypes.ACCOUNTREQUEST);
             f.Add(MessageTypes.ACCOUNTRESPONSE);       
+            f.Add(MessageTypes.ISSHORTABLE);
             f.Add(MessageTypes.TICKNOTIFY);
-            f.Add(MessageTypes.POSITIONREQUEST);
-            f.Add(MessageTypes.POSITIONRESPONSE);
             f.Add(MessageTypes.SENDORDERLIMIT);
             f.Add(MessageTypes.SENDORDERMARKET);
             f.Add(MessageTypes.LIVETRADING);
@@ -185,14 +235,22 @@ namespace ServerDAS
         long tl_gotSrvFillRequest(Order o)
 
         {
-
+            //if (!ok)
+            //{
+            //    debug("not logged in.");
+            //    return (long)MessageTypes.SYMBOL_NOT_LOADED;
+            //}
+           // string action = o.side ? "buy" : "sell";
             string otype = o.isLimit ? "limit" : "market";
 
 
             if (o.id == 0)
                 o.id = OrderImpl.Unique;
-            string route = "auto";
 
+            //if (o.ex.ToUpper().Contains("ARCA"))
+            //    route = "ecn_arca";
+            //else if (o.ex.ToUpper().Contains("INET"))
+            //    route = "inet";
 
          
 
@@ -234,7 +292,7 @@ namespace ServerDAS
             }
 
 
-
+            int err = 0;
 
             try
             {
@@ -263,18 +321,22 @@ namespace ServerDAS
 
                 
 
-                itemOrder.LSendOrder(newOrder, ref errMsg, true, socketOrderServer, ref morig);
+                err = itemOrder.LSendOrder(newOrder, ref errMsg, true, socketOrderServer, ref morig);
+                if ((err != 0) || ((errMsg != null) && (errMsg != string.Empty)))
+                {
+                    debug("error occured sending order: " + o.ToString() + " err: " + Util.PrettyError(Providers.DAS, err));
+                }
                 ls.Add(morig);
 
             }
 
-            catch (Exception e1)
+            catch (Exception ex)
             {
-
+                debug("DAS exception occured sending order: "+o.ToString()+" err: "+ex.Message+ex.StackTrace);
                 return (long)MessageTypes.INVALID_ORDERSIZE;
             }
            
-            return (long)MessageTypes.OK;
+            return (long)err;
         }
 
         private void buttonLogin_Click(object sender, EventArgs e)
@@ -311,25 +373,14 @@ namespace ServerDAS
                 
                 socketQuoteServer.Connect(Properties.Settings.Default.QuoteserverAddress, Properties.Settings.Default.QuoteserverPort);
                 socketQuoteServer.PkgLogin(user_id, textBoxPwd.Text.Trim(), Properties.Settings.Default.QuoteserverAddress);
-                status("login successfully.");
+                labelMessage.Text = "login successfully.";
             }
             catch (Exception e1)
             {
-                status(" Login fail." + e1.Message);
+                debug("DAS connector login exception: " + e1.Message + e1.StackTrace);
+                labelMessage.Text = " Login fail." + e1.Message;
             }
 
-        }
-
-        void status(string msg)
-        {
-            if (InvokeRequired)
-                Invoke(new DebugDelegate(status), new object[] { msg });
-            else
-            {
-                labelMessage.Text = msg;
-                labelMessage.Invalidate();
-                debug(msg);
-            }
         }
 
         private void CancelResponseHandler(object sender, OrderArgs e)
@@ -376,7 +427,74 @@ namespace ServerDAS
 
         }
 
-        
+        /*
+        private void ExecuteNotifyHandler(object sender, OrderArgs e)
+        {
+
+
+            itemOrder iorder = e.ItemOrder;
+
+           
+
+            
+            Order o = new OrderImpl(iorder.msecsym, iorder.IsBuyOrder(), iorder.mqty, Convert.ToDecimal(iorder.mprice), Convert.ToDecimal(iorder.mstopprice), "", iorder.mc_date, iorder.mc_date, iorder.morderid);
+            Trade trade = new TradeImpl();
+            trade.symbol = iorder.msecsym;
+            trade.side = iorder.IsBuyOrder();
+            trade.xprice = Convert.ToDecimal(iorder.mprice);
+            trade.xsize = iorder.mqty;
+            DateTime mdate = ComFucs.GetDate(iorder.mm_date);
+
+            trade.xdate = mdate.Day+ mdate.Month*100+mdate.Year*10000;
+            trade.xtime = mdate.Second + mdate.Minute*100+ mdate.Hour*10000 ;
+            tl.newFill(trade);
+        }
+
+       
+
+        private void OrderHandler(object sender, OrderArgs e)
+        {
+            
+
+                itemOrder iorder = e.ItemOrder;
+                // if (!ls.Contains(iorder.morigtkn)) return;
+                DateTime mdate = ComFucs.GetDate(iorder.mm_date);
+                Order o = new OrderImpl(iorder.msecsym, iorder.IsBuyOrder(), iorder.mqty, Convert.ToDecimal(iorder.mprice), Convert.ToDecimal(iorder.mstopprice), "",
+                            mdate.Second + mdate.Minute * 100 + mdate.Hour * 10000, mdate.Second + mdate.Minute * 100 + mdate.Hour * 10000, iorder.morderid);
+
+                tl.newOrder(o);
+            
+
+
+        }
+
+
+        private void OrderModifyHandler(object sender, OrderArgs e)
+        {
+            
+                if ((e.ItemOrder.mstatus | 0x0004) != 0)
+                {
+                  //  tl.newCancel(e.ItemOrder.morderid);
+                }
+                if ((e.ItemOrder.mstatus | 0x0002) != 0)
+                {
+                    itemOrder iorder = e.ItemOrder;
+                    Order o = new OrderImpl(iorder.msecsym, iorder.IsBuyOrder(), iorder.mqty, Convert.ToDecimal(iorder.mprice), Convert.ToDecimal(iorder.mstopprice), "", iorder.mc_date, iorder.mc_date, iorder.morderid);
+                    Trade trade = new TradeImpl();
+                    trade.symbol = iorder.msecsym;
+                    trade.side = iorder.IsBuyOrder();
+                    trade.xprice = Convert.ToDecimal(iorder.mprice);
+                    trade.xsize = iorder.mqty;
+                    DateTime mdate = ComFucs.GetDate(iorder.mm_date);
+                    trade.xdate = mdate.Day + mdate.Month * 100 + mdate.Year * 10000;
+                    trade.xtime = mdate.Second + mdate.Minute * 100 + mdate.Hour * 10000;
+                    tl.newFill(trade);
+                }
+            
+
+
+        }
+         * */
 
 
         private void Lv1Handler(object sender, Lv1Args e)
@@ -399,16 +517,6 @@ namespace ServerDAS
            
             tl.newTick(t);
 
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            _dw.Toggle();
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            TradeLink.AppKit.CrashReport.Report(PROGRAM, _log.Content, null, null, false, PROGRAM + " Bug " + Util.ToTLDate());
         }
 
     }
