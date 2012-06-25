@@ -30,7 +30,7 @@ namespace TradeLink.Common
     {
         
         public SellStop(string sym, int size, decimal stop, string comment) : base(sym, false, Math.Abs(size), 0, stop, comment, 0, 0) { }
-        public SellStop(string sym, int size, decimal stop) : base(sym, false, size, 0, Math.Abs(size), "", 0, 0) { }
+        public SellStop(string sym, int size, decimal stop) : base(sym, false, size, Math.Abs(size),stop, "", 0, 0) { }
         public SellStop(string sym, int size, decimal stop, long orderid) : base(sym, false, Math.Abs(size), 0, stop, "", 0, 0, orderid) { }
 
     }
