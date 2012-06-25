@@ -189,7 +189,35 @@ namespace TradeLink.Common
         }
 
         /// <summary>
-        /// get or set current id by name
+        /// get a current id name by symbol
+        /// </summary>
+        /// <param name="sym"></param>
+        /// <param name="idname"></param>
+        /// <returns></returns>
+        public long this[string sym, string idname]
+        {
+            get { return this[sym + idname]; }
+            set { this[sym + idname] = value; }
+        }
+
+        /// <summary>
+        /// get a current idname by number
+        /// </summary>
+        /// <param name="idx"></param>
+        /// <param name="idname"></param>
+        /// <returns></returns>
+        public long this[int idx, string idname]
+        {
+            get { return this[idx + idname]; }
+            set { this[idx + idname] = value; }
+        }
+
+        /// <summary>
+        /// get or set current id by name.
+        /// NOTE : generally you will want to call this with a symbol,
+        /// EG idt["IBM","my entry market"]
+        /// 
+        /// otherwise called like :
         /// (eg idt["myentrymkt"], idt["myentrylmt"], idt["myexitprofit"])
         /// Set name to zero to force reset on next use.
         /// </summary>

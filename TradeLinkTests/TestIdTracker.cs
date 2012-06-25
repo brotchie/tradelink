@@ -103,5 +103,43 @@ namespace TestTradeLink
 
 
         }
+
+
+        [Test]
+        public void SymbolNamedIds()
+        {
+            IdTracker idt = new IdTracker();
+            idt.SendDebugEvent += new TradeLink.API.DebugDelegate(Console.WriteLine);
+            const string sym = "TST";
+            const string sym2 = "BST";
+            // get an id
+            string id1 = "my market entry";
+            var entry = new MarketOrder(sym, 100, idt[sym,id1]);
+            var entry2 = new MarketOrder(sym, 100, idt[sym2, id1]);
+
+
+            // verify they are unique
+            Assert.AreNotEqual(entry.id, entry2.id, "different symbol entries should not match");
+            
+
+            // make sure they always return the same value
+            var c1 = idt[sym,id1];
+            var c1_2 = idt[sym2,id1];
+
+            Assert.AreEqual(c1, entry.id, id1 + " id changed");
+
+            // test resetting
+            idt[sym,id1] = 0;
+            var newc1 = idt[sym,id1];
+            Assert.AreNotEqual(newc1, c1, id1 + " did not change after a reset");
+
+            // request it again, should be same
+
+            var newc1compare = idt[sym,id1];
+            Assert.AreEqual(newc1, newc1compare, id1 + " changed after a read request");
+
+
+
+        }
     }
 }
