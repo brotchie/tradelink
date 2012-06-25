@@ -53,6 +53,7 @@ namespace TimeSales
         const string ASIZE = "ASize";
         const string AX = "AExch";
         const string DP = "Depth";
+        const string DATE = "Date";
 
         void initgrid()
         {
@@ -67,6 +68,7 @@ namespace TimeSales
             _dt.Columns.Add(BX);
             _dt.Columns.Add(AX);
             _dt.Columns.Add(DP);
+            _dt.Columns.Add(DATE);
             _bs.DataSource = _dt;
             _dg.DataSource = _bs;
             _dg.AllowUserToAddRows = false;
@@ -225,6 +227,7 @@ namespace TimeSales
             string oe = "";
             string ex = "";
             string depth = "";
+            string date = t.date.ToString();
             if (t.isIndex)
             {
                 trade = t.trade.ToString(_dpf);
@@ -250,7 +253,7 @@ namespace TimeSales
                 depth = t.depth.ToString();
             }
 
-            _dt.Rows.Add(time, trade, ts, ex, bid, ask, bs, os, be, oe,depth);
+            _dt.Rows.Add(time, trade, ts, ex, bid, ask, bs, os, be, oe,depth,date);
             if (Math.Abs(_dg.FirstDisplayedScrollingRowIndex-_dt.Rows.Count)<100)
                 SafeBindingSource.refreshgrid(_dg, _bs,false);
             int per = (int)(100 * line / (double)total);
