@@ -396,19 +396,24 @@ namespace TradeLink.AppKit
                                     // get coordinate for present days label
                                     lastlabelcoord = i;
                                     // draw day
-                                    g.DrawString(date[2].ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (f.Font.GetHeight() * 3));
+                                    g.DrawString(date[2].ToString(), f.Font, new SolidBrush(fgcol), getX(i), r.Height - (float)(f.Font.GetHeight() * 3.5));
                                 }
                                 // if it's first bar or a new month
                                 if ((i == 0) || (lastbardate[1] != date[1]))
                                 {
+                                    Font monf = new System.Drawing.Font(f.Font.FontFamily, f.Font.Size - 1, FontStyle.Regular);
                                     // get the month
                                     string ds = date[1].ToString();
-                                    // if it sfirst bar or the year has changed, add year to month
-                                    if ((i == 0) || (lastbardate[0] != date[0])) 
-                                        ds += '/' + date[0].ToString();
                                     // draw the month
-                                    Font monf = new System.Drawing.Font(f.Font.FontFamily,f.Font.Size-1, FontStyle.Regular);
-                                    g.DrawString(ds, monf, new SolidBrush(fgcol), getX(i), r.Height - (float)(monf.GetHeight() * 1.5));
+                                    g.DrawString(ds, monf, new SolidBrush(fgcol), getX(i), r.Height - (float)(monf.GetHeight() * 2.5));
+
+                                    // if the year has changed, also show year 
+                                    if ((lastbardate[0] != date[0]))
+                                    {
+                                        ds = date[0].ToString();
+                                        g.DrawString(ds, monf, new SolidBrush(fgcol), getX(i), r.Height - (float)(monf.GetHeight()*1.5));
+
+                                    }
                                 }
                                 //save last date
                                 lastbardate = date;
@@ -419,7 +424,7 @@ namespace TradeLink.AppKit
 
                     // DRAW YLABELS
                     // max number of even intervaled ylabels possible on yaxis
-                    int numlabels = (int)((r.Height - hborder) / (f.Font.GetHeight() * 1.5));
+                    int numlabels = (int)((r.Height - hborder) / (f.Font.GetHeight() * 1.5))-1;
                     // nearest price units giving "pretty" even intervaled ylabels
                     decimal priceunits = NearestPrettyPriceUnits(highesth - lowestl, numlabels);
                     // starting price point from low end of range, including lowest low in barlist
@@ -428,13 +433,14 @@ namespace TradeLink.AppKit
                     //decimal priceunits = (highesth-lowestl)/numlabels;
                     Pen priceline = new Pen(Color.BlueViolet);
                     priceline.DashStyle = System.Drawing.Drawing2D.DashStyle.Dot;
-
-                    for (decimal i = 0; i <= numlabels; i++)
+                    // draw the price line
+                    for (decimal i = 1; i <= numlabels; i++)
                     {
                         decimal price = lowstart + (i * priceunits);
                         g.DrawString(price.ToString("C"), f.Font, new SolidBrush(fgcol), r.Width - border, getY(price) - f.Font.GetHeight());
                         g.DrawLine(priceline, border / 3, getY(price), r.Width - border, getY(price));
                     }
+                    // show the interval if requested
                     if (DisplayInterval && (bl != null))
                     {
                         g.DrawString(bl.DefaultInterval.ToString(), f.Font, new SolidBrush(fgcol), 3, 3);
