@@ -98,6 +98,7 @@ namespace ServerDAS
                 {
                     socketQuoteServer.WLSTAddWatch(s.Symbol);
                     socketQuoteServer.WLSTAddWatch(s.Symbol, 2);
+                    v(s.Symbol + " watching l1, l2 data.");
                 }
                 catch (Exception ex)
                 {
@@ -171,18 +172,24 @@ namespace ServerDAS
             
                 if (orderid == 0)
                 {
+                    v("ignoring cancel for invalid id: 0");
                     return ;
                 }
 
 
                 if (!socketOrderServer.sitemOrder.sordermap.ContainsKey(Convert.ToInt32(number)))
                 {
+                    v("ignoring cancel for unknown order: "+number);
                     return ;
                 }
 
                 itemOrder porder = socketOrderServer.sitemOrder.sordermap[orderid];
 
-                if (!porder.IsOpenOrder()) return ;
+                if (!porder.IsOpenOrder()) 
+                {
+                    v("ignoring cancel for closed order, tlid: "+number+" sym: "+porder.msecsym+" ord: "+porder.ToString());
+                    return ;
+                }
 
                 if (porder.mlvsqty > 0)
                 {
@@ -190,15 +197,19 @@ namespace ServerDAS
                     {
                         iManager im = new iManager(socketOrderServer);
                         im.Send_CancelOrder(porder, 0);
+                        v("requested cancel for: " + number + " sym: " + porder.msecsym + " ord: " + porder.ToString());
                     }
                     catch (Exception ex)
                     {
-                        debug("DAS error canceling order: " +number+" err: "+ ex.Message + ex.StackTrace);
+                        debug("DAS error canceling order: " + number + " err: " + ex.Message + ex.StackTrace);
                     }
 
                     tl.newCancel(number);
-                    
+
                 }
+                else
+                    v("ignoring cancel for order with zero size, tlid: " + number + " sym: " + porder.msecsym + " ord: " + porder.ToString());
+
                
                 
         }
@@ -326,6 +337,8 @@ namespace ServerDAS
                 {
                     debug("error occured sending order: " + o.ToString() + " err: " + Util.PrettyError(Providers.DAS, err));
                 }
+                else
+                    v(o.symbol + " successfully sent: " + o.ToString() + " morig: " + morig);
                 ls.Add(morig);
 
             }
@@ -374,6 +387,7 @@ namespace ServerDAS
                 socketQuoteServer.Connect(Properties.Settings.Default.QuoteserverAddress, Properties.Settings.Default.QuoteserverPort);
                 socketQuoteServer.PkgLogin(user_id, textBoxPwd.Text.Trim(), Properties.Settings.Default.QuoteserverAddress);
                 labelMessage.Text = "login successfully.";
+                debug("successful login: " + user_id);
             }
             catch (Exception e1)
             {
@@ -386,7 +400,8 @@ namespace ServerDAS
         private void CancelResponseHandler(object sender, OrderArgs e)
         {
             
-            tl.newCancel(e.ItemOrder.morderid); 
+            tl.newCancel(e.ItemOrder.morderid);
+            v(e.ItemOrder.msecsym+" received cancel ack for: " + e.ItemOrder.morderid);
 
         }
 
@@ -413,6 +428,7 @@ namespace ServerDAS
             trade.xdate = mdate.Day + mdate.Month * 100 + mdate.Year * 10000;
             trade.xtime = mdate.Second + mdate.Minute * 100 + mdate.Hour * 10000;
             tl.newFill(trade);
+            v(trade.symbol+" received fill ack for: " + trade.ToString());
         }
 
         private void OrderNotifyHandler(object sender, OrderArgs e)
@@ -424,7 +440,7 @@ namespace ServerDAS
                         mdate.Second + mdate.Minute * 100 + mdate.Hour * 10000, mdate.Second + mdate.Minute * 100 + mdate.Hour * 10000, iorder.morderid);
 
             tl.newOrder(o);
-
+            v(o.symbol + " received order ack for: " + o.ToString());
         }
 
         /*
@@ -517,6 +533,30 @@ namespace ServerDAS
            
             tl.newTick(t);
 
+        }
+
+        bool _noverb = true;
+
+        void v(string msg)
+        {
+            if (_noverb)
+                return;
+            debug(msg);
+        }
+
+        private void _verbose_CheckedChanged(object sender, EventArgs e)
+        {
+            string notmsg = _verbose.Checked ? "Verbose: on" : "Verbose: disabled.";
+            _verbose.Text = notmsg;
+            _verbose.Invalidate();
+            _noverb = !_verbose.Checked;
+            debug(notmsg);
+
+        }
+
+        private void toginfo_Click(object sender, EventArgs e)
+        {
+            _dw.Toggle();
         }
 
     }
