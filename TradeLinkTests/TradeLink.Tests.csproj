@@ -201,11 +201,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="FTI20070926.TIK">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="runtests.cmd" />
     <None Include="SPX20070926.TIK">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestWAG.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

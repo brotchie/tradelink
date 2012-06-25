@@ -696,6 +696,7 @@ histperiod=daily&startdate=" + startdate + "&enddate=" + enddate + "&output=csv&
             s.HistSource.gotTick += new TickDelegate(HistSource_gotTick);
             _fromepf = new BarListImpl(s.Symbol);
             while (s.HistSource.NextTick()) ;
+            s.HistSource.Close();
             return _fromepf;
         }
         /// <summary>

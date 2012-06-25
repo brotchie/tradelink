@@ -181,6 +181,7 @@ namespace TradeLink.Common
             }
             catch (EndOfStreamException)
             {
+                Close();
                 return false;
             }
             catch (ObjectDisposedException)

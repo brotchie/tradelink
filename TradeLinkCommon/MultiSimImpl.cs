@@ -215,8 +215,14 @@ namespace TradeLink.Common
             {
                 if (w.IsBusy) 
                     w.CancelAsync();
-                if (w.workersec.HistSource.BaseStream.CanRead)
-                    w.workersec.HistSource.Close();
+                if ((w.workersec.HistSource.BaseStream!=null) && w.workersec.HistSource.BaseStream.CanRead)
+                {
+                    try
+                    {
+                        w.workersec.HistSource.Close();
+                    }
+                    catch { }
+                }
             }
         }
 

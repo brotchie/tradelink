@@ -11,6 +11,33 @@ namespace TestTradeLink
     public class TestBarList
     {
         int newbars = 0;
+
+        [Test,Explicit]
+        public void ReadAndOverwrite()
+        {
+            const string tf = @"SPX20070926.TIK";
+
+            // read a barlist
+            var bl = BarListImpl.FromTIK(tf);
+
+            // get new bars
+            var newbl = BarListImpl.DayFromGoogle("FTI");
+
+            // append
+            for (int i = 0; i < newbl.Count; i++)
+                foreach (var k in BarImpl.ToTick(newbl[i]))
+                    bl.newTick(k);
+
+            
+
+            // write the barlist
+            Assert
+                .IsTrue(BarListImpl.ChartSave(bl, Environment.CurrentDirectory, 20070926), "error saving new data");
+
+
+        }
+
+
         [Test]
         public void FiveMin()
         {
@@ -338,10 +365,11 @@ namespace TestTradeLink
         [Test]
         public void FromTIK()
         {
+            const string tf = "FTI20070926.TIK";
             // get sample tick data
-            BarList bl = BarListImpl.FromTIK("FTI20070926.TIK");
+            BarList bl = BarListImpl.FromTIK(tf);
             // verify expected number of 5min bars exist (78 in 9:30-4p)
-            Assert.AreEqual(83, bl.Count);
+            Assert.Greater(bl.Count,82,"not enough bars from: "+tf);
 
         }
 
