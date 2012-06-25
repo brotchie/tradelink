@@ -62,5 +62,46 @@ namespace TestTradeLink
             Assert.IsFalse(overlap, "ids overlapped");
 
         }
+
+
+        [Test]
+        public void NamedIds()
+        {
+            IdTracker idt = new IdTracker();
+            idt.SendDebugEvent+=new TradeLink.API.DebugDelegate(Console.WriteLine);
+            const string sym = "TST";
+            // get an id
+            string id1 = "my market entry";
+            string id2 = "my limit entry";
+            string id3 = "my exit";
+            var entry = new MarketOrder(sym, 100, idt[id1]);
+            var lmt = new LimitOrder(sym, 100, 11, idt[id2]);
+            var exit = new StopOrder(sym, 100, 9, idt[id3]);
+
+            // verify they are unique
+            Assert.AreNotEqual(entry.id, lmt.id, "entry market and limit should not match");
+            Assert.AreNotEqual(exit.id, lmt.id, "exit and entry limit should not match");
+
+            // make sure they always return the same value
+            var c1 = idt[id1];
+            var c2 = idt[id2];
+            var c3 = idt[id3];
+            Assert.AreEqual(c1, entry.id, id1 + " id changed");
+            Assert.AreEqual(c2, lmt.id, id2 + " id changed");
+            Assert.AreEqual(c3, exit.id, id3+" id changed");
+
+            // test resetting
+            idt[id3] = 0;
+            var newc3 = idt[id3];
+            Assert.AreNotEqual(newc3, c3, id3 + " did not change after a reset");
+
+            // request it again, should be same
+
+            var newc3compare = idt[id3];
+            Assert.AreEqual(newc3, newc3compare, id3 + " changed after a read request");
+
+
+
+        }
     }
 }

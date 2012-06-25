@@ -1,3 +1,4 @@
+using System;
 
 namespace TradeLink.Common
 {
@@ -6,18 +7,19 @@ namespace TradeLink.Common
     /// </summary>
     public class LimitOrder : OrderImpl
     {
-        public LimitOrder(string sym, bool side, int size, decimal price, long orderid) : base(sym, side, size, price, 0, string.Empty, 0, 0,orderid) { }
-        public LimitOrder(string sym, bool side, int size, decimal price, string comment) : base(sym, side, size, price, 0, comment, 0, 0) { }
-        public LimitOrder(string sym, bool side, int size, decimal price) : base (sym,side,size,price,0,"",0,0) { }
+        public LimitOrder(string sym, int size, decimal price, long orderid) : base(sym, size>0, Math.Abs(size), price, 0, string.Empty, 0, 0, orderid) { }
+        public LimitOrder(string sym, bool side, int size, decimal price, long orderid) : base(sym, side, Math.Abs(size), price, 0, string.Empty, 0, 0, orderid) { }
+        public LimitOrder(string sym, bool side, int size, decimal price, string comment) : base(sym, side, Math.Abs(size), price, 0, comment, 0, 0) { }
+        public LimitOrder(string sym, bool side, int size, decimal price) : base(sym, side, Math.Abs(size), price, 0, "", 0, 0) { }
     }
     /// <summary>
     /// Create buy limit orders.
     /// </summary>
     public class BuyLimit : OrderImpl
     {
-        public BuyLimit(string sym, int size, decimal price, long orderid) : base(sym, true, size, price, 0, string.Empty, 0, 0,orderid) { }
-        public BuyLimit(string sym, int size, decimal price, string comment) : base (sym,true,size,price,0,comment,0,0) { }
-        public BuyLimit(string sym, int size, decimal price) : base (sym,true,size,price,0,"",0,0) { }
+        public BuyLimit(string sym, int size, decimal price, long orderid) : base(sym, true, Math.Abs(size), price, 0, string.Empty, 0, 0, orderid) { }
+        public BuyLimit(string sym, int size, decimal price, string comment) : base(sym, true, Math.Abs(size), price, 0, comment, 0, 0) { }
+        public BuyLimit(string sym, int size, decimal price) : base(sym, true, Math.Abs(size), price, 0, "", 0, 0) { }
     }
 
     /// <summary>
@@ -25,9 +27,9 @@ namespace TradeLink.Common
     /// </summary>
     public class SellLimit : OrderImpl
     {
-        public SellLimit(string sym, int size, decimal price, long orderid) : base(sym, false, size, price, 0, string.Empty, 0, 0,orderid) { }
-        public SellLimit(string sym, int size, decimal price, string comment) : base (sym,false,size,price,0,comment,0,0) { }
-        public SellLimit(string sym, int size, decimal price) : base (sym,false,size,price,0,"",0,0) { }
+        public SellLimit(string sym, int size, decimal price, long orderid) : base(sym, false, Math.Abs(size), price, 0, string.Empty, 0, 0, orderid) { }
+        public SellLimit(string sym, int size, decimal price, string comment) : base(sym, false, Math.Abs(size), price, 0, comment, 0, 0) { }
+        public SellLimit(string sym, int size, decimal price) : base(sym, false, Math.Abs(size), price, 0, "", 0, 0) { }
     }
 
     /// <summary>

@@ -7,7 +7,7 @@ namespace TradeLink.Common
     /// <summary>
     /// used to obtain valid ids for orders, responses, etc
     /// </summary>
-    public class IdTracker : IConvertible
+    public class IdTracker : GenericTracker<long>, IConvertible
     {
         public static implicit operator long(IdTracker idt)
         {
@@ -179,6 +179,58 @@ namespace TradeLink.Common
         /// return true if next id will overflow
         /// </summary>
         public bool NextOverflows { get { return _nextid >= _maxid; } }
+
+        public event TradeLink.API.DebugDelegate SendDebugEvent;
+
+        protected void debug(string msg)
+        {
+            if (SendDebugEvent != null)
+                SendDebugEvent(msg);
+        }
+
+        /// <summary>
+        /// get or set current id by name
+        /// (eg idt["myentrymkt"], idt["myentrylmt"], idt["myexitprofit"])
+        /// Set name to zero to force reset on next use.
+        /// </summary>
+        /// <param name="idname"></param>
+        /// <returns></returns>
+        public override long this[string idname]
+        {
+            get
+            {
+                // see if we have this idname
+                int idx = getindex(idname);
+                // if we do, return the current numeric id
+                if ((idx>=0) && (base[idx]!=0))
+                    return base[idname];
+                else if ((idx>=0) && (base[idx] == 0))
+                {
+                    var newid = AssignId;
+                    base[idx] = newid;
+                    debug("idtracker idname: " + idname + " was reset, assigning new id: " + newid);
+                }
+                // if we don't, assign one... save and return it
+                var newnameid = AssignId;
+                addindex(idname, newnameid);
+                debug("idtracker idname: " + idname + " never used, assigning new id: " + newnameid);
+                return newnameid;
+                
+            }
+            set
+            {
+                int idx = getindex(idname);
+                if (idx < 0)
+                {
+                    addindex(idname, value);
+                    debug("idtracker idname: "+idname+" reset to: "+value);
+                    return;
+                }
+                base[idx] = value;
+                debug("idtracker idname: " + idname + " reset to: " + value);
+            }
+        }
+
     }
 
     public class IdTrackerOverflow : Exception

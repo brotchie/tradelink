@@ -53,7 +53,7 @@ namespace TradeLink.Common
         /// <summary>
         /// gets default value for a given type
         /// </summary>
-        public T Default { get { return _defval; } set { _defval = value; } }
+        public virtual T Default { get { return _defval; } set { _defval = value; } }
         /// <summary>
         /// gets type of whatever is being tracked
         /// </summary>
@@ -204,13 +204,13 @@ namespace TradeLink.Common
         /// </summary>
         /// <param name="i"></param>
         /// <returns></returns>
-        public T this[int i] { get { return _tracked[i]; } set { _tracked[i] = value; } }
+        public virtual T this[int i] { get { return _tracked[i]; } set { _tracked[i] = value; } }
         /// <summary>
         /// get a tracked value from it's text label
         /// </summary>
         /// <param name="txt"></param>
         /// <returns></returns>
-        public T this[string txt] { get { return _tracked[getindex(txt)]; } set { _tracked[getindex(txt)] = value; } }
+        public virtual T this[string txt] { get { return _tracked[getindex(txt)]; } set { _tracked[getindex(txt)] = value; } }
 
         /// <summary>
         /// called when new text label is added
