@@ -9,7 +9,7 @@ using TradeLink.Research;
 namespace TestTradeLink
 {
     [TestFixture]
-    public class TestTemplate
+    public class TestExpectSize
     {
 
 

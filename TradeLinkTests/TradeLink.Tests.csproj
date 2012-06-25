@@ -105,6 +105,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TestExpectSize.cs" />
     <Compile Include="TestTifTracker_Ticks.cs" />
     <Compile Include="TestResults.cs" />
     <Compile Include="TestTickTracker.cs" />
