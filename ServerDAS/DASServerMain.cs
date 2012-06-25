@@ -68,6 +68,9 @@ namespace ServerDAS
             tl.newRegisterSymbols +=new SymbolRegisterDel(tl_newRegisterSymbols);
             tl.newPosList += new PositionArrayDelegate(tl_newPosList);
 
+            debug(Util.TLSIdentity());
+            debug("Attempting to start: " + PROGRAM);
+
             //api.OnStatusChange += new Axtdaactx.ITDAAPICommEvents_OnStatusChangeEventHandler(api_OnStatusChange);
             ////api.OnL1Quote +=  rs_LevelOneStreaming = new AmeritradeBrokerAPI.RequestState();
             ////api.rs_LevelOneStreaming.TickWithArgs += new AmeritradeBrokerAPI.EventHandlerWithArgs(rs_LevelOneStreaming_TickWithArgs);
@@ -216,6 +219,7 @@ namespace ServerDAS
 
         void DASServerMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            debug("stopping: " + PROGRAM);
             _log.Stop();
             Properties.Settings.Default.Save();
             //if (ok)
