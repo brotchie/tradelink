@@ -28,6 +28,7 @@ namespace TestTradeLink
                 TickImpl.NewTrade(SYM,10.50m,100), // want to make sure we are not oversold
                 TickImpl.NewTrade(SYM,10.50m,100),
                 TickImpl.NewTrade(SYM,10.50m,100),
+
             };
         }
 
@@ -141,10 +142,93 @@ namespace TestTradeLink
             Assert.AreEqual(1, oc);
         }
 
-        void tt_SendDebug(Debug deb)
+
+
+        [Test]
+        public void MultiFire()
         {
-            debug(deb.Msg);
+            // setup trail tracker
+            TrailTracker tt = new TrailTracker();
+            tt.VerboseDebugging = true;
+            tt.SendOrder += new OrderDelegate(tt_SendOrder);
+            tt.SendDebug += new DebugDelegate(tt_SendDebug);
+            // set 15c trailing stop
+            tt.DefaultTrail = new OffsetInfo(0, .15m,0,.5m);
+            // verify it's set
+            Assert.AreEqual(.15m, tt.DefaultTrail.StopDist);
+            // get feed
+            Tick[] tape = MultiFireSampleData();
+            // test broker
+            Broker b = new Broker();
+            b.Reset();
+            // get fills over to trail tracker
+            b.GotFill += new FillDelegate(tt.Adjust);
+            // take initial position
+            b.SendOrderStatus(new MarketOrder(SYM, 400));
+            // get orders from trail tracker
+            tt.SendOrder += new OrderDelegate(b.SendOrder);
+            // no orders to start
+            oc = 0;
+            // iterate through feed
+            for (int i = 0; i < tape.Length; i++)
+            {
+                Tick k = tape[i];
+                // set a date and time
+                k.date = 20070926;
+                k.time = 95500;
+                // execute orders, nothing to do on first two ticks
+                b.Execute(k);
+                // pass every tick to tracker
+                tt.newTick(k);
+
+            }
+            // get position
+            Position p = b.GetOpenPosition(SYM);
+            // verify position is flat
+            Assert.AreEqual(200,p.UnsignedSize, "position is not flat: " + p.ToString());
+            // one retrace sent at the end
+            Assert.AreEqual(1, oc,"too many fires");
+
         }
+
+        void tt_SendDebug(string msg)
+        {
+            Console.WriteLine(msg);
+        }
+
+
+        public Tick[] MultiFireSampleData()
+        {
+            return new Tick[] {
+                TickImpl.NewTrade(SYM,10,100), // get fill for initial position
+                TickImpl.NewTrade(SYM,10,100), 
+                TickImpl.NewTrade(SYM,10,100),
+                TickImpl.NewTrade(SYM,10,100),
+                TickImpl.NewTrade(SYM,10,100), 
+                TickImpl.NewTrade(SYM,10.8m,100),  // new high
+                TickImpl.NewTrade(SYM,10.75m,100),
+                TickImpl.NewTrade(SYM,11,100),  // new high
+                TickImpl.NewTrade(SYM,10.50m,100), // retrace... FLAT!
+                TickImpl.NewTrade(SYM,10.50m,1), // not enough to fill flat order
+                TickImpl.NewTrade(SYM,10.50m,100), // flat order should be completely filled here
+                TickImpl.NewTrade(SYM,10.50m,100),
+                TickImpl.NewTrade(SYM,10.50m,100), // want to make sure we are not oversold
+                TickImpl.NewTrade(SYM,10.50m,100),
+                TickImpl.NewTrade(SYM,10.50m,100),
+                                TickImpl.NewTrade(SYM,10.50m,100),
+                TickImpl.NewTrade(SYM,10.50m,200),
+                TickImpl.NewTrade(SYM,10.40m,200),
+                TickImpl.NewTrade(SYM,10.40m,200),
+                                TickImpl.NewTrade(SYM,10.40m,200),
+                TickImpl.NewTrade(SYM,9,100),
+
+                                TickImpl.NewTrade(SYM,9,100),
+
+                                                TickImpl.NewTrade(SYM,9,100),
+            };
+        }
+
+
         
     }
 }

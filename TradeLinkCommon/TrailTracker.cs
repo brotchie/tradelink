@@ -14,6 +14,15 @@ namespace TradeLink.Common
     {
         PositionTracker _pt = null;
         IdTracker _id = null;
+
+        GenericTracker<int> esize = new GenericTracker<int>();
+        GenericTracker<int> firecount = new GenericTracker<int>();
+
+
+        /// <summary>
+        /// default max fires per round turn
+        /// </summary>
+        public int MaxFireCount = 1;
         /// <summary>
         /// position tracker used by this component
         /// </summary>
@@ -62,6 +71,8 @@ namespace TradeLink.Common
                     _symidx.Add(sym, _trail.Count);
                     _trail.Add(value);
                     _ref.Add(0);
+                    firecount.addindex(sym, 0);
+                    esize.addindex(sym,pt[sym].UnsignedSize);
                     _pendingfill.Add(false);
                 }
                 else // save it
@@ -103,11 +114,14 @@ namespace TradeLink.Common
         public void newTick(Tick k)
         {
             // see if we're turned on
-            if (!isValid) return;
+            if (!isValid) 
+                return;
             // see if we can exit when trail is broken
-            if (SendOrder == null) return;
+            if (SendOrder == null) 
+                return;
             // see if we have anything to trail against
-            if (_pt[k.symbol].isFlat) return;
+            if (_pt[k.symbol].isFlat) 
+                return;
             // // pass along as point
             if (k.isTrade && !UseBidAskExitPrices)
                 newPoint(k.symbol, k.trade);
@@ -116,6 +130,8 @@ namespace TradeLink.Common
             else if (UseBidAskExitPrices && _pt[k.symbol].isShort && k.hasAsk)
                 newPoint(k.symbol, k.ask);
         }
+
+        
 
         bool _usebidask = false;
         /// <summary>
@@ -145,15 +161,19 @@ namespace TradeLink.Common
                 _symidx.Add(symbol, idx);
                 _ref.Add(refp);
                 _pendingfill.Add(false);
+                firecount.addindex(symbol, 0);
+                esize.addindex(symbol,pt[symbol].UnsignedSize);
                 // just in case user is modifying on seperate thread
                 lock (_trail)
                 {
                     _trail.Add(trail);
                 }
-                D("trail tracking: " + symbol + " " + trail.ToString());
+                D(symbol+" trail tracking modified: "+trail.ToString());
             }
             else if ((idx == NOSYM) && !_trailbydefault)
+            {
                 return;
+            }
             else
             {
                 // get parameters
@@ -179,25 +199,48 @@ namespace TradeLink.Common
                 refp = p;
                 // save it
                 _ref[idx] = refp;
+                // notify
+                v(symbol + " new reference price: " + p);
             }
 
             // see if we broke our trail
-            if (!_pendingfill[idx] && (trail.StopDist!=0) && (Math.Abs(refp - p) > trail.StopDist))
+            var testdist = Math.Abs(refp - p);
+            var trailtest = testdist> trail.StopDist;
+            if (!_pendingfill[idx] && (trail.StopDist!=0) && trailtest && (MaxFireCount>firecount[idx]))
             {
                 // notify
-                D("hit trailing stop at: " + p.ToString("F2"));
+                D(symbol+" hit trailing stop at: " + p.ToString("F2"));
                 // mark pending order
                 _pendingfill[idx] = true;
                 // get order
                 Order flat = new MarketOrderFlat(_pt[symbol], trail.StopPercent, trail.NormalizeSize, trail.MinimumLotSize);
                 // get order id
                 flat.id = _id.AssignId;
+                // adjust expectation
+                esize[idx] -= flat.UnsignedSize;
+                // count fire
+                firecount[idx]++;
                 // send flat order
                 SendOrder(flat);
                 // notify
-                D("enforcing trail with: " + flat.ToString());
+                D(symbol+" enforcing trail with: " + flat.ToString()+" esize: "+esize[idx]+" count: "+firecount[idx]);
                 if (HitOffset != null)
                     HitOffset(symbol, flat.id,p);
+            }
+            else if (!_noverb)
+            {
+                if (_pendingfill[idx])
+                    v(symbol + " waiting for trail fill.");
+                else if (trail.StopDist == 0)
+                    v(symbol + " trail has been disabled.");
+                else if (!trailtest)
+                {
+                    v(symbol + " trail not hit, current dist: " + testdist + " trailamt: " + trail.StopDist);
+                }
+                else if (MaxFireCount > firecount[idx])
+                {
+                    v(symbol + " trail max fire reached at: " + firecount[idx] + " max: " + MaxFireCount);
+                }
             }
 
 
@@ -205,6 +248,18 @@ namespace TradeLink.Common
 
 
         }
+
+        void v(string msg)
+        {
+            if (_noverb)
+                return;
+            D(msg);
+        }
+
+        bool _noverb = true;
+
+        public bool VerboseDebugging { get { return !_noverb; } set { _noverb = !value; } }
+
         public event HitOffsetDelegate HitOffset;
         public event OrderDelegate SendOrder;
 
@@ -229,6 +284,7 @@ namespace TradeLink.Common
         {
             // get index for symbol
             int idx = symidx(fill.symbol);
+            
             // only do following if we're tracking trail for this symbol
             if (idx != NOSYM)
             {
@@ -236,23 +292,28 @@ namespace TradeLink.Common
                 int psize = _pt[fill.symbol].UnsignedSize;
                 // get trailing information
                 OffsetInfo trail = _trail[idx];
-                // get expected position size
-                int esize = psize - Calc.Norm2Min(psize * trail.StopPercent, trail.MinimumLotSize);
                 // get actual position size after change
                 int asize = psize - fill.UnsignedSize;
                 // if expected and actual match, mark pending as false
-                if (esize == asize)
+                if (esize[idx] == asize)
                 {
-                    D("filled trailing stop for: " + fill.symbol);
+                    D(fill.symbol+" trailing stop completely filled with: " + fill.ToString());
                     _pendingfill[idx] = false;
                 }
+                else
+                    v(fill.symbol + " trail partial fill: "+fill.ToString()+" e: " + esize[idx] + " != a: " + asize);
 
             }
+            else
+                v(fill.symbol + " fill: "+fill.ToString()+" ignored while trail disabled.");
 
             _pt.Adjust(fill);
             // if we're flat now, make sure ref price is reset
             if (_pt[fill.symbol].isFlat)
+            {
                 _ref[idx] = 0;
+                v(fill.symbol + " flat, reset trail reference price.");
+            }
 
         }
     }
