@@ -186,7 +186,45 @@ namespace TradeLink.Common
         {
             if (SendDebugEvent != null)
                 SendDebugEvent(msg);
+            
         }
+
+        public const string UNKNOWN_IDNAME = "UNKNOWN_IDNAME";
+
+        /// <summary>
+        /// gets an id name from an order id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public string getidname(long id)
+        {
+            int idx = id2idname.getindex(id.ToString());
+            if (idx < 0)
+                return UNKNOWN_IDNAME;
+            return id2idname[idx];
+
+        }
+
+        
+
+        /// <summary>
+        /// gets an id name for a symbol
+        /// </summary>
+        /// <param name="sym"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static string getidname(string sym, string name)
+        {
+            return sym + "." + name;
+        }
+        /// <summary>
+        /// gets a id name for a symbol
+        /// </summary>
+        /// <param name="sym"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public string idname(string sym, string name) { return getidname(sym, name); }
+
 
         /// <summary>
         /// get a current id name by symbol
@@ -196,8 +234,8 @@ namespace TradeLink.Common
         /// <returns></returns>
         public long this[string sym, string idname]
         {
-            get { return this[sym + idname]; }
-            set { this[sym + idname] = value; }
+            get { return this[getidname(sym,idname)]; }
+            set { this[getidname(sym, idname)] = value; }
         }
 
         /// <summary>
@@ -211,6 +249,8 @@ namespace TradeLink.Common
             get { return this[idx + idname]; }
             set { this[idx + idname] = value; }
         }
+
+        GenericTracker<string> id2idname = new GenericTracker<string>();
 
         /// <summary>
         /// get or set current id by name.
@@ -236,11 +276,13 @@ namespace TradeLink.Common
                 {
                     var newid = AssignId;
                     base[idx] = newid;
+                    id2idname[idx] = idname;
                     debug("idtracker idname: " + idname + " was reset, assigning new id: " + newid);
                 }
                 // if we don't, assign one... save and return it
                 var newnameid = AssignId;
                 addindex(idname, newnameid);
+                id2idname.addindex(newnameid.ToString(), idname);
                 debug("idtracker idname: " + idname + " never used, assigning new id: " + newnameid);
                 return newnameid;
                 
@@ -251,12 +293,23 @@ namespace TradeLink.Common
                 if (idx < 0)
                 {
                     addindex(idname, value);
+                    id2idname.addindex(value.ToString(), idname);
                     debug("idtracker idname: "+idname+" reset to: "+value);
                     return;
                 }
+                id2idname[idx] = idname;
                 base[idx] = value;
                 debug("idtracker idname: " + idname + " reset to: " + value);
             }
+        }
+        /// <summary>
+        /// clear all named ids
+        /// (subsequent ids will still be unique from previous)
+        /// </summary>
+        public override void Clear()
+        {
+            id2idname.Clear();
+            base.Clear();
         }
 
     }

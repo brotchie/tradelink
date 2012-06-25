@@ -138,6 +138,10 @@ namespace TestTradeLink
             var newc1compare = idt[sym,id1];
             Assert.AreEqual(newc1, newc1compare, id1 + " changed after a read request");
 
+            // test fetching idname from id
+            Assert.AreEqual(idt.idname(sym,id1), idt.getidname(newc1compare));
+            Assert.AreEqual(IdTracker.UNKNOWN_IDNAME, idt.getidname(2));
+
 
 
         }
