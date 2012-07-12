@@ -69,6 +69,7 @@ namespace TestTradeLink
         {
             IdTracker idt = new IdTracker();
             idt.SendDebugEvent+=new TradeLink.API.DebugDelegate(Console.WriteLine);
+            idt.isMagicIdOnMaxName = false;
             const string sym = "TST";
             // get an id
             string id1 = "my market entry";
@@ -109,6 +110,7 @@ namespace TestTradeLink
         public void SymbolNamedIds()
         {
             IdTracker idt = new IdTracker();
+            idt.isMagicIdOnMaxName = false;
             idt.SendDebugEvent += new TradeLink.API.DebugDelegate(Console.WriteLine);
             const string sym = "TST";
             const string sym2 = "BST";
@@ -143,6 +145,57 @@ namespace TestTradeLink
             Assert.AreEqual(IdTracker.UNKNOWN_IDNAME, idt.getidname(2));
 
 
+
+        }
+
+
+        [Test]
+        public void MaxNamedAssigns()
+        {
+            IdTracker idt = new IdTracker();
+            // set defaults
+            idt.MaxNamedAssigns = 1;
+            idt.isMagicIdOnMaxName = true;
+
+            idt.SendDebugEvent += new TradeLink.API.DebugDelegate(Console.WriteLine);
+            const string sym = "TST";
+            
+            // get an id
+            string id1 = "my market entry";
+            //var newc1 = idt[sym, id1];
+            var entry = new MarketOrder(sym, 100, idt[sym, id1]);
+            
+            // verify # of assigns
+            Assert.AreEqual(1, idt.AssignCount(id1, sym), "wrong assignment count 1");
+
+            // request it again, should be zero
+            var newc1compare = idt[sym, id1];
+            Assert.AreEqual(idt.MagicId, newc1compare, id1 + " was not an invalid id (#1)");
+
+            // verify # of assigns
+            Assert.AreEqual(1, idt.AssignCount(id1, sym), "wrong assignment count 2");
+
+            // change default fires
+            idt.MaxNamedAssigns = 2;
+            // fire again
+            newc1compare = idt[sym, id1];
+            // verify # of assigns
+            Assert.AreEqual(2, idt.AssignCount(id1, sym), "wrong assignment count 3");
+            Assert.AreNotEqual(entry.id, newc1compare, " was not unique");
+            Assert.AreNotEqual(idt.MagicId, newc1compare, " should not be magic id");
+
+            // fire again to hit the max
+            var denied = idt[sym, id1];
+            // verify # of assigns
+            Assert.AreEqual(2, idt.AssignCount(id1, sym), "wrong assignment count 4");
+            Assert.AreEqual(idt.MagicId, denied, id1 + " was not an invalid id (#2)");
+
+
+            // change default
+            idt.isMagicIdOnMaxName = false;
+            var final = idt[sym, id1];
+            Assert.AreEqual(2, idt.AssignCount(id1, sym), "wrong assignment count 5");
+            Assert.AreEqual(final, newc1compare, id1 + " changed after a read request");
 
         }
     }

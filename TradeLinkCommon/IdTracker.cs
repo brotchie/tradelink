@@ -99,6 +99,18 @@ namespace TradeLink.Common
             throw new InvalidCastException();
         }
 
+        /// <summary>
+        /// number of unique ids (per symbol) that can be returned from a named assignment
+        /// </summary>
+        public int MaxNamedAssigns = 1;
+
+        /// <summary>
+        /// otherwise the same id is returned
+        /// </summary>
+        public bool isMagicIdOnMaxName = true;
+
+        public long MagicId = 0;
+
         const long DEFAULTOWNER = 0;
         const long MAXOWNER = 512;
         // calculate mask length
@@ -204,6 +216,30 @@ namespace TradeLink.Common
             return id2idname[idx];
 
         }
+        /// <summary>
+        /// get count of assignments from symbol and name
+        /// </summary>
+        /// <param name="idname"></param>
+        /// <param name="sym"></param>
+        /// <returns></returns>
+        public int AssignCount(string idname, string sym)
+        {
+            string name = getidname(sym, idname);
+            return AssignCount(name);
+        }
+
+        /// <summary>
+        /// get count of assignments from this name
+        /// </summary>
+        /// <param name="idname"></param>
+        /// <returns></returns>
+        public int AssignCount(string idname)
+        {
+            var idx = getindex(idname);
+            if (idx < 0)
+                return 0;
+            return idnamefires[idx];
+        }
 
         
 
@@ -250,6 +286,7 @@ namespace TradeLink.Common
             set { this[idx + idname] = value; }
         }
 
+        GenericTracker<int> idnamefires = new GenericTracker<int>();
         GenericTracker<string> id2idname = new GenericTracker<string>();
 
         /// <summary>
@@ -269,21 +306,50 @@ namespace TradeLink.Common
             {
                 // see if we have this idname
                 int idx = getindex(idname);
+                
                 // if we do, return the current numeric id
-                if ((idx>=0) && (base[idx]!=0))
-                    return base[idname];
-                else if ((idx>=0) && (base[idx] == 0))
+                if ((idx >= 0) && (base[idx] != 0))
                 {
+                    // test for max fire
+                    if (idnamefires[idx] >= MaxNamedAssigns)
+                    {
+                        if (isMagicIdOnMaxName)
+                            return MagicId;
+                        // otherwise return current id
+                        return base[idname];
+                    }
+                    // otherwise reassign and fire
+                    var newid = AssignId;
+                    idnamefires[idx]++;
+                    id2idname.addindex(newid.ToString(), idname);
+                    base[idx] = newid;
+                    debug("idtracker " + idname + " assigned new id: " + newid + " count: " + idnamefires[idx]);
+                    return newid;
+                    
+                }
+                else if ((idx >= 0) && (base[idx] == 0))
+                {
+                    // test for max fire
+                    if (idnamefires[idx] >= MaxNamedAssigns)
+                    {
+                        if (isMagicIdOnMaxName)
+                            return MagicId;
+                        // otherwise return current id
+                        return base[idname];
+                    }
                     var newid = AssignId;
                     base[idx] = newid;
-                    id2idname[idx] = idname;
-                    debug("idtracker idname: " + idname + " was reset, assigning new id: " + newid);
+                    id2idname.addindex(newid.ToString(), idname);
+                    idnamefires[idx]++;
+                    debug("idtracker idname: " + idname + " was reset, assigning new id: " + newid + " count: " + idnamefires[idx]);
+                    return newid;
                 }
                 // if we don't, assign one... save and return it
                 var newnameid = AssignId;
-                addindex(idname, newnameid);
+                idx = addindex(idname, newnameid);
                 id2idname.addindex(newnameid.ToString(), idname);
-                debug("idtracker idname: " + idname + " never used, assigning new id: " + newnameid);
+                idnamefires.addindex(idname, 1);
+                debug("idtracker idname: " + idname + " never used, assigning new id: " + newnameid + " count: " + idnamefires[idx]);
                 return newnameid;
                 
             }
@@ -294,10 +360,12 @@ namespace TradeLink.Common
                 {
                     addindex(idname, value);
                     id2idname.addindex(value.ToString(), idname);
+                    idnamefires.addindex(idname, 0);
                     debug("idtracker idname: "+idname+" reset to: "+value);
                     return;
                 }
                 id2idname[idx] = idname;
+                idnamefires[idx] = 0;
                 base[idx] = value;
                 debug("idtracker idname: " + idname + " reset to: " + value);
             }
@@ -309,6 +377,7 @@ namespace TradeLink.Common
         public override void Clear()
         {
             id2idname.Clear();
+            idnamefires.Clear();
             base.Clear();
         }
 
