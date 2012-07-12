@@ -272,6 +272,38 @@ namespace TestTradeLink
             Assert.AreEqual(insert.Symbol,actualinsert.Symbol);
         }
 
+        [Test]
+        public void InsertBar_MultipleInsert()
+        {
+            string sym = "FTI";
+            int d = 20070926;
+            BarList org = new BarListImpl(BarInterval.FiveMin, sym);
+            Assert.IsTrue(org.isValid, "your original barlist is not valid 1");
+            int orgcount = org.Count;
+            Assert.AreEqual(0, orgcount);
+
+            int h = 7;
+            int m = 55;
+            for (int i = 0; i < 10; i++)
+            {
+                int t = h*10000+m*100;
+                Bar insert = new BarImpl(30, 30, 30, 30, 10000, d, t, sym, (int)BarInterval.FiveMin);
+                Assert.IsTrue(insert.isValid, "your bar to insert is not valid 1");
+                int insertpos = BarListImpl.GetBarIndexPreceeding(org, insert.Bardate, insert.Bartime);
+                Assert.AreEqual(i - 1, insertpos, "insertion position");
+                BarList inserted = BarListImpl.InsertBar(org, insert, insertpos);
+                Assert.AreEqual(i + 1, inserted.Count, "element count after insertion");
+                m += 5;
+                if (m >= 60)
+                {
+                    h += m / 60;
+                    m = m % 60;
+                }
+                org = inserted;
+            }
+            Assert.AreEqual(orgcount+10, org.Count, "total element count after insertion");
+        }
+
         [Test, Explicit]
         public void InsertBar_HistoricalBarsPresent()
         {

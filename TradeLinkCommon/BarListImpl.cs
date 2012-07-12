@@ -136,13 +136,13 @@ namespace TradeLink.Common
         public static BarListImpl InsertBar(BarList bl, Bar b, int position)
         {
             
-            BarListImpl copy = new BarListImpl(bl);
+            BarListImpl copy = new BarListImpl(bl.Symbol, bl.Intervals);
             for (int j = 0; j < bl.CustomIntervals.Length; j++)
             {
                 if (bl.CustomIntervals[j] != b.Interval)
                     continue;
                 int count = bl.IntervalCount(b.Interval);
-                if (count != 0)
+                if (count > 0)
                 {
                     for (int i = 0; i < count; i++)
                     {
