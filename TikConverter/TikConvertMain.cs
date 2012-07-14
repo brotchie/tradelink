@@ -274,6 +274,11 @@ namespace TikConverter
                         infile = new StreamReader(filename);
                         infile.ReadLine(); // ignore first line header of input file
                         break;
+                    case Converter.TRTH:
+                        infile = new StreamReader(filename);
+                        // Ignore header line.
+                        infile.ReadLine();
+                        break;
                  }
 
             }
@@ -309,6 +314,9 @@ namespace TikConverter
                             break;
                         case Converter.MultiCharts:
                             k = MultiCharts.parseline(infile.ReadLine(), _sym);
+                            break;
+                        case Converter.TRTH:
+                            k = TRTH.parseline(infile.ReadLine());
                             break;
                     }
                 }

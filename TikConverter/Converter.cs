@@ -12,4 +12,5 @@ public enum Converter
     QCollector_eSignal,
     MultiCharts,
     EuronextDaily,
+    TRTH,
 }

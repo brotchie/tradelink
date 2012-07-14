@@ -101,6 +101,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="TradeStation.cs" />
     <Compile Include="TradingPhysics.cs" />
+    <Compile Include="TRTH.cs" />
     <EmbeddedResource Include="TikConvertMain.resx">
       <DependentUpon>TikConvertMain.cs</DependentUpon>
       <SubType>Designer</SubType>
